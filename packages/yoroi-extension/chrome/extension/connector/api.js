@@ -49,7 +49,10 @@ import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
-import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type {
   CardanoTxRequest,
@@ -85,8 +88,9 @@ import {
   derivePrivateByAddressing,
   derivePublicByAddressing
 } from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
+import type { WalletState } from '../background/types';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -456,23 +460,12 @@ export async function connectorGetDRepKey(
   return (await _getDRepKeyAndAddressing(wallet))[0].to_hex();
 }
 
-async function __pubKeyAndAddressingByChainAndIndex(
-  wallet: PublicDeriver<>,
+function __pubKeyAndAddressingByChainAndIndex(
+  wallet: { publicKey: string, publicDeriverLevel: number, ... },
   chainLevelDerivationIndex: number,
   addressLevelDerivationIndex: number,
-): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
-  const withPubKey = asGetPublicKey(wallet);
-  if (withPubKey == null) {
-    throw new Error('Unable to get public key from the wallet');
-  }
-  const withLevels = asHasLevels(wallet);
-  if (withLevels == null) {
-    throw new Error('Unable to get derivation levels from the wallet');
-  }
-  const publicKeyResp = await withPubKey.getPublicKey();
-  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-    Buffer.from(publicKeyResp.Hash, 'hex')
-  );
+): [RustModule.WalletV4.PublicKey, Addressing] {
+  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(wallet.publicKey);
   const addressing = {
     addressing: {
       path: [
@@ -485,11 +478,10 @@ async function __pubKeyAndAddressingByChainAndIndex(
       startLevel: Bip44DerivationLevels.PURPOSE.level,
     },
   };
-
   const derivedPubKey = derivePublicByAddressing({
     ...addressing,
     startingFrom: {
-      level: withLevels.getParent().getPublicDeriverLevel(),
+      level: wallet.publicDeriverLevel,
       key: publicKey,
     },
   }).to_raw_key();
@@ -499,23 +491,58 @@ async function __pubKeyAndAddressingByChainAndIndex(
 async function _getDRepKeyAndAddressing(
   wallet: PublicDeriver<>,
 ): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
+  const publicKey = (await withPubKey.getPublicKey()).Hash;
+  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
   return __pubKeyAndAddressingByChainAndIndex(
+    { publicKey, publicDeriverLevel },
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+}
+
+export function getDrepRewardAddressHexAndAddressing(
+  wallet: WalletState,
+): [string, Addressing] {
+  const [pubKey, addressing] = __pubKeyAndAddressingByChainAndIndex(
     wallet,
     ChainDerivations.GOVERNANCE_DREP_KEYS,
     DREP_KEY_INDEX,
   );
+  // <TODO:WALLET_API>
+  const config = getCardanoHaskellBaseConfig(
+    getNetworkById(wallet.networkId)
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const network = parseInt(config.ChainNetworkId, 10);
+  return [pubKeyHashToRewardAddress(pubKey.hash().to_hex(), network), addressing];
 }
 
 export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
   getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
 ): Promise<{| key: string, isRegistered: boolean |}> {
-  const stakeKey =
-    (await __pubKeyAndAddressingByChainAndIndex(
-      wallet,
-      ChainDerivations.CHIMERIC_ACCOUNT,
-      STAKING_KEY_INDEX,
-    ))[0];
+  const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
+  const publicKey = (await withPubKey.getPublicKey()).Hash;
+  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
+  const stakeKey = __pubKeyAndAddressingByChainAndIndex(
+    { publicKey, publicDeriverLevel },
+    ChainDerivations.CHIMERIC_ACCOUNT,
+    STAKING_KEY_INDEX,
+  )[0];
   const network = wallet.getParent().getNetworkInfo();
   const stakeAddrHex = RustModule.WasmScope(Module => {
     return Module.WalletV4.RewardAddress.new(
@@ -619,15 +646,15 @@ const CERT_TO_KEYHASH_FUNCS = [
   ([
     cert => cert.as_drep_registration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepRegistration>),
   ([
     cert => cert.as_drep_deregistration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepDeregistration>),
   ([
     cert => cert.as_drep_update(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
     cert => {
@@ -678,7 +705,7 @@ function getCertificatesRequiredSignKeys(
       if (!voter) {
         throw new Error('unexpectedly missing voter');
       }
-      const keyHash = voter.to_drep_cred()?.to_keyhash();
+      const keyHash = voter.to_drep_credential()?.to_keyhash();
       if (keyHash) {
         result.add(keyHash.to_hex());
       }

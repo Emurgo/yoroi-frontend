@@ -110,8 +110,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return this.recent.length > 0;
   }
 
+  // <TODO:PENDING_REMOVAL> wallet state should be used directly
   @computed get hasAnyPending(): boolean {
-    return false;
+    return (this.stores.wallets.selected?.submittedTransactions.length ?? 0) > 0;
   }
 
   @computed get hasMoreToLoad(): boolean {
@@ -121,6 +122,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   }
 
   // todo: legacy code to be removed
+  // <TODO:PENDING_REMOVAL>
   @computed get balance(): MultiToken | null {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) return null;

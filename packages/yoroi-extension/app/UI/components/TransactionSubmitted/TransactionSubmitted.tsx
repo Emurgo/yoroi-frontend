@@ -1,32 +1,50 @@
+import { Button, Stack, Typography } from '@mui/material';
 import React from 'react';
-import { Stack, Typography, Button } from '@mui/material';
-import { SuccessIlustration } from './SuccessIlustration';
 import { useHistory } from 'react-router-dom';
+import { SuccessIlustration } from './SuccessIlustration';
 // @ts-ignore
 import { ROUTES } from '../../../routes-config';
 // @ts-ignore
-import globalMessages from '../../../i18n/global-messages';
 import { FormattedMessage } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
 
-export const TransactionSubmitted = () => {
+export const TransactionSubmitted = ({
+  title,
+  subtitle,
+  content,
+  btnText,
+  onPress,
+}: {
+  title?: string;
+  subtitle?: string;
+  content?: string;
+  btnText?: string;
+  onPress?: () => void;
+}) => {
   const history = useHistory();
   return (
-    <Stack alignItems="center" mt="110px">
+    <Stack width="100%" alignItems="center" pt="143px" sx={{ maxWidth: '500px', margin: '0 auto' }}>
       <SuccessIlustration />
-      <Typography variant="h5" fontWeight="500" mt={4} mb={1}>
-        <FormattedMessage {...globalMessages.transactionSubmitted} />
+      <Typography variant="h5" fontWeight="500" mt="8px">
+        {title ? title : <FormattedMessage {...globalMessages.transactionSubmitted} />}
       </Typography>
-      <Typography variant="body1" mb={2} color="ds.text_gray_low">
-        <FormattedMessage {...globalMessages.transactionSubmittedInfo} />
+      {subtitle && (
+        <Typography variant="body1" color="ds.gray_c800" mt="8px">
+          {subtitle}
+        </Typography>
+      )}
+
+      <Typography variant="body1" mt="8px" color="ds.text_gray_medium" textAlign="center" mb="16px">
+        {content ? content : <FormattedMessage {...globalMessages.transactionSubmittedInfo} />}
       </Typography>
       <Button
         //  @ts-ignore
         variant="primary"
         onClick={() => {
-          history.push(ROUTES.WALLETS.TRANSACTIONS);
+          onPress ? onPress() : history.push(ROUTES.WALLETS.TRANSACTIONS);
         }}
       >
-        <FormattedMessage {...globalMessages.goToTransactions} />
+        {btnText ? btnText : <FormattedMessage {...globalMessages.goToTransactions} />}
       </Button>
     </Stack>
   );

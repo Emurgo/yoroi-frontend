@@ -36,7 +36,7 @@ export const PortfolioContextProvider = ({
     accountPair: null,
   },
 }: PortfolioProviderProps) => {
-  const { walletBalance, primaryTokenInfo, assetList, selectedWallet } = useWalletManager();
+  const { walletBalance, assetList, selectedWallet } = useWalletManager();
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -70,7 +70,6 @@ export const PortfolioContextProvider = ({
       ...actions,
       settingFiatPairUnit,
       walletBalance,
-      primaryTokenInfo,
       assetList,
     }),
     [state, actions]

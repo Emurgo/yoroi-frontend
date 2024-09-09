@@ -94,7 +94,7 @@ export default function SelectAssetDialog({
                 fontSize: '14px',
                 fontFamily: 'Rubik',
                 height: '40px',
-                backgroundColor: 'ds.bg_color_min',
+                backgroundColor: 'ds.bg_color_max',
                 color: 'ds.text_gray_medium',
                 '&:focus': {
                   borderWidth: '2px',

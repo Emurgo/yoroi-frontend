@@ -54,6 +54,7 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import { WalletManagerProvider } from './UI/context/WalletManagerProvider';
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 
 // PAGES
@@ -570,8 +571,21 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(governanceProps.stores);
+
+  const { delegationTransaction } = governanceProps.stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+
   return (
-    <GovernanceContextProvider currentWallet={currentWalletInfo}>
+    <GovernanceContextProvider
+      currentWallet={currentWalletInfo}
+      createDrepDelegationTransaction={governanceProps.stores.delegation.createDrepDelegationTransaction}
+      signDelegationTransaction={governanceProps.actions.ada.delegationTransaction.signTransaction.trigger}
+      txDelegationResult={delegationTxResult}
+      txDelegationError={delegationTxError}
+      tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
+      triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+    >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
   );

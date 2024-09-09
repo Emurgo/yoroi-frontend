@@ -244,11 +244,12 @@ export default class AddNFTDialog extends Component<Props, State> {
           {currentNftsList.length === 0 ? (
             <div className={styles.noAssetFound}>
               <NoItemsFoundImg />
-              <h1 className={styles.text}>
+              <Typography variant="h1" className={styles.text} color="ds.text_gray_medium">
                 {intl.formatMessage(
                   fullNftsList.length === 0 ? messages.noNFTsYet : messages.noNFTsFound
                 )}
-              </h1>
+           
+              </Typography>
             </div>
           ) : (
             <>

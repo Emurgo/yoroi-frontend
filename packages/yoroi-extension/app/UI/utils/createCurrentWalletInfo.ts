@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js';
+import moment from 'moment';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { maybe } from '../../coreUtils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
@@ -44,6 +46,21 @@ const getStakePoolMeta = (stores: any) => {
 
 const getTotalAmount = (walletAmount, rewards) => {
   return maybe(walletAmount, w => rewards.joinAddCopy(w));
+};
+
+const combinedMultiToken = (walletAmount /*: MultiToken */, rewards /*: MultiToken */) /*: MultiToken */ => {
+  return walletAmount && rewards ? walletAmount.joinAddCopy(rewards) : walletAmount ?? rewards;
+};
+
+const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*: MultiToken */ => {
+  const balance = selectedWallet.balance;
+  const rewardBalance /*: MultiToken */ = stores.delegation.getRewardBalanceOrZero(selectedWallet);
+  const totalBalance /*: MultiToken */ = combinedMultiToken(balance, rewardBalance);
+  const defaultEntry = totalBalance?.getDefaultEntry();
+  if (defaultEntry == null) return new BigNumber(0);
+  const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+  const tokenInfo = getTokenInfo(defaultEntry);
+  return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
 
 const getAssetWalletAssetList = stores => {
@@ -95,13 +112,33 @@ const getAssetWalletAssetList = stores => {
     });
 };
 
+const dateFormat = 'YYYY-MM-DD';
+
+const groupTransactionsByDay = transactions => {
+  const groups: any = [];
+  for (const transaction of transactions) {
+    const date: string = moment(transaction.date).format(dateFormat);
+    // find the group this transaction belongs in
+    let group = groups.find(g => g.date === date);
+    // if first transaction in this group, create the group
+    if (!group) {
+      group = { date, transactions: [] };
+      groups.push(group);
+    }
+    group.transactions.push(transaction);
+  }
+  return groups.sort((a, b) => b.transactions[0].date.getTime() - a.transactions[0].date.getTime());
+};
+
 export const createCurrrentWalletInfo = (stores: any): any => {
   const { wallets, delegation, tokenInfoStore, coinPriceStore, profile } = stores;
 
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
-    const selectedWallet = wallets.selected;
+    const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
+    const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
+
     if (selectedWallet == null) {
       throw new Error(`no selected Wallet. Should never happen`);
     }
@@ -130,24 +167,32 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const getFiatCurrentPrice = coinPriceStore.getCurrentPrice;
     const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
     const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
+    const isHardware: boolean = selectedWallet.isHardware;
 
     // Asset List
     const assetList = getAssetWalletAssetList(stores);
+
+    const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
     return {
       currentPool: walletCurrentPoolInfo,
       networkId,
       walletId: currentWalletId,
       selectedWallet: selectedWallet,
+      walletAdaBalance: walletAdaBalance.toNumber(),
+      unitOfAccount: stores.profile.unitOfAccount,
+      defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
+      getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+      recentTransactions: groupedTx ? groupedTx : [],
+      submitedTransactions: selectedWallet.submittedTransactions,
       backendService: BackendService,
       backendServiceZero: BackendServiceZero,
+      isHardwareWallet: isHardware,
       primaryTokenInfo: tokenInfo,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
         fiatAmount: fiatDisplay || 0,
         currency: currency === null ? 'USD' : currency,
-        percents: 0.0, //(Math.random()), NOT USED - will be deteled
-        amount: 0.0, //(Math.random()), NOT USED - will be deteled
       },
       assetList: assetList,
       nftList: [],
