@@ -1165,6 +1165,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
+  /**
+   * <TODO:LEDGER/SIGN_DATA>
+   */
   checkHwWalletSignData(): void {
     const { connectedWallet } = this;
     if (connectedWallet == null) {

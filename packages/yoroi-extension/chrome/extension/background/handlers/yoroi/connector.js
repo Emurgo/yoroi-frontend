@@ -18,8 +18,6 @@ import {
 import { getPublicDeriverById } from './utils';
 import { asGetPublicKey } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
-  getAddressing,
-  connectorSignData,
   connectorSignCardanoTx,
 } from '../../../connector/api';
 import { createAuthEntry } from '../../../../../app/connector/api';
@@ -41,6 +39,7 @@ import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoa
 import { mergeWitnessSets } from '../../../../../app/api/ada/transactions/utils';
 import { hexToBytes } from '../../../../../app/coreUtils';
 import { Logger } from '../../../../../app/utils/logging';
+import { walletSignData } from '../../../../../app/api/ada';
 
 type RpcUid = number;
 
@@ -243,14 +242,9 @@ export const UserSignConfirm: HandlerType<
             return await withSelectedWallet(
               request.tabId,
               async (wallet) => {
-                const addressing = await getAddressing(wallet, address);
-                if (!addressing) {
-                  throw new Error('key derivation path does not exist');
-                }
-                return await connectorSignData(
+                return await walletSignData(
                   wallet,
                   request.password,
-                  addressing,
                   address,
                   payload,
                 );

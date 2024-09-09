@@ -14,9 +14,6 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;
 
-  @observable loadRustRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(RustModule.load.bind(RustModule));
-
   __blockingLoadingRequests: Array<[Request<() => Promise<void>>, string]> = [];
 
   setup(): void {
@@ -27,14 +24,18 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
     this.__blockingLoadingRequests.push([new Request(() => promise), name]);
   }
 
-  async load(env: 'connector' | 'extension'): Promise<void> {
-    const rustLoadingParams = (env === 'extension') ? ['dontLoadMessagesSigning'] : [];
+  async load(): Promise<void> {
+    try {
+      await RustModule.load();
+    } catch (e) {
+      Logger.error(
+        `${nameof(BaseLoadingStore)}::${nameof(this.load)}
+           Unable to load libraries (error type: rust)`
+        + stringifyError(e)
+      );
+    }
     await Promise
-      .all([
-        // $FlowIgnore[invalid-tuple-arity]
-        this.loadRustRequest.execute(rustLoadingParams),
-        ...(this.__blockingLoadingRequests.map(([r]) => r.execute())),
-      ])
+      .all(this.__blockingLoadingRequests.map(([r]) => r.execute()))
       .then(async () => {
         Logger.debug(`[yoroi] closing other instances`);
         await closeOtherInstances(this.getTabIdKey.bind(this)());
@@ -49,13 +50,9 @@ export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, 
         return undefined;
       })
       .catch((error) => {
-        const isRustLoadError = this.loadRustRequest.error != null;
         const failedBlockingLoadingRequestName =
           this.__blockingLoadingRequests.find(([r]) => r.error != null)?.[1];
-        const errorType =
-          (isRustLoadError && 'rust')
-          || failedBlockingLoadingRequestName
-          || 'unclear';
+        const errorType = failedBlockingLoadingRequestName || 'unclear';
         Logger.error(
           `${nameof(BaseLoadingStore)}::${nameof(this.load)}
            Unable to load libraries (error type: ${errorType}) `
