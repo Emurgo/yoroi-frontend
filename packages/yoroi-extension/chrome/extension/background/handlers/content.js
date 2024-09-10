@@ -28,7 +28,6 @@ import {
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
-  getAddressing,
   connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
@@ -52,7 +51,7 @@ import { asAddressedUtxo as asAddressedUtxoCardano, } from '../../../../app/api/
 import { find721metadata } from '../../../../app/utils/nftMetadata';
 import { getDb, syncWallet } from '../state';
 import { getCardanoStateFetcher } from '../utils';
-import AdaApi from '../../../../app/api/ada';
+import AdaApi, { getAddressing } from '../../../../app/api/ada';
 
 /*::
 declare var chrome;

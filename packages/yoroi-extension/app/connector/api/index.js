@@ -5,6 +5,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { WalletAuthEntry } from '../../../chrome/extension/connector/types';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { cip8Sign } from '../../api/ada';
 
 
 type CreateAuthEntryParams = {|
@@ -79,28 +80,4 @@ export const authSignHexPayload: ({|
     Buffer.from(privKey, 'hex')
   );
   return appPrivKey.sign(Buffer.from(payloadHex, 'hex')).to_hex();
-}
-
-export const cip8Sign = async (
-  address: Buffer,
-  signKey: RustModule.WalletV4.PrivateKey,
-  payload: Buffer,
-): Promise<RustModule.MessageSigning.COSESign1> => {
-  const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
-  protectedHeader.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(
-      RustModule.MessageSigning.AlgorithmId.EdDSA
-    )
-  );
-  protectedHeader.set_header(
-    RustModule.MessageSigning.Label.new_text('address'),
-    RustModule.MessageSigning.CBORValue.new_bytes(address)
-  );
-  const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
-  const unprotected = RustModule.MessageSigning.HeaderMap.new();
-  const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
-  const builder = RustModule.MessageSigning.COSESign1Builder.new(headers, payload, false);
-  const toSign = builder.make_data_to_sign().to_bytes();
-  const signedSigStruct = signKey.sign(toSign).to_bytes();
-  return builder.build(signedSigStruct);
 }
