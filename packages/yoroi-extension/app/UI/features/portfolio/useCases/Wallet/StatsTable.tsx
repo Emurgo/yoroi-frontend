@@ -164,7 +164,11 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPrice token={row} unitOfAccount={unitOfAccount} secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+            <TokenPrice
+              token={row}
+              isPrimaryToken={row.policyId.length === 0}
+              ptActivity={ptActivity} unitOfAccount={unitOfAccount}
+              secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
             />
           </TableCell>
 
@@ -248,6 +252,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               <p>load</p>
             ) : (
               <TokenPriceTotal
+                isPrimaryToken={row.policyId.length === 0}
                 token={row}
                 accountPair={accountPair}
                 secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
@@ -277,16 +282,11 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 };
 
 const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
-  if (secondaryToken24Activity === null || secondaryToken24Activity === undefined) {
-    return <></>;
-  }
+
   const theme: any = useTheme();
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
-  console.log('TOken INFO', token);
 
-  if (tokenPrice === undefined) {
-    return <></>
-  }
+
   const {
     currency: selectedCurrency,
     config,
@@ -302,8 +302,6 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
 
   if (ptPrice == null) return `... ${currency}`;
 
-  if (token?.quantity === undefined || secondaryToken24Activity === undefined || secondaryToken24Activity === undefined)
-    return `—— ${currency}`;
 
   // if (!isPrimaryToken(amount.info) && tokenPrice == null) return `—— ${currency}`;
 
@@ -331,14 +329,14 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
     .toFormat(decimals)} ${currency}`;
 
 
-  console.log('token', {
-    name: token.name,
-    quantity: token.quantity,
-    tokenCALCULATEDFINALPrice: price,
-    selectedCurrency,
-    tokenPrice: tokenPrice,
-    showingAda,
-  });
+  // console.log('token', {
+  //   name: token.name,
+  //   quantity: token.quantity,
+  //   tokenCALCULATEDFINALPrice: price,
+  //   selectedCurrency,
+  //   tokenPrice: tokenPrice,
+  //   showingAda,
+  // });
 
 
 
@@ -360,11 +358,10 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
   );
 };
 
-const TokenPrice = ({ token, unitOfAccount, secondaryToken24Activity }) => {
-  if (secondaryToken24Activity === null || secondaryToken24Activity === undefined) {
-    return <></>;
-  }
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+const TokenPrice = ({ token, unitOfAccount, secondaryToken24Activity, ptActivity, isPrimaryToken }) => {
+
+  const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
       {formatPriceChange(tokenPrice)} {unitOfAccount}
