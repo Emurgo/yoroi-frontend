@@ -1,14 +1,17 @@
 import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { atomicBreakdown } from '@yoroi/common';
+import BigNumber from 'bignumber.js';
 import React, { useMemo, useState } from 'react';
 import { Chip, Skeleton } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
+import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
 import { formatNumber } from '../../common/helpers/formatHelper';
-import { priceChange } from '../../common/helpers/priceChange';
+import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
@@ -84,7 +87,12 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const {
     tokenActivity: { data24h },
+    isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
+
+  const ptActivity = useCurrencyPairing().ptActivity;
+
+  console.log('primaryTokenActivity', ptActivity);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -156,16 +164,21 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Typography variant="body2" color="ds.text_gray_medium">
-              {formatNumber(row.price)} {unitOfAccount}
-            </Typography>
+            <TokenPrice token={row} unitOfAccount={unitOfAccount} secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+            />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPriceChangeChip
-              priceData={data24h && data24h[`${row.policyId}.${row.assetName}`]}
-              isPrimaryToken={row.policyId.length === 0}
-            />
+            {data24h === undefined ? (
+              <p>load</p>
+            ) : (
+              <TokenPriceChangeChip
+                secondaryTokenActivity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+                primaryTokenActivity={ptActivity}
+                isPrimaryToken={row.policyId.length === 0}
+              />
+            )}
+
             {/* <Chip
               type={row['24h'] > 0 ? ChipTypes.ACTIVE : row['24h'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
               label={
@@ -231,20 +244,15 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-              <Stack direction="column">
-                <Typography color="ds.text_gray_normal">
-                  {row.totalAmount} {row.name}
-                </Typography>
-                {row.name === accountPair?.to.name ? (
-                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
-                ) : (
-                  <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-                    {formatNumber(row.totalAmountFiat)} {accountPair?.to.name}
-                  </Typography>
-                )}
-              </Stack>
-            </Stack>
+            {data24h === undefined ? (
+              <p>load</p>
+            ) : (
+              <TokenPriceTotal
+                token={row}
+                accountPair={accountPair}
+                secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+              />
+            )}
           </TableCell>
         </TableRow>
       ))}
@@ -254,18 +262,112 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
 export default StatsTable;
 
-const TokenPriceChangeChip = ({ priceData, isPrimaryToken }) => {
-  console.log('TokenPriceChangeChip PROPS', { isPrimaryToken, priceData });
-  if (priceData === undefined) {
-    return <p>loafing</p>;
-  }
-  const { close, open } = priceData[1].price;
+const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
+  const { close, open } = isPrimaryToken
+    ? primaryTokenActivity
+    : secondaryTokenActivity?.length && secondaryTokenActivity[1].price;
 
   const { changePercent, variantPnl } = priceChange(open, close);
 
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography>{changePercent}%</Typography>
+      <Typography>{formatPriceChange(changePercent)}%</Typography>
     </PnlTag>
+  );
+};
+
+const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
+  if (secondaryToken24Activity === null || secondaryToken24Activity === undefined) {
+    return <></>;
+  }
+  const theme: any = useTheme();
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  console.log('TOken INFO', token);
+
+  if (tokenPrice === undefined) {
+    return <></>
+  }
+  const {
+    currency: selectedCurrency,
+    config,
+    ptActivity: { close: ptPrice },
+  } = useCurrencyPairing();
+
+
+  // const showingAda = isPrimaryTokenActive && amount.info.id !== portfolioPrimaryTokenInfo.id;
+  const showingAda = accountPair?.from.name === 'ADA';
+
+  const currency = selectedCurrency;
+  const decimals = config.decimals;
+
+  if (ptPrice == null) return `... ${currency}`;
+
+  if (token?.quantity === undefined || secondaryToken24Activity === undefined || secondaryToken24Activity === undefined)
+    return `—— ${currency}`;
+
+  // if (!isPrimaryToken(amount.info) && tokenPrice == null) return `—— ${currency}`;
+
+  // if (hidePrimaryPair && isPrimaryToken(amount.info) && isPrimaryTokenActive) return '';
+
+  // Assuming token.quantity is a BigNumber and token.numberOfDecimals represents the number of decimals
+  const decimalPlaces = token.numberOfDecimals;
+
+  // Multiply the BigNumber by 10^decimalPlaces to shift the decimals
+  const shiftedBigNumber = token.quantity.times(BigNumber(10).pow(decimalPlaces)); // Stay in BigNumber realm
+
+  // Convert to bigint
+  const bigIntValue = BigInt(shiftedBigNumber.toString(10)); // Convert BigNumber to string, then to BigInt
+
+  // Ensure tokenPrice and ptPrice are BigNumber instances and convert if needed
+  const safeTokenPrice = BigNumber.isBigNumber(tokenPrice) ? tokenPrice : new BigNumber(tokenPrice ?? '1');
+  const safePtPrice = BigNumber.isBigNumber(ptPrice) ? ptPrice : new BigNumber(ptPrice ?? '1');
+
+
+
+  // Now, pass the bigIntValue to atomicBreakdown
+  const price = `${atomicBreakdown(bigIntValue, token.numberOfDecimals)
+    .bn.times(safeTokenPrice) // BigNumber operation
+    .times(showingAda ? 1 : safePtPrice) // BigNumber operation
+    .toFormat(decimals)} ${currency}`;
+
+
+  console.log('token', {
+    name: token.name,
+    quantity: token.quantity,
+    tokenCALCULATEDFINALPrice: price,
+    selectedCurrency,
+    tokenPrice: tokenPrice,
+    showingAda,
+  });
+
+
+
+  return (
+    <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+      <Stack direction="column">
+        <Typography color="ds.text_gray_normal">
+          {token.totalAmount} {token.name}
+        </Typography>
+        {token.name === accountPair?.to.name ? (
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+        ) : (
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+            {price}
+          </Typography>
+        )}
+      </Stack>
+    </Stack>
+  );
+};
+
+const TokenPrice = ({ token, unitOfAccount, secondaryToken24Activity }) => {
+  if (secondaryToken24Activity === null || secondaryToken24Activity === undefined) {
+    return <></>;
+  }
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  return (
+    <Typography variant="body2" color="ds.text_gray_medium">
+      {formatPriceChange(tokenPrice)} {unitOfAccount}
+    </Typography>
   );
 };

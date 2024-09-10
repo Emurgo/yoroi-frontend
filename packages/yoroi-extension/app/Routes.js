@@ -205,8 +205,8 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
-        <WalletManagerProvider stores={stores}>
-          <Switch>
+        <Switch>
+          <WalletManagerProvider stores={stores}>
             <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} actions={actions} />} />
             <Route
               exact
@@ -336,8 +336,8 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
             />
 
             <Redirect to={ROUTES.MY_WALLETS} />
-          </Switch>
-        </WalletManagerProvider>
+          </WalletManagerProvider>
+        </Switch>
       </Suspense>
     </QueryClientProvider>
   );

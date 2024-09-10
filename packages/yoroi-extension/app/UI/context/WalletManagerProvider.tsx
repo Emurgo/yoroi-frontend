@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { maybe } from '../../coreUtils';
@@ -50,6 +51,7 @@ export const WalletManagerProvider: React.FC<React.PropsWithChildren<{ stores: a
         // Get Fiat price
         const ticker = tokenInfo.Metadata.ticker;
         const { currency } = profile.unitOfAccount;
+
         const getFiatCurrentPrice = coinPriceStore.getCurrentPrice;
         const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
         const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
@@ -81,7 +83,7 @@ export const WalletManagerProvider: React.FC<React.PropsWithChildren<{ stores: a
     };
 
     generateCurrentWalletInfo();
-  }, [stores, stores.coinPriceStore.currentPriceTickers?.length]);
+  }, [stores, stores.profile.unitOfAccount.currency, stores.coinPriceStore.currentPriceTickers?.length, stores.routes]);
 
   // Expose context value
   const contextValue = React.useMemo(() => ({ ...currentWalletInfo }), [currentWalletInfo]);
@@ -142,18 +144,22 @@ const getAssetWalletAssetList = (stores: any) => {
       const tokenLogo = `data:image/png;base64,${
         token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
       }`;
+
+      const getFiatCurrentPrice = stores.coinPriceStore.getCurrentPrice;
+      const { currency } = stores.profile.unitOfAccount;
+
+      const fiatPrice = getFiatCurrentPrice(tokenName, currency === null ? 'USD' : currency);
+      const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
       return {
         name: tokenName,
         id: tokenId,
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
+        quantity: asQuantity(token.entry.amount),
         tokenLogo: tokenLogo,
         ...token.info.Metadata,
-        totalAmountFiat: Math.round(100000 * Math.random()), // MOCKED
-        price: 0.223, // MOCKED
-        '24h': -(10 * Math.random()), // MOCKED
-        '1W': 10 * Math.random(), // MOCKED
-        '1M': 10 * Math.random(), // MOCKED
+        totalAmountFiat: fiatDisplay,
+        price: fiatPrice,
         portfolioPercents: Math.round(100 * Math.random()), // MOCKED
         overview: {
           description:
@@ -166,4 +172,12 @@ const getAssetWalletAssetList = (stores: any) => {
         },
       };
     });
+};
+
+export const asQuantity = (value: BigNumber | number | string) => {
+  const bn = new BigNumber(value);
+  if (bn.isNaN() || !bn.isFinite()) {
+    throw new Error('Invalid quantity');
+  }
+  return bn;
 };

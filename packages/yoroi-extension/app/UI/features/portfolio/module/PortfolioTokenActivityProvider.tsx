@@ -79,6 +79,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
 
   React.useEffect(() => {
     if (data24h) {
+      console.log('data24h', data24h);
       const combinedData = {
         data24h: data24h,
         // '1w': data1w,
