@@ -144,7 +144,7 @@ type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; cha
 const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography>{changePercent}%</Typography>
+      <Typography variant="caption">{changePercent}%</Typography>
     </PnlTag>
   );
 };

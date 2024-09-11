@@ -52,7 +52,6 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
-import { WalletManagerProvider } from './UI/context/WalletManagerProvider';
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
@@ -201,12 +200,10 @@ declare var CONFIG: ConfigType;
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
   const queryClient = new QueryClient();
-
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
         <Switch>
-          <WalletManagerProvider stores={stores}>
             <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} actions={actions} />} />
             <Route
               exact
@@ -336,7 +333,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
             />
 
             <Redirect to={ROUTES.MY_WALLETS} />
-          </WalletManagerProvider>
         </Switch>
       </Suspense>
     </QueryClientProvider>
@@ -514,6 +510,8 @@ const GovernanceSubpages = (stores, actions) => (
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   // const queryClient = new QueryClient();
+
+
   const loader = (
     <FullscreenLayout bottomPadding={0}>
       <Stack alignItems="center" justifyContent="center" height="50vh">
@@ -591,9 +589,11 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
+
   return (
     <CurrencyProvider currency={portfolioProps.stores.profile.unitOfAccount.currency || 'USD'}>
-      <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+      <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount} currentWallet={currentWalletInfo}>
         <Suspense fallback={null} settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
           {children}
         </Suspense>

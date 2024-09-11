@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-import { useWalletManager } from '../../../context/WalletManagerProvider';
 import {
   AccountPair,
   CurrencyType,
@@ -26,6 +25,7 @@ type PortfolioProviderProps = {
     unitOfAccount: CurrencyType;
     accountPair: AccountPair;
   };
+  currentWallet: any
 };
 
 export const PortfolioContextProvider = ({
@@ -35,8 +35,9 @@ export const PortfolioContextProvider = ({
     unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
     accountPair: null,
   },
+  currentWallet
 }: PortfolioProviderProps) => {
-  const { walletBalance, assetList, selectedWallet } = useWalletManager();
+  const { walletBalance, assetList, selectedWallet } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }

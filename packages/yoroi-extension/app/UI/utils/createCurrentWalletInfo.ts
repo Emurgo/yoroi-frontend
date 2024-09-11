@@ -63,17 +63,17 @@ const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*:
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
 
-const getAssetWalletAssetList = stores => {
+const getAssetWalletAssetList = (stores: any) => {
   const spendableBalance = stores.transactions.balance;
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   if (spendableBalance == null) return [];
   return [spendableBalance.getDefaultEntry(), ...spendableBalance.nonDefaultEntries()]
-    .map(entry => ({
+    .map((entry: any) => ({
       entry,
       info: getTokenInfo(entry),
     }))
-    .filter(item => item.info.IsNFT === false)
-    .map(token => {
+    .filter((item: any) => item.info.IsNFT === false)
+    .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
@@ -82,23 +82,23 @@ const getAssetWalletAssetList = stores => {
       const tokenLogo = `data:image/png;base64,${
         token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
       }`;
+
+      const getFiatCurrentPrice = stores.coinPriceStore.getCurrentPrice;
+      const { currency } = stores.profile.unitOfAccount;
+
+      const fiatPrice = getFiatCurrentPrice(tokenName, currency === null ? 'USD' : currency);
+      const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
       return {
         name: tokenName,
         id: tokenId,
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
+        quantity: asQuantity(token.entry.amount),
         tokenLogo: tokenLogo,
         ...token.info.Metadata,
-        totalAmountFiat: Math.round(100000 * Math.random()), // MOCKED
-        price: 0.223, // MOCKED
-        '24h': -(10 * Math.random()), // MOCKED
-        '1W': 10 * Math.random(), // MOCKED
-        '1M': 10 * Math.random(), // MOCKED
+        totalAmountFiat: fiatDisplay,
+        price: fiatPrice,
         portfolioPercents: Math.round(100 * Math.random()), // MOCKED
-
-        // The below properties are used only in token details page
-        chartData: {},
-        performance: [],
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -175,20 +175,20 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
     return {
-      currentPool: walletCurrentPoolInfo,
-      networkId,
-      walletId: currentWalletId,
-      selectedWallet: selectedWallet,
-      walletAdaBalance: walletAdaBalance.toNumber(),
-      unitOfAccount: stores.profile.unitOfAccount,
-      defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
-      getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
-      recentTransactions: groupedTx ? groupedTx : [],
-      submitedTransactions: selectedWallet.submittedTransactions,
-      backendService: BackendService,
-      backendServiceZero: BackendServiceZero,
-      isHardwareWallet: isHardware,
-      primaryTokenInfo: tokenInfo,
+      currentPool: walletCurrentPoolInfo, // good
+      networkId, // good
+      walletId: currentWalletId, // good
+      selectedWallet: selectedWallet, // good
+      walletAdaBalance: walletAdaBalance.toNumber(), // good
+      unitOfAccount: stores.profile.unitOfAccount, // good
+      defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId), // good
+      getCurrentPrice: stores.coinPriceStore.getCurrentPrice, // good
+      recentTransactions: groupedTx ? groupedTx : [], // good
+      submitedTransactions: selectedWallet.submittedTransactions, // good
+      backendService: BackendService, // good
+      backendServiceZero: BackendServiceZero, // good
+      isHardwareWallet: isHardware, // good
+      primaryTokenInfo: tokenInfo, // good
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
         fiatAmount: fiatDisplay || 0,
@@ -200,4 +200,12 @@ export const createCurrrentWalletInfo = (stores: any): any => {
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
   }
+};
+
+export const asQuantity = (value: BigNumber | number | string) => {
+  const bn = new BigNumber(value);
+  if (bn.isNaN() || !bn.isFinite()) {
+    throw new Error('Invalid quantity');
+  }
+  return bn;
 };

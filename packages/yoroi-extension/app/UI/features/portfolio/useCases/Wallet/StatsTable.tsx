@@ -89,7 +89,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
     tokenActivity: { data24h },
     isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
-
   const ptActivity = useCurrencyPairing().ptActivity;
 
   console.log('primaryTokenActivity', ptActivity);

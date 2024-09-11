@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import React from 'react';
 import { Icon } from '../../../../components';
@@ -11,10 +11,12 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-const PnlTag = ({ children, withIcon = false, variant = 'neutral', style, ...etc }: Props) => {
-  const theme = useTheme();
 
-  const icon = variant === 'danger' ? <Icon.ChevronDown /> : <Icon.ChevronUp />;
+
+const PnlTag = ({ children, withIcon = false, variant = 'neutral', style, ...etc }: Props) => {
+  // const theme = useTheme();
+
+  const icon = variant === 'danger' ? <Icon.ChipArrowDown fill="red" /> : <Icon.ChipArrowUp />;
 
   return (
     <TagContainer mode={variant} style={style} {...etc}>

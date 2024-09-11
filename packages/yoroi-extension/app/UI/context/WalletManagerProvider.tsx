@@ -141,9 +141,8 @@ const getAssetWalletAssetList = (stores: any) => {
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
       const tokenId = getTokenIdentifierIfExists(token.info) ?? '-';
-      const tokenLogo = `data:image/png;base64,${
-        token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
-      }`;
+      const tokenLogo = `data:image/png;base64,${token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
+        }`;
 
       const getFiatCurrentPrice = stores.coinPriceStore.getCurrentPrice;
       const { currency } = stores.profile.unitOfAccount;

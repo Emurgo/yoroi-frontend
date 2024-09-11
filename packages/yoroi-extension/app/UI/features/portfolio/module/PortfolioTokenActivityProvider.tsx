@@ -52,7 +52,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
     },
   }).current;
 
-  const { assetList } = usePortfolio();
+  const { assetList, walletBalance } = usePortfolio();
 
   React.useEffect(() => {
     // filter and add here the ids for query
@@ -76,7 +76,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       // fetch1m(state.secondaryTokenIds);
     }
   }, [state.secondaryTokenIds, fetch24h]);
-
+  console.log("@@@@", data24h)
   React.useEffect(() => {
     if (data24h) {
       console.log('data24h', data24h);
@@ -87,7 +87,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       };
       actions.tokenActivityChanged(combinedData);
     }
-  }, [data24h, actions]);
+  }, [data24h, actions, loading24h, walletBalance.ada]);
 
   const value = React.useMemo(
     () => ({
@@ -119,17 +119,17 @@ export enum PortfolioTokenActivityActionType {
 
 export type PortfolioTokenActivityAction =
   | {
-      type: PortfolioTokenActivityActionType.SecondaryTokenIdsChanged;
-      secondaryTokenIds: Portfolio.Token.Id[];
-    }
+    type: PortfolioTokenActivityActionType.SecondaryTokenIdsChanged;
+    secondaryTokenIds: Portfolio.Token.Id[];
+  }
   | {
-      type: PortfolioTokenActivityActionType.TokenActivityChanged;
-      tokenActivity: Portfolio.Api.TokenActivityResponse;
-    }
+    type: PortfolioTokenActivityActionType.TokenActivityChanged;
+    tokenActivity: Portfolio.Api.TokenActivityResponse;
+  }
   | {
-      type: PortfolioTokenActivityActionType.ActivityWindowChanged;
-      activityWindow: Portfolio.Token.ActivityWindow;
-    };
+    type: PortfolioTokenActivityActionType.ActivityWindowChanged;
+    activityWindow: Portfolio.Token.ActivityWindow;
+  };
 
 export const portfolioTokenActivityReducer = (
   state: PortfolioTokenActivityState,
