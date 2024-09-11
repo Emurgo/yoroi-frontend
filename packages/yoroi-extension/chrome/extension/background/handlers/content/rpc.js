@@ -22,7 +22,7 @@ import type {
   IFetcher as CardanoIFetcher
 } from '../../../../../app/api/ada/lib/state-fetch/IFetcher.types';
 import { getCardanoStateFetcher, } from '../../utils';
-import AdaApi from '../../../../../app/api/ada';
+import AdaApi, { getAddressing } from '../../../../../app/api/ada';
 import { find721metadata } from '../../../../../app/utils/nftMetadata';
 import {
   connectorCreateCardanoTx,
@@ -35,7 +35,6 @@ import {
   connectorGetUtxosCardano,
   connectorRecordSubmittedCardanoTransaction,
   connectorSendTxCardano,
-  getAddressing,
   connectorGetAssets,
   getTokenMetadataFromIds,
   MAX_COLLATERAL,
