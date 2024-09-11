@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
 import { styled, useTheme } from '@mui/material/styles';
-import { Skeleton, Card } from '../../../../components';
-import TransactionTable from './TransactionTable';
-import TokenDetailChart from './TokenDetailChart';
+import React, { useEffect, useState } from 'react';
+import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
+import { Card, Skeleton } from '../../../../components';
+import Menu from '../../common/components/Menu';
+import NavigationButton from '../../common/components/NavigationButton';
+import { formatNumber } from '../../common/helpers/formatHelper';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import TokenDetailPerformance from './TokenDetailPerformance';
-import TokenDetailOverview from './TokenDetailOverview';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { SubMenuOption, TokenType } from '../../common/types/index';
-import NavigationButton from '../../common/components/NavigationButton';
 import mockData from '../../common/mockData';
-import { formatNumber } from '../../common/helpers/formatHelper';
-import Menu from '../../common/components/Menu';
+import { SubMenuOption, TokenType } from '../../common/types/index';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+import TokenDetailOverview from './TokenDetailOverview';
+import TokenDetailPerformance from './TokenDetailPerformance';
+import TransactionTable from './TransactionTable';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -43,15 +42,15 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
   const subMenuOptions: SubMenuOption[] = [
     {
-      label: strings.performance,
-      className: 'performance',
-      route: 'performance',
-    },
-    {
       label: strings.overview,
       className: 'overview',
       route: 'overview',
     },
+    // {
+    //   label: strings.performance,
+    //   className: 'performance',
+    //   route: 'performance',
+    // },
   ];
 
   const [selectedTab, setSelectedTab] = useState(subMenuOptions[0]?.route);
@@ -142,7 +141,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
             <Divider />
 
-            <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} />
+            {/* <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} /> */}
           </Card>
 
           <Card>
@@ -153,13 +152,13 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
               {selectedTab === subMenuOptions[0]?.route ? (
                 <TabContent>
-                  <TokenDetailPerformance tokenInfo={tokenInfo} isLoading={isLoading} />
+                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isAda={isAda} />
                 </TabContent>
               ) : null}
 
               {selectedTab === subMenuOptions[1]?.route ? (
                 <TabContent>
-                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isAda={isAda} />
+                  <TokenDetailPerformance tokenInfo={tokenInfo} isLoading={isLoading} />
                 </TabContent>
               ) : null}
             </Box>

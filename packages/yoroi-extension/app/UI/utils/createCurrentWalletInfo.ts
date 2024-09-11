@@ -74,6 +74,7 @@ const getAssetWalletAssetList = (stores: any) => {
     }))
     .filter((item: any) => item.info.IsNFT === false)
     .map((token: any) => {
+      console.log('token', token);
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
@@ -93,7 +94,6 @@ const getAssetWalletAssetList = (stores: any) => {
         id: tokenId,
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
-        quantity: asQuantity(token.entry.amount),
         tokenLogo: tokenLogo,
         ...token.info.Metadata,
         totalAmountFiat: fiatDisplay,
@@ -108,6 +108,15 @@ const getAssetWalletAssetList = (stores: any) => {
           fingerprint:
             'asset311q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj6789',
         },
+
+        // TODO new structure here
+        quantity: token.entry.amount,
+        // info: {
+        //   indetifier: token.entry.identifier,
+        //   description: token.info.Metadata.assetMintMetadata[0],
+        //   policyId: token.info.Metadata.policyId,
+        //   fingerprint: '',
+        // },
       };
     });
 };

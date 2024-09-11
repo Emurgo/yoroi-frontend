@@ -1,8 +1,8 @@
 import React from 'react';
-import mockData from '../../features/portfolio/common/mockData';
-import PortfolioLayout from './layout';
-import TokenDetails from './../../features/portfolio/useCases/TokenDetails/TokenDetails';
 import { TokenType } from '../../features/portfolio/common/types';
+import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
+import TokenDetails from './../../features/portfolio/useCases/TokenDetails/TokenDetails';
+import PortfolioLayout from './layout';
 
 type Props = {
   stores: any;
@@ -13,9 +13,11 @@ type Props = {
 const PortfolioDetailPage = ({ match, ...props }: Props) => {
   const tokenId = match.params.tokenId;
 
+  const { assetList } = usePortfolio()
+
   const tokenInfo = React.useMemo(() => {
-    const tmp = mockData.wallet.tokenList.find(item => item.id === tokenId);
-    if (tmp) return tmp;
+    const token = assetList.find(item => item.id === tokenId);
+    if (token) return token;
     return {} as TokenType;
   }, [tokenId]);
 

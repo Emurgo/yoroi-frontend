@@ -52,7 +52,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
               {String(accountPair?.from.value)}
             </Typography>
           )}
-          <Typography variant="body2" fontWeight="500" color="ds.black_static">
+          <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
             {accountPair?.from.name}
             <Typography
               component="span"
@@ -63,7 +63,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
               sx={{
                 cursor: 'pointer',
                 display: 'inline',
-                marginTop: '5px',
               }}
             >
               /{accountPair?.to.name}
@@ -71,11 +70,11 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
           </Typography>
         </Stack>
 
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
           {isLoading ? (
             <Skeleton width="129px" height="16px" />
           ) : (
-            <Typography color="ds.gray_c600">
+            <Typography color="ds.text_gray_medium">
               {accountPair?.to.value} {accountPair?.to.name}
             </Typography>
           )}
@@ -86,49 +85,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             </Stack>
           ) : (
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
-              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
+              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2), }}>
                 <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
                 <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
-
-                {/* <Chip
-                  type={
-                    walletBalance.percents > 0
-                      ? ChipTypes.ACTIVE
-                      : walletBalance.percents < 0
-                      ? ChipTypes.INACTIVE
-                      : ChipTypes.DISABLED
-                  }
-                  label={
-                    <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      {walletBalance.percents > 0 ? (
-                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                      ) : walletBalance.percents < 0 ? (
-                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                      ) : null}
-                      <Typography variant="caption1">
-                        {walletBalance.percents >= 0
-                          ? formatNumber(walletBalance.percents)
-                          : formatNumber(-1 * walletBalance.percents)}
-                        %
-                      </Typography>
-                    </Stack>
-                  }
-                />
-                <Chip
-                  type={
-                    walletBalance.amount > 0
-                      ? ChipTypes.ACTIVE
-                      : walletBalance.amount < 0
-                      ? ChipTypes.INACTIVE
-                      : ChipTypes.DISABLED
-                  }
-                  label={
-                    <Typography variant="caption1">
-                      {walletBalance.amount > 0 && '+'}
-                      {formatNumber(walletBalance.amount)} {unitOfAccount}
-                    </Typography>
-                  }
-                /> */}
               </Stack>
             </Tooltip>
           )}
@@ -144,7 +103,7 @@ type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; cha
 const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography variant="caption">{changePercent}%</Typography>
+      <Typography variant="caption" lineHeight="16px">{changePercent}%</Typography>
     </PnlTag>
   );
 };
@@ -158,7 +117,7 @@ const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProps) => {
 
   return (
     <PnlTag variant={variantPnl}>
-      <Typography>{`${Number(changeValue) > 0 ? '+' : ''}${changeValue} ${currency}`}</Typography>
+      <Typography variant="caption" lineHeight="16px">{`${Number(changeValue) > 0 ? '+' : ''}${changeValue} ${currency}`}</Typography>
     </PnlTag>
   );
 };

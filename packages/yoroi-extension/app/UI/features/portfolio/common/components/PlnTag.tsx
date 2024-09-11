@@ -31,10 +31,11 @@ const TagContainer = styled(Box, {
 })<{
   mode: 'danger' | 'success' | 'neutral';
 }>(({ theme, mode }) => ({
+  height: '25px',
   display: 'flex',
   alignItems: 'center',
   borderRadius: '999px',
-  padding: '3px 6px',
+  padding: '4px 6px',
   backgroundColor: getBackgroundColor(theme, mode),
 }));
 

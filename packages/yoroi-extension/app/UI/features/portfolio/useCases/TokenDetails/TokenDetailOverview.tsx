@@ -1,8 +1,8 @@
+import { Box, Link, Stack, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import React from 'react';
-import { Stack, Box, Typography, Link } from '@mui/material';
 import { Skeleton } from '../../../../components/Skeleton';
 import { CopyButton } from '../../../../components/buttons/CopyButton';
-import { useTheme } from '@mui/material/styles';
 import tokenPng from '../../common/assets/images/token.png';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
@@ -16,6 +16,7 @@ interface Props {
 const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
+
 
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>

@@ -1,11 +1,9 @@
-import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Skeleton } from '../../../../components/Skeleton';
 import { TokenType } from '../../common/types/index';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const PerformanceItemType = {
   FIAT: 'fiat',
@@ -45,7 +43,7 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
-        {firstPerformanceItemList.map((item, index) => (
+        {/* {firstPerformanceItemList.map((item, index) => (
           <Stack
             key={item.id}
             direction="row"
@@ -71,10 +69,10 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
               </Typography>
             )}
           </Stack>
-        ))}
+        ))} */}
       </Stack>
       <Stack direction="column" spacing={'0.375rem'} sx={{ marginTop: theme.spacing(1) }}>
-        {secondPerformanceItemList.map((item, index) => (
+        {/* {secondPerformanceItemList.map((item, index) => (
           <Stack key={item.id} direction="row" justifyContent="space-between" alignItems="center">
             <Typography color="ds.gray_600">{item.label}</Typography>
             {isLoading ? (
@@ -94,7 +92,7 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
               </Typography>
             )}
           </Stack>
-        ))}
+        ))} */}
       </Stack>
     </Stack>
   );
