@@ -3,13 +3,9 @@
 import type { AccountBalance, Address, Asset, CardanoTx, Paginate, TokenId, Value, } from './types';
 import { ConnectorError, TxSendErrorCodes } from './types';
 import { RustModule } from '../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  Addressing,
-  IPublicDeriver,
-} from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, IPublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { PublicDeriver, } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import {
-  asGetAllAccounting,
   asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
@@ -24,10 +20,7 @@ import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '..
 
 import { CoreAddressTypes, TxStatusCodes, } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { FullAddressPayload } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
-import {
-  getAllAddresses,
-  getAllAddressesForDisplay,
-} from '../../../app/api/ada/lib/storage/bridge/traitUtils';
+import { getAllAddresses, getAllAddressesForDisplay, } from '../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getReceiveAddress } from '../../../app/stores/stateless/addressStores';
 
 import type { PersistedSubmittedTransaction } from '../../../app/api/localStorage';
@@ -49,21 +42,20 @@ import {
   signTransaction as shelleySignTransaction,
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
-import { getCardanoHaskellBaseConfig, } from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
-import type {
-  CardanoTxRequest,
-  ForeignUtxoFetcher,
-} from '../../../app/api/ada';
-import AdaApi from '../../../app/api/ada';
+import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
+import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
 import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
-import { cip8Sign } from '../../../app/connector/api';
 import { GetToken } from '../../../app/api/ada/lib/storage/database/primitives/api/read';
 import { getAllSchemaTables, raii, } from '../../../app/api/ada/lib/storage/database/utils';
-  import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow } from '../../../app/api/ada/lib/storage/database/primitives/tables';
 import {
   Amount as LibAmount,
   NativeAssets as LibNativeAssets,
@@ -73,20 +65,10 @@ import {
 import { coinSelectionClassificationStrategy } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
 import { setRuntime } from '@emurgo/yoroi-eutxo-txs/dist/kernel'
 import { NotEnoughMoneyToSendError as LibNotEnoughMoneyToSendError } from '@emurgo/yoroi-eutxo-txs/dist/errors'
-import {
-  ChainDerivations,
-  DREP_KEY_INDEX,
-  HARD_DERIVATION_START,
-  STAKING_KEY_INDEX,
-  WalletTypePurpose
-} from '../../../app/config/numbersConfig';
-import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
-import {
-  derivePrivateByAddressing,
-  derivePublicByAddressing
-} from '../../../app/api/ada/lib/cardanoCrypto/deriveByAddressing';
-import { transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
+import { ChainDerivations, DREP_KEY_INDEX, STAKING_KEY_INDEX } from '../../../app/config/numbersConfig';
+import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
+import type { WalletState } from '../background/types';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -453,14 +435,29 @@ export async function _connectorGetUnusedAddresses(
 export async function connectorGetDRepKey(
   wallet: PublicDeriver<>,
 ): Promise<string> {
-  return (await _getDRepKeyAndAddressing(wallet))[0].to_hex();
+  return (await getDRepKeyAndAddressing(wallet))[0].to_hex();
 }
 
-async function __pubKeyAndAddressingByChainAndIndex(
+export function getDrepRewardAddressHexAndAddressing(
+  wallet: WalletState,
+): [string, Addressing] {
+  const [pubKey, addressing] = pubKeyAndAddressingByChainAndIndex(
+    wallet,
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+  // <TODO:WALLET_API>
+  const config = getCardanoHaskellBaseConfig(
+    getNetworkById(wallet.networkId)
+  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const network = parseInt(config.ChainNetworkId, 10);
+  return [pubKeyHashToRewardAddress(pubKey.hash().to_hex(), network), addressing];
+}
+
+export async function connectorGetStakeKey(
   wallet: PublicDeriver<>,
-  chainLevelDerivationIndex: number,
-  addressLevelDerivationIndex: number,
-): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
+): Promise<{| key: string, isRegistered: boolean |}> {
   const withPubKey = asGetPublicKey(wallet);
   if (withPubKey == null) {
     throw new Error('Unable to get public key from the wallet');
@@ -469,53 +466,13 @@ async function __pubKeyAndAddressingByChainAndIndex(
   if (withLevels == null) {
     throw new Error('Unable to get derivation levels from the wallet');
   }
-  const publicKeyResp = await withPubKey.getPublicKey();
-  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-    Buffer.from(publicKeyResp.Hash, 'hex')
-  );
-  const addressing = {
-    addressing: {
-      path: [
-        WalletTypePurpose.CIP1852,
-        CoinType.CARDANO,
-        HARD_DERIVATION_START,
-        chainLevelDerivationIndex,
-        addressLevelDerivationIndex,
-      ],
-      startLevel: Bip44DerivationLevels.PURPOSE.level,
-    },
-  };
-
-  const derivedPubKey = derivePublicByAddressing({
-    ...addressing,
-    startingFrom: {
-      level: withLevels.getParent().getPublicDeriverLevel(),
-      key: publicKey,
-    },
-  }).to_raw_key();
-  return [derivedPubKey, addressing];
-}
-
-async function _getDRepKeyAndAddressing(
-  wallet: PublicDeriver<>,
-): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
-  return __pubKeyAndAddressingByChainAndIndex(
-    wallet,
-    ChainDerivations.GOVERNANCE_DREP_KEYS,
-    DREP_KEY_INDEX,
-  );
-}
-
-export async function connectorGetStakeKey(
-  wallet: PublicDeriver<>,
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse>,
-): Promise<{| key: string, isRegistered: boolean |}> {
-  const stakeKey =
-    (await __pubKeyAndAddressingByChainAndIndex(
-      wallet,
-      ChainDerivations.CHIMERIC_ACCOUNT,
-      STAKING_KEY_INDEX,
-    ))[0];
+  const publicKey = (await withPubKey.getPublicKey()).Hash;
+  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
+  const stakeKey = pubKeyAndAddressingByChainAndIndex(
+    { publicKey, publicDeriverLevel },
+    ChainDerivations.CHIMERIC_ACCOUNT,
+    STAKING_KEY_INDEX,
+  )[0];
   const network = wallet.getParent().getNetworkInfo();
   const stakeAddrHex = RustModule.WasmScope(Module => {
     return Module.WalletV4.RewardAddress.new(
@@ -619,15 +576,15 @@ const CERT_TO_KEYHASH_FUNCS = [
   ([
     cert => cert.as_drep_registration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepRegistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepRegistration>),
   ([
     cert => cert.as_drep_deregistration(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepDeregistration>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepDeregistration>),
   ([
     cert => cert.as_drep_update(),
     cert => cert.voting_credential().to_keyhash(),
-  ]: CertToKeyhashFuncs<RustModule.WalletV4.DrepUpdate>),
+  ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
     cert => {
@@ -678,7 +635,7 @@ function getCertificatesRequiredSignKeys(
       if (!voter) {
         throw new Error('unexpectedly missing voter');
       }
-      const keyHash = voter.to_drep_cred()?.to_keyhash();
+      const keyHash = voter.to_drep_credential()?.to_keyhash();
       if (keyHash) {
         result.add(keyHash.to_hex());
       }
@@ -830,7 +787,7 @@ async function __connectorSignCardanoTx(
         otherRequiredSigners.push({ address, addressing });
       }
     }
-    const [ drepKey, addressing ] = await _getDRepKeyAndAddressing(publicDeriver);
+    const [ drepKey, addressing ] = await getDRepKeyAndAddressing(publicDeriver);
     const drepCred = drepKey.hash().to_hex();
     if (totalAdditionalRequiredSignKeys.has(drepCred)) {
       const address = RustModule.WalletV4.RewardAddress.new(
@@ -1143,111 +1100,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     usedUtxos,
   });
   await persistSubmittedTransactions(submittedTxs);
-}
-
-export async function getAddressing(
-  publicDeriver: PublicDeriver<>,
-  address: string,
-): Promise<?Addressing> {
-  const findAddressing = (addresses) => {
-    for (const { addrs, addressing } of addresses) {
-      for (const { Hash } of addrs) {
-        if (Hash === address) {
-          return { addressing };
-        }
-      }
-    }
-  };
-
-  const withAccounting = asGetAllAccounting(publicDeriver);
-  if (!withAccounting) {
-    throw new Error('unable to get accounting addresses from public deriver');
-  }
-  const rewardAddressing = findAddressing(
-    await withAccounting.getAllAccountingAddresses(),
-  );
-  if (rewardAddressing) {
-    return rewardAddressing;
-  }
-
-  const [ dRepPubKey, dRepAddressing ] = await _getDRepKeyAndAddressing(publicDeriver);
-  if (dRepPubKey.hash().to_hex() === address) {
-    return dRepAddressing;
-  }
-
-  const withUtxos = asGetAllUtxos(publicDeriver);
-  if (!withUtxos) {
-    throw new Error('unable to get UTxO addresses from public deriver');
-  }
-  return findAddressing(
-    await withUtxos.getAllUtxoAddresses(),
-  );
-}
-
-export async function connectorSignData(
-  publicDeriver: PublicDeriver<>,
-  password: string,
-  addressing: Addressing,
-  address: string,
-  payload: string,
-): Promise<{| signature: string, key: string |}> {
-  const withSigningKey = asGetSigningKey(publicDeriver);
-  if (!withSigningKey) {
-    throw new Error('unable to get signing key');
-  }
-  const normalizedKey = await withSigningKey.normalizeKey({
-    ...(await withSigningKey.getSigningKey()),
-    password,
-  });
-
-  const withLevels = asHasLevels(publicDeriver);
-  if (!withLevels) {
-    throw new Error('unable to get levels');
-  }
-
-  const signingKey = derivePrivateByAddressing({
-    addressing: addressing.addressing,
-    startingFrom: {
-      key: RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      ),
-      level: withLevels.getParent().getPublicDeriverLevel(),
-    },
-  }).to_raw_key();
-
-  const coseSign1 = await cip8Sign(
-    Buffer.from(address, 'hex'),
-    signingKey,
-    Buffer.from(payload, 'hex'),
-  );
-
-  const key = RustModule.MessageSigning.COSEKey.new(
-    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
-  );
-  key.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_int(
-      RustModule.MessageSigning.Int.new_i32(6)
-    )
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_bytes(
-      signingKey.to_public().as_bytes()
-    )
-  );
-
-  return {
-    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
-    key: Buffer.from(key.to_bytes()).toString('hex'),
-  };
 }
 
 export function getTokenMetadataFromIds(

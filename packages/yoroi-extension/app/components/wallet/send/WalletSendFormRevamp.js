@@ -230,7 +230,7 @@ type Props = {|
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
   'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
-    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_min} inset !important`,
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
   },
 }));
 
@@ -605,7 +605,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
         return (
-          <Box className={styles.receiverStep} sx={{ background: 'ds.bg_color_min' }}>
+          <Box className={styles.receiverStep} sx={{ background: 'ds.bg_color_max' }}>
             {domainResolverSupported && this.props.supportedAddressDomainBannerState.isDisplayed ? (
               <Box pb="10px">
                 <SupportedAddressDomainsBanner onClose={this.props.supportedAddressDomainBannerState.onClose} />
@@ -631,7 +631,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   variant="caption1"
                   color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
-                  id='wallet:send:enterAddressStep-domainResolverAddress-text'
+                  id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
                   {truncateAddressShort(domainResolverResult.address)}
@@ -730,7 +730,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   position: 'absolute',
                   top: '-8px',
                   left: '6px',
-                  backgroundColor: 'ds.bg_color_min',
+                  backgroundColor: 'ds.bg_color_max',
                   paddingX: '4px',
                   color: shouldSendAll && 'grayscale.200',
                   fontWeight: 400,
@@ -843,7 +843,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     color: 'magenta.500',
                     fontSize: '12px',
                   }}
-                  id='wallet:send:addAssetsStep-amountError-text'
+                  id="wallet:send:addAssetsStep-amountError-text"
                 >
                   {amountInputError}
                 </Typography>
@@ -991,7 +991,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const { bodyRef } = this;
     return (
       <>
-        <Box className={styles.component} sx={{ backgroundColor: 'ds.bg_color_min' }}>
+        <Box className={styles.component} sx={{ backgroundColor: 'ds.bg_color_max' }}>
           <Box className={styles.wrapper} sx={{ height: '100%' }}>
             <SendFormHeader step={currentStep} onUpdateStep={this.onUpdateStep.bind(this)} />
             <Box

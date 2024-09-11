@@ -19,6 +19,7 @@ export type WalletType = 'trezor' | 'ledger' | 'mnemonic';
 // CoreAddressT are integers 0 ~ 4 so we use an array here.
 type AddressesByType = Array<Array<FullAddressPayload>>;
 
+// <TODO:THIS_NEEDS_TO_BE_A_CLASS>
 export type WalletState = {|
   publicDeriverId: number,
   conceptualWalletId: number,
@@ -27,6 +28,7 @@ export type WalletState = {|
   networkId: number,
   name: string,
   type: WalletType,
+  isHardware: boolean,
   hardwareWalletDeviceId: ?string,
   plate: WalletChecksum,
   publicKey: string,

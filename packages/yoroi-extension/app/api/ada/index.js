@@ -4,7 +4,13 @@ import type { lf$Database } from 'lovefield';
 import { fullErrStr, Logger, stringifyData, stringifyError } from '../../utils/logging';
 import CardanoByronTransaction from '../../domain/CardanoByronTransaction';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
-import { ChainDerivations, CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
+import {
+  ChainDerivations,
+  CoinTypes,
+  DREP_KEY_INDEX,
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+} from '../../config/numbersConfig';
 import { createHardwareCip1852Wallet, createStandardCip1852Wallet, } from './lib/storage/bridge/walletBuilder/shelley';
 import {
   getAllTransactions,
@@ -24,7 +30,7 @@ import { createMetadata } from './lib/storage/bridge/metadataUtils';
 
 import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
-import { Bip44DerivationLevels, flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
+import { flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
@@ -32,7 +38,11 @@ import { TransactionType } from './lib/storage/database/primitives/tables';
 import { PublicDeriver, } from './lib/storage/models/PublicDeriver/index';
 import {
   asDisplayCutoff,
+  asGetAllAccounting,
   asGetAllUtxos,
+  asGetPublicKey,
+  asGetSigningKey,
+  asHasLevels,
   asHasUtxoChains,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
@@ -41,7 +51,9 @@ import type {
   Address,
   Addressing,
   AddressType,
+  BaseSingleAddressPath,
   IDisplayCutoff,
+  IGetAllUtxoAddressesResponse,
   IGetAllUtxosResponse,
   IGetSigningKey,
   IGetStakingKey,
@@ -50,8 +62,6 @@ import type {
   IPublicDeriver,
   UsedStatus,
   Value,
-  BaseSingleAddressPath,
-  IGetAllUtxoAddressesResponse,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -69,7 +79,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { cip8Sign, v4PublicToV2, } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
@@ -105,6 +115,7 @@ import type {
   FilterFunc,
   GetRecentTransactionHashesFunc,
   GetTransactionsByHashesFunc,
+  GetUtxoDataResponse,
   HistoryFunc,
   MultiAssetMintMetadataFunc,
   MultiAssetSupplyFunc,
@@ -113,17 +124,11 @@ import type {
   SignedRequest,
   SignedResponse,
   TokenInfoFunc,
-  GetUtxoDataResponse,
   UtxoData,
 } from './lib/state-fetch/types';
 import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
-import {
-  getAllAddressesForDisplay,
-  getAllAddressesForWallet,
-} from './lib/storage/bridge/traitUtils';
-import type {
-  AddressRowWithPath,
-} from './lib/storage/bridge/traitUtils';
+import type { AddressRowWithPath, } from './lib/storage/bridge/traitUtils';
+import { getAllAddressesForDisplay, getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
   cardanoMinAdaRequiredFromAssets_coinsPerWord,
@@ -143,10 +148,7 @@ import type {
   RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import {
-  getCardanoHaskellBaseConfig,
-  getNetworkById,
-} from './lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, getNetworkById, } from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos, } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
@@ -159,6 +161,7 @@ import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/carda
 import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
 import type { IFetcher } from './lib/state-fetch/IFetcher.types';
+import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 
 // ADA specific Request / Response params
 
@@ -1361,6 +1364,7 @@ export default class AdaApi {
         false,
       );
 
+      // <TODO:WALLET_API>
       const defaultToken = {
         defaultNetworkId: wallet.networkId,
         defaultIdentifier: wallet.defaultTokenId,
@@ -2504,4 +2508,181 @@ export async function genOwnStakingKey(request: {|
     if (error instanceof LocalizableError) throw error;
     throw new GenericApiError();
   }
+}
+
+export { cip8Sign } from './lib/cardanoCrypto/utils';
+
+/**
+ * // <TODO:WALLET_API>
+ */
+export function pubKeyAndAddressingByChainAndIndex(
+  wallet: { publicKey: string, publicDeriverLevel: number, ... },
+  chainLevelDerivationIndex: number,
+  addressLevelDerivationIndex: number,
+): [RustModule.WalletV4.PublicKey, Addressing] {
+  const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(wallet.publicKey);
+  const addressing = {
+    addressing: {
+      path: [
+        WalletTypePurpose.CIP1852,
+        CoinType.CARDANO,
+        HARD_DERIVATION_START,
+        chainLevelDerivationIndex,
+        addressLevelDerivationIndex,
+      ],
+      startLevel: Bip44DerivationLevels.PURPOSE.level,
+    },
+  };
+  const derivedPubKey = derivePublicByAddressing({
+    ...addressing,
+    startingFrom: {
+      level: wallet.publicDeriverLevel,
+      key: publicKey,
+    },
+  }).to_raw_key();
+  return [derivedPubKey, addressing];
+}
+
+/**
+ * // <TODO:WALLET_API>
+ */
+export async function getDRepKeyAndAddressing(
+  wallet: PublicDeriver<>,
+): Promise<[RustModule.WalletV4.PublicKey, Addressing]> {
+  const withPubKey = asGetPublicKey(wallet);
+  if (withPubKey == null) {
+    throw new Error('Unable to get public key from the wallet');
+  }
+  const withLevels = asHasLevels(wallet);
+  if (withLevels == null) {
+    throw new Error('Unable to get derivation levels from the wallet');
+  }
+  const publicKey = (await withPubKey.getPublicKey()).Hash;
+  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
+  return pubKeyAndAddressingByChainAndIndex(
+    {
+      publicKey,
+      publicDeriverLevel
+    },
+    ChainDerivations.GOVERNANCE_DREP_KEYS,
+    DREP_KEY_INDEX,
+  );
+}
+
+/**
+ * // <TODO:WALLET_API>
+ */
+export async function getAddressing(
+  publicDeriver: PublicDeriver<>,
+  address: string,
+): Promise<?Addressing> {
+  const findAddressing = (addresses) => {
+    for (const {
+      addrs,
+      addressing
+    } of addresses) {
+      for (const { Hash } of addrs) {
+        if (Hash === address) {
+          return { addressing };
+        }
+      }
+    }
+  };
+
+  const withAccounting = asGetAllAccounting(publicDeriver);
+  if (!withAccounting) {
+    throw new Error('unable to get accounting addresses from public deriver');
+  }
+  const rewardAddressing = findAddressing(
+    await withAccounting.getAllAccountingAddresses(),
+  );
+  if (rewardAddressing) {
+    return rewardAddressing;
+  }
+
+  const [dRepPubKey, dRepAddressing] = await getDRepKeyAndAddressing(publicDeriver);
+  if (dRepPubKey.hash().to_hex() === address) {
+    return dRepAddressing;
+  }
+
+  const withUtxos = asGetAllUtxos(publicDeriver);
+  if (!withUtxos) {
+    throw new Error('unable to get UTxO addresses from public deriver');
+  }
+  return findAddressing(
+    await withUtxos.getAllUtxoAddresses(),
+  );
+}
+
+/**
+ * // <TODO:WALLET_API> not clear if will be possible to make a part of wallet API since requires a signature from HWs
+ */
+export async function walletSignData(
+  publicDeriver: PublicDeriver<>,
+  password: string,
+  address: string,
+  payload: string,
+): Promise<{| signature: string, key: string |}> {
+  const withSigningKey = asGetSigningKey(publicDeriver);
+  if (!withSigningKey) {
+    throw new Error('unable to get signing key');
+  }
+  const normalizedKey = await withSigningKey.normalizeKey({
+    ...(await withSigningKey.getSigningKey()),
+    password,
+  });
+
+  const withLevels = asHasLevels(publicDeriver);
+  if (!withLevels) {
+    throw new Error('unable to get levels');
+  }
+
+  const addressing = await getAddressing(publicDeriver, address);
+  if (!addressing) {
+    throw new Error('key derivation path does not exist');
+  }
+
+  const signingKey = derivePrivateByAddressing({
+    addressing: addressing.addressing,
+    startingFrom: {
+      key: RustModule.WalletV4.Bip32PrivateKey.from_bytes(
+        Buffer.from(normalizedKey.prvKeyHex, 'hex')
+      ),
+      level: withLevels.getParent().getPublicDeriverLevel(),
+    },
+  }).to_raw_key();
+
+  const coseSign1 = await cip8Sign(
+    Buffer.from(address, 'hex'),
+    signingKey,
+    Buffer.from(payload, 'hex'),
+  );
+
+  const key = RustModule.MessageSigning.COSEKey.new(
+    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
+  );
+  key.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_int(
+      RustModule.MessageSigning.Int.new_i32(6)
+    )
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_bytes(
+      signingKey.to_public().as_bytes()
+    )
+  );
+
+  return {
+    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
+    key: Buffer.from(key.to_bytes()).toString('hex'),
+  };
 }

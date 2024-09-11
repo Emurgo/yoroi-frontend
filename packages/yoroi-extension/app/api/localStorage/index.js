@@ -12,6 +12,7 @@ import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types';
 import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 import { maybe } from '../../coreUtils';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 
 declare var chrome;
 declare var browser;
@@ -459,3 +460,9 @@ export function createStorageFlag(key: string, defaultValue: boolean): StorageFi
   return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
 }
 
+export function createFlagStorage(): StorageAPI {
+    return {
+      get: async s => (await getLocalItem(s)) ?? null,
+      set: setLocalItem,
+    };
+}

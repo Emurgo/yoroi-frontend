@@ -79,7 +79,7 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
           justifyContent: 'space-between',
           ...paddings,
           ...this.props.sx,
-          background: 'ds.bg_color_min',
+          background: 'ds.bg_color_max',
         }}
         className={this.props.className}
       >

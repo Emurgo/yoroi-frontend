@@ -51,13 +51,16 @@ class StakingPageContent extends Component<AllProps> {
   };
 
   async componentDidMount() {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-
-    if (this.props.stores.delegation.getPoolTransitionConfig(publicDeriver).shouldUpdatePool) {
-      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(publicDeriver);
+    // Check governance only for certain network
+    if (wallet.type !== 'trezor') {
+      noop(this.props.stores.delegation.checkGovernanceStatus(wallet));
+    }
+    if (this.props.stores.delegation.getPoolTransitionConfig(wallet).shouldUpdatePool) {
+      const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(wallet);
       if (poolTransitionInfo?.suggestedPool) {
         noop(this.props.stores.delegation.createDelegationTransaction(poolTransitionInfo.suggestedPool.hash));
       }
@@ -207,7 +210,7 @@ class StakingPageContent extends Component<AllProps> {
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver.publicDeriverId);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
-    const isParticipatingToGovernance = stores.delegation.governanceStatus;
+    const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
 
     return (
       <Box>
@@ -215,7 +218,7 @@ class StakingPageContent extends Component<AllProps> {
           <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
         ) : null}
 
-        {isStakeRegistered ? (
+        {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
               onOverviewClick={() =>

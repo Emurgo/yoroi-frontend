@@ -15,8 +15,6 @@ import BigNumber from 'bignumber.js';
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
-type RustModuleLoadFlags = 'dontLoadMessagesSigning';
-
 function isWasmPointer(o: ?any): boolean {
   return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
 }
@@ -152,7 +150,7 @@ class Module {
   _messageSigning: WasmMessageSigning;
   _crossCsl: CrossCsl;
 
-  async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
+  async load(): Promise<void> {
     if (
       this._wasmv2 != null
         || this._wasmv4 != null
@@ -161,11 +159,7 @@ class Module {
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
-    if (flags.includes('dontLoadMessagesSigning')) {
-      this._messageSigning = ((null: any): WasmMessageSigning);
-    } else {
-      this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
-    }
+    this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
     this._crossCsl = await import('@emurgo/cross-csl-browser');
   }
 

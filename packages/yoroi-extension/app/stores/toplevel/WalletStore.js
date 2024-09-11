@@ -14,9 +14,16 @@ import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWa
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
+import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { createFlagStorage } from '../../api/localStorage';
+import { forceNonNull, timeCached } from '../../coreUtils';
+import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+
 /*::
 declare var chrome;
 */
@@ -65,11 +72,16 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return restoredWallet;
   });
 
+  flagStorage: StorageAPI;
+  absoluteSlotGetters: { [string]: () => Promise<number> } = {};
+
   setup(): void {
     super.setup();
     const { wallets } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
+
+    this.flagStorage = createFlagStorage();
 
     listenForWalletStateUpdate(async (params) => {
       if (params.eventType === 'update') {
@@ -111,11 +123,50 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     });
   }
 
+  // <TODO:ENCAPSULATE> make it a part of the wallet.network api
+  async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
+    const wallet: ?WalletState = this.selected;
+    if (wallet == null) return null;
+    const network = getNetworkById(wallet.networkId);
+    const networkName = network.NetworkFeatureName;
+    if (networkName == null) return null;
+
+    let absoluteSlotGetter = this.absoluteSlotGetters[networkName];
+    if (absoluteSlotGetter == null) {
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      absoluteSlotGetter = timeCached(
+        async () => {
+          const bestblockInfo: BestBlockResponse = await fetcher.getBestBlock({ network });
+          const { epoch, slot } = bestblockInfo;
+          if (epoch != null && slot != null) {
+            return TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), { epoch, slot });
+          }
+          console.warn('Failing to resolve absolute slot, bestblock info without epoch or slot: ', bestblockInfo);
+          return -1;
+        },
+        60_000, // 1 minute
+      );
+      this.absoluteSlotGetters[networkName] = absoluteSlotGetter;
+    }
+
+    const absoluteSlot = await absoluteSlotGetter();
+
+    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+      .readFlag(feature, networkName, absoluteSlot);
+  }
+
   @computed get selected(): null | WalletState {
     if (typeof this.selectedIndex === 'number') {
       return this.wallets[this.selectedIndex];
     }
     return null;
+  }
+
+  @computed get selectedOrFail(): WalletState {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
   }
 
   @action
@@ -144,13 +195,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @computed get hasActiveWallet(): boolean {
     return this.selected != null;
-  }
-
-  @computed get selectedOrFail(): WalletState {
-    if (this.selected == null) {
-      throw new Error('A selected wallet is required!');
-    }
-    return this.selected;
   }
 
   @computed get activeWalletPlate(): ?WalletChecksum {

@@ -48,6 +48,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
     this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
   };
 
+  checkAndResetGovRoutes: void => void = () => {
+    if (
+      this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
+      this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
+    ) {
+      this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
+    }
+  };
+
   render(): Node {
     const { stores, pageBanner } = this.props;
     const { profile, wallets} = stores;
@@ -93,11 +102,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           menu={this.props.menu}
           walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <BuySellAdaButton
-              onBuySellClick={() =>
-                this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })
-              }
-            />
+            <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
           }
           pageBanner={pageBanner}
         />
@@ -133,9 +138,15 @@ export default class NavBarContainerRevamp extends Component<Props> {
       return (
         <WalletListDialog
           cardanoWallets={cardanoWallets}
-          onSelect={this.onSelectWallet}
+          onSelect={wallet => {
+            this.checkAndResetGovRoutes();
+            this.onSelectWallet(wallet);
+          }}
           selectedWalletId={selected?.publicDeriverId}
-          close={this.props.actions.dialogs.closeActiveDialog.trigger}
+          close={() => {
+            this.checkAndResetGovRoutes();
+            this.props.actions.dialogs.closeActiveDialog.trigger();
+          }}
           shouldHideBalance={this.props.stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
