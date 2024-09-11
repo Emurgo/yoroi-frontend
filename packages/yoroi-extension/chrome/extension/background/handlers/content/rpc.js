@@ -92,12 +92,8 @@ async function confirmSign(
   });
 }
 
-declare function _MaybeWallet(cond: true): PublicDeriver<>;
-// eslint-disable-next-line no-redeclare
-declare function _MaybeWallet(cond: false): void;
-
-type RequestType<NeedConnectedWallet, ParamT> = {|
-  wallet: $Call<typeof _MaybeWallet, NeedConnectedWallet>,
+type RequestType<WalletType, ParamT> = {|
+  wallet: WalletType,
   tabId: number,
   message: {|
     uid: number,
@@ -118,40 +114,48 @@ type ReturnType<ReturnT> = {|
   |}
 |} | void;
 
-type HandleFuncType<NeedConnectedWallet, ParamT, ReturnT> = (
-  request: RequestType<NeedConnectedWallet, ParamT>
+type HandleFuncType<WalletType, ParamT, ReturnT> = (
+  request: RequestType<WalletType, ParamT>
 ) => Promise<ReturnType<ReturnT>>;
 
-type Handler<NeedConnectedWallet, ParamT, ReturnT> = {|
-  needConnectedWallet: NeedConnectedWallet,
+type Handler<ParamT, ReturnT> = {|
+  needConnectedWallet: true,
   syncConnectedWallet: boolean,
-  handle: HandleFuncType<NeedConnectedWallet, ParamT, ReturnT>,
+  handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>,
+|} | {|
+  needConnectedWallet: false,
+  syncConnectedWallet: boolean,
+  handle: HandleFuncType<void, ParamT, ReturnT>,
 |};
 
-class _TypeCarrier<ParamT, ReturnT> {
-  toBe<NeedConnectedWallet>(
-    needConnectedWallet: NeedConnectedWallet,
-    syncConnectedWallet: boolean,
-    handle: HandleFuncType<NeedConnectedWallet, ParamT, ReturnT>,
-  ): Handler<NeedConnectedWallet, ParamT, ReturnT> {
-    return { needConnectedWallet, syncConnectedWallet, handle };
+class NewHandler {
+
+  static basic<ParamT, ReturnT>(
+    handle: HandleFuncType<void, ParamT, ReturnT>
+  ): Handler<ParamT, ReturnT> {
+    return { needConnectedWallet: false, syncConnectedWallet: false, handle };
+  }
+
+  static withWallet<ParamT, ReturnT>(
+    handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>
+  ): Handler<ParamT, ReturnT> {
+    return { needConnectedWallet: true, syncConnectedWallet: false, handle };
+  }
+
+  static withSyncedWallet<ParamT, ReturnT>(
+    handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>
+  ): Handler<ParamT, ReturnT> {
+    return { needConnectedWallet: true, syncConnectedWallet: true, handle };
   }
 }
 
-function defineHandler<ParamT, ReturnT>(): _TypeCarrier<ParamT, ReturnT> {
-  return new _TypeCarrier();
-}
-
-type _GetParamT = <_NeedConnectedWallet, ParamT, _ReturnT>(Handler<_NeedConnectedWallet, ParamT, _ReturnT>) => ParamT;
-export type GetParamT<HandlerT> = $Call<_GetParamT, HandlerT>;
-
-const signDataHandler = defineHandler<
+const signDataHandler = NewHandler.withSyncedWallet<
   [
     string, // rawAddress
     string, // payload
   ],
   void,
->().toBe(true, true, async ({ message, wallet, tabId }) => {
+>(async ({ message, wallet, tabId }) => {
   const rawAddress = message.params[0];
   const payload = message.params[1];
   const connection = await getConnectedSite(tabId);
@@ -195,10 +199,10 @@ const signDataHandler = defineHandler<
 });
 
 const Handlers = Object.freeze({
-  'is_enabled/cardano': defineHandler<
+  'is_enabled/cardano': NewHandler.basic<
     void,
     boolean,
-  >().toBe(false, false, async ({ message, tabId }) => {
+  >(async ({ message, tabId }) => {
     try {
       const whitelistedEntry = await findWhitelistedConnection(
         message.url,
@@ -212,7 +216,7 @@ const Handlers = Object.freeze({
     }
   }),
 
-  'sign_tx/cardano': defineHandler<
+  'sign_tx/cardano': NewHandler.basic<
     [
       {|
         tx: string,
@@ -221,7 +225,7 @@ const Handlers = Object.freeze({
       |}
     ],
     void,
-  >().toBe(false, false, async ({ message, tabId }) => {
+  >(async ({ message, tabId }) => {
     const connection = await getConnectedSite(tabId);
     if (connection == null) { // shouldn't happen
       Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
@@ -248,10 +252,10 @@ const Handlers = Object.freeze({
   'sign_data': signDataHandler,
   'cip95_sign_data': signDataHandler,
 
-  'get_balance': defineHandler<
+  'get_balance': NewHandler.withSyncedWallet<
     [ string /* tokenId */ ],
     string /* cbor */ | (AccountBalance | Value) /* non-cbor */
-  >().toBe(true, true, async ({ message, wallet }) => {
+  >(async ({ message, wallet }) => {
     const tokenId = asTokenId(message.params[0]);
     const balance = await connectorGetBalance(wallet, tokenId);
     if (message.returnType === 'cbor' && tokenId === '*' && !(typeof balance === 'string')) {
@@ -278,13 +282,13 @@ const Handlers = Object.freeze({
     return { ok: balance };
   }),
 
-  'get_utxos/cardano': defineHandler<
+  'get_utxos/cardano': NewHandler.withSyncedWallet<
     [
       string | null, // valueExpected
       boolean, // paginate
     ],
     null,
-  >().toBe(true, true, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
     const paginate = message.params[1] == null ? null : asPaginate(message.params[1]);
 
@@ -315,10 +319,10 @@ const Handlers = Object.freeze({
     }
   }),
 
-  'get_used_addresses': defineHandler<
+  'get_used_addresses': NewHandler.withWallet<
     [ boolean /* paginate */],
     Array<Address> /* cbor */| Array<string> /* non-cbor */
-  >().toBe(true, false, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const paginate = message.params[0] == null ? null : asPaginate(message.params[0]);
 
     const addresses = await connectorGetUsedAddressesWithPaginate(wallet, paginate);
@@ -328,10 +332,10 @@ const Handlers = Object.freeze({
     return { ok: await addressesToBech(addresses) };
   }),
 
-  'get_unused_addresses': defineHandler<
+  'get_unused_addresses': NewHandler.withWallet<
     void,
     Array<Address> /* cbor */| Array<string> /* non-cbor */
-  >().toBe(true, false, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const addresses = await connectorGetUnusedAddresses(wallet);
     if (message.returnType === 'cbor') {
       return { ok: addresses };
@@ -339,10 +343,10 @@ const Handlers = Object.freeze({
     return { ok: await addressesToBech(addresses) };
   }),
 
-  'get_reward_addresses/cardano': defineHandler<
+  'get_reward_addresses/cardano': NewHandler.withWallet<
     void,
     Array<Address> /* cbor */| Array<string> /* non-cbor */
-  >().toBe(true, false, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const addresses = await connectorGetCardanoRewardAddresses(wallet);
     if (message.returnType === 'cbor') {
       return { ok: addresses };
@@ -350,18 +354,18 @@ const Handlers = Object.freeze({
     return { ok: await addressesToBech(addresses) };
   }),
 
-  'get_drep_key': defineHandler<
+  'get_drep_key': NewHandler.withWallet<
     void,
     string,
-  >().toBe(true, false, async ({ wallet }) => {
+  >(async ({ wallet }) => {
     const dRepKey = await connectorGetDRepKey(wallet);
     return { ok: dRepKey };
   }),
 
-  'get_stake_key': defineHandler<
+  'get_stake_key': NewHandler.withWallet<
     void,
     {| key: string, isRegistered: boolean |}
-  >().toBe(true, false, async ({ wallet }) => {
+  >(async ({ wallet }) => {
     const stateFetcher: CardanoIFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     const resp = await connectorGetStakeKey(
       wallet,
@@ -370,10 +374,10 @@ const Handlers = Object.freeze({
     return { ok: resp };
   }),
 
-  'get_change_address': defineHandler<
+  'get_change_address': NewHandler.withWallet<
     void,
     string,
-  >().toBe(true, false, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const address = await connectorGetChangeAddress(wallet);
     if (message.returnType === 'cbor') {
       return { ok: address };
@@ -381,10 +385,10 @@ const Handlers = Object.freeze({
     return { ok: (await addressesToBech([address]))[0] };
   }),
 
-  'submit_tx': defineHandler<
+  'submit_tx': NewHandler.withWallet<
     [ string /* tx hex */ ],
     string,
-  >().toBe(true, false, async ({ wallet, message }) => {
+  >(async ({ wallet, message }) => {
     const txBuffer = Buffer.from(message.params[0], 'hex');
     await connectorSendTxCardano(
       wallet,
@@ -411,14 +415,14 @@ const Handlers = Object.freeze({
     return { ok: id };
   }),
 
-  'ping': defineHandler<void, boolean>().toBe(false, false, async () => {
+  'ping': NewHandler.basic<void, boolean>(async () => {
     return { ok: true };
   }),
 
-  'create_tx/cardano': defineHandler<
+  'create_tx/cardano': NewHandler.withWallet<
     [ CardanoTxRequest ],
     string,
-  >().toBe(true, false, async ({ wallet, message, tabId }) => {
+  >(async ({ wallet, message, tabId }) => {
     const connection = await getConnectedSite(tabId);
     if (connection == null) { // shouldn't happen
       Logger.error(`ERR - sign_tx could not find connection with tabId = ${tabId}`);
@@ -437,10 +441,10 @@ const Handlers = Object.freeze({
     return { ok: resp };
   }),
 
-  'get_network_id': defineHandler<
+  'get_network_id': NewHandler.withWallet<
     void,
     number,
-  >().toBe(true, false, async ({ wallet, tabId }) => {
+  >(async ({ wallet, tabId }) => {
     const connection = await getConnectedSite(tabId);
     if (connection == null) { // shouldn't happen
       Logger.error(`ERR - get_network_id could not find connection with tabId = ${tabId}`);
@@ -451,10 +455,10 @@ const Handlers = Object.freeze({
   }),
 
 
-  'list_nfts/cardano': defineHandler<
+  'list_nfts/cardano': NewHandler.withSyncedWallet<
     void,
     {| [string]: {| metadata: NFTMetadata | null |} |}
-  >().toBe(true, true, async ({ wallet }) => {
+  >(async ({ wallet }) => {
     const assets = await connectorGetAssets(wallet);
     const potentialNFTAssets = assets.filter(asset => asset.amount === '1');
     const tokenIds = potentialNFTAssets.map(asset => asset.identifier);
@@ -482,10 +486,10 @@ const Handlers = Object.freeze({
   }),
 
 
-  'auth_sign_hex_payload/cardano': defineHandler<
+  'auth_sign_hex_payload/cardano': NewHandler.basic<
     [string],
     string,
-  >().toBe(false, false, async ({ tabId, message }) => {
+  >(async ({ tabId, message }) => {
     const connection = await getConnectedSite(tabId);
 
     const auth = connection?.status?.auth;
@@ -499,13 +503,13 @@ const Handlers = Object.freeze({
     return { ok: signatureHex };
   }),
 
-  'auth_check_hex_payload/cardano': defineHandler<
+  'auth_check_hex_payload/cardano': NewHandler.basic<
     [
       string,
       string
     ],
     boolean
-  >().toBe(false, false, async ({ tabId, message }) => {
+  >(async ({ tabId, message }) => {
     const connection = await getConnectedSite(tabId);
     if (!connection) {
       throw new Error(`could not find tabId ${tabId} in connected sites`);
@@ -525,10 +529,10 @@ const Handlers = Object.freeze({
     return { ok: res };
   }),
 
-  'get_collateral_utxos': defineHandler<
+  'get_collateral_utxos': NewHandler.withSyncedWallet<
     string,
     void,
-  >().toBe(true, true, async ({ wallet, tabId, message }) => {
+  >(async ({ wallet, tabId, message }) => {
     const firstParam = message.params[0];
     const definedRequiredAmount = !!firstParam;
     let requiredAmount: string = firstParam || String(MAX_COLLATERAL);
