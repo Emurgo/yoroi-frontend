@@ -119,13 +119,12 @@ type HandleFuncType<WalletType, ParamT, ReturnT> = (
 ) => Promise<ReturnType<ReturnT>>;
 
 type Handler<ParamT, ReturnT> = {|
+  needConnectedWallet: false,
+  handle: HandleFuncType<void, ParamT, ReturnT>,
+|} | {|
   needConnectedWallet: true,
   syncConnectedWallet: boolean,
   handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>,
-|} | {|
-  needConnectedWallet: false,
-  syncConnectedWallet: boolean,
-  handle: HandleFuncType<void, ParamT, ReturnT>,
 |};
 
 class NewHandler {
@@ -133,7 +132,7 @@ class NewHandler {
   static basic<ParamT, ReturnT>(
     handle: HandleFuncType<void, ParamT, ReturnT>
   ): Handler<ParamT, ReturnT> {
-    return { needConnectedWallet: false, syncConnectedWallet: false, handle };
+    return { needConnectedWallet: false, handle };
   }
 
   static withWallet<ParamT, ReturnT>(
