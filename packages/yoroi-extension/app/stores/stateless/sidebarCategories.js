@@ -184,7 +184,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
     isVisible: ({ selected }) => selected != null && !isTrezorTWallet(selected.getParent()),
-    featureFlagName: 'governance',
   },
   {
     className: 'settings',
