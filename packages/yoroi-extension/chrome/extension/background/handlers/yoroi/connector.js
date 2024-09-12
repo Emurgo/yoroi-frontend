@@ -3,30 +3,26 @@
 
 import type { HandlerType } from './type';
 import {
-  withDb,
-  withSelectedWallet,
   getConnectedSite,
   connectContinuation,
   setConnectedSite,
   deleteConnectedSite,
-  sendToInjector,
-  transformCardanoUtxos,
   getAllConnectedSites,
-  getFromStorage,
-  STORAGE_KEY_IMG_BASE64,
-} from '../content';
+  getConnectedWallet,
+} from '../content/connect';
+import { sendToInjector } from '../content/utils';
+
 import { getPublicDeriverById } from './utils';
 import { asGetPublicKey } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   connectorSignCardanoTx,
+  transformCardanoUtxos,
 } from '../../../connector/api';
 import { createAuthEntry } from '../../../../../app/connector/api';
 import { getWalletChecksum } from '../../../../../app/api/export/utils';
 import type CardanoTxRequest from '../../../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../../../app/api/ada/lib/state-fetch/types';
 import {
-  APIErrorCodes,
-  ConnectorError,
   DataSignErrorCodes,
   TxSignErrorCodes,
   type WalletAuthEntry,
@@ -42,6 +38,23 @@ import { Logger } from '../../../../../app/utils/logging';
 import { walletSignData } from '../../../../../app/api/ada';
 
 type RpcUid = number;
+
+function rpcResponse(
+  tabId: number,
+  uid: RpcUid,
+  response: {| ok: any |} | {| err: any |}
+) {
+  sendToInjector(
+    tabId,
+    {
+      type: 'connector_rpc_response',
+      uid,
+      return: response,
+      protocol: 'cardano',
+    }
+  );
+};
+
 
 export const UserConnectResponse: HandlerType<
   {|
@@ -136,34 +149,18 @@ export const UserSignConfirm: HandlerType<
   typeTag: 'user-sign-confirm',
 
   handle: async (request) => {
-    const rpcResponse = (response: {| ok: any |} | {| err: any |}) => {
-      sendToInjector(
-        request.tabId,
-        {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: response
-        }
-      );
-    };
-
     const connection = await getConnectedSite(request.tabId);
     if (connection == null) {
-      // fixme: should response with `rpcResponse`
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: 'Connection has failed. Please retry.',
-      });
+      console.error('Handling user sign confirmation but lost connection to dApp site.');
+      return;
     }
     const responseData = connection.pendingSigns[String(request.uid)];
     if (!responseData) {
-      // fixme: should response with `rpcResponse`
-      throw new ConnectorError({
-        code: APIErrorCodes.API_INTERNAL_ERROR,
-        info: `Sign request data is not available after confirmation (uid=${request.uid}). Please retry.`,
-      });
+      console.error('Handling user sign confirmation but signing request is unexpectedly missing..');
+      return;
     }
+
+    const wallet = await getConnectedWallet(request.tabId, false);
 
     switch (responseData.request.type) {
       case 'tx/cardano':
@@ -172,10 +169,10 @@ export const UserSignConfirm: HandlerType<
         try {
           let signedTxWitnessSetHex;
           if (request.password) {
-            signedTxWitnessSetHex = await signCardanoTx(
-              (request.tx: any),
+            signedTxWitnessSetHex = await connectorSignCardanoTx(
+              wallet,
               request.password,
-              request.tabId
+              (request.tx: any),
             );
           } else if (request.witnessSetHex) {
             signedTxWitnessSetHex = request.witnessSetHex;
@@ -187,12 +184,12 @@ export const UserSignConfirm: HandlerType<
           resp = { err: 'transaction signing failed' };
         }
         if (responseData.continuationData.type !== 'cardano-tx') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { tx, returnTx } = responseData.continuationData;
         if (resp?.ok == null) {
-          rpcResponse(resp);
+          rpcResponse(request.tabId, request.uid, resp);
         } else {
           const resultWitnessSetHex: string = resp.ok;
           if (returnTx) {
@@ -221,10 +218,10 @@ export const UserSignConfirm: HandlerType<
                   true,
                 );
               }
-              rpcResponse({ ok: fullTx.to_hex() });
+              rpcResponse(request.tabId, request.uid, { ok: fullTx.to_hex() });
             });
           } else {
-            rpcResponse({ ok: resultWitnessSetHex });
+            rpcResponse(request.tabId, request.uid, { ok: resultWitnessSetHex });
           }
         }
       }
@@ -232,31 +229,23 @@ export const UserSignConfirm: HandlerType<
       case 'data':
       {
         if (responseData.continuationData.type !== 'cardano-data') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { address, payload } = responseData.continuationData;
         let dataSig;
         try {
-          dataSig = await withDb(async (db, localStorageApi) => {
-            return await withSelectedWallet(
-              request.tabId,
-              async (wallet) => {
-                return await walletSignData(
-                  wallet,
-                  request.password,
-                  address,
-                  payload,
-                );
-              },
-              db,
-              localStorageApi,
-              false,
-            );
-          });
+          dataSig = await walletSignData(
+            wallet,
+            request.password,
+            address,
+            payload,
+          );
         } catch (error) {
           Logger.error(`error when signing data ${error}`);
           rpcResponse(
+            request.tabId,
+            request.uid,
             {
               err: {
                 code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
@@ -266,13 +255,13 @@ export const UserSignConfirm: HandlerType<
           );
           return;
         }
-        rpcResponse({ ok: dataSig });
+        rpcResponse(request.tabId, request.uid, { ok: dataSig });
       }
         break;
       case 'tx-reorg/cardano':
       {
         if (responseData.continuationData.type !== 'cardano-reorg-tx') {
-          rpcResponse({ err: 'unexpected error' });
+          rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
         const { isCBOR } = responseData.continuationData;
@@ -281,7 +270,7 @@ export const UserSignConfirm: HandlerType<
           [...(request.tx: any)],
           isCBOR
         );
-        rpcResponse({ ok: utxos });
+        rpcResponse(request.tabId, request.uid, { ok: utxos });
       }
         break;
       default:
@@ -292,30 +281,6 @@ export const UserSignConfirm: HandlerType<
     await setConnectedSite(request.tabId, connection);
   },
 });
-
-/**
- * Returns HEX of a serialised witness set
- */
-async function signCardanoTx(
-  tx: CardanoTx,
-  password: string,
-  tabId: number
-): Promise<string> {
-  return await withDb(async (db, localStorageApi) => {
-    return await withSelectedWallet(
-      tabId,
-      async (wallet) => {
-        return await connectorSignCardanoTx(
-          wallet,
-          password,
-          tx,
-        );
-      },
-      db,
-      localStorageApi
-    );
-  });
-}
 
 export const UserSignReject: HandlerType<
   {|
@@ -334,17 +299,13 @@ export const UserSignReject: HandlerType<
         ? DataSignErrorCodes.DATA_SIGN_USER_DECLINED
         : TxSignErrorCodes.USER_DECLINED;
 
-      sendToInjector(
+      rpcResponse(
         request.tabId,
+        request.uid,
         {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: 'User rejected'
-            },
+          err: {
+            code,
+            info: 'User rejected'
           },
         }
       );
@@ -376,17 +337,13 @@ export const SignFail: HandlerType<
         ? DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION
         : TxSignErrorCodes.PROOF_GENERATION;
 
-      sendToInjector(
+      rpcResponse(
         request.tabId,
+        request.uid,
         {
-          type: 'connector_rpc_response',
-          protocol: responseData.protocol,
-          uid: request.uid,
-          return: {
-            err: {
-              code,
-              info: `utxo error: ${request.errorType} (${request.data})`
-            },
+          err: {
+            code,
+            info: `utxo error: ${request.errorType} (${request.data})`
           },
         }
       );
@@ -445,12 +402,11 @@ export const ConnectWindowRetrieveData: HandlerType<
       const connection = connectedSites[tabId];
       if (connection.status?.requestType) {
         connection.status.openedWindow = true;
-        const imgBase64Url = await getFromStorage(STORAGE_KEY_IMG_BASE64);
+
         return {
           url: connection.url,
-          protocol: connection.protocol,
           appAuthID: connection.appAuthID,
-          imgBase64Url,
+          imgBase64Url: connection.imgBase64Url,
           tabId: Number(tabId),
         };
       }

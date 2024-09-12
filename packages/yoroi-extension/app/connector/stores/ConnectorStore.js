@@ -926,10 +926,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
   _removeWalletFromWhitelist: (request: {|
     url: string,
-    protocol: string,
   |}) => Promise<void> = async request => {
     const filter = this.currentConnectorWhitelist.filter(
-      e => !(e.url === request.url && e.protocol === request.protocol)
+      e => e.url !== request.url
     );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,

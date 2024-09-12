@@ -212,7 +212,8 @@ export type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: {
     senderUtxos: Array<CardanoAddressedUtxo>,
-    +unsignedTx: RustModule.WalletV4.TransactionBuilder |
+    +unsignedTx: RustModule.WalletV4.Transaction |
+      RustModule.WalletV4.TransactionBuilder |
       RustModule.WalletV4.TransactionBody |
       Buffer |
       Uint8Array,

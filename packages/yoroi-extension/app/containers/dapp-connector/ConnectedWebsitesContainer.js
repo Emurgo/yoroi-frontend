@@ -44,13 +44,12 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
     await this.props.actions.connector.getConnectorWhitelist.trigger();
   }
 
-  onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void = ({ url, protocol }) => {
-    if (url == null || protocol == null) {
+  onRemoveWallet: ({| url: ?string |}) => void = ({ url }) => {
+    if (url == null) {
       throw new Error(`Removing a wallet from whitelist but there's no url or protocol`);
     }
     this.props.actions.connector.removeWalletFromWhitelist.trigger({
       url,
-      protocol,
     });
   };
 

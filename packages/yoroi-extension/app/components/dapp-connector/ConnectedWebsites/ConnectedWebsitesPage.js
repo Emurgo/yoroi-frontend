@@ -21,7 +21,7 @@ type Props = {|
   +whitelistEntries: ?Array<WhitelistEntry>,
   +activeSites: Array<string>,
   +wallets: ?Array<WalletState>,
-  +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
+  +onRemoveWallet: ({| url: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};
@@ -92,7 +92,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     }
 
     const cardanoNodes = whitelistEntries
-      .map(({ url, protocol, publicDeriverId, image }, entryIndex) => {
+      .map(({ url, publicDeriverId, image }, entryIndex) => {
         const wallet = wallets.find(
           cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
         );
@@ -103,7 +103,6 @@ class ConnectedWebsitesPage extends Component<AllProps> {
           <WalletRowRevamp
             key={url}
             url={url}
-            protocol={protocol}
             websiteIcon={image}
             onRemoveWallet={this.props.onRemoveWallet}
             balance={wallet.balance}
@@ -180,7 +179,7 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     }
 
     const cardanoNodes = whitelistEntries
-      .map(({ url, protocol, publicDeriverId, image }) => {
+      .map(({ url, publicDeriverId, image }) => {
         const wallet = wallets.find(
           cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
         );
@@ -192,7 +191,6 @@ class ConnectedWebsitesPage extends Component<AllProps> {
           <WalletRow
             key={url}
             url={url}
-            protocol={protocol}
             websiteIcon={image}
             isActiveSite={this.props.activeSites.includes(url)}
             onRemoveWallet={this.props.onRemoveWallet}

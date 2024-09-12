@@ -1119,3 +1119,66 @@ export function getTokenMetadataFromIds(
     }
   );
 }
+
+export function assetToRustMultiasset(
+  jsonAssets: $PropertyType<RemoteUnspentOutput, 'assets'>
+): RustModule.WalletV4.MultiAsset {
+  const groupedAssets = jsonAssets.reduce((res, a) => {
+    (res[a.policyId] = (res[a.policyId]||[])).push(a);
+    return res;
+  }, {})
+  const W4 = RustModule.WalletV4;
+  const multiasset = W4.MultiAsset.new();
+  for (const policyHex of Object.keys(groupedAssets)) {
+    const assetGroup = groupedAssets[policyHex];
+    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const assets = RustModule.WalletV4.Assets.new();
+    for (const asset of assetGroup) {
+      assets.insert(
+        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.BigNum.from_str(asset.amount),
+      );
+    }
+    multiasset.insert(policyId, assets);
+  }
+  return multiasset;
+}
+
+export async function transformCardanoUtxos(
+  utxos: Array<RemoteUnspentOutput>,
+  isCBOR: boolean,
+): any {
+  const cardanoUtxos: $ReadOnlyArray<$ReadOnly<RemoteUnspentOutput>> = utxos;
+  await RustModule.load();
+  const W4 = RustModule.WalletV4;
+  if (isCBOR) {
+    return cardanoUtxos.map(u => {
+      const input = W4.TransactionInput.new(
+        W4.TransactionHash.from_bytes(
+          Buffer.from(u.tx_hash, 'hex')
+        ),
+        u.tx_index,
+      );
+      const value = W4.Value.new(W4.BigNum.from_str(u.amount));
+      if ((u.assets || []).length > 0) {
+        value.set_multiasset(assetToRustMultiasset(u.assets));
+      }
+      const output = W4.TransactionOutput.new(
+        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+        value,
+      );
+      return Buffer.from(
+        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
+      ).toString('hex');
+    })
+  }
+
+  return cardanoUtxos.map(u => {
+    return {
+        ...u,
+      receiver: W4.Address.from_bytes(
+        Buffer.from(u.receiver, 'hex'),
+      ).to_bech32(),
+    };
+  });
+}
