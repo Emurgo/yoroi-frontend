@@ -92,6 +92,16 @@ export function buildDev(env: string) {
     webpackHotMiddleware,
     serverOpts
   );
+
+  const Webpack = require('webpack');
+  const WebpackDevServer = require('webpack-dev-server');
+  const webpackConfig = config.contentScriptConfig(
+    argv.env,
+    isNightly,
+    !shouldInjectConnector
+  );
+  const server = new WebpackDevServer(webpackConfig.devServer, Webpack(webpackConfig));
+  server.start();
 }
 
 if (argv.type === 'debug') {

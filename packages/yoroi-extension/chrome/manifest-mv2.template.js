@@ -87,7 +87,9 @@ export default ({
           uriTemplate: 'main_window.html#/send-from-uri?q=%s',
         },
       ],
-    web_accessible_resources: [],
+    web_accessible_resources: [
+      'js/bringInject.js',
+    ],
   };
 
   if (shouldInjectConnector) {
