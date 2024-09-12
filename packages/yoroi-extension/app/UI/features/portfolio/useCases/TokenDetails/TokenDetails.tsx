@@ -5,12 +5,13 @@ import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-
 import { Card, Skeleton } from '../../../../components';
 import Menu from '../../common/components/Menu';
 import NavigationButton from '../../common/components/NavigationButton';
-import { formatNumber } from '../../common/helpers/formatHelper';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
 import mockData from '../../common/mockData';
 import { SubMenuOption, TokenType } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { TokenChartInterval } from './TokenChartInterval';
 import TokenDetailOverview from './TokenDetailOverview';
 import TokenDetailPerformance from './TokenDetailPerformance';
 import TransactionTable from './TransactionTable';
@@ -33,12 +34,15 @@ interface Props {
 }
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
+  console.log("tokenInfo", tokenInfo)
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  const { unitOfAccount, walletBalance } = usePortfolio();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isAda: boolean = tokenInfo.name.toLowerCase() === 'ada';
+  const isPrimaryToken: boolean = tokenInfo.id === '-'
+  const tokenTotalAmount = isPrimaryToken ? walletBalance.ada : tokenInfo.totalAmount
+  console.log("[tokenTotalAmount]", tokenTotalAmount)
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -73,6 +77,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
 
     return () => clearTimeout(timer);
   }, []);
+  const { data } = useGetPortfolioTokenChart('24 H', tokenInfo)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -114,7 +119,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                 ) : (
                   <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
                     <Typography variant="h2" fontWeight="500" color="ds.gray_max">
-                      {formatNumber(tokenInfo.totalAmount)}
+                      {tokenTotalAmount}
                     </Typography>
                     <Typography
                       variant="body2"
@@ -133,15 +138,16 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_600">
-                    {formatNumber(tokenInfo.totalAmountFiat)} {isAda && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+                    {(tokenInfo.totalAmountFiat)} {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}
               </Stack>
             </Stack>
 
             <Divider />
-
-            {/* <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isAda={isAda} /> */}
+            {/* {isPrimaryToken && <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isPrimaryToken={isPrimaryToken} /> */}
+            {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryTokents={true} />
+            }
           </Card>
 
           <Card>
@@ -152,7 +158,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
               {selectedTab === subMenuOptions[0]?.route ? (
                 <TabContent>
-                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isAda={isAda} />
+                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isPrimaryToken={isPrimaryToken} />
                 </TabContent>
               ) : null}
 

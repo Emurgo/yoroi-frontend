@@ -1,16 +1,28 @@
 import { Box, Button, Stack, Typography, styled } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { LineChart, Line, CartesianGrid, YAxis, ResponsiveContainer, Tooltip as RechartTooltip } from 'recharts';
 import { useTheme } from '@mui/material/styles';
-import { Skeleton, Tooltip, Chip } from '../../../../components';
-import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
-import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Icon } from '../../../../components/icons';
-import useChart from '../../common/hooks/useChart';
-import { TokenType } from '../../common/types/index';
+import React, { useEffect, useState } from 'react';
+import { CartesianGrid, Line, LineChart, Tooltip as RechartTooltip, ResponsiveContainer, YAxis } from 'recharts';
+import { Chip, Skeleton, Tooltip } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
+import { Icon } from '../../../../components/icons';
+import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { formatNumber } from '../../common/helpers/formatHelper';
+import { createChartData } from '../../common/helpers/mockHelper';
+import useChart from '../../common/hooks/useChart';
+import { TOKEN_CHART_INTERVAL, useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
+import { useStrings } from '../../common/hooks/useStrings';
+import { TokenType } from '../../common/types/index';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
+
+
+const chartData = {
+  start24HoursAgo: createChartData('24H'),
+  start1WeekAgo: createChartData('1W'),
+  start1MonthAgo: createChartData('1M'),
+  start6MonthAgo: createChartData('6M'),
+  start1YearAgo: createChartData('1Y'),
+  ALL: createChartData('1Y'),
+}
 
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -33,11 +45,11 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
 interface Props {
   isLoading: boolean;
   tokenInfo: TokenType;
-  isAda: boolean;
+  isPrimaryToken: boolean;
 }
 
-const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element => {
-  const chartHeight = isAda ? 153 : 257;
+const TokenDetailChart = ({ isLoading, tokenInfo, isPrimaryToken }: Props): JSX.Element => {
+  const chartHeight = isPrimaryToken ? 153 : 257;
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -53,7 +65,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
     minValue,
     maxValue,
     activePeriodId,
-  } = useChart(tokenInfo.chartData);
+  } = useChart(chartData);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   useEffect(() => {
@@ -74,6 +86,15 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
       setIsFetching(false);
     }, 1000);
   };
+
+
+  // new logic =----------------------------------------------------------------
+
+
+  const [timeInterval, setTimeInterval] = useState<any>(TOKEN_CHART_INTERVAL.DAY)
+
+  const { data } = useGetPortfolioTokenChart(timeInterval, tokenInfo)
+  console.log("useGetPortfolioTokenChart", data)
 
   return (
     <Stack
@@ -144,12 +165,11 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                     detailInfo.fiatValue > 0
                       ? ChipTypes.ACTIVE
                       : detailInfo.fiatValue < 0
-                      ? ChipTypes.INACTIVE
-                      : ChipTypes.DISABLED
+                        ? ChipTypes.INACTIVE
+                        : ChipTypes.DISABLED
                   }
                   label={
-                    // @ts-ignore
-                    <Typography variant="caption1">
+                    <Typography variant="caption">
                       {detailInfo.fiatValue > 0 && '+'}
                       {formatNumber(detailInfo.fiatValue)} {unitOfAccount}
                     </Typography>
@@ -173,7 +193,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
           {isFetching ? null : (
             <ResponsiveContainer width={'99%'} height={chartHeight}>
               <LineChart
-                data={tokenInfo?.chartData[activePeriodId]}
+                data={chartData[activePeriodId]}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
@@ -195,7 +215,7 @@ const TokenDetailChart = ({ isLoading, tokenInfo, isAda }: Props): JSX.Element =
                       chartBottom={chartHeight}
                       rectWidth={93}
                       rectHeight={34}
-                      dataLength={tokenInfo?.chartData[activePeriodId].length}
+                      dataLength={chartData[activePeriodId].length}
                       {...props}
                     />
                   )}
