@@ -54,7 +54,7 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
     const { data, isFetching } = useGetPortfolioTokenChart(timeInterval, tokenInfo);
 
     const handlePeriodChange = (id: string) => {
-        setTimeInterval(id);
+        setTimeInterval(TOKEN_CHART_INTERVAL[id]);
     };
 
     // Prepare the chart data for recharts
@@ -136,7 +136,7 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
                             onClick={() => handlePeriodChange(interval)}
                             theme={theme}
                         >
-                            {interval}
+                            {TOKEN_CHART_INTERVAL[interval]}
                         </StyledButton>
                     ))}
                 </Stack>
