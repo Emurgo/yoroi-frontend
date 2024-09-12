@@ -3,70 +3,26 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import React, { useMemo, useState } from 'react';
-import { Chip, Skeleton } from '../../../../components';
+import { Chip } from '../../../../components';
 import { ChipTypes } from '../../../../components/Chip';
 import { Icon } from '../../../../components/icons';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
+import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';
 import { formatNumber } from '../../common/helpers/formatHelper';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
+import { useTokenPercentages } from '../../common/hooks/useTokenPercentages';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 
-const TableRowSkeleton = ({ theme, ...props }) => (
-  <TableRow
-    {...props}
-    sx={{
-      '& td': { border: 0 },
-    }}
-  >
-    <TableCell>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-        <Skeleton width="40px" height="40px" />
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="55px" height="24px" />
-          <Skeleton width="55px" height="16px" />
-        </Stack>
-      </Stack>
-    </TableCell>
 
-    <TableCell>
-      <Skeleton width="126px" height="24px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="62px" height="20px" />
-    </TableCell>
-
-    <TableCell>
-      <Skeleton width="146px" height="24px" />
-    </TableCell>
-
-    <TableCell>
-      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
-        <Stack direction="column" spacing={theme.spacing(0.25)}>
-          <Skeleton width="146px" height="24px" />
-          <Skeleton width="146px" height="16px" />
-        </Stack>
-      </Stack>
-    </TableCell>
-  </TableRow>
-);
 
 interface Props {
   data: TokenType[];
@@ -91,7 +47,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 
-  console.log('primaryTokenActivity', ptActivity);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -114,6 +69,10 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   ];
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
+
+  // TODO refactor and add calculation based on fiat toatl value - endpont not working 
+  const procentageData = useTokenPercentages(data)
+
 
   return (
     <Table
@@ -141,25 +100,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           }}
         >
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-              <Box
-                width="40px"
-                height="40px"
-                sx={{
-                  borderRadius: `${theme.shape.borderRadius}px`,
-                }}
-                component="img"
-                src={row.tokenLogo || tokenPng}
-              ></Box>
-              <Stack direction="column">
-                <Typography fontWeight="500" color="ds.text_gray_normal">
-                  {row.name}
-                </Typography>
-                <Typography variant="body2" color="ds.text_gray_medium">
-                  {row.ticker}
-                </Typography>
-              </Stack>
-            </Stack>
+            <TokenDisplay token={row} />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
@@ -181,69 +122,20 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
                 isPrimaryToken={row.policyId.length === 0}
               />
             )}
-
-            {/* <Chip
-              type={row['24h'] > 0 ? ChipTypes.ACTIVE : row['24h'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-              label={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['24h'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : row['24h'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  ) : null}
-                  <Typography variant="caption1">
-                    {row['24h'] >= 0 ? formatNumber(row['24h']) : formatNumber(-1 * row['24h'])}%
-                  </Typography>
-                </Stack>
-              }
-              sx={{ cursor: 'pointer' }}
-            /> */}
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Chip
-              type={row['1W'] > 0 ? ChipTypes.ACTIVE : row['1W'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-              label={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['1W'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : row['1W'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  ) : null}
-                  {/* @ts-ignore */}
-                  <Typography variant="caption1">
-                    {row['1W'] >= 0 ? formatNumber(row['1W']) : formatNumber(-1 * row['1W'])}%
-                  </Typography>
-                </Stack>
-              }
-              sx={{ cursor: 'pointer' }}
+            <TokenChip token={row} />
+          </TableCell>
+
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
+            <TokenChip token={row} />
+          </TableCell>
+
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
+            <TokenProcentage
+              procentage={row.info.policyId.length === 0 ? procentageData[""] : procentageData[`${row.policyId}.${row.assetName}`]}
             />
-          </TableCell>
-
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Chip
-              type={row['1M'] > 0 ? ChipTypes.ACTIVE : row['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-              label={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  {row['1M'] > 0 ? (
-                    <Icon.ChipArrowUp fill={theme.palette.ds.secondary_c800} />
-                  ) : row['1M'] < 0 ? (
-                    <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_c700} />
-                  ) : null}
-                  {/* @ts-ignore */}
-                  <Typography variant="caption1">
-                    {row['1M'] >= 0 ? formatNumber(row['1M']) : formatNumber(-1 * row['1M'])}%
-                  </Typography>
-                </Stack>
-              }
-              sx={{ cursor: 'pointer' }}
-            />
-          </TableCell>
-
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <Typography variant="body2" color="ds.text_gray_medium">
-              {formatNumber(row.portfolioPercents)} %
-            </Typography>
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
@@ -265,6 +157,30 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 };
 
 export default StatsTable;
+
+
+const TokenDisplay = ({ token }) => {
+  const theme = useTheme()
+  return <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+    <Box
+      width="40px"
+      height="40px"
+      sx={{
+        borderRadius: `${theme.shape.borderRadius}px`,
+      }}
+      component="img"
+      src={token.tokenLogo || tokenPng}
+    ></Box>
+    <Stack direction="column">
+      <Typography fontWeight="500" color="ds.text_gray_normal">
+        {token.name}
+      </Typography>
+      <Typography variant="body2" color="ds.text_gray_medium">
+        {token.ticker}
+      </Typography>
+    </Stack>
+  </Stack>
+}
 
 const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
   const { close, open } = isPrimaryToken
@@ -367,3 +283,34 @@ const TokenPrice = ({ token, unitOfAccount, secondaryToken24Activity, ptActivity
     </Typography>
   );
 };
+
+const TokenProcentage = ({ procentage }) => {
+  return (
+    <Typography variant="body2" color="ds.text_gray_medium">
+      {procentage}%
+    </Typography>
+  );
+};
+
+
+// MOCK DATA
+const TokenChip = ({ token }) => {
+  const theme = useTheme()
+  return <Chip
+    type={token['1M'] > 0 ? ChipTypes.ACTIVE : token['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+    label={
+      <Stack direction="token" justifyContent="space-between" alignItems="center">
+        {token['1M'] > 0 ? (
+          <Icon.ChipArtokenUp fill={theme.palette.ds.secondary_c800} />
+        ) : token['1M'] < 0 ? (
+          <Icon.ChipArtokenDown fill={theme.palette.ds.sys_magenta_c700} />
+        ) : null}
+        {/* @ts-ignore */}
+        <Typography variant="caption1">
+          {token['1M'] >= 0 ? formatNumber(token['1M']) : formatNumber(-1 * token['1M'])}%
+        </Typography>
+      </Stack>
+    }
+    sx={{ cursor: 'pointer' }}
+  />
+}

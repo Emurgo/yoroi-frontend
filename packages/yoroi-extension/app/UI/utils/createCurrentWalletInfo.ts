@@ -74,7 +74,6 @@ const getAssetWalletAssetList = (stores: any) => {
     }))
     .filter((item: any) => item.info.IsNFT === false)
     .map((token: any) => {
-      console.log('token', token);
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
@@ -88,10 +87,12 @@ const getAssetWalletAssetList = (stores: any) => {
       const { currency } = stores.profile.unitOfAccount;
 
       const fiatPrice = getFiatCurrentPrice(tokenName, currency === null ? 'USD' : currency);
-      const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
+      const coinShiftedAmount = new BigNumber(shiftedAmount);
+
+      const fiatDisplay = calculateAndFormatValue(coinShiftedAmount, fiatPrice);
       return {
         name: tokenName,
-        id: tokenId,
+
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
         tokenLogo: tokenLogo,
@@ -99,6 +100,7 @@ const getAssetWalletAssetList = (stores: any) => {
         totalAmountFiat: fiatDisplay,
         price: fiatPrice,
         portfolioPercents: Math.round(100 * Math.random()), // MOCKED
+
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -111,11 +113,20 @@ const getAssetWalletAssetList = (stores: any) => {
 
         // TODO new structure here
         quantity: token.entry.amount,
-        // info: {
-        //   indetifier: token.entry.identifier,
-        //   description: token.info.Metadata.assetMintMetadata[0],
-        //   policyId: token.info.Metadata.policyId,
-        //   fingerprint: '',
+        id: tokenId,
+        info: {
+          id: token.entry.identifier,
+          name: tokenName,
+          policyId: token.info.Metadata.policyId,
+          fingerprint: token.id,
+          metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
+        },
+        // utils: {
+        //   totalAmountFiat: fiatDisplay,
+        //   price: fiatPrice,
+        //   totalAmount: [beforeDecimal, afterDecimal].join(''),
+        //   amountForSorting: shiftedAmount,
+        //   image: tokenLogo,
         // },
       };
     });
@@ -175,7 +186,10 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const { currency } = profile.unitOfAccount;
     const getFiatCurrentPrice = coinPriceStore.getCurrentPrice;
     const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
-    const fiatDisplay = calculateAndFormatValue(shiftedAmount, fiatPrice);
+    if (fiatPrice === null) {
+      return;
+    }
+    const fiatDisplay = calculateAndFormatValue(Number(shiftedAmount), fiatPrice);
     const isHardware: boolean = selectedWallet.isHardware;
 
     // Asset List
