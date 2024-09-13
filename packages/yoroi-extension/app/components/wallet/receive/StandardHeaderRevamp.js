@@ -58,17 +58,10 @@ export default class StandardHeaderRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const {
-      walletAddress,
-      isSubmitting,
-      error,
-      isWalletAddressUsed,
-      onCopyAddressTooltip,
-      notification,
-    } = this.props;
+    const { walletAddress, isSubmitting, error, isWalletAddressUsed, onCopyAddressTooltip, notification } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
-    const locationId = 'wallet:receive:infoPanel:header'
+    const locationId = 'wallet:receive:infoPanel:header';
 
     const generateAddressForm = (
       <LoadingButton
@@ -95,15 +88,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
           {intl.formatMessage(messages.walletAddressLabel)}
         </Typography>
 
-        <Box
-          display="flex"
-          alignItems="start"
-          justifyContent="center"
-          mb="30px"
-          pb="30px"
-          gap="24px"
-          position="relative"
-        >
+        <Box display="flex" alignItems="start" justifyContent="center" mb="30px" pb="30px" gap="24px" position="relative">
           <Box display="flex" justifyContent="center" alignItems="center">
             <Box
               p="16px"
@@ -164,12 +149,16 @@ export default class StandardHeaderRevamp extends Component<Props> {
               </CopyableAddress>
             </Box>
 
-            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="grayscale.600">
+            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </Typography>
 
             {generateAddressForm}
-            {error && <div className={styles.error} id={locationId + '-addressError-text'}>{intl.formatMessage(error)}</div>}
+            {error && (
+              <div className={styles.error} id={locationId + '-addressError-text'}>
+                {intl.formatMessage(error)}
+              </div>
+            )}
           </Box>
         </Box>
       </Box>

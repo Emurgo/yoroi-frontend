@@ -30,8 +30,8 @@ const ExpandMoreIcon = () => (
 const Accordion = styled((props /* AccordionProps */) => (
   <MuiAccordion TransitionProps={{ timeout: { exit: 500 } }} disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
-  backgroundColor: theme.palette.ds.bg_color_min,
-  borderBottom: theme.palette.ds.bg_color_min,
+  backgroundColor: theme.palette.ds.bg_color_max,
+  borderBottom: theme.palette.ds.bg_color_max,
   '&:not(:last-child)': {
     borderBottom: 0,
   },

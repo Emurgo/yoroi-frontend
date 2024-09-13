@@ -96,7 +96,9 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load('connector');
+    loadedStores.loading.load()
+      .then(() => console.debug('connector / loading store loaded'))
+      .catch(e => console.error('connector / loading store load failed', e));
 
     return loadedStores;
   }

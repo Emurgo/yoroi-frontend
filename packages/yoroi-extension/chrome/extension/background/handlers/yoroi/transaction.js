@@ -119,9 +119,11 @@ export const SignAndBroadcastTransaction: HandlerType<
           }
         }
 
+        const unsignedTxWasm = RustModule.WalletV4.Transaction.from_hex(unsignedTx);
+
         const signRequest = {
           senderUtxos,
-          unsignedTx: Buffer.from(unsignedTx, 'hex'),
+          unsignedTx: unsignedTxWasm,
           metadata: metadata ? Scope.WalletV4.AuxiliaryData.from_hex(metadata) : undefined,
           neededStakingKeyHashes: {
             wits: new Set(wits),
@@ -135,6 +137,8 @@ export const SignAndBroadcastTransaction: HandlerType<
           signRequest,
           sendTx: stateFetcher.sendTx,
         });
+
+        unsignedTxWasm.free();
 
         try {
           await connectorRecordSubmittedCardanoTransaction(

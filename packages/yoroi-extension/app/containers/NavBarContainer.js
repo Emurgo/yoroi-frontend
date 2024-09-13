@@ -52,9 +52,7 @@ export default class NavBarContainer extends Component<Props> {
     const { wallets } = walletsStore;
 
     const walletComponents = wallets.map(wallet => {
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        wallet
-      );
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
       const { lastSyncInfo } = wallet;
 
       return (

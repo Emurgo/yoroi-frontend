@@ -27,10 +27,9 @@ const messages = defineMessages({
 
 type Props = {|
   +url: ?string,
-  +protocol: ?string,
   +isActiveSite: boolean,
   +shouldHideBalance: boolean,
-  +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
+  +onRemoveWallet: ({| url: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletName: string,
   +websiteIcon: string,
@@ -100,7 +99,6 @@ export default class WalletRow extends Component<Props, State> {
     const {
       isActiveSite,
       url,
-      protocol,
       plate,
       onRemoveWallet,
       balance,
@@ -171,7 +169,7 @@ export default class WalletRow extends Component<Props, State> {
             </div>
             <div className={styles.delete}>
               {showDeleteIcon && (
-                <button onClick={() => onRemoveWallet({ url, protocol })} type="button">
+                <button onClick={() => onRemoveWallet({ url })} type="button">
                   <DeleteIcon />
                 </button>
               )}

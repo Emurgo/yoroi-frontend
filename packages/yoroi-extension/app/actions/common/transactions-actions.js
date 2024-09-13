@@ -11,7 +11,7 @@ export type TransactionRowsToExportRequest = {|
 |};
 
 export default class TransactionsActions {
-  loadMoreTransactions: AsyncAction<{ publicDeriverId: number, networkId: number, ... }> = new AsyncAction();
+  loadMoreTransactions: AsyncAction<WalletState> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
     publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,

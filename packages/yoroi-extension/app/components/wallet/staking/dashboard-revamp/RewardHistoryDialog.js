@@ -56,7 +56,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
       closeOnOverlayClick={false}
       closeButton={<DialogCloseButton onClose={onClose} />}
       onClose={onClose}
-      styleContentOverride={{ background: palette.ds.bg_color_min }}
+      styleContentOverride={{ background: palette.ds.bg_color_max }}
     >
       <Box maxWidth="600px">
         <Typography component="div" mb="24px" variant="body1" fontWeight={500} color="ds.text_gray_medium">

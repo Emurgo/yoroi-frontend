@@ -10,6 +10,7 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
+import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -266,6 +267,21 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       });
     }
     return result;
+  }
+
+  certificates(): Array<{| kind: $Values<CertificateKind>, payloadHex: string |}> {
+    const res = [];
+    const certs = this.unsignedTx.build().certs();
+    if (certs != null) {
+      for (let i = 0; i < certs.len(); i++) {
+        const cert = certs.get(i);
+        res.push({
+          kind: cert.kind(),
+          payloadHex: cert.to_hex(),
+        });
+      }
+    }
+    return res;
   }
 
   receivers(includeChange: boolean): Array<string> {

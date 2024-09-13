@@ -39,8 +39,9 @@ export const light = {
   web_sidebar_item_active: `${lightPalette.black_static}${opacity._16}`, // extension active sidebar item background
   web_sidebar_item_inactive: `${lightPalette.white_static}${opacity._48}`, // extension inactive sidebar item
 
+  special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
   // TODO new to be added in code
-  web_sidebar_item_active_bg: `${lightPalette.black_static}${opacity._24}`,
+  web_sidebar_item_active_bg: `${lightPalette.black_static}${opacity._16}`,
 
   mobile_overlay: `${lightPalette.black_static}${opacity._40}`, // mobile bottom sheet overlay
   mobile_bg_blur: `${lightPalette.white_static}${opacity._80}`, // mobile bottom sheet background

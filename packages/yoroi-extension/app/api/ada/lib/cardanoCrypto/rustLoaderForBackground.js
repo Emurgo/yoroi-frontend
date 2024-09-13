@@ -153,7 +153,7 @@ function createWasmScope(): {|
 }
 
 class Module {
-  async load(_ignored: any): Promise<void> {
+  async load(): Promise<void> {
     // noop because all the modules are synchronously loaded
   }
 

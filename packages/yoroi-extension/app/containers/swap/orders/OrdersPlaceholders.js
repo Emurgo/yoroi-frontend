@@ -42,7 +42,7 @@ export const LoadingOpenOrders = ({ columnLeftPaddings }: LoadingCompProps): Nod
       <Table
         columnKeys={[]}
         columnNames={[]}
-        columnAlignment={[]}
+        columnAlignment={['center']}
         columnLeftPaddings={columnLeftPaddings}
         gridTemplateColumns="176px 150px 166px 150px 216px 240px auto"
         columnGap="0px"
@@ -87,7 +87,7 @@ export const LoadingCompletedOrders = ({ columnLeftPaddings }: LoadingCompProps)
       <Table
         columnKeys={[]}
         columnNames={[]}
-        columnAlignment={[]}
+        columnAlignment={['center']}
         columnLeftPaddings={columnLeftPaddings}
         gridTemplateColumns="auto 150px auto auto 0px auto auto"
         columnGap="0px"

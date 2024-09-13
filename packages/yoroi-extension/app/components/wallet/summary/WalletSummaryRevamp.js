@@ -174,7 +174,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
       );
 
     return (
-      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.bg_color_min' }}>
+      <Box id="wallet:transactions-walletSummary-box" sx={{ bgcolor: 'ds.bg_color_max' }}>
         <Box
           sx={{
             marginBottom: '16px',

@@ -1,12 +1,11 @@
 import { invalid } from '@yoroi/common';
 import { produce } from 'immer';
 
-type VoteKind = 'none' | 'delegate' | 'abstain' | 'no-confidence';
-export type Vote = { kind: VoteKind; drepID?: string };
+export type Vote = { kind: string; drepID?: string };
 
 // Define types
 export type GovernanceActions = {
-  governanceVoteChanged: (vote: Vote) => void;
+  governanceVoteChanged: (vote: any) => void;
   dRepIdChanged: (id: string) => void;
 };
 
@@ -27,7 +26,7 @@ export type GovernanceAction =
 
 // Define state type
 export type GovernanceState = {
-  governanceVote: Vote;
+  governanceVote: any;
   dRepId?: string;
 };
 

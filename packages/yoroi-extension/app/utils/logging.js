@@ -23,12 +23,12 @@ function pushError(s: string): void {
 
 export const Logger = {
 
-  debug: (data : string) => {
-    logger.debug(data);
+  debug: (...args: any[]) => {
+    logger.debug(...args);
   },
 
-  info: (data : string) => {
-    logger.info(data);
+  info: (...args: any[]) => {
+    logger.info(...args);
   },
 
   error: (data : string) => {
@@ -38,8 +38,8 @@ export const Logger = {
     pushError(`[${moment().format()}] ${fixedString}\n`);
   },
 
-  warn: (data : string) => {
-    logger.warn(data);
+  warn: (...args: any[]) => {
+    logger.warn(...args);
   }
 };
 
