@@ -14,9 +14,9 @@ Check out our [documents](docs/specs/meta) on the governance of this project.
 
 ## First-time setup
 
-This is a multi-project Github repository. You can find the different projects in the [packages](packages/) folder.
+This is a multi-project GitHub repository. You can find the different projects in the [packages](packages/) folder.
 
-Although each project has its own setup steps, steps, there are also setup steps for this repository as a whole.
+Although each project has its own setup steps, there are also setup steps for this repository as a whole.
 
 **If you have `nvm`**, just run
 

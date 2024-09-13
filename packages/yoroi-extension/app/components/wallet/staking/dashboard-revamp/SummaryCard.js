@@ -94,7 +94,7 @@ function SummaryCard({
   };
 
   return (
-    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_min' }}>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_max' }}>
       <Box
         sx={{
           padding: '15px 24px',

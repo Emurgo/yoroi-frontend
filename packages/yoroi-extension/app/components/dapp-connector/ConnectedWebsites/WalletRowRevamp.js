@@ -18,9 +18,8 @@ import styles from './WalletRow.scss';
 
 type Props = {|
   +url: ?string,
-  +protocol: ?string,
   +shouldHideBalance: boolean,
-  +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
+  +onRemoveWallet: ({| url: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletName: string,
   +websiteIcon: string,
@@ -86,7 +85,6 @@ export default class WalletRowRevamp extends Component<Props, State> {
   render(): Node {
     const {
       url,
-      protocol,
       plate,
       onRemoveWallet,
       balance,
@@ -115,7 +113,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
           position: 'relative',
           borderRadius: '8px',
           border: '1px solid',
-          borderColor: 'common.white',
+          borderColor: 'ds.gray_200',
           '&:hover': {
             borderColor: 'grayscale.400',
           },
@@ -154,7 +152,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
         </Box>
         {showDeleteIcon && (
           <SIconButton position="absolute" right="16px" top="16px">
-            <button onClick={() => onRemoveWallet({ url, protocol })} type="button" id="removeWalletButton">
+            <button onClick={() => onRemoveWallet({ url })} type="button" id="removeWalletButton">
               <DeleteIcon />
             </button>
           </SIconButton>

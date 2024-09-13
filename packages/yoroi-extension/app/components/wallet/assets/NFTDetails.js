@@ -176,7 +176,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         sx={{
           margin: '0 auto',
           minHeight: '400px',
-          backgroundColor: 'ds.bg_color_min',
+          backgroundColor: 'ds.bg_color_max',
           borderRadius: '8px',
         }}
       >
@@ -189,7 +189,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               img: {
                 objectFit: 'unset',
               },
-              backgroundColor: 'ds.bg_color_min',
+              backgroundColor: 'ds.bg_color_max',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
@@ -342,7 +342,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 boxShadow: 'none',
                 bgcolor: 'transparent',
                 overflow: 'auto',
-                backgroundColor: 'ds.bg_color_min',
+                backgroundColor: 'ds.bg_color_max',
               }}
               value={tabs[1].id}
             >

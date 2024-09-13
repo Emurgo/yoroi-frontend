@@ -13,6 +13,7 @@ export const networks = Object.freeze({
   CardanoMainnet: ({
     NetworkId: 0,
     NetworkName: 'Cardano Mainnet',
+    NetworkFeatureName: 'mainnet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -86,6 +87,7 @@ export const networks = Object.freeze({
   CardanoPreprodTestnet: ({
     NetworkId: 2_50,
     NetworkName: 'Cardano Preprod Testnet',
+    NetworkFeatureName: 'preprod',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -124,6 +126,7 @@ export const networks = Object.freeze({
   CardanoPreviewTestnet: ({
     NetworkId: 3_50,
     NetworkName: 'Cardano Preview Testnet',
+    NetworkFeatureName: 'preview',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -161,6 +164,7 @@ export const networks = Object.freeze({
   CardanoSanchoTestnet: ({
     NetworkId: 4_50,
     NetworkName: 'Cardano Sancho Testnet',
+    NetworkFeatureName: 'sanchonet',
     Backend: {
       BackendService: environment.isTest()
         ? 'http://localhost:21000'
@@ -209,16 +213,19 @@ export function isCardanoHaskell(network: $ReadOnly<NetworkRow>): boolean {
   return network.CoinType === CoinTypes.CARDANO && network.Fork === CardanoForks.Haskell;
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfig(network: $ReadOnly<NetworkRow>): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
 
+// <TODO:WALLET_API>
 export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
   // $FlowIgnore[incompatible-exact]
   return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfigCombined(network: $ReadOnly<NetworkRow>): CardanoHaskellConfig {
   return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network));
 }

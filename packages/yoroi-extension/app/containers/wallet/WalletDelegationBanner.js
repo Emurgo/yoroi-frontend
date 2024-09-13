@@ -210,6 +210,7 @@ const WrapperBanner = styled(Box)({
   padding: '24px',
   borderRadius: '8px',
   overflowY: 'hidden',
+  border: '2px solid red',
 });
 
 const AvatarWrapper = styled(Box)({

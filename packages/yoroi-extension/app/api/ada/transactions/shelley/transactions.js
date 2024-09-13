@@ -1013,7 +1013,7 @@ type UtxoOrAddressing = CardanoAddressedUtxo | {| ...Address, ...Addressing |};
 
 export function signTransaction(
   senderUtxos: Array<CardanoAddressedUtxo>,
-  unsignedTx:
+  unsignedTx: RustModule.WalletV4.Transaction |
     RustModule.WalletV4.TransactionBuilder |
     RustModule.WalletV4.TransactionBody |
     Buffer |
@@ -1062,7 +1062,11 @@ export function signTransaction(
   let txBody;
   let txHash;
   let txWitSet;
-  if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
+  if (unsignedTx instanceof RustModule.WalletV4.Transaction) {
+    txBody = unsignedTx.body();
+    txWitSet = unsignedTx.witness_set();
+    txHash = RustModule.WalletV4.hash_transaction(txBody);
+  } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
     const tx = unsignedTx.build_tx();
     txBody = tx.body();
     txWitSet = tx.witness_set();

@@ -34,6 +34,7 @@ import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
+  getDrepRewardAddressHexAndAddressing,
   getScriptRequiredSigningKeys,
   resolveTxOrTxBody,
 } from '../../../chrome/extension/connector/api';
@@ -671,11 +672,11 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           cip95Info.push({
             type: 'VotingProcedure',
             voterType: voter.kind(),
-            voterHash: voter.to_constitutional_committee_hot_cred()?.to_scripthash()?.to_hex() ||
-              voter.to_constitutional_committee_hot_cred()?.to_keyhash()?.to_hex() ||
-              voter.to_drep_cred()?.to_scripthash()?.to_hex() ||
-              voter.to_drep_cred()?.to_keyhash()?.to_hex() ||
-              voter.to_staking_pool_key_hash()?.to_hex() ||
+            voterHash: voter.to_constitutional_committee_hot_credential()?.to_scripthash()?.to_hex() ||
+              voter.to_constitutional_committee_hot_credential()?.to_keyhash()?.to_hex() ||
+              voter.to_drep_credential()?.to_scripthash()?.to_hex() ||
+              voter.to_drep_credential()?.to_keyhash()?.to_hex() ||
+              voter.to_stake_pool_key_hash()?.to_hex() ||
               (() => { throw new Error('unexpected voter'); })(),
             govActionTxId: govActionId.transaction_id().to_hex(),
             govActionIndex: govActionId.index(),
@@ -925,10 +926,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
   _removeWalletFromWhitelist: (request: {|
     url: string,
-    protocol: string,
   |}) => Promise<void> = async request => {
     const filter = this.currentConnectorWhitelist.filter(
-      e => !(e.url === request.url && e.protocol === request.protocol)
+      e => e.url !== request.url
     );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
@@ -1091,6 +1091,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
 
+    const [drepAddressHex, drepAddressing] = getDrepRewardAddressHexAndAddressing(publicDeriver);
+    ownStakeAddressMap[drepAddressHex] = drepAddressing.addressing.path;
+
     let ledgerSignTxPayload;
     try {
       ledgerSignTxPayload = toLedgerSignRequest(
@@ -1103,7 +1106,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         rawTxBody,
         additionalRequiredSigners,
       );
-    } catch {
+    } catch (e) {
+      console.error('toLedgerSignRequest failed: ', e);
       runInAction(() => {
         this.hwWalletError = unsupportedTransactionError;
         this.isHwWalletErrorRecoverable = false;
@@ -1160,6 +1164,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
+  /**
+   * <TODO:LEDGER/SIGN_DATA>
+   */
   checkHwWalletSignData(): void {
     const { connectedWallet } = this;
     if (connectedWallet == null) {

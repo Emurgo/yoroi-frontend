@@ -1,8 +1,13 @@
 // @flow
+import type { Node } from 'react';
+import type { CardanoConnectorSignRequest } from '../../../connector/types';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { MappedOrder } from './hooks';
+import type { FormattedTokenValue } from './util';
 import { Box, Button } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import moment from 'moment';
-import type { Node } from 'react';
 import { useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import {
@@ -14,20 +19,18 @@ import Table from '../../../components/common/table/Table';
 import Tabs from '../../../components/common/tabs/Tabs';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import type { MappedOrder } from './hooks';
-import type { FormattedTokenValue } from './util';
 import { signTransaction } from '../../../api/thunk';
+import NoCompleteOrders from './NoCompleteOrders';
+import NoOpenOrders from './NoOpenOrders';
+import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -114,7 +117,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
 
   const fetchTransactionTimestamps = txHashes =>
     swapStore.fetchTransactionTimestamps({ wallet, txHashes });
-  const { openOrders, completedOrders, transactionTimestamps } = useRichOrders(
+  const { openOrders, completedOrders, transactionTimestamps, openOrdersLoading, completedOrdersLoading } = useRichOrders(
     defaultTokenInfo,
     fetchTransactionTimestamps
   );
@@ -124,6 +127,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     return date == null ? '-' : moment(date).format('MMM D, YYYY H:mm');
   };
 
+  const getComparableDate = txHash => {
+    const renderedTimestamp = txHashToRenderedTimestamp(txHash);
+    return renderedTimestamp === '-' ? null : moment(renderedTimestamp, 'MMM D, YYYY H:mm').toDate();
+  };
+
+  const sortOrdersByDate = orders => {
+    return orders.sort((a, b) => {
+      const dateA = getComparableDate(a.txId);
+      const dateB = getComparableDate(b.txId);
+      if (dateA && dateB) {
+        return dateB - dateA; // Sort descending
+      }
+      return dateA ? -1 : 1; // Handle null dates
+    });
+  };
   const handleCancelRequest = async order => {
     setCancellationState({ order, tx: null });
     try {
@@ -278,6 +296,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
     .join(' ');
 
+  const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
+  const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
+  const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
+
+  const sortedCompletedOrders = sortOrdersByDate(completedOrders);
+
   return (
     <>
       <Box sx={{ mx: '24px' }}>
@@ -299,7 +323,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         </Box>
         <Table
           columnKeys={columnKeys}
-          columnNames={columnNames}
+          columnNames={safeColumnNames}
           columnAlignment={columnAlignment}
           columnLeftPaddings={columnLeftPaddings}
           gridTemplateColumns={gridTemplateColumns}
@@ -307,7 +331,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
         >
           {showCompletedOrders
-            ? completedOrders.map(order => (
+            ? sortedCompletedOrders.map(order => (
                 <OrderRow
                   key={order.txId}
                   order={order}
@@ -348,6 +372,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           hwWalletError={null}
         />
       )}
+      {!showCompletedOrders && openOrdersLoading && <LoadingOpenOrders columnLeftPaddings={columnLeftPaddings} />}
+      {showCompletedOrders && completedOrdersLoading && <LoadingCompletedOrders columnLeftPaddings={columnLeftPaddings} />}
+      {!openOrdersLoading && isDisplayOpenOrdersEmpty && <NoOpenOrders />}
+      {!completedOrdersLoading && isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
     </>
   );
 }

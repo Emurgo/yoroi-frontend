@@ -90,6 +90,9 @@ function TextField({
           marginTop: '4px',
           letterSpacing: '0.2px',
         },
+        'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
+          WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+        },
       }}
       /*
         In order to show placeholders for classic theme we dont' need to override
@@ -130,9 +133,9 @@ function TextField({
         ) : (
           <InputAdornment position="end">
             {Boolean(error) === true && !isRevampTheme ? (
-              <ErrorIcon id='input-error-icon'/>
+              <ErrorIcon id="input-error-icon" />
             ) : (done === true && !isRevampTheme) || greenCheck ? (
-              <DoneIcon id='input-done-icon'/>
+              <DoneIcon id="input-done-icon" />
             ) : null}
           </InputAdornment>
         ),

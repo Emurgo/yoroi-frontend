@@ -104,7 +104,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             borderColor: 'primary.600',
           },
           transition: 'border-color 300ms ease',
-          backgroundColor: 'ds.bg_color_min',
+          backgroundColor: 'ds.bg_color_max',
         }}
       >
         <div className={styles.outerWrapper}>
@@ -112,12 +112,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
             <div className={classnames([styles.plate])}>{iconComponent}</div>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
-                <Typography
-                  component="div"
-                  variant="body2"
-                  fontWeight={500}
-                  sx={{ color: 'grayscale.900' }}
-                >
+                <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
                   {truncateLongName(this.props.name)}
                 </Typography>
                 <Typography component="div" variant="caption1" sx={{ color: 'grayscale.600' }}>
@@ -159,6 +154,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               ':disabled': {
                 bgcolor: 'primary.200',
               },
+              backgroundColor: 'ds.primary_500',
             }}
             color="primary"
           >

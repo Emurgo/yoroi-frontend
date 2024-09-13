@@ -36,3 +36,54 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
     return fixedTransaction.to_hex();
   });
 }
+
+export function dRepToMaybeCredentialHex(s: string): ?string {
+  return RustModule.WasmScope(Module => {
+    try {
+      if (s.startsWith('drep1')) {
+        return Module.WalletV4.Credential
+          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+      }
+      if (s.startsWith('drep_script1')) {
+        return Module.WalletV4.Credential
+          .from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
+      }
+    } catch {} // eslint-disable-line no-empty
+    return null;
+  })
+}
+
+export function pubKeyHashToRewardAddress(hex: string, network: number): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.RewardAddress.new(
+      network,
+      Module.WalletV4.Credential.from_keyhash(
+        Module.WalletV4.Ed25519KeyHash.from_hex(hex),
+      ),
+    ).to_address().to_hex(),
+  );
+}
+
+export const cip8Sign = async (
+  address: Buffer,
+  signKey: RustModule.WalletV4.PrivateKey,
+  payload: Buffer,
+): Promise<RustModule.MessageSigning.COSESign1> => {
+  const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
+  protectedHeader.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(
+      RustModule.MessageSigning.AlgorithmId.EdDSA
+    )
+  );
+  protectedHeader.set_header(
+    RustModule.MessageSigning.Label.new_text('address'),
+    RustModule.MessageSigning.CBORValue.new_bytes(address)
+  );
+  const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
+  const unprotected = RustModule.MessageSigning.HeaderMap.new();
+  const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
+  const builder = RustModule.MessageSigning.COSESign1Builder.new(headers, payload, false);
+  const toSign = builder.make_data_to_sign().to_bytes();
+  const signedSigStruct = signKey.sign(toSign).to_bytes();
+  return builder.build(signedSigStruct);
+}
