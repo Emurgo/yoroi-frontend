@@ -17,7 +17,8 @@ import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/inva
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
-import type { PoolMeta } from '../../../stores/toplevel/DelegationStore';
+import type { PoolMeta, PoolTransition } from '../../../stores/toplevel/DelegationStore';
+import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import SeizaFetcher from './SeizaFetcher';
@@ -36,6 +37,7 @@ import { isTestnet, getNetworkById } from '../../../api/ada/lib/storage/database
 type Props = {|
   ...StoresAndActionsProps,
   urlTemplate: ?string,
+  poolTransition: ?PoolTransition,
 |};
 type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
@@ -65,6 +67,16 @@ class CardanoStakingPage extends Component<AllProps, State> {
     });
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
   };
+
+  UNSAFE_componentWillMount(): * {
+    const suggestedPoolId = this.props.poolTransition?.suggestedPool?.hash;
+    if (suggestedPoolId != null) {
+      runInAction(() => {
+        this.setState(s =>
+          ({ ...s, selectedPoolId: suggestedPoolId }));
+      });
+    }
+  }
 
   async componentWillUnmount() {
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
@@ -364,6 +376,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
           />
         </Dialog>
       );
+    }
+    if (this.props.stores.delegation.poolInfoQuery.error != null) {
+      return this._errorDialog(this.props.stores.delegation.poolInfoQuery.error);
     }
     if (delegationTransaction.createDelegationTx.isExecuting) {
       return (
