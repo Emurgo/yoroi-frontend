@@ -442,7 +442,7 @@ describe('app/api/ada/index', () => {
         coinsPerUtxoByte: '4310',
         poolDeposit: '500000000',
         keyDeposit: '2000000',
-
+        epoch: 0,
       },
     }
     const response = await AdaApi.prototype.createUnsignedTxForUtxos(createTxRequest);
