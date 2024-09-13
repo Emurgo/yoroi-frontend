@@ -15,9 +15,12 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Mainnet',
     NetworkFeatureName: 'mainnet',
     Backend: {
-      BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://api.yoroiwallet.com',
-      TokenInfoService: 'https://cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-mainnet.emurgornd.com',
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://api.yoroiwallet.com',
+      TokenInfoService:
+        'https://cdn.yoroiwallet.com',
+      BackendServiceZero: 'https://zero.yoroiwallet.com',
     },
     BaseConfig: ([
       Object.freeze({
@@ -86,8 +89,11 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preprod Testnet',
     NetworkFeatureName: 'preprod',
     Backend: {
-      BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://preprod-backend.yoroiwallet.com',
-      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://preprod-backend.yoroiwallet.com',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: 'https://yoroi-backend-zero-preprod.emurgornd.com',
     },
     BaseConfig: ([
@@ -122,7 +128,9 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preview Testnet',
     NetworkFeatureName: 'preview',
     Backend: {
-      BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://preview-backend.emurgornd.com',
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://preview-backend.emurgornd.com',
       TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: 'https://yoroi-backend-zero-preview.emurgornd.com',
     },
@@ -158,8 +166,11 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Sancho Testnet',
     NetworkFeatureName: 'sanchonet',
     Backend: {
-      BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://sanchonet-backend.yoroiwallet.com',
-      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendService: environment.isTest()
+        ? 'http://localhost:21000'
+        : 'https://sanchonet-backend.yoroiwallet.com',
+      TokenInfoService:
+        'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: 'https://yoroi-backend-zero-sanchonet.emurgornd.com',
     },
     BaseConfig: ([
@@ -191,13 +202,10 @@ export const networks = Object.freeze({
   }: NetworkRow),
 });
 
-export function isTestnet(network: $ReadOnly<NetworkRow>): boolean {
-  return (
-    network.NetworkId === networks.CardanoTestnet.NetworkId ||
-    network.NetworkId === networks.CardanoPreprodTestnet.NetworkId ||
-    network.NetworkId === networks.CardanoPreviewTestnet.NetworkId ||
-    network.NetworkId === networks.CardanoSanchoTestnet.NetworkId
-  );
+export function isTestnet(
+  network: $ReadOnly<NetworkRow>,
+): boolean {
+  return network.NetworkId !== networks.CardanoMainnet.NetworkId;
 }
 
 // <TODO:PENDING_REMOVAL> LEGACY
