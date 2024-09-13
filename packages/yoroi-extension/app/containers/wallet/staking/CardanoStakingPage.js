@@ -69,7 +69,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
     this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
   };
 
-  componentWillMount(): * {
+  UNSAFE_componentWillMount(): * {
     const suggestedPoolId = this.props.poolTransition?.suggestedPool?.hash;
     if (suggestedPoolId != null) {
       runInAction(() => {
