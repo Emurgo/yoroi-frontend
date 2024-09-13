@@ -100,7 +100,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 };
 
 type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; changePercent: string };
-const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
+export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
       <Typography variant="caption" lineHeight="16px">{changePercent}%</Typography>
@@ -112,7 +112,7 @@ type PnlPairedChangeProps = {
   variantPnl: 'danger' | 'success' | 'neutral';
   changeValue: string;
 };
-const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProps) => {
+export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProps) => {
   const { currency } = useCurrencyPairing();
 
   return (

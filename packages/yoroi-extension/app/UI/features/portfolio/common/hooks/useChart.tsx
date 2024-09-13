@@ -1,30 +1,27 @@
-import React, { useMemo, useState } from 'react';
-import { useStrings } from './useStrings';
-import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
-import moment from 'moment';
-import { IChartData, IChartDataItem } from '../types/chart';
-import { ITabButtonProps } from '../types';
+import { useTheme } from '@mui/material/styles';
+import React, { useState } from 'react';
+import { IChartData } from '../types/chart';
 
 const useChart = (data: IChartData) => {
-  const strings = useStrings();
   const theme: any = useTheme();
-  const [periodButtonProps, setPeriodButtonProps] = useState<ITabButtonProps[]>([
-    { id: 'start24HoursAgo', label: strings['24H'], active: true },
-    { id: 'start1WeekAgo', label: strings['1W'], active: false },
-    { id: 'start1MonthAgo', label: strings['1M'], active: false },
-    { id: 'start6MonthAgo', label: strings['6M'], active: false },
-    { id: 'start1YearAgo', label: strings['1Y'], active: false },
-    { id: 'ALL', label: strings['ALL'], active: false },
-  ]);
-  const [detailInfo, setDetailInfo] = useState<{ value: number; fiatValue: number }>({
-    value: data ? data[periodButtonProps[0]?.id || 0][data[periodButtonProps[0]?.id || 0].length - 1].value : 0,
-    fiatValue: data ? data[periodButtonProps[0]?.id || 0][data[periodButtonProps[0]?.id || 0].length - 1].fiatValue : 0,
+  console.log("data", data)
+  console.log("data", data[0]?.label)
+  // const [periodButtonProps, setPeriodButtonProps] = useState<ITabButtonProps[]>([
+  //   { id: 'start24HoursAgo', label: strings['24H'], active: true },
+  //   { id: 'start1WeekAgo', label: strings['1W'], active: false },
+  //   { id: 'start1MonthAgo', label: strings['1M'], active: false },
+  //   { id: 'start6MonthAgo', label: strings['6M'], active: false },
+  //   { id: 'start1YearAgo', label: strings['1Y'], active: false },
+  //   { id: 'ALL', label: strings['ALL'], active: false },
+  // ]);
+  const [detailInfo, setDetailInfo] = useState<{ value: number; label: string, changeValue: number, changePercent: number }>({
+    label: data[0]?.label,
+    value: data[0]?.value,
+    changeValue: data[0]?.changeValue,
+    changePercent: data[0]?.changePercent,
   });
   const [isDragging, setIsDragging] = useState<boolean>(false);
-
-  const activePeriodId = useMemo(() => periodButtonProps.find(item => item.active)?.id || 0, [periodButtonProps]);
-
   const CustomYAxisTick = ({
     x,
     y,
@@ -51,7 +48,6 @@ const useChart = (data: IChartData) => {
   const CustomActiveDot = ({
     cx,
     cy,
-    payload,
     index,
     dataLength,
     chartBottom,
@@ -107,43 +103,15 @@ const useChart = (data: IChartData) => {
                 fontFamily: theme.typography.fontFamily,
                 fontSize: '0.75rem',
                 fontWeight: 400,
+                paddingRight: '5px',
               }}
             >
-              {moment(payload.time).format('MM/DD/YY H:mm')}
+              {detailInfo.label}
             </Box>
           </g>
         )}
       </svg>
     );
-  };
-
-  const handleChoosePeriod = (id: string) => {
-    const tmp = periodButtonProps.map(item => {
-      if (item.id === id) {
-        if (item.active) {
-          return item;
-        } else {
-          return { ...item, active: true };
-        }
-      }
-      return {
-        ...item,
-        active: false,
-      };
-    });
-    setPeriodButtonProps(tmp);
-    setDetailInfo({
-      value: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
-            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
-          ].value
-        : 0,
-      fiatValue: data
-        ? data[periodButtonProps.find(item => item.id === id)?.id || 0][
-            data[periodButtonProps.find(item => item.id === id)?.id || 0].length - 1
-          ].fiatValue
-        : 0,
-    });
   };
 
   const handleMouseMove = (props: any) => {
@@ -155,53 +123,57 @@ const useChart = (data: IChartData) => {
     }
 
     const value = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.value : 0;
-    const fiatValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.fiatValue : 0;
+    const changeValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.changeValue : 0;
+    const changePercent = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.changePercent : 0;
+    const label = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.label : "";
 
-    if (!value || !fiatValue) return;
+    if (!value || !changeValue) return;
     setDetailInfo({
       value,
-      fiatValue,
+      changeValue,
+      changePercent,
+      label
     });
   };
 
   const handleMouseDown = (props: any) => {
+    console.log(" handleMouseDown props", props)
     if (!props || !props.activePayload || props.activePayload.length <= 0) return;
 
     const value = props.activePayload[0].payload.value;
-    const fiatValue = props.activePayload[0].payload.fiatValue;
+    const changeValue = props.activePayload[0].payload.changeValue;
+    const changePercent = props.activePayload[0].payload.changePercent;
+    const label = props.activePayload[0].payload.label;
 
-    if (!value || !fiatValue) return;
+    if (!value || !changeValue) return;
     setDetailInfo({
       value,
-      fiatValue,
+      changeValue,
+      changePercent,
+      label
     });
     setIsDragging(true);
   };
 
   const handleMouseUp = () => {
     setDetailInfo({
-      value: data ? data[activePeriodId][data[activePeriodId].length - 1].value : 0,
-      fiatValue: data ? data[activePeriodId][data[activePeriodId].length - 1].fiatValue : 0,
+      value: data ? data[0].value : 0,
+      changeValue: data ? data[0].changeValue : 0,
+      changePercent: data ? data[0].changePercent : 0,
+      label: data ? data[0].label : "",
     });
     setIsDragging(false);
   };
 
-  const minValue = data ? Math.min(...data[activePeriodId].map((item: IChartDataItem) => item.value)) : 0;
 
-  const maxValue = data ? Math.max(...data[activePeriodId].map((item: IChartDataItem) => item.value)) : 0;
 
   return {
     CustomYAxisTick,
     CustomActiveDot,
-    handleChoosePeriod,
     handleMouseMove,
     handleMouseDown,
     handleMouseUp,
-    periodButtonProps,
     detailInfo,
-    minValue,
-    maxValue,
-    activePeriodId,
   };
 };
 

@@ -184,11 +184,11 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     // Get Fiat price
     const ticker = tokenInfo.Metadata.ticker;
     const { currency } = profile.unitOfAccount;
-    const getFiatCurrentPrice = coinPriceStore.getCurrentPrice;
+    const getFiatCurrentPrice = coinPriceStore?.getCurrentPrice;
     const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
-    if (fiatPrice === null) {
-      return;
-    }
+    // if (fiatPrice === null) {
+    //   return;
+    // }
     const fiatDisplay = calculateAndFormatValue(Number(shiftedAmount), fiatPrice);
     const isHardware: boolean = selectedWallet.isHardware;
 

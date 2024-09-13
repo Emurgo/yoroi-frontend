@@ -7,12 +7,14 @@ import {
     LineChart,
     Tooltip as RechartTooltip,
     ResponsiveContainer,
-    XAxis,
-    YAxis,
+    YAxis
 } from 'recharts';
-import { Skeleton } from '../../../../components';
+import { Chip, ChipTypes, Icon, Skeleton } from '../../../../components';
+import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
 import { formatNumber } from '../../common/helpers/formatHelper';
+import { priceChange } from '../../common/helpers/priceChange';
+import useChart from '../../common/hooks/useChart';
 import { TOKEN_CHART_INTERVAL, useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
@@ -53,15 +55,35 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
     const [timeInterval, setTimeInterval] = useState<any>(TOKEN_CHART_INTERVAL.DAY);
     const { data, isFetching } = useGetPortfolioTokenChart(timeInterval, tokenInfo);
 
+
+    const {
+        ptActivity: { close, open },
+        config,
+    } = useCurrencyPairing();
+
+    const { changeValue, changePercent } = priceChange(open, close);
+
     const handlePeriodChange = (id: string) => {
         setTimeInterval(TOKEN_CHART_INTERVAL[id]);
     };
+
 
     // Prepare the chart data for recharts
     const chartData = data?.map((point: any) => ({
         label: point.label,
         value: point.value,
+        changePercent: point.changePercent,
+        changeValue: point.changeValue,
     })) || [];
+    const {
+        CustomYAxisTick,
+        CustomActiveDot,
+        handleMouseMove,
+        handleMouseDown,
+        handleMouseUp,
+        detailInfo,
+    } = useChart(chartData);
+
 
     return (
         <Stack
@@ -78,14 +100,19 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
                     </Typography>
                 )}
                 <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-                    {isFetching || !data ? (
+                    {isFetching || !data || chartData === undefined ? (
                         <Skeleton width="64px" height="13px" />
                     ) : (
-                        <Stack direction="row" alignItems="flex-end" color="ds.gray_max">
-                            <Typography fontWeight="500">{formatNumber(data[data.length - 1]?.value)}</Typography>
-                            <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
-                                &nbsp;{unitOfAccount}
-                            </Typography>
+                        <Stack direction="row" alignItems="center">
+
+                            <Stack direction="row" alignItems="flex-end" color="ds.gray_max">
+                                <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
+                                <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
+                                    &nbsp;{unitOfAccount}
+                                </Typography>
+                            </Stack>
+                            <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
+                            <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount} />
                         </Stack>
                     )}
                 </Stack>
@@ -104,18 +131,30 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
                         <ResponsiveContainer width={'99%'} height={chartHeight}>
                             <LineChart
                                 data={chartData}
+                                onMouseDown={handleMouseDown}
+                                onMouseUp={handleMouseUp}
+                                onMouseMove={handleMouseMove}
+                                onMouseLeave={handleMouseUp}
                             >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                 <YAxis
                                     domain={['auto', 'auto']}
                                     axisLine={false}
                                     tickLine={false}
-                                    tickCount={9}
-                                    tickFormatter={(value) => formatNumber(value)}
-                                />
-                                <XAxis dataKey="label" />
-                                <RechartTooltip cursor={false} />
+                                    type={'number'}
+                                    tick={CustomYAxisTick}
+                                    tickCount={9} />
+                                <RechartTooltip cursor={false} content={<></>} />
                                 <Line
+                                    activeDot={(props: any) => (
+                                        <CustomActiveDot
+                                            chartBottom={chartHeight}
+                                            rectWidth={93}
+                                            rectHeight={34}
+                                            dataLength={chartData.length}
+                                            {...props}
+                                        />
+                                    )}
                                     dot={false}
                                     type="monotone"
                                     dataKey="value"
@@ -145,3 +184,46 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
     );
 };
 
+
+
+const PriceChangeChip = ({ value }) => {
+    const theme = useTheme()
+    return <>
+        <Chip
+            type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+            label={
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    {value > 0 ? (
+                        <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
+                    ) : value < 0 ? (
+                        <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+                    ) : null}
+                    {/* @ts-ignore */}
+                    <Typography variant="caption1">
+                        {value >= 0 ? formatNumber(value) : formatNumber(-1 * value)}%
+                    </Typography>
+                </Stack>
+            }
+        />
+    </>
+}
+const PriceValueChip = ({ value, unitOfAccount }) => {
+    return <>
+        <Chip
+            type={
+                value > 0
+                    ? ChipTypes.ACTIVE
+                    : value < 0
+                        ? ChipTypes.INACTIVE
+                        : ChipTypes.DISABLED
+            }
+            label={
+                // @ts-ignore
+                <Typography variant="caption1">
+                    {value > 0 && '+'}
+                    {formatNumber(value)} {unitOfAccount}
+                </Typography>
+            }
+        />
+    </>
+}
