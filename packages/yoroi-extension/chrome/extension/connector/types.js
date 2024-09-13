@@ -134,7 +134,6 @@ export type WalletAuthEntry = {|
 
 export type WhitelistEntry = {|
   url: string,
-  protocol: 'cardano',
   publicDeriverId: number,
   appAuthID: ?string,
   auth: ?WalletAuthEntry,
@@ -146,7 +145,6 @@ export type ConnectingMessage = {|
   url: string,
   appAuthID?: string,
   imgBase64Url: string,
-  protocol: 'cardano',
 |};
 export type SigningMessage = {|
   publicDeriverId: number,
