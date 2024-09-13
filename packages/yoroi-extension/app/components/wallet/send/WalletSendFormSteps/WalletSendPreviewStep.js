@@ -6,10 +6,7 @@ import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
-import type {
-  TokenRow,
-  NetworkRow,
-} from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type LocalizableError from '../../../../i18n/LocalizableError';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
@@ -18,7 +15,7 @@ import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import { truncateToken } from '../../../../utils/formatters';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { getTokenName, genFormatTokenAmount } from '../../../../stores/stateless/tokenHelpers';
-import { Button, Link, Stack, Tooltip, Typography } from '@mui/material';
+import { Button, Link, Stack, Tooltip, Typography, styled } from '@mui/material';
 import { getNFTs, getTokens } from '../../../../utils/wallet';
 import { IncorrectWalletPasswordError } from '../../../../api/common/errors';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -36,6 +33,11 @@ import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
+
+const SBox = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_3,
+  color: 'grayscale.min',
+}));
 
 type Props = {|
   +staleTx: boolean,
@@ -98,8 +100,7 @@ const messages = defineMessages({
   },
   txConfirmationLedgerNanoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
   },
   sendUsingLedgerNano: {
     id: 'wallet.send.ledger.confirmationDialog.submit',
@@ -107,8 +108,7 @@ const messages = defineMessages({
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
   },
   sendUsingTrezorT: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
@@ -205,11 +205,9 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
   renderDefaultTokenAmount: TokenEntry => Node = entry => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
     return (
-      <div className={styles.amount} id='wallet:send:confrimTransactionStep-amountToSend-text'>
+      <div className={styles.amount} id="wallet:send:confrimTransactionStep-amountToSend-text">
         {formatValue(entry)}
-        <span className={styles.currencySymbol}>
-          &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
-        </span>
+        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
       </div>
     );
   };
@@ -220,34 +218,28 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     const { unitOfAccountSetting } = this.props;
     return unitOfAccountSetting.enabled ? (
       <>
-        <div className={styles.totalAmount} id='wallet:send:confrimTransactionStep-totalAmount-text'>
+        <div className={styles.totalAmount} id="wallet:send:confrimTransactionStep-totalAmount-text">
           {formatValue(entry)}
-          <span className={styles.currencySymbol}>
-            &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
-          </span>
+          <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
         </div>
-        <div className={styles.totalFiatAmount} id='wallet:send:confrimTransactionStep-totalAmountInFiat-text'>
+        <div className={styles.totalFiatAmount} id="wallet:send:confrimTransactionStep-totalAmountInFiat-text">
           {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
           <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
         </div>
       </>
     ) : (
-      <div className={styles.totalAmount} id='wallet:send:confrimTransactionStep-totalAmount-text'>
+      <div className={styles.totalAmount} id="wallet:send:confrimTransactionStep-totalAmount-text">
         {formatValue(entry)}
-        <span className={styles.currencySymbol}>
-          &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
-        </span>
+        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
       </div>
     );
   };
   renderSingleFee: TokenEntry => Node = entry => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
     return (
-      <div className={styles.fees} id='wallet:send:confrimTransactionStep-feeAmount-text'>
+      <div className={styles.fees} id="wallet:send:confrimTransactionStep-feeAmount-text">
         {formatValue(entry)}
-        <span className={styles.currencySymbol}>
-          &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
-        </span>
+        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
       </div>
     );
   };
@@ -300,10 +292,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               placement="top"
               title={
                 <Typography component="div" textAlign="center">
-                  <FormattedMessage
-                    {...messages.minAdaHelp}
-                    values={{ moreDetails: moreDetailsLink }}
-                  />
+                  <FormattedMessage {...messages.minAdaHelp} values={{ moreDetails: moreDetailsLink }} />
                 </Typography>
               }
             >
@@ -423,9 +412,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         >
           <Box width="506px" mx="auto">
             {this.renderError()}
-            {this.props.staleTx ? (
-              <div className={styles.staleTxWarning}>{staleTxWarning}</div>
-            ) : null}
+            {this.props.staleTx ? <div className={styles.staleTxWarning}>{staleTxWarning}</div> : null}
             {receiverHandle ? (
               <div style={{ marginBottom: '20px' }}>
                 <Box mb="8px">
@@ -434,12 +421,14 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     variant="body1"
                     sx={{
                       color: 'grayscale.900',
                       overflowWrap: 'break-word',
                     }}
+                    id='wallet:send:confrimTransactionStep-receiverHandleInfo-text'
                   >
                     {receiverHandle.nameServer}: {receiverHandle.handle}
                   </Typography>
@@ -453,7 +442,8 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                 </Typography>
               </Box>
               <Box>
-                <Typography component="div"
+                <Typography
+                  component="div"
                   variant="body1"
                   sx={{
                     color: 'grayscale.900',
@@ -466,16 +456,13 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               </Box>
             </div>
 
-            <Box
-              className={styles.totalAmountWrapper}
-              sx={{ bgcolor: 'primary.600', color: 'grayscale.min' }}
-            >
-              <div className={styles.totalAmountLabel}>
-                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
-              </div>
+            <SBox className={styles.totalAmountWrapper}>
+              <div className={styles.totalAmountLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}</div>
               <div>
                 <Box className={styles.totalAmountValue}>
-                  {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+                  <Typography variant="body2" color="ds.text_gray_medium">
+                    {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+                  </Typography>
                 </Box>
                 {amount.nonDefaultEntries().length > 0 && (
                   <div className={styles.assetsCount}>
@@ -485,12 +472,10 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                   </div>
                 )}
               </div>
-            </Box>
+            </SBox>
 
             <div className={styles.feesWrapper}>
-              <div className={styles.feesLabel}>
-                {intl.formatMessage(globalMessages.transactionFee)}
-              </div>
+              <div className={styles.feesLabel}>{intl.formatMessage(globalMessages.transactionFee)}</div>
               <div className={styles.feesValue}>
                 {this.renderBundle({
                   amount: this.props.transactionFee,
@@ -501,9 +486,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
             <div className={styles.amountWrapper}>
               <div className={styles.amountLabel}>{this._amountLabel()}</div>
-              <div className={styles.amountValue}>
-                {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
-              </div>
+              <div className={styles.amountValue}>{this.renderDefaultTokenAmount(amount.getDefaultEntry())}</div>
             </div>
 
             <div className={styles.wrapper}>
@@ -552,7 +535,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               size="medium"
               onClick={() => this.props.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
               sx={{ width: '128px' }}
-              id='wallet:send:confrimTransactionStep-backToAddAssetsStep-button'
+              id="wallet:send:confrimTransactionStep-backToAddAssetsStep-button"
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </Button>
@@ -563,13 +546,9 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               sx={{ width: '128px' }}
               onClick={this.submit.bind(this)}
               disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
-              id='wallet:send:confrimTransactionStep-confirmTransaction-button'
+              id="wallet:send:confrimTransactionStep-confirmTransaction-button"
             >
-              {isSubmitting ? (
-                <LoadingSpinner light />
-              ) : (
-                intl.formatMessage(this.getSendButtonText())
-              )}
+              {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
             </Button>
           </Stack>
         </Box>

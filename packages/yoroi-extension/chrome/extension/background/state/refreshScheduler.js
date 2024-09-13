@@ -1,5 +1,5 @@
 // @flow
-import type { PublicDeriver, } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import type { PublicDeriver } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getWallets } from '../../../../app/api/common/index';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getCardanoStateFetcher } from '../utils';
@@ -7,15 +7,8 @@ import AdaApi from '../../../../app/api/ada';
 import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../../../app/environment';
 import { getDb } from './databaseManager';
-import {
-  getSubscriptions,
-  registerCallback,
-  emitUpdateToSubscriptions,
-} from '../subscriptionManager';
-import LocalStorageApi, {
-  loadSubmittedTransactions,
-  persistSubmittedTransactions,
-} from '../../../../app/api/localStorage/index';
+import { getSubscriptions, registerCallback, emitUpdateToSubscriptions } from '../subscriptionManager';
+import LocalStorageApi, { loadSubmittedTransactions, persistSubmittedTransactions } from '../../../../app/api/localStorage/index';
 import { Queue } from 'async-await-queue';
 import type { WalletState } from '../types';
 import WalletTransaction from '../../../../app/domain/WalletTransaction';
@@ -28,10 +21,10 @@ import {
   getNetworkById,
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
-registerCallback((params) => {
+registerCallback(params => {
   if (params.type === 'subscriptionChange') {
     refreshThreadMain().catch(error => {
-      console.error('error when refreshing:', error)
+      console.error('error when refreshing:', error);
     });
   }
 });
@@ -62,14 +55,11 @@ async function refreshAll(): Promise<void> {
 
   for (let i = 0; i < publicDerivers.length; i++) {
     try {
-      await syncWallet(
-        publicDerivers[i],
-        `periodical refresh ${i+1} of ${publicDerivers.length}`,
-      );
-    } catch(error) {
+      await syncWallet(publicDerivers[i], `periodical refresh ${i + 1} of ${publicDerivers.length}`);
+    } catch (error) {
       console.error('Error when refreshing wallet.', error);
     }
-  };
+  }
 }
 
 // Keep track of whether a wallet is being synced because the UI shows this.
@@ -77,11 +67,7 @@ export const refreshingWalletIdSet: Set<number> = new Set();
 // There are multiple entry points to syncWallet. Ensure only one is running.
 const syncingQueue = new Queue();
 
-export async function syncWallet(
-  publicDeriver: PublicDeriver<>,
-  logInfo: string,
-  priority: number = 0
-): Promise<void> {
+export async function syncWallet(publicDeriver: PublicDeriver<>, logInfo: string, priority: number = 0): Promise<void> {
   return syncingQueue.run(() => _syncWallet(publicDeriver, logInfo), priority);
 }
 async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Promise<void> {
@@ -90,7 +76,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     'Syncing wallet ID %s name "%s" for %s.',
     publicDeriverId,
     (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
-    logInfo,
+    logInfo
   );
 
   const lastSyncInfo = await publicDeriver.getLastSyncInfo();
@@ -194,7 +180,7 @@ function emitUpdate(
   publicDeriverId: number,
   isRefreshing: boolean,
   walletState?: ?WalletState,
-  newTxs?: Array<WalletTransaction>,
+  newTxs?: Array<WalletTransaction>
 ): void {
   emitUpdateToSubscriptions({
     type: 'wallet-state-update',
@@ -207,4 +193,3 @@ function emitUpdate(
     },
   });
 }
-

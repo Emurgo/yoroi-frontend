@@ -47,7 +47,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           gridTemplateColumns: '1fr auto',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: isReadonly ? 'ds.bg_color_min' : 'ds.bg_color_min',
+          bgcolor: isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
           ...(!isReadonly && {
@@ -66,7 +66,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'ds.bg_color_min',
+            bgcolor: 'ds.bg_color_max',
             borderRadius: '10px',
           }}
         >
@@ -85,7 +85,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           variant="body1"
           color="ds.text_gray_medium"
           placeholder="0"
-          bgcolor={isReadonly ? 'ds.bg_color_min' : 'ds.bg_color_min'}
+          bgcolor={isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max'}
           readOnly={isReadonly}
           value={isValidTickers ? valueToDisplay : NO_PRICE_VALUE_PLACEHOLDER}
           onChange={event => {

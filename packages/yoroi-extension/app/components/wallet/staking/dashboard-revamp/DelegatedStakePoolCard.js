@@ -57,7 +57,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
       sx={{
         border: '1px solid',
         borderColor: 'grayscale.200',
-        bgcolor: 'ds.bg_color_min',
+        bgcolor: 'ds.bg_color_max',
         paddingBottom: '24px',
       }}
     >

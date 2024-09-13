@@ -1,22 +1,15 @@
 version: 2
 updates:
 - package-ecosystem: npm
-  directory: "/packages/yoroi-extension"
+  directory: "/packages/e2e-tests"
   schedule:
     interval: weekly
     day: friday
     time: "03:00"
-    timezone: UTC
-  open-pull-requests-limit: 5
+    timezone: "Europe/London"
+  open-pull-requests-limit: 1
   allow:
-    - dependency-name: "@cardano-foundation/ledgerjs-hw-app-cardano"
-    - dependency-name: "@emurgo/*"
-    - dependency-name: "cardano-*"
-    - dependency-name: "lodash"
-    - dependency-name: "mobx*"
-    - dependency-name: "react*"
-    - dependency-name: "trezor-connect"
     - dependency-name: "chromedriver"
   assignees:
-    - "vsubhuman"
+    - "emurgo-rnd"
   rebase-strategy: disabled

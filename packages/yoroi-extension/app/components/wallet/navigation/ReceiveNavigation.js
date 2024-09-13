@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './ReceiveNavigation.scss';
 
-import { ReactComponent as AttentionIcon }  from '../../../assets/images/attention-modern.inline.svg';
+import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButton from './ReceiveNavButton';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
@@ -17,7 +17,7 @@ import {
   AddressSubgroup,
 } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
-import { ReactComponent as InfoIcon }  from '../../../assets/images/attention-big-light.inline.svg';
+import { ReactComponent as InfoIcon } from '../../../assets/images/attention-big-light.inline.svg';
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
@@ -97,8 +97,7 @@ export default class ReceiveNavigation extends Component<Props> {
             key={type.name.subgroup}
             className={classNames([type.name.subgroup, type.name.group])}
             icon={
-              type.name.subgroup === AddressSubgroup.internal ||
-              type.name.subgroup === AddressSubgroup.mangled
+              type.name.subgroup === AddressSubgroup.internal || type.name.subgroup === AddressSubgroup.mangled
                 ? AttentionIcon
                 : undefined
             }

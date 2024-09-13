@@ -4,6 +4,7 @@
   "scripts": {
     "eslint": "lerna run eslint --stream",
     "flow": "lerna run flow --stream",
+    "tsc": "lerna run tsc --stream",
     "test": "lerna run test --stream",
     "translations:purge": "lerna run translations:purge -- stream",
     "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func"

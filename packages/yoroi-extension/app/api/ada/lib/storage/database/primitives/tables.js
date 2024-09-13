@@ -65,9 +65,10 @@ export type CardanoHaskellConfig = $ReadOnly<
   |}>
 >;
 
-export type NetworkInsert = {|
+export type NetworkRow = {|
   NetworkId: number,
   NetworkName: string,
+  NetworkFeatureName?: string,
   CoinType: CoinTypesT,
   Backend: {|
     BackendService: string,
@@ -90,9 +91,6 @@ export type NetworkInsert = {|
    * To differentiate these, we need some identifier of the fork
    */
   Fork: number,
-|};
-export type NetworkRow = {|
-  ...NetworkInsert,
 |};
 export const NetworkSchema: {|
   +name: 'Network',

@@ -1,12 +1,5 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import {
-  defaultWaitTimeout,
-  fiveSeconds,
-  halfSecond,
-  oneMinute,
-  oneSecond,
-  quarterSecond,
-} from '../helpers/timeConstants.js';
+import { defaultWaitTimeout, halfSecond, oneMinute, oneSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
@@ -219,9 +212,9 @@ class WalletCommonBase extends BasePage {
   }
   async goToSettingsTab() {
     this.logger.info(`WalletCommonBase::goToSettingsTab is called`);
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.goToSettingsTab.name);
     await this.click(this.settingTabButtonLocator);
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);

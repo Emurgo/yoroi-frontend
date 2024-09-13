@@ -1,5 +1,5 @@
-import * as React from 'react';
 import { observer } from 'mobx-react';
+import * as React from 'react';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../../containers/banners/BannerContainer';

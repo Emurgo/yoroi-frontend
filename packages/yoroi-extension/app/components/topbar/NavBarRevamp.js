@@ -37,7 +37,7 @@ class NavBarRevamp extends Component<Props> {
     return (
       <Box
         sx={{
-          backgroundColor: 'ds.bg_color_min',
+          backgroundColor: 'ds.bg_color_max',
           borderBottom: pageBanner ? 'none' : '1px solid',
           borderBottomColor: 'grayscale.200',
         }}

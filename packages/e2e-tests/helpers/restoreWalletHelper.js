@@ -80,8 +80,8 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
   await walletDetailsPage.continue();
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
-  await transactionsPage.waitPrepareWalletBannerIsClosed();
   await transactionsPage.closeUpdatesModalWindow();
+  await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed).to.be.true;
   const walletInfo = await transactionsPage.getSelectedWalletInfo();

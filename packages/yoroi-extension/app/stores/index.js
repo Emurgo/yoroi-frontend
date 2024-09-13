@@ -169,7 +169,9 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    await loadedStores.loading.load('extension');
+    await loadedStores.loading.load()
+      .then(() => console.debug('extension / loading store loaded'))
+      .catch(e => console.error('extension / loading store load failed', e));
 
     return loadedStores;
   }
