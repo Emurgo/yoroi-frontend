@@ -6,6 +6,7 @@ import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from 
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
+import { CurrentWalletType } from '../types/currrentWallet';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -150,11 +151,13 @@ const groupTransactionsByDay = transactions => {
   return groups.sort((a, b) => b.transactions[0].date.getTime() - a.transactions[0].date.getTime());
 };
 
-export const createCurrrentWalletInfo = (stores: any): any => {
+export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undefined => {
   const { wallets, delegation, tokenInfoStore, coinPriceStore, profile } = stores;
 
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
+
+    console.log('walletCurrentPoolInfo', walletCurrentPoolInfo);
 
     const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
     const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
@@ -198,30 +201,30 @@ export const createCurrrentWalletInfo = (stores: any): any => {
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
     return {
-      currentPool: walletCurrentPoolInfo, // good
-      networkId, // good
-      walletId: currentWalletId, // good
-      selectedWallet: selectedWallet, // good
-      walletAdaBalance: walletAdaBalance.toNumber(), // good
-      unitOfAccount: stores.profile.unitOfAccount, // good
-      defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId), // good
-      getCurrentPrice: stores.coinPriceStore.getCurrentPrice, // good
-      recentTransactions: groupedTx ? groupedTx : [], // good
-      submitedTransactions: selectedWallet.submittedTransactions, // good
-      backendService: BackendService, // good
-      backendServiceZero: BackendServiceZero, // good
-      isHardwareWallet: isHardware, // good
-      primaryTokenInfo: tokenInfo, // good
+      currentPool: walletCurrentPoolInfo,
+      networkId,
+      walletId: currentWalletId,
+      selectedWallet: selectedWallet,
+      walletAdaBalance: walletAdaBalance.toNumber(),
+      unitOfAccount: stores.profile.unitOfAccount,
+      defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
+      getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
+      recentTransactions: groupedTx ? groupedTx : [],
+      submitedTransactions: selectedWallet.submittedTransactions,
+      backendService: BackendService,
+      backendServiceZero: BackendServiceZero,
+      isHardwareWallet: isHardware,
+      primaryTokenInfo: tokenInfo,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
         fiatAmount: fiatDisplay || 0,
         currency: currency === null ? 'USD' : currency,
       },
       assetList: assetList,
-      nftList: [],
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
+    return undefined;
   }
 };
 

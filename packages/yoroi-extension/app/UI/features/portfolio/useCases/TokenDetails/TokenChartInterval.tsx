@@ -58,7 +58,7 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
 
     const {
         ptActivity: { close, open },
-        config,
+        // config,
     } = useCurrencyPairing();
 
     const { changeValue, changePercent } = priceChange(open, close);
@@ -107,12 +107,12 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
 
                             <Stack direction="row" alignItems="flex-end" color="ds.gray_max">
                                 <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
-                                <Typography variant="caption1" sx={{ marginBottom: theme.spacing(0.25) }}>
+                                <Typography variant="caption" sx={{ marginBottom: theme.spacing(0.25) }}>
                                     &nbsp;{unitOfAccount}
                                 </Typography>
                             </Stack>
                             <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
-                            <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount} />
+                            <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
                         </Stack>
                     )}
                 </Stack>
@@ -186,8 +186,8 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
 
 
 
-const PriceChangeChip = ({ value }) => {
-    const theme = useTheme()
+const PriceChangeChip = ({ value }: { value: number }) => {
+    const theme: any = useTheme()
     return <>
         <Chip
             type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
@@ -207,7 +207,7 @@ const PriceChangeChip = ({ value }) => {
         />
     </>
 }
-const PriceValueChip = ({ value, unitOfAccount }) => {
+const PriceValueChip = ({ value, unitOfAccount }: { value: number, unitOfAccount: string }) => {
     return <>
         <Chip
             type={
@@ -218,8 +218,7 @@ const PriceValueChip = ({ value, unitOfAccount }) => {
                         : ChipTypes.DISABLED
             }
             label={
-                // @ts-ignore
-                <Typography variant="caption1">
+                <Typography variant="caption">
                     {value > 0 && '+'}
                     {formatNumber(value)} {unitOfAccount}
                 </Typography>

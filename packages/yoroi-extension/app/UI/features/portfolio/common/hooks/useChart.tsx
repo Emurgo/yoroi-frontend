@@ -15,7 +15,7 @@ const useChart = (data: IChartData) => {
   //   { id: 'start1YearAgo', label: strings['1Y'], active: false },
   //   { id: 'ALL', label: strings['ALL'], active: false },
   // ]);
-  const [detailInfo, setDetailInfo] = useState<{ value: number; label: string, changeValue: number, changePercent: number }>({
+  const [detailInfo, setDetailInfo] = useState<{ value?: number; label?: string, changeValue?: number, changePercent?: number }>({
     label: data[0]?.label,
     value: data[0]?.value,
     changeValue: data[0]?.changeValue,
@@ -157,10 +157,10 @@ const useChart = (data: IChartData) => {
 
   const handleMouseUp = () => {
     setDetailInfo({
-      value: data ? data[0].value : 0,
-      changeValue: data ? data[0].changeValue : 0,
-      changePercent: data ? data[0].changePercent : 0,
-      label: data ? data[0].label : "",
+      value: data ? data[0]?.value : 0,
+      changeValue: data ? data[0]?.changeValue : 0,
+      changePercent: data ? data[0]?.changePercent : 0,
+      label: data ? data[0]?.label : "",
     });
     setIsDragging(false);
   };

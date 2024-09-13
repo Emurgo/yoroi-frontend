@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { CurrentWalletType } from '../../../types/currrentWallet';
 import {
   AccountPair,
   CurrencyType,
@@ -25,7 +26,7 @@ type PortfolioProviderProps = {
     unitOfAccount: CurrencyType;
     accountPair: AccountPair;
   };
-  currentWallet: any
+  currentWallet: CurrentWalletType
 };
 
 export const PortfolioContextProvider = ({
@@ -71,7 +72,7 @@ export const PortfolioContextProvider = ({
       ...actions,
       settingFiatPairUnit,
       walletBalance,
-      assetList,
+      assetList: assetList || [],
     }),
     [state, actions]
   );

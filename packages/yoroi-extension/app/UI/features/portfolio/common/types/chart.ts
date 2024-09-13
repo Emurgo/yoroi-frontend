@@ -5,6 +5,4 @@ export interface IChartDataItem {
   changeValue: number;
 }
 
-export interface IChartData {
-  data: IChartDataItem[];
-}
+export type IChartData = IChartDataItem[];

@@ -14,11 +14,12 @@ const defaultPortfolioTokenActivityState: PortfolioTokenActivityState = freeze(
     secondaryTokenIds: [],
     aggregatedBalances: {},
     tokenActivity: {},
-    activityWindow: '24h',
+    activityWindow: Portfolio.Token.ActivityWindow.OneDay,
     isLoading: false,
   },
   true
 );
+
 const PortfolioTokenActivityContext = React.createContext<PortfolioTokenActivityState>({
   ...defaultPortfolioTokenActivityState,
 });
@@ -55,8 +56,6 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const { assetList, walletBalance } = usePortfolio();
 
   React.useEffect(() => {
-    // filter and add here the ids for query
-
     const listForActivity = assetList.filter(item => item.policyId.length > 0).map(item => `${item.policyId}.${item.assetName}`); //
 
     actions.secondaryTokenIdsChanged(listForActivity);

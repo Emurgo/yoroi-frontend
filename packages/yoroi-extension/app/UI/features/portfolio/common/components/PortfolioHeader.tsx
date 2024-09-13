@@ -2,14 +2,14 @@ import { Box, Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
+import { WalletBalance } from '../../../../types/currrentWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
-import { BalanceType } from '../types/index';
 import PnlTag from './PlnTag';
 
 interface Props {
-  walletBalance: BalanceType;
+  walletBalance: WalletBalance;
   setKeyword: (keyword: string) => void;
   isLoading: boolean;
   tooltipTitle: JSX.Element;

@@ -1,9 +1,10 @@
 import { produce } from 'immer';
+import { CurrentWalletType } from '../../../types/currrentWallet';
 
 export type CurrencyType = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY' | 'none' | null;
 export type AccountPair = {
-  from: { name: string; value: number };
-  to: { name: string; value: number };
+  from: { name: string; value: string };
+  to: { name: string; value: string };
 } | null;
 
 // Define types
@@ -35,6 +36,7 @@ export type PortfolioState = {
     enabled: boolean;
   };
   accountPair: AccountPair | null;
+  currentWallet: CurrentWalletType;
 };
 
 // Define default state
@@ -45,6 +47,7 @@ export const defaultPortfolioState: PortfolioState = {
     enabled: false,
   },
   accountPair: null,
+  currentWallet: undefined,
 };
 
 // Define action handlers

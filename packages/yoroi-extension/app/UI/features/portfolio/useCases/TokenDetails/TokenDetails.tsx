@@ -145,7 +145,6 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             </Stack>
 
             <Divider />
-            {/* {isPrimaryToken && <TokenDetailChart isLoading={isLoading} tokenInfo={tokenInfo} isPrimaryToken={isPrimaryToken} /> */}
             {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryTokents={true} />
             }
           </Card>

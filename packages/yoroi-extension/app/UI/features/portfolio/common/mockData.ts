@@ -1,4 +1,4 @@
-import { createChartData, getRandomTime, start1WeekAgo, start24HoursAgo } from './helpers/mockHelper';
+import { getRandomTime, start1WeekAgo, start24HoursAgo } from './helpers/mockHelper';
 import { BalanceType, LiquidityItemType, OrderItemType, TokenType } from './types';
 import { HistoryItemStatus, HistoryItemType, TransactionItemType } from './types/transaction';
 
@@ -52,14 +52,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'DOGE',
@@ -92,14 +84,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'AGIX',
@@ -132,14 +116,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'Shiba',
@@ -172,14 +148,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'ALT',
@@ -212,14 +180,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN1',
@@ -252,14 +212,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN2',
@@ -292,14 +244,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN3',
@@ -332,14 +276,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN6',
@@ -372,14 +308,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN8',
@@ -412,14 +340,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
     ] as TokenType[],
   },

@@ -3,13 +3,12 @@ import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 
-const PerformanceItemType = {
-  FIAT: 'fiat',
-  TOKEN: 'token',
-  RANK: 'rank',
-};
+// const PerformanceItemType = {
+//   FIAT: 'fiat',
+//   TOKEN: 'token',
+//   RANK: 'rank',
+// };
 
 interface Props {
   tokenInfo: TokenType;
@@ -17,25 +16,26 @@ interface Props {
 }
 
 const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+  console.log({ tokenInfo, isLoading })
   const theme = useTheme();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  // const { unitOfAccount } = usePortfolio();
 
-  const firstPerformanceItemList = [
-    { id: 'tokenPriceChange', type: PerformanceItemType.FIAT, label: strings.tokenPriceChange },
-    { id: 'tokenPrice', type: PerformanceItemType.FIAT, label: strings.tokenPrice },
-    { id: 'marketCap', type: PerformanceItemType.FIAT, label: strings.marketCap },
-    { id: 'volumn', type: PerformanceItemType.FIAT, label: strings['24hVolumn'] },
-    { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
-  ];
+  // const firstPerformanceItemList = [
+  //   { id: 'tokenPriceChange', type: PerformanceItemType.FIAT, label: strings.tokenPriceChange },
+  //   { id: 'tokenPrice', type: PerformanceItemType.FIAT, label: strings.tokenPrice },
+  //   { id: 'marketCap', type: PerformanceItemType.FIAT, label: strings.marketCap },
+  //   { id: 'volumn', type: PerformanceItemType.FIAT, label: strings['24hVolumn'] },
+  //   { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
+  // ];
 
-  const secondPerformanceItemList = [
-    { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
-    { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
-    { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
-    { id: 'allTimeHigh', type: PerformanceItemType.FIAT, label: strings.allTimeHigh },
-    { id: 'allTimeLow', type: PerformanceItemType.FIAT, label: strings.allTimeLow },
-  ];
+  // const secondPerformanceItemList = [
+  //   { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
+  //   { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
+  //   { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
+  //   { id: 'allTimeHigh', type: PerformanceItemType.FIAT, label: strings.allTimeHigh },
+  //   { id: 'allTimeLow', type: PerformanceItemType.FIAT, label: strings.allTimeLow },
+  // ];
 
   return (
     <Stack direction="column">
