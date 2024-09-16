@@ -76,11 +76,10 @@ export const darkThemeBase: any = {
     gradients: {
       bg_gradient_1:
         'linear-gradient(195.39deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.1) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
-      bg_gradient_2:
-        'linear-gradient(205.51deg, rgba(11, 153, 125, 0.49) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
+      bg_gradient_2: 'linear-gradient(205.51deg, rgba(11, 153, 125, 0.49) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
       bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
     },
-    background: { bg_color_low: dark.gray_cmin, bg_color_medium: grayscale['100'] },
+    background: { bg_color_max: dark.gray_min, bg_color_medium: grayscale['100'] },
     uitext: {
       primary: {
         high: primary['700'],
@@ -89,7 +88,7 @@ export const darkThemeBase: any = {
       },
       on_primary: staticColors.white,
       gray: {
-        max: dark.gray_cmax,
+        max: dark.gray_max,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],
@@ -106,7 +105,7 @@ export const darkThemeBase: any = {
         low: primary['300'],
       },
       gray: {
-        high: dark.gray_cmax,
+        high: dark.gray_max,
         normal: grayscale['900'],
         medium: grayscale['600'],
         low: grayscale['400'],

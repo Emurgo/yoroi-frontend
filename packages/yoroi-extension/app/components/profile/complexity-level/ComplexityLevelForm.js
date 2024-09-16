@@ -57,6 +57,7 @@ type Props = {|
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
+  +baseTheme?: string,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -72,7 +73,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { complexityLevel, isSubmitting, isRevampLayout } = this.props;
+    const { complexityLevel, isSubmitting, isRevampLayout, baseTheme } = this.props;
 
     const levels = [
       {
@@ -159,7 +160,14 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                     textAlign: 'center',
                     p: '1px',
                     border: 'solid 1px transparent',
-                    background: theme => (isSelected ? theme.palette.ds.bg_gradient_1 : theme.palette.ds.bg_gradient_2),
+                    background: theme =>
+                      isSelected
+                        ? baseTheme === 'light-theme'
+                          ? theme.palette.gradients.green
+                          : theme.palette.gradients_2
+                        : baseTheme === 'light-theme'
+                        ? 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)'
+                        : theme.palette.ds.bg_gradient_3,
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
                     borderRadius: '8px',

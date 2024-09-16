@@ -7,8 +7,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
@@ -31,6 +29,7 @@ import globalMessages from '../../i18n/global-messages';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 type Props = StoresAndActionsProps;
 
@@ -55,18 +54,18 @@ class MyWalletsPage extends Component<AllProps> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  handleWalletNavItemClick: PublicDeriver<> => void = (
-    publicDeriver
+  handleWalletNavItemClick: number => void = (
+    publicDeriverId
   ) => {
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.WALLETS.ROOT,
-      publicDeriver,
+      publicDeriverId,
     });
   };
 
-  openToSettings: (PublicDeriver<>) => void = publicDeriver => {
+  openToSettings: (number) => void = publicDeriverId => {
     this.props.actions.wallets.setActiveWallet.trigger({
-      wallet: publicDeriver,
+      publicDeriverId
     });
     this.props.actions.router.goToRoute.trigger({
       route: ROUTES.SETTINGS.WALLET,
@@ -78,7 +77,7 @@ class MyWalletsPage extends Component<AllProps> {
     const { actions, stores } = this.props;
 
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const { wallets } = this.props.stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
     const navbarElementClassic = (
       <NavBar
@@ -127,25 +126,14 @@ class MyWalletsPage extends Component<AllProps> {
     );
   }
 
-  /*
-   * TODO: this should operator on conceptual wallets
-   * with publicDerivers acting as sub-rows
-   * but since we don't support multi-currency or multi-account yet we simplify the UI for now
-   */
-  generateRow: (PublicDeriver<>) => Node = publicDeriver => {
-    const parent = publicDeriver.getParent();
-    const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-      parent
-    );
-
+  generateRow: (WalletState) => Node = wallet => {
     const walletSumCurrencies = (() => {
-      const network = publicDeriver.getParent().getNetworkInfo();
       const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-        network.NetworkId
+        wallet.networkId
       );
       const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
         identifier: defaultToken.Identifier,
-        networkId: network.NetworkId,
+        networkId: wallet.networkId,
       });
       return (
         <>
@@ -157,60 +145,54 @@ class MyWalletsPage extends Component<AllProps> {
       );
     })();
 
-    const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+    const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+      wallet
+    );
 
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate =
-      withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+    const { plate, lastSyncInfo } = wallet;
 
-    const isRefreshing = this.props.stores.transactions.isWalletRefreshing(publicDeriver);
-
-    const isLoading = this.props.stores.transactions.isWalletLoading(publicDeriver);
-
-    const lastSyncInfo = this.props.stores.transactions.getLastSyncInfo(publicDeriver);
+    const isLoading = this.props.stores.transactions.isWalletLoading(wallet.publicDeriverId);
 
     return (
       <WalletRow
         isExpandable={false /* TODO: should be expandable if > 1 public deriver */}
-        key={publicDeriver.getPublicDeriverId()}
-        onRowClicked={() => this.handleWalletNavItemClick(publicDeriver)}
+        key={wallet.publicDeriverId}
+        onRowClicked={() => this.handleWalletNavItemClick(wallet.publicDeriverId)}
         walletSumDetails={
           <WalletDetails
-            walletAmount={balance}
+            walletAmount={wallet.balance}
             rewards={rewards}
             // TODO: This should be probably bound to an individual wallet
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={this.props.stores.profile.shouldHideBalance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-            isRefreshing={isRefreshing}
+            isRefreshing={wallet.isRefreshing}
           />
         }
         walletSumCurrencies={walletSumCurrencies}
-        walletSubRow={() => this.createSubrow(publicDeriver)}
-        walletPlate={<NavPlate plate={plate} wallet={settingsCache} />}
+        walletSubRow={() => this.createSubrow(wallet)}
+        walletPlate={<NavPlate plate={plate} walletType={wallet.type} name={wallet.name}/>}
         walletSync={
           <WalletSync
             time={lastSyncInfo.Time ? moment(lastSyncInfo.Time).fromNow() : null}
-            isRefreshing={isRefreshing}
+            isRefreshing={wallet.isRefreshing}
             isLoading={isLoading}
           />
         }
-        onSettings={() => this.openToSettings(publicDeriver)}
+        onSettings={() => this.openToSettings(wallet.publicDeriverId)}
       />
     );
   };
 
-  createSubrow: (PublicDeriver<>) => Node = publicDeriver => {
+  createSubrow: (WalletState) => Node = wallet => {
     const { intl } = this.context;
 
-    const network = publicDeriver.getParent().getNetworkInfo();
     const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-      network.NetworkId
+      wallet.networkId,
     );
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.Identifier,
-      networkId: network.NetworkId,
+      networkId: wallet.networkId,
     });
 
     // TODO: replace with wallet addresses
@@ -221,19 +203,12 @@ class MyWalletsPage extends Component<AllProps> {
 
     const addressesLength = walletAddresses.length;
 
-    const parent = publicDeriver.getParent();
-    const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-      parent
-    );
-
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate =
-      withPubKey == null ? null : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+    const plate = wallet.plate;
 
     const walletSubRow = (
       <WalletSubRow
         walletInfo={{
-          conceptualWalletName: settingsCache.conceptualWalletName,
+          conceptualWalletName: wallet.name,
           plate,
         }}
         // TODO: do we delete WalletDetails? Lots of duplication with Nav alternative

@@ -88,7 +88,7 @@ export const DelagationForm = () => {
       setFormLoading(true);
       await signDelegationTransaction({
         password,
-        publicDeriver: selectedWallet,
+        wallet: selectedWallet,
         dialog: null,
       });
       setFormLoading(false);
@@ -121,7 +121,7 @@ export const DelagationForm = () => {
           {mapStatusDescription[governanceVote.kind || '']}
         </Typography>
         <TotalBox>
-          <Typography variant="h4" color="ds.gray_cmin">
+          <Typography variant="h4" color="ds.gray_min">
             {strings.total}
           </Typography>
           <Box textAlign="right">
@@ -133,7 +133,7 @@ export const DelagationForm = () => {
             </Typography>
           </Box>
         </TotalBox>
-        <Typography variant="body2" color="ds.gray_c600" mb="24px">
+        <Typography variant="body2" color="ds.gray_600" mb="24px">
           {strings.transactionDetails}
         </Typography>
         <Box mb="40px">

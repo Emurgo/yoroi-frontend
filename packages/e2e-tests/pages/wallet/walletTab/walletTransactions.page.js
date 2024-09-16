@@ -1,4 +1,5 @@
 import {
+  defaultWaitTimeout,
   fiveSeconds,
   quarterSecond,
   threeSeconds,
@@ -147,7 +148,7 @@ export class TransactionsSubTab extends WalletTab {
   };
   // 'wallet is empty' banner
   walletEmptyBannerLocator = {
-    locator: 'walletEmptyBanner',
+    locator: 'wallet|staking-emptyWalletBanner-box',
     method: 'id',
   };
   // transaction
@@ -188,13 +189,13 @@ export class TransactionsSubTab extends WalletTab {
 
     return submenuState && summaryState;
   }
-  async isWalletEmpty() {
-    this.logger.info(`TransactionsSubTab::isWalletEmpty is called`);
+  async walletIsEmpty() {
+    this.logger.info(`TransactionsSubTab::walletIsEmpty is called`);
     const emptyBannerIsDisplayed = await (
       await this.findElement(this.walletEmptyBannerLocator)
     ).isDisplayed();
-    const displayedTxs = await this.findElements(this.transactionRowLocator);
-    return emptyBannerIsDisplayed && displayedTxs.length == 0;
+    const displayedTxsGroups = await this.__getTxsGroups();
+    return emptyBannerIsDisplayed && displayedTxsGroups == 0;
   }
   async __getTxsGroups() {
     const locatorForAllGroups = {
@@ -202,6 +203,7 @@ export class TransactionsSubTab extends WalletTab {
       method: 'xpath',
     };
     const result = [];
+    await this.setImplicitTimeout(twoSeconds, this.__getTxsGroups.name);
     const allGroups = await this.findElements(locatorForAllGroups);
     for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
       const groupDatePrettified = await this.getText(
@@ -213,6 +215,7 @@ export class TransactionsSubTab extends WalletTab {
         groupIndex,
       });
     }
+    await this.setImplicitTimeout(defaultWaitTimeout, this.__getTxsGroups.name);
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {
@@ -382,10 +385,11 @@ export class TransactionsSubTab extends WalletTab {
       return true;
     }
     if (loaderIsDisplayed) {
+      const thirtySec = 3 * defaultWaitTimeout;
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-      const result = await this.waitLoaderIsNotDisplayed(fiveSeconds, quarterSecond);
+      const result = await this.waitLoaderIsNotDisplayed(thirtySec, quarterSecond);
       if (!result) {
-        throw new Error(`Transactions are still loading after ${fiveSeconds / 1000} seconds`);
+        throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
       }
     }
   }

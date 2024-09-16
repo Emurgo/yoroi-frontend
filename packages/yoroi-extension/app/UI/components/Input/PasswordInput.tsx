@@ -71,7 +71,7 @@ const SOutlinedInput = styled(OutlinedInput)(({ theme, error }: any) => ({
   },
 
   '& .MuiFormLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_c500,
+    color: error && theme.palette.ds.sys_magenta_500,
   },
 }));
 const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
@@ -80,6 +80,6 @@ const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
   },
 
   '& .MuiFormLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_c500,
+    color: error && theme.palette.ds.sys_magenta_500,
   },
 }));

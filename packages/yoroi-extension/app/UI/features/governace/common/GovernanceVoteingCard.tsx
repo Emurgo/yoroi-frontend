@@ -27,8 +27,9 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
   width: '294px',
   height: '362px',
   borderRadius: '8px',
+
   ...(!selected && {
-    backgroundImage: !pending && theme.palette.ds?.bg_gradient_1,
+    background: !pending && (theme.name === 'light-theme' ? theme.palette.ds?.bg_gradient_1 : theme.palette.ds?.bg_gradient_2),
     backgroundOrigin: 'border-box',
     boxShadow: 'inset 0 100vw white',
     border: '2px solid transparent',
@@ -44,7 +45,7 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: !pending && theme.palette.ds.bg_gradient_1,
+    background: !pending && theme.palette.ds.bg_gradient_1,
     backgroundOrigin: 'content-box',
     boxShadow: 'none',
     transition: 'all 250ms ease-in-out',
@@ -97,7 +98,7 @@ export const GovernanceVoteingCard = ({
           <Typography variant="h3" fontWeight="500" mt="16px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color={'ds.gray_c800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
+          <Description variant="body2" color={'ds.gray_800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </CardContent>

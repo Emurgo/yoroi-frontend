@@ -8,11 +8,13 @@ import { addressSubgroupName } from '../../../types/AddressFilterTypes';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './InternalHeader.scss';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   warning1: {
     id: 'wallet.receive.page.internalWarning1',
-    defaultMessage: '!!!Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain'
+    defaultMessage:
+      '!!!Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain',
   },
   blogLinkUrl: {
     id: 'wallet.receive.page.internal.learnMore',
@@ -26,7 +28,7 @@ type Props = {|
 
 @observer
 export default class InternalHeader extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -44,16 +46,25 @@ export default class InternalHeader extends Component<Props> {
     );
     return (
       <WarningHeader
-        message={(
+        message={
           <div className={styles.component}>
-            <div>{intl.formatMessage(messages.warning1)}</div><br />
-            <div><FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} /></div>
-            <div>
+            <Typography variant="caption" color="ds.text_gray_medium">
+              {intl.formatMessage(messages.warning1)}
+            </Typography>
+            <br />
+            <Typography
+              variant="caption"
+              color="ds.text_gray_medium"
+              sx={{ '& .InternalHeader_link': { px: '2px', color: 'ds.sys_cyan_500' } }}
+            >
+              <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
+            </Typography>
+            <Typography variant="caption" color="ds.text_gray_medium">
               {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
               <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-            </div>
+            </Typography>
           </div>
-        )}
+        }
       />
     );
   }

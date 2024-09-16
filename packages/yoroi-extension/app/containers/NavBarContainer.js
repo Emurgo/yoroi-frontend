@@ -12,8 +12,6 @@ import NoWalletsDropdown from '../components/topbar/NoWalletsDropdown';
 import NavDropdown from '../components/topbar/NavDropdown';
 import NavDropdownRow from '../components/topbar/NavDropdownRow';
 import { ROUTES } from '../routes-config';
-import { asGetPublicKey } from '../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
@@ -35,10 +33,10 @@ export default class NavBarContainer extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  switchToNewWallet: (PublicDeriver<>) => void = newWallet => {
+  switchToNewWallet: (number) => void = publicDeriverId => {
     this.props.actions.router.goToRoute.trigger({
       route: this.props.stores.app.currentRoute,
-      publicDeriver: newWallet,
+      publicDeriverId,
     });
   };
 
@@ -50,44 +48,29 @@ export default class NavBarContainer extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { stores } = this.props;
-    const { profile } = stores;
-
-    const walletsStore = stores.wallets;
-
-    const wallets = this.props.stores.wallets.publicDerivers;
+    const { profile, wallets: walletsStore } = stores;
+    const { wallets } = walletsStore;
 
     const walletComponents = wallets.map(wallet => {
-      const balance: ?MultiToken = this.props.stores.transactions.getBalance(wallet);
       const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-      const lastSyncInfo = this.props.stores.transactions.lastSyncInfo;
-
-      const parent = wallet.getParent();
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
-
-      const withPubKey = asGetPublicKey(wallet);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
+      const { lastSyncInfo } = wallet;
 
       return (
         <NavDropdownRow
-          key={wallet.getPublicDeriverId()}
-          plateComponent={<NavPlate plate={plate} wallet={settingsCache} />}
-          onSelect={() => this.switchToNewWallet(wallet)}
+          key={wallet.publicDeriverId}
+          plateComponent={<NavPlate plate={wallet.plate} walletType={wallet.type} name={wallet.name} />}
+          onSelect={() => this.switchToNewWallet(wallet.publicDeriverId)}
           isCurrentWallet={wallet === this.props.stores.wallets.selected}
           syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
-              walletAmount={balance}
+              walletAmount={wallet.balance}
               rewards={rewards}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
               getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
               defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                wallet.getParent().getNetworkInfo().NetworkId
+                wallet.networkId
               )}
               showEyeIcon={false}
               unitOfAccountSetting={profile.unitOfAccount}
@@ -115,18 +98,19 @@ export default class NavBarContainer extends Component<Props> {
           return <NoWalletsDropdown />;
         }
 
-        const balance: ?MultiToken = this.props.stores.transactions.getBalance(publicDeriver);
-        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(publicDeriver);
+        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+          publicDeriver
+        );
 
         return (
           <NavWalletDetails
             onUpdateHideBalance={this.updateHideBalance}
             shouldHideBalance={profile.shouldHideBalance}
             rewards={rewards}
-            walletAmount={balance}
+            walletAmount={publicDeriver.balance}
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-              publicDeriver.getParent().getNetworkInfo().NetworkId
+              publicDeriver.networkId
             )}
             unitOfAccountSetting={profile.unitOfAccount}
             getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
@@ -148,22 +132,9 @@ export default class NavBarContainer extends Component<Props> {
     })();
 
     const getPlate = () => {
-      const publicDeriver = walletsStore.selected;
-      if (publicDeriver == null) return null;
-
-      const parent = publicDeriver.getParent();
-
-      const settingsCache = this.props.stores.walletSettings.getConceptualWalletSettingsCache(
-        parent
-      );
-
-      const withPubKey = asGetPublicKey(publicDeriver);
-      const plate =
-        withPubKey == null
-          ? null
-          : this.props.stores.wallets.getPublicKeyCache(withPubKey).plate;
-
-      return <NavPlate plate={plate} wallet={settingsCache} />;
+      const { selected, selectedWalletName } = walletsStore;
+      if (selected == null || selectedWalletName == null) return null;
+      return <NavPlate plate={selected.plate} walletType={selected.type} name={selectedWalletName} />;
     };
 
     return (

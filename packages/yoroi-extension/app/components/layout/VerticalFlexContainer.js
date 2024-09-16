@@ -20,6 +20,7 @@ function VerticalFlexContainer({ children }: Props): Node {
           height: '7px',
           display: 'block',
         },
+        backgroundColor: 'ds.bg_color_max',
       }}
     >
       {children}

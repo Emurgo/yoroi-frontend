@@ -1,6 +1,6 @@
 // @flow
 import { useState } from 'react';
-import { Box } from '@mui/material';
+import { Box, styled } from '@mui/material';
 import Tabs from '../../../../components/common/tabs/Tabs';
 import { ReactComponent as RefreshIcon } from '../../../../assets/images/revamp/icons/refresh.inline.svg';
 import { useSwap } from '@yoroi/swap';
@@ -11,12 +11,8 @@ type TopActionsProps = {|
 |};
 
 export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
-
   const { orderTypeChanged } = useSwap();
-  const {
-    sellTokenInfo = {},
-    buyTokenInfo = {},
-  } = useSwapForm();
+  const { sellTokenInfo = {}, buyTokenInfo = {} } = useSwapForm();
 
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isDisabled = !isValidTickers;
@@ -48,16 +44,23 @@ export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
           onClick: () => orderTypeChanged(type),
         }))}
       />
-      <Box
-        sx={{ cursor: 'pointer', '& path': { fill: isDisabled && '#A0A4A8' } }}
-        onClick={isDisabled ? () => {} : handleRefresh}
-      >
+      <ButtonWrapper isDisabled={isDisabled} onClick={isDisabled ? () => {} : handleRefresh}>
         <RefreshIcon
           style={{
             ...(!isDisabled && refreshIconStyles),
           }}
         />
-      </Box>
+      </ButtonWrapper>
     </Box>
   );
 };
+
+const ButtonWrapper = styled(Box)(({ theme, isDisabled }) => ({
+  cursor: 'pointer',
+  '& path': { fill: isDisabled ? '#A0A4A8' : 'ds.el_gray_medium' },
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));

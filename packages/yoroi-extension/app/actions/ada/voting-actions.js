@@ -1,13 +1,13 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class VotingActions {
   generateCatalystKey: AsyncAction<void> = new AsyncAction();
   createTransaction: AsyncAction<null | string> = new AsyncAction();
   signTransaction: AsyncAction<{|
     password?: string,
-    publicDeriver: PublicDeriver<>,
+    wallet: WalletState,
   |}> = new AsyncAction();
   cancel: Action<void> = new Action();
   submitGenerate: Action<void> = new Action();

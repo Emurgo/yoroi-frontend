@@ -12,14 +12,12 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import Dialog from '../../../components/widgets/Dialog';
 import { EPOCH_REWARD_DENOMINATOR } from '../../../config/numbersConfig';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import AnnotatedLoader from '../../../components/transfer/AnnotatedLoader';
 import DelegationSuccessDialog from '../../../components/wallet/staking/DelegationSuccessDialog';
 import type { PoolMeta, PoolTransition } from '../../../stores/toplevel/DelegationStore';
-import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
 import SeizaFetcher from './SeizaFetcher';
@@ -33,7 +31,7 @@ import { withLayout } from '../../../styles/context/layout';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
 import type { PoolData } from './SeizaFetcher';
-import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { isTestnet, getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -95,18 +93,18 @@ class CardanoStakingPage extends Component<AllProps, State> {
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
-    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(selectedWallet);
+    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(
+      selectedWallet.publicDeriverId
+    );
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.props.stores.profile.currentLocale;
 
-      const publicDeriver = this.props.stores.wallets.selected;
-      if (publicDeriver == null) {
-        throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
-      }
-      const balance = this.props.stores.transactions.getBalance(publicDeriver);
-      const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriver);
-      const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(publicDeriver);
+      const balance = selectedWallet.balance;
+      const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
+        selectedWallet.publicDeriverId
+      );
+      const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
       const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
@@ -141,11 +139,11 @@ class CardanoStakingPage extends Component<AllProps, State> {
               ticker={truncateToken(
                 getTokenName(
                   this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                    publicDeriver.getParent().getNetworkInfo().NetworkId
+                    selectedWallet.networkId
                   )
                 )
               )}
-              isTestnet={isTestnet(publicDeriver.getParent().getNetworkInfo())}
+              isTestnet={isTestnet(getNetworkById(selectedWallet.networkId))}
             />
           ) : null}
 
@@ -202,12 +200,14 @@ class CardanoStakingPage extends Component<AllProps, State> {
       throw new Error(`${nameof(CardanoStakingPage)} no public deriver. Should never happen`);
     }
 
-    const delegationStore = this.props.stores.delegation;
-    const balance = this.props.stores.transactions.getBalance(publicDeriver);
+    const { balance } = publicDeriver;
     if (balance == null) {
       return null;
     }
-    const rewardBalance = delegationStore.getRewardBalanceOrZero(publicDeriver);
+    const delegationStore = this.props.stores.delegation;
+    const rewardBalance = delegationStore.getRewardBalanceOrZero(
+      publicDeriver
+    );
     const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
       rewardBalance.getDefaultEntry()
     );
@@ -251,7 +251,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
         }}
         selectedExplorer={
           this.props.stores.explorers.selectedExplorer.get(
-            selectedWallet.getParent().getNetworkInfo().NetworkId
+            selectedWallet.networkId
           ) ??
           (() => {
             throw new Error('No explorer for wallet network');
@@ -284,11 +284,11 @@ class CardanoStakingPage extends Component<AllProps, State> {
     );
   };
 
-  _getPoolInfo: (PublicDeriver<>) => void | PoolMeta = publicDeriver => {
+  _getPoolInfo: ({ networkId: number, ... }) => void | PoolMeta = publicDeriver => {
     const selectedPoolId = this.state.selectedPoolId;
     return selectedPoolId == null ? undefined
       : this.props.stores.delegation.getLocalPoolInfo(
-          publicDeriver.getParent().getNetworkInfo(),
+          publicDeriver.networkId,
           selectedPoolId
         );
   };
@@ -331,7 +331,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
 
-    const networkInfo = selectedWallet.getParent().getNetworkInfo();
+    const networkInfo = getNetworkById(selectedWallet.networkId);
     const currentParams = networkInfo.BaseConfig.reduce(
       (acc, next) => Object.assign(acc, next),
       {}
@@ -413,14 +413,12 @@ class CardanoStakingPage extends Component<AllProps, State> {
           )}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
           isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
-          isHardware={
-            selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-          }
+          isHardware={selectedWallet.type !== 'mnemonic'}
           onCancel={this.cancel}
           onSubmit={async ({ password }) => {
             await this.props.actions.ada.delegationTransaction.signTransaction.trigger({
               password,
-              publicDeriver: selectedWallet,
+              wallet: selectedWallet,
               dialog: DelegationSuccessDialog,
             });
           }}
@@ -428,7 +426,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
           error={this.props.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
             this.props.stores.explorers.selectedExplorer.get(
-              selectedWallet.getParent().getNetworkInfo().NetworkId
+              selectedWallet.networkId
             ) ??
             (() => {
               throw new Error('No explorer for wallet network');

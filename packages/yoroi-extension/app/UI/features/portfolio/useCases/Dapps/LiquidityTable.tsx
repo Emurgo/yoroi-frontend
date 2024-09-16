@@ -145,7 +145,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
                   src={hoskyPng}
                 ></Box>
               </Stack>
-              <Typography fontWeight="500" color="ds.gray_c900">
+              <Typography fontWeight="500" color="ds.gray_900">
                 {row.firstToken.name} - {row.secondToken.name}
               </Typography>
             </Stack>
@@ -172,7 +172,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
                 component="img"
                 src={minswapPng}
               ></Box>
-              <Typography fontWeight="500" color="ds.primary_c500">
+              <Typography fontWeight="500" color="ds.primary_500">
                 {row.DEX}
               </Typography>
             </Stack>
@@ -180,11 +180,11 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900">
+              <Typography color="ds.gray_900">
                 {formatNumber(row.firstTokenValue)} {row.firstToken.name}
               </Typography>
               {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_600 }}>
                   {formatNumber(row.firstTokenValueUsd)} {unitOfAccount}
                 </Typography>
               )}
@@ -193,11 +193,11 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900">
+              <Typography color="ds.gray_900">
                 {formatNumber(row.secondTokenValue)} {row.secondToken.name}
               </Typography>
               {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
-                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_c600 }}>
+                <Typography variant="body2" sx={{ color: theme.palette.ds.gray_600 }}>
                   {formatNumber(row.secondTokenValueUsd)} {unitOfAccount}
                 </Typography>
               )}
@@ -205,16 +205,16 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell>
-            <Typography color="ds.gray_c900">{formatNumber(row.lpTokens)}</Typography>
+            <Typography color="ds.gray_900">{formatNumber(row.lpTokens)}</Typography>
           </TableCell>
 
           <TableCell>
             <Stack direction="column" spacing={theme.spacing(0.25)}>
-              <Typography color="ds.gray_c900" sx={{ textAlign: 'right' }}>
+              <Typography color="ds.gray_900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>
               {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
-                <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
+                <Typography variant="body2" color="ds.gray_600" sx={{ textAlign: 'right' }}>
                   {formatNumber(row.totalValueUsd)} {unitOfAccount}
                 </Typography>
               )}

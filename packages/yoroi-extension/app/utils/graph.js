@@ -4,24 +4,28 @@ import type { GraphItems } from '../components/wallet/staking/dashboard/GraphWra
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
+  getNetworkById,
 } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../api/common/lib/MultiToken';
-import { PublicDeriver } from '../api/ada/lib/storage/models/PublicDeriver/index';
-import type { NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type { PoolMeta, DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
 
 const generateRewardGraphData: ({|
   delegationRequests: DelegationRequests,
   currentEpoch: number,
-  publicDeriver: PublicDeriver<>,
-  getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
+  networkId: number,
+  defaultTokenId: string,
+  getLocalPoolInfo: (number, string) => void | PoolMeta,
   tokenInfo: TokenInfoMap,
 |}) => ?{|
   totalRewards: Array<GraphItems>,
   perEpochRewards: Array<GraphItems>,
 |} = request => {
-  const defaultToken = request.publicDeriver.getParent().getDefaultToken();
+  const defaultToken = {
+    defaultNetworkId: request.networkId,
+    defaultIdentifier: request.defaultTokenId
+  };
+  const network = getNetworkById(request.networkId);
 
   const history = request.delegationRequests.rewardHistory.result;
   if (history == null) {
@@ -36,16 +40,16 @@ const generateRewardGraphData: ({|
   let amountSum = new MultiToken([], defaultToken);
 
   const startEpoch = (() => {
-    if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+    if (isCardanoHaskell(network)) {
       const shelleyConfig = getCardanoHaskellBaseConfig(
-        request.publicDeriver.getParent().getNetworkInfo()
+        network
       )[1];
       return shelleyConfig.StartAt;
     }
     return 0;
   })();
   const endEpoch = (() => {
-    if (isCardanoHaskell(request.publicDeriver.getParent().getNetworkInfo())) {
+    if (isCardanoHaskell(network)) {
       // TODO: -1 since cardano-db-sync doesn't expose this information for some reason
       return request.currentEpoch - 1;
     }
@@ -54,7 +58,7 @@ const generateRewardGraphData: ({|
 
   const getMiniPoolInfo = (poolHash: string) => {
     const meta = request.getLocalPoolInfo(
-      request.publicDeriver.getParent().getNetworkInfo(),
+      request.networkId,
       poolHash
     );
     if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {
@@ -113,10 +117,11 @@ const generateRewardGraphData: ({|
 
 export const generateGraphData: ({|
   delegationRequests: DelegationRequests,
-  publicDeriver: PublicDeriver<>,
+  networkId: number,
+  defaultTokenId: string,
   currentEpoch: number,
   shouldHideBalance: boolean,
-  getLocalPoolInfo: ($ReadOnly<NetworkRow>, string) => void | PoolMeta,
+  getLocalPoolInfo: (number, string) => void | PoolMeta,
   tokenInfo: TokenInfoMap,
 |}) => GraphData = request => {
   return {
@@ -125,7 +130,8 @@ export const generateGraphData: ({|
       items: generateRewardGraphData({
         delegationRequests: request.delegationRequests,
         currentEpoch: request.currentEpoch,
-        publicDeriver: request.publicDeriver,
+        networkId: request.networkId,
+        defaultTokenId: request.defaultTokenId,
         getLocalPoolInfo: request.getLocalPoolInfo,
         tokenInfo: request.tokenInfo,
       }),

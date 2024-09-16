@@ -2,12 +2,7 @@
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import { asGetStakingKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  networks,
-  isCardanoHaskell,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
@@ -59,7 +54,8 @@ export type TopbarCategory = {|
   +icon?: string,
   +label?: MessageDescriptor,
   +isVisible: ({|
-    selected: PublicDeriver<>,
+    selected: number,
+    networkId: number,
     walletHasAssets: boolean,
   |}) => boolean | {| disabledReason: MessageDescriptor |},
   isHiddenButAllowed?: boolean,
@@ -77,7 +73,8 @@ export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
   icon: dashboardIcon,
   label: messages.delegationDashboard,
-  isVisible: request => asGetStakingKey(request.selected) != null,
+  // every wallet is Cardano Shelley wallet now
+  isVisible: _request => true,
 });
 export const SUMMARY: TopbarCategory = registerCategory({
   className: 'summary',
@@ -112,16 +109,14 @@ export const VOTING: TopbarCategory = registerCategory({
   route: ROUTES.WALLETS.CATALYST_VOTING,
   icon: votingIcon,
   label: messages.voting,
-  isVisible: request => asGetStakingKey(request.selected) != null,
+  isVisible: _request => true,
 });
 export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
   className: 'stakeSimulator',
   route: ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE,
   icon: delegationListIcon,
   label: messages.delegationList,
-  isVisible: request =>
-    asGetStakingKey(request.selected) != null &&
-    request.selected.isMainnet(),
+  isVisible: request => request.networkId === networks.CardanoMainnet.NetworkId,
 });
 
 export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
@@ -130,10 +125,8 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
   icon: undefined,
   label: messages.delegationById,
   isVisible: request => {
-    const networkId = request.selected.getParent().getNetworkInfo().NetworkId;
+    const { networkId } = request;
     return (
-      asGetStakingKey(request.selected) != null &&
-      isCardanoHaskell(request.selected.getParent().getNetworkInfo()) &&
       (environment.isTest() ||
         networkId === networks.CardanoTestnet.NetworkId ||
         networkId === networks.CardanoPreprodTestnet.NetworkId ||

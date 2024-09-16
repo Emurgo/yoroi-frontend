@@ -23,14 +23,14 @@ const Menu = ({ options, onItemClick, isActiveItem }: Props) => {
             justifyContent: 'center',
             alignItems: 'center',
             borderBottom: '3px solid',
-            borderColor: isActiveItem(option.route) ? 'ds.primary_c500' : 'transparent',
+            borderColor: isActiveItem(option.route) ? 'ds.primary_500' : 'transparent',
             cursor: 'pointer',
           }}
         >
           <Typography
             variant="body1"
             fontWeight="500"
-            sx={{ color: isActiveItem(option.route) ? theme.palette.ds.primary_c500 : theme.palette.ds.text_gray_medium }}
+            sx={{ color: isActiveItem(option.route) ? theme.palette.ds.primary_500 : theme.palette.ds.text_gray_low }}
           >
             {option.label}
           </Typography>

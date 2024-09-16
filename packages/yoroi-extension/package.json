@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.3.120",
+  "version": "5.3.121",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -88,8 +88,8 @@
     "babel-plugin-add-module-exports": "1.0.4",
     "babel-plugin-dynamic-import-node": "2.3.3",
     "babel-plugin-module-resolver": "4.1.0",
-    "babel-plugin-ts-nameof": "4.2.1",
     "babel-plugin-react-intl": "5.1.18",
+    "babel-plugin-ts-nameof": "4.2.1",
     "babel-preset-react-optimize": "1.0.1",
     "cardano-wallet": "1.2.2",
     "chai": "4.3.0",
@@ -169,7 +169,7 @@
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.4",
     "assert": "2.1.0",
-    "async-mutex": "0.5.0",
+    "async-await-queue": "2.1.4",
     "axios": "0.21.1",
     "bech32": "2.0.0",
     "bignumber.js": "9.1.2",
@@ -216,7 +216,7 @@
     "react-query": "^3.39.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
-    "recharts": "1.8.5",
+    "recharts": "2.12.7",
     "semver": "7.6.0",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
@@ -224,8 +224,8 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "ua-parser-js": "1.0.37",
-    "util": "0.12.5",
-    "url": "0.11.3"
+    "url": "0.11.3",
+    "util": "0.12.5"
   },
   "overrides": {
     "@babel/helpers": "7.16.0"

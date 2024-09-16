@@ -1,32 +1,36 @@
 // @flow
+import type { Node } from 'react';
+import type { CardanoConnectorSignRequest } from '../../../connector/types';
+import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { MappedOrder } from './hooks';
+import type { FormattedTokenValue } from './util';
 import { Box, Button } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import moment from 'moment';
-import type { Node } from 'react';
 import { useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
-import { signTransactionHex } from '../../../api/ada/transactions/signTransactionHex';
-import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor } from '../../../api/ada/transactions/utils';
+import {
+  getTransactionFeeFromCbor,
+  getTransactionTotalOutputFromCbor,
+} from '../../../api/ada/transactions/utils';
 import AssetPair from '../../../components/common/assets/AssetPair';
 import Table from '../../../components/common/table/Table';
 import Tabs from '../../../components/common/tabs/Tabs';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import type { CardanoConnectorSignRequest } from '../../../connector/types';
 import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
-import type { MappedOrder } from './hooks';
-import type { FormattedTokenValue } from './util';
+import { signTransaction } from '../../../api/thunk';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
+import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -50,7 +54,7 @@ const orderColumns: Array<Column> = [
   {
     name: 'Pair (From / To)',
     align: 'left',
-    width: ({ completedOrders }) => (completedOrders ? 'auto' : '176px'),
+    width: '176px',
   },
   {
     name: 'Asset price',
@@ -58,24 +62,24 @@ const orderColumns: Array<Column> = [
   },
   {
     name: 'Asset amount',
-    width: ({ completedOrders }) => (completedOrders ? 'auto' : '166px'),
+    width: '166px',
   },
   {
     name: 'Total',
-    width: ({ completedOrders }) => (completedOrders ? 'auto' : '150px'),
+    width: '150px',
     openOrdersOnly: true,
   },
   {
     name: 'DEX',
     align: 'left',
     leftPadding: '32px',
-    width: ({ completedOrders }) => (completedOrders ? '0px' : '216px'),
+    width: '216px',
     openOrdersOnly: true,
   },
   {
     name: ({ completedOrders }) => (completedOrders ? 'Time executed' : 'Time created'),
     align: 'left',
-    width: ({ completedOrders }) => (completedOrders ? 'auto' : '240px'),
+    width: '240px',
   },
   {
     name: 'Transaction ID',
@@ -106,14 +110,17 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   } = props.stores;
 
   const wallet = wallets.selectedOrFail;
-  const network = wallet.getParent().getNetworkInfo();
-  const walletVariant = wallet.getParent().getWalletVariant();
-  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const defaultTokenInfo = tokenInfoStore.getDefaultTokenInfoSummary(wallet.networkId);
 
-  const selectedExplorer = explorers.selectedExplorer.get(network.NetworkId) ?? fail('No explorer for wallet network');
+  const selectedExplorer =
+    explorers.selectedExplorer.get(wallet.networkId) ?? fail('No explorer for wallet network');
 
-  const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
-  let { openOrders, completedOrders, transactionTimestamps } = useRichOrders(defaultTokenInfo, fetchTransactionTimestamps);
+  const fetchTransactionTimestamps = txHashes =>
+    swapStore.fetchTransactionTimestamps({ wallet, txHashes });
+  const { openOrders, completedOrders, transactionTimestamps, openOrdersLoading, completedOrdersLoading } = useRichOrders(
+    defaultTokenInfo,
+    fetchTransactionTimestamps
+  );
 
   const txHashToRenderedTimestamp: string => string = txHash => {
     const date = transactionTimestamps[txHash];
@@ -144,19 +151,33 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       let collateralReorgTxHex: ?string = null;
       let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
       if (utxoHex == null) {
-        const { unsignedTxHex, txData, collateralUtxoHex } = await swapStore.createCollateralReorgForCancel({ wallet });
+        const {
+          unsignedTxHex,
+          txData,
+          collateralUtxoHex,
+        } = await swapStore.createCollateralReorgForCancel({ wallet });
         collateralReorgTxHex = unsignedTxHex;
         collateralReorgTxData = txData;
         utxoHex = collateralUtxoHex;
       }
-      return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData);
+      return handleCreateCancelTransaction(
+        order,
+        utxoHex,
+        collateralReorgTxHex,
+        collateralReorgTxData
+      );
     } catch (e) {
       console.error('Failed to prepare a collateral utxo for cancel', e);
       throw e;
     }
   };
 
-  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData) => {
+  const handleCreateCancelTransaction = async (
+    order,
+    utxoHex,
+    collateralReorgTx,
+    collateralReorgTxData
+  ) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
@@ -169,7 +190,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           collateral: utxoHex,
         },
       });
-      const totalCancelOutput = getTransactionTotalOutputFromCbor(cancelTxCbor, wallet.getParent().getDefaultToken());
+      const totalCancelOutput = getTransactionTotalOutputFromCbor(
+        cancelTxCbor,
+        wallet.balance.getDefaults()
+      );
       const formattedCancelValues = createFormattedTokenValues({
         entries: totalCancelOutput.entries().map(e => ({
           id: e.identifier,
@@ -192,7 +216,9 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
         return {
           order: s.order,
           collateralReorgTx:
-            collateralReorgTx && collateralReorgTxData ? { cbor: collateralReorgTx, txData: collateralReorgTxData } : undefined,
+            collateralReorgTx && collateralReorgTxData
+              ? { cbor: collateralReorgTx, txData: collateralReorgTxData }
+              : undefined,
           tx: {
             cbor: cancelTxCbor,
             formattedFee: formattedFeeValue,
@@ -219,7 +245,11 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    const signedCollateralReorgTx = await signTransactionHex(wallet, password, collateralReorgTx.cbor);
+    const signedCollateralReorgTx = await signTransaction({
+      publicDeriverId: wallet.publicDeriverId,
+      password,
+      transactionHex: collateralReorgTx.cbor
+    });
     setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
@@ -237,8 +267,15 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
-    const signedCancelTx = await signTransactionHex(wallet, password, tx.cbor);
-    const signedTransactionHexes = signedCollateralReorgTx != null ? [signedCollateralReorgTx, signedCancelTx] : [signedCancelTx];
+    const signedCancelTx = await signTransaction({
+      publicDeriverId: wallet.publicDeriverId,
+      password,
+      transactionHex: tx.cbor
+    });
+    const signedTransactionHexes =
+      signedCollateralReorgTx != null
+        ? [signedCollateralReorgTx, signedCancelTx]
+        : [signedCancelTx];
     await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
@@ -252,8 +289,12 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     showCompletedOrders && c.openOrdersOnly ? '' : resolveValueOrGetter(c.name, columnContext)
   );
   const columnAlignment = orderColumns.map(c => resolveValueOrGetter(c.align ?? '', columnContext));
-  const columnLeftPaddings = orderColumns.map(c => resolveValueOrGetter(c.leftPadding ?? '', columnContext));
-  const gridTemplateColumns = orderColumns.map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext)).join(' ');
+  const columnLeftPaddings = orderColumns.map(c =>
+    resolveValueOrGetter(c.leftPadding ?? '', columnContext)
+  );
+  const gridTemplateColumns = orderColumns
+    .map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext))
+    .join(' ');
 
   const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
   const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
@@ -262,7 +303,7 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
   const sortedCompletedOrders = sortOrdersByDate(completedOrders);
 
   return (
-    <Box sx={{ border: '1px solid transparent' }}>
+    <>
       <Box sx={{ mx: '24px' }}>
         <Box sx={{ my: '24px' }}>
           <Tabs
@@ -280,7 +321,6 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
             ]}
           />
         </Box>
-
         <Table
           columnKeys={columnKeys}
           columnNames={safeColumnNames}
@@ -328,13 +368,15 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           getTokenInfo={genLookupOrFail(tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorer}
           submissionError={null}
-          walletType={walletVariant}
+          walletType={wallet.type}
           hwWalletError={null}
         />
       )}
-      {isDisplayOpenOrdersEmpty && <NoOpenOrders />}
-      {isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
-    </Box>
+      {!showCompletedOrders && openOrdersLoading && <LoadingOpenOrders columnLeftPaddings={columnLeftPaddings} />}
+      {showCompletedOrders && completedOrdersLoading && <LoadingCompletedOrders columnLeftPaddings={columnLeftPaddings} />}
+      {!openOrdersLoading && isDisplayOpenOrdersEmpty && <NoOpenOrders />}
+      {!completedOrdersLoading && isDisplayCompletedOrdersEmpty && <NoCompleteOrders />}
+    </>
   );
 }
 
@@ -353,7 +395,12 @@ const OrderRow = ({
 |}) => {
   return (
     <>
-      <AssetPair sx={{ py: '20px' }} from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
+      <AssetPair
+        sx={{ py: '20px' }}
+        from={order.from.token}
+        to={order.to.token}
+        defaultTokenInfo={defaultTokenInfo}
+      />
       <Box textAlign="right">{order.price}</Box>
       <Box textAlign="right">{order.amount}</Box>
       <Box textAlign="right">
@@ -370,7 +417,11 @@ const OrderRow = ({
       </Box>
       <Box textAlign="left">{txHashToRenderedTimestamp(order.txId)}</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId}>
+        <ExplorableHashContainer
+          selectedExplorer={selectedExplorer}
+          linkType="transaction"
+          hash={order.txId}
+        >
           <span>{truncateAddressShort(order.txId)}</span>
         </ExplorableHashContainer>
         {maybe(handleCancel, f => (

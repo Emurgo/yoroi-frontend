@@ -94,7 +94,7 @@ function SummaryCard({
   };
 
   return (
-    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'background.card' }}>
+    <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_max' }}>
       <Box
         sx={{
           padding: '15px 24px',
@@ -105,7 +105,7 @@ function SummaryCard({
           alignItems: 'center',
         }}
       >
-        <Typography component="div" variant="h5" color="common.black" fontWeight={500}>
+        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
         <Button
@@ -131,7 +131,7 @@ function SummaryCard({
             </Typography>
           </InfoDetails>
           <InfoDetails>
-            <Typography component="div" variant="h2" color="common.black" fontWeight={500}>
+            <Typography component="div" variant="h2" color="ds.text_gray_medium" fontWeight={500}>
               {renderAmount(totalRewards)}
             </Typography>
             <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
@@ -157,7 +157,7 @@ function SummaryCard({
           </InfoDetails>
           <InfoDetails>
             {totalDelegated ? (
-              <Typography component="div" variant="h2" fontWeight="500" color="common.black">
+              <Typography component="div" variant="h2" fontWeight="500" color="ds.text_gray_medium">
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (

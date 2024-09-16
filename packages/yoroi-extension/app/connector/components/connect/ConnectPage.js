@@ -15,14 +15,10 @@ import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type {
-  PublicDeriverCache,
-  ConnectingMessage,
-} from '../../../../chrome/extension/connector/types';
+import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import { environment } from '../../../environment';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { Box } from '@mui/system';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -35,6 +31,7 @@ import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import { withLayout } from '../../../styles/context/layout';
 import AmountDisplay from '../../../components/common/AmountDisplay';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   subtitle: {
@@ -47,8 +44,7 @@ const messages = defineMessages({
   },
   connectWalletAuthRequest: {
     id: 'connector.label.connectWalletAuthRequest',
-    defaultMessage:
-      '!!!The dApp requests to use your wallet identity for authentication. Enter your password to confirm.',
+    defaultMessage: '!!!The dApp requests to use your wallet identity for authentication. Enter your password to confirm.',
   },
   yourWallets: {
     id: 'connector.label.yourWallets',
@@ -81,31 +77,26 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +publicDerivers: Array<PublicDeriverCache>,
+  +publicDerivers: Array<WalletState>,
   +loading: $Values<typeof LoadingWalletStates>,
   +error: string,
   +isAppAuth: boolean,
   +hidePasswordForm: void => void,
-  +onConnect: (
-    deriver: PublicDeriver<>,
-    checksum: ?WalletChecksum,
-    password: ?string
-  ) => Promise<void>,
+  +onConnect: (deriver: WalletState, checksum: ?WalletChecksum, password: ?string) => Promise<void>,
   +onCancel: void => void,
   +selectedWallet: {|
     index: number,
-    deriver: ?PublicDeriver<>,
+    deriver: ?WalletState,
     checksum: ?WalletChecksum,
   |},
   +message: ?ConnectingMessage,
-  +onSelectWallet: (PublicDeriver<>, ?WalletChecksum) => void,
+  +onSelectWallet: (WalletState, ?WalletChecksum) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +network: string,
   +shouldHideBalance: boolean,
   +unitOfAccount: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
-  +isSelectWalletHardware: boolean,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -122,9 +113,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(
-            globalMessages.walletPasswordFieldPlaceholder
-          ),
+          placeholder: this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder),
           value: '',
           validators: [
             ({ field }) => {
@@ -162,9 +151,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
         if (deriver && checksum) {
           this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
             if (error instanceof WrongPassphraseError) {
-              this.form
-                .$('walletPassword')
-                .invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+              this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
             } else {
               throw error;
             }
@@ -199,16 +186,16 @@ class ConnectPage extends Component<Props & InjectedProps> {
       shouldHideBalance,
       isAppAuth,
       onUpdateHideBalance,
-      isSelectWalletHardware,
       isRevampLayout,
+      selectedWallet,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
 
-    const isLoading =
-      loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING;
+    const isLoading = loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING;
     const isSuccess = loading === LoadingWalletStates.SUCCESS;
     const isError = loading === LoadingWalletStates.REJECTED;
+    const isSelectWalletHardware = selectedWallet.deriver?.type !== 'mnemonic';
 
     const url = message?.url ?? '';
     const faviconUrl = message?.imgBase64Url;
@@ -220,9 +207,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
             <NoWalletImage />
           </div>
           <div>
-            <div className={styles.noWalletsText}>
-              {intl.formatMessage(messages.noWalletsFound, { network })}
-            </div>
+            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound, { network })}</div>
             <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>
@@ -240,12 +225,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
           {isSelectWalletHardware ? (
             intl.formatMessage(messages.harwareWalletConnectWithAuthNotSupported)
           ) : (
-            <TextField
-              type="password"
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-              id="walletPassword"
-            />
+            <TextField type="password" {...walletPasswordField.bind()} error={walletPasswordField.error} id="walletPassword" />
           )}
         </div>
         <Stack direction="row" spacing={4} mt="15px">
@@ -279,7 +259,8 @@ class ConnectPage extends Component<Props & InjectedProps> {
         {hasWallets ? (
           <>
             <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="h4"
               color="gray.900"
               marginTop="32px"
@@ -293,11 +274,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
             </Typography>
             <div className={styles.connectWrapper}>
               <div className={styles.image}>
-                {faviconUrl != null && faviconUrl !== '' ? (
-                  <img src={faviconUrl} alt={`${url} favicon`} />
-                ) : (
-                  <NoDappIcon />
-                )}
+                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
               </div>
               <Box marginTop="16px">
                 <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
@@ -326,24 +303,15 @@ class ConnectPage extends Component<Props & InjectedProps> {
                     <Typography component="div" variant="body-1" lineHeight="24px" color="gray.900">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
-                    <button
-                      type="button"
-                      className={styles.toggleButton}
-                      onClick={onUpdateHideBalance}
-                    >
+                    <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
                       {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
                     </button>
                   </div>
 
                   <ul className={styles.list}>
                     {publicDerivers.map((wallet, idx) => (
-                      <li
-                        key={wallet.publicDeriver.getPublicDeriverId()}
-                        className={styles.listItem}
-                      >
-                        <WalletButton
-                          onClick={() => onSelectWallet(wallet.publicDeriver, wallet.checksum)}
-                        >
+                      <li key={wallet.publicDeriverId} className={styles.listItem}>
+                        <WalletButton onClick={() => onSelectWallet(wallet, wallet.plate)}>
                           <ConnectedWallet
                             publicDeriver={wallet}
                             walletBalance={
@@ -378,9 +346,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
         {hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
             <div className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</div>
-            <div className={styles.infoText}>
-              {intl.formatMessage(connectorMessages.messageReadOnly)}
-            </div>
+            <div className={styles.infoText}>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
           </div>
         ) : null}
       </div>

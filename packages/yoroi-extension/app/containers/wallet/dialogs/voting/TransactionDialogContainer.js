@@ -57,7 +57,7 @@ class TransactionDialogContainer extends Component<AllProps> {
             try {
               await this.props.actions.ada.voting.signTransaction.trigger({
                 password,
-                publicDeriver: selectedWallet,
+                wallet: selectedWallet,
               });
               await submit();
             } catch (error) {

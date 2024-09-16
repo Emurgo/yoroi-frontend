@@ -213,16 +213,19 @@ export function isCardanoHaskell(network: $ReadOnly<NetworkRow>): boolean {
   return network.CoinType === CoinTypes.CARDANO && network.Fork === CardanoForks.Haskell;
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfig(network: $ReadOnly<NetworkRow>): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
 
+// <TODO:WALLET_API>
 export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
   // $FlowIgnore[incompatible-exact]
   return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfigCombined(network: $ReadOnly<NetworkRow>): CardanoHaskellConfig {
   return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network));
 }
@@ -257,3 +260,11 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
     }
     throw new Error(`Missing default asset for network type ${JSON.stringify(network)}`);
   });
+
+export function getNetworkById(id: number): $ReadOnly<NetworkRow> {
+  const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === id);
+  if (!networkKey) {
+    throw new Error('network not found');
+  }
+  return networks[networkKey];
+}

@@ -251,8 +251,8 @@ export const roundUpCurrency = (value, fiatCurrency) => {
   }
 };
 
-export const diffIsLess1Perc = (valueA, valueB) => {
-  const valueA1Perc = valueA * 0.01;
+export const diffIsLessPerc = (valueA, valueB, percDiff) => {
+  const valueA1Perc = valueA * (percDiff / 100);
   return valueB >= valueA - valueA1Perc && valueB <= valueA + valueA1Perc;
 };
 

@@ -11,6 +11,7 @@ import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tab
 import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { formatValue, calculateAndFormatValue } from '../../utils/unit-of-account';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +showAmount?: boolean,
@@ -54,10 +55,7 @@ export default class AmountDisplay extends Component<Props> {
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -86,30 +84,26 @@ export default class AmountDisplay extends Component<Props> {
     return (
       <>
         {showAmount === true && (
-          <div className={styles.amount} id={id + '-availableBalance-text'}>
+          <Typography variant="body2" color="ds.text_gray_medium" fontWeight="500" id={id + '-availableBalance-text'} mt="10px">
             {balanceDisplay}&nbsp;{truncateToken(getTokenName(tokenInfo))}
-          </div>
+          </Typography>
         )}
         {showFiat === true && (
-          <div className={styles.fiat} id={id + '-availableFiatBalance-text'}>
+          <Typography mb="5px" color="ds.text_gray_medium" fontSize="12px" id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'} {currency || 'USD'}
-          </div>
+          </Typography>
         )}
       </>
     );
   }
 }
 
-export function FiatDisplay(props: {|
-  shouldHideBalance: boolean,
-  amount: BigNumber | null,
-  currency: string,
-|}): Node {
+export function FiatDisplay(props: {| shouldHideBalance: boolean, amount: BigNumber | null, currency: string |}): Node {
   if (props.shouldHideBalance) {
     return (
-      <span className={styles.fiat}>
+      <Typography className={styles.fiat} variant="body2" color="ds.text_gray_medium" fontWeight="500">
         {hiddenAmount} {props.currency}
-      </span>
+      </Typography>
     );
   }
 
@@ -118,8 +112,8 @@ export function FiatDisplay(props: {|
   }
 
   return (
-    <div className={styles.fiat}>
+    <Typography variant="body2" className={styles.fiat} color="ds.text_gray_medium" fontWeight="500">
       {formatValue(props.amount)} {props.currency}
-    </div>
+    </Typography>
   );
 }

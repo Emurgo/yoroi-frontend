@@ -256,6 +256,7 @@ export default class TransactionRevamp extends Component<Props, State> {
             flexDirection: 'column',
             alignItems: 'flex-end',
             justifyContent: 'center',
+            backgroundColor: 'ds.bg_color_max',
           }}
         >
           <Typography variant="body1" fontWeight={500} color="grayscale.900">
@@ -505,7 +506,11 @@ export default class TransactionRevamp extends Component<Props, State> {
     const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`;
 
     return (
-      <Box className={styles.component} id={this.props.id + '-transaction_' + this.props.txIndex + '-box'}>
+      <Box
+        className={styles.component}
+        id={this.props.id + '-transaction_' + this.props.txIndex + '-box'}
+        sx={{ backgroundColor: 'ds.bg_color_max' }}
+      >
         {/* ==== Clickable Header -> toggles details ==== */}
         <Box
           sx={{ padding: '20px 0', cursor: 'pointer' }}
@@ -640,14 +645,14 @@ export default class TransactionRevamp extends Component<Props, State> {
           className={contentStyles}
           sx={{
             overflowX: 'overlay',
-            bgcolor: 'common.white',
+            bgcolor: 'ds.bg_color_max',
             border: isExpanded ? '1px solid' : 'none',
             borderColor: 'grayscale.200',
             borderRadius: '8px',
             mt: '8px',
           }}
         >
-          <Box className={detailsStyles}>
+          <Box className={detailsStyles} sx={{ borderBottom: isExpanded ?? '1px solid', borderColor: 'ds.gray_200' }}>
             {/* converting assets is not implemented but we may use it in the future for tokens */}
             {data.type === transactionTypes.EXCHANGE && (
               <div className={styles.conversion}>
@@ -659,8 +664,8 @@ export default class TransactionRevamp extends Component<Props, State> {
                 </div>
               </div>
             )}
-            <Box sx={{ overflowX: 'overlay', bgcolor: 'common.white' }}>
-              <div className={styles.addressContent}>
+            <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.bg_color_max' }}>
+              <Box className={styles.addressContent} sx={{ border: '1px solid', borderColor: 'ds.gray_200' }}>
                 <div>
                   <Box
                     sx={{
@@ -686,7 +691,10 @@ export default class TransactionRevamp extends Component<Props, State> {
                       {intl.formatMessage(globalMessages.amountLabel)}
                     </Typography>
                   </Box>
-                  <Box className={styles.addressList} sx={{ color: 'grayscale.600' }}>
+                  <Box
+                    className={styles.addressList}
+                    sx={{ color: 'grayscale.600', borderBottom: '1px solid', borderColor: 'ds.gray_200' }}
+                  >
                     {data.addresses.from.map((address, addressIndex) => {
                       const addressRowId = `${txIdFullInfoBasePart}:fromAddresses:address_${addressIndex}`;
                       return this.renderRow({
@@ -738,7 +746,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     })}
                   </div>
                 </Box>
-              </div>
+              </Box>
               {this.getWithdrawals(data, txIdFullInfoBasePart)}
               {this.getCertificate(data, txIdFullInfoBasePart)}
 
@@ -922,7 +930,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       return null;
     }
     return (
-      <div className={styles.addressContent}>
+      <Box className={styles.addressContent} sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_200' }}>
         <div>
           <Box
             sx={{
@@ -960,7 +968,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           </div>
         </div>
         <div />
-      </div>
+      </Box>
     );
   };
 
@@ -1032,7 +1040,8 @@ export default class TransactionRevamp extends Component<Props, State> {
       return (
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
-          <span className={styles.rowData}>{metadata}</span>
+
+          <Typography className={styles.rowData}>{metadata}</Typography>
         </div>
       );
     }

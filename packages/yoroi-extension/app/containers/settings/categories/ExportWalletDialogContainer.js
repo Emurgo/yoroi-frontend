@@ -6,16 +6,11 @@ import { intlShape } from 'react-intl';
 
 import ExportPublicKeyDialog from '../../../components/wallet/settings/ExportPublicKeyDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetPublicKey,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 type Props = {|
   ...StoresAndActionsProps,
-  publicDeriver: void | PublicDeriver<>,
 |};
 
 @observer
@@ -29,16 +24,11 @@ export default class ExportWalletDialogContainer extends Component<Props> {
     if (selected == null) {
       return null;
     }
-    const withPublicKey = asGetPublicKey(selected);
-    if (withPublicKey == null) {
-      return null;
-    }
-    const { publicKey } = this.props.stores.wallets.getPublicKeyCache(withPublicKey);
     return (
       <ExportPublicKeyDialog
         onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
-        publicKeyHex={publicKey}
-        pathToPublic={withPublicKey.pathToPublic}
+        publicKeyHex={selected.publicKey}
+        pathToPublic={selected.pathToPublic}
       />
     );
   }

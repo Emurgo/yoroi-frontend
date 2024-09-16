@@ -12,15 +12,11 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
-import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { Box } from '@mui/material';
 import AddCollateralPage from '../components/signin/AddCollateralPage';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet,
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { getPrivateStakingKey } from '../../api/thunk';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 @observer
 export default class SignTxContainer extends Component<
@@ -39,30 +35,21 @@ export default class SignTxContainer extends Component<
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: (PublicDeriver<>) => string => Promise<void> = deriver => async password => {
+  onConfirm: (WalletState) => string => Promise<void> = deriver => async password => {
     const { signingMessage } = this.props.stores.connector;
     if (signingMessage == null) {
       throw new Error('missing the signing message');
     }
     const connectedWallet = this.props.stores.connector.filteredWallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+      wallet => wallet.publicDeriverId === signingMessage.publicDeriverId
     );
     if (connectedWallet == null) {
       throw new Error('missing connected wallet');
     }
 
-    if (connectedWallet.publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET) {
-      // check the password
-      const withSigningKey = asGetSigningKey(deriver);
-      if (!withSigningKey) {
-        throw new Error(`[sign tx] no signing key`);
-      }
-      const signingKeyFromStorage = await withSigningKey.getSigningKey();
-      // will throw a WrongPasswordError
-      await withSigningKey.normalizeKey({
-        ...signingKeyFromStorage,
-        password,
-      });
+    if (connectedWallet.type === 'mnemonic') {
+      // will throw a WrongPasswordError if password is wrong
+      await getPrivateStakingKey({ publicDeriverId: deriver.publicDeriverId, password });
     }
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
@@ -103,13 +90,13 @@ export default class SignTxContainer extends Component<
     if (signingMessage == null) return this.renderLoading();
 
     const selectedWallet = this.props.stores.connector.filteredWallets.find(
-      wallet => wallet.publicDeriver.getPublicDeriverId() === signingMessage.publicDeriverId
+      wallet => wallet.publicDeriverId === signingMessage.publicDeriverId
     );
     if (selectedWallet == null) return this.renderLoading();
     const whitelistEntries = this.props.stores.connector.currentConnectorWhitelist;
     const connectedWebsite = whitelistEntries.find(
       cacheEntry =>
-        selectedWallet.publicDeriver.getPublicDeriverId() === cacheEntry.publicDeriverId &&
+        selectedWallet.publicDeriverId === cacheEntry.publicDeriverId &&
         cacheEntry.url === signingMessage.requesterUrl
     );
 
@@ -132,9 +119,9 @@ export default class SignTxContainer extends Component<
     };
 
     const getAddressToDisplay = addr =>
-      addressToDisplayString(addr, selectedWallet.publicDeriver.getParent().getNetworkInfo());
+      addressToDisplayString(addr, getNetworkById(selectedWallet.networkId));
 
-    const handleConfirm = password => this.onConfirm(selectedWallet.publicDeriver)(password);
+    const handleConfirm = password => this.onConfirm(selectedWallet)(password);
 
     const notification =
       this.notificationElementId == null
@@ -148,20 +135,11 @@ export default class SignTxContainer extends Component<
 
     const selectedExplorer =
       this.props.stores.explorers.selectedExplorer.get(
-        selectedWallet.publicDeriver.getParent().getNetworkInfo().NetworkId
+        selectedWallet.networkId
       ) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();
-
-    let walletType;
-    if (isLedgerNanoWallet(selectedWallet.publicDeriver.getParent())) {
-      walletType = 'ledger';
-    } else if (isTrezorTWallet(selectedWallet.publicDeriver.getParent())) {
-      walletType = 'trezor';
-    } else {
-      walletType = 'web';
-    }
 
     let component = null;
 
@@ -178,7 +156,7 @@ export default class SignTxContainer extends Component<
             onCancel={this.onCancel}
             selectedExplorer={selectedExplorer}
             submissionError={this.props.stores.connector.submissionError}
-            walletType={walletType}
+            walletType={selectedWallet.type}
             hwWalletError={this.props.stores.connector.hwWalletError}
           />
         );
@@ -203,8 +181,11 @@ export default class SignTxContainer extends Component<
             notification={notification}
             txData={txData}
             getTokenInfo={genLookupOrNull(this.props.stores.tokenInfoStore.tokenInfo)}
-            defaultToken={selectedWallet.publicDeriver.getParent().getDefaultToken()}
-            network={selectedWallet.publicDeriver.getParent().getNetworkInfo()}
+            defaultToken={{
+              defaultNetworkId: selectedWallet.networkId,
+              defaultIdentifier: selectedWallet.defaultTokenId,
+            }}
+            network={getNetworkById(selectedWallet.networkId)}
             onConfirm={handleConfirm}
             onCancel={this.onCancel}
             addressToDisplayString={getAddressToDisplay}
@@ -213,7 +194,7 @@ export default class SignTxContainer extends Component<
             unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
             submissionError={this.props.stores.connector.submissionError}
             signData={signData}
-            walletType={walletType}
+            walletType={selectedWallet.type}
             hwWalletError={this.props.stores.connector.hwWalletError}
             isHwWalletErrorRecoverable={this.props.stores.connector.isHwWalletErrorRecoverable}
             tx={tx}
