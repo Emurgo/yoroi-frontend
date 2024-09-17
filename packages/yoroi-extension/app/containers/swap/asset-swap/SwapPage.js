@@ -72,9 +72,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const { sellTokenInfo, buyTokenInfo, resetSwapForm, sellQuantity, buyQuantity } = useSwapForm();
 
   const wallet = props.stores.wallets.selectedOrFail;
-  const walletType: string = wallet.getParent().getWalletVariant();
-  const isHardwareWallet = walletType !== 'web';
-  const network = wallet.getParent().getNetworkInfo();
+  const walletType: string = wallet.type;
+  const isHardwareWallet = wallet.isHardware;
+  const network = getNetworkById(wallet.networkId);
   const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
@@ -119,15 +119,6 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
   const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
-
-  const wallet = props.stores.wallets.selectedOrFail;
-  const network = getNetworkById(wallet.networkId);
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
-    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
@@ -258,7 +249,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     setOpenedDialog('loadingOverlay');
     const password = userPasswordState?.value;
 
-    const baseBroadcastRequest = { publicDeriver: wallet, signRequest };
+    const baseBroadcastRequest = { wallet, signRequest };
     const broadcastRequest = isHardwareWallet
       ? { [walletType]: baseBroadcastRequest }
       : { normal: { ...baseBroadcastRequest, password },
