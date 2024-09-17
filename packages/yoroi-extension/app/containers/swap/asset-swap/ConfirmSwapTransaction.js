@@ -1,27 +1,27 @@
 //@flow
 import { Box, Typography } from '@mui/material';
-import TextField from '../../../components/common/TextField';
-import { useSwapForm } from '../context/swap-form';
-import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
-import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
-import { useSwapFeeDisplay } from '../hooks';
-import type { PriceImpact } from '../../../components/swap/types';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import { useEffect } from 'react';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
+import TextField from '../../../components/common/TextField';
 import {
   FormattedActualPrice,
-  FormattedMarketPrice,
   FormattedLimitPrice,
+  FormattedMarketPrice,
   PriceImpactBanner,
   PriceImpactColored,
   PriceImpactIcon,
   PriceImpactPercent,
 } from '../../../components/swap/PriceImpact';
-import type { State } from '../context/swap-form/types';
-import { useEffect } from 'react';
-import { IncorrectWalletPasswordError } from '../../../api/common/errors';
+import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
+import { useSwapForm } from '../context/swap-form';
+import { useSwapFeeDisplay } from '../hooks';
+import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { PriceImpact } from '../../../components/swap/types';
+import type { State } from '../context/swap-form/types';
 
 type Props = {|
   slippageValue: string,
@@ -103,14 +103,14 @@ export default function ConfirmSwapTransaction({
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
-        <Typography component="div" variant="h4" fontWeight={500}>
+        <Typography component="div" variant="h4" fontWeight={500} color="ds.text_gray_medium">
           Confirm swap transaction
         </Typography>
       </Box>
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               Swap from
             </Typography>
           </Box>
@@ -126,7 +126,7 @@ export default function ConfirmSwapTransaction({
         </Box>
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               Swap to
             </Typography>
           </Box>
@@ -153,11 +153,7 @@ export default function ConfirmSwapTransaction({
         </SummaryRow>
         <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
-        <SummaryRow
-          col1={priceStrings[orderData.type].label}
-          withInfo
-          infoText={priceStrings[orderData.type].info}
-        >
+        <SummaryRow col1={priceStrings[orderData.type].label} withInfo infoText={priceStrings[orderData.type].info}>
           {orderData.type === 'market' ? <FormattedMarketPrice /> : <FormattedLimitPrice />}
         </SummaryRow>
         <SummaryRow
@@ -182,7 +178,7 @@ export default function ConfirmSwapTransaction({
         <Box display="flex" justifyContent="space-between">
           <Box>Total</Box>
           <Box>
-            <Typography component="div" fontSize="20px" fontWeight="500">
+            <Typography component="div" fontSize="20px" fontWeight="500" color="ds.text_gray_medium">
               {formattedNonPtAmount ?? formattedPtAmount}
             </Typography>
           </Box>
@@ -190,14 +186,14 @@ export default function ConfirmSwapTransaction({
         {formattedNonPtAmount && (
           <Box display="flex" justifyContent="right">
             <Box>
-              <Typography component="div" fontSize="20px" fontWeight="500">
+              <Typography component="div" fontSize="20px" fontWeight="500" color="ds.text_gray_medium">
                 {formattedPtAmount}
               </Typography>
             </Box>
           </Box>
         )}
         <Box display="flex" justifyContent="right">
-          <Typography component="div" variant="body1">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             {getFormattedPairingValue(ptAmount)}
           </Typography>
         </Box>
@@ -224,17 +220,17 @@ export default function ConfirmSwapTransaction({
 const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="grayscale.600">
+      <Typography variant="body1" color="ds.text_gray_medium">
         {col1}
       </Typography>
       {withInfo ? (
-        <Box ml="8px">
+        <Box ml="8px" sx={{ height: '24px' }}>
           <InfoTooltip width={500} content={<Typography color="inherit">{infoText}</Typography>} />
         </Box>
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">
+      <Typography component="div" variant="body1" color="ds.text_gray_medium">
         {children}
       </Typography>
     </Box>

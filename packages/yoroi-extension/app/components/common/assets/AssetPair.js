@@ -1,9 +1,9 @@
 //@flow
 import { Box } from '@mui/material';
-import type { AssetAmount } from '../../swap/types';
 import adaTokenImage from '../../../assets/images/ada.inline.svg';
-import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
+import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
+import type { AssetAmount } from '../../swap/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 
 type Props = {|
@@ -14,8 +14,9 @@ type Props = {|
 |};
 
 function tokenImgSrc(token, defaultTokenInfo): string {
-  return token.ticker === defaultTokenInfo.ticker ? adaTokenImage
-    : (urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage);
+  return token.ticker === defaultTokenInfo.ticker
+    ? adaTokenImage
+    : urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage;
 }
 
 function tokenImg(token, defaultTokenInfo): React$Node {
@@ -23,7 +24,11 @@ function tokenImg(token, defaultTokenInfo): React$Node {
     <Box
       width="24px"
       height="24px"
-      sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
+      sx={{
+        overflowY: 'hidden',
+        '& > svg': { width: '100%', height: '100%' },
+        borderRadius: '4px',
+      }}
     >
       <img
         width="100%"
@@ -34,7 +39,7 @@ function tokenImg(token, defaultTokenInfo): React$Node {
         }}
       />
     </Box>
-  )
+  );
 }
 
 export default function AssetPair({ from, to, defaultTokenInfo, sx = {} }: Props): React$Node {
@@ -42,10 +47,12 @@ export default function AssetPair({ from, to, defaultTokenInfo, sx = {} }: Props
     <Box display="flex" alignItems="center" gap="8px" sx={sx}>
       <Box display="flex" alignItems="center" gap="8px">
         {tokenImg(from, defaultTokenInfo)}
-        <Box fontWeight={500}>{from?.ticker ?? '-'}</Box>
+        <Box fontWeight={500} sx={{ color: 'ds.text_gray_medium' }}>
+          {from?.ticker ?? '-'}
+        </Box>
       </Box>
       <Box>/</Box>
-      <Box display="flex" alignItems="center" gap="8px">
+      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
         {tokenImg(to, defaultTokenInfo)}
         <Box fontWeight={500}>{to?.ticker ?? '-'}</Box>
       </Box>

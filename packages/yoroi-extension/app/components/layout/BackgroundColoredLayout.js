@@ -1,7 +1,7 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import { observer } from 'mobx-react';
 import { Box } from '@mui/system';
+import { observer } from 'mobx-react';
+import type { Node, ComponentType } from 'react';
 
 type Props = {|
   +children: Node,
@@ -15,7 +15,7 @@ function BackgroundColoredLayout({ children, isRevamp = false }: Props): Node {
         overflow: 'auto',
         height: '100%',
         padding: isRevamp ? 0 : '30px',
-        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+        backgroundColor: isRevamp ? 'ds.bg_color_max' : 'var(--yoroi-palette-gray-50)',
       }}
     >
       {children}

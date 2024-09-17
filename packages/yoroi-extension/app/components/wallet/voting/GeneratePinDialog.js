@@ -105,23 +105,13 @@ export default class GeneratePinDialog extends Component<Props> {
               steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
               setCurrentStep={() => {}}
             />
-            <Typography component="div"
-              textAlign="center"
-              pt="24px"
-              pb="40px"
-              variant="body1"
-              color="grayscale.900"
-            >
+            <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.line1} />
             </Typography>
           </>
         ) : (
           <>
-            <ProgressStepBlock
-              stepsList={stepsList}
-              progressInfo={progressInfo}
-              classicTheme={classicTheme}
-            />
+            <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} classicTheme={classicTheme} />
 
             <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
               <FormattedHTMLMessage {...messages.line1} />

@@ -1,18 +1,18 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
-import { observer } from 'mobx-react';
 import { FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
-import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
+import { observer } from 'mobx-react';
+import type { Node } from 'react';
+import { Component } from 'react';
+import { FormattedHTMLMessage, FormattedMessage, defineMessages, intlShape } from 'react-intl';
 import { ReactComponent as YoroiClassicTheme } from '../../../../assets/images/yoroi-classic-theme.inline.svg';
-import ThemeToggler from '../../themeToggler';
+import { ReactComponent as YoroiModernTheme } from '../../../../assets/images/yoroi-modern-theme.inline.svg';
 import environment from '../../../../environment';
-import type { Theme } from '../../../../styles/themes';
+import globalMessages from '../../../../i18n/global-messages';
 import { THEMES } from '../../../../styles/themes';
+import ThemeToggler from '../../themeToggler';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Theme } from '../../../../styles/themes';
 
 const messages = defineMessages({
   themeLabel: {
@@ -79,8 +79,8 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
 |};
 
-const NEW_THEME = THEMES.YOROI_REVAMP;
-const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
+// const NEW_THEME = THEMES.YOROI_BASE;
+// const OLD_THEME = `${THEMES.YOROI_MODERN}-${THEMES.YOROI_CLASSIC}`;
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -90,7 +90,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
   render(): Node {
     const { currentTheme, onSubmit, onExternalLinkClick } = this.props;
     const { intl } = this.context;
-    const isRevampLayout = currentTheme === THEMES.YOROI_REVAMP;
+    const isRevampLayout = currentTheme === THEMES.YOROI_BASE;
 
     const blogLink = (
       <Typography
@@ -117,21 +117,22 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: !isRevampLayout && '24px',
         }}
       >
-        <Typography component="div"
+        {/* <Typography
+          component="div"
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '0px' : '12px'}
           color="grayscale.900"
         >
           {intl.formatMessage(messages.version)}
-        </Typography>
-        <Box>
+        </Typography> */}
+        {/* <Box>
           <RadioGroup
             aria-labelledby="theme-switch-buttons"
             value={currentTheme === NEW_THEME ? NEW_THEME : OLD_THEME}
             onChange={e => {
               const theme = e.target.value === NEW_THEME ? NEW_THEME : THEMES.YOROI_MODERN;
-              onSubmit(theme);
+              onSubmit(NEW_THEME);
             }}
             sx={{
               display: 'flex',
@@ -161,16 +162,17 @@ export default class ThemeSettingsBlock extends Component<Props> {
               }}
             />
           </RadioGroup>
-        </Box>
-        {false && currentTheme === THEMES.YOROI_REVAMP && environment.isDev() && (
+        </Box> */}
+        {currentTheme === THEMES.YOROI_BASE && environment.isDev() && (
           <Box sx={{ mt: '20px' }}>
             <ThemeToggler />
           </Box>
         )}
-        {currentTheme !== THEMES.YOROI_REVAMP && (
+        {currentTheme !== THEMES.YOROI_BASE && (
           <Box>
             <Box sx={{ marginTop: '20px' }}>
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="h5"
                 sx={{
                   fontWeight: 500,
@@ -181,14 +183,19 @@ export default class ThemeSettingsBlock extends Component<Props> {
               >
                 {intl.formatMessage(messages.selectColorTheme)}
               </Typography>
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="body2"
                 color="var(--yoroi-support-settings-text)"
                 sx={{ marginBottom: '2px' }}
               >
                 <FormattedHTMLMessage {...messages.themeNote} />
               </Typography>
-              <Typography component="div" variant="body2" color="var(--yoroi-support-settings-text)">
+              <Typography
+                component="div"
+                variant="body2"
+                color="var(--yoroi-support-settings-text)"
+              >
                 <FormattedMessage {...messages.blog} values={{ blogLink }} />
               </Typography>
             </Box>

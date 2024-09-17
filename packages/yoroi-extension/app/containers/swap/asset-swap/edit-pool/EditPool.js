@@ -1,16 +1,24 @@
 // @flow
-import { useState } from 'react';
-import { Box, Typography } from '@mui/material';
-import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
-import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
+import { Box, Typography, styled } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { capitalize } from 'lodash';
+import { useState } from 'react';
+import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';
+import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
 import { SwapPoolIcon } from '../../../../components/swap/SwapPoolComponents';
-import SwapPoolFullInfo from './PoolFullInfo';
-import { useSwapForm } from '../../context/swap-form';
 import { maybe } from '../../../../coreUtils';
+import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
+import SwapPoolFullInfo from './PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
@@ -33,10 +41,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
 
   const { pool } = calculation;
 
-  const formattedTotal =
-    formattedNonPtAmount == null
-      ? formattedPtAmount
-      : `${formattedNonPtAmount} + ${formattedPtAmount}`;
+  const formattedTotal = formattedNonPtAmount == null ? formattedPtAmount : `${formattedNonPtAmount} + ${formattedPtAmount}`;
   const titleTotalFeesFormatted = `Total: ${formattedTotal}`;
 
   const isLimitOrder = type === 'limit';
@@ -56,21 +61,20 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
         }}
       >
         <Box display="flex" gap="8px" alignItems="center">
-          <Typography component="div" variant="body1" color="grayscale.600">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             DEX
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
-            <Typography component="div" variant="body1" color="grayscale.max">
-              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ??
-                'No pool found'}
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
             </Typography>
             {isLimitOrder && (
-              <Box sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
+              <IconWrapper sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
                 <EditIcon />
-              </Box>
+              </IconWrapper>
             )}
           </Box>
         </Box>
@@ -81,7 +85,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
           borderColor: 'grayscale.400',
           borderRadius: '8px',
           position: 'relative',
-          bgcolor: 'common.white',
+          bgcolor: 'ds.bg_color_max',
           p: '16px',
         }}
       >
@@ -90,11 +94,13 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
+            marginBottom: showFullInfo && '8px',
+            cursor: 'pointer',
           }}
           onClick={handleShowFullInfo}
         >
           {pool.provider && (
-            <Typography component="div" variant="body1" color="grayscale.max">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               {titleTotalFeesFormatted}
             </Typography>
           )}
@@ -111,7 +117,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             </Box>
           </Box>
         </Box>
-        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo />}
+        {showFullInfo && <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} withInfo showMinAda />}
       </Box>
     </Box>
   );

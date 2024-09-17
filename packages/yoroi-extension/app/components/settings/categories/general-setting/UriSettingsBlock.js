@@ -44,10 +44,8 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           {intl.formatMessage(globalMessages.uriSchemeLabel)}
         </Typography>
 
-        <Typography component="div" variant={isRevampLayout ? 'body1' : 'body2'} color="common.black">
-          {intl.formatMessage(
-            isRevampLayout ? globalMessages.uriExplanationRevamp : globalMessages.uriExplanation
-          )}
+        <Typography component="div" variant={isRevampLayout ? 'body1' : 'body2'} color="ds.text_gray_medium">
+          {intl.formatMessage(isRevampLayout ? globalMessages.uriExplanationRevamp : globalMessages.uriExplanation)}
         </Typography>
 
         <Button

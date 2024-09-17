@@ -7,13 +7,12 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
 type Props = {|
   ...StoresAndActionsProps,
-  publicDeriver: PublicDeriver<>,
+  publicDeriverId: number,
 |};
 
 const dialogMessages = defineMessages({
@@ -59,7 +58,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
           danger: false,
           onClick: async () => {
             await this.props.actions.walletSettings.resyncHistory.trigger({
-              publicDeriver: this.props.publicDeriver,
+              publicDeriverId: this.props.publicDeriverId,
             });
             this.props.actions.dialogs.closeActiveDialog.trigger();
           },

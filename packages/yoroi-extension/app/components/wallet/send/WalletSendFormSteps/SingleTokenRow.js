@@ -102,7 +102,7 @@ export default class SingleTokenRow extends Component<Props,State> {
             <Typography component="div" variant="body1" color="grayscale.900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
-            <div className={styles.amount}>{displayAmount}</div>
+            <Typography variant="body1" color="grayscale.900" className={styles.amount}>{displayAmount}</Typography>
           </button>
         ) : (
           <Box

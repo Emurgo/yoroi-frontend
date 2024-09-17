@@ -1,20 +1,20 @@
 // @flow
-import type { AssetAmount, PriceImpact } from './types';
-import { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
-import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
-import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
-import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
-import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
-import { truncateAddressShort } from '../../utils/formatters';
+import { useEffect, useState } from 'react';
+import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
-import Dialog from '../widgets/Dialog';
+import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
+import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
+import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
+import { ReactComponent as WalletIcon } from '../../assets/images/revamp/icons/wallet.inline.svg';
+import { ReactComponent as NoAssetsFound } from '../../assets/images/revamp/no-assets-found.inline.svg';
+import { truncateAddressShort } from '../../utils/formatters';
 import Table from '../common/table/Table';
-import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
-import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
+import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
+import type { AssetAmount, PriceImpact } from './types';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -27,7 +27,7 @@ type Props = {|
   onAssetSelected: any => void,
   onClose: void => void,
   defaultTokenInfo: RemoteTokenInfo,
-  getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> },
+  getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> },
 |};
 
 export default function SelectAssetDialog({
@@ -49,13 +49,10 @@ export default function SelectAssetDialog({
     assets.filter(a => {
       if (a == null) return false;
       if (!searchTerm) return true;
-      return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
+      return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
 
-  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } =
-    getTokenInfoBatch(filteredAssets.map(a => a.id))
+  const metadataPromiseMap: { [string]: Promise<RemoteTokenInfo> } = getTokenInfoBatch(filteredAssets.map(a => a.id));
 
   return (
     <Dialog
@@ -97,6 +94,8 @@ export default function SelectAssetDialog({
                 fontSize: '14px',
                 fontFamily: 'Rubik',
                 height: '40px',
+                backgroundColor: 'ds.bg_color_max',
+                color: 'ds.text_gray_medium',
                 '&:focus': {
                   borderWidth: '2px',
                   borderColor: 'grayscale.max',
@@ -107,7 +106,7 @@ export default function SelectAssetDialog({
               }}
             />
           </Box>
-          <Box>
+          <Box sx={{ marginBottom: '16px' }}>
             <Typography component="div" variant="body2" color="grayscale.700">
               {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
             </Typography>
@@ -137,20 +136,12 @@ export default function SelectAssetDialog({
       )}
       {filteredAssets.length === 0 && (
         <Box py="8px">
-          <Box
-            display="flex"
-            flexDirection="column"
-            gap="16px"
-            alignItems="center"
-            justifyContent="center"
-          >
+          <Box display="flex" flexDirection="column" gap="16px" alignItems="center" justifyContent="center">
             <Box mt="60px">
               <NoAssetsFound />
             </Box>
-            <Typography component="div" variant="body1" fontWeight={500}>
-              {type === 'from'
-                ? `No tokens found for “${searchTerm}”`
-                : 'No asset was found to swap'}
+            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
+              {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
             </Typography>
           </Box>
         </Box>
@@ -184,7 +175,6 @@ export const AssetAndAmountRow = ({
   displayAmount?: ?string,
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
-
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
 
   const isFrom = type === 'from';
@@ -196,21 +186,20 @@ export const AssetAndAmountRow = ({
 
   useEffect(() => {
     if (id != null) {
-      getTokenInfo(id).then(tokenInfo => {
-        if (tokenInfo.logo != null) {
-          setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
-        }
-        return null;
-      }).catch(e => {
-        console.warn('Failed to resolve remote info for token: ' + id, e);
-      });
+      getTokenInfo(id)
+        .then(tokenInfo => {
+          if (tokenInfo.logo != null) {
+            setRemoteTokenLogo(`data:image/png;base64,${tokenInfo.logo}`);
+          }
+          return null;
+        })
+        .catch(e => {
+          console.warn('Failed to resolve remote info for token: ' + id, e);
+        });
     }
-  }, [id])
+  }, [id]);
 
-  const imgSrc =
-    ticker === defaultTokenInfo.ticker
-      ? adaTokenImage
-      : remoteTokenLogo ?? defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
 
   const amount = displayAmount ?? assetAmount;
 
@@ -262,7 +251,7 @@ export const AssetAndAmountRow = ({
         </Box>
         <Box flexGrow="1" width="100%">
           <Box display="flex" alignItems="center" gap="8px">
-            <Typography component="div" fontWeight={500} variant="body1">
+            <Typography component="div" fontWeight={500} variant="body1" color="ds.text_gray_medium">
               {(name !== address || name !== id) && name !== ticker && `[${ticker}]`} {name}
             </Typography>
             {!isFrom && amount != null && (
@@ -284,13 +273,7 @@ export const AssetAndAmountRow = ({
       {!isFrom && (
         <>
           {volume24h ? (
-            <Box
-              alignSelf="center"
-              flexShrink="0"
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-end"
-            >
+            <Box alignSelf="center" flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
               <Typography component="div" variant="body1" color="grayscale.900">
                 <span>{volume24h}</span>&nbsp;<span>{ticker}</span>
               </Typography>
@@ -311,9 +294,7 @@ export const AssetAndAmountRow = ({
               justifyContent="flex-end"
               gap="8px"
             >
-              {!priceNotChanged && (
-                <Box>{priceIncreased ? <ArrowTopIcon /> : <ArrowBottomIcon />}</Box>
-              )}
+              {!priceNotChanged && <Box>{priceIncreased ? <ArrowTopIcon /> : <ArrowBottomIcon />}</Box>}
               <Box>{priceChange24h}</Box>
             </Box>
           )}
@@ -321,13 +302,7 @@ export const AssetAndAmountRow = ({
       )}
 
       {isFrom && (
-        <Box
-          alignSelf="center"
-          flexShrink="0"
-          display="flex"
-          flexDirection="column"
-          alignItems="flex-end"
-        >
+        <Box alignSelf="center" flexShrink="0" display="flex" flexDirection="column" alignItems="flex-end">
           <Typography component="div" variant="body1" color="grayscale.900" display="flex">
             {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
             <PriceImpactColored priceImpactState={priceImpactState}>

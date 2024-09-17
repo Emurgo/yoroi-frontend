@@ -25,7 +25,7 @@ class MemoWarningModal extends BasePage {
     method: 'id',
   };
   // * understandBtn
-  undesrtandButtonLocator = {
+  understandButtonLocator = {
     locator: 'memoNoExternalStorageDialog-iunderstand-button',
     method: 'id',
   };
@@ -54,13 +54,13 @@ class MemoWarningModal extends BasePage {
   // * confirm adding
   async understandAdding() {
     this.logger.info(`MemoWarningModal::understandAdding is called`);
-    await this.click(this.undesrtandButtonLocator);
+    await this.click(this.understandButtonLocator);
     return new AddMemoDialog(this.driver, this.logger);
   }
   // * confirm editing
   async understandEditing() {
     this.logger.info(`MemoWarningModal::understandEditing is called`);
-    await this.click(this.undesrtandButtonLocator);
+    await this.click(this.understandButtonLocator);
     return new EditMemoDialog(this.driver, this.logger);
   }
 }

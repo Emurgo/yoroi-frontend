@@ -5,30 +5,25 @@ import type { WhitelistEntry } from '../../../../chrome/extension/connector/type
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
-import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
-import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { observer } from 'mobx-react';
 import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
 import { ReactComponent as NoDappsConnected } from '../../../assets/images/revamp/no-dapps-connected.inline.svg';
 import { connectorMessages } from '../../../i18n/global-messages';
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver';
 import { withLayout } from '../../../styles/context/layout';
 import styles from './ConnectedWebsitesPage.scss';
 import WalletRow from './WalletRow';
 import WalletRowRevamp from './WalletRowRevamp';
 import { Box, Typography } from '@mui/material';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
-type WalletInfo = {| balance: null | MultiToken, plate: WalletChecksum |};
 type Props = {|
   +whitelistEntries: ?Array<WhitelistEntry>,
   +activeSites: Array<string>,
-  +wallets: ?Array<PublicDeriver<>>,
-  +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
+  +wallets: ?Array<WalletState>,
+  +onRemoveWallet: ({| url: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
-  +getConceptualWallet: (PublicDeriver<>) => ConceptualWalletSettingsCache,
-  +getWalletInfo: (PublicDeriver<>) => WalletInfo,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean |};
@@ -97,27 +92,24 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     }
 
     const cardanoNodes = whitelistEntries
-      .map(({ url, protocol, publicDeriverId, image }, entryIndex) => {
+      .map(({ url, publicDeriverId, image }, entryIndex) => {
         const wallet = wallets.find(
-          cacheEntry => cacheEntry.getPublicDeriverId() === publicDeriverId
+          cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
         );
 
         if (wallet == null) return null;
-
-        const { balance, plate } = this.props.getWalletInfo(wallet);
 
         return [
           <WalletRowRevamp
             key={url}
             url={url}
-            protocol={protocol}
             websiteIcon={image}
             onRemoveWallet={this.props.onRemoveWallet}
-            balance={balance}
-            plate={plate}
+            balance={wallet.balance}
+            plate={wallet.plate}
             shouldHideBalance={this.props.shouldHideBalance}
             getTokenInfo={this.props.getTokenInfo}
-            settingsCache={this.props.getConceptualWallet(wallet)}
+            walletName={wallet.name}
             id={'walletRow_' + entryIndex}
           />,
         ];
@@ -187,27 +179,27 @@ class ConnectedWebsitesPage extends Component<AllProps> {
     }
 
     const cardanoNodes = whitelistEntries
-      .map(({ url, protocol, publicDeriverId, image }) => {
+      .map(({ url, publicDeriverId, image }) => {
         const wallet = wallets.find(
-          cacheEntry => cacheEntry.getPublicDeriverId() === publicDeriverId
+          cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
         );
         if (wallet == null) {
           return null;
         }
-        const { balance, plate } = this.props.getWalletInfo(wallet);
+
         return (
           <WalletRow
             key={url}
             url={url}
-            protocol={protocol}
             websiteIcon={image}
             isActiveSite={this.props.activeSites.includes(url)}
             onRemoveWallet={this.props.onRemoveWallet}
-            balance={balance}
-            plate={plate}
+            balance={wallet.balance}
+            plate={wallet.plate}
             shouldHideBalance={this.props.shouldHideBalance}
             getTokenInfo={this.props.getTokenInfo}
-            settingsCache={this.props.getConceptualWallet(wallet)}
+            walletName={wallet.name}
+            walletType={wallet.type}
           />
         );
       })

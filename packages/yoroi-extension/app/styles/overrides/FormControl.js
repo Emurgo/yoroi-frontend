@@ -1,35 +1,19 @@
 // @flow
-const ClassicFormControl = {
-  styleOverrides: {
-    root: {
-      paddingBottom: '20px',
-      marginBottom: '10px',
-    },
-  },
-  defaultProps: {
-    variant: 'outlined',
-    fullWidth: true,
-  },
-};
 
-const ModernFormControl = {
+const FormControl = {
   styleOverrides: {
-    root: {
+    root: ({ theme }: any): any => ({
       paddingBottom: '20px',
       marginBottom: '10px',
       marginTop: '7px',
       '&:hover': {
         '& .MuiInputLabel-root': {
-          color: 'var(--yoroi-comp-input-text-focus)',
-          '&.Mui-disabled': {
-            color: 'var(--yoroi-comp-input-border-disabled)',
-          },
-          '&.Mui-error': {
-            color: 'var(--yoroi-comp-input-error)',
-          },
+          color: theme.palette.ds.gray_900,
+          '&.Mui-disabled': { color: theme.palette.ds.gray_200 },
+          '&.Mui-error': { color: theme.palette.ds.sys_magenta_500 },
         },
       },
-    },
+    }),
   },
   defaultProps: {
     variant: 'outlined',
@@ -37,4 +21,4 @@ const ModernFormControl = {
   },
 };
 
-export { ClassicFormControl, ModernFormControl };
+export { FormControl };

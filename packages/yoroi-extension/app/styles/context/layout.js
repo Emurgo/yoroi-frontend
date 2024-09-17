@@ -18,7 +18,7 @@ const LayoutContext = React.createContext();
 
 const LayoutProvider = (props: Object): Node => {
   const { layout } = props;
-  const localLayout: Layouts = layout === THEMES.YOROI_REVAMP ? 'REVAMP' : 'CLASSIC';
+  const localLayout: Layouts = layout === THEMES.YOROI_BASE ? 'REVAMP' : 'CLASSIC';
 
   return (
     <LayoutContext.Provider

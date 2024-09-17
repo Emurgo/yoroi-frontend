@@ -2,7 +2,7 @@
 
 import type { lf$schema$Builder } from 'lovefield';
 import { ConstraintAction, ConstraintTiming, Type } from 'lovefield';
-import type { CertificateRelationType, CoreAddressT, TxStatusCodesType, } from './enums';
+import type { CertificateRelationType, CoreAddressT, TxStatusCodesType } from './enums';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
@@ -21,10 +21,10 @@ export type CommonBaseConfig = {|
 export type CardanoHaskellByronBaseConfig = {|
   ...CommonBaseConfig,
   /*
-  * Legacy byron addresses contained a network id inside of its attributes
-  * This network id was a 32-bit number, but the bech32 ID is smaller
-  * Therefore, the Byron network ID is only used to generate legacy addresses
-  */
+   * Legacy byron addresses contained a network id inside of its attributes
+   * This network id was a 32-bit number, but the bech32 ID is smaller
+   * Therefore, the Byron network ID is only used to generate legacy addresses
+   */
   +ByronNetworkId: number,
   +GenesisDate: string,
   +SlotsPerEpoch: number,
@@ -39,30 +39,31 @@ export type CardanoHaskellShelleyBaseConfig = {|
   +LinearFee: {|
     +coefficient: string,
     +constant: string,
-  |};
+  |},
   +MinimumUtxoVal: string,
   +CoinsPerUtxoWord: string,
   +PoolDeposit: string,
   +KeyDeposit: string,
 |};
-export type CardanoHaskellBaseConfig = [
-  $ReadOnly<CardanoHaskellByronBaseConfig>,
-  $ReadOnly<CardanoHaskellShelleyBaseConfig>
-];
+export type CardanoHaskellBaseConfig = [$ReadOnly<CardanoHaskellByronBaseConfig>, $ReadOnly<CardanoHaskellShelleyBaseConfig>];
 
 // unfortunate hack to get around the fact tuple spreading is broken in Flow
-export type CardanoHaskellConfig = $ReadOnly<InexactSubset<{|
-  ...$ElementType<CardanoHaskellBaseConfig, 0>,
-  ...$ElementType<CardanoHaskellBaseConfig, 1>,
-|}>>;
+export type CardanoHaskellConfig = $ReadOnly<
+  InexactSubset<{|
+    ...$ElementType<CardanoHaskellBaseConfig, 0>,
+    ...$ElementType<CardanoHaskellBaseConfig, 1>,
+  |}>
+>;
 
-export type NetworkInsert = {|
+export type NetworkRow = {|
   NetworkId: number,
   NetworkName: string,
+  NetworkFeatureName?: string,
   CoinType: CoinTypesT,
   Backend: {|
     BackendService?: string,
     TokenInfoService?: string,
+    BackendServiceZero?: string,
   |},
   /**
    * Starting configuration for the wallet.
@@ -81,9 +82,6 @@ export type NetworkInsert = {|
    */
   Fork: number,
 |};
-export type NetworkRow = {|
-  ...NetworkInsert,
-|};
 export const NetworkSchema: {|
   +name: 'Network',
   properties: $ObjMapi<NetworkRow, ToSchemaProp>,
@@ -96,7 +94,7 @@ export const NetworkSchema: {|
     Backend: 'Backend',
     BaseConfig: 'BaseConfig',
     Fork: 'Fork',
-  }
+  },
 };
 
 export type KeyInsert = {|
@@ -120,7 +118,7 @@ export const KeySchema: {|
     Hash: 'Hash',
     IsEncrypted: 'IsEncrypted',
     PasswordLastUpdate: 'PasswordLastUpdate',
-  }
+  },
 };
 
 export type AddressInsert = {|
@@ -144,7 +142,7 @@ export const AddressSchema: {|
     Type: 'Type',
     Hash: 'Hash',
     IsUsed: 'IsUsed',
-  }
+  },
 };
 
 export type EncryptionMetaInsert = {|
@@ -172,7 +170,7 @@ export const EncryptionMetaSchema: {|
     TransactionSeed: 'TransactionSeed',
     BlockSeed: 'BlockSeed',
     TokenSeed: 'TokenSeed',
-  }
+  },
 };
 
 export type KeyDerivationInsert = {|
@@ -204,7 +202,7 @@ export const KeyDerivationSchema: {|
     PublicKeyId: 'PublicKeyId',
     Parent: 'Parent',
     Index: 'Index',
-  }
+  },
 };
 
 export type BlockInsert = {|
@@ -233,11 +231,11 @@ export const BlockSchema: {|
     Digest: 'Digest',
     Hash: 'Hash',
     BlockTime: 'BlockTime',
-  }
+  },
 };
 
 export type DbBlock = {|
-  +block: $ReadOnly<BlockRow>;
+  +block: $ReadOnly<BlockRow>,
 |};
 
 export const TransactionType = Object.freeze({
@@ -277,9 +275,7 @@ export type CardanoShelleyTransactionInsert = {|
   ...TransactionInsertBase,
 |};
 
-export type TransactionInsert =
-  CardanoByronTransactionInsert |
-  CardanoShelleyTransactionInsert;
+export type TransactionInsert = CardanoByronTransactionInsert | CardanoShelleyTransactionInsert;
 
 export type TransactionRow = {|
   TransactionId: number,
@@ -302,7 +298,7 @@ export const TransactionSchema: {|
     Status: 'Status',
     ErrorMessage: 'ErrorMessage',
     Extra: 'Extra',
-  }
+  },
 };
 
 export type CertificatePart = {|
@@ -332,7 +328,7 @@ export const CertificateSchema: {|
     Ordinal: 'Ordinal',
     Kind: 'Kind',
     Payload: 'Payload',
-  }
+  },
 };
 export type CertificateAddressInsert = {|
   CertificateId: number,
@@ -354,7 +350,7 @@ export const CertificateAddressSchema: {|
     CertificateId: 'CertificateId',
     AddressId: 'AddressId',
     Relation: 'Relation',
-  }
+  },
 };
 
 export type CanonicalAddressInsert = {|
@@ -383,7 +379,7 @@ export const CanonicalAddressSchema: {|
   properties: {
     CanonicalAddressId: 'CanonicalAddressId',
     KeyDerivationId: 'KeyDerivationId',
-  }
+  },
 };
 
 export type AddressMappingInsert = {|
@@ -410,7 +406,7 @@ export const AddressMappingSchema: {|
      * We can't make the "KeyDerivationId" nullable because you can't create an index on a nullable
      */
     AddressId: 'AddressId',
-  }
+  },
 };
 
 export type NFTMetadata = {|
@@ -424,7 +420,7 @@ export type NFTMetadata = {|
     name?: ?string,
     mediaType?: ?string,
     src?: ?(string | Array<string>),
-  |}>
+  |}>,
 |};
 
 export type CardanoAssetMintMetadata = {|
@@ -434,10 +430,10 @@ export type CardanoAssetMintMetadata = {|
   [key: string]: {|
     version?: ?string,
     [policyID: string]: {|
-      [assetNameHex: string]: NFTMetadata
-    |}
-  |}
-|}
+      [assetNameHex: string]: NFTMetadata,
+    |},
+  |},
+|};
 
 export type TokenMetadata = {|
   +type: 'Cardano',
@@ -452,7 +448,7 @@ export type TokenMetadata = {|
   // If the token row is fetched from network, this is the ISO time string.
   // Otherwise it is null or not present.
   lastUpdatedAt?: ?string,
-  +assetMintMetadata?: Array<CardanoAssetMintMetadata>
+  +assetMintMetadata?: Array<CardanoAssetMintMetadata>,
 |};
 
 export type TokenInsert = {|
@@ -464,15 +460,17 @@ export type TokenInsert = {|
    * for Cardano, this is policyId || assetName
    * Note: we don't use null for the primary token of the chain
    * As some blockchains have multiple primary tokens
-  */
+   */
   Identifier: string,
   IsNFT?: boolean,
   Metadata: TokenMetadata,
 |};
-export type TokenUpsertWithDigest = TokenInsert | {|
-  TokenId?: ?number,
-  ...TokenInsert,
-|};
+export type TokenUpsertWithDigest =
+  | TokenInsert
+  | {|
+      TokenId?: ?number,
+      ...TokenInsert,
+    |};
 export type TokenUpsert = $Diff<TokenUpsertWithDigest, {| Digest: number |}>;
 export type TokenRow = {|
   TokenId: number,
@@ -491,7 +489,7 @@ export const TokenSchema: {|
     Digest: 'Digest',
     Identifier: 'Identifier',
     Metadata: 'Metadata',
-  }
+  },
 };
 
 export type TokenListInsert = {|
@@ -518,7 +516,7 @@ export const TokenListSchema: {|
     ListId: 'ListId',
     TokenId: 'TokenId',
     Amount: 'Amount',
-  }
+  },
 };
 
 export type DbTransaction = {|
@@ -533,12 +531,13 @@ export type DbTokenInfo = {|
       Identifier: string,
       NetworkId: number,
     |}>,
-  |}>
+  |}>,
 |};
 
 export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
   // Network Table
-  schemaBuilder.createTable(NetworkSchema.name)
+  schemaBuilder
+    .createTable(NetworkSchema.name)
     .addColumn(NetworkSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(NetworkSchema.properties.NetworkName, Type.STRING)
     .addColumn(NetworkSchema.properties.CoinType, Type.NUMBER)
@@ -550,71 +549,56 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
        * since we may want to support users adding custom networks eventually
        * so we need custom user networks to live in a different ID range than pre-built networks
        * so that if we add any new premade-network, we can just hardcode an ID without conflict
-      */
-      ([NetworkSchema.properties.NetworkId]: Array<string>),
+       */
+      ([NetworkSchema.properties.NetworkId]: Array<string>)
     );
 
   // Key Table
-  schemaBuilder.createTable(KeySchema.name)
+  schemaBuilder
+    .createTable(KeySchema.name)
     .addColumn(KeySchema.properties.KeyId, Type.INTEGER)
     .addColumn(KeySchema.properties.Type, Type.INTEGER)
     .addColumn(KeySchema.properties.Hash, Type.STRING)
     .addColumn(KeySchema.properties.IsEncrypted, Type.BOOLEAN)
     .addColumn(KeySchema.properties.PasswordLastUpdate, Type.DATE_TIME)
-    .addPrimaryKey(
-      ([KeySchema.properties.KeyId]: Array<string>),
-      true,
-    )
-    .addNullable(([
-      KeySchema.properties.PasswordLastUpdate,
-    ]));
+    .addPrimaryKey(([KeySchema.properties.KeyId]: Array<string>), true)
+    .addNullable([KeySchema.properties.PasswordLastUpdate]);
 
   // Address Table
-  schemaBuilder.createTable(AddressSchema.name)
+  schemaBuilder
+    .createTable(AddressSchema.name)
     .addColumn(AddressSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AddressSchema.properties.Digest, Type.NUMBER)
     .addColumn(AddressSchema.properties.Type, Type.NUMBER)
     .addColumn(AddressSchema.properties.Hash, Type.STRING)
     .addColumn(AddressSchema.properties.IsUsed, Type.BOOLEAN)
-    .addPrimaryKey(
-      ([AddressSchema.properties.AddressId]: Array<string>),
-      true,
-    )
+    .addPrimaryKey(([AddressSchema.properties.AddressId]: Array<string>), true)
     .addIndex(
       'Address_Digest_Index',
       ([AddressSchema.properties.Digest]: Array<string>),
       false // not unique. There is a (very small) chance of collisions
     )
-    .addIndex(
-      'Address_Type_Index',
-      ([AddressSchema.properties.Type]: Array<string>),
-      false
-    );
-
+    .addIndex('Address_Type_Index', ([AddressSchema.properties.Type]: Array<string>), false);
 
   // EncryptionMeta Table
-  schemaBuilder.createTable(EncryptionMetaSchema.name)
+  schemaBuilder
+    .createTable(EncryptionMetaSchema.name)
     .addColumn(EncryptionMetaSchema.properties.EncryptionMetaId, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.AddressSeed, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.TransactionSeed, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.BlockSeed, Type.INTEGER)
     .addColumn(EncryptionMetaSchema.properties.TokenSeed, Type.INTEGER)
-    .addPrimaryKey(
-      ([EncryptionMetaSchema.properties.EncryptionMetaId]: Array<string>),
-      false,
-    );
+    .addPrimaryKey(([EncryptionMetaSchema.properties.EncryptionMetaId]: Array<string>), false);
 
   // KeyDerivation Table
-  schemaBuilder.createTable(KeyDerivationSchema.name)
+  schemaBuilder
+    .createTable(KeyDerivationSchema.name)
     .addColumn(KeyDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(KeyDerivationSchema.properties.PrivateKeyId, Type.INTEGER)
     .addColumn(KeyDerivationSchema.properties.PublicKeyId, Type.INTEGER)
     .addColumn(KeyDerivationSchema.properties.Parent, Type.INTEGER)
     .addColumn(KeyDerivationSchema.properties.Index, Type.INTEGER)
-    .addPrimaryKey(
-      ([KeyDerivationSchema.properties.KeyDerivationId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([KeyDerivationSchema.properties.KeyDerivationId]: Array<string>), true)
     .addForeignKey('KeyDerivation_Parent', {
       local: KeyDerivationSchema.properties.Parent,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
@@ -627,7 +611,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('KeyDerivation_PublicKeyId', {
       local: KeyDerivationSchema.properties.PublicKeyId,
-      ref: `${KeySchema.name}.${KeySchema.properties.KeyId}`
+      ref: `${KeySchema.name}.${KeySchema.properties.KeyId}`,
     })
     .addNullable([
       KeyDerivationSchema.properties.PrivateKeyId,
@@ -636,29 +620,25 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       KeyDerivationSchema.properties.Index,
     ]);
 
-  schemaBuilder.createTable(BlockSchema.name)
+  schemaBuilder
+    .createTable(BlockSchema.name)
     .addColumn(BlockSchema.properties.BlockId, Type.INTEGER)
     .addColumn(BlockSchema.properties.SlotNum, Type.INTEGER)
     .addColumn(BlockSchema.properties.Height, Type.INTEGER)
     .addColumn(BlockSchema.properties.Digest, Type.NUMBER)
     .addColumn(BlockSchema.properties.Hash, Type.STRING)
     .addColumn(BlockSchema.properties.BlockTime, Type.DATE_TIME)
-    .addPrimaryKey(
-      ([BlockSchema.properties.BlockId]: Array<string>),
-      true,
-    )
+    .addPrimaryKey(([BlockSchema.properties.BlockId]: Array<string>), true)
     .addIndex(
       'Block_Digest_Index',
       ([BlockSchema.properties.Digest]: Array<string>),
       false // not unique. There is a (very small) chance of collisions
-    ).addIndex(
-      'Block_Height_Index',
-      ([BlockSchema.properties.Height]: Array<string>),
-      false
-    );;
+    )
+    .addIndex('Block_Height_Index', ([BlockSchema.properties.Height]: Array<string>), false);
 
   // Transaction table
-  schemaBuilder.createTable(TransactionSchema.name)
+  schemaBuilder
+    .createTable(TransactionSchema.name)
     .addColumn(TransactionSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(TransactionSchema.properties.Type, Type.INTEGER)
     .addColumn(TransactionSchema.properties.Digest, Type.NUMBER)
@@ -669,13 +649,10 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TransactionSchema.properties.Status, Type.INTEGER)
     .addColumn(TransactionSchema.properties.ErrorMessage, Type.STRING)
     .addColumn(TransactionSchema.properties.Extra, Type.OBJECT)
-    .addPrimaryKey(
-      ([TransactionSchema.properties.TransactionId]: Array<string>),
-      true,
-    )
+    .addPrimaryKey(([TransactionSchema.properties.TransactionId]: Array<string>), true)
     .addForeignKey('Transaction_Block', {
       local: TransactionSchema.properties.BlockId,
-      ref: `${BlockSchema.name}.${BlockSchema.properties.BlockId}`
+      ref: `${BlockSchema.name}.${BlockSchema.properties.BlockId}`,
     })
     .addNullable([
       TransactionSchema.properties.BlockId,
@@ -689,32 +666,24 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       false // not unique. There is a (very small) chance of collisions
     );
   // CanonicalAddress
-  schemaBuilder.createTable(CanonicalAddressSchema.name)
+  schemaBuilder
+    .createTable(CanonicalAddressSchema.name)
     .addColumn(CanonicalAddressSchema.properties.CanonicalAddressId, Type.INTEGER)
     .addColumn(CanonicalAddressSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(
-      ([CanonicalAddressSchema.properties.CanonicalAddressId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([CanonicalAddressSchema.properties.CanonicalAddressId]: Array<string>), true)
     .addForeignKey('CanonicalAddress_KeyDerivation', {
       local: CanonicalAddressSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     })
-    .addIndex(
-      'CanonicalAddress_KeyDerivation_Index',
-      ([CanonicalAddressSchema.properties.KeyDerivationId]: Array<string>),
-      true
-    );
+    .addIndex('CanonicalAddress_KeyDerivation_Index', ([CanonicalAddressSchema.properties.KeyDerivationId]: Array<string>), true);
   // AddressMapping
-  schemaBuilder.createTable(AddressMappingSchema.name)
+  schemaBuilder
+    .createTable(AddressMappingSchema.name)
     .addColumn(AddressMappingSchema.properties.AddressMappingId, Type.INTEGER)
     .addColumn(AddressMappingSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(AddressMappingSchema.properties.AddressId, Type.INTEGER)
-    .addPrimaryKey(
-      ([AddressMappingSchema.properties.AddressMappingId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([AddressMappingSchema.properties.AddressMappingId]: Array<string>), true)
     .addForeignKey('AddressMapping_KeyDerivation', {
       local: AddressMappingSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
@@ -725,23 +694,17 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
       action: ConstraintAction.CASCADE,
     })
-    .addIndex(
-      'AddressMapping_KeyDerivation_Index',
-      ([AddressMappingSchema.properties.KeyDerivationId]: Array<string>),
-      false
-    );
+    .addIndex('AddressMapping_KeyDerivation_Index', ([AddressMappingSchema.properties.KeyDerivationId]: Array<string>), false);
 
   // Certificate Table
-  schemaBuilder.createTable(CertificateSchema.name)
+  schemaBuilder
+    .createTable(CertificateSchema.name)
     .addColumn(CertificateSchema.properties.CertificateId, Type.INTEGER)
     .addColumn(CertificateSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(CertificateSchema.properties.Ordinal, Type.INTEGER)
     .addColumn(CertificateSchema.properties.Kind, Type.INTEGER)
     .addColumn(CertificateSchema.properties.Payload, Type.STRING)
-    .addPrimaryKey(
-      ([CertificateSchema.properties.CertificateId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([CertificateSchema.properties.CertificateId]: Array<string>), true)
     .addForeignKey('Certificate_Transaction', {
       local: CertificateSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
@@ -754,15 +717,13 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     );
 
   // CertificateAddress Table
-  schemaBuilder.createTable(CertificateAddressSchema.name)
+  schemaBuilder
+    .createTable(CertificateAddressSchema.name)
     .addColumn(CertificateAddressSchema.properties.CertificateAddressId, Type.INTEGER)
     .addColumn(CertificateAddressSchema.properties.CertificateId, Type.INTEGER)
     .addColumn(CertificateAddressSchema.properties.AddressId, Type.INTEGER)
     .addColumn(CertificateAddressSchema.properties.Relation, Type.INTEGER)
-    .addPrimaryKey(
-      ([CertificateAddressSchema.properties.CertificateAddressId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([CertificateAddressSchema.properties.CertificateAddressId]: Array<string>), true)
     .addForeignKey('CertificateAddress_Certificate', {
       local: CertificateAddressSchema.properties.CertificateId,
       ref: `${CertificateSchema.name}.${CertificateSchema.properties.CertificateId}`,
@@ -772,19 +733,12 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
       local: CertificateAddressSchema.properties.AddressId,
       ref: `${AddressSchema.name}.${AddressSchema.properties.AddressId}`,
     })
-    .addIndex(
-      'CertificateAddress_Certificate_Index',
-      ([CertificateAddressSchema.properties.CertificateId]: Array<string>),
-      false
-    )
-    .addIndex(
-      'Address_Transaction_Index',
-      ([CertificateAddressSchema.properties.AddressId]: Array<string>),
-      false
-    );
+    .addIndex('CertificateAddress_Certificate_Index', ([CertificateAddressSchema.properties.CertificateId]: Array<string>), false)
+    .addIndex('Address_Transaction_Index', ([CertificateAddressSchema.properties.AddressId]: Array<string>), false);
 
   // Token Table
-  schemaBuilder.createTable(TokenSchema.name)
+  schemaBuilder
+    .createTable(TokenSchema.name)
     .addColumn(TokenSchema.properties.TokenId, Type.INTEGER)
     .addColumn(TokenSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(TokenSchema.properties.IsDefault, Type.BOOLEAN)
@@ -792,10 +746,7 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     .addColumn(TokenSchema.properties.Identifier, Type.STRING)
     .addColumn(TokenSchema.properties.Digest, Type.NUMBER)
     .addColumn(TokenSchema.properties.Metadata, Type.OBJECT)
-    .addPrimaryKey(
-      ([TokenSchema.properties.TokenId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([TokenSchema.properties.TokenId]: Array<string>), true)
     .addForeignKey('Token_Network', {
       local: TokenSchema.properties.NetworkId,
       ref: `${NetworkSchema.name}.${NetworkSchema.properties.NetworkId}`,
@@ -812,16 +763,14 @@ export const populatePrimitivesDb = (schemaBuilder: lf$schema$Builder) => {
     );
 
   // TokenList Table
-  schemaBuilder.createTable(TokenListSchema.name)
+  schemaBuilder
+    .createTable(TokenListSchema.name)
     .addColumn(TokenListSchema.properties.TokenListItemId, Type.INTEGER)
     .addColumn(TokenListSchema.properties.ListId, Type.INTEGER)
     .addColumn(TokenListSchema.properties.TokenId, Type.INTEGER)
 
     .addColumn(TokenListSchema.properties.Amount, Type.STRING)
-    .addPrimaryKey(
-      ([TokenListSchema.properties.TokenListItemId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([TokenListSchema.properties.TokenListItemId]: Array<string>), true)
     .addForeignKey('TokenList_Token', {
       local: TokenListSchema.properties.TokenId,
       ref: `${TokenSchema.name}.${TokenSchema.properties.TokenId}`,

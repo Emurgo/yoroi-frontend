@@ -4,14 +4,17 @@
   "scripts": {
     "eslint": "lerna run eslint --stream",
     "flow": "lerna run flow --stream",
+    "tsc": "lerna run tsc --stream",
     "test": "lerna run test --stream",
     "translations:purge": "lerna run translations:purge -- stream",
     "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func"
   },
-
   "devDependencies": {
     "concurrently": "^7.0.0",
     "husky": "4.3.8",
-    "lerna": "^4.0.0"
+    "lerna": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack-cli": "^5.1.4"
   }
 }

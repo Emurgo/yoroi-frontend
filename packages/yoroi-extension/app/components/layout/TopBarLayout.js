@@ -1,10 +1,10 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import { observer } from 'mobx-react';
-import styles from './TopBarLayout.scss';
-import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
+import { observer } from 'mobx-react';
+import type { Node, ComponentType } from 'react';
+import { withLayout } from '../../styles/context/layout';
 import { THEMES } from '../../styles/themes';
+import styles from './TopBarLayout.scss';
 
 type Props = {|
   +banner?: Node,
@@ -64,7 +64,7 @@ function TopBarLayout({
             boxShadow: !isRevamp && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
             borderRadius: !isRevamp && showAsCard === true && '8px',
             ...(showInContainer === true && {
-              bgcolor: 'common.white',
+              bgcolor: 'ds.bg_color_max',
               width: '100%',
               overflow: 'hidden',
               display: 'flex',
@@ -78,7 +78,7 @@ function TopBarLayout({
           {isRevamp ? (
             <Box
               sx={{
-                bgcolor: bgcolor || 'common.white',
+                bgcolor: bgcolor || 'ds.bg_color_max',
                 height: '100%',
                 width: '100%',
                 maxWidth: '1872px',
@@ -96,10 +96,9 @@ function TopBarLayout({
                   sx={{
                     height: '100%',
                     minHeight: '200px',
-                    padding:
-                      typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
+                    padding: typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
                     pb: 0,
-                    bgcolor: bgcolor || 'common.white',
+                    bgcolor: 'ds.bg_color_max',
                   }}
                 >
                   {children}
@@ -124,7 +123,7 @@ function TopBarLayout({
       const boxProperties = {
         height: '100%',
         minHeight: '200px',
-        backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+        backgroundColor: isRevamp ? 'ds.bg_color_max' : 'var(--yoroi-palette-gray-50)',
         maxWidth: '1295px',
         paddingLeft: '40px',
         paddingRight: '40px',
@@ -164,7 +163,7 @@ function TopBarLayout({
   return (
     <Box
       sx={{
-        backgroundColor: 'common.white',
+        backgroundColor: 'ds.bg_color_max',
         boxShadow: isModern ? '0 0 70px 0 rgba(0, 0, 0, 0.75)' : 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -192,7 +191,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor: isRevamp ? 'common.white' : 'var(--yoroi-palette-gray-50)',
+            backgroundColor: isRevamp ? 'ds.bg_color_max' : 'var(--yoroi-palette-gray-50)',
           }}
         >
           {banner}

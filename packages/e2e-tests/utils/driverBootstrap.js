@@ -4,16 +4,27 @@ import firefox from 'selenium-webdriver/firefox.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
+  chromeBin,
   chromeExtIdUrl,
   firefoxBin,
   firefoxExtIdUrl,
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox } from './utils.js';
+import {
+  getDownloadsDir,
+  getTargetBrowser,
+  isBrave,
+  isChrome,
+  isDapp,
+  isFirefox,
+  isHeadless,
+} from './utils.js';
+import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
+prefs.setLevel(logging.Type.DRIVER, logging.Level.INFO);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,8 +56,8 @@ const getBraveBuilder = () => {
           '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
           '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
           '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
-          '--start-maximized', // Starts the browser maximized, regardless of any previous settings
-          '--headless=new', // Runs the browser in the headless mode
+          '--start-maximized' // Starts the browser maximized, regardless of any previous settings
+          // '--headless=new' // Runs the browser in the headless mode
         )
         .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     );
@@ -54,33 +65,29 @@ const getBraveBuilder = () => {
 
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
+  const chromeOpts = new chrome.Options()
+    .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
+    .addArguments('--disable-dev-shm-usage')
+    .addArguments('--no-sandbox')
+    .addArguments('--disable-gpu')
+    .addArguments('--disable-setuid-sandbox')
+    .addArguments('--start-maximized')
+    .setUserPreferences({ 'download.default_directory': downloadsDir });
+  if (isHeadless()) {
+    chromeOpts.addArguments('--headless=new');
+  }
+  if (isDapp()) {
+    chromeOpts.setChromeBinaryPath(chromeBin);
+  }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
     .setLoggingPrefs(prefs)
-    .setChromeOptions(
-      new chrome.Options()
-        .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
-        .addArguments(
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--start-maximized',
-          // '--headless=new', // Runs the browser in the headless mode
-        )
-        .setUserPreferences({ 'download.default_directory': downloadsDir })
-    );
+    .setChromeOptions(chromeOpts);
 };
 
-const getFirefoxBuilder = () => {
+const __getFFOptions = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
-    // .addArguments('--headless') // Runs the browser in the headless mode
-    /**
-     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
-     * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
-     */
-    .setBinary(firefoxBin)
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -100,6 +107,19 @@ const getFirefoxBuilder = () => {
     .setPreference('browser.download.manager.showAlertOnComplete', false)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
 
+  if (isHeadless()) {
+    options.addArguments('--headless');
+  }
+  return options;
+};
+
+const getFirefoxBuilder = () => {
+  const options = __getFFOptions();
+  /**
+   * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
+   * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
+   */
+  options.setBinary(firefoxBin);
   return new Builder()
     .withCapabilities({
       chromeOptions: {
@@ -127,7 +147,7 @@ export const getBuilder = () => {
 // getting a driver
 export const getDriver = () => {
   const driver = getBuilder().build();
-  driver.manage().setTimeouts({ implicit: 10000 });
+  driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
   if (isFirefox()) {
     driver.manage().window().maximize();
   }

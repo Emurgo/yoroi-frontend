@@ -1,13 +1,13 @@
 // @flow
-import type { Node } from 'react';
-import type { AssetAmount } from './types';
 import { Box, Typography } from '@mui/material';
-import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
+import type { Node } from 'react';
+import { useEffect, useState } from 'react';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
+import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
+import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
-import { useEffect, useState } from 'react';
 
 type Props = {|
   label: string,
@@ -62,10 +62,7 @@ export default function SwapInput({
     }
   }, [id]);
 
-  const imgSrc =
-    ticker === defaultTokenInfo.ticker
-      ? adaTokenImage
-      : remoteTokenLogo ?? defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
 
   return (
     <Box>
@@ -74,7 +71,7 @@ export default function SwapInput({
         component="fieldset"
         sx={{
           borderStyle: 'solid',
-          borderWidth: tokenInfo.id?.length > 0 && error ? '2px' : '1px',
+          borderWidth: (tokenInfo.id?.length > 0 && error) || focusState.value ? '2px' : '1px',
           borderColor: error ? 'magenta.500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
@@ -84,9 +81,10 @@ export default function SwapInput({
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'common.white',
+          bgcolor: 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
+          maxHeight: '95px',
           '&:hover': {
             borderColor: !error && 'grayscale.max',
           },
@@ -99,8 +97,8 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
-            color: error ? 'magenta.500' : 'black',
+            bgcolor: 'ds.bg_color_max',
+            color: error ? 'magenta.500' : 'ds.text_gray_medium',
           }}
         >
           {label}
@@ -112,6 +110,7 @@ export default function SwapInput({
             border: '0',
             outline: 'none',
             '::placeholder': { color: 'grayscale.600' },
+            bgcolor: 'ds.bg_color_max',
           }}
           component="input"
           type="text"
@@ -128,7 +127,11 @@ export default function SwapInput({
             <Box
               width="24px"
               height="24px"
-              sx={{ overflowY: 'hidden', '& > svg': { width: '100%', height: '100%' } }}
+              sx={{
+                overflowY: 'hidden',
+                '& > svg': { width: '100%', height: '100%' },
+                borderRadius: '4px',
+              }}
             >
               <img
                 width="100%"
@@ -158,6 +161,7 @@ export default function SwapInput({
                 ':disabled': {
                   cursor: 'not-allowed',
                 },
+                color: 'ds.text_gray_medium',
               }}
               onClick={() => {
                 handleAmountChange(quantity);

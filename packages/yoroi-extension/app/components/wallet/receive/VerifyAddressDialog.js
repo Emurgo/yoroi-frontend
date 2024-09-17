@@ -35,6 +35,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -68,9 +69,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
   };
 
   getLabelStyle: void => string = () => {
-    return this.props.classicTheme
-      ? 'SimpleFormField_label FormFieldOverridesClassic_label'
-      : styles.label;
+    return this.props.classicTheme ? 'SimpleFormField_label FormFieldOverridesClassic_label' : styles.label;
   };
 
   render(): Node {
@@ -95,6 +94,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.cancel}
+        id="verifyAddressDialog"
       >
         {this.renderQrCode()}
         {this.renderAddressBlock()}
@@ -112,12 +112,12 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const notificationId = 'verify-address-notification';
     return (
       <>
-        <span className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
           {intl.formatMessage(globalMessages.addressLabel)}
-        </span>
+        </Typography>
         <div className="verificationAddress">
           <CopyableAddress
-            id='verifyAddressDialog'
+            id="verifyAddressDialog"
             hash={this.props.addressInfo.address}
             elementId={notificationId}
             onCopyAddress={() => this.props.onCopyAddressTooltip(notificationId)}
@@ -128,11 +128,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
               light={false}
               selectedExplorer={this.props.selectedExplorer}
               hash={this.props.addressInfo.address}
-              linkType={
-                this.props.addressInfo.type === CoreAddressTypes.CARDANO_REWARD
-                  ? 'stakeAddress'
-                  : 'address'
-              }
+              linkType={this.props.addressInfo.type === CoreAddressTypes.CARDANO_REWARD ? 'stakeAddress' : 'address'}
             >
               <RawHash light={false} className={styles.hash}>
                 {truncateAddress(this.props.addressInfo.address)}
@@ -180,10 +176,10 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (stakingKey == null) return null;
     return (
       <>
-        <span className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
-        </span>
-        <div className="stakingKey">
+        </Typography>
+        <div className="stakingKey" id="verifyAddressDialog-stakingKeyHash-text">
           <RawHash light={false} className={styles.hash}>
             {stakingKey}
           </RawHash>
@@ -216,9 +212,9 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (spendingKey == null) return null;
     return (
       <>
-        <span className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
           {intl.formatMessage(globalMessages.spendingKeyHashLabel)}
-        </span>
+        </Typography>
         <div className="spendingKey">
           <RawHash light={false} className={styles.hash}>
             {spendingKey}
@@ -252,14 +248,14 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
 
     return (
       <>
-        <span className={this.getLabelStyle()}>
-          {intl.formatMessage(globalMessages.keyRegistrationPointer)}
-        </span>
-        <div className="keyPointer">
+        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+          {intl.formatMessage(globalMessages.keyRegistrationPointer)}sdsds
+        </Typography>
+        <Typography className="keyPointer" variant="body1" color="ds.text_gray_low">
           <RawHash light={false} className={styles.hash}>
             ({slot}, {txIdx}, {certIdx})
           </RawHash>
-        </div>
+        </Typography>
         <br />
       </>
     );
@@ -271,11 +267,18 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>
-        <span className={this.getLabelStyle()}>
+        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
-        </span>
+        </Typography>
         <div className={derivationClasses}>
-          <div className={styles.hash}>{toDerivationPathString(addressing.path)}</div>
+          <Typography
+            className={styles.hash}
+            id="verifyAddressDialog-derivationPath-text"
+            variant="body1"
+            color="ds.text_gray_low"
+          >
+            {toDerivationPathString(addressing.path)}
+          </Typography>
         </div>
         <br />
       </>

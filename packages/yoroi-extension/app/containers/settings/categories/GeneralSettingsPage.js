@@ -70,8 +70,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting ||
-      coinPriceStore.refreshCurrentUnit.isExecuting;
+      profileStore.setUnitOfAccountRequest.isExecuting;
     const { currentTheme } = profileStore;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
@@ -121,15 +120,12 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
         <ThemeSettingsBlock
           currentTheme={currentTheme}
           onSubmit={(theme: string) => {
-            if (theme === THEMES.YOROI_REVAMP) {
-              const { wallets } = this.props.stores;
-              const publicDeriver = wallets.selected;
-              const publicDerivers = wallets.publicDerivers;
-
-              if (publicDeriver == null && publicDerivers.length !== 0) {
-                const lastSelectedWallet = wallets.getLastSelectedWallet();
+            if (theme === THEMES.YOROI_BASE) {
+              const { wallets, selected } = this.props.stores.wallets;
+              if (selected == null && wallets.length !== 0) {
+                const lastSelectedWallet = this.props.stores.wallets.getLastSelectedWallet();
                 this.props.actions.wallets.setActiveWallet.trigger({
-                  wallet: lastSelectedWallet ?? publicDerivers[0],
+                  publicDeriverId: (lastSelectedWallet ?? wallets[0]).publicDeriverId,
                 });
               }
             }

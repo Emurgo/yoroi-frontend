@@ -43,6 +43,12 @@ export const isFirefox = () => getTargetBrowser() === TargetBrowser.FF;
 export const isChrome = () => getTargetBrowser() === TargetBrowser.Chrome;
 export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
 
+export const getCurrentOS = () => process.platform;
+export const isLinux = () => getCurrentOS() === 'linux';
+export const isMacOS = () => getCurrentOS() === 'darwin';
+export const isHeadless = () => process.env.HEADLESS === 'true';
+export const isDapp = () => process.env.ISDAPP === 'true';
+
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');
   const testsDataDir = testRunDir(getTargetBrowser());
@@ -245,8 +251,8 @@ export const roundUpCurrency = (value, fiatCurrency) => {
   }
 };
 
-export const diffIsLess1Perc = (valueA, valueB) => {
-  const valueA1Perc = valueA * 0.01;
+export const diffIsLessPerc = (valueA, valueB, percDiff) => {
+  const valueA1Perc = valueA * (percDiff / 100);
   return valueB >= valueA - valueA1Perc && valueB <= valueA + valueA1Perc;
 };
 

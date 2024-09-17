@@ -80,8 +80,8 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
   await walletDetailsPage.continue();
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
-  await transactionsPage.waitPrepareWalletBannerIsClosed();
   await transactionsPage.closeUpdatesModalWindow();
+  await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed).to.be.true;
   const walletInfo = await transactionsPage.getSelectedWalletInfo();
@@ -95,4 +95,19 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
     expWalletPlate
   );
   return walletInfo;
+};
+
+export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
+  const addWalletPage = new AddNewWallet(webdriver, logger);
+  const state = await addWalletPage.isDisplayed();
+  expect(state).to.be.true;
+  await addWalletPage.prepareDBAndStorage(templateName);
+  await addWalletPage.refreshPage();
+};
+
+export const waitTxPage = async (webdriver, logger) => {
+  const transactionsPage = new TransactionsSubTab(webdriver, logger);
+  await transactionsPage.waitPrepareWalletBannerIsClosed();
+  const txPageIsDisplayed = await transactionsPage.isDisplayed();
+  expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
 };

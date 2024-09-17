@@ -11,12 +11,12 @@ import { ReactComponent as DeleteIcon } from '../../../assets/images/dapp-connec
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
 import WalletType from '../../widgets/WalletType';
 import NavPlate from '../../topbar/NavPlate';
-import type { ConceptualWalletSettingsCache } from '../../../stores/toplevel/WalletSettingsStore';
 import { intlShape, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Tooltip, Typography } from '@mui/material';
+import type { WalletType as WalletT } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   active: {
@@ -27,15 +27,15 @@ const messages = defineMessages({
 
 type Props = {|
   +url: ?string,
-  +protocol: ?string,
   +isActiveSite: boolean,
   +shouldHideBalance: boolean,
-  +onRemoveWallet: ({| url: ?string, protocol: ?string |}) => void,
+  +onRemoveWallet: ({| url: ?string |}) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +settingsCache: ConceptualWalletSettingsCache,
+  +walletName: string,
   +websiteIcon: string,
   +balance: MultiToken | null,
   +plate: WalletChecksum,
+  +walletType: WalletT,
 |};
 
 type State = {|
@@ -99,13 +99,13 @@ export default class WalletRow extends Component<Props, State> {
     const {
       isActiveSite,
       url,
-      protocol,
       plate,
       onRemoveWallet,
       balance,
       shouldHideBalance,
-      settingsCache,
+      walletName,
       websiteIcon,
+      walletType,
     } = this.props;
     const { showDeleteIcon } = this.state;
     const { intl } = this.context;
@@ -119,19 +119,17 @@ export default class WalletRow extends Component<Props, State> {
           className={styles.component}
         >
           <div className={styles.name}>
-            {settingsCache.conceptualWalletName}
-            {settingsCache && (
-              <span>
-                {' '}
-                &#183; <WalletType wallet={settingsCache} />
-              </span>
-            )}
+            {walletName}
+            <span>
+              {' '}
+              &#183; <WalletType walletType={walletType} />
+            </span>
           </div>
           <div className={styles.rowWrapper}>
             <div>
               <div className={styles.card}>
                 <div className={styles.avatar}>
-                  <NavPlate plate={plate} wallet={settingsCache} />
+                  <NavPlate plate={plate} walletType={walletType} name={walletName} />
                 </div>
                 <div className={styles.balance}>
                   {this.renderAmountDisplay({
@@ -171,7 +169,7 @@ export default class WalletRow extends Component<Props, State> {
             </div>
             <div className={styles.delete}>
               {showDeleteIcon && (
-                <button onClick={() => onRemoveWallet({ url, protocol })} type="button">
+                <button onClick={() => onRemoveWallet({ url })} type="button">
                   <DeleteIcon />
                 </button>
               )}

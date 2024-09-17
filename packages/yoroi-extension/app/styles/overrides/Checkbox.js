@@ -1,54 +1,19 @@
 // @flow
-import { lightTheme } from '../themes/revamp/light-theme-base';
 
-const ClassicCheckbox = {
+const Checkbox: any = {
   styleOverrides: {
-    root: {
-      padding: 0,
-      marginRight: '18px',
-      color: 'var(--yoroi-comp-checkbox-background-active)',
-      '&.Mui-checked': {
-        color: 'var(--yoroi-comp-checkbox-background-active)',
-      },
-      '&.Mui-disabled': {
-        color: 'var(--yoroi-comp-checkbox-border-disabled)',
-      },
-    },
-  },
-};
-
-const ModernCheckbox = {
-  styleOverrides: {
-    root: {
-      padding: 0,
-      marginRight: '18px',
-      color: 'var(--yoroi-comp-checkbox-border)',
-      '&.Mui-checked': {
-        color: 'var(--yoroi-comp-checkbox-background-active)',
-      },
-      '&.Mui-disabled': {
-        color: 'var(--yoroi-comp-checkbox-border-disabled)',
-      },
-    },
-  },
-};
-
-const RevampCheckbox: any = {
-  styleOverrides: {
-    root: {
+    root: ({ theme }) => ({
       padding: 0,
       marginRight: '18px',
       borderRadius: '2px',
-      color: 'primary.500',
-      '&.Mui-checked': {
-        color: 'primary.500',
-      },
+      color: theme.palette.ds.gray_800,
+      '&.Mui-checked': { color: theme.palette.ds.primary_500 },
       '&.Mui-disabled': {
-        color: lightTheme.palette.grayscale[400],
-        backgroundColor: lightTheme.palette.grayscale[400],
+        color: theme.palette.ds.gray_400,
+        backgroundColor: theme.palette.ds.gray_400,
       },
-    },
+    }),
   },
 };
 
-export { ClassicCheckbox, ModernCheckbox, RevampCheckbox };
+export { Checkbox };

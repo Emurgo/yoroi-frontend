@@ -14,33 +14,19 @@ import {
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
-import AddNewWallet from '../pages/addNewWallet.page.js';
+import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
-describe('Export transactions', function () {
+describe('Export transactions, positive', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
 
-  before(function (done) {
-    webdriver = driversPoolsManager.getDriverFromPool();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+    await waitTxPage(webdriver, logger);
     cleanDownloads();
-    done();
-  });
-
-  it('Prepare DB and storages', async function () {
-    const addWalletPage = new AddNewWallet(webdriver, logger);
-    const state = await addWalletPage.isDisplayed();
-    expect(state).to.be.true;
-    await addWalletPage.prepareDBAndStorage('testWallet1');
-    await addWalletPage.refreshPage();
-  });
-
-  it('Check transactions page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.waitPrepareWalletBannerIsClosed();
-    const txPageIsDisplayed = await transactionsPage.isDisplayed();
-    expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   });
 
   // Open the export txs modal window

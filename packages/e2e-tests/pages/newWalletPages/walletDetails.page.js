@@ -1,4 +1,5 @@
 import AddWalletBase from './addWalletBase.page.js';
+import { fiveSeconds, quarterSecond } from '../../helpers/timeConstants.js';
 
 class WalletDetails extends AddWalletBase {
   defaultMessage =
@@ -53,9 +54,15 @@ class WalletDetails extends AddWalletBase {
   //
   async closeTipsModalWindow() {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
-    await this.waitForElement(this.tipsModalLocator);
-    await this.waitForElement(this.tipModalContinueButtonLocator);
-    await this.click(this.tipModalContinueButtonLocator);
+    await this.waitPresentedAndAct(
+      this.tipsModalLocator,
+      async () => {
+        await this.waitPresentedAndAct(
+          this.tipModalContinueButtonLocator,
+          async () => await this.click(this.tipModalContinueButtonLocator)
+        )
+      }
+    );
   }
   async enterWalletName(walletName) {
     this.logger.info(`WalletDetails::enterWalletName is called`);

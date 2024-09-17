@@ -1,151 +1,8 @@
 import WalletTab from './walletTab.page.js';
-import BasePage from '../../basepage.js';
-import { twoSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
-
-class GenerateURIModal extends BasePage {
-  // locators
-  generateURIModalLocator = {
-    locator: 'uriGenerateDialog-dialogWindow-modalWindow',
-    method: 'id',
-  };
-  generateURIModalTitleLocator = {
-    locator: 'uriGenerateDialog-dialogTitle-text',
-    method: 'id',
-  };
-  generateButtonLocator = {
-    locator: 'uriGenerateDialog-generate-button',
-    method: 'id',
-  };
-  closeModalButtonLocator = {
-    locator: 'uriGenerateDialog-closeModal-button',
-    method: 'id',
-  };
-  receiverAddressTextLocator = {
-    locator: '//input[starts-with(@id, "receiver--")]', // unfortunately, I didn't find a way to make a proper ID
-    method: 'xpath',
-  };
-  amountToSendInputLocator = {
-    locator: '//input[starts-with(@id, "amount--")]', // unfortunately, I didn't find a way to make a proper ID
-    method: 'xpath',
-  };
-  inputErrorMessageFieldLocator = {
-    locator: '//p[starts-with(@id, "amount--") and contains(@id, "-helper-text")]',
-    method: 'xpath',
-  };
-  // methods
-  /**
-   * Getting a receiver address from the disabled receiver input
-   * @returns {Promise<string>} A bech32 string format address
-   */
-  async getReceiverAddress() {
-    this.logger.info(`ReceiveSubTab::GenerateURIModal::getReceiverAddress is called.`);
-    const address = await this.getAttribute(this.receiverAddressTextLocator, 'value');
-    this.logger.info(`ReceiveSubTab::GenerateURIModal::getReceiverAddress::address - "${address}"`);
-    return address;
-  }
-  /**
-   * Entering amount to send
-   * @param {string} adaAmount Amount to send
-   */
-  async enterReceiveAmount(adaAmount) {
-    this.logger.info(`ReceiveSubTab::GenerateURIModal::enterReceiveAmount is called.`);
-    await this.click(this.amountToSendInputLocator);
-    await this.input(this.amountToSendInputLocator, adaAmount);
-  }
-  /**
-   * Pressing the button "Generate".
-   * The method contains a waiter with 2 seconds timeout
-   */
-  async generateLink() {
-    this.logger.info(`ReceiveSubTab::GenerateURIModal::generateLink is called.`);
-    const buttonIsEnabled = await this.customWaiter(
-      async () => {
-        const buttonlIsEnabled = await this.getAttribute(this.generateButtonLocator, 'disabled');
-        return buttonlIsEnabled === null;
-      },
-      twoSeconds,
-      quarterSecond
-    );
-    if (buttonIsEnabled) {
-      await this.click(this.generateButtonLocator);
-    } else {
-      throw new Error('The Continue button is disabled');
-    }
-  }
-  /**
-   * Getting the error message of amount input field
-   * @returns {Promise<string>}
-   */
-  async getAmountErrorMessage() {
-    this.logger.info(`ReceiveSubTab::GenerateURIModal::getAmountErrorMessage is called.`);
-
-    const messageAppeared = await this.customWaiter(
-      async () => {
-        const displayedText = await this.getText(this.inputErrorMessageFieldLocator);
-        return displayedText !== '';
-      },
-      twoSeconds,
-      quarterSecond
-    );
-    if (messageAppeared) {
-      const errMsg = await this.getText(this.inputErrorMessageFieldLocator);
-      this.logger.info(
-        `ReceiveSubTab::GenerateURIModal::getAmountErrorMessage:errMsg - "${errMsg}"`
-      );
-      return errMsg;
-    } else {
-      return '';
-    }
-  }
-}
-
-class DisplayURIModal extends BasePage {
-  // locators
-  uriDisplayModalLocator = {
-    locator: 'uriDisplayDialog-dialogWindow-modalWindow',
-    method: 'id',
-  };
-  uriDisplayModalTitleLocator = {
-    locator: 'uriDisplayDialog-dialogTitle-text',
-    method: 'id',
-  };
-  closeModalButtonLocator = {
-    locator: 'uriDisplayDialog-closeModal-button',
-    method: 'id',
-  };
-  linkTextLocator = {
-    locator: 'uriDisplayDialog-address-text',
-    method: 'id',
-  };
-  copyLinkButtonLocator = {
-    locator: 'uriDisplayDialog-copyAddress-button',
-    method: 'id',
-  };
-  // methods
-  /**
-   * Getting a generated link right from the component itself
-   * @returns {Promise<string>}
-   */
-  async getGeneratedLink() {
-    this.logger.info(`ReceiveSubTab::DisplayURIModal::getGeneratedLink is called.`);
-    return await this.getText(this.linkTextLocator);
-  }
-  /**
-   * Getting a generated link by clicking on the copy button near the text field.
-   * The address will be saved into clipboard.
-   */
-  async copyGeneratedLink() {
-    this.logger.info(`ReceiveSubTab::DisplayURIModal::copyGeneratedLink is called.`);
-    await this.click(this.copyGeneratedLink);
-  }
-  /**
-   * Closing the modal window
-   */
-  async closeModalWindow() {
-    this.logger.info(`ReceiveSubTab::DisplayURIModal::closeModalWindow is called.`);
-    await this.click(this.closeModalButtonLocator);
-  }
-}
+import GenerateURIModal from './receiveModals/generateURIModal.page.js';
+import DisplayURIModal from './receiveModals/displayURIModal.page.js';
+import { balanceReplacer } from '../../../helpers/constants.js';
+import VerifyAddressModal from './receiveModals/verifyAddressModal.page.js';
 
 class ReceiveSubTab extends WalletTab {
   // locators
@@ -377,18 +234,26 @@ class ReceiveSubTab extends WalletTab {
     const allAddrs = await this.findElements(this.generalAddrRowLocator);
     return allAddrs.length;
   }
+  async getFullAddressFromRow(rowIndex) {
+    this.logger.info(`ReceiveSubTab::getFullAddressFromRow is called. Row index: ${rowIndex}`);
+    const linkText = await this.getLinkFromComponent(this.addressTextInRowLocator(rowIndex));
+    const splittedLink = linkText.split('/');
+    return splittedLink[splittedLink.length - 1];
+  }
   /**
-   * 
+   * Getting an address info from the Receive page
    * @param {number} rowIndex An index of a row in the addresses table starting from 0
-   * @returns {Promise<{address: string, balance: number}>}
+   * @returns {Promise<{addressShort: string, addressFull: string, balance: number}>}
    */
   async getAddressInfo(rowIndex) {
     this.logger.info(`ReceiveSubTab::getAddressInfo is called. Row index: ${rowIndex}`);
-    const shortAddr = await this.getText(this.addressTextInRowLocator(rowIndex));
+    const addressShort = await this.getText(this.addressTextInRowLocator(rowIndex));
+    const addressFull = await this.getFullAddressFromRow(rowIndex);
     const addrBalanceText = await this.getText(this.addressBalanceTextInRowLocator(rowIndex));
     if (addrBalanceText === '-') {
       return {
-        address: shortAddr,
+        addressShort,
+        addressFull,
         balance: 0,
       };
     }
@@ -396,7 +261,8 @@ class ReceiveSubTab extends WalletTab {
     const matchResult = [...addrBalanceText.matchAll(regexp)];
     const addrBalance = parseFloat(matchResult[0]);
     return {
-      address: shortAddr,
+      addressShort,
+      addressFull,
       balance: addrBalance,
     };
   }
@@ -442,7 +308,7 @@ class ReceiveSubTab extends WalletTab {
     return new DisplayURIModal(this.driver, this.logger);
   }
   /**
-   * 
+   * Generating the Payment URI with the selected address
    * @param {number} rowIndex An index of a row in the addresses table starting from 0
    * @param {string} adaAmount ADA amount to receive
    * @returns {Promise<{address: string, amount: string, genLink: string}>}
@@ -473,6 +339,22 @@ class ReceiveSubTab extends WalletTab {
     const address = await this.getText(this.currentAddressToUseTextLocator);
     this.logger.info(`ReceiveSubTab::getCurrentReceiveAddr::address - "${address}"`);
     return address;
+  }
+  async allAddressesBalancesHidden() {
+    this.logger.info(`ReceiveSubTab::allAddressesBalancesHidden is called.`);
+    const addrsAmount = await this.getAmountOfAddresses();
+    const allBalancesHidden = [];
+    for (let rowIndex = 0; rowIndex < addrsAmount; rowIndex++) {
+      const addrBalanceText = await this.getText(this.addressBalanceTextInRowLocator(rowIndex));
+      allBalancesHidden.push(addrBalanceText === balanceReplacer || '-');
+    }
+    return allBalancesHidden.every(addrBalance => addrBalance === true);
+  }
+  async callVerifyAddress(rowindex) {
+    this.logger.info(`ReceiveSubTab::callVerifyAddress is called.`);
+    const verifuAddrBtnLocator = this.verifyAddressButtonInRowLocator(rowindex);
+    await this.clickByScript(verifuAddrBtnLocator);
+    return new VerifyAddressModal(this.driver, this.logger);
   }
 }
 

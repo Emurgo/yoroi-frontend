@@ -443,9 +443,6 @@ export default class ConnectStore {
     _sender?: any,
     sendResponse?: ?(any) => void,
   ) => ?boolean = (req, _sender, sendResponse) => {
-    if (sendResponse) {
-      this.sendResponseFunc = sendResponse;
-    }
     const { data } = req;
     if (data == null) {
       console.error(`Missing data in req ${JSON.stringify(req)}`);
@@ -454,6 +451,9 @@ export default class ConnectStore {
     if (!data.target?.startsWith(YOROI_LEDGER_CONNECT_TARGET_NAME)) {
       console.debug(`[YLC] Got non ledger ConnectStore\nrequest: ${req.origin ?? 'undefined'}\ndata: ${JSON.stringify(req.data, null, 2) ?? 'undefined'}`);
       return;
+    }
+    if (sendResponse) {
+      this.sendResponseFunc = sendResponse;
     }
     if (data.extension != null) {
       runInAction(() => { this.extension = data.extension; });

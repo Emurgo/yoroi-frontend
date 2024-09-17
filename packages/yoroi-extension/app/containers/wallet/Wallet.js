@@ -14,7 +14,6 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import { withLayout } from '../../styles/context/layout';
 import type { LayoutComponentMap } from '../../styles/context/layout';
@@ -83,7 +82,11 @@ class Wallet extends Component<AllProps> {
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
-    const visibilityContext = { selected: publicDeriver, walletHasAssets };
+    const visibilityContext = {
+      selected: publicDeriver.publicDeriverId,
+      networkId: publicDeriver.networkId,
+      walletHasAssets
+    };
     if (
       !activeCategory?.isVisible(visibilityContext) &&
       activeCategory?.isHiddenButAllowed !== true
@@ -123,20 +126,24 @@ class Wallet extends Component<AllProps> {
         </TopBarLayout>
       );
     }
-    const warning = this.getWarning(selectedWallet);
+    const warning = this.getWarning(selectedWallet.publicDeriverId);
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
+
+    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
+    const spendableBalance = stores.transactions.balance;
+    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver);
+    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
-    const spendableBalance = this.props.stores.transactions.balance;
-    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
-    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet);
-
-    const visibilityContext = { selected: selectedWallet, walletHasAssets };
+    const visibilityContext = {
+      selected: selectedWallet.publicDeriverId,
+      networkId: selectedWallet.networkId,
+      walletHasAssets
+    };
 
     const menu = (
       <SubMenu
@@ -230,8 +237,8 @@ class Wallet extends Component<AllProps> {
     return this.props.renderLayoutComponent({ CLASSIC: walletClassic, REVAMP: walletRevamp });
   }
 
-  getWarning: (PublicDeriver<>) => void | Node = publicDeriver => {
-    const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriver).dialogs;
+  getWarning: (number) => void | Node = publicDeriverId => {
+    const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriverId).dialogs;
     if (warnings.length === 0) {
       return undefined;
     }

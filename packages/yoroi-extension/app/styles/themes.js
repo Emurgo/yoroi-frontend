@@ -2,23 +2,22 @@
 
 import { createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
-import { revampBaseTheme as revampBaseThemeLight } from './themes/revamp/light-theme-mui';
-import { classicTheme } from './themes/classic-theme';
-import { modernTheme } from './themes/modern-theme';
+import { baseLightTheme } from './themes/light-theme-mui';
+import { classicTheme } from './themes/legacy/classic-theme';
+import { modernTheme } from './themes/legacy/modern-theme';
 
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
-  YOROI_REVAMP: 'YoroiRevamp',
+  YOROI_BASE: 'YoroiBase',
 });
 export type Theme = $Values<typeof THEMES>;
 // Old way
-export const revampTheme: Object =
-  createTheme(deepmerge({ name: 'revamp' }, revampBaseThemeLight));
+export const baseTheme: Object = createTheme(deepmerge({ name: 'base' }, baseLightTheme));
 export const MuiThemes: {| [Theme]: Object |} = Object.freeze({
   [THEMES.YOROI_CLASSIC]: classicTheme,
   [THEMES.YOROI_MODERN]: modernTheme,
-  [THEMES.YOROI_REVAMP]: revampTheme,
+  [THEMES.YOROI_BASE]: baseTheme,
 });
 
 // Refer: https://github.com/Emurgo/yoroi-frontend/pull/497

@@ -1,6 +1,5 @@
 // @flow
 import { action, computed, observable, runInAction } from 'mobx';
-import { debounce, find } from 'lodash';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import { ROUTES } from '../../routes-config';
@@ -8,81 +7,26 @@ import environment from '../../environment';
 import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notification.types';
-import type { GetWalletsFunc } from '../../api/common/index';
-import { getWallets } from '../../api/common/index';
-import type { CreateWalletResponse, RestoreWalletResponse } from '../../api/common/types';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetPublicKey,
-  asGetSigningKey,
-  asGetStakingKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import type {
-  IGetLastSyncInfoResponse,
-  IGetPublic,
-  IGetSigningKey,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
+import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { Logger, stringifyError } from '../../utils/logging';
-import { assuranceModes } from '../../config/transactionAssuranceConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getWalletChecksum } from '../../api/export/utils';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import { BigNumber } from 'bignumber.js';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
+import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
+import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { createFlagStorage } from '../../api/localStorage';
+import { forceNonNull, timeCached } from '../../coreUtils';
+import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
+import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 
-type GroupedWallets = {|
-  publicDerivers: Array<PublicDeriver<>>,
-  conceptualWallet: ConceptualWallet,
-|};
-
-function groupWallets(publicDerivers: Array<PublicDeriver<>>): Array<GroupedWallets> {
-  const pairingMap = new Map();
-  for (const publicDeriver of publicDerivers) {
-    // note: this may override previous entries but the result is the same
-    const parent = publicDeriver.getParent();
-    pairingMap.set(parent, {
-      conceptualWallet: parent,
-      publicDerivers: [],
-    });
-  }
-  // now fill them with public derivers
-  for (const publicDeriver of publicDerivers) {
-    const parentEntry = pairingMap.get(publicDeriver.getParent());
-    if (parentEntry == null) throw new Error('getPairing public deriver without parent');
-    parentEntry.publicDerivers.push(publicDeriver);
-  }
-  return Array.from(pairingMap.values());
-}
-
-export function groupForWallet(
-  grouped: Array<GroupedWallets>,
-  publicDeriver: PublicDeriver<>
-): void | GroupedWallets {
-  for (const conceptualGroup of grouped) {
-    for (const pubDeriver of conceptualGroup.publicDerivers) {
-      if (pubDeriver === publicDeriver) {
-        return conceptualGroup;
-      }
-    }
-  }
-  return undefined;
-}
-
-export type SigningKeyCache = {|
-  publicDeriver: IGetSigningKey,
-  // todo: maybe should be a Request instead of just the result data
-  signingKeyUpdateDate: null | Date,
-|};
-
-export type PublicKeyCache = {|
-  publicDeriver: IGetPublic,
-  plate: WalletChecksum,
-  publicKey: string,
-|};
+/*::
+declare var chrome;
+*/
 
 export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 
@@ -91,17 +35,23 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
  * dealing with wallets / accounts.
  */
 export default class WalletStore extends Store<StoresMap, ActionsMap> {
-  WALLET_REFRESH_INTERVAL: number = environment.getWalletRefreshInterval();
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable initialSyncingWalletIds: Array<number> = [];
-  @observable publicDerivers: Array<PublicDeriver<>>;
-  @observable selected: null | PublicDeriver<>;
-  @observable getInitialWallets: Request<GetWalletsFunc> = new Request<GetWalletsFunc>(getWallets);
+  @observable initialSyncingWalletIds: Set<number> = observable.set();
+  @observable wallets: Array<WalletState> = [];
+  @observable selectedIndex: null | number = null;
+  // mobx is not smart enough to update the wallet name on the nav bar without this
+  @observable selectedWalletName: null | string = null;
 
-  @observable createWalletRequest: Request<DeferredCall<CreateWalletResponse>> = new Request<
-    DeferredCall<CreateWalletResponse>
-  >(async create => {
+  @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
+
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<
+    DeferredCall<{| txId: string |}>
+  >(request => request());
+
+  @observable createWalletRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async create => {
     const createdWallet = await create();
     if (!createdWallet)
       throw new Error(`${nameof(this.createWalletRequest)} failed to create wallet`);
@@ -110,9 +60,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.stores.walletBackup.teardown();
     return createdWallet;
   });
-  @observable restoreRequest: Request<DeferredCall<RestoreWalletResponse>> = new Request<
-    DeferredCall<RestoreWalletResponse>
-  >(async restore => {
+  @observable restoreRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async restore => {
     const restoredWallet = await restore();
     if (!restoredWallet)
       throw new Error(`${nameof(this.createWalletRequest)} failed to restore wallet`);
@@ -121,77 +71,121 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.restoreRequest.reset();
     return restoredWallet;
   });
-  @observable isImportActive: boolean = false;
 
-  @observable sendMoneyRequest: SendMoneyRequest = new Request<
-    DeferredCall<{| txId: string |}>
-  >(request => request());
-
-  @observable signingKeyCache: Array<SigningKeyCache> = [];
-  getSigningKeyCache: IGetSigningKey => SigningKeyCache = publicDeriver => {
-    const foundRequest = find(this.signingKeyCache, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(
-      `${nameof(WalletStore)}::${nameof(this.getSigningKeyCache)} no signing key in cache`
-    );
-  };
-
-  @observable publicKeyCache: Array<PublicKeyCache> = [];
-  getPublicKeyCache: IGetPublic => PublicKeyCache = publicDeriver => {
-    const foundRequest = find(this.publicKeyCache, { publicDeriver });
-    if (foundRequest) return foundRequest;
-
-    throw new Error(
-      `${nameof(WalletStore)}::${nameof(this.getPublicKeyCache)} no public key in cache`
-    );
-  };
+  flagStorage: StorageAPI;
+  absoluteSlotGetters: { [string]: () => Promise<number> } = {};
 
   setup(): void {
     super.setup();
-    this.publicDerivers = [];
     const { wallets } = this.actions;
     wallets.unselectWallet.listen(this._unsetActiveWallet);
     wallets.setActiveWallet.listen(this._setActiveWallet);
-    setInterval(this._pollRefresh, this.WALLET_REFRESH_INTERVAL);
-    document.addEventListener(
-      'visibilitychange',
-      debounce(_e => this._pollRefresh(), this.ON_VISIBLE_DEBOUNCE_WAIT)
-    );
+
+    this.flagStorage = createFlagStorage();
+
+    listenForWalletStateUpdate(async (params) => {
+      if (params.eventType === 'update') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
+        if (params.isRefreshing) {
+          runInAction(() => {
+            this.wallets[index].isRefreshing = true;
+          });
+        } else {
+          const newWalletState = params.walletState;
+          // Reloading token info must happen before updating the wallet state because if there is
+          // a new transaction that brings a never-seen-before token and we are on the assets page
+          // then it crashes due to missing token.
+          await this.stores.tokenInfoStore.refreshTokenInfo();
+          runInAction(() => {
+            Object.assign(this.wallets[index], newWalletState);
+          });
+          if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
+            this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
+          }
+          runInAction(() => {
+            this.initialSyncingWalletIds.delete(params.publicDeriverId);
+          });
+          await this.stores.transactions.updateNewTransactions(params.newTxs, this.wallets[index]);
+        }
+      } else if (params.eventType === 'remove') {
+        const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
+        if (index === -1) {
+          return;
+        }
+        runInAction(() => {
+          this.wallets.splice(index, 1);
+        });
+      }
+      // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
+    });
+  }
+
+  // <TODO:ENCAPSULATE> make it a part of the wallet.network api
+  async getRemoteFeatureFlag(feature: string): Promise<?boolean> {
+    const wallet: ?WalletState = this.selected;
+    if (wallet == null) return null;
+    const network = getNetworkById(wallet.networkId);
+    const networkName = network.NetworkFeatureName;
+    if (networkName == null) return null;
+
+    let absoluteSlotGetter = this.absoluteSlotGetters[networkName];
+    if (absoluteSlotGetter == null) {
+      const fetcher = this.stores.substores.ada.stateFetchStore.fetcher;
+      absoluteSlotGetter = timeCached(
+        async () => {
+          const bestblockInfo: BestBlockResponse = await fetcher.getBestBlock({ network });
+          const { epoch, slot } = bestblockInfo;
+          if (epoch != null && slot != null) {
+            return TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), { epoch, slot });
+          }
+          console.warn('Failing to resolve absolute slot, bestblock info without epoch or slot: ', bestblockInfo);
+          return -1;
+        },
+        60_000, // 1 minute
+      );
+      this.absoluteSlotGetters[networkName] = absoluteSlotGetter;
+    }
+
+    const absoluteSlot = await absoluteSlotGetter();
+
+    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+      .readFlag(feature, networkName, absoluteSlot);
+  }
+
+  @computed get selected(): null | WalletState {
+    if (typeof this.selectedIndex === 'number') {
+      return this.wallets[this.selectedIndex];
+    }
+    return null;
+  }
+
+  @computed get selectedOrFail(): WalletState {
+    if (this.selected == null) {
+      throw new Error('A selected wallet is required!');
+    }
+    return this.selected;
   }
 
   @action
-  _baseAddNewWallet: RestoreWalletResponse => Promise<void> = async newWallet => {
-    // set the first created as the result
-    const newWithCachedData: Array<PublicDeriver<>> = [];
-    for (const newPublicDeriver of newWallet.publicDerivers) {
-      const withCache = await this.populateCacheForWallet(newPublicDeriver);
-      newWithCachedData.push(withCache);
-    }
-
+  _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
     this.showWalletCreatedNotification();
 
-    for (const pubDeriver of newWithCachedData) {
-      const lastSyncInfo = await pubDeriver.getLastSyncInfo();
-      this.registerObserversForNewWallet({
-        publicDeriver: pubDeriver,
-        lastSyncInfo,
-      });
-    }
-    for (const publicDeriver of newWithCachedData) {
-      this._queueWarningIfNeeded(publicDeriver);
-    }
+    this.registerObserversForNewWallet({
+      publicDeriver: newWallet,
+      lastSyncInfo: newWallet.lastSyncInfo,
+    });
+
     runInAction(() => {
-      this.publicDerivers.push(...newWithCachedData);
+      this.wallets.push(newWallet);
       this._setActiveWallet({
-        wallet: newWithCachedData[0],
+        publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.initialSyncingWalletIds.push(newWallet.publicDerivers[0].getPublicDeriverId());
+      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-      for (const publicDeriver of newWithCachedData) {
-        this._startParallelRefreshForWallet(publicDeriver);
-      }
     });
   };
 
@@ -203,262 +197,112 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.selected != null;
   }
 
-  @computed get selectedOrFail(): PublicDeriver<> {
-    if (this.selected == null) {
-      throw new Error('A selected wallet is required!');
-    }
-    return this.selected;
-  }
-
   @computed get activeWalletPlate(): ?WalletChecksum {
-    const selectedPublicDeriverId = this.selected?.publicDeriverId;
-    if (selectedPublicDeriverId != null) {
-      const selectedCache: ?PublicKeyCache = this.publicKeyCache
-        // $FlowFixMe[prop-missing]
-        .find(c => c.publicDeriver.publicDeriverId === selectedPublicDeriverId);
-      return selectedCache == null ? null : selectedCache.plate;
-    }
-    return null;
+    return this.selected?.plate;
   }
 
   @computed get hasLoadedWallets(): boolean {
     return this.getInitialWallets.wasExecuted;
   }
 
-  @computed get hasAnyWallets(): boolean {
-    if (!this.hasLoadedWallets) return false;
-    if (this.publicDerivers.length === 0) return false;
-    return this.publicDerivers.length > 0;
+  @computed get hasAnyWallets(): ?boolean {
+    if (!this.hasLoadedWallets) return undefined;
+    return this.wallets.length > 0;
   }
 
-  @computed get grouped(): Array<GroupedWallets> {
-    return groupWallets(this.publicDerivers);
+  refreshWalletFromRemote: (number) => Promise<void> = async _publicDeriverId => {
+    // legacy code, no-op now, to be removed
   }
-
-  refreshWalletFromRemote: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    try {
-      await this.stores.transactions.refreshTransactionData({
-        publicDeriver,
-        isLocalRequest: false,
-      });
-      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-    } catch (error) {
-      Logger.error(
-        `${nameof(WalletStore)}::${nameof(this.refreshWalletFromRemote)} ` + stringifyError(error)
-      );
-      throw error;
-    } finally {
-      runInAction(() => {
-        // $FlowFixMe[prop-missing] this is an mobx obervable.array so there is a remove method
-        this.initialSyncingWalletIds.remove(publicDeriver.getPublicDeriverId());
-      });
-    }
-  };
-
-  refreshWalletFromLocalOnLaunch: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    try {
-      await this.stores.transactions.refreshTransactionData({
-        publicDeriver,
-        isLocalRequest: true,
-      });
-      await this.stores.addresses.refreshAddressesFromDb(publicDeriver);
-    } catch (error) {
-      Logger.error(
-        `${nameof(WalletStore)}::${nameof(this.refreshWalletFromLocalOnLaunch)} ` +
-          stringifyError(error)
-      );
-      throw error;
-    }
-  };
 
   @action
-  addHwWallet: (PublicDeriver<>) => Promise<void> = async (
-    publicDeriver: PublicDeriver<>
-  ): Promise<void> => {
-    const lastSyncInfo = await publicDeriver.getLastSyncInfo();
-    const withCache = await this.populateCacheForWallet(publicDeriver);
-
+  addHwWallet: (WalletState) => Promise<void> = async (wallet): Promise<void> => {
     this.registerObserversForNewWallet({
-      publicDeriver: withCache,
-      lastSyncInfo,
+      publicDeriver: wallet,
+      lastSyncInfo: wallet.lastSyncInfo,
     });
-    this._queueWarningIfNeeded(withCache);
+
     runInAction(() => {
-      this.publicDerivers.push(withCache);
-      this.initialSyncingWalletIds.push(publicDeriver.getPublicDeriverId());
+      this.wallets.push(wallet);
+      this.initialSyncingWalletIds.add(wallet.publicDeriverId);
     });
-    this._startParallelRefreshForWallet(withCache);
   };
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(
-        `${nameof(this.restoreWalletsFromStorage)} db not loaded. Should never happen`
-      );
-    }
-    const result = await this.getInitialWallets.execute({
-      db: persistentDb,
-    }).promise;
+    const result = await this.getInitialWallets.execute().promise;
     if (result == null || result.length === 0) return;
 
-    const newWithCachedData: Array<PublicDeriver<>> = [];
-    for (const newPublicDeriver of result) {
-      const withCache = await this.populateCacheForWallet(newPublicDeriver);
-      newWithCachedData.push(withCache);
-    }
-    for (const publicDeriver of newWithCachedData) {
-      const lastSyncInfo = await publicDeriver.getLastSyncInfo();
+    for (const publicDeriver of result) {
       this.registerObserversForNewWallet({
         publicDeriver,
-        lastSyncInfo,
+        lastSyncInfo: publicDeriver.lastSyncInfo,
       });
+
+      this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     }
-    for (const publicDeriver of newWithCachedData) {
-      this._queueWarningIfNeeded(publicDeriver);
-    }
-    runInAction('refresh active wallet', () => {
-      if (this.selected == null && newWithCachedData.length === 1) {
-        this.actions.wallets.setActiveWallet.trigger({
-          wallet: newWithCachedData[0],
-        });
-      }
-      this.publicDerivers.push(...newWithCachedData);
+
+    runInAction(() => {
+      this.wallets.push(...result);
     });
-    setTimeout(async () => {
-      await Promise.all(newWithCachedData
-        .map(w => this.refreshWalletFromLocalOnLaunch(w)));
-      // This should correctly handle both states of `paralletSync`, both
-      // initially and when it changes.
-      // The initial case is straightforward.
-      // When change happens, i.e. when the action fires, the value of `parallelSync`
-      // has already been changed, so the new invocation of `_startRefreshAllWallets`
-      // should choose the correct mode. And the currently running polling loops
-      // (`_refreshAllWalletsSerial` for serial syncing,
-      // or `_startParallelRefreshForWallet` for parallel syncing)  should terminate
-      // when they see the `parallelSync` value change.
-      // There is no need to handle muliple simultaneous refreshing of one
-      // wallet because the TransactionStore ensures it couldn't happen.
-      this._startRefreshAllWallets();
-      this.actions.serverConnection.parallelSyncStateChange.listen(() => {
-        this._startRefreshAllWallets();
-      });
-      // todo: under the current architecture, the delay is required otherwise if we go to the send page
-      // immediately it would crash, but soon we will migrate to new architecture which allows for
-      // immediate transition
-      const { sellAdaParams } = this.stores.loading;
-      if (sellAdaParams) {
-        const { selected } = this;
-        if (!selected) {
-          throw new Error('unexpected');
-        }
-        const defaultToken = selected.getParent().getDefaultToken();
-        this.stores.loading.setUriParams({
-          address: sellAdaParams.addr,
-          amount: new MultiToken(
-            [{
-              identifier: defaultToken.defaultIdentifier,
-              networkId: defaultToken.defaultNetworkId,
-              amount: (new BigNumber(sellAdaParams.amount)).shiftedBy(6).decimalPlaces(0, 0/* ROUND_UP */),
-            }],
-            defaultToken,
-          ),
-        });
-        this.actions.router.goToRoute.trigger({
-          route: ROUTES.WALLETS.SEND,
-        });
-      }
-    }, 50); // let the UI render first so that the loading process is perceived faster
   };
 
   @action registerObserversForNewWallet: ({|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     lastSyncInfo: IGetLastSyncInfoResponse,
   |}) => void = request => {
     const { addresses, transactions, substores } = this.stores;
     addresses.addObservedWallet(request.publicDeriver);
-    transactions.addObservedWallet(request);
+    transactions.addObservedWallet(request.publicDeriver);
     const { time, delegation } = substores.ada;
+
     time.addObservedTime(request.publicDeriver);
-    if (asGetStakingKey(request.publicDeriver) != null) {
-      delegation.addObservedWallet(request.publicDeriver);
-      delegation.refreshDelegation(request.publicDeriver);
-    }
+
+    addresses.addObservedWallet(request.publicDeriver);
+
+    transactions.addObservedWallet(request.publicDeriver);
+
+    delegation.addObservedWallet(request.publicDeriver);
+    delegation.refreshDelegation(request.publicDeriver);
+
+    this.stores.walletSettings.walletWarnings.push({
+      publicDeriverId: request.publicDeriver.publicDeriverId,
+      dialogs: [],
+    });
+
+    this._queueWarningIfNeeded(request.publicDeriver);
+
+    this.stores.tokenInfoStore.refreshTokenInfo().catch(console.error);
   };
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| wallet: PublicDeriver<> |}) => void = ({ wallet }) => {
-    this.actions.profile.setSelectedNetwork.trigger(wallet.getParent().getNetworkInfo());
-    this.selected = wallet;
+  @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
+    const walletIndex = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
+    if (walletIndex === -1) {
+      throw new Error('unexpected missing wallet id');
+    }
+    this.actions.profile.setSelectedNetwork.trigger(
+      getNetworkById(this.wallets[walletIndex].networkId)
+    );
+    this.selectedIndex = walletIndex;
+    this.selectedWalletName = this.wallets[walletIndex].name;
     // Cache select wallet
-    this.api.localStorage.setSelectedWalletId(wallet.getPublicDeriverId());
-    // do not await on purpose since the UI will handle adding loaders while refresh is happening
-    this.refreshWalletFromRemote(wallet);
+    this.api.localStorage.setSelectedWalletId(publicDeriverId);
+    subscribe(publicDeriverId);
   };
 
-  getLastSelectedWallet: void => ?PublicDeriver<> = () => {
+  getLastSelectedWallet: void => ?WalletState = () => {
     const walletId = this.api.localStorage.getSelectedWalletId();
-    return this.publicDerivers.find(pd => pd.getPublicDeriverId() === walletId);
+    return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 
   @action _unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
-    this.selected = null;
+    this.selectedIndex = null;
+    this.selectedWalletName = null;
   };
 
   // =================== PRIVATE API ==================== //
-
-  _pollRefresh: void => Promise<void> = async () => {
-    // Do not update if screen not active
-    // TODO: use visibilityState instead
-    // Also no need to update if we are in parallel sync mode
-    if (!document.hidden && !this.stores.serverConnectionStore.parallelSync) {
-      const selected = this.selected;
-      if (selected) {
-        // note: don't need to await since UI will handle this
-        this.refreshWalletFromRemote(selected);
-      }
-    }
-  };
-
-  _startRefreshAllWallets: void => Promise<void> = async () => {
-    if (this.stores.serverConnectionStore.parallelSync) {
-      for (const publicDeriver of this.publicDerivers) {
-        this._startParallelRefreshForWallet(publicDeriver);
-      }
-    } else {
-      this._refreshAllWalletsSerial();
-    }
-  };
-  _refreshAllWalletsSerial: void => Promise<void> = async () => {
-    for (const publicDeriver of this.publicDerivers) {
-      if (this.stores.serverConnectionStore.parallelSync) {
-        return;
-      }
-      if (this.selected !== publicDeriver) {
-        try {
-          await this.refreshWalletFromRemote(publicDeriver);
-        } catch {
-          // ignore error
-        }
-      }
-    }
-    setTimeout(this._refreshAllWalletsSerial, this.WALLET_REFRESH_INTERVAL);
-  };
-  _startParallelRefreshForWallet: (PublicDeriver<>) => Promise<void> = async publicDeriver => {
-    if (!this.stores.serverConnectionStore.parallelSync) {
-      return;
-    }
-
-    await this.refreshWalletFromRemote(publicDeriver);
-
-    setTimeout(
-      this._startParallelRefreshForWallet.bind(this, publicDeriver),
-      this.WALLET_REFRESH_INTERVAL
-    );
-  };
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
@@ -477,64 +321,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.actions.notifications.open.trigger(WalletCreationNotifications.WalletRestoredNotification);
   };
 
-  // TODO: maybe delete this function and turn it into another "addObservedWallet"
-  populateCacheForWallet: (PublicDeriver<>) => Promise<PublicDeriver<>> = async publicDeriver => {
-    // $FlowFixMe[incompatible-call]
-    const withPubKey = asGetPublicKey(publicDeriver);
-
-    if (withPubKey != null) {
-      const publicKey = await withPubKey.getPublicKey();
-      if (publicKey.IsEncrypted) {
-        throw new Error(`${nameof(this.populateCacheForWallet)} unexpected encrypted public key`);
-      }
-      const checksum = await getWalletChecksum(withPubKey);
-      if (checksum != null) {
-        runInAction(() => {
-          this.publicKeyCache.push({
-            publicDeriver: withPubKey,
-            plate: checksum,
-            publicKey: publicKey.Hash,
-          });
-        });
-      }
-    }
-
-    const publicDeriverInfo = await publicDeriver.getFullPublicDeriverInfo();
-    const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
-
-    {
-      const withSigningKey = asGetSigningKey(publicDeriver);
-      if (withSigningKey) {
-        const key = await withSigningKey.getSigningKey();
-        runInAction(() => {
-          this.signingKeyCache.push({
-            publicDeriver: withSigningKey,
-            signingKeyUpdateDate: key.row.PasswordLastUpdate,
-          });
-        });
-      }
-    }
-    runInAction(() => {
-      this.stores.walletSettings.publicDeriverSettingsCache.push({
-        publicDeriver,
-        assuranceMode: assuranceModes.NORMAL,
-        publicDeriverName: publicDeriverInfo.Name,
-      });
-      this.stores.walletSettings.conceptualWalletSettingsCache.push({
-        conceptualWallet: publicDeriver.getParent(),
-        conceptualWalletName: conceptualWalletInfo.Name,
-      });
-      this.stores.walletSettings.walletWarnings.push({
-        publicDeriver,
-        dialogs: [],
-      });
-    });
-
-    return publicDeriver;
-  };
-
   @action
-  _queueWarningIfNeeded: (PublicDeriver<>) => void = publicDeriver => {
+  _queueWarningIfNeeded: (WalletState) => void = publicDeriver => {
     if (environment.isTest()) return;
     if (!environment.isProduction()) return;
 
@@ -550,37 +338,36 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       'SKBE-5478',
       'SHHN-6941', // mobile debug restore
     ];
-    const withPubKey = asGetPublicKey(publicDeriver);
-    if (withPubKey != null) {
-      const { plate } = this.getPublicKeyCache(withPubKey);
-      const existingWarnings = this.stores.walletSettings.getWalletWarnings(publicDeriver);
-      // bring this back if we ever need it. Removing this code deletes the i18n strings.
-      // eslint-disable-next-line no-constant-condition
-      if (false) {
-        existingWarnings.dialogs.push(
-          createProblematicWalletDialog(
-            plate.TextPart,
-            action(() => {
-              existingWarnings.dialogs.pop();
-            }),
-          )
-        );
-      }
-      if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
-        existingWarnings.dialogs.push(
-          createDebugWalletDialog(
-            plate.TextPart,
-            action(() => {
-              existingWarnings.dialogs.pop();
-            }),
-          )
-        );
-      }
+
+    const { plate } = publicDeriver;
+    const existingWarnings = this.stores.walletSettings.getWalletWarnings(publicDeriver.publicDeriverId);
+    // bring this back if we ever need it. Removing this code deletes the i18n strings.
+    // eslint-disable-next-line no-constant-condition
+    if (false) {
+      existingWarnings.dialogs.push(
+        createProblematicWalletDialog(
+          plate.TextPart,
+          action(() => {
+            existingWarnings.dialogs.pop();
+          }),
+        )
+      );
+    }
+    if (debugWalletChecksums.find(elem => elem === plate.TextPart) != null) {
+      existingWarnings.dialogs.push(
+        createDebugWalletDialog(
+          plate.TextPart,
+          action(() => {
+            existingWarnings.dialogs.pop();
+          }),
+        )
+      );
     }
   };
 
   sendAndRefresh: ({|
-    publicDeriver: void | PublicDeriver<>,
+    publicDeriverId: void | number,
+    plateTextPart: void | string,
     broadcastRequest: void => Promise<{| txId: string |}>,
     refreshWallet: () => Promise<void>,
   |}) => Promise<{| txId: string |}> = async request => {
@@ -588,12 +375,13 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     const tx = await this.sendMoneyRequest.execute(async () => {
       const result = await request.broadcastRequest();
 
-      if (request.publicDeriver != null) {
+      if (request.publicDeriverId != null) {
         const memo = this.stores.transactionBuilderStore.memo;
-        if (memo !== '' && memo !== undefined) {
+        if (memo !== '' && memo !== undefined && request.plateTextPart) {
           try {
             await this.actions.memos.saveTxMemo.trigger({
-              publicDeriver: request.publicDeriver,
+              publicDeriverId: request.publicDeriverId,
+              plateTextPart: request.plateTextPart,
               memo: {
                 Content: memo,
                 TransactionHash: result.txId,
@@ -621,8 +409,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return tx;
   };
 
-  isInitialSyncing: (PublicDeriver<>) => boolean = (publicDeriver) => {
-    return this.initialSyncingWalletIds.includes(publicDeriver.getPublicDeriverId());
+  isInitialSyncing: (number) => boolean = (publicDeriverId) => {
+    return this.initialSyncingWalletIds.has(publicDeriverId);
+  }
+
+  @action onRenameSelectedWallet: (string) => void = (newName) => {
+    this.selectedWalletName = newName;
   }
 }
 

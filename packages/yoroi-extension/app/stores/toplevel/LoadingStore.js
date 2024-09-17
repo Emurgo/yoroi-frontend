@@ -15,7 +15,6 @@ import type { StoresMap } from '../index';
 import {
   TabIdKeys,
 } from '../../utils/tabManager';
-import type { lf$Database } from 'lovefield';
 
 type SellAdaParamsType = {|
   addr: string,
@@ -141,9 +140,5 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
   getTabIdKey(): string {
     return TabIdKeys.Primary;
-  }
-
-  getDatabase(): ?lf$Database {
-    return this.loadPersistentDbRequest.result;
   }
 }

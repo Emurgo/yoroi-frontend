@@ -22,7 +22,15 @@ import { ReactComponent as NoTransactionModernSvg } from '../../assets/images/tr
 import { hiddenAmount } from '../../utils/strings';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_low,
+    },
+  },
+}));
 
 const messages = defineMessages({
   generatedAddressesSectionTitle: {
@@ -82,7 +90,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-  locationId: string = 'wallet:receive:infoPanel:footer'
+  locationId: string = 'wallet:receive:infoPanel:footer';
 
   getAmount: TokenEntry => ?Node = tokenEntry => {
     if (this.props.shouldHideBalance) {
@@ -92,18 +100,14 @@ export default class WalletReceiveRevamp extends Component<Props> {
 
     const shiftedAmount = tokenEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      tokenInfo.Metadata.numberOfDecimals
-    );
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
     // recall: can't be negative in this situation
     const adjustedBefore = '+' + beforeDecimalRewards;
 
     return (
       <>
         {adjustedBefore}
-        <span className={styles.afterDecimal}>{afterDecimalRewards}</span>{' '}
-        {truncateToken(getTokenName(tokenInfo))}
+        <span className={styles.afterDecimal}>{afterDecimalRewards}</span> {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   };
@@ -126,28 +130,18 @@ export default class WalletReceiveRevamp extends Component<Props> {
       <Typography
         component="div"
         variant="body1"
-        color="grayscale.900"
+        color="ds.text_gray_medium"
         textAlign="right"
         id={this.locationId + ':addressRow_' + rowIndex + '-adaAmount-text'}
       >
-        {address.values != null ? (
-          <span>{this.getAmount(address.values.getDefaultEntry())}</span>
-        ) : (
-          '-'
-        )}
+        {address.values != null ? <span>{this.getAmount(address.values.getDefaultEntry())}</span> : '-'}
       </Typography>
     );
     return { header, body };
   };
 
   render(): Node {
-    const {
-      walletAddresses,
-      onVerifyAddress,
-      onGeneratePaymentURI,
-      onCopyAddressTooltip,
-      notification,
-    } = this.props;
+    const { walletAddresses, onVerifyAddress, onGeneratePaymentURI, onCopyAddressTooltip, notification } = this.props;
     const { intl } = this.context;
     const valueBlock = this.getValueBlock();
     const walletReceiveContent = (
@@ -204,9 +198,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   selectedExplorer={this.props.selectedExplorer}
                   hash={address.address}
                   light={address.isUsed === true}
-                  linkType={
-                    address.type === CoreAddressTypes.CARDANO_REWARD ? 'stakeAddress' : 'address'
-                  }
+                  linkType={address.type === CoreAddressTypes.CARDANO_REWARD ? 'stakeAddress' : 'address'}
                 >
                   <RawHash light={address.isUsed === true}>
                     <Typography component="div" variant="body1" color="grayscale.900">
@@ -234,7 +226,9 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   >
                     <div className={styles.generateURLActionBlock}>
                       <span className={styles.generateURIIcon}>
-                        <GenerateURIIcon />
+                        <IconWrapper>
+                          <GenerateURIIcon />
+                        </IconWrapper>
                       </span>
                     </div>
                   </button>
@@ -248,14 +242,12 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   justifyContent: 'flex-end',
                 }}
               >
-                <button
-                  type="button"
-                  onClick={onVerifyAddress.bind(this, address)}
-                  id={rowLocationId + '-verifyAddress-button'}
-                >
+                <button type="button" onClick={onVerifyAddress.bind(this, address)} id={rowLocationId + '-verifyAddress-button'}>
                   <div>
-                    <span className={styles.verifyIcon}>
-                      <VerifyIcon />
+                    <span>
+                      <IconWrapper>
+                        <VerifyIcon />
+                      </IconWrapper>
                     </span>
                   </div>
                 </button>

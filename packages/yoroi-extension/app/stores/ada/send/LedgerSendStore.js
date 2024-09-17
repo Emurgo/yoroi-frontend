@@ -10,7 +10,6 @@ import Store from '../../base/Store';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import { PublicDeriver } from '../../../api/ada/lib/storage/models/PublicDeriver/index';
 import type {
   SendUsingLedgerParams
 } from '../../../actions/ada/ledger-send-actions';
@@ -32,10 +31,6 @@ import {
 import { LedgerConnect } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { asGetPublicKey, asHasLevels, } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
-import {
-  ConceptualWallet
-} from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type {
   Addressing,
@@ -47,6 +42,8 @@ import {
   generateRegistrationMetadata,
   generateCip15RegistrationMetadata,
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
+import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
+import { broadcastTransaction } from '../../../api/thunk';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -65,7 +62,8 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       // drop the return type
       async (request) => {
         await this.stores.wallets.sendAndRefresh({
-          publicDeriver: undefined,
+          publicDeriverId: undefined,
+          plateTextPart: undefined,
           broadcastRequest: async () => await this.signAndBroadcast(request),
           refreshWallet: async () => {}
         })
@@ -94,8 +92,17 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
   _sendWrapper: {|
     params: SendUsingLedgerParams,
-    publicDeriver: PublicDeriver<>,
     onSuccess?: void => void,
+    +wallet: {
+      publicDeriverId: number,
+      stakingAddressing: Addressing,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      +plate: { TextPart: string, ... },
+      ...
+    },
   |} => Promise<void> = async (request) => {
     try {
       if (this.isActionProcessing) {
@@ -114,10 +121,10 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         broadcastRequest: {
           ledger: {
             signRequest,
-            publicDeriver: request.publicDeriver,
+            wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
@@ -141,40 +148,39 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     params: {|
       signRequest: HaskellShelleyTxSignRequest,
     |},
-    publicDeriver: PublicDeriver<>,
+    +wallet: {
+      publicDeriverId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
 
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-      if (withLevels == null) {
-        throw new Error(`${nameof(this.signAndBroadcast)} No public deriver level for this public deriver`);
-      }
-
-      const withPublicKey = asGetPublicKey(withLevels);
-      if (withPublicKey == null) throw new Error(`${nameof(this.signAndBroadcast)} No public key for this public deriver`);
-      const publicKey = await withPublicKey.getPublicKey();
-
       const publicKeyInfo = {
         key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(publicKey.Hash, 'hex')
+          Buffer.from(request.wallet.publicKey, 'hex')
         ),
         addressing: {
           startLevel: 1,
-          path: withLevels.getPathToPublic(),
+          path: request.wallet.pathToPublic,
         },
       };
 
-      const expectedSerial = request.publicDeriver.getParent().hardwareInfo?.DeviceId || '';
+      const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
       return this.signAndBroadcast({
         ...request.params,
         publicKey: publicKeyInfo,
-        publicDeriver: request.publicDeriver,
+        publicDeriverId: request.wallet.publicDeriverId,
         addressingMap: genAddressingLookup(
-          request.publicDeriver,
+          request.wallet.networkId,
           this.stores.addresses.addressSubgroupMap
         ),
         expectedSerial,
+        networkId: request.wallet.networkId,
       });
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
@@ -189,7 +195,8 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       ...Addressing,
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    publicDeriver: PublicDeriver<>,
+    publicDeriverId: number,
+    networkId: number,
     expectedSerial: string | void,
   |} => Promise<{| txId: string |}> = async (request) => {
     let ledgerConnect: ?LedgerConnect;
@@ -209,7 +216,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         cip36 = getVersionResponse.compatibility.supportsCIP36Vote === true;
       }
 
-      const network = request.publicDeriver.getParent().getNetworkInfo();
+      const network = getNetworkById(request.networkId);
 
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
@@ -295,26 +302,12 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         metadata,
       );
 
-      await this.api.ada.broadcastLedgerSignedTx({
-        signedTxRequest: {
-          network,
-          id: txId,
-          encodedTx: signedTx.to_bytes(),
-        },
-        sendTx: this.stores.substores.ada.stateFetchStore.fetcher.sendTx,
+      await broadcastTransaction({
+        publicDeriverId: request.publicDeriverId,
+        signedTxHex: signedTx.to_hex(),
       });
 
-      Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-
-      await this.stores.substores.ada.transactions.recordSubmittedTransaction(
-        request.publicDeriver,
-        request.signRequest,
-        txId,
-      );
-
-      return {
-        txId,
-      };
+      return { txId };
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

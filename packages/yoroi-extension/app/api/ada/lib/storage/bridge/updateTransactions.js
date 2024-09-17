@@ -194,8 +194,8 @@ async function rawGetAllTxIds(
     derivationTables,
   );
 
-  const utxoAddressIds = utxoAddresses.map(row => row.AddressId);
-  const accountingAddressIds = accountingAddresses.map(row => row.AddressId);
+  const utxoAddressIds = utxoAddresses.map(row => row.address.AddressId);
+  const accountingAddressIds = accountingAddresses.map(row => row.address.AddressId);
 
   const certificateTransactions = await deps.GetCertificates.forAddress(db, dbTx, {
     addressIds: [
@@ -216,8 +216,8 @@ async function rawGetAllTxIds(
   return {
     txIds,
     addresses: {
-      utxoAddresses,
-      accountingAddresses,
+      utxoAddresses: utxoAddresses.map(a => a.address),
+      accountingAddresses: accountingAddresses.map(a => a.address),
     },
   };
 }
@@ -236,15 +236,14 @@ export async function rawGetTransactions(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
     GetCertificates: Class<GetCertificates>,
   |},
-  request: {|
+  request: {
     publicDeriver: IPublicDeriver<ConceptualWallet>,
     getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{|
       Block: null | $ReadOnly<BlockRow>,
       Transaction: $ReadOnly<TransactionRow>,
     |}>>,
-    skip?: number,
-    limit?: number,
-  |},
+    ...
+  },
   derivationTables: Map<number, string>,
 ): Promise<{|
   addressLookupMap: Map<number, string>,
@@ -1228,8 +1227,8 @@ async function rollback(
     { publicDeriver: request.publicDeriver },
     derivationTables,
   );
-  const utxoAddressIds = utxoAddresses.map(address => address.AddressId);
-  const accountingAddressIds = accountingAddresses.map(address => address.AddressId);
+  const utxoAddressIds = utxoAddresses.map(a => a.address.AddressId);
+  const accountingAddressIds = accountingAddresses.map(a => a.address.AddressId);
   const txIds = Array.from(new Set([
     ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
       db, dbTx, { addressIds: accountingAddressIds },
@@ -3054,7 +3053,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepRegistration,
+            Kind: RustModule.WalletV4.CertificateKind.DRepRegistration,
             Payload: '',
             TransactionId: txId,
           },
@@ -3066,7 +3065,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepDeregistration,
+            Kind: RustModule.WalletV4.CertificateKind.DRepDeregistration,
             Payload: '',
             TransactionId: txId,
           },
@@ -3078,7 +3077,7 @@ async function certificateToDb(
         result.push((txId: number) => ({
           certificate: {
             Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.DrepUpdate,
+            Kind: RustModule.WalletV4.CertificateKind.DRepUpdate,
             Payload: '',
             TransactionId: txId,
           },
@@ -3134,7 +3133,10 @@ async function rawUpdateUtxos(
   utxoStorageApi.setDb(db);
   utxoStorageApi.setDbTx(dbTx);
 
-  const requestAddresses = toRequestAddresses(addresses);
+  const requestAddresses = toRequestAddresses({
+    utxoAddresses: addresses.utxoAddresses.map(a => a.address),
+    accountingAddresses: addresses.accountingAddresses.map(a => a.address),
+  });
   if (compareAndSetIfNewAddressSetHash(publicDeriver.getPublicDeriverId(), requestAddresses)) {
     await utxoStorageApi.clearUtxoState();
   }

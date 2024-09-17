@@ -3,9 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import {
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import type { ConfigType } from '../../../config/config-types';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
@@ -13,6 +10,7 @@ import TransferSendPage from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -34,15 +32,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
-    const withChains = asHasUtxoChains(selected);
-    if (withChains == null) {
-      throw new Error(`${nameof(UnmangleTxDialogContainer)} no chains`);
-    }
 
     const getAddresses = (clazz) => {
       const entries = this.props.stores.addresses.addressSubgroupMap.get(clazz)?.all ?? [];
       const payloadList = entries.map(
-        info => getAddressPayload(info.address, selected.getParent().getNetworkInfo())
+        info => getAddressPayload(info.address, getNetworkById(selected.networkId))
       );
       return new Set(payloadList);
     };
@@ -50,11 +44,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
 
     const filter = getMangledFilter(
       getAddresses,
-      selected,
+      selected.networkId,
     );
     // note: don't await
     this.props.actions.txBuilderActions.initialize.trigger({
-      publicDeriver: withChains,
+      publicDeriver: selected,
       /**
        * We filter to only UTXOs of mangled addresses
        * this ensures that the tx fee is also paid by a UTXO of a mangled address

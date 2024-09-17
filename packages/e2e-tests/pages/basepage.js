@@ -8,13 +8,16 @@ import {
   getSnapshotObjectFromJSON,
   isFirefox,
   isChrome,
+  isMacOS,
 } from '../utils/utils.js';
 import { getExtensionUrl } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
   defaultWaitTimeout,
+  fiveSeconds,
   halfSecond,
   oneSecond,
+  quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
 
@@ -50,13 +53,13 @@ class BasePage {
   }
   async goToExtension() {
     this.logger.info('BasePage::goToExtension is called');
-    await this.driver.manage().setTimeouts({ implicit: halfSecond });
+    await this.setImplicitTimeout(halfSecond, this.goToExtension.name);
 
     const extURL = getExtensionUrl();
     await this.driver.get(extURL);
     await this.waitForElementLocated(this.rootLocator);
 
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtension.name);
   }
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
@@ -93,8 +96,13 @@ class BasePage {
   }
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
-    const locatorElem = await this.waitForElement(locator);
-    return await locatorElem.getText();
+    return await this.waitPresentedAndAct(
+      locator,
+      async () => {
+        const locatorElem = await this.findElement(locator);
+        return await locatorElem.getText();
+      }
+    );
   }
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(
@@ -160,7 +168,7 @@ class BasePage {
   }
   async inputElem(webElement, value) {
     this.logger.info(
-      `BasePage::inputElem is called. WebElement: ${JSON.stringify(webElement)}, Value: ${value}`
+      `BasePage::inputElem is called. Value: ${value}`
     );
     await webElement.sendKeys(value);
   }
@@ -185,10 +193,14 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
-    await input.sendKeys(Key.chord(Key.COMMAND, 'a'));
+    await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
     await this.sleep(200);
     await input.sendKeys(Key.NULL);
-    await input.sendKeys(Key.BACK_SPACE);
+    await input.sendKeys(Key.DELETE);
+  }
+  async setImplicitTimeout(timeoutMs, functionName) {
+    this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
+    await this.driver.manage().setTimeouts({ implicit: timeoutMs });
   }
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
@@ -240,6 +252,18 @@ class BasePage {
       await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
     }
   }
+  async getDriverLogs(testSuiteName, logFileName) {
+    this.logger.info(`BasePage::getDriverLogs is called.`);
+    const testRundDataDir = createTestRunDataDir(testSuiteName);
+    const cleanName = logFileName.replace(/ /gi, '_');
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogEntries = await this.driver
+      .manage()
+      .logs()
+      .get(logging.Type.DRIVER, logging.Level.INFO);
+    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
+    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
+  }
   async waitForElementLocated(locator) {
     this.logger.info(
       `BasePage::waitForElementLocated is called. Value: ${JSON.stringify(locator)}`
@@ -249,8 +273,7 @@ class BasePage {
   }
   async waitForElement(locator) {
     this.logger.info(`BasePage::waitForElement is called. Value: ${JSON.stringify(locator)}`);
-    await this.waitForElementLocated(locator);
-    const element = await this.findElement(locator);
+    const element = await this.waitForElementLocated(locator);
     return await this.driver.wait(until.elementIsVisible(element));
   }
   async waitEnable(locator) {
@@ -258,6 +281,19 @@ class BasePage {
     const element = await this.findElement(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
+  }
+  async buttonIsEnabled(locator) {
+    this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
+    const buttonIsEnabled = await this.customWaiter(
+      async () => {
+        const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
+        return buttonlIsEnabled === null;
+      },
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return buttonIsEnabled;
   }
   async waitDisabled(locator) {
     this.logger.info(`BasePage::waitDisabled is called. Value: ${JSON.stringify(locator)}`);
@@ -291,18 +327,18 @@ class BasePage {
   ) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.customWaiter.name);
 
     while (endTime >= Date.now()) {
       const conditionState = await conditionFunc();
       this.logger.info(`BasePage::customWaiter conditionState is ${conditionState}.`);
       if (conditionState) {
-        await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+        await this.setImplicitTimeout(defaultWaitTimeout, this.customWaiter.name);
         return true;
       }
       await this.sleep(repeatPeriod);
     }
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.customWaiter.name);
     return false;
   }
   async customWaitIsPresented(
@@ -314,12 +350,50 @@ class BasePage {
     const result = await this.customWaiter(
       async () => {
         const elemsPresented = await this.findElements(locator);
-        return elemsPresented === 1;
+        return elemsPresented.length === 1;
       },
       timeout,
       repeatPeriod
     );
     return result;
+  }
+  async customWaitIsNotPresented(
+    locator,
+    timeout = defaultWaitTimeout,
+    repeatPeriod = defaultRepeatPeriod
+  ) {
+    this.logger.info(`BasePage::customWaitIsNotPresented is called.`);
+    const result = await this.customWaiter(
+      async () => {
+        const elemsPresented = await this.findElements(locator);
+        return elemsPresented.length === 0;
+      },
+      timeout,
+      repeatPeriod
+    );
+    return result;
+  }
+  /**
+   * The function wait until the passed element is found and call the passed function
+   * @param {{locator: string, method: id}} locator Element locator
+   * @param {object} funcToCall A function that should be called when the element is found
+   * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
+   * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
+   * @returns {Promise<any>}
+   */
+  async waitPresentedAndAct(
+    locator,
+    funcToCall,
+    timeout = fiveSeconds,
+    repeatPeriod = quarterSecond
+  ) {
+    this.logger.info(`BasePage::waitPresentedAndAct is called. Locator: '${locator.locator}'`);
+    const elemState = await this.customWaitIsPresented(locator, timeout, repeatPeriod);
+    if (elemState) {
+      return await funcToCall();
+    } else {
+      throw new Error(`The element is not found. Element: ${locator.locator}`);
+    }
   }
   async sleep(milliseconds) {
     this.logger.info(`BasePage::sleep is called. Value: ${milliseconds}`);
@@ -329,18 +403,18 @@ class BasePage {
     this.logger.info(
       `BasePage::checkIfExists: Checking if element exists "${JSON.stringify(locator)}"`
     );
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.checkIfExists.name);
     try {
       await this.findElement(locator);
       this.logger.info(`BasePage::checkIfExists: The element "${JSON.stringify(locator)}" exists`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+      await this.setImplicitTimeout(defaultWaitTimeout, this.checkIfExists.name);
       return true;
     } catch (error) {
       this.logger.error(
         `BasePage::checkIfExists: The element "${JSON.stringify(locator)}" does not exists`
       );
       this.logger.error(`BasePage::checkIfExists: The error: ${JSON.stringify(error, null, 2)}`);
-      await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+      await this.setImplicitTimeout(defaultWaitTimeout, this.checkIfExists.name);
       return false;
     }
   }
@@ -356,32 +430,38 @@ class BasePage {
   }
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
-    this.logger.info(`Webdriver::getInfoFromIndexedDB Table name "${tableName}"`);
+    this.logger.info(`BasePage::getInfoFromIndexedDB Table name "${tableName}"`);
     let result;
     if (isFirefox()) {
       result = await this.getInfoFromIndexedDBFF(tableName);
+    } else {
+      result = await this.getInfoFromIndexedDBChrome(tableName);
     }
-    result = await this.getInfoFromIndexedDBChrome(tableName);
-    this.logger.info(`Webdriver::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
+    this.logger.info(`BasePage::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
     return result;
   }
   async getInfoFromIndexedDBFF(tableName) {
+    this.logger.info(`BasePage::getInfoFromIndexedDBFF Table name "${tableName}"`);
     await this.driver.executeScript(
-      (dbName, table) => {
+      (table) => {
+        const dbName = 'yoroi-schema';
         const dbRequest = window.indexedDB.open(dbName);
         dbRequest.onsuccess = function (event) {
           const db = event.target.result;
-          const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).getAll();
+          // without that it doesn't work
+          window.dataBase = db;
+          const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).mozGetAll();
           tableContentRequest.onsuccess = function (event) {
             window.tableData = event.target.result;
           };
         };
       },
-      'yoroi-schema',
       tableName
     );
     let tableContent;
     try {
+      // without that it doesn't work
+      await this.driver.executeScript(() => window.dataBase);
       tableContent = await this.driver.executeScript(() => window.tableData);
     } catch (error) {
       this.webDriverLogger.warn(error);
@@ -490,6 +570,37 @@ class BasePage {
     }
   }
 
+  async setInfoToIndexedDBFirefox(tableName, value) {
+    this.logger.info(`BasePage::setInfoToIndexedDBFirefox is called for the table ${tableName}.`);
+    for (const valueItem of value) {
+      await this.driver.executeScript(
+        (dbName, tableName, valueItem) => {
+          const dbRequest = window.indexedDB.open(dbName);
+          dbRequest.onsuccess = function (event) {
+            const db = event.target.result;
+            const tableContentRequest = db
+              .transaction(tableName, 'readwrite')
+              .objectStore(tableName)
+              .put(valueItem);
+            tableContentRequest.onsuccess = function (event) {
+              console.log(`--> Tx is success.`);
+              console.log(`--> Tx result: ${event.target.result}`);
+            };
+            tableContentRequest.oncomplete = function (event) {
+              console.log(`--> Tx is complete. Result: ${event.target.result}`);
+            };
+            tableContentRequest.onerror = function (event) {
+              console.log('-----> Error happend:', event.target.result);
+            };
+          };
+        },
+        'yoroi-schema',
+        tableName,
+        valueItem,
+      );
+    }
+  }
+
   async setInfoToIndexedDBChrome(tableName, value) {
     this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
     this.driver.executeScript(() => {
@@ -529,34 +640,36 @@ class BasePage {
     }
   }
 
-  async getInfoChromeLocalStorage(key) {
-    this.logger.info(`BasePage::getInfoChromeLocalStorage is called. Key: "${key}"`);
+  async getInfoBrowserLocalStorage(key) {
+    this.logger.info(`BasePage::getInfoBrowserLocalStorage is called. Key: "${key}"`);
     this.driver.executeScript(
       `await chrome.storage.local.get('${key}', function (result) {window.someKeyValue = result})`
     );
     const result = await this.driver.executeScript(() => window.someKeyValue);
-    this.logger.info(`BasePage::getInfoChromeLocalStorage::result ${JSON.stringify(result)}`);
+    this.logger.info(`BasePage::getInfoBrowserLocalStorage::result ${JSON.stringify(result)}`);
     return result;
   }
 
-  async setInfoChromeLocalStorage(key, value) {
+  async setInfoBrowserLocalStorage(key, value) {
     this.logger.info(
       `BasePage::setInfoChromeLocalStorage is called. Key: "${key}", value: "${value}"`
     );
-    await this.driver.executeScript(`await chrome.storage.local.set({ "${key}": "${value}" })`);
+    await this.driver.executeScript(`chrome.storage.local.set({ "${key}": "${value}" })`);
   }
 
   async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
     for (const dbKey in dbSnapshot) {
-      await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
+      isFirefox()
+        ? await this.setInfoToIndexedDBFirefox(dbKey, dbSnapshot[dbKey])
+        : await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
-    const chromeStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.chromeLocalStorage.json`;
-    const chromeStorageSnapshot = getSnapshotObjectFromJSON(chromeStorageFileName);
-    for (const storageKey in chromeStorageSnapshot) {
-      await this.setInfoChromeLocalStorage(storageKey, chromeStorageSnapshot[storageKey]);
+    const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName);
+    for (const storageKey in browserStorageSnapshot) {
+      await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
     // set info into regular storage
     const commonStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.localStorage.json`;
