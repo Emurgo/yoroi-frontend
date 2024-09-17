@@ -94,8 +94,6 @@ export async function createLedgerSignTxPayload(request: {|
     ));
   }
 
-  const ttl = txBody.ttl();
-
   let auxiliaryData = undefined;
   if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
     const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } =
@@ -165,7 +163,8 @@ export async function createLedgerSignTxPayload(request: {|
     tx: {
       inputs: ledgerInputs,
       outputs: ledgerOutputs,
-      ttl: ttl === undefined ? ttl : ttl.toString(),
+      ttl: txBody.ttl_bignum()?.to_str() ?? null,
+      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       fee: txBody.fee().to_str(),
       network: {
         networkId: request.networkId,
@@ -174,9 +173,12 @@ export async function createLedgerSignTxPayload(request: {|
       withdrawals: ledgerWithdrawal.length === 0 ? null : ledgerWithdrawal,
       certificates: ledgerCertificates.length === 0 ? null : ledgerCertificates,
       auxiliaryData,
-      validityIntervalStart: undefined,
+      scriptDataHashHex: txBody.script_data_hash()?.to_hex() ?? null,
     },
     additionalWitnessPaths: [],
+    options: {
+      tagCborSets: false,
+    }
   };
 }
 
@@ -275,10 +277,13 @@ function _transformToLedgerOutputs(request: {|
 |}): Array<TxOutput> {
   const result = [];
 
+  // <TODO:UPDATE> support post-alonzo map
+
   for (let i = 0; i < request.txOutputs.len(); i++) {
     const output = request.txOutputs.get(i);
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
+    const datumHashHex = output.data_hash()?.to_hex() ?? null;
 
     const changeAddr = request.changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
@@ -296,6 +301,7 @@ function _transformToLedgerOutputs(request: {|
           type: TxOutputDestinationType.DEVICE_OWNED,
           params: addressParams,
         },
+        datumHashHex,
       });
     } else {
       result.push({
@@ -306,7 +312,8 @@ function _transformToLedgerOutputs(request: {|
           params: {
             addressHex: Buffer.from(address.to_bytes()).toString('hex'),
           },
-        }
+        },
+        datumHashHex,
       });
     }
   }
@@ -785,7 +792,6 @@ export function buildSignedTransaction(
     mergeWitnessSets(tx.witness_set().to_hex(), witSet.to_hex())
   );
 
-  // TODO: handle script witnesses
   return RustModule.WalletV4.Transaction.new(
     tx.body(),
     mergedWitnessSet,
@@ -1120,11 +1126,11 @@ export function toLedgerSignRequest(
       inputs: formatInputs(txBody.inputs()),
       outputs,
       fee: txBody.fee().to_str(),
-      ttl: txBody.ttl(),
+      ttl: txBody.ttl_bignum()?.to_str() ?? null,
+      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       certificates: formattedCertificates,
       withdrawals: formattedWithdrawals,
       auxiliaryData: formattedAuxiliaryData,
-      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       mint: JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(
         ([policyIdHex, assets]) => ({
           policyIdHex,

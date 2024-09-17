@@ -372,7 +372,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     refreshWallet: () => Promise<void>,
   |}) => Promise<{| txId: string |}> = async request => {
     this.sendMoneyRequest.reset();
-    const tx = await this.sendMoneyRequest.execute(async () => {
+    const resp = await this.sendMoneyRequest.execute(async () => {
       const result = await request.broadcastRequest();
 
       if (request.publicDeriverId != null) {
@@ -405,8 +405,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       return result;
     }).promise;
-    if (tx == null) throw new Error(`Should never happen`);
-    return tx;
+    if (resp == null) throw new Error(`Should never happen`);
+    return resp;
   };
 
   isInitialSyncing: (number) => boolean = (publicDeriverId) => {

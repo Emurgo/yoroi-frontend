@@ -282,9 +282,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     const isPasswordError = e instanceof IncorrectWalletPasswordError;
     runInAction(() => {
       txSubmitErrorState.update(e);
-      if (!isPasswordError) {
-        setOrderStepValue(1);
-      }
+      setOrderStepValue(isPasswordError ? 1 : 2);
     });
     if (!isPasswordError) {
       console.error('Failed to submit swap tx', e);

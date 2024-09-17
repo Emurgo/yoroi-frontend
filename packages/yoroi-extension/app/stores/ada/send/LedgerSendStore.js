@@ -44,6 +44,7 @@ import {
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
+import { transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
 
 /** Note: Handles Ledger Signing */
 export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
@@ -218,6 +219,9 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       const network = getNetworkById(request.networkId);
 
+      const tx = request.signRequest.self().build_tx();
+      const txId = transactionHexToHash(tx.to_hex());
+
       const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network,
@@ -292,8 +296,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         request.signRequest.self().set_auxiliary_data(metadata);
       }
 
-      const tx = request.signRequest.self().build_tx();
-      const txId = Buffer.from(RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()).toString('hex');
       const signedTx = buildSignedTransaction(
         tx,
         request.signRequest.senderUtxos,
