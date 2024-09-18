@@ -75,7 +75,6 @@ const getAssetWalletAssetList = (stores: any) => {
     }))
     .filter((item: any) => item.info.IsNFT === false)
     .map((token: any) => {
-      console.log('token', token);
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
