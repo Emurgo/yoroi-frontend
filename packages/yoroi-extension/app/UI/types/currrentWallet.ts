@@ -49,6 +49,7 @@ export type CurrentWalletType = {
   submitedTransactions: any[]; // Define the structure of transactions if needed
   backendService: string;
   backendServiceZero: string;
+  stakingAddress: string;
   isHardwareWallet: boolean;
   primaryTokenInfo: PrimaryTokenInfo;
   walletBalance: WalletBalance;

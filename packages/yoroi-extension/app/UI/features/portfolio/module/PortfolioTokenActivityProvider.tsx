@@ -77,7 +77,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       // fetch1m(state.secondaryTokenIds);
     }
   }, [state.secondaryTokenIds, fetch24h]);
-  console.log('@@@@', data24h);
+
   React.useEffect(() => {
     if (data24h) {
       console.log('data24h', data24h);

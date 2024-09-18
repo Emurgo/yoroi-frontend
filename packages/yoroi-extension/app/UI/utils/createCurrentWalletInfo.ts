@@ -202,6 +202,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       backendServiceZero: BackendServiceZero,
       isHardwareWallet: isHardware,
       primaryTokenInfo: tokenInfo,
+      stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
         fiatAmount: fiatDisplay || 0,

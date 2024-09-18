@@ -45,8 +45,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 
-  console.log('data24h', data24h);
-
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
     { id: 'price', label: strings.price, align: 'left', sortType: 'numeric' },
