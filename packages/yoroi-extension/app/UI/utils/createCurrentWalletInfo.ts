@@ -147,8 +147,6 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
-    console.log('walletCurrentPoolInfo', walletCurrentPoolInfo);
-
     const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
     const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
 

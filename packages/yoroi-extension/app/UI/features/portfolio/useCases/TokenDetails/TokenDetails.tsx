@@ -33,7 +33,6 @@ interface Props {
 }
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
-  console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
@@ -65,18 +64,6 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
     }
   };
 
-  // useEffect(() => {
-  //   // FAKE FETCHING DATA TO SEE SKELETON
-  //   setIsLoading(true);
-
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 2000);
-
-  //   return () => clearTimeout(timer);
-  // }, []);
-  // const { data } = useGetPortfolioTokenChart('24 H', tokenInfo)
-
   return (
     <Box sx={{ width: '100%' }}>
       <Header>
@@ -97,7 +84,11 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           </Typography>
         </Box>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <NavigationButton variant="contained" onClick={() => navigateTo.swapPage()} label={strings.swap} />
+          <NavigationButton
+            variant="contained"
+            onClick={() => navigateTo.swapPage(tokenInfo.info.id}
+            label={strings.swap}
+          />
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
         </Stack>

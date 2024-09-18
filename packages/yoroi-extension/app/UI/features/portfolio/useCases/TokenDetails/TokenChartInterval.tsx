@@ -87,15 +87,15 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
           {isFetching || !data || chartData === undefined ? (
             <Skeleton width="64px" height="13px" />
           ) : (
-            <Stack direction="row" alignItems="center">
-              <Stack direction="row" alignItems="flex-end" color="ds.gray_max">
+            <Stack direction="row" alignItems="center" gap="16px">
+              <Stack direction="row" alignItems="flex-end" textAlign="center" color="ds.gray_max">
                 <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
-                <Typography variant="caption" sx={{ marginBottom: theme.spacing(0.25) }}>
-                  &nbsp;{unitOfAccount}
-                </Typography>
+                <Typography variant="caption">&nbsp;{unitOfAccount}</Typography>
               </Stack>
-              <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
-              <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
+              <Stack direction="row" gap="4px">
+                <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
+                <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
+              </Stack>
             </Stack>
           )}
         </Stack>

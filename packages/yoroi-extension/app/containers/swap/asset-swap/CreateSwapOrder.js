@@ -1,7 +1,7 @@
 // @flow
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
-import { useState } from 'react';
+import { useState ,useEffect,useMemo} from 'react';
 import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
@@ -17,6 +17,9 @@ import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
 import { useSwapForm } from '../context/swap-form';
+import { useSwapTokensOnlyVerified } from '@yoroi/swap';
+import { useLocation } from "react-router-dom";
+import { comparatorByGetter } from '../../../coreUtils';
 
 type Props = {|
   slippageValue: string,
@@ -38,6 +41,7 @@ export const CreateSwapOrder = ({
   priceImpactState,
 }: Props): React$Node => {
   const [openedDialog, setOpenedDialog] = useState('');
+  const [selectedAssetFromRoute, setSelectedAssetFromRoute] = useState();
 
   const {
     orderData: {
@@ -47,7 +51,42 @@ export const CreateSwapOrder = ({
     buyTokenInfoChanged,
   } = useSwap();
 
-  const { onChangeLimitPrice } = useSwapForm();
+  const {
+    buyQuantity: { isTouched: isBuyTouched },
+    buyTouched,
+    onChangeLimitPrice
+  } = useSwapForm();
+
+  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
+
+  const walletAssets = swapStore.assets;
+
+  const walletVerifiedAssets = useMemo(() => {
+    return walletAssets.map(a => {
+      const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
+      return a.id === '' || vft ? { ...a, ...vft } : undefined;
+    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
+  }, [onlyVerifiedTokens, walletAssets]);
+
+
+
+  const search = useLocation().search;
+  const tokenId = new URLSearchParams(search).get('tokenId');
+  const selectedAsset = walletVerifiedAssets.filter((asset) => asset.id === tokenId);
+  
+  useEffect(()=>{
+    if(selectedAsset){
+      setSelectedAssetFromRoute(selectedAsset[0]);
+      onChangeLimitPrice();
+    }
+  },[]);
+
+  useEffect(() => {
+    if (selectedAssetFromRoute) {
+      buyTouched(selectedAssetFromRoute);
+      buyTokenInfoChanged({id:selectedAssetFromRoute?.id,decimals:selectedAssetFromRoute?.decimals});
+    }
+  }, [selectedAssetFromRoute]);
 
   return (
     <>
