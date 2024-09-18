@@ -15,7 +15,7 @@ type TokenWithPercentage = Token & {
   percentage: number;
 };
 
-export const useTokenPercentages = (tokens: Token[]): TokenWithPercentage[] => {
+export const useTokenPercentages = (tokens: any[]): TokenWithPercentage[] => {
   const tokenPercentages = useMemo(() => {
     if (!tokens || tokens.length === 0) return {};
 
@@ -24,9 +24,7 @@ export const useTokenPercentages = (tokens: Token[]): TokenWithPercentage[] => {
     }, new BigNumber(0));
 
     return tokens.reduce((acc, token) => {
-      const percentage = totalQuantity.isZero()
-        ? '0.00'
-        : token.quantity.dividedBy(totalQuantity).multipliedBy(100).toFixed(2);
+      const percentage = totalQuantity.isZero() ? '0.00' : token.quantity.dividedBy(totalQuantity).multipliedBy(100).toFixed(2);
 
       return {
         ...acc,

@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { CurrentWalletType } from '../../../types/currrentWallet';
+import { WalletBalance } from '../../../types/currrentWallet';
 
 export type CurrencyType = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY' | 'none' | null;
 export type AccountPair = {
@@ -36,7 +36,9 @@ export type PortfolioState = {
     enabled: boolean;
   };
   accountPair: AccountPair | null;
-  currentWallet: CurrentWalletType;
+  walletBalance: WalletBalance | null;
+  networkId: number | null;
+  assetList: any[];
 };
 
 // Define default state
@@ -47,8 +49,9 @@ export const defaultPortfolioState: PortfolioState = {
     enabled: false,
   },
   accountPair: null,
-  currentWallet: undefined,
-  networkId: undefined,
+  walletBalance: null,
+  networkId: null,
+  assetList: [],
 };
 
 // Define action handlers

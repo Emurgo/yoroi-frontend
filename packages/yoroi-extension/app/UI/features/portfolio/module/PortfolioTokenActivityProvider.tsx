@@ -13,7 +13,7 @@ const defaultPortfolioTokenActivityState: PortfolioTokenActivityState = freeze(
   {
     secondaryTokenIds: [],
     aggregatedBalances: {},
-    tokenActivity: {},
+    tokenActivity: { data24h: null },
     activityWindow: Portfolio.Token.ActivityWindow.OneDay,
     isLoading: false,
   },
@@ -39,7 +39,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
         secondaryTokenIds,
       });
     },
-    tokenActivityChanged: tokenActivity => {
+    tokenActivityChanged: (tokenActivity: any) => {
       dispatch({
         type: PortfolioTokenActivityActionType.TokenActivityChanged,
         tokenActivity,
@@ -56,7 +56,9 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const { assetList, walletBalance } = usePortfolio();
 
   React.useEffect(() => {
-    const listForActivity = assetList.filter(item => item.policyId.length > 0).map(item => `${item.policyId}.${item.assetName}`); //
+    const listForActivity: any = assetList
+      .filter(item => item.policyId?.length > 0)
+      .map(item => `${item.policyId}.${item.assetName}`); //
 
     actions.secondaryTokenIdsChanged(listForActivity);
 
@@ -75,18 +77,18 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       // fetch1m(state.secondaryTokenIds);
     }
   }, [state.secondaryTokenIds, fetch24h]);
-  console.log("@@@@", data24h)
+  console.log('@@@@', data24h);
   React.useEffect(() => {
     if (data24h) {
       console.log('data24h', data24h);
-      const combinedData = {
+      const combinedData: any = {
         data24h: data24h,
         // '1w': data1w,
         // '1m': data1m,
       };
       actions.tokenActivityChanged(combinedData);
     }
-  }, [data24h, actions, loading24h, walletBalance.ada]);
+  }, [data24h, actions, loading24h, walletBalance?.ada]);
 
   const value = React.useMemo(
     () => ({
@@ -105,7 +107,7 @@ export const usePortfolioTokenActivity = () =>
 
 type PortfolioTokenActivityState = Readonly<{
   secondaryTokenIds: Portfolio.Token.Id[];
-  tokenActivity: Portfolio.Api.TokenActivityResponse;
+  tokenActivity: { data24h: any };
   activityWindow: Portfolio.Token.ActivityWindow;
   isLoading: boolean;
 }>;
@@ -118,17 +120,17 @@ export enum PortfolioTokenActivityActionType {
 
 export type PortfolioTokenActivityAction =
   | {
-    type: PortfolioTokenActivityActionType.SecondaryTokenIdsChanged;
-    secondaryTokenIds: Portfolio.Token.Id[];
-  }
+      type: PortfolioTokenActivityActionType.SecondaryTokenIdsChanged;
+      secondaryTokenIds: Portfolio.Token.Id[];
+    }
   | {
-    type: PortfolioTokenActivityActionType.TokenActivityChanged;
-    tokenActivity: Portfolio.Api.TokenActivityResponse;
-  }
+      type: PortfolioTokenActivityActionType.TokenActivityChanged;
+      tokenActivity: { data24h: any };
+    }
   | {
-    type: PortfolioTokenActivityActionType.ActivityWindowChanged;
-    activityWindow: Portfolio.Token.ActivityWindow;
-  };
+      type: PortfolioTokenActivityActionType.ActivityWindowChanged;
+      activityWindow: Portfolio.Token.ActivityWindow;
+    };
 
 export const portfolioTokenActivityReducer = (
   state: PortfolioTokenActivityState,
@@ -151,6 +153,6 @@ export const portfolioTokenActivityReducer = (
 
 export type PortfolioTokenActivityActions = Readonly<{
   secondaryTokenIdsChanged: (secondaryTokenIds: Portfolio.Token.Id[]) => void;
-  tokenActivityChanged: (tokenActivity: Portfolio.Api.TokenActivityResponse) => void;
+  tokenActivityChanged: (tokenActivity: { data24: any }) => void;
   activityWindowChanged: (activityWindow: Portfolio.Token.ActivityWindow) => void;
 }>;

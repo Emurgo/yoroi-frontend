@@ -6,20 +6,18 @@ import { getNetworkUrl } from '../../../../utils/getNetworkUrl';
 import tokenPng from '../../common/assets/images/token.png';
 import { isPrimaryToken } from '../../common/helpers/isPrimary';
 import { useStrings } from '../../common/hooks/useStrings';
-import { TokenType } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 interface Props {
-  tokenInfo: TokenType;
+  tokenInfo: TokenInfoType;
   isLoading: boolean;
-  isAda: boolean;
 }
 
 const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { networkId } = usePortfolio();
-  const networkUrl = getNetworkUrl(networkId);
+  const networkUrl = networkId && getNetworkUrl(networkId);
 
   const isPrimary = isPrimaryToken(tokenInfo.info);
 

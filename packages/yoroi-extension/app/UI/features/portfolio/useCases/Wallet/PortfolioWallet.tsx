@@ -14,14 +14,14 @@ const PortfolioWallet = (): JSX.Element => {
   const { walletBalance, assetList, changeUnitOfAccountPair, unitOfAccount } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState<TokenType[]>(assetList);
   const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
 
   useEffect(() => {
     changeUnitOfAccountPair({
-      from: { name: 'ADA', value: walletBalance.ada },
-      to: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
+      from: { name: 'ADA', value: walletBalance?.ada || '0' },
+      to: { name: unitOfAccount || 'USD', value: walletBalance?.fiatAmount || '0' },
     });
   }, [walletBalance, unitOfAccount]);
 
@@ -63,7 +63,7 @@ const PortfolioWallet = (): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        walletBalance={walletBalance}
+        walletBalance={walletBalance || { ada: '0', fiatAmount: '0', currency: 'USD' }}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

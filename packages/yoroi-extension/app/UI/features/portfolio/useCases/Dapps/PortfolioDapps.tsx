@@ -1,13 +1,12 @@
-import { Stack, Typography, Box } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import LiquidityTable from './LiquidityTable';
-import mockData from '../../common/mockData';
-import OrderTable from './OrderTable';
-import LendAndBorrow from './LendAndBorrow';
-import { useStrings } from '../../common/hooks/useStrings';
+import React, { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
+import { useStrings } from '../../common/hooks/useStrings';
 import { ITabButtonProps, LiquidityItemType, OrderItemType } from '../../common/types/index';
+import LendAndBorrow from './LendAndBorrow';
+import LiquidityTable from './LiquidityTable';
+import OrderTable from './OrderTable';
 
 const TableTabs = Object.freeze({
   LIQUIDITY: 1,
@@ -95,7 +94,7 @@ const PortfolioDapps = ({ data }: Props) => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        balance={mockData.common.dappsBalance}
+        walletBalance={{ ada: '0', fiatAmount: '0', currency: 'USD' }}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

@@ -10,7 +10,6 @@ import { priceChange } from '../../common/helpers/priceChange';
 import useChart from '../../common/hooks/useChart';
 import { TOKEN_CHART_INTERVAL, useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
-import { TokenType } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 // Styling for the period buttons
@@ -33,8 +32,7 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
 }));
 
 interface Props {
-  isLoading: boolean;
-  tokenInfo: TokenType;
+  tokenInfo: TokenInfoType;
   isPrimaryToken: boolean;
 }
 

@@ -85,7 +85,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             </Stack>
           ) : (
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
-              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2), }}>
+              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
                 <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
                 <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
               </Stack>
@@ -103,7 +103,9 @@ type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; cha
 export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography variant="caption" lineHeight="16px">{changePercent}%</Typography>
+      <Typography variant="caption" lineHeight="16px">
+        {changePercent}%
+      </Typography>
     </PnlTag>
   );
 };
@@ -117,7 +119,9 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
 
   return (
     <PnlTag variant={variantPnl}>
-      <Typography variant="caption" lineHeight="16px">{`${Number(changeValue) > 0 ? '+' : ''}${changeValue} ${currency}`}</Typography>
+      <Typography variant="caption" lineHeight="16px">{`${
+        Number(changeValue) > 0 ? '+' : ''
+      }${changeValue} ${currency}`}</Typography>
     </PnlTag>
   );
 };

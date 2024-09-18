@@ -2,7 +2,6 @@ import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
-import { TokenType } from '../../common/types/index';
 
 // const PerformanceItemType = {
 //   FIAT: 'fiat',
@@ -11,12 +10,12 @@ import { TokenType } from '../../common/types/index';
 // };
 
 interface Props {
-  tokenInfo: TokenType;
+  tokenInfo: TokenInfoType;
   isLoading: boolean;
 }
 
 const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
-  console.log({ tokenInfo, isLoading })
+  console.log({ tokenInfo, isLoading });
   const theme = useTheme();
   const strings = useStrings();
   // const { unitOfAccount } = usePortfolio();

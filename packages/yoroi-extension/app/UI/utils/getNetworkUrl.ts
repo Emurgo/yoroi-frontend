@@ -1,5 +1,8 @@
-export const getNetworkUrl = (networkId: number): string => {
-  return isTestnet(networkId) ? 'https://testnet.cardanoscan.io/token' : 'https://cardanoscan.io/token';
+export const getNetworkUrl = (networkId: string | undefined): string => {
+  if (networkId) {
+    return isTestnet(Number(networkId)) ? 'https://testnet.cardanoscan.io/token' : 'https://cardanoscan.io/token';
+  }
+  return '';
 };
 
 export const isTestnet = (networkId: number): boolean => {

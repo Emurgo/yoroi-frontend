@@ -8,7 +8,7 @@ import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import mockData from '../../common/mockData';
-import { SubMenuOption, TokenType } from '../../common/types/index';
+import { SubMenuOption } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { TokenChartInterval } from './TokenChartInterval';
 import TokenDetailOverview from './TokenDetailOverview';
@@ -29,17 +29,18 @@ const TabContent = styled(Box)({
 });
 
 interface Props {
-  tokenInfo: TokenType;
+  tokenInfo: TokenInfoType;
 }
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
+  console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount, walletBalance } = usePortfolio();
   const [isLoading, _] = useState<boolean>(false);
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-  const tokenTotalAmount = isPrimaryToken ? walletBalance.ada : tokenInfo.totalAmount;
+  const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.totalAmount;
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -84,11 +85,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
           </Typography>
         </Box>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <NavigationButton
-            variant="contained"
-            onClick={() => navigateTo.swapPage(tokenInfo.info.id}
-            label={strings.swap}
-          />
+          <NavigationButton variant="contained" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
         </Stack>
@@ -134,7 +131,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             </Stack>
 
             <Divider />
-            {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryTokents={true} />}
+            {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryToken={true} />}
           </Card>
 
           <Card>
@@ -145,7 +142,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
               {selectedTab === subMenuOptions[0]?.route ? (
                 <TabContent>
-                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} isPrimaryToken={isPrimaryToken} />
+                  <TokenDetailOverview tokenInfo={tokenInfo} isLoading={isLoading} />
                 </TabContent>
               ) : null}
 

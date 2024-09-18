@@ -22,8 +22,6 @@ import { IHeadCell } from '../../common/types/table';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 
-
-
 interface Props {
   data: TokenType[];
   isLoading: boolean;
@@ -43,10 +41,11 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const {
     tokenActivity: { data24h },
-    isLoading: isActivityLoading,
+    // isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 
+  console.log('data24h', data24h);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -70,9 +69,8 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
 
-  // TODO refactor and add calculation based on fiat toatl value - endpoint not working 
-  const procentageData = useTokenPercentages(data)
-
+  // TODO refactor and add calculation based on fiat toatl value - endpoint not working
+  const procentageData = useTokenPercentages(data);
 
   return (
     <Table
@@ -85,7 +83,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
       isLoading={isLoading}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(list).map((row: TokenType) => (
+      {getSortedData(list).map((row: any) => (
         <TableRow
           key={row.id}
           onClick={() => navigateTo.portfolioDetail(row.id)}
@@ -105,21 +103,21 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice
-              token={row}
-              isPrimaryToken={row.policyId.length === 0}
-              ptActivity={ptActivity} unitOfAccount={unitOfAccount}
+              isPrimaryToken={row.policyId?.length === 0}
+              ptActivity={ptActivity}
+              unitOfAccount={unitOfAccount}
               secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
             />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            {data24h === undefined ? (
+            {data24h === null ? (
               <p>load</p>
             ) : (
               <TokenPriceChangeChip
                 secondaryTokenActivity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
                 primaryTokenActivity={ptActivity}
-                isPrimaryToken={row.policyId.length === 0}
+                isPrimaryToken={row.policyId?.length === 0}
               />
             )}
           </TableCell>
@@ -134,16 +132,18 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenProcentage
-              procentage={row.info.policyId.length === 0 ? procentageData[""] : procentageData[`${row.policyId}.${row.assetName}`]}
+              procentage={
+                row.info.policyId.length === 0 ? procentageData[''] : procentageData[`${row.policyId}.${row.assetName}`]
+              }
             />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            {data24h === undefined ? (
+            {data24h === null ? (
               <p>load</p>
             ) : (
               <TokenPriceTotal
-                isPrimaryToken={row.policyId.length === 0}
+                // isPrimaryToken={row.policyId.length === 0}
                 token={row}
                 accountPair={accountPair}
                 secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
@@ -158,29 +158,30 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
 export default StatsTable;
 
-
 const TokenDisplay = ({ token }) => {
-  const theme = useTheme()
-  return <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-    <Box
-      width="40px"
-      height="40px"
-      sx={{
-        borderRadius: `${theme.shape.borderRadius}px`,
-      }}
-      component="img"
-      src={token.tokenLogo || tokenPng}
-    ></Box>
-    <Stack direction="column">
-      <Typography fontWeight="500" color="ds.text_gray_normal">
-        {token.name}
-      </Typography>
-      <Typography variant="body2" color="ds.text_gray_medium">
-        {token.ticker}
-      </Typography>
+  const theme = useTheme();
+  return (
+    <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+      <Box
+        width="40px"
+        height="40px"
+        sx={{
+          borderRadius: `${theme.shape.borderRadius}px`,
+        }}
+        component="img"
+        src={token.tokenLogo || tokenPng}
+      ></Box>
+      <Stack direction="column">
+        <Typography fontWeight="500" color="ds.text_gray_normal">
+          {token.name}
+        </Typography>
+        <Typography variant="body2" color="ds.text_gray_medium">
+          {token.ticker}
+        </Typography>
+      </Stack>
     </Stack>
-  </Stack>
-}
+  );
+};
 
 const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
   const { close, open } = isPrimaryToken
@@ -197,17 +198,14 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 };
 
 const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
-
   const theme: any = useTheme();
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
-
 
   const {
     currency: selectedCurrency,
     config,
     ptActivity: { close: ptPrice },
   } = useCurrencyPairing();
-
 
   // const showingAda = isPrimaryTokenActive && amount.info.id !== portfolioPrimaryTokenInfo.id;
   const showingAda = accountPair?.from.name === 'ADA';
@@ -216,7 +214,6 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
   const decimals = config.decimals;
 
   if (ptPrice == null) return `... ${currency}`;
-
 
   // if (!isPrimaryToken(amount.info) && tokenPrice == null) return `—— ${currency}`;
 
@@ -235,14 +232,11 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
   const safeTokenPrice = BigNumber.isBigNumber(tokenPrice) ? tokenPrice : new BigNumber(tokenPrice ?? '1');
   const safePtPrice = BigNumber.isBigNumber(ptPrice) ? ptPrice : new BigNumber(ptPrice ?? '1');
 
-
-
   // Now, pass the bigIntValue to atomicBreakdown
   const price = `${atomicBreakdown(bigIntValue, token.numberOfDecimals)
     .bn.times(safeTokenPrice) // BigNumber operation
     .times(showingAda ? 1 : safePtPrice) // BigNumber operation
     .toFormat(decimals)} ${currency}`;
-
 
   // console.log('token', {
   //   name: token.name,
@@ -252,8 +246,6 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
   //   tokenPrice: tokenPrice,
   //   showingAda,
   // });
-
-
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
@@ -273,8 +265,7 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
   );
 };
 
-const TokenPrice = ({ token, unitOfAccount, secondaryToken24Activity, ptActivity, isPrimaryToken }) => {
-
+const TokenPrice = ({ unitOfAccount, secondaryToken24Activity, ptActivity, isPrimaryToken }) => {
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
 
   return (
@@ -292,25 +283,28 @@ const TokenProcentage = ({ procentage }) => {
   );
 };
 
-
 // MOCK DATA
 const TokenChip = ({ token }) => {
-  const theme = useTheme()
-  return <Chip
-    type={token['1M'] > 0 ? ChipTypes.ACTIVE : token['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-    label={
-      <Stack direction="token" justifyContent="space-between" alignItems="center">
-        {token['1M'] > 0 ? (
-          <Icon.ChipArtokenUp fill={theme.palette.ds.secondary_c800} />
-        ) : token['1M'] < 0 ? (
-          <Icon.ChipArtokenDown fill={theme.palette.ds.sys_magenta_c700} />
-        ) : null}
-        {/* @ts-ignore */}
-        <Typography variant="caption1">
-          {token['1M'] >= 0 ? formatNumber(token['1M']) : formatNumber(-1 * token['1M'])}%
-        </Typography>
-      </Stack>
-    }
-    sx={{ cursor: 'pointer' }}
-  />
-}
+  const theme = useTheme();
+  return (
+    <Chip
+      type={token['1M'] > 0 ? ChipTypes.ACTIVE : token['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+      label={
+        <Stack justifyContent="space-between" alignItems="center">
+          {token['1M'] > 0 ? (
+            // @ts-ignore
+            <Icon.ChevronUp fill={theme.palette.ds.secondary_c800} />
+          ) : token['1M'] < 0 ? (
+            // @ts-ignore
+            <Icon.ChevronDown fill={theme.palette.ds.sys_magenta_c700} />
+          ) : null}
+          {/* @ts-ignore */}
+          <Typography variant="caption1">
+            {token['1M'] >= 0 ? formatNumber(token['1M']) : formatNumber(-1 * token['1M'])}%
+          </Typography>
+        </Stack>
+      }
+      sx={{ cursor: 'pointer' }}
+    />
+  );
+};

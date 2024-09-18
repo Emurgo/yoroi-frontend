@@ -75,6 +75,7 @@ const getAssetWalletAssetList = (stores: any) => {
     }))
     .filter((item: any) => item.info.IsNFT === false)
     .map((token: any) => {
+      console.log('token', token);
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
@@ -93,11 +94,10 @@ const getAssetWalletAssetList = (stores: any) => {
       const fiatDisplay = calculateAndFormatValue(coinShiftedAmount, fiatPrice);
       return {
         name: tokenName,
-
+        assetName: token.info.Metadata.assetName,
         totalAmount: [beforeDecimal, afterDecimal].join(''),
         amountForSorting: shiftedAmount,
         tokenLogo: tokenLogo,
-        ...token.info.Metadata,
         totalAmountFiat: fiatDisplay,
         price: fiatPrice,
 
