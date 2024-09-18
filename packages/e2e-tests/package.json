@@ -44,14 +44,14 @@
   "author": "Denis Nebytov (denis@emurgo.io)",
   "license": "ISC",
   "devDependencies": {
-    "@emurgo/cardano-serialization-lib-nodejs": "12.0.0-alpha.26",
+    "@emurgo/cardano-serialization-lib-nodejs": "12.1.0",
     "bignumber.js": "9.1.2",
     "chai": "4.3.10",
     "chromedriver": "128.0.3",
     "cross-env": "7.0.3",
     "json-server": "0.17.4",
     "mocha": "10.2.0",
-    "mochawesome": "^7.1.3",
+    "mochawesome": "7.1.3",
     "prettier": "3.0.3",
     "selenium-webdriver": "4.19.0",
     "simple-node-logger": "21.8.12"
