@@ -38,7 +38,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount, walletBalance } = usePortfolio();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, _] = useState<boolean>(false);
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance.ada : tokenInfo.totalAmount;
 

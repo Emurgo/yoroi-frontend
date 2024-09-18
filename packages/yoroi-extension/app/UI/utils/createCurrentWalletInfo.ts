@@ -101,18 +101,6 @@ const getAssetWalletAssetList = (stores: any) => {
         totalAmountFiat: fiatDisplay,
         price: fiatPrice,
 
-        // metadata101: extractMetadataInfo(token?.info),
-
-        overview: {
-          description:
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
-          website: 'https://www.cardano.org',
-          detailOn: 'https://www.yoroiwallet.com',
-          policyId: '2aa9c1557fcf8e7caa049fa0911a8724a1cdaf8037fe0b431c6ac664',
-          fingerprint:
-            'asset311q8dhlxmgagkx0ldt4xc7wzdv2wza8gu2utxw294sr23zuc8dhlxmgagkx0ldt4xc7wzk8213yjnad98h1n1j99naskajsj6789',
-        },
-
         // TODO new structure here
         quantity: token.entry.amount,
         id: tokenId,
@@ -120,9 +108,10 @@ const getAssetWalletAssetList = (stores: any) => {
           id: token.entry.identifier,
           name: tokenName,
           policyId: token.info.Metadata.policyId,
-          fingerprint: token.id,
+          fingerprint: tokenId,
           metadata: extractMetadataInfo({ metadata: token.info.Metadata?.assetMintMetadata?.[0] || null }),
         },
+        // TODO - refactor and add here any formated data/utils for token
         // utils: {
         //   totalAmountFiat: fiatDisplay,
         //   price: fiatPrice,
