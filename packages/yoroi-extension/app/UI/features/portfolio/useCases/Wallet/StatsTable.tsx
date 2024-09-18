@@ -1,4 +1,4 @@
-import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { Box, Skeleton, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
@@ -110,7 +110,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             {data24h === null ? (
-              <p>load</p>
+              <Skeleton variant="text" width="50px" height="30px" />
             ) : (
               <TokenPriceChangeChip
                 secondaryTokenActivity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
@@ -138,7 +138,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             {data24h === null ? (
-              <p>load</p>
+              <Skeleton variant="text" width="50px" height="30px" />
             ) : (
               <TokenPriceTotal
                 // isPrimaryToken={row.policyId.length === 0}
@@ -265,6 +265,7 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
 
 const TokenPrice = ({ unitOfAccount, secondaryToken24Activity, ptActivity, isPrimaryToken }) => {
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
@@ -274,6 +275,8 @@ const TokenPrice = ({ unitOfAccount, secondaryToken24Activity, ptActivity, isPri
 };
 
 const TokenProcentage = ({ procentage }) => {
+  if (procentage === undefined) return <Skeleton variant="text" width="50px" height="30px" />;
+
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
       {procentage}%
