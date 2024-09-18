@@ -24,7 +24,10 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
 
   useEffect(() => {
     const stakignAddr = publicDeriver.stakingAddress;
-    const skey = Buffer.from(unwrapStakingKey(stakignAddr).to_bytes()).toString('hex');
+    const skey = unwrapStakingKey(stakignAddr).to_keyhash()?.to_hex();
+    if (skey == null) {
+      throw new Error('Cannot get staking key from the wallet!');
+    }
     setStakingKey(skey);
   }, []);
 

@@ -81,10 +81,11 @@ function RestoreWalletPage(props: Props & Intl): Node {
   } = useRestoreWallet();
 
   const getDuplicatedWalletData = () => {
-    if (!duplicatedWallet) return {};
+    if (!duplicatedWallet) return null;
 
     return {
       plate: duplicatedWallet.plate,
+      conceptualWalletName: duplicatedWallet.name,
       balance: duplicatedWallet.balance,
       shouldHideBalance: profileData.shouldHideBalance,
       tokenInfo: tokenInfoStore.tokenInfo,

@@ -154,7 +154,6 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
     for (const dapp of connectedDapps) {
       await this.actions.connector.removeWalletFromWhitelist.trigger({
-        protocol: dapp.protocol,
         url: dapp.url,
       });
     }
