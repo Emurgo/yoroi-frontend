@@ -39,7 +39,7 @@ export default class Layout extends React.Component<Props> {
     return (
       <div className={styles.component}>
         {/* TestBlock will only be visible in Development mode */}
-        {isDevelopment && (
+        {false && isDevelopment && (
           <TestBlock
             setTransport={setTransport}
             currentTransportId={transportId}

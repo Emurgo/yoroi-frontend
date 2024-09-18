@@ -140,6 +140,11 @@ type ConfirmedSignData = {|
   password: string,
   // hardware wallet:
   witnessSetHex?: ?string,
+  signedMessageData?: {|
+    signatureHex: string;
+    signingPublicKeyHex: string;
+    addressFieldHex: string;
+  |},
 |};
 
 export const UserSignConfirm: HandlerType<
@@ -232,28 +237,38 @@ export const UserSignConfirm: HandlerType<
           rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
-        const { address, payload } = responseData.continuationData;
+
         let dataSig;
-        try {
-          dataSig = await walletSignData(
-            wallet,
-            request.password,
-            address,
-            payload,
-          );
-        } catch (error) {
-          Logger.error(`error when signing data ${error}`);
-          rpcResponse(
-            request.tabId,
-            request.uid,
-            {
-              err: {
-                code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
-                info: error.message,
+
+        if (request.password !== '') {
+          const { address, payload } = responseData.continuationData;
+          try {
+            dataSig = await walletSignData(
+              wallet,
+              request.password,
+              address,
+              payload,
+            );
+          } catch (error) {
+            Logger.error(`error when signing data ${error}`);
+            rpcResponse(
+              request.tabId,
+              request.uid,
+              {
+                err: {
+                  code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
+                  info: error.message,
+                }
               }
-            }
-          );
-          return;
+            );
+            return;
+          }
+        } else {
+          const { signedMessageData } = request;
+          if (signedMessageData == null) {
+            throw new Error('unexpected user signed confirmation: missing hardware wallet signing response');
+          }
+          dataSig = signedMessageData.signatureHex;
         }
         rpcResponse(request.tabId, request.uid, { ok: dataSig });
       }

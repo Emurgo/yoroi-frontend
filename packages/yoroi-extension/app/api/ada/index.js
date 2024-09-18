@@ -2686,3 +2686,18 @@ export async function walletSignData(
     key: Buffer.from(key.to_bytes()).toString('hex'),
   };
 }
+
+// todo: DRep key
+export function findPath(wallet: WalletState, inputAddress: string): ?Array<number> {
+  if (inputAddress === wallet.stakingAddress) {
+    return wallet.stakingAddressing.addressing.path;
+  }
+
+  for (const { address, path } of wallet.allAddresses.utxoAddresses) {
+    if (address.Hash === inputAddress) {
+      return  path;
+    }
+  }
+
+  return null;
+}
