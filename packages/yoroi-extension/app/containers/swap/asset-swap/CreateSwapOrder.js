@@ -5,7 +5,7 @@ import { useState ,useEffect,useMemo} from 'react';
 import { Box } from '@mui/material';
 import SwapPriceInput from '../../../components/swap/SwapPriceInput';
 import SlippageDialog from '../../../components/swap/SlippageDialog';
-import { useSwap } from '@yoroi/swap';
+import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
 import EditSellAmount from './edit-sell-amount/EditSellAmount';
 import EditBuyAmount from './edit-buy-amount/EditBuyAmount';
 import SelectBuyTokenFromList from './edit-buy-amount/SelectBuyTokenFromList';
@@ -17,8 +17,7 @@ import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
 import { useSwapForm } from '../context/swap-form';
-import { useSwapTokensOnlyVerified } from '@yoroi/swap';
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import { comparatorByGetter } from '../../../coreUtils';
 
 type Props = {|
@@ -52,7 +51,6 @@ export const CreateSwapOrder = ({
   } = useSwap();
 
   const {
-    buyQuantity: { isTouched: isBuyTouched },
     buyTouched,
     onChangeLimitPrice
   } = useSwapForm();

@@ -13,7 +13,6 @@ module.exports = {
   extends: [
     'airbnb',
     'prettier',
-    'plugin:@typescript-eslint/recommended', // Enable recommended rules from the TypeScript plugin
   ],
   env: {
     browser: true,
@@ -137,7 +136,6 @@ module.exports = {
     'no-floating-promise',
     'prettier',
     'eslint-plugin-simple-import-sort',
-    '@typescript-eslint', // Add TypeScript plugin
   ],
   globals: {
     chrome: true,

@@ -143,7 +143,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: ({ selected }) => environment.isDev(),
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'nfts',
