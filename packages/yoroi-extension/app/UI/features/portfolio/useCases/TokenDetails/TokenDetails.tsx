@@ -1,12 +1,11 @@
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
 import { Card, Skeleton } from '../../../../components';
 import Menu from '../../common/components/Menu';
 import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
-import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
 import mockData from '../../common/mockData';
 import { SubMenuOption, TokenType } from '../../common/types/index';
@@ -34,15 +33,14 @@ interface Props {
 }
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
-  console.log("tokenInfo", tokenInfo)
+  console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { unitOfAccount, walletBalance } = usePortfolio();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const isPrimaryToken: boolean = tokenInfo.id === '-'
-  const tokenTotalAmount = isPrimaryToken ? walletBalance.ada : tokenInfo.totalAmount
-  console.log("[tokenTotalAmount]", tokenTotalAmount)
+  const isPrimaryToken: boolean = tokenInfo.id === '-';
+  const tokenTotalAmount = isPrimaryToken ? walletBalance.ada : tokenInfo.totalAmount;
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -67,17 +65,17 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
     }
   };
 
-  useEffect(() => {
-    // FAKE FETCHING DATA TO SEE SKELETON
-    setIsLoading(true);
+  // useEffect(() => {
+  //   // FAKE FETCHING DATA TO SEE SKELETON
+  //   setIsLoading(true);
 
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+  //   const timer = setTimeout(() => {
+  //     setIsLoading(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
-  const { data } = useGetPortfolioTokenChart('24 H', tokenInfo)
+  //   return () => clearTimeout(timer);
+  // }, []);
+  // const { data } = useGetPortfolioTokenChart('24 H', tokenInfo)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -138,15 +136,14 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                   <Skeleton width="129px" height="16px" />
                 ) : (
                   <Typography color="ds.gray_600">
-                    {(tokenInfo.totalAmountFiat)} {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+                    {tokenInfo.totalAmountFiat} {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
                   </Typography>
                 )}
               </Stack>
             </Stack>
 
             <Divider />
-            {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryTokents={true} />
-            }
+            {isPrimaryToken && <TokenChartInterval tokenInfo={tokenInfo} isPrimaryTokents={true} />}
           </Card>
 
           <Card>

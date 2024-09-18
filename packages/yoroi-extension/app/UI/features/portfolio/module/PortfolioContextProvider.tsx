@@ -26,7 +26,7 @@ type PortfolioProviderProps = {
     unitOfAccount: CurrencyType;
     accountPair: AccountPair;
   };
-  currentWallet: CurrentWalletType
+  currentWallet: CurrentWalletType;
 };
 
 export const PortfolioContextProvider = ({
@@ -36,9 +36,9 @@ export const PortfolioContextProvider = ({
     unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
     accountPair: null,
   },
-  currentWallet
+  currentWallet,
 }: PortfolioProviderProps) => {
-  const { walletBalance, assetList, selectedWallet } = currentWallet;
+  const { walletBalance, assetList, selectedWallet, networkId } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -73,6 +73,7 @@ export const PortfolioContextProvider = ({
       settingFiatPairUnit,
       walletBalance,
       assetList: assetList || [],
+      networkId,
     }),
     [state, actions]
   );

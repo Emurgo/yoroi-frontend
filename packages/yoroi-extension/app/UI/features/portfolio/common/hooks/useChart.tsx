@@ -5,8 +5,7 @@ import { IChartData } from '../types/chart';
 
 const useChart = (data: IChartData) => {
   const theme: any = useTheme();
-  console.log("data", data)
-  console.log("data", data[0]?.label)
+
   // const [periodButtonProps, setPeriodButtonProps] = useState<ITabButtonProps[]>([
   //   { id: 'start24HoursAgo', label: strings['24H'], active: true },
   //   { id: 'start1WeekAgo', label: strings['1W'], active: false },

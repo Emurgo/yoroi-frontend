@@ -1,11 +1,13 @@
-import { Box, Link, Stack, Typography } from '@mui/material';
+import { Box, Link as LinkMui, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { Skeleton } from '../../../../components/Skeleton';
-import { CopyButton } from '../../../../components/buttons/CopyButton';
+import { getNetworkUrl } from '../../../../utils/getNetworkUrl';
 import tokenPng from '../../common/assets/images/token.png';
+import { isPrimaryToken } from '../../common/helpers/isPrimary';
 import { useStrings } from '../../common/hooks/useStrings';
 import { TokenType } from '../../common/types/index';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 interface Props {
   tokenInfo: TokenType;
@@ -13,10 +15,13 @@ interface Props {
   isAda: boolean;
 }
 
-const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Element => {
+const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
+  const { networkId } = usePortfolio();
+  const networkUrl = getNetworkUrl(networkId);
 
+  const isPrimary = isPrimaryToken(tokenInfo.info);
 
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>
@@ -29,10 +34,10 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
             height="32px"
             sx={{
               backgroundColor: theme.palette.ds.gray_300,
-              borderRadius: `${theme.shape.borderRadius}px`,
+              borderRadius: `50px`,
             }}
             component="img"
-            src={tokenPng}
+            src={tokenInfo.tokenLogo || tokenPng}
           ></Box>
         )}
         {isLoading ? (
@@ -44,121 +49,79 @@ const TokenDetailOverview = ({ tokenInfo, isLoading, isAda }: Props): JSX.Elemen
         )}
       </Stack>
 
-      <Stack direction="column" spacing={theme.spacing(0.5)}>
-        {isLoading ? (
-          <Skeleton width="53px" height="16px" />
-        ) : (
-          <Typography fontWeight="500" color="ds.gray_900">
-            {strings.description}
-          </Typography>
-        )}
-        {isLoading ? (
-          <>
-            <Skeleton height="20px" width="full" />
-            <Skeleton height="20px" width="full" />
-            <Skeleton height="20px" width="127px" />
-          </>
-        ) : (
-          <Typography color="ds.gray_600">{tokenInfo?.overview.description}</Typography>
-        )}
-      </Stack>
+      <TokenOverviewSection label={strings.description} value={tokenInfo.info.metadata.description} />
 
-      <Stack direction="column" spacing={theme.spacing(0.5)}>
-        {isLoading ? (
-          <Skeleton width="53px" height="16px" />
-        ) : (
-          <Typography fontWeight="500" color="ds.gray_900">
-            {strings.website}
-          </Typography>
-        )}
-        {isLoading ? (
-          <Skeleton width="127px" height="20px" />
-        ) : (
-          <Link href={tokenInfo?.overview.website} target="_blank" rel="noopener noreferrer" style={{ width: 'fit-content' }}>
-            cardano.org
-          </Link>
-        )}
-      </Stack>
+      <TokenOverviewSection
+        label={strings.website}
+        value={tokenInfo.info.metadata.website || 'https://cardano.org/'}
+        isExternalLink
+      />
 
-      {isAda ? null : (
+      {isPrimary ? (
+        <></>
+      ) : (
         <>
-          <Stack direction="column" spacing={theme.spacing(0.5)}>
-            {isLoading ? (
-              <Skeleton width="84px" height="20px" />
-            ) : (
-              <Typography fontWeight="500" color="ds.gray_900">
-                {strings.policyId}
-              </Typography>
-            )}
+          <TokenOverviewSection label={strings.policyId} value={tokenInfo?.info.policyId} />
 
-            <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
-              {isLoading ? (
-                <Box flex={1}>
-                  <Skeleton height="20px" width="full" />
-                  <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-                </Box>
-              ) : (
-                <Typography color="ds.gray_600" sx={{ wordBreak: 'break-word' }}>
-                  {tokenInfo?.overview.policyId}
-                </Typography>
-              )}
-              <CopyButton disabled={isLoading} textToCopy={`${tokenInfo?.overview.policyId}`} />
-            </Stack>
-          </Stack>
-
-          <Stack direction="column" spacing={theme.spacing(0.5)}>
-            {isLoading ? (
-              <Skeleton width="84px" height="20px" />
-            ) : (
-              <Typography fontWeight="500" color="ds.gray_900">
-                {strings.fingerprint}
-              </Typography>
-            )}
-
-            <Stack direction="row" alignItems="flex-start" spacing={theme.spacing(2)}>
-              {isLoading ? (
-                <Box flex={1}>
-                  <Skeleton height="20px" width="full" />
-                  <Skeleton height="16px" width="53px" sx={{ marginTop: '5px' }} />
-                </Box>
-              ) : (
-                <Typography color="ds.gray_600" sx={{ wordBreak: 'break-word' }}>
-                  {tokenInfo?.overview.fingerprint}
-                </Typography>
-              )}
-              <CopyButton disabled={isLoading} textToCopy={`${tokenInfo?.overview.fingerprint}`} />
-            </Stack>
-          </Stack>
+          <TokenOverviewSection label={strings.fingerprint} value={tokenInfo?.info.fingerprint} />
         </>
       )}
 
-      <Stack direction="column" spacing={theme.spacing(0.5)}>
-        {isLoading ? (
-          <Skeleton width="53px" height="16px" />
-        ) : (
-          <Typography fontWeight="500" color="ds.gray_900">
-            {strings.detailsOn}
-          </Typography>
-        )}
-        <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-          {isLoading ? (
-            <Skeleton width="127px" height="20px" />
-          ) : (
-            <Link href={tokenInfo?.overview.detailOn} target="_blank" rel="noopener noreferrer">
-              Cardanoscan
-            </Link>
-          )}
-          {isLoading ? (
-            <Skeleton width="60px" height="20px" />
-          ) : (
-            <Link href={tokenInfo?.overview.detailOn} target="_blank" rel="noopener noreferrer">
-              Adaex
-            </Link>
-          )}
-        </Stack>
-      </Stack>
+      <TokenOverviewSection
+        label={strings.fingerprint}
+        value={`${networkUrl}/${tokenInfo.info.policyId}${tokenInfo?.assetName}`}
+        networkUrl={networkUrl || undefined}
+      />
     </Stack>
   );
 };
 
 export default TokenDetailOverview;
+
+type TokenOverviewSection = {
+  label: string;
+  value: string;
+  isExternalLink?: boolean;
+  networkUrl?: undefined | string;
+};
+
+const TokenOverviewSection = ({ label, value, isExternalLink = false, networkUrl }: TokenOverviewSection) => {
+  const theme: any = useTheme();
+  if (!value) {
+    return <></>;
+  }
+
+  return (
+    <Stack direction="column" spacing={theme.spacing(0.5)}>
+      <Typography fontWeight="500" color="ds.gray_900">
+        {label}
+      </Typography>
+      {networkUrl ? (
+        <Stack direction="row" gap="16px">
+          <LinkMui
+            target="_blank"
+            href={networkUrl != null ? `${value}` : ''}
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            Cardanoscan
+          </LinkMui>
+          <LinkMui
+            target="_blank"
+            href={networkUrl != null ? `${value}` : ''}
+            rel="noopener noreferrer"
+            sx={{ textDecoration: 'none' }}
+          >
+            Adaex
+          </LinkMui>
+        </Stack>
+      ) : isExternalLink ? (
+        <LinkMui href={value} target="_blank" rel="noopener noreferrer" style={{ width: 'fit-content' }}>
+          {value}
+        </LinkMui>
+      ) : (
+        <Typography color="ds.gray_600">{value}</Typography>
+      )}
+    </Stack>
+  );
+};

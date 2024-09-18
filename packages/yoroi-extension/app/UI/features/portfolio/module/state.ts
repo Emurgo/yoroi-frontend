@@ -48,6 +48,7 @@ export const defaultPortfolioState: PortfolioState = {
   },
   accountPair: null,
   currentWallet: undefined,
+  networkId: undefined,
 };
 
 // Define action handlers

@@ -70,7 +70,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
 
-  // TODO refactor and add calculation based on fiat toatl value - endpont not working 
+  // TODO refactor and add calculation based on fiat toatl value - endpoint not working 
   const procentageData = useTokenPercentages(data)
 
 

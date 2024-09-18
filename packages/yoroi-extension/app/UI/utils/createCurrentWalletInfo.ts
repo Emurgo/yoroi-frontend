@@ -100,7 +100,8 @@ const getAssetWalletAssetList = (stores: any) => {
         ...token.info.Metadata,
         totalAmountFiat: fiatDisplay,
         price: fiatPrice,
-        portfolioPercents: Math.round(100 * Math.random()), // MOCKED
+
+        // metadata101: extractMetadataInfo(token?.info),
 
         overview: {
           description:
@@ -120,7 +121,7 @@ const getAssetWalletAssetList = (stores: any) => {
           name: tokenName,
           policyId: token.info.Metadata.policyId,
           fingerprint: token.id,
-          metadata: token.info.Metadata?.assetMintMetadata?.[0] || null,
+          metadata: extractMetadataInfo({ metadata: token.info.Metadata?.assetMintMetadata?.[0] || null }),
         },
         // utils: {
         //   totalAmountFiat: fiatDisplay,
@@ -228,10 +229,40 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
   }
 };
 
-export const asQuantity = (value: BigNumber | number | string) => {
-  const bn = new BigNumber(value);
-  if (bn.isNaN() || !bn.isFinite()) {
-    throw new Error('Invalid quantity');
+// export const asQuantity = (value: BigNumber | number | string) => {
+//   const bn = new BigNumber(value);
+//   if (bn.isNaN() || !bn.isFinite()) {
+//     throw new Error('Invalid quantity');
+//   }
+//   return bn;
+// };
+
+type Metadata = {
+  metadata?: {
+    [key: string]: {
+      [key: string]: {
+        [tokenName: string]: {
+          name?: string;
+          website?: string;
+          description?: string;
+          desc?: string;
+          url?: string;
+        };
+      };
+    };
+  };
+};
+
+export const extractMetadataInfo = (metadataObj: Metadata) => {
+  if (!metadataObj.metadata) {
+    return { name: null, website: null, description: null };
   }
-  return bn;
+  const tokenInfo = Object.values(metadataObj.metadata).flatMap(chain =>
+    Object.values(chain).flatMap(tokens => Object.values(tokens))
+  );
+  for (const info of tokenInfo) {
+    return { website: info?.url || info?.website, description: info?.desc };
+  }
+
+  return null;
 };

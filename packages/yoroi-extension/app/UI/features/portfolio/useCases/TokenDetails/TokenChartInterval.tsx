@@ -128,8 +128,9 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
                     }}
                 >
                     {isFetching || !data ? null : (
-                        <ResponsiveContainer width={'99%'} height={chartHeight}>
+                        <ResponsiveContainer width={'100%'} height={chartHeight} >
                             <LineChart
+                                margin={{ top: 0, left: -23, right: 0, bottom: 0 }}
                                 data={chartData}
                                 onMouseDown={handleMouseDown}
                                 onMouseUp={handleMouseUp}
@@ -170,7 +171,7 @@ export const TokenChartInterval = ({ isLoading, tokenInfo, isPrimaryToken }: Pro
                     {Object.keys(TOKEN_CHART_INTERVAL).map((interval) => (
                         <StyledButton
                             key={interval}
-                            variant={timeInterval === interval ? 'contained' : 'text'}
+                            variant={timeInterval === TOKEN_CHART_INTERVAL[interval] ? 'contained' : 'text'}
                             disabled={isFetching}
                             onClick={() => handlePeriodChange(interval)}
                             theme={theme}
