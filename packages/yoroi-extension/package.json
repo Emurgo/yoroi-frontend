@@ -171,6 +171,7 @@
     "@yoroi/staking": "^1.5.1",
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.7",
+    "@yoroi/explorers": "^1.0.2",
     "assert": "2.1.0",
     "async-await-queue": "2.1.4",
     "axios": "0.21.1",

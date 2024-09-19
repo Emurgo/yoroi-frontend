@@ -17,10 +17,14 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { networkId } = usePortfolio();
-  const networkUrl = networkId && getNetworkUrl(networkId);
+  const networkUrl = networkId !== null ? getNetworkUrl(networkId) : '';
+  console.log('networkUrl', networkUrl);
+  // const explorers = useExplorers('mainnet' as Chain.SupportedNetworks);
+
+  // console.log('explorers', explorers);
 
   const isPrimary = isPrimaryToken(tokenInfo.info);
-
+  console.log('URLL', `${networkUrl}/${tokenInfo?.info.policyId}${tokenInfo?.assetName}`);
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
@@ -68,7 +72,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
       <TokenOverviewSection
         label={strings.fingerprint}
         value={`${networkUrl}/${tokenInfo.info.policyId}${tokenInfo?.assetName}`}
-        networkUrl={networkUrl || undefined}
+        isNetworkUrl={true}
       />
     </Stack>
   );
@@ -76,14 +80,15 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
 
 export default TokenDetailOverview;
 
-type TokenOverviewSection = {
+type TokenOverviewSectionTypes = {
   label: string;
   value: string;
   isExternalLink?: boolean;
-  networkUrl?: undefined | string;
+  isNetworkUrl?: boolean;
 };
 
-const TokenOverviewSection = ({ label, value, isExternalLink = false, networkUrl }: TokenOverviewSection) => {
+const TokenOverviewSection = ({ label, value, isExternalLink = false, isNetworkUrl = false }: TokenOverviewSectionTypes) => {
+  console.log('value', value);
   const theme: any = useTheme();
   if (!value) {
     return <></>;
@@ -94,11 +99,11 @@ const TokenOverviewSection = ({ label, value, isExternalLink = false, networkUrl
       <Typography fontWeight="500" color="ds.gray_900">
         {label}
       </Typography>
-      {networkUrl ? (
+      {isNetworkUrl ? (
         <Stack direction="row" gap="16px">
           <LinkMui
             target="_blank"
-            href={networkUrl != null ? `${value}` : ''}
+            href={isNetworkUrl != null ? `${value}` : ''}
             rel="noopener noreferrer"
             sx={{ textDecoration: 'none' }}
           >
@@ -106,7 +111,7 @@ const TokenOverviewSection = ({ label, value, isExternalLink = false, networkUrl
           </LinkMui>
           <LinkMui
             target="_blank"
-            href={networkUrl != null ? `${value}` : ''}
+            href={isNetworkUrl != null ? `${value}` : ''}
             rel="noopener noreferrer"
             sx={{ textDecoration: 'none' }}
           >
