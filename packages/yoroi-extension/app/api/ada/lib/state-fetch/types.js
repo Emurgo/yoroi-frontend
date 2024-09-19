@@ -548,6 +548,9 @@ export type GetRecentTransactionHashesRequest = {|
     blockHash: string,
     txHash?: ?string,
   |},
+  include?: {
+    assets: Array<string>,
+  }
 |};
 
 export type TxSummary = {|

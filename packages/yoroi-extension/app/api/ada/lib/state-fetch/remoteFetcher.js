@@ -234,7 +234,7 @@ export class RemoteFetcher implements IFetcher {
   getRecentTransactionHashes
   : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>
     = (body) => {
-      const { network, addresses, before } = body;
+      const { network, addresses, before, include } = body;
       const { BackendService } = network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getRecentTransactionHashes)} missing backend url`);
       return axios(
@@ -242,7 +242,7 @@ export class RemoteFetcher implements IFetcher {
         {
           method: 'post',
           timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: { addresses, before },
+          data: { addresses, before, include },
           headers: {
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()

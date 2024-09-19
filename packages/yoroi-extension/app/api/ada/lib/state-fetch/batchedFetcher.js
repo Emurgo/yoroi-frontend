@@ -296,6 +296,7 @@ export function batchGetTransactionsHistoryForAddresses(
 function batchGetRecentTransactionHashes(
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
 ): GetRecentTransactionHashesFunc {
+  // <TODO:UPDATE> Batch by addresses?
   return getRecentTransactionHashes;
 }
 

@@ -294,7 +294,7 @@ function deserializeTx(tx: any): WalletTransaction {
 }
 
 export const refreshTransactions: GetEntryFuncType<typeof RefreshTransactions> = async (request) => {
-  const txs = await callBackground({ type: 'refresh-transactions', request });
+  const txs = await callBackground({ type: RefreshTransactions.typeTag, request });
   return txs.map(deserializeTx);
 }
 
