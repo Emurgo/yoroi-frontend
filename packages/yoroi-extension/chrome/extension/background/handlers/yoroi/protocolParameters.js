@@ -138,13 +138,21 @@ class ProcolParameterApi {
     );
   }
 
-  async getCachedProtocolParameters(epoch: number): Promise<?ProtocolParameters> {
+  async getCachedProtocolParameters(
+    epoch: number,
+    allowFallbackToPreviousEpoch: boolean
+  ): Promise<?ProtocolParameters> {
     const storage = this.getCacheStorage();
     const cache = await storage.get();
     if (!cache) {
       return null;
     }
-    return cache.find((protocolParameters) => protocolParameters.epoch === epoch);
+    return cache.find((protocolParameters) => {
+      if (allowFallbackToPreviousEpoch) {
+        return protocolParameters.epoch <= epoch;
+      }
+      return protocolParameters.epoch === epoch;
+    });
   }
 
   async cacheProtocolParameters(protocolParameters: ProtocolParameters): Promise<void> {
@@ -172,13 +180,26 @@ class ProcolParameterApi {
 
   async getProtocolParameters(): Promise<ProtocolParameters> {
     const { currentEpoch } = this.getEpochData();
-    const cached = await this.getCachedProtocolParameters(currentEpoch);
+    const cached = await this.getCachedProtocolParameters(currentEpoch, false);
     if (cached) {
       return cached;
     }
-    const fetched = await this.fetchProtocolParametersFromNetwork();
-    if (fetched) {
-      return fetched;
+    try {
+      const fetched = await this.fetchProtocolParametersFromNetwork();
+      if (fetched) {
+        return fetched;
+      }
+    } catch (error) {
+      console.error(
+        'failed to fetch protocol parameters for network %s epoch $S:',
+        this.#networkId,
+        currentEpoch,
+        error
+      );
+    }
+    const cachedPrevious = await this.getCachedProtocolParameters(currentEpoch, true);
+    if (cachedPrevious) {
+      return cachedPrevious;
     }
     return this.getDefaultProtocolParameters();
   }
@@ -201,7 +222,7 @@ export const getProtocolParameters: (number) => Promise<ProtocolParameters> =
 
 export async function updateProtocolParametersCacheFromNetwork(networkId: number, epoch: ?number) {
   const api = new ProcolParameterApi(networkId);
-  if (epoch == null || await api.getCachedProtocolParameters(epoch) == null) {
+  if (epoch == null || await api.getCachedProtocolParameters(epoch, false) == null) {
     await api.fetchProtocolParametersFromNetwork();
   }
 }
