@@ -26,6 +26,7 @@ const LayoutProvider = (props: Object): Node => {
         selectedLayout: localLayout,
         currentTheme: layout,
         isRevampLayout: localLayout === 'REVAMP',
+        // <TODO:PENDING_REMOVAL> disabling legacy UI
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
           const selectedComponent = layoutMap[localLayout];
           return selectedComponent;
