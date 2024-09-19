@@ -8,7 +8,7 @@ export const darkPalette = {
   primary_400: '#2E4BB0',
   primary_300: '#304489',
   primary_200: '#242D4F',
-  primary_100: '#171B28',
+  primary_100: '#1F253B',
 
   secondary_900: '#E4F7F3',
   secondary_800: '#C6F7ED',
@@ -52,7 +52,7 @@ export const darkPalette = {
   sys_orange_100: '#291802',
 
   bg_gradient_1: 'linear-gradient(195.39deg,  #1AE3BB 26%, #4B6DDE 10%,#4B6DDE 16%)',
-  bg_gradient_2: 'linear-gradient(205.51deg, #0B997D 48%, #08C29D 8%)',
+  bg_gradient_2: 'linear-gradient(206deg, rgba(11, 153, 125, 0.48) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
   bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 100%, #2B3E7D 100%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
   special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
