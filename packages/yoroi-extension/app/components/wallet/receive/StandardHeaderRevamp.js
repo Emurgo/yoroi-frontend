@@ -146,7 +146,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               </CopyableAddress>
             </Box>
 
-            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_medium">
+            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </Typography>
 
