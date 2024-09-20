@@ -18,7 +18,7 @@ const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false, add
   console.log('theme', theme);
   // Get QRCode color value from active theme's CSS variable
   const qrCodeBackgroundColor = addBg ? theme.palette.ds.el_gray_max : '#ffffff';
-  const qrCodeForegroundColor = fgColor ?? readCssVar('--yoroi-qr-code-foreground');
+  const qrCodeForegroundColor = theme.palette.ds.gray_min;
 
   return (
     <QRCode

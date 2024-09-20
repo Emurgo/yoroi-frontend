@@ -75,7 +75,7 @@ function TextField({
     <TextFieldBase
       className={className}
       error={Boolean(error)}
-      label={!Boolean(revamp) && label}
+      label={label}
       value={value}
       disabled={disabled}
       autoFocus={autoFocus}
@@ -89,6 +89,9 @@ function TextField({
         '& .MuiFormHelperText-root': {
           marginTop: '4px',
           letterSpacing: '0.2px',
+        },
+        '& .MuiFormLabel-root': {
+          color: theme => `${theme.palette.ds.text_gray_medium} !important`,
         },
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,

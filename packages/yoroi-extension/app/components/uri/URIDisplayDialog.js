@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { buildURI } from '../../utils/URIHandling';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import classnames from 'classnames';
 import Dialog from '../widgets/Dialog';
 import DialogBackButton from '../widgets/DialogBackButton';
@@ -17,6 +17,13 @@ import CopyableAddress from '../widgets/CopyableAddress';
 import BigNumber from 'bignumber.js';
 import styles from './URIDisplayDialog.scss';
 import globalMessages from '../../i18n/global-messages';
+
+const WarningBox = styled(Box)(({ theme }) => ({
+  padding: '16px',
+  paddingTop: '12px',
+  borderRadius: '8px',
+  background: theme.palette.ds.bg_gradient_1,
+}));
 
 const messages = defineMessages({
   uriDisplayDialogTitle: {
@@ -29,8 +36,7 @@ const messages = defineMessages({
   },
   usabilityWarning: {
     id: 'uri.display.dialog.usabilityWarning',
-    defaultMessage:
-      '!!!This link can only be opened by users with Yoroi installed on their browser',
+    defaultMessage: '!!!This link can only be opened by users with Yoroi installed on their browser',
   },
 });
 
@@ -65,17 +71,10 @@ export default class URIDisplayDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={onClose}
         backButton={<DialogBackButton onBack={onBack} />}
-        id='uriDisplayDialog'
+        id="uriDisplayDialog"
       >
         <Box maxWidth="600px">
-          <Box
-            sx={{
-              p: '16px',
-              pt: '12px',
-              borderRadius: '8px',
-              background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)',
-            }}
-          >
+          <WarningBox>
             <Box mb="8px" display="flex" alignItems="center" justifyContent="flex-start" gap="8px">
               <Box component="span" color="grayscale.max">
                 <InfoIcon />
@@ -87,19 +86,20 @@ export default class URIDisplayDialog extends Component<Props> {
             <Typography component="div" variant="body1" color="grayscale.max">
               {intl.formatMessage(messages.usabilityWarning)}
             </Typography>
-          </Box>
+          </WarningBox>
           <div className={styles.qrCode}>
-            <QrCodeWrapper value={uri} fgColor="black" size={152} />
+            <QrCodeWrapper value={uri} size={152} />
           </div>
           <div className={styles.uriDisplay}>
             <CopyableAddress
-              id='uriDisplayDialog'
+              id="uriDisplayDialog"
               hash={uri}
               elementId={uriNotificationId}
               onCopyAddress={() => onCopyAddressTooltip(uriNotificationId)}
               notification={notification}
               placementTooltip="bottom-start"
               sx={{
+                color: 'ds.text_gray_medium',
                 alignItems: 'flex-start',
                 '& > .CopyableAddress_copyIconBig': {
                   p: '6px',
