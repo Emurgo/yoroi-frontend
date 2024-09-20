@@ -1,5 +1,5 @@
 // @flow
-import { Box, Button, Typography, useTheme } from '@mui/material';
+import { Box, Button, Typography, useTheme, styled } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import type { Node } from 'react';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
@@ -15,7 +15,7 @@ function colorsBySeverity(isSevere: boolean) {
   const theme = useTheme();
   return isSevere
     ? { fg: theme.palette.ds.text_error, bg: theme.palette.ds.sys_magenta_100 }
-    : { fg: theme.palette.ds.sys_yellow_500, bg: theme.palette.ds.sys_yellow_100 };
+    : { fg: theme.palette.ds.sys_orange_500, bg: theme.palette.ds.sys_yellow_100 };
 }
 
 export function PriceImpactColored({
@@ -50,10 +50,26 @@ export function PriceImpactIcon({ isSevere, small }: {| isSevere: boolean, small
         marginLeft: '-3px',
       }}
     >
-      {isSevere ? <ErrorTriangleIcon {...svgProp} /> : <ExclamationCircleIcon {...svgProp} />}
+      {isSevere ? (
+        <IconWrapper isSevere={isSevere}>
+          <ErrorTriangleIcon {...svgProp} />
+        </IconWrapper>
+      ) : (
+        <IconWrapper isSevere={isSevere}>
+          <ExclamationCircleIcon {...svgProp} />
+        </IconWrapper>
+      )}
     </Box>
   );
 }
+
+const IconWrapper = styled(Box)(({ theme, isSevere }) => ({
+  '& svg': {
+    '& path': {
+      fill: isSevere ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.sys_orange_500,
+    },
+  },
+}));
 
 function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   const { palette } = useTheme();
