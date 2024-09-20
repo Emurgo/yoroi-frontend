@@ -85,6 +85,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     if (/^DeviceVersionUnsupported/.test(error.message)) {
       return new LocalizableError(ledgerErrors.deviceVersionNoDataSigning);
     }
+    if (/Invalid data supplied to Ledger/.test(error.message)) {
+      return new LocalizableError(
+        ledgerErrors.deviceStatusError
+      );
+    }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
@@ -127,11 +132,6 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'DeviceVersionUnsupported: CIP36 registration not supported by Ledger app version 5.0.0.':
         localizableError = new LocalizableError(
           ledgerErrors.cip36NotSupported
-        );
-        break;
-      case 'DeviceStatusError: Invalid data supplied to Ledger':
-        localizableError = new LocalizableError(
-          ledgerErrors.deviceStatusError
         );
         break;
       default:
