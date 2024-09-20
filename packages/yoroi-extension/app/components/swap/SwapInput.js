@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
+import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark.inline.svg';
 import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
+import { useTheme } from '@mui/material';
 
 type Props = {|
   label: string,
@@ -38,6 +40,8 @@ export default function SwapInput({
 }: Props): Node {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
+  const { name } = useTheme();
+  console.log('name', name);
 
   const handleChange = e => {
     if (!disabled) {
@@ -62,7 +66,8 @@ export default function SwapInput({
     }
   }, [id]);
 
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
+  const defaultImage = name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
 
   return (
     <Box>
@@ -138,7 +143,7 @@ export default function SwapInput({
                 src={imgSrc}
                 alt=""
                 onError={e => {
-                  e.target.src = defaultTokenImage;
+                  e.target.src = defaultImage;
                 }}
               />
             </Box>
