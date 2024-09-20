@@ -7,13 +7,17 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+
+const QrCodeBackground = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_1,
+}));
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -90,14 +94,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
 
         <Box display="flex" alignItems="start" justifyContent="center" mb="30px" pb="30px" gap="24px" position="relative">
           <Box display="flex" justifyContent="center" alignItems="center">
-            <Box
-              p="16px"
-              borderRadius="16px"
-              height="min-content"
-              sx={{
-                background: theme => theme.palette.gradients['blue-green-bg'],
-              }}
-            >
+            <QrCodeBackground p="16px" borderRadius="16px" height="min-content">
               <Box
                 alignItems="flex-start"
                 display="flex"
@@ -114,7 +111,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               >
                 <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
               </Box>
-            </Box>
+            </QrCodeBackground>
           </Box>
           <Box width="100%">
             <Box mb="8px">
