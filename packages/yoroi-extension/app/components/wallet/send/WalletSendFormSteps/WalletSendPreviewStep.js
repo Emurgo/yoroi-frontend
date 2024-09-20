@@ -33,6 +33,7 @@ import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
+import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
 
 const SBox = styled(Box)(({ theme }) => ({
   background: theme.palette.ds.bg_gradient_3,
@@ -368,7 +369,31 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (walletType === 'mnemonic') {
       const { txError } = this.state;
       if (txError !== null) {
-        return <div className={styles.txError}>{txError}</div>;
+        return (
+          <Stack direction="column" gap="8px" className={styles.txError} sx={{ backgroundColor: 'ds.sys_magenta_100' }}>
+            <Stack gap="8px" direction="row">
+              <AttentionIcon />
+              <Typography variant="body1" color="ds.sys_magenta_500">
+                Transaction error
+              </Typography>
+            </Stack>
+            <Typography variant="body1" color="ds.text-gray-medium">
+              The transaction cannot be done due to technical reasons. Try again or
+              <Link
+                className={styles.faq}
+                href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+                target="_blank"
+                rel="noreferrer"
+                sx={{
+                  color: 'ds.text-primary-medium',
+                  marginLeft: '4px',
+                }}
+              >
+                Ask our support team
+              </Link>
+            </Typography>
+          </Stack>
+        );
       }
       return null;
     }
@@ -416,7 +441,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             {receiverHandle ? (
               <div style={{ marginBottom: '20px' }}>
                 <Box mb="8px">
-                  <Typography component="div" variant="body1" color="grayscale.600">
+                  <Typography component="div" variant="body1" color="ds.text_gray_medium">
                     {intl.formatMessage(messages.receiverHandleLabel)}
                   </Typography>
                 </Box>
@@ -428,7 +453,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                       color: 'grayscale.900',
                       overflowWrap: 'break-word',
                     }}
-                    id='wallet:send:confrimTransactionStep-receiverHandleInfo-text'
+                    id="wallet:send:confrimTransactionStep-receiverHandleInfo-text"
                   >
                     {receiverHandle.nameServer}: {receiverHandle.handle}
                   </Typography>
@@ -437,7 +462,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             ) : null}
             <div>
               <Box mb="8px">
-                <Typography component="div" variant="body1" color="grayscale.600">
+                <Typography component="div" variant="body1" color="ds.text_gray_medium">
                   {intl.formatMessage(messages.receiverLabel)}
                 </Typography>
               </Box>
@@ -475,18 +500,24 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             </SBox>
 
             <div className={styles.feesWrapper}>
-              <div className={styles.feesLabel}>{intl.formatMessage(globalMessages.transactionFee)}</div>
-              <div className={styles.feesValue}>
+              <Typography variant="body1" color="ds.text_gray_low">
+                {intl.formatMessage(globalMessages.transactionFee)}
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
                 {this.renderBundle({
                   amount: this.props.transactionFee,
                   render: this.renderSingleFee,
                 })}
-              </div>
+              </Typography>
             </div>
 
             <div className={styles.amountWrapper}>
-              <div className={styles.amountLabel}>{this._amountLabel()}</div>
-              <div className={styles.amountValue}>{this.renderDefaultTokenAmount(amount.getDefaultEntry())}</div>
+              <Typography variant="body1" color="ds.text_gray_low">
+                {this._amountLabel()}
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {this.renderDefaultTokenAmount(amount.getDefaultEntry())}
+              </Typography>
             </div>
 
             <div className={styles.wrapper}>
