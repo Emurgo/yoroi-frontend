@@ -39,8 +39,8 @@ export const darkPalette = {
   sys_magenta_700: '#FFC0D0',
   sys_magenta_600: '#FB9CB5',
   sys_magenta_500: '#FF7196',
-  sys_magenta_300: '#572835',
-  sys_magenta_100: '#2F171D',
+  sys_magenta_300: '#64303E',
+  sys_magenta_100: '#3B252A',
 
   sys_cyan_500: '#59B1F4',
   sys_cyan_100: '#112333',
