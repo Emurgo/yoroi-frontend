@@ -1179,6 +1179,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         params: ledgerSignTxPayload,
       });
     } catch (error) {
+      bringWindowToForeground();
       runInAction(() => {
         this.hwWalletError = new convertToLocalizableLedgerError(error);
         this.isHwWalletErrorRecoverable = true;
