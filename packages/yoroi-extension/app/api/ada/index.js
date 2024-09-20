@@ -79,7 +79,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { cip8Sign, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { cip8Sign, v4PublicToV2, makeCip8Key, buildCoseSign1FromSignature } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
@@ -2658,28 +2658,27 @@ export async function walletSignData(
     Buffer.from(payload, 'hex'),
   );
 
-  const key = RustModule.MessageSigning.COSEKey.new(
-    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
+  const key = makeCip8Key(signingKey.to_public().as_bytes());
+
+  return {
+    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
+    key: Buffer.from(key.to_bytes()).toString('hex'),
+  };
+}
+
+export async function encodeHardwareWalletSignResult(
+  addressHex: string,
+  signatureHex: string,
+  payloadHex: string,
+  signingPublicKeyHex: string,
+): Promise<{| signature: string, key: string |}> {
+  const coseSign1 = await buildCoseSign1FromSignature (
+    Buffer.from(addressHex, 'hex'),
+    Buffer.from(signatureHex, 'hex'),
+    Buffer.from(payloadHex, 'hex'),
   );
-  key.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_int(
-      RustModule.MessageSigning.Int.new_i32(6)
-    )
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_bytes(
-      signingKey.to_public().as_bytes()
-    )
-  );
+
+  const key = makeCip8Key(Buffer.from(signingPublicKeyHex, 'hex'));
 
   return {
     signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),

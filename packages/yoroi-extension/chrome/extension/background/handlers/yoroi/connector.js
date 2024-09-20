@@ -35,7 +35,7 @@ import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoa
 import { mergeWitnessSets } from '../../../../../app/api/ada/transactions/utils';
 import { hexToBytes } from '../../../../../app/coreUtils';
 import { Logger } from '../../../../../app/utils/logging';
-import { walletSignData } from '../../../../../app/api/ada';
+import { walletSignData, encodeHardwareWalletSignResult } from '../../../../../app/api/ada';
 
 type RpcUid = number;
 
@@ -238,10 +238,11 @@ export const UserSignConfirm: HandlerType<
           return;
         }
 
+        const { address, payload } = responseData.continuationData;
+
         let dataSig;
 
         if (request.password !== '') {
-          const { address, payload } = responseData.continuationData;
           try {
             dataSig = await walletSignData(
               wallet,
@@ -268,7 +269,12 @@ export const UserSignConfirm: HandlerType<
           if (signedMessageData == null) {
             throw new Error('unexpected user signed confirmation: missing hardware wallet signing response');
           }
-          dataSig = signedMessageData.signatureHex;
+          dataSig = await encodeHardwareWalletSignResult(
+            signedMessageData.addressFieldHex,
+            signedMessageData.signatureHex,
+            payload,
+            signedMessageData.signingPublicKeyHex,
+          );
         }
         rpcResponse(request.tabId, request.uid, { ok: dataSig });
       }
