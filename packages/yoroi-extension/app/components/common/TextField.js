@@ -75,7 +75,7 @@ function TextField({
     <TextFieldBase
       className={className}
       error={Boolean(error)}
-      label={label}
+      label={!Boolean(revamp) && label}
       value={value}
       disabled={disabled}
       autoFocus={autoFocus}
