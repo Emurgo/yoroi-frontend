@@ -1,5 +1,5 @@
 // @flow
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
@@ -16,7 +16,6 @@ import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 import type { AssetAmount, PriceImpact } from './types';
-import { useTheme } from '@mui/material';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -179,7 +178,7 @@ export const AssetAndAmountRow = ({
 |}): React$Node => {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const theme = useTheme();
-  const defaultImage = theme.name == 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
+  const defaultImage = theme.name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
 
   const isFrom = type === 'from';
 

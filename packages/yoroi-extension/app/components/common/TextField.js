@@ -60,7 +60,7 @@ function TextField({
   isLoading,
   ...props
 }: Props): Node {
-  const theme = useTheme();
+  const appTheme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(prev => !prev);
@@ -69,7 +69,7 @@ function TextField({
     event.preventDefault();
   };
 
-  const isRevampTheme = theme.name === 'revamp-light';
+  const isRevampTheme = appTheme.name === 'revamp-light';
 
   return (
     <TextFieldBase
@@ -100,17 +100,17 @@ function TextField({
           border: theme => `1px solid ${theme.palette.ds.el_gray_min}`,
         },
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
-          WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+          WebkitBoxShadow: `0 0 0 30px ${appTheme.palette.ds.bg_color_max} inset !important`,
         },
       }}
       /*
         In order to show placeholders for classic theme we dont' need to override
         'shrink' and 'notched' prop status so we pass an empty object
       */
-      InputLabelProps={theme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }}
+      InputLabelProps={appTheme.name === 'classic' ? { shrink: true, ...InputLabelProps } : { ...InputLabelProps }}
       InputProps={{
         ...((Boolean(revamp) ? { disableUnderline: true } : {}): any),
-        ...((theme.name === 'classic' ? { notched: false } : {}): any),
+        ...((appTheme.name === 'classic' ? { notched: false } : {}): any),
         sx: value.length === 0 ? { color: 'grayscale.900 !important' } : null,
         endAdornment: isLoading ? (
           <InputAdornment position="end" sx={{ marginTop: '-26px' }}>

@@ -1,5 +1,5 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import type { Node } from 'react';
 import { useEffect, useState } from 'react';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
@@ -9,7 +9,6 @@ import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark
 import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
-import { useTheme } from '@mui/material';
 
 type Props = {|
   label: string,

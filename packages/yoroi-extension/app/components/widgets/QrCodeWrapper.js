@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import QRCode from 'qrcode.react';
-import { readCssVar } from '../../styles/utils';
 import { useTheme } from '@mui/material';
 
 type Props = {|
@@ -13,7 +12,7 @@ type Props = {|
   +fgColor?: string,
 |};
 
-const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false, addBg = true, fgColor }: Props): Node => {
+const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false, addBg = true }: Props): Node => {
   const theme = useTheme();
   console.log('theme', theme);
   // Get QRCode color value from active theme's CSS variable
