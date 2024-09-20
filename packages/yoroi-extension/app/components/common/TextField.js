@@ -92,6 +92,11 @@ function TextField({
         },
         '& .MuiFormLabel-root': {
           color: theme => `${theme.palette.ds.text_gray_medium} !important`,
+          backgroundColor: theme => `${theme.palette.ds.bg_color_max} !important`,
+          padding: '0 4px !important',
+        },
+        '& .MuiOutlinedInput-root.Mui-disabled ': {
+          backgroundColor: theme => `${theme.palette.ds.bg_color_min} !important`,
         },
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
