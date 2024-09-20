@@ -602,6 +602,7 @@
   "wallet.hw.ledger.common.error.103": "Ledger device is locked, please unlock it and retry.",
   "wallet.hw.ledger.common.error.104": "Ledger device timeout, please retry.",
   "wallet.hw.ledger.common.error.105": "Network error. Please check your internet connection.",
+  "wallet.hw.ledger.error.deviceStatus": "Invalid or oversized data for Ledger.",
   "wallet.hw.ledger.error.deviceVersionNoDataSigning": "CIP-8 message signing not supported by your Ledger app version",
   "wallet.hw.ledger.data.sign.unsupported.error": "The Ledger Cardano app does not support data signing at this memoment",
   "wallet.hw.trezor.data.sign.unsupported.error": "Trezor does not support data signing at this memoment",

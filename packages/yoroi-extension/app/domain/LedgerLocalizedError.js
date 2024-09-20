@@ -47,6 +47,10 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.error.deviceVersionNoDataSigning',
     defaultMessage: '!!!CIP-8 message signing not supported by your Ledger app version',
   },
+  deviceStatusError: {
+    id: 'wallet.hw.ledger.error.deviceStatus',
+    defaultMessage: '!!!Invalid or oversized data for Ledger.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -123,6 +127,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'DeviceVersionUnsupported: CIP36 registration not supported by Ledger app version 5.0.0.':
         localizableError = new LocalizableError(
           ledgerErrors.cip36NotSupported
+        );
+        break;
+      case 'DeviceStatusError: Invalid data supplied to Ledger':
+        localizableError = new LocalizableError(
+          ledgerErrors.deviceStatusError
         );
         break;
       default:
