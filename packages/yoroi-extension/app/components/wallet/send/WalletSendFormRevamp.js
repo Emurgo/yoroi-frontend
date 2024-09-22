@@ -629,7 +629,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 <Typography
                   component="div"
                   variant="caption1"
-                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
@@ -663,7 +663,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="caption1"
-                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
@@ -696,7 +696,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 variant="caption1"
                 sx={{
                   position: 'absolute',
-                  color: 'magenta.500',
+                  color: 'ds.sys_magenta_500',
                   left: '50%',
                   top: '-14px',
                   transform: 'translateX(-50%)',
@@ -715,7 +715,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   ? {
                       borderWidth: '2px',
                       borderStyle: 'solid',
-                      borderColor: 'magenta.500',
+                      borderColor: 'ds.sys_magenta_500',
                     }
                   : {
                       borderWidth: '1px',
@@ -840,7 +840,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     position: 'absolute',
                     bottom: '-25px',
                     left: '17px',
-                    color: 'magenta.500',
+                    color: 'ds.text_error',
                     fontSize: '12px',
                   }}
                   id="wallet:send:addAssetsStep-amountError-text"
