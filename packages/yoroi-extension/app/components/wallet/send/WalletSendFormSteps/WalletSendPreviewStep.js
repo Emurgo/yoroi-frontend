@@ -462,7 +462,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             ) : null}
             <div>
               <Box mb="8px">
-                <Typography component="div" variant="body1" color="ds.text_gray_medium">
+                <Typography component="div" variant="body1" color="ds.text_gray_low">
                   {intl.formatMessage(messages.receiverLabel)}
                 </Typography>
               </Box>
@@ -471,7 +471,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                   component="div"
                   variant="body1"
                   sx={{
-                    color: 'grayscale.900',
+                    color: 'ds.text_gray_medium',
                     overflowWrap: 'break-word',
                   }}
                   id="wallet:send:confrimTransactionStep-receiverAddress-text"
@@ -484,7 +484,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             <SBox className={styles.totalAmountWrapper}>
               <div className={styles.totalAmountLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}</div>
               <div>
-                <Box className={styles.totalAmountValue}>
+                <Box className={styles.totalAmountValue} mb="12px">
                   <Typography variant="body2" color="ds.text_gray_medium">
                     {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
                   </Typography>

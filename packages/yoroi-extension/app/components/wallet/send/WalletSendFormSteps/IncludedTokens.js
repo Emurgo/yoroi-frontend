@@ -9,9 +9,17 @@ import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import NFTImage from './NFTImage';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { splitAmount } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +shouldSendAll: boolean,
@@ -27,9 +35,7 @@ export default class IncludedTokens extends Component<Props> {
   renderItems(items: FormattedNFTDisplay[] | FormattedTokenDisplay[]): Node {
     return items.map(item => {
       const numberOfDecimals = item.info?.Metadata.numberOfDecimals || 0;
-      const displayAmount = item.amount
-        ? splitAmount(new BigNumber(item.amount), numberOfDecimals).join('')
-        : '0';
+      const displayAmount = item.amount ? splitAmount(new BigNumber(item.amount), numberOfDecimals).join('') : '0';
 
       return (
         <Box
@@ -70,21 +76,17 @@ export default class IncludedTokens extends Component<Props> {
                     },
                   }}
                 >
-                  <NFTImage
-                    image={item.image ?? null}
-                    name={item.name}
-                    width="30px"
-                    height="30px"
-                  />
+                  <NFTImage image={item.image ?? null} name={item.name} width="30px" height="30px" />
                 </Box>
                 <Box width="80%">
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     whiteSpace="nowrap"
                     overflow="hidden"
                     textOverflow="ellipsis"
                     justifySelf="flex-start"
                     variant="body1"
-                    color="grayscale.max"
+                    color="ds.text_gray_medium"
                   >
                     {item.name}
                   </Typography>
@@ -105,9 +107,10 @@ export default class IncludedTokens extends Component<Props> {
                   }}
                 >
                   <NoAssetLogo />
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     variant="body1"
-                    color="grayscale.max"
+                    color="ds.text_gray_medium"
                     whiteSpace="nowrap"
                     overflow="hidden"
                     textOverflow="ellipsis"
@@ -116,7 +119,7 @@ export default class IncludedTokens extends Component<Props> {
                   </Typography>
                 </Box>
                 <Box ml="auto" flexShrink={0}>
-                  <Typography component="div" variant="body1" color="grayscale.max">
+                  <Typography component="div" variant="body1" color="ds.text_gray_medium">
                     {displayAmount}
                   </Typography>
                 </Box>
@@ -134,12 +137,19 @@ export default class IncludedTokens extends Component<Props> {
           >
             {!this.props.shouldSendAll && (
               <Box
-                sx={{ bgcolor: 'grayscale.50', width: '32px', height: '32px', borderRadius: '50%' }}
+                sx={{
+                  bgcolor: 'grayscale.50',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                }}
                 component="button"
                 type="button"
                 onClick={() => this.props.onRemoveTokens([item.info])}
               >
-                <RemoveIcon />
+                <IconWrapper>
+                  <RemoveIcon />
+                </IconWrapper>
               </Box>
             )}
           </Box>
@@ -155,12 +165,7 @@ export default class IncludedTokens extends Component<Props> {
       <Box mt="24px">
         {tokens.length > 0 && (
           <Box mb={nfts.length > 0 ? '24px' : '0px'}>
-            <Typography component="div"
-              variant="caption1"
-              color="grey.900"
-              mb="8px"
-              sx={{ display: 'inline-block' }}
-            >
+            <Typography component="div" variant="caption1" color="ds.text_gray_medium" mb="8px" sx={{ display: 'inline-block' }}>
               {intl.formatMessage(globalMessages.tokens)}
             </Typography>
             <Box>{this.renderItems(tokens)}</Box>
@@ -169,19 +174,13 @@ export default class IncludedTokens extends Component<Props> {
 
         {nfts.length > 0 && (
           <Box>
-            <Typography component="div"
-              variant="caption1"
-              color="grey.900"
-              mb="8px"
-              sx={{ display: 'inline-block' }}
-            >
+            <Typography component="div" variant="caption1" color="ds.text_gray_medium" mb="8px" sx={{ display: 'inline-block' }}>
               {intl.formatMessage(globalMessages.nfts)}
             </Typography>
             <Box>{this.renderItems(nfts)}</Box>
           </Box>
         )}
       </Box>
-
     );
   }
 }

@@ -17,7 +17,7 @@ import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, TextField, styled } from '@mui/material';
 
 type Props = {|
   +token: FormattedTokenDisplay,
@@ -39,11 +39,10 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough balance',
   },
 });
-export default class SingleTokenRow extends Component<Props,State> {
+export default class SingleTokenRow extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-
 
   constructor(props: Props) {
     super(props);
@@ -59,9 +58,7 @@ export default class SingleTokenRow extends Component<Props,State> {
 
   onAmountUpdate(value: string | null): void {
     const formattedAmount =
-      value !== null && value !== ''
-        ? new BigNumber(formattedAmountToNaturalUnits(value, this.getNumDecimals()))
-        : null;
+      value !== null && value !== '' ? new BigNumber(formattedAmountToNaturalUnits(value, this.getNumDecimals())) : null;
     if (formattedAmount && formattedAmount.isNegative()) return;
     this.props.updateAmount(this.props.token.info, formattedAmount);
   }
@@ -77,41 +74,36 @@ export default class SingleTokenRow extends Component<Props,State> {
       amount = amount.shiftedBy(-numberOfDecimals).toString();
     }
 
-    const displayAmount = token.amount
-      ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
-      : '0';
+    const displayAmount = token.amount ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('') : '0';
 
     return (
       <div className={styles.component}>
         {!this.props.isTokenIncluded(token.info) ? (
-          <button
-            type="button"
-            className={styles.token}
-            onClick={() => this.props.onAddToken(token.info)}
-          >
+          <Box type="button" className={styles.token} onClick={() => this.props.onAddToken(token.info)}>
             <div className={styles.name}>
               <div className={styles.logo}>
                 <NoAssetLogo />
               </div>
               <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
-                {token.label.startsWith('asset')
-                  ? truncateAddressShort(token.label, 14)
-                  : token.label}
+                {token.label.startsWith('asset') ? truncateAddressShort(token.label, 14) : token.label}
               </Typography>
             </div>
             <Typography component="div" variant="body1" color="grayscale.900">
               {truncateAddressShort(token.id, 14)}
             </Typography>
-            <Typography variant="body1" color="grayscale.900" className={styles.amount}>{displayAmount}</Typography>
-          </button>
+            <Typography variant="body1" color="grayscale.900" className={styles.amount} sx={{ paddingRight: '10px' }}>
+              {displayAmount}
+            </Typography>
+          </Box>
         ) : (
           <Box
             border="2px solid"
             borderColor="grayscale.400"
-            className={
-              classnames([styles.amountWrapper,
-                !isValid && styles.amountError,this.state.isInputFocused && styles.inputFocused])
-            }
+            className={classnames([
+              styles.amountWrapper,
+              !isValid && styles.amountError,
+              this.state.isInputFocused && styles.inputFocused,
+            ])}
           >
             <div className={styles.amountTokenName}>
               <div className={styles.logo}>
@@ -121,12 +113,10 @@ export default class SingleTokenRow extends Component<Props,State> {
                 {token.label}
               </Typography>
             </div>
-            <div>
-              <Typography component="div" variant="body1" color="grayscale.900">
-                {truncateAddressShort(token.id, 14)}
-              </Typography>
-            </div>
-            <div className={styles.amountInput}>
+            <Typography component="div" variant="body1" color="grayscale.900">
+              {truncateAddressShort(token.id, 14)}
+            </Typography>
+            <Box className={styles.amountInput}>
               <AmountInputRevamp
                 value={!amount ? null : formattedAmountToBigNumber(amount)}
                 onChange={this.onAmountUpdate.bind(this)}
@@ -134,24 +124,19 @@ export default class SingleTokenRow extends Component<Props,State> {
                 amountFieldRevamp
                 placeholder={displayAmount}
                 onFocus={() => {
-                  this.setState({ isInputFocused: true })
+                  this.setState({ isInputFocused: true });
                 }}
                 onBlur={() => {
-                  this.setState({ isInputFocused: false })
+                  this.setState({ isInputFocused: false });
                 }}
+                autoFocus
               />
-            </div>
-            <button
-              type="button"
-              onClick={() => this.props.onRemoveToken(token.info)}
-              className={styles.close}
-            >
+            </Box>
+            <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
               {' '}
               <CloseIcon />{' '}
             </button>
-            <div className={styles.error}>
-              {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
-            </div>
+            <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
           </Box>
         )}
       </div>
