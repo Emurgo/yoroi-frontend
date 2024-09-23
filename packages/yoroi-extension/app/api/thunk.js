@@ -227,10 +227,9 @@ export async function signAndBroadcastTransaction(
 
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
   const result = await callBackground({ type: BroadcastTransaction.typeTag, request });
-  if (result.error) {
+  if (result?.error) {
     throw new Error(result.error);
   }
-  return result;
 }
 
 // Only mnemonic wallet has private staking key.

@@ -518,6 +518,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
           '& > div': {
             padding: '0px',
             margin: '0px',
+            height: '32px',
           },
           '& input': {
             border: 'none',
@@ -525,6 +526,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
             width: '100%',
             fontSize: '24px',
             lineHeight: '32px',
+            marginTop: '-16px',
           },
           '& input::placeholder': { color: 'grayscale.600' },
         }}
