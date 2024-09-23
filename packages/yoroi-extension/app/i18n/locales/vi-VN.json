@@ -32,6 +32,7 @@
   "api.errors.invalidWitnessError": "Chữ ký không hợp lệ.",
   "api.errors.noInputsError": "Ví đã khôi phục của bạn trống. Vui lòng kiểm tra cụm từ khôi phục của bạn và khôi phục lại.",
   "api.errors.noOutputsError": "Giao dịch yêu cầu ít nhất 1 đầu ra, nhưng không có đầu ra nào được cung cấp.",
+  "api.errors.oversizedTransaction": "Maximum transaction size exceeded.",
   "api.errors.poolMissingApiError": "Pool không thể tìm thấy. Làm ơn kiểm tra lại Pool ID và đảm bảo rằng pool không bị hủy đăng ký.",
   "api.errors.rewardAddressEmpty": "Địa chỉ trả thưởng chưa hiển thị cho đến khi người dùng có phần thưởng.",
   "api.errors.rollbackApiError": "Rollback đã được phát hiện.",
