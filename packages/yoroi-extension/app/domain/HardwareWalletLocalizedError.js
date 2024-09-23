@@ -12,13 +12,13 @@ const errors: * = defineMessages({
     id: 'wallet.hw.tx.unsupported.error',
     defaultMessage: '!!!Signing this transaction with hardware wallet is not supported.',
   },
-  ledgerSignDataUnsupportedError: {
-    id: 'wallet.hw.ledger.data.sign.unsupported.error',
-    defaultMessage: '!!!The Ledger Cardano app does not support data signing at this memoment',
-  },
   trezorSignDataUnsupportedError: {
     id: 'wallet.hw.trezor.data.sign.unsupported.error',
     defaultMessage: '!!!Trezor does not support data signing at this memoment',
+  },
+  unknownAddressError: {
+    id: 'wallet.hw.data.sign.unkown.address',
+    defaultMessage: '!!!The requested signing address is not found in this wallet',
   },
 });
 
@@ -30,10 +30,10 @@ export const unsupportedTransactionError: LocalizableError = new LocalizableErro
   errors.unsupportedTransactionError
 );
 
-export const ledgerSignDataUnsupportedError: LocalizableError = new LocalizableError(
-  errors.ledgerSignDataUnsupportedError
-);
-
 export const trezorSignDataUnsupportedError: LocalizableError = new LocalizableError(
   errors.trezorSignDataUnsupportedError
+);
+
+export const unknownAddressError: LocalizableError = new LocalizableError(
+  errors.unknownAddressError
 );

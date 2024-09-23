@@ -90,8 +90,7 @@ class SidebarContainer extends Component<AllProps, State> {
       <SidebarRevamp
         onLogoClick={() => {
           actions.router.goToRoute.trigger({
-            route: ROUTES.WALLETS.TRANSACTIONS,
-            publicDeriverId: stores.wallets.selected?.publicDeriverId,
+            route: ROUTES.WALLETS.ROOT,
           });
         }}
         onCategoryClicked={category => {

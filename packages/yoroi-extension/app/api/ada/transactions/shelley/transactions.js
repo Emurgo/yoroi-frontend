@@ -15,6 +15,7 @@ import {
   CannotSendBelowMinimumValueError,
   NotEnoughMoneyToSendError,
   NoOutputsError,
+  OversizedTransactionError,
 } from '../../../common/errors';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
@@ -332,7 +333,16 @@ export function sendAllUnsignedTxFromUtxo(
     txBuilder.set_auxiliary_data(metadata);
   }
 
-  if (totalBalance.lt(txBuilder.min_fee().to_str())) {
+  let minFee;
+  try {
+    minFee = txBuilder.min_fee().to_str();
+  } catch (error) {
+    if (/Maximum transaction size of \d+ exceeded\./.test(error)) {
+      throw new OversizedTransactionError();
+    }
+    throw error;
+  }
+  if (totalBalance.lt(minFee)) {
     // not enough in inputs to even cover the cost of including themselves in a tx
     throw new NotEnoughMoneyToSendError();
   }
