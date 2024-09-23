@@ -198,7 +198,6 @@ async function connectorEventListener(event) {
 }
 
 if (shouldInject()) {
-    injectIntoPage('bringInject');
     if (injectIntoPage('initialInject')) {
         // events from page (injected code)
         window.addEventListener("message", connectorEventListener);

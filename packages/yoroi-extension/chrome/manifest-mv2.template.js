@@ -76,6 +76,18 @@ export default ({
         matches: ['*://connect.trezor.io/*/popup.html'],
         js: ['js/trezor-content-script.js'],
       },
+      {
+        matches: [
+          'file://*/*',
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/bringInject.js',
+        ],
+        run_at: 'document_start',
+        all_frames: true,
+      }
     ],
     content_security_policy: contentSecurityPolicy,
     protocol_handlers: !enableProtocolHandlers
