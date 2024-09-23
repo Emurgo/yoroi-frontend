@@ -87,3 +87,52 @@ export const cip8Sign = async (
   const signedSigStruct = signKey.sign(toSign).to_bytes();
   return builder.build(signedSigStruct);
 }
+
+export const buildCoseSign1FromSignature = async (
+  address: Buffer,
+  signature: Buffer,
+  payload: Buffer,
+): Promise<RustModule.MessageSigning.COSESign1> => {
+  const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
+  protectedHeader.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(
+      RustModule.MessageSigning.AlgorithmId.EdDSA
+    )
+  );
+  protectedHeader.set_header(
+    RustModule.MessageSigning.Label.new_text('address'),
+    RustModule.MessageSigning.CBORValue.new_bytes(address)
+  );
+  const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
+  const unprotected = RustModule.MessageSigning.HeaderMap.new();
+  const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
+  const builder = RustModule.MessageSigning.COSESign1Builder.new(headers, payload, false);
+  return builder.build(signature);
+}
+
+export const makeCip8Key: (Uint8Array) => RustModule.MessageSigning.COSEKey = (publicSigningKey) => {
+  const key = RustModule.MessageSigning.COSEKey.new(
+    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
+  );
+  key.set_algorithm_id(
+    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_int(
+      RustModule.MessageSigning.Int.new_i32(6)
+    )
+  );
+  key.set_header(
+    RustModule.MessageSigning.Label.new_int(
+      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
+    ),
+    RustModule.MessageSigning.CBORValue.new_bytes(
+      publicSigningKey
+    )
+  );
+
+  return key;
+}

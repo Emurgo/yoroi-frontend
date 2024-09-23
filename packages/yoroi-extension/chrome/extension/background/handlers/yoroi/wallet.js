@@ -86,6 +86,8 @@ export const CreateHardwareWallet: HandlerType<
   typeTag: 'create-hardware-wallet',
 
   handle: async (request) => {
+    await RustModule.load();
+
     const db = await getDb();
 
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
