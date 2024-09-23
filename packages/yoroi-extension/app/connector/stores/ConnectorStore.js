@@ -54,10 +54,10 @@ import type LocalizableError from '../../i18n/LocalizableError';
 import { convertToLocalizableError as convertToLocalizableLedgerError } from '../../domain/LedgerLocalizedError';
 import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
-  ledgerSignDataUnsupportedError,
   transactionHashMismatchError,
   trezorSignDataUnsupportedError,
   unsupportedTransactionError,
+  unknownAddressError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
@@ -76,7 +76,8 @@ import {
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
-import AdaApi from '../../api/ada';
+import AdaApi, { findPath } from '../../api/ada';
+import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -294,12 +295,62 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         });
       }
     } else if (signingMessage.sign.type === 'data') {
-      userSignConfirm({
-        tx: null,
-        uid: signingMessage.sign.uid,
-        tabId: signingMessage.tabId,
-        password,
-      });
+      const { payload } = signingMessage.sign;
+
+      if (wallet.type === 'mnemonic') {
+        userSignConfirm({
+          tx: null,
+          uid: signingMessage.sign.uid,
+          tabId: signingMessage.tabId,
+          password,
+        });
+      } else if (wallet.type === 'ledger') {
+        const signingPath = findPath(wallet, signingMessage.sign.address);
+        if (signingPath == null) {
+          runInAction(() => {
+            this.hwWalletError = unknownAddressError;
+            this.isHwWalletErrorRecoverable = false;
+          });
+          return;
+        }
+
+        const expectedSerial = wallet.hardwareWalletDeviceId || '';
+
+        const ledgerConnect = new LedgerConnect({
+          locale: this.stores.profile.currentLocale,
+        });
+
+        let ledgerSignResult;
+        try {
+          ledgerSignResult = await ledgerConnect.signMessage({
+            serial: expectedSerial,
+            params: {
+              messageHex: payload,
+              signingPath,
+              hashPayload: false,
+              preferHexDisplay: false,
+              // see https://vacuumlabs.github.io/ledgerjs-cardano-shelley/7.1.3/enums/MessageAddressFieldType.html#ADDRESS
+              addressFieldType: MessageAddressFieldType.KEY_HASH,
+            },
+          });
+          userSignConfirm({
+            tx: null,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+            password: '',
+            signedMessageData: ledgerSignResult,
+          });
+        } catch (error) {
+          bringWindowToForeground();
+          runInAction(() => {
+            this.hwWalletError = new convertToLocalizableLedgerError(error);
+            this.isHwWalletErrorRecoverable = true;
+          });
+          return;
+        }
+      } else {
+        throw new Error('Not expected to reach here. Unexpectedly wallet type');
+      }
     } else {
       throw new Error(`unkown sign data type ${signingMessage.sign.type}`);
     }
@@ -1128,6 +1179,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         params: ledgerSignTxPayload,
       });
     } catch (error) {
+      bringWindowToForeground();
       runInAction(() => {
         this.hwWalletError = new convertToLocalizableLedgerError(error);
         this.isHwWalletErrorRecoverable = true;
@@ -1172,12 +1224,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (connectedWallet == null) {
       return;
     }
-    if (connectedWallet.type !== 'mnemonic') {
-      const hwWalletError = connectedWallet.type === 'ledger'
-        ? ledgerSignDataUnsupportedError
-        : trezorSignDataUnsupportedError;
+    if (connectedWallet.type === 'trezor') {
       runInAction(() => {
-        this.hwWalletError = hwWalletError;
+        this.hwWalletError = trezorSignDataUnsupportedError;
         this.isHwWalletErrorRecoverable = false;
       });
     }
@@ -1201,3 +1250,12 @@ function deserializeAnchor(anchor: ?RustModule.WalletV4.Anchor): Anchor | null {
 
 
 
+function bringWindowToForeground(): void {
+  declare var chrome;
+  chrome.windows.update(
+    -2, // current window
+    {
+      focused: true,
+    }
+  );
+}

@@ -16,6 +16,7 @@ import type {
   DeriveAddressRequest,
   GetExtendedPublicKeyRequest,
   GetExtendedPublicKeysRequest,
+  MessageData,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type {
   MessageType,
@@ -239,6 +240,12 @@ export default class ConnectStore {
           params,
         });
         break;
+      case OPERATION_NAME.SIGN_MESSAGE:
+        this.signMessage({
+          actn,
+          params,
+        });
+        break;
       default:
         throw new Error(`[YLC] Unexpected action called: ${actn}`);
     }
@@ -418,6 +425,28 @@ export default class ConnectStore {
     }
   };
 
+  signMessage: {|
+    actn: OperationNameType,
+    params: MessageData,
+  |} => Promise<void> = async (request) => {
+    let transport;
+    try {
+      transport = await makeTransport(this.transportId);
+      const { version } = await this._detectLedgerDevice(transport);
+
+      const adaApp = new AdaApp(transport);
+      const resp = await adaApp.signMessage(
+        request.params
+      );
+
+      this._replyMessageWrap(request.actn, true, resp);
+    } catch (err) {
+      this._replyError(request.actn, err);
+    } finally {
+      transport && transport.close();
+    }
+  };
+
   // #==============================================#
   //  Yoroi extension main tab <==> this tab communications
   // #==============================================#
@@ -479,6 +508,7 @@ export default class ConnectStore {
       case OPERATION_NAME.SIGN_TX:
       case OPERATION_NAME.SHOW_ADDRESS:
       case OPERATION_NAME.DERIVE_ADDRESS:
+      case OPERATION_NAME.SIGN_MESSAGE:
         // Only one operation in one session
         if (!this.userInteractableRequest) {
           this.userInteractableRequest = {
