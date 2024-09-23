@@ -2,7 +2,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import * as React from 'react';
 import { Icon } from '../icons/index';
 import { IconButtonWrapper } from '../wrappers/IconButtonWrapper';
@@ -30,7 +30,6 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 
 export const ModalManager = () => {
   const { height, width, closeModal, content, title, isOpen } = useModal();
-  const theme = useTheme();
 
   return (
     <BootstrapDialog
