@@ -1,3 +1,5 @@
+// @flow
+
 import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
 
 (async () => {
@@ -102,8 +104,41 @@ import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
   });
 })().catch(console.error);
 
-// example
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-});
+function getAddresses(): Promise<string> {
+  const uid = Math.random();
+  return new Promise((resolve, reject) => {
+    chrome.runtime.onMessage.addListener((msg, sender) => {
+      if (msg.type === 'connector_rpc_response' && msg.uid === uid) {
+        if (msg.return.ok) {
+          resolve(msg.return.ok);
+        } else {
+          reject(new Error(msg.return.err));
+        }
+      }
+    });
 
-console.log('Bring injected');
+    window.postMessage({
+      type: "connector_rpc_request",
+      url: location.hostname,
+      uid,
+      function: 'get_used_addresses',
+      params: [undefined],
+      returnType: 'cbor',
+    });
+  });
+}
+
+async function example() {
+  try {
+    const addrs = await getAddresses();
+    console.log('address', addrs[0]);
+  } catch (error) {
+    if (error.message === 'no wallet') {
+      console.log('no wallet');
+    } else {
+      throw error;
+    }
+  }
+}
+
+example().catch(console.error);
