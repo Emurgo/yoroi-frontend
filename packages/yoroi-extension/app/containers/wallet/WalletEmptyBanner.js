@@ -7,7 +7,6 @@ import { ReactComponent as CoverBg } from '../../assets/images/transaction/walle
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import { fontSize } from '../../styles/themes/tokens/tokens';
 
 type Props = {|
   onBuySellClick: () => void,

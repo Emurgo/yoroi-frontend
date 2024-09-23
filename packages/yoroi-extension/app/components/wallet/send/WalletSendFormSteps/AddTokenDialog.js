@@ -30,7 +30,6 @@ import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import { fontWeight } from '../../../../styles/themes/tokens/tokens';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {

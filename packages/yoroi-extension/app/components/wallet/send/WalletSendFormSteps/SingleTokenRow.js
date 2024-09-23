@@ -17,7 +17,7 @@ import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
-import { Box, Typography, TextField, styled } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
