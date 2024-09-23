@@ -18,6 +18,9 @@ const IconWrapper = styled(Box)(({ theme }) => ({
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
     },
+    '& rect': {
+      fill: theme.palette.ds.bg_color_max,
+    },
   },
 }));
 
