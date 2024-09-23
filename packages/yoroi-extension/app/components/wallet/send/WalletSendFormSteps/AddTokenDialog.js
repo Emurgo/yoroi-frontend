@@ -314,11 +314,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={
-          fullTokensList.length === 0
-            ? intl.formatMessage(globalMessages.tokens)
-            : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
-        }
+        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
         actions={[
           {
             disabled:
