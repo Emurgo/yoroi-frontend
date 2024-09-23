@@ -156,6 +156,10 @@ const messages = defineMessages({
     id: 'api.errors.getUtxoDataError',
     defaultMessage: '!!!Error received from server while getting UTXO data',
   },
+  oversizedTransactionError: {
+    id: 'api.errors.oversizedTransaction',
+    defaultMessage: '!!!Maximum transaction size exceeded.',
+  },
 });
 
 export class ServerStatusError extends LocalizableError {
@@ -494,6 +498,15 @@ export class GetUtxoDataError extends LocalizableError {
     super({
       id: messages.getUtxoDataError.id,
       defaultMessage: messages.getUtxoDataError.defaultMessage || '',
+    });
+  }
+}
+
+export class OversizedTransactionError extends LocalizableError {
+  constructor() {
+    super({
+      id: messages.oversizedTransactionError.id,
+      defaultMessage: messages.oversizedTransactionError.defaultMessage
     });
   }
 }
