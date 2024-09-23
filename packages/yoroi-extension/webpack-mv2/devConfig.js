@@ -136,7 +136,6 @@ const contentScriptConfig = (
   },
 
   plugins: [
-    ...commonConfig.plugins('dev', networkName),
     new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1
     }),
