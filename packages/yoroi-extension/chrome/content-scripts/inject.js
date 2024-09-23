@@ -80,7 +80,7 @@ function getFavicons(url) {
     // sometimes the favicon is specified at the top of the HTML
     const optionalFavicon = document.querySelector("link[rel~='icon']");
     if(optionalFavicon) {
-        return [defaultFavicon, optionalFavicon.href]
+        return [optionalFavicon.href, defaultFavicon]
     }
     return [defaultFavicon];
 }

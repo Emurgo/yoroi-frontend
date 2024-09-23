@@ -25,6 +25,7 @@ import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletS
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
+import { Redirect } from 'react-router';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -47,14 +48,6 @@ class Wallet extends Component<AllProps> {
   };
 
   componentDidMount() {
-    // reroute to the default path for the wallet
-    const newRoute = this.checkRoute();
-    if (newRoute != null) {
-      this.props.actions.router.redirect.trigger({
-        route: newRoute,
-      });
-    }
-
     if (!this.props.stores.profile.isRevampAnnounced)
       this.props.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
   }
@@ -69,8 +62,8 @@ class Wallet extends Component<AllProps> {
 
     // void -> this route is fine for this wallet type
     // string -> what you should be redirected to
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) return;
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) return;
 
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
@@ -83,8 +76,8 @@ class Wallet extends Component<AllProps> {
     // ex: a cardano-only page for an Ergo wallet
     // or no category is selected yet (wallet selected for the first time)
     const visibilityContext = {
-      selected: publicDeriver.publicDeriverId,
-      networkId: publicDeriver.networkId,
+      selected: wallet.publicDeriverId,
+      networkId: wallet.networkId,
       walletHasAssets
     };
     if (
@@ -106,8 +99,9 @@ class Wallet extends Component<AllProps> {
   render(): Node {
     const { actions, stores } = this.props;
     // abort rendering if the page isn't valid for this wallet
-    if (this.checkRoute() != null) {
-      return null;
+    const newRoute = this.checkRoute();
+    if (newRoute != null) {
+      return <Redirect to={newRoute} />;
     }
     const { intl } = this.context;
     const selectedWallet = stores.wallets.selected;

@@ -216,7 +216,7 @@ export default class LocalStorageApi {
   getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
     const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
-    const filteredWhitelist = JSON.parse(result).filter(e => e.protocol != null);
+    const filteredWhitelist = JSON.parse(result);
     this.setWhitelist(filteredWhitelist);
     return filteredWhitelist;
   };
