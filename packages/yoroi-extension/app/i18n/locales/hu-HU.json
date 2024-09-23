@@ -32,6 +32,7 @@
   "api.errors.invalidWitnessError": "Az aláírás érvénytelen.",
   "api.errors.noInputsError": "Your recovered wallet is empty. Please check your recovery phrase and restore again.",
   "api.errors.noOutputsError": "The transaction requires at least 1 output, but none was provided.",
+  "api.errors.oversizedTransaction": "Maximum transaction size exceeded.",
   "api.errors.poolMissingApiError": "Pool could not be found. Please check the pool ID and ensure the pool was not deregistered.",
   "api.errors.rewardAddressEmpty": "Reward address is not visible until users get any reward.",
   "api.errors.rollbackApiError": "Rollback was detected.",
