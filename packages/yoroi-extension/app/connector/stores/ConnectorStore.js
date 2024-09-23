@@ -660,7 +660,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         const govActionIds = votingProcedures.get_governance_action_ids_by_voter(
           voter
         );
-        for (let j = 0; i < govActionIds.len(); j++) {
+        for (let j = 0; j < govActionIds.len(); j++) {
           const govActionId = govActionIds.get(j);
           if (!govActionId) {
             throw new Error('unexpectedly missing governance action id');
