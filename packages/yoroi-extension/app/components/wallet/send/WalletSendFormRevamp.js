@@ -720,7 +720,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   : {
                       borderWidth: '1px',
                       borderStyle: 'solid',
-                      borderColor: 'grey.400',
+                      borderColor: 'ds.el_gray_min',
                     }),
               }}
             >
@@ -732,7 +732,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   left: '6px',
                   backgroundColor: 'ds.bg_color_max',
                   paddingX: '4px',
-                  color: shouldSendAll && 'grayscale.200',
+                  color: 'ds.text_gray_medium',
                   fontWeight: 400,
                   fontSize: '12px',
                   lineHeight: '16px',
@@ -794,6 +794,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   sx={{
                     '&.MuiButton-sizeSmall': {
                       lineHeight: '17px',
+                      padding: '8px',
+                      backgroundColor: 'ds.gray_100',
+                      color: 'ds.text_gray_low',
                     },
                   }}
                   disabled={maxSendableAmount.isExecuting}
@@ -823,11 +826,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 <Box
                   sx={{
                     margin: '16px 16px 0px 16px',
-                    pt: '16px',
-                    color: 'grayscale.600',
+                    pt: '24px',
+                    color: 'ds.text_gray_low',
                     fontSize: '16px',
                     letterSpacing: 0,
-                    borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
+                    borderTopWidth: '1px',
+                    borderTopStyle: 'solid',
+                    borderTopColor: 'ds.gray_200',
                   }}
                 >
                   {this.renderUnitOfAccountAmount(amountFieldProps.value)}
