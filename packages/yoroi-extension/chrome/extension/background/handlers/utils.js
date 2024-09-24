@@ -30,12 +30,11 @@ import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wal
 import {
   isTestnet,
   isCardanoHaskell,
-  getCardanoHaskellBaseConfig,
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
 import {
   asAddressedUtxo,
-  cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord,
+  cardanoValueFromRemoteFormat,
 } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
@@ -44,6 +43,7 @@ import { getDb } from '../state/databaseManager';
 // eslint-disable-next-line import/no-cycle
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
+import { getProtocolParameters } from './yoroi/protocolParameters';
 
 export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
   const db = await getDb();
@@ -83,17 +83,23 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   }
   const utxos = await withUtxos.getAllUtxos();
   const addressedUtxos = asAddressedUtxo(utxos).filter(u => u.assets.length > 0);
-  const config = getCardanoHaskellBaseConfig(network).reduce(
-    (acc, next) => Object.assign(acc, next),
-    {}
-  );
+  const protocolParameters = await getProtocolParameters(network.NetworkId);
   const deposits: Array<BigNumber> = addressedUtxos.map(u => {
     try {
-      return cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(
+      const output = RustModule.WalletV4.TransactionOutput.new(
+        // using a dummy common base address here. This is the longest address
+        // to ensure safety but and not optimum.
+        RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
         // $FlowIgnore[prop-missing] property `addressing` is missing in  `RemoteUnspentOutput` [1] but exists in  `CardanoAddressedUtxo` [2]
-        u,
-        new BigNumber(config.CoinsPerUtxoWord),
+        cardanoValueFromRemoteFormat(u),
       );
+      // todo: set data hash here if necessary
+      return new BigNumber(RustModule.WalletV4.min_ada_for_output(
+        output,
+        RustModule.WalletV4.DataCost.new_coins_per_byte(
+          RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte)
+        ),
+      ).to_str());
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(
@@ -249,6 +255,24 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
 
   const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
 
+  const allAddressesByType = [];
+  const externalAddressesByType = [];
+  const internalAddressesByType = [];
+
+  for (const typeName of Object.keys(CoreAddressTypes)) {
+    const addrType = CoreAddressTypes[typeName];
+
+    allAddressesByType[addrType] = [];
+    externalAddressesByType[addrType] = [];
+    internalAddressesByType[addrType] = [];
+  }
+
+  const withStakingKey = asGetStakingKey(publicDeriver);
+  if (withStakingKey == null) {
+    throw new Error('unexpected missing asGetAllAccounting result');
+  }
+  const stakingKeyDbRow = await withStakingKey.getStakingKey();
+
   return {
     publicDeriverId,
     conceptualWalletId: publicDeriver.getParent().getConceptualWalletId(),
@@ -271,8 +295,8 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     },
     pathToPublic: [],
     signingKeyUpdateDate: null,
-    stakingAddressing: { addressing: { path: [], startLevel: 0 } },
-    stakingAddress: '',
+    stakingAddressing: { addressing: stakingKeyDbRow.addressing },
+    stakingAddress: stakingKeyDbRow.addr.Hash,
     publicDeriverLevel: 0,
     lastSyncInfo: {
       LastSyncInfoId: 0,
@@ -285,10 +309,10 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     assetDeposits: zero,
     defaultTokenId: '',
     assuranceMode: assuranceModes.NORMAL,
-    allAddressesByType: [],
+    allAddressesByType,
     foreignAddresses: [],
-    externalAddressesByType: [],
-    internalAddressesByType: [],
+    externalAddressesByType,
+    internalAddressesByType,
     allAddresses: { utxoAddresses: [], accountingAddresses: [] },
     allUtxoAddresses: [],
     isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,

@@ -20,6 +20,7 @@ import {
   isFirefox,
   isHeadless,
 } from './utils.js';
+import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
@@ -84,15 +85,9 @@ const getChromeBuilder = () => {
     .setChromeOptions(chromeOpts);
 };
 
-const getFirefoxBuilder = () => {
+const __getFFOptions = () => {
   const downloadsDir = getDownloadsDir();
   const options = new firefox.Options()
-    // .addArguments('--headless') // Runs the browser in the headless mode
-    /**
-     * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
-     * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
-     */
-    .setBinary(firefoxBin)
     /**
      * Firefox disallows unsigned extensions by default. We solve this through a config change
      * The proper way to do this is to use the "temporary addon" feature of Firefox
@@ -112,6 +107,19 @@ const getFirefoxBuilder = () => {
     .setPreference('browser.download.manager.showAlertOnComplete', false)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi.xpi'));
 
+  if (isHeadless()) {
+    options.addArguments('--headless');
+  }
+  return options;
+};
+
+const getFirefoxBuilder = () => {
+  const options = __getFFOptions();
+  /**
+   * For Firefox it is needed to use "Firefox for Developers" to load the unsigned extensions
+   * Set the FIREFOX_BIN env variable to the "Firefox for Developers" executable
+   */
+  options.setBinary(firefoxBin);
   return new Builder()
     .withCapabilities({
       chromeOptions: {
@@ -139,7 +147,7 @@ export const getBuilder = () => {
 // getting a driver
 export const getDriver = () => {
   const driver = getBuilder().build();
-  driver.manage().setTimeouts({ implicit: 10000 });
+  driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
   if (isFirefox()) {
     driver.manage().window().maximize();
   }

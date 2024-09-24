@@ -73,6 +73,7 @@ import {
   RemoveWalletFromWhiteList,
   GetConnectedSites,
 } from '../../chrome/extension/background/handlers/yoroi/connector';
+import { GetProtocolParameters } from '../../chrome/extension/background/handlers/yoroi/protocolParameters';
 import type {
   RemoveAllTransactionsRequest,
   RemoveAllTransactionsResponse,
@@ -80,7 +81,6 @@ import type {
 import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
-
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -201,12 +201,13 @@ export async function signAndBroadcastTransaction(
     publicDeriverId: number,
   |}
 ): Promise<{| txId: string |}> {
-  const txBody = request.signRequest.unsignedTx.build();
+  const tx = request.signRequest.unsignedTx.build_tx();
+  const txBody = tx.body();
   const txHash = RustModule.WalletV4.hash_transaction(txBody);
 
   const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,
-    unsignedTx: txBody.to_hex(),
+    unsignedTx: tx.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
     neededHashes: [...request.signRequest.neededStakingKeyHashes.neededHashes],
     wits: [...request.signRequest.neededStakingKeyHashes.wits],
@@ -214,6 +215,7 @@ export async function signAndBroadcastTransaction(
     publicDeriverId: request.publicDeriverId,
     txHash: txHash.to_hex(),
   };
+  tx.free();
   txBody.free();
   txHash.free();
   const result = await callBackground({
@@ -225,10 +227,9 @@ export async function signAndBroadcastTransaction(
 
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
   const result = await callBackground({ type: BroadcastTransaction.typeTag, request });
-  if (result.error) {
+  if (result?.error) {
     throw new Error(result.error);
   }
-  return result;
 }
 
 // Only mnemonic wallet has private staking key.
@@ -373,6 +374,10 @@ export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = asy
   return await callBackground({ type: GetConnectedSites.typeTag });
 }
 
+export const getProtocolParameters: GetEntryFuncType<typeof GetProtocolParameters> = async (request) => {
+  return await callBackground({ type: GetProtocolParameters.typeTag, request });
+}
+  
 // Background -> UI notifications:
 const callbacks = Object.freeze({
   walletStateUpdate: [],
@@ -381,7 +386,7 @@ const callbacks = Object.freeze({
 });
 chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
-  console.log('get message from background:', JSON.stringify(message, null, 2));
+  Logger.debug('get message from background:', JSON.stringify(message, null, 2));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {

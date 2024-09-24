@@ -16,7 +16,7 @@ import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmat
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { getMinimumValue, validateAmount } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
@@ -94,6 +94,9 @@ class WalletSendPage extends Component<AllProps> {
       this.showSupportedAddressDomainBanner =
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
+    const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
+    loadProtocolParametersRequest.reset();
+    loadProtocolParametersRequest.execute();
     ampli.sendInitiated();
   }
 
@@ -134,9 +137,17 @@ class WalletSendPage extends Component<AllProps> {
     const { selected } = this.props.stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
-    const { transactionBuilderStore } = this.props.stores;
+    const {
+      uiDialogs,
+      profile,
+      transactionBuilderStore,
+      protocolParameters,
+    } = this.props.stores;
 
-    const { uiDialogs, profile } = this.props.stores;
+    if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
+      return null;
+    }
+
     const { actions } = this.props;
     const { hasAnyPending } = this.props.stores.transactions;
     const { txBuilderActions } = this.props.actions;
@@ -244,10 +255,7 @@ class WalletSendPage extends Component<AllProps> {
             validateAmount(
               amount,
               transactionBuilderStore.selectedToken ?? defaultToken,
-              getMinimumValue(
-                network,
-                transactionBuilderStore.selectedToken?.IsDefault ?? true
-              ),
+              transactionBuilderStore.minAda.getDefault(),
               this.context.intl
             )
           }

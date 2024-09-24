@@ -31,9 +31,9 @@ class ConnectorTab extends WalletCommonBase {
   // functions
   async getAllConnectedWallets() {
     this.logger.info(`ConnectorTab::getAllConnectedWallets is called.`);
-    await this.driver.manage().setTimeouts({ implicit: oneSecond });
+    await this.setImplicitTimeout(oneSecond, this.getAllConnectedWallets.name);
     const allWallets = await this.findElements(this.connectedWalletRowLocator);
-    await this.driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+    await this.setImplicitTimeout(defaultWaitTimeout, this.getAllConnectedWallets.name);
     return allWallets;
   }
   async getConnectedWalletInfo(walletName) {

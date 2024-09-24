@@ -11,6 +11,8 @@ import type {
   ShowAddressRequest,
   GetVersionResponse,
   GetSerialResponse,
+  MessageData,
+  SignedMessageData,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { MessageType } from '../../ledger/types/cmn';
 
@@ -91,6 +93,20 @@ export class LedgerConnect {
       undefined,
       request.serial,
       true,
+    );
+  }
+
+  signMessage: {|
+    serial: ?string,
+    params: MessageData,
+    useOpenTab?: boolean,
+  |} => Promise<SignedMessageData> = (request) => {
+    return this._requestLedger(
+      OPERATION_NAME.SIGN_MESSAGE,
+      request.params,
+      request.serial,
+      false,
+      request.useOpenTab === true,
     );
   }
 

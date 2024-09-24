@@ -273,6 +273,7 @@ class StakingPageContent extends Component<AllProps> {
           stores={this.props.stores}
           actions={this.props.actions}
           urlTemplate={CONFIG.poolExplorer.simpleTemplate}
+          poolTransition={delegationStore.getPoolTransitionInfo(publicDeriver)}
         />
 
         {uiDialogs.isOpen(OverviewModal) ? (

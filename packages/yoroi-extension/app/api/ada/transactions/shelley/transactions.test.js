@@ -162,7 +162,7 @@ beforeAll(async () => {
 function getProtocolParams(): {|
   linearFeeCoefficient: string,
   linearFeeConstant: string,
-  coinsPerUtxoWord: string,
+  coinsPerUtxoByte: string,
   poolDeposit: string,
   keyDeposit: string,
   networkId: number,
@@ -170,10 +170,10 @@ function getProtocolParams(): {|
   return {
     linearFeeCoefficient: '2',
     linearFeeConstant: '500',
-    coinsPerUtxoWord: '1',
+    coinsPerUtxoByte: '1',
     poolDeposit: '500',
     keyDeposit: '500',
-    networkId: network.NetworkId,
+    networkId: Number(network.BaseConfig[0].ChainNetworkId),
   };
 }
 
@@ -206,6 +206,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -235,6 +237,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -266,6 +270,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -281,11 +287,13 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        coinsPerUtxoWord: '99000',
+        coinsPerUtxoByte: '12375',
       },
       [],
       [],
       false,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
     // should avoid failing by consuming the second UTXO
     await expect(newAdaUnsignedTxFromUtxo(
@@ -295,11 +303,13 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        coinsPerUtxoWord: '31000',
+        coinsPerUtxoByte: '3875',
       },
       [],
       [],
       false,
+      undefined,
+      network.NetworkId,
     )).resolves.not.toThrow(NotEnoughMoneyToSendError);
     // should pass because we can add a change
     await expect(newAdaUnsignedTxFromUtxo(
@@ -309,11 +319,13 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        coinsPerUtxoWord: '30000',
+        coinsPerUtxoByte: '3750',
       },
       [],
       [],
       false,
+      undefined,
+      network.NetworkId,
     )).resolves.not.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -329,6 +341,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       false,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NoOutputsError);
   });
 
@@ -372,6 +386,8 @@ describe('Create unsigned TX from UTXO', () => {
         [],
         [],
         true,
+        undefined,
+        network.NetworkId,
       );
 
       jest.spyOn(global.Math, 'random').mockRestore();
@@ -438,19 +454,21 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     );
 
     // always take utxos[4], take either utxos[2] or utxos[3] randomly
     try {
       expect(new Set([utxos[4], utxos[2]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
       expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998058');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1944');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998054');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1948');
     } catch {
       expect(new Set([utxos[4], utxos[3]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
       expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('32000001');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998335');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1666');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998331');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1670');
     }
 
     function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
@@ -512,11 +530,13 @@ describe('Create unsigned TX from UTXO', () => {
       {
         ...getProtocolParams(),
         // high enough that we can't send the remaining amount as change
-        coinsPerUtxoWord: '34482',
+        coinsPerUtxoByte: '4310',
       },
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -537,9 +557,10 @@ describe('Create unsigned TX from UTXO', () => {
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
         // high enough that we can't send the remaining amount as change
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('34482'),
+        coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('4310'),
       },
       undefined,
+      network.NetworkId,
     )).not.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -571,6 +592,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -588,12 +611,13 @@ describe('Create unsigned TX from UTXO', () => {
           RustModule.WalletV4.BigNum.from_str('2'),
           RustModule.WalletV4.BigNum.from_str('500'),
         ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
+        coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('1'),
         poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
       },
       undefined,
+      network.NetworkId,
     )).toThrow(AssetOverflowError);
   });
 
@@ -626,6 +650,8 @@ describe('Create unsigned TX from UTXO', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     )).rejects.toThrow(AssetOverflowError);
   });
 
@@ -671,11 +697,13 @@ describe('Create unsigned TX from UTXO', () => {
       new BigNumber(0),
       {
         ...getProtocolParams(),
-        coinsPerUtxoWord: '34482',
+        coinsPerUtxoByte: '4310',
       },
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     );
 
     expect(result.senderUtxos.length).toEqual(2);
@@ -711,6 +739,8 @@ describe('Create unsigned TX from addresses', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     );
     expect(unsignedTxResponse.senderUtxos).toEqual([addressedUtxos[1]]);
 
@@ -758,6 +788,8 @@ describe('Create signed transactions', () => {
       [],
       [],
       true,
+      undefined,
+      network.NetworkId,
     );
 
     jest.spyOn(global.Math, 'random').mockRestore();
@@ -917,6 +949,8 @@ describe('Create signed transactions', () => {
       ],
       [],
       true,
+      undefined,
+      network.NetworkId,
     );
     const signedTx = signTransaction(
       unsignedTxResponse.senderUtxos,
@@ -994,6 +1028,8 @@ describe('Create signed transactions', () => {
         amount: RustModule.WalletV4.BigNum.from_str(withdrawAmount)
       }],
       true,
+      undefined,
+      network.NetworkId,
     );
 
     const signedTx = signTransaction(
@@ -1064,11 +1100,13 @@ describe('Create sendAll unsigned TX from UTXO', () => {
             RustModule.WalletV4.BigNum.from_str('2'),
             RustModule.WalletV4.BigNum.from_str('500'),
           ),
-          coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
+          coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('1'),
           poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
           keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
           networkId: network.NetworkId,
         },
+        undefined,
+        network.NetworkId,
       );
 
       const expectedFee = new BigNumber('1070');
@@ -1102,11 +1140,13 @@ describe('Create sendAll unsigned TX from UTXO', () => {
           RustModule.WalletV4.BigNum.from_str('2'),
           RustModule.WalletV4.BigNum.from_str('500'),
         ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
+        coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('1'),
         poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
       },
+      undefined,
+      network.NetworkId,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 
@@ -1124,11 +1164,13 @@ describe('Create sendAll unsigned TX from UTXO', () => {
           RustModule.WalletV4.BigNum.from_str('2'),
           RustModule.WalletV4.BigNum.from_str('500'),
         ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
+        coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('1'),
         poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
         networkId: network.NetworkId,
       },
+      undefined,
+      network.NetworkId,
     )).toThrow(NotEnoughMoneyToSendError);
   });
 

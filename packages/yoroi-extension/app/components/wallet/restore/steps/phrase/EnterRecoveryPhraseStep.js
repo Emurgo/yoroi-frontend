@@ -15,6 +15,9 @@ import DuplicatedWalletDialog from './DuplicatedWalletDialog';
 import { TIPS_DIALOGS } from '../../../dialogs/constants';
 import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
 import { fail } from '../../../../../coreUtils';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 
 const messages = defineMessages({
   description: {
@@ -31,7 +34,14 @@ type Intl = {|
 type Props = {|
   mode: ?RestoreModeType,
   initialRecoveryPhrase: string,
-  duplicatedWalletData: any,
+  duplicatedWalletData: ?{|
+    plate: WalletChecksum,
+    conceptualWalletName: string,
+    balance: MultiToken,
+    updateHideBalance: () => Promise<void>,
+    shouldHideBalance: boolean,
+    tokenInfo: TokenInfoMap,
+  |},
   openDuplicatedWallet: number => void,
   setCurrentStep: string => void,
   checkValidPhrase: string => boolean,
@@ -124,13 +134,15 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
           />
         </Box>
       </Stack>
-      <DuplicatedWalletDialog
-        duplicatedWalletData={duplicatedWalletData}
-        open={isActiveDialog}
-        onClose={handleClose}
-        // $FlowFixMe[incompatible-call]
-        onNext={() => openDuplicatedWallet(duplicatedWalletId)}
-      />
+      {duplicatedWalletData && (
+        <DuplicatedWalletDialog
+          duplicatedWalletData={duplicatedWalletData}
+          open={isActiveDialog}
+          onClose={handleClose}
+          // $FlowFixMe[incompatible-call]
+          onNext={() => openDuplicatedWallet(duplicatedWalletId)}
+        />
+      )}
     </Stack>
   );
 }

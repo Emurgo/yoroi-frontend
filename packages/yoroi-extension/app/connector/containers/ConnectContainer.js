@@ -77,7 +77,6 @@ export default class ConnectContainer extends Component<
     const connector = this.props.actions.connector;
 
     const url = chromeMessage.url;
-    const protocol = chromeMessage.protocol;
     const appAuthID = chromeMessage.appAuthID;
 
     let authEntry;
@@ -96,12 +95,11 @@ export default class ConnectContainer extends Component<
 
     // Removing any previous whitelisted connections for the same url
     const whitelist = (result.length ? [...result] : []).filter(
-      e => e.protocol !== protocol || e.url !== url
+      e => e.url !== url
     );
 
     whitelist.push({
       url,
-      protocol,
       publicDeriverId,
       appAuthID,
       auth: authEntry,
