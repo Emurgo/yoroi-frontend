@@ -87,11 +87,11 @@ function createLenget<T>(...items: Array<T>): LenGet<T> {
   return { len: () => items.length, get: i => items[i] };
 }
 
-describe('generators', () => {
+function createLengetMap<K,V>(items: { [K]: V }): LenGetMap<K,V> {
+  return { keys: () => createLenget(...Object.keys(items)), get: k => items[k] };
+}
 
-  function createLengetMap<K,V>(items: { [K]: V }): LenGetMap<K,V> {
-    return { keys: () => createLenget(...Object.keys(items)), get: k => items[k] };
-  }
+describe('generators', () => {
 
   function createAssetNames(...hexes: Array<string>): RustModule.WalletV4.AssetNames {
     const names = RustModule.WalletV4.AssetNames.new();
@@ -254,5 +254,18 @@ describe('ExtendedIterable', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const zipped = it.zip([10, 20, 30, 40, 50, 60]);
     expect(zipped.toArray()).toEqual([[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]])
+  });
+  test('map', () => {
+    const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
+    const zipped = it.map(x => x * x);
+    expect(zipped.toArray()).toEqual([1, 4, 9, 16, 25])
+  });
+  test('keys', () => {
+    const it = iterateLenGetMap(createLengetMap({ a: 1, b: 2, c: 3 }));
+    expect(it.keys().toArray()).toEqual(['a', 'b', 'c']);
+  });
+  test('values', () => {
+    const it = iterateLenGetMap(createLengetMap({ a: 1, b: 2, c: 3 }));
+    expect(it.values().toArray()).toEqual([1, 2, 3]);
   });
 });

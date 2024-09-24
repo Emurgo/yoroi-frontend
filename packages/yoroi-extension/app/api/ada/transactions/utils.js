@@ -532,8 +532,7 @@ export function getTransactionTotalOutputFromCbor(txHex: string, defaults: Defau
     return RustModule.WasmScope(Module => {
       const outputs = Module.WalletV4.FixedTransaction.from_hex(txHex).body().outputs();
       const sum = new MultiToken([], defaults);
-      for (let i = 0; i < outputs.len(); i++) {
-        const output = outputs.get(i);
+      for (const output of iterateLenGet(outputs)) {
         sum.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaults));
       }
       return sum;
@@ -560,8 +559,8 @@ export function mergeWitnessSets(
     let vkeys = wset1.vkeys();
     const newVkeys = wset2.vkeys();
     if (vkeys && newVkeys) {
-      for (let i = 0; i < newVkeys.len(); i++) {
-        vkeys.add(newVkeys.get(i));
+      for (const newVkey of iterateLenGet(newVkeys)) {
+        vkeys.add(newVkey);
       }
     } else if (newVkeys) {
       vkeys = newVkeys;
@@ -573,8 +572,8 @@ export function mergeWitnessSets(
     let nativeScripts = wset1.native_scripts();
     const newNativeScripts = wset2.native_scripts();
     if (nativeScripts && newNativeScripts) {
-      for (let i = 0; i < newNativeScripts.len(); i++) {
-        nativeScripts.add(newNativeScripts.get(i));
+      for (const newNativeScript of iterateLenGet(newNativeScripts)) {
+        nativeScripts.add(newNativeScript);
       }
     } else if (newNativeScripts) {
       nativeScripts = newNativeScripts;
@@ -586,8 +585,8 @@ export function mergeWitnessSets(
     let bootstraps = wset1.bootstraps();
     const newBootstraps = wset2.bootstraps();
     if (bootstraps && newBootstraps) {
-      for (let i = 0; i < newBootstraps.len(); i++) {
-        bootstraps.add(newBootstraps.get(i));
+      for (const newBootstrap of iterateLenGet(newBootstraps)) {
+        bootstraps.add(newBootstrap);
       }
     } else if (newBootstraps) {
       bootstraps = newBootstraps;
@@ -599,8 +598,8 @@ export function mergeWitnessSets(
     let plutusScripts = wset1.plutus_scripts();
     const newPlutusScripts = wset2.plutus_scripts();
     if (plutusScripts && newPlutusScripts) {
-      for (let i = 0; i < newPlutusScripts.len(); i++) {
-        plutusScripts.add(newPlutusScripts.get(i));
+      for (const newPlutusScript of iterateLenGet(newPlutusScripts)) {
+        plutusScripts.add(newPlutusScript);
       }
     } else if (newPlutusScripts) {
       plutusScripts = newPlutusScripts;
@@ -612,8 +611,8 @@ export function mergeWitnessSets(
     let plutusData = wset1.plutus_data();
     const newPlutusData = wset2.plutus_data();
     if (plutusData && newPlutusData) {
-      for (let i = 0; i < newPlutusData.len(); i++) {
-        plutusData.add(newPlutusData.get(i));
+      for (const newPlutusDatum of iterateLenGet(newPlutusData)) {
+        plutusData.add(newPlutusDatum);
       }
     } else if (newPlutusData) {
       plutusData = newPlutusData;
@@ -625,8 +624,8 @@ export function mergeWitnessSets(
     let redeemers = wset1.redeemers();
     const newRedeemers = wset2.redeemers();
     if (redeemers && newRedeemers) {
-      for (let i = 0; i < newRedeemers.len(); i++) {
-        redeemers.add(newRedeemers.get(i));
+      for (const newRedeemer of iterateLenGet(newRedeemers)) {
+        redeemers.add(newRedeemer);
       }
     } else if (newRedeemers) {
       redeemers = newRedeemers;

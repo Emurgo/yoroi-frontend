@@ -49,7 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, hexToBytes, iterateLenGet } from '../../../app/coreUtils';
+import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -996,9 +996,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     }
     fee.joinAddMutable(value);
   }
-  const txOutputs = txBody.outputs();
-  for (let i = 0; i < txOutputs.len(); i++) {
-    const output = txOutputs.get(i);
+  for (const output of iterateLenGet(txBody.outputs())) {
     const value = multiTokenFromCardanoValue(output.amount(), defaults);
     const address = Buffer.from(output.address().to_bytes()).toString('hex');
     addresses.to.push({
@@ -1017,10 +1015,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   const withdrawals = txBody.withdrawals();
   const withdrawalsData = [];
   if (withdrawals) {
-    const withdrawalKeys = withdrawals.keys();
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const key = withdrawalKeys.get(i);
-      const withdrawalAmount = withdrawals.get(key);
+    for (const [key, withdrawalAmount] of iterateLenGetMap(withdrawals)) {
       if (!withdrawalAmount) {
         throw new Error('unexpected missing withdrawal amount');
       }

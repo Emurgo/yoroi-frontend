@@ -1,5 +1,7 @@
 // @flow
 
+import { extend } from 'lodash/object';
+
 export function bytesToHex(bytes: *): string {
   return Buffer.from(bytes).toString('hex');
 }
@@ -98,6 +100,10 @@ export function sorted<T>(arr: T[], f?: (a: T, b: T) => number): T[] {
 
 export function first<T>(arr: T[]): ?T {
   return arr[0];
+}
+
+export function second<T>(arr: T[]): ?T {
+  return arr[1];
 }
 
 export function last<T>(arr: T[]): ?T {
@@ -217,8 +223,8 @@ export function iterateLenGet<T>(lenget: ?LenGet<T>): ExtendedIterable<T> {
   })());
 }
 
-export function iterateLenGetMap<K, V>(map: ?LenGetMap<K,V>): ExtendedIterable<[K, V]> {
-  return ExtendedIterable.from<[K,V]>((function*() {
+export function iterateLenGetMap<K, V>(map: ?LenGetMap<K,V>): ExtendedIterableMap<K, V> {
+  return ExtendedIterableMap.fromTuples<K,V>((function*() {
     if (map) {
       for (const k of iterateLenGet(map.keys())) {
         yield [k, map.get(k)];
@@ -269,5 +275,33 @@ export class ExtendedIterable<T> implements Iterable<T> {
 
   toArray(): Array<T> {
     return [...this.__source];
+  }
+
+  map<R>(f: T => R): ExtendedIterable<R> {
+    const source = this.__source;
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        yield f(t);
+      }
+    })())
+  }
+}
+
+export class ExtendedIterableMap<K,V> extends ExtendedIterable<[K,V]> {
+
+  constructor(source: Iterable<[K,V]>) {
+    super(source)
+  }
+
+  static fromTuples<X,Y>(col: Iterable<[X,Y]>): ExtendedIterableMap<X,Y> {
+    return new ExtendedIterableMap<X, Y>(col);
+  }
+
+  keys(): ExtendedIterable<K> {
+    return this.map(([k]) => k);
+  }
+
+  values(): ExtendedIterable<V> {
+    return this.map(([,v]) => v);
   }
 }

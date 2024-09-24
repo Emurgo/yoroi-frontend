@@ -1,38 +1,30 @@
 // // @flow
-import type {
-  CardanoAddressedUtxo,
-} from '../types';
-import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
+import type { CardanoAddressedUtxo, } from '../types';
+import { verifyFromDerivationRoot } from '../../lib/storage/models/utils';
 import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
-  CardanoSignTransaction,
-  CardanoInput,
-  CardanoOutput,
-  CardanoWithdrawal,
-  CardanoCertificate,
   CardanoAddressParameters,
   CardanoAssetGroup,
-  CardanoToken,
+  CardanoCertificate,
+  CardanoInput,
+  CardanoOutput,
   CardanoSignedTxWitness,
+  CardanoSignTransaction,
+  CardanoToken,
+  CardanoWithdrawal,
 } from 'trezor-connect-flow';
 import {
-  CardanoCertificateType,
   CardanoAddressType,
-  CardanoTxSigningMode,
-  CardanoTxOutputSerializationFormat,
-  CardanoTxWitnessType,
+  CardanoCertificateType,
   CardanoGovernanceRegistrationFormat,
+  CardanoTxOutputSerializationFormat,
+  CardanoTxSigningMode,
+  CardanoTxWitnessType,
 } from 'trezor-connect-flow';
-import type {
-  Address, Value, Addressing,
-} from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import {
-  Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import {
-  ChainDerivations,
-} from '../../../../config/numbersConfig';
+import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
+import { ChainDerivations, } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
@@ -40,7 +32,7 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { fail, iterateLenGetMap, zipGenerators } from '../../../../coreUtils';
+import { fail, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -159,7 +151,7 @@ function formatTrezorWithdrawals(
 ): Array<CardanoWithdrawal> {
 
   const result = [];
-  for (const [[, withdrawalAmount], path] of iterateLenGetMap(withdrawals).zip(paths)) {
+  for (const [withdrawalAmount, path] of iterateLenGetMap(withdrawals).values().zip(paths)) {
     result.push({
       amount: withdrawalAmount?.to_str() || fail('withdrawal amount is not defined (should not happen)'),
       path,
@@ -169,22 +161,21 @@ function formatTrezorWithdrawals(
 }
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  path: Array<Array<number>>,
+  paths: Array<Array<number>>,
 ): Array<CardanoCertificate> {
   const result = [];
-  for (let i = 0; i < certificates.len(); i++) {
-    const cert = certificates.get(i);
+  for (const [cert, path] of iterateLenGet(certificates).zip(paths)) {
     if (cert.as_stake_registration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_REGISTRATION,
-        path: path[i],
+        path: path,
       });
       continue;
     }
     if (cert.as_stake_deregistration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DEREGISTRATION,
-        path: path[i],
+        path: path,
       });
       continue;
     }
@@ -192,7 +183,7 @@ function formatTrezorCertificates(
     if (delegationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
-        path: path[i],
+        path: path,
         pool: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
       });
       continue;
@@ -233,17 +224,11 @@ function toTrezorTokenBundle(
   if (assets == null) return Object.freeze({});
 
   const assetGroup: Array<CardanoAssetGroup> = [];
-  const policyHashes = assets.keys();
-  for (let i = 0; i < policyHashes.len(); i++) {
-    const policyId = policyHashes.get(i);
-    const assetsForPolicy = assets.get(policyId);
+  for (const [policyId, assetsForPolicy] of iterateLenGetMap(assets)) {
     if (assetsForPolicy == null) continue;
 
     const tokenAmounts: Array<CardanoToken> = [];
-    const assetNames = assetsForPolicy.keys();
-    for (let j = 0; j < assetNames.len(); j++) {
-      const assetName = assetNames.get(j);
-      const amount = assetsForPolicy.get(assetName);
+    for (const [assetName, amount] of iterateLenGetMap(assetsForPolicy)) {
       if (amount == null) continue;
 
       tokenAmounts.push({
@@ -264,8 +249,7 @@ function _generateTrezorOutputs(
   stakingKeyPath: Array<number>,
 ): Array<CardanoOutput> {
   const result = [];
-  for (let i = 0; i < txOutputs.len(); i++) {
-    const output = txOutputs.get(i);
+  for (const output of iterateLenGet(txOutputs)) {
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
@@ -516,8 +500,7 @@ export function toTrezorSignRequest(
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
     const formatted = [];
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
+    for (const input of iterateLenGet(inputs)) {
       const hash = input.transaction_id().to_hex();
       const index = input.index();
       const ownUtxo = addressedUtxos.find(utxo =>
@@ -537,11 +520,12 @@ export function toTrezorSignRequest(
 
   function formatOutput(
     output: RustModule.WalletV4.TransactionOutput,
-    isPostAlonzoTransactionOutput: boolean,
   ): CardanoOutput {
     const amount =  output.amount().coin().to_str();
     const { tokenBundle } = toTrezorTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
+
+    const isPostAlonzoTransactionOutput = output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
 
     const addr = output.address();
     let result;
@@ -666,22 +650,13 @@ export function toTrezorSignRequest(
     return result;
   }
 
-  const outputs = [];
-  for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(
-      formatOutput(
-        txBody.outputs().get(i),
-        parsedCbor.get(1)[i].constructor.name === 'Map',
-      )
-    );
-  }
+  const outputs = iterateLenGet(txBody.outputs()).map(formatOutput).toArray();
 
   const formattedRequiredSigners = [];
   const additionalWitnessRequests = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
-    for (let i = 0; i < requiredSigners.len(); i++) {
-      const hash = requiredSigners.get(i);
+    for (const hash of iterateLenGet(requiredSigners)) {
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
         RustModule.WalletV4.Credential.from_keyhash(hash),
@@ -724,9 +699,7 @@ export function toTrezorSignRequest(
     };
 
     const result = [];
-    for (let i = 0; i < certificates.len(); i++) {
-      const cert = certificates.get(i);
-
+    for (const cert of iterateLenGet(certificates)) {
       const registrationCert = cert.as_stake_registration();
       if (registrationCert != null) {
         result.push({
@@ -762,10 +735,7 @@ export function toTrezorSignRequest(
   if (withdrawals) {
     const result = [];
 
-    const withdrawalKeys = withdrawals.keys();
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const rewardAddress = withdrawalKeys.get(i);
-      const withdrawalAmount = withdrawals.get(rewardAddress);
+    for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals)) {
       if (withdrawalAmount == null) {
         throw new Error('missing withdraw amount should never happen');
       }
@@ -850,10 +820,7 @@ export function toTrezorSignRequest(
   }
   const collateralReturn = txBody.collateral_return();
   if (collateralReturn) {
-    result.collateralReturn = formatOutput(
-      collateralReturn,
-      parsedCbor.get(16).constructor.name === 'Map',
-    );
+    result.collateralReturn = formatOutput(collateralReturn);
   }
   const totalCollateral = txBody.total_collateral();
   if (totalCollateral) {
@@ -862,8 +829,7 @@ export function toTrezorSignRequest(
   const referenceInputs = txBody.reference_inputs();
   if (referenceInputs) {
     const formattedReferenceInputs = [];
-    for (let i = 0; i < referenceInputs.len(); i++) {
-      const input = referenceInputs.get(i);
+    for (const input of iterateLenGet(referenceInputs)) {
       formattedReferenceInputs.push({
         prev_hash: input.transaction_id().to_hex(),
         prev_index: input.index(),
