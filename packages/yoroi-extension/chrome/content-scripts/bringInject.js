@@ -128,8 +128,13 @@ function getFromBackground(functionName: string, params: andy): Promise<any> {
   });
 }
 
-function getAddresses(): Promise<string> {
-  return getFromBackground('get_used_addresses', [undefined]);
+async function getFirstAddress(): Promise<string> {
+  const usedAddresses = await getFromBackground('get_used_addresses', [undefined]);
+  if (usedAddresses.length > 0) {
+    return usedAddresses[0];
+  }
+  const unusedAddresses = await getFromBackground('get_unused_addresses', [undefined]);
+  return unusedAddresses[0];
 }
 
 function getTheme(): Promise<'light' | 'dark'> {
@@ -138,8 +143,8 @@ function getTheme(): Promise<'light' | 'dark'> {
 
 async function example() {
   try {
-    const addrs = await getAddresses();
-    console.log('>>>address', addrs[0]);
+    const addr = await getFirstAddress();
+    console.log('address', addr);
   } catch (error) {
     if (error.message === 'no wallet') {
       console.log('no wallet');
