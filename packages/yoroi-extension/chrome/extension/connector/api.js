@@ -49,7 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
+import { bytesToHex, forceNonNull, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -155,23 +155,15 @@ function stringToLibValue(s: string): LibValue {
       // $FlowFixMe
       function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
         const mappedAssets = [];
-        if (masset != null) {
-          for (const policy of iterateLenGet(masset.keys())) {
-            const assets = masset.get(policy);
-            if (assets != null) {
-              for (const name of iterateLenGet(assets.keys())) {
-                const amount = assets.get(name);
-                if (amount != null) {
-                  mappedAssets.push({
-                    asset: {
-                      policy: policy.to_bytes(),
-                      name: name.to_bytes(),
-                    },
-                    amount: new LibAmount(amount.to_str()),
-                  })
-                }
-              }
-            }
+        for (const [policy, assets] of iterateLenGetMap(masset)) {
+          for (const [name, amount] of iterateLenGetMap(assets)) {
+            mappedAssets.push({
+              asset: {
+                policy: policy.to_bytes(),
+                name: name.to_bytes(),
+              },
+              amount: new LibAmount(forceNonNull(amount).to_str()),
+            })
           }
         }
         return LibNativeAssets.from(mappedAssets);

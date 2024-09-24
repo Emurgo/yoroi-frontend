@@ -2465,8 +2465,7 @@ function getDifferenceAfterTx(
   {
     const txBody = utxoResponse.txBuilder.build();
     for (const output of iterateLenGet(txBody.outputs())) {
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
-      if (addrContainsAccountKey(address, accountKeyString, true)) {
+      if (addrContainsAccountKey(output.address().to_hex(), accountKeyString, true)) {
         sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }

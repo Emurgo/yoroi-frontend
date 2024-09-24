@@ -267,6 +267,12 @@ export class ExtendedIterable<T> implements Iterable<T> {
     return this.__source[Symbol.iterator]();
   }
 
+  forEach(f: T => void): void {
+    for (const t of this.__source) {
+      f(t);
+    }
+  }
+
   zip<B>(iterB: Iterable<B>): ExtendedIterable<[T,B]> {
     return zipGenerators<T,B>(this.__source, iterB);
   }
@@ -282,6 +288,30 @@ export class ExtendedIterable<T> implements Iterable<T> {
         yield f(t);
       }
     })())
+  }
+
+  filter(f: T => boolean): ExtendedIterable<T> {
+    const source = this.__source;
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) {
+        if (f(t)) {
+          yield t;
+        }
+      }
+    })());
+  }
+
+  unique(): ExtendedIterable<T> {
+    const set = new Set<T>();
+    return this.filter(t => {
+      if (set.has(t)) return false;
+      set.add(t);
+      return true;
+    });
+  }
+
+  nonNull(): ExtendedIterable<$NonMaybeType<T>> {
+    return this.filter(t => t != null);
   }
 }
 

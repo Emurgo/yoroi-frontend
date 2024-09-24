@@ -557,16 +557,11 @@ export function toRemoteByronTx(
   const body = signedTx.body();
   const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
 
-  const outputs = [];
-  for (const output of iterateLenGet(body.outputs())) {
-    const value = output.amount();
-    const assets = parseTokenList(value.multiasset());
-    outputs.push({
-      address: toHexOrBase58(output.address()),
-      amount: value.coin().to_str(),
-      assets
-    });
-  }
+  const outputs = iterateLenGet(body.outputs()).map(output => ({
+    address: toHexOrBase58(output.address()),
+    amount: output.amount().coin().to_str(),
+    assets: parseTokenList(output.amount().multiasset())
+  })).toArray();
 
   const inputs = iterateLenGet(body.inputs()).map(input => ({
     id: input.transaction_id().to_hex(),
