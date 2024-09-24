@@ -17,6 +17,49 @@ type EnvParams = {|
   isLight: "true" | "false"
 |};
 */
+const contentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
+  mode: 'production',
+  optimization: commonConfig.optimization,
+  experiments: commonConfig.experiments,
+  resolve: commonConfig.resolve(),
+  entry: {
+    contentScript: [
+      path.join(__dirname, '../chrome/content-scripts/bringInject.js'),
+    ]
+  },
+  output: {
+    path: path.join(__dirname, '../build/js'),
+    filename: 'bringInject.js',
+  },
+
+  plugins: [
+    ...commonConfig.plugins('build', env.networkName),
+    new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1
+    }),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      env.networkName,
+      true,
+      JSON.parse(env.nightly),
+      JSON.parse(env.isLight)
+    )),
+    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+  ],
+  module: {
+    rules: [
+      ...commonConfig.rules(false),
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        options: {
+          presets: []
+        }
+      },
+    ]
+  },
+});
+
 const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   mode: 'production',
   optimization: commonConfig.optimization,
@@ -86,4 +129,4 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
 });
 
 // export a callable function so we can swap out the network to use
-module.exports = baseProdConfig;
+module.exports = [ contentScriptConfig, baseProdConfig ];

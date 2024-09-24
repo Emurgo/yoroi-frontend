@@ -145,6 +145,7 @@
   "dependencies": {
     "@amplitude/analytics-browser": "^2.1.3",
     "@babel/preset-typescript": "^7.24.7",
+    "@bringweb3/chrome-extension-kit": "^1.0.12",
     "@cardano-foundation/ledgerjs-hw-app-cardano": "7.1.3",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",

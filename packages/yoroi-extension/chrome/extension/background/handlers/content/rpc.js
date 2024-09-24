@@ -65,6 +65,7 @@ import {
 } from './connect';
 import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
+import { getPublicDeriverById } from '../yoroi/utils';
 
 declare var chrome;
 
@@ -643,6 +644,15 @@ const Handlers = Object.freeze({
       );
     }
   }),
+
+  'get-theme-mode': NewHandler.basic<
+    void,
+    'dark' | 'light'
+  >(async () => {
+    const localStorageApi = new LocalStorageApi();
+    const theme = await localStorageApi.getUserThemeMode();
+    return { ok: theme || 'light' };
+  }),
 });
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {
@@ -690,7 +700,24 @@ export async function handleRpc(message: Object, sender: Object) {
 
     let connectedWallet = undefined;
     if (handler.needConnectedWallet) {
-      connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
+      try {
+        connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
+      } catch (error) {
+        // fixme: unsafe
+        const localStorageApi = new LocalStorageApi();
+        const publicDeriverId = await localStorageApi.getSelectedWalletId();
+        if (publicDeriverId == null) {
+          sendRpcResponse(
+            {
+              err: 'no wallet',
+            },
+            tabId,
+            message.uid,
+          );
+          return;
+        }
+        connectedWallet = await getPublicDeriverById(publicDeriverId);
+      }
     }
 
     const result = await handler.handle({
