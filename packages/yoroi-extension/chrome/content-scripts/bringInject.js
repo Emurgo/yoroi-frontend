@@ -117,13 +117,34 @@ function getFromBackground(functionName: string, params: andy): Promise<any> {
       }
     });
 
-    window.postMessage({
+    chrome.runtime.sendMessage({
       type: "connector_rpc_request",
-      url: location.hostname,
+      url: 'bring',
       uid,
       function: functionName,
       params,
       returnType: 'cbor',
+    });
+  });
+}
+
+// return false if user rejects
+function bindBringToWallet(unbindCallback: () => void): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.onMessage.addListener((msg, sender) => {
+      if (msg.type === 'yoroi_connect_response/cardano') {
+        resolve(msg.success);
+      } else if (msg.type === 'disconnect') {
+        unbindCallback();
+      }
+    });
+
+    chrome.runtime.sendMessage({
+      type: 'yoroi_connect_request/cardano',
+      connectParameters: {
+        url: 'bring',
+      },
+      imgBase64Url: '', // fixme: use Bring icon here
     });
   });
 }
@@ -137,19 +158,27 @@ function getTheme(): Promise<'light' | 'dark'> {
 }
 
 async function example() {
+  const bound = await bindBringToWallet(() => {
+    console.log('user unbinds wallet');
+  });
+  console.log('bound successfully:', bound);
+  if (!bound) {
+    return;
+  }
+
   try {
     const addrs = await getAddresses();
-    console.log('>>>address', addrs[0]);
+    console.log('address', addrs[0]);
   } catch (error) {
-    if (error.message === 'no wallet') {
-      console.log('no wallet');
+    if (error.message === 'not bound') {
+      console.log('Bring not bound to wallet');
     } else {
       throw error;
     }
   }
 
   const theme = await getTheme();
-  console.log('>>>theme:', theme);
+  console.log('theme:', theme);
 }
 
 example().catch(console.error);
