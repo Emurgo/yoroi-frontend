@@ -62,7 +62,6 @@ import {
   getConnectedWallet,
   type ConnectedSite,
   type SignContinuationDataType,
-  getAllConnectedSites,
 } from './connect';
 import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
@@ -701,22 +700,23 @@ export async function handleRpc(message: Object, sender: Object) {
 
     let connectedWallet = undefined;
     if (handler.needConnectedWallet) {
-      if (message.url === 'bring') {
-        const connectedSites = await getAllConnectedSites();
-        const bringConnectedSite = Object.values(connectedSites).find(({ url }) => url === 'bring');
-        if (!bringConnectedSite) {
+      try {
+        connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
+      } catch (error) {
+        // fixme: unsafe
+        const localStorageApi = new LocalStorageApi();
+        const publicDeriverId = await localStorageApi.getSelectedWalletId();
+        if (publicDeriverId == null) {
           sendRpcResponse(
             {
-              err: 'not bound',
+              err: 'no wallet',
             },
             tabId,
             message.uid,
           );
           return;
         }
-        connectedWallet = await getPublicDeriverById(bringConnectedSite.status.publicDeriverId);      
-      } else {
-        connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
+        connectedWallet = await getPublicDeriverById(publicDeriverId);
       }
     }
 
