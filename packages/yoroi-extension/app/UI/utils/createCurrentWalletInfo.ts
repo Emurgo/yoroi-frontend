@@ -8,6 +8,25 @@ import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
 
+// TODO To be added and constructed from wallet apo
+const primaryTokenFullInfo = {
+  application: 'coin',
+  decimals: 6,
+  description: 'Cardano',
+  fingerprint: '',
+  id: '.',
+  name: 'ADA',
+  nature: 'primary',
+  originalImage: '',
+  reference: '',
+  status: 'valid',
+  symbol: '₳',
+  tag: '',
+  ticker: 'ADA',
+  type: 'ft',
+  website: 'https://www.cardano.org/',
+};
+
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
   const vote = state.drepDelegation;
@@ -101,7 +120,7 @@ const getAssetWalletAssetList = (stores: any) => {
         price: fiatPrice,
 
         // TODO new structure here
-        quantity: token.entry.amount,
+        quantity: asQuantity(token.entry.amount),
         id: tokenId,
         info: {
           id: token.entry.identifier,
@@ -109,6 +128,7 @@ const getAssetWalletAssetList = (stores: any) => {
           policyId: token.info.Metadata.policyId,
           fingerprint: tokenId,
           metadata: extractMetadataInfo({ metadata: token.info.Metadata?.assetMintMetadata?.[0] || null }),
+          numberOfDecimals,
         },
         // TODO - refactor and add here any formated data/utils for token
         // utils: {
@@ -176,9 +196,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const { currency } = profile.unitOfAccount;
     const getFiatCurrentPrice = coinPriceStore?.getCurrentPrice;
     const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
-    // if (fiatPrice === null) {
-    //   return;
-    // }
+
     const fiatDisplay = calculateAndFormatValue(Number(shiftedAmount), fiatPrice);
     const isHardware: boolean = selectedWallet.isHardware;
 
@@ -201,11 +219,12 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       backendService: BackendService,
       backendServiceZero: BackendServiceZero,
       isHardwareWallet: isHardware,
-      primaryTokenInfo: tokenInfo,
+      // primaryTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
+      primaryTokenInfo: { ...primaryTokenFullInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
-        fiatAmount: fiatDisplay || 0,
+        fiatAmount: fiatDisplay || 0, // to be removed
         currency: currency === null ? 'USD' : currency,
       },
       assetList: assetList,
@@ -216,13 +235,13 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
   }
 };
 
-// export const asQuantity = (value: BigNumber | number | string) => {
-//   const bn = new BigNumber(value);
-//   if (bn.isNaN() || !bn.isFinite()) {
-//     throw new Error('Invalid quantity');
-//   }
-//   return bn;
-// };
+export const asQuantity = (value: BigNumber | number | string) => {
+  const bn = new BigNumber(value);
+  if (bn.isNaN() || !bn.isFinite()) {
+    throw new Error('Invalid quantity');
+  }
+  return bn;
+};
 
 type Metadata = {
   metadata?: {

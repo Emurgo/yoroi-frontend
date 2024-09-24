@@ -57,30 +57,28 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
 
   React.useEffect(() => {
     const listForActivity: any = assetList
-      .filter(item => item.policyId?.length > 0)
-      .map(item => `${item.policyId}.${item.assetName}`); //
+      .filter(item => item.info?.policyId?.length > 0)
+      .map(item => `${item.info?.policyId}.${item.assetName}`); //
 
     actions.secondaryTokenIdsChanged(listForActivity);
 
     queryClient.invalidateQueries([queryKey]);
   }, [actions, queryClient]);
-
   // Use hook for each interval (24h, 1w, 1m)
   const { mutate: fetch24h, data: data24h, isLoading: loading24h } = useMultiTokenActivity('24h');
-  // const { mutate: fetch1w, data: data1w, isLoading: loading1w } = useMultiTokenActivity('1w');
+  const { mutate: fetch1w, data: data1w, isLoading: loading1w } = useMultiTokenActivity('7d');
+  console.log('fetch1w', fetch1w);
   // const { mutate: fetch1m, data: data1m, isLoading: loading1m } = useMultiTokenActivity('1m');
-
   React.useEffect(() => {
     if (state.secondaryTokenIds.length > 0) {
       fetch24h(state.secondaryTokenIds);
-      // fetch1w(state.secondaryTokenIds);
+      fetch1w(state.secondaryTokenIds);
       // fetch1m(state.secondaryTokenIds);
     }
   }, [state.secondaryTokenIds, fetch24h]);
 
   React.useEffect(() => {
     if (data24h) {
-      console.log('data24h', data24h);
       const combinedData: any = {
         data24h: data24h,
         // '1w': data1w,

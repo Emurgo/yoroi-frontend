@@ -4,26 +4,18 @@ import React, { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
-import { TokenType } from '../../common/types/index';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from './StatsTable';
 
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance, assetList, changeUnitOfAccountPair, unitOfAccount } = usePortfolio();
+  const { walletBalance, assetList } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<TokenType[]>(assetList);
+  const [tokenList, setTokenList] = useState<TokenInfoType[]>(assetList);
   const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
-
-  useEffect(() => {
-    changeUnitOfAccountPair({
-      from: { name: 'ADA', value: walletBalance?.ada || '0' },
-      to: { name: unitOfAccount || 'USD', value: walletBalance?.fiatAmount || '0' },
-    });
-  }, [walletBalance, unitOfAccount]);
 
   useEffect(() => {
     if (isShownWelcomeBanner) return;

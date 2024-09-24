@@ -4,9 +4,21 @@ import { SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { WalletBalance } from '../../../../types/currrentWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
+import { HeaderPrice } from './HeaderPrice';
 import PnlTag from './PlnTag';
+
+export function formatValue(value: BigNumber): string {
+  if (value.isZero()) {
+    return '0';
+  }
+  if (value.abs().lt(1)) {
+    return value.toFormat(6);
+  }
+  return value.toFixed(2);
+}
 
 interface Props {
   walletBalance: WalletBalance;
@@ -18,28 +30,65 @@ interface Props {
 const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }: Props): JSX.Element => {
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair } = usePortfolio();
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const { tokenActivity } = usePortfolioTokenActivity();
 
   const {
-    ptActivity: { close, open },
+    currency: selectedCurrency,
+
+    ptActivity: { open, close: ptPrice },
     config,
   } = useCurrencyPairing();
 
-  const { changeValue, changePercent, variantPnl } = priceChange(open, close);
+  const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
+
+  const showADA = accountPair?.from.name === 'ADA';
+
+  const totalTokenPrice = React.useMemo(() => {
+    // const tokenPrice = tokenActivity?.data24h[amount?.info.id]?.price.close;
+    const showingAda = accountPair?.from.name !== 'ADA';
+    const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
+    const decimals = showingAda ? primaryTokenInfo.decimals : config.decimals;
+
+    if (ptPrice == null) return `... ${currency}`;
+
+    console.log('DATATA', {
+      // tokenPrice,
+      showingAda,
+      currency,
+      quantity: primaryTokenInfo.quantity,
+      ptPrice,
+      unitOfAccount,
+      decimals,
+    });
+
+    const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
+
+    return totalAmount;
+  }, [tokenActivity, selectedCurrency, config.decimals, ptPrice]);
 
   const handleCurrencyChange = () => {
-    if (unitOfAccount !== accountPair?.from.name) {
-      changeUnitOfAccountPair({
-        from: { name: unitOfAccount || 'USD', value: walletBalance.fiatAmount },
-        to: { name: 'ADA', value: walletBalance.ada },
-      });
-    } else {
-      changeUnitOfAccountPair({
-        from: { name: 'ADA', value: walletBalance.ada },
-        to: { name: unitOfAccount, value: walletBalance.fiatAmount },
-      });
-    }
+    changeUnitOfAccountPair({
+      from: { name: showADA ? unitOfAccount : 'ADA', value: showADA ? totalTokenPrice : walletBalance.ada },
+      to: { name: showADA ? 'ADA' : unitOfAccount, value: showADA ? walletBalance.ada : totalTokenPrice },
+    });
   };
+
+  React.useEffect(() => {
+    changeUnitOfAccountPair({
+      from: { name: 'ADA', value: walletBalance?.ada || '0' },
+      to: { name: unitOfAccount || 'USD', value: totalTokenPrice || '0' },
+    });
+  }, [walletBalance, unitOfAccount, totalTokenPrice]);
+
+  // const amount = React.useMemo(
+  //   () =>
+  //     aggregatePrimaryAmount({
+  //       primaryTokenInfo,
+  //       tokenActivity: tokenActivity.data24h,
+  //     }),
+  //   [primaryTokenInfo, tokenActivity, ptPrice]
+  // );
 
   return (
     <Stack direction="row" justifyContent="space-between">
@@ -53,7 +102,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             </Typography>
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
-            {accountPair?.from.name}
+            <Typography component="span" variant="body2" fontWeight="500" color="ds.text_gray_medium">
+              {accountPair?.from.name}
+            </Typography>
             <Typography
               component="span"
               variant="body2"
@@ -71,13 +122,14 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
-          {isLoading ? (
+          {/* {isLoading ? (
             <Skeleton width="129px" height="16px" />
           ) : (
             <Typography color="ds.text_gray_medium">
-              {accountPair?.to.value} {accountPair?.to.name}
+              {close.toFixed(config.decimals)} {unitOfAccount}
             </Typography>
-          )}
+          )} */}
+          <HeaderPrice isLoading={tokenActivity === null} />
           {isLoading ? (
             <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
               <Skeleton width="47px" height="20px" />

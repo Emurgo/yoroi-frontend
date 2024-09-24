@@ -20,6 +20,7 @@ export const useMultiTokenActivity = (
         Accept: 'application/json',
       },
     });
+    console.log('tokenActivityresponse', { interval, response });
     return response.data;
   };
 

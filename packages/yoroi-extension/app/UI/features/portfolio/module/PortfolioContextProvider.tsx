@@ -38,7 +38,7 @@ export const PortfolioContextProvider = ({
   },
   currentWallet,
 }: PortfolioProviderProps) => {
-  const { walletBalance, assetList, selectedWallet, networkId } = currentWallet;
+  const { walletBalance, assetList, selectedWallet, networkId, primaryTokenInfo } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -74,6 +74,7 @@ export const PortfolioContextProvider = ({
       walletBalance,
       assetList: assetList || [],
       networkId,
+      primaryTokenInfo,
     }),
     [state, actions]
   );

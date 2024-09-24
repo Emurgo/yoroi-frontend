@@ -36,7 +36,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
     order: null,
     orderBy: null,
   });
-
   const list = useMemo(() => [...data], [data]);
 
   const {
@@ -69,7 +68,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
   // TODO refactor and add calculation based on fiat toatl value - endpoint not working
   const procentageData = useTokenPercentages(data);
-
   return (
     <Table
       name="stat"
@@ -101,19 +99,19 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice
-              isPrimaryToken={row.policyId?.length === 0}
+              isPrimaryToken={row.info.policyId?.length === 0}
               ptActivity={ptActivity}
               unitOfAccount={unitOfAccount}
-              secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+              secondaryToken24Activity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
             />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            {data24h === null ? (
+            {data24h === null || ptActivity === null ? (
               <Skeleton variant="text" width="50px" height="30px" />
             ) : (
               <TokenPriceChangeChip
-                secondaryTokenActivity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
+                secondaryTokenActivity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
                 primaryTokenActivity={ptActivity}
                 isPrimaryToken={row.policyId?.length === 0}
               />
@@ -131,7 +129,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenProcentage
               procentage={
-                row.info.policyId.length === 0 ? procentageData[''] : procentageData[`${row.policyId}.${row.assetName}`]
+                row.info.policyId.length === 0 ? procentageData[''] : procentageData[`${row.info.policyId}.${row.assetName}`]
               }
             />
           </TableCell>
@@ -140,12 +138,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             {data24h === null ? (
               <Skeleton variant="text" width="50px" height="30px" />
             ) : (
-              <TokenPriceTotal
-                // isPrimaryToken={row.policyId.length === 0}
-                token={row}
-                accountPair={accountPair}
-                secondaryToken24Activity={data24h && data24h[`${row.policyId}.${row.assetName}`]}
-              />
+              <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
             )}
           </TableCell>
         </TableRow>
@@ -182,6 +175,9 @@ const TokenDisplay = ({ token }) => {
 };
 
 const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
+  if (secondaryTokenActivity === undefined) {
+    return <Skeleton variant="text" width="50px" height="30px" />;
+  }
   const { close, open } = isPrimaryToken
     ? primaryTokenActivity
     : secondaryTokenActivity?.length && secondaryTokenActivity[1].price;
@@ -195,55 +191,49 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
   );
 };
 
-const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
+const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const theme: any = useTheme();
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  const { accountPair, primaryTokenInfo } = usePortfolio();
+
+  if (secondaryToken24Activity === undefined) {
+    return <Skeleton variant="text" width="50px" height="30px" />;
+  }
 
   const {
-    currency: selectedCurrency,
-    config,
     ptActivity: { close: ptPrice },
   } = useCurrencyPairing();
 
-  // const showingAda = isPrimaryTokenActive && amount.info.id !== portfolioPrimaryTokenInfo.id;
-  const showingAda = accountPair?.from.name === 'ADA';
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
 
-  const currency = selectedCurrency;
-  const decimals = config.decimals;
+  const showingAda = accountPair?.from.name === 'ADA';
+  const currency = accountPair?.from.name;
+  const decimals = showingAda ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
+  if (token.name === 'INDY') {
+    console.log('@@@@@@@tokenPrice', {
+      id: token.info.id,
+      name: token.name,
+      token,
+      tokenPrice,
+      currency: accountPair?.from.name,
+      tokenQuantity: tokenQuantityAsBigInt,
+      ptPrice,
+      decimals,
+    });
+  }
 
   if (ptPrice == null) return `... ${currency}`;
 
-  // if (!isPrimaryToken(amount.info) && tokenPrice == null) return `—— ${currency}`;
+  const totalTokenPrice = atomicBreakdown(tokenQuantityAsBigInt, decimals)
+    .bn.times(tokenPrice ?? 1)
+    .times(showingAda ? 1 : String(ptPrice))
+    .toFormat(decimals);
 
-  // if (hidePrimaryPair && isPrimaryToken(amount.info) && isPrimaryTokenActive) return '';
+  // const totalTokenPrice2 = calculateTokenValueWithPrecision(token.quantity, String(tokenPrice), decimals);
 
-  // Assuming token.quantity is a BigNumber and token.numberOfDecimals represents the number of decimals
-  const decimalPlaces = token.numberOfDecimals;
-
-  // Multiply the BigNumber by 10^decimalPlaces to shift the decimals
-  const shiftedBigNumber = token.quantity.times(BigNumber(10).pow(decimalPlaces)); // Stay in BigNumber realm
-
-  // Convert to bigint
-  const bigIntValue = BigInt(shiftedBigNumber.toString(10)); // Convert BigNumber to string, then to BigInt
-
-  // Ensure tokenPrice and ptPrice are BigNumber instances and convert if needed
-  const safeTokenPrice = BigNumber.isBigNumber(tokenPrice) ? tokenPrice : new BigNumber(tokenPrice ?? '1');
-  const safePtPrice = BigNumber.isBigNumber(ptPrice) ? ptPrice : new BigNumber(ptPrice ?? '1');
-
-  // Now, pass the bigIntValue to atomicBreakdown
-  const price = `${atomicBreakdown(bigIntValue, token.numberOfDecimals)
-    .bn.times(safeTokenPrice) // BigNumber operation
-    .times(showingAda ? 1 : safePtPrice) // BigNumber operation
-    .toFormat(decimals)} ${currency}`;
-
-  // console.log('token', {
-  //   name: token.name,
-  //   quantity: token.quantity,
-  //   tokenCALCULATEDFINALPrice: price,
-  //   selectedCurrency,
-  //   tokenPrice: tokenPrice,
-  //   showingAda,
-  // });
+  if (token.name === 'INDY') {
+    console.log('newTotalPrice', { totalTokenPrice, tokenQuantityAsBigInt });
+  }
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
@@ -255,7 +245,7 @@ const TokenPriceTotal = ({ token, accountPair, secondaryToken24Activity }) => {
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-            {price}
+            {totalTokenPrice} {accountPair?.from.name || 'USD'}
           </Typography>
         )}
       </Stack>
@@ -309,3 +299,36 @@ const TokenChip = ({ token }) => {
     />
   );
 };
+
+export function formatValue(value: BigNumber): string {
+  if (value.isZero()) {
+    return '0';
+  }
+  if (value.abs().lt(1)) {
+    return value.toFormat(6);
+  }
+  return value.toFixed(2);
+}
+
+function calculateTokenValueWithPrecision(quantity: BigNumber, price: string, decimals: number): string {
+  // Convert price to BigNumber for accurate multiplication
+  const bigPrice = new BigNumber(price);
+
+  // Multiply quantity by price
+  const totalValue = quantity.multipliedBy(bigPrice);
+
+  // Round the result to the specified number of decimals
+  const totalValueWithPrecision = totalValue.decimalPlaces(decimals);
+
+  return totalValueWithPrecision.toFixed(decimals);
+}
+
+function bigNumberToBigInt(bn: BigNumber): bigint {
+  // Convert BigNumber to a string representation of a whole number
+  const wholeNumberString = bn.toFixed(0); // 0 means no decimals
+
+  // Convert the string to BigInt
+  const bigIntValue = BigInt(wholeNumberString);
+
+  return bigIntValue;
+}
