@@ -470,38 +470,6 @@ function cardanoMinAdaRequiredFromOutput(
   return new BigNumber(minAdaRequired);
 }
 
-/**
- * <TODO:PENDING_REMOVAL> LEGACY
- * @deprecated
- */
-export function coinsPerWord_to_coinsPerByte(coinsPerWord: BigNumber): BigNumber {
-  return coinsPerWord.div(8).integerValue(BigNumber.ROUND_FLOOR);
-}
-
-/**
- * @deprecated
- */
-export function cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u: RemoteUnspentOutput, coinsPerWord: BigNumber): BigNumber {
-  return cardanoMinAdaRequiredFromRemoteFormat(u, coinsPerWord_to_coinsPerByte(coinsPerWord));
-}
-
-export function cardanoMinAdaRequiredFromRemoteFormat(u: RemoteUnspentOutput, coinsPerByte: BigNumber): BigNumber {
-  return cardanoUtxoMonadFromRemoteFormat(u)
-    .unwrap<BigNumber>((wasmUtxo, Module) => {
-      const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
-      const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
-      const minAdaRequired = Module.WalletV4.min_ada_for_output(wasmUtxo.output(), dataCost).to_str();
-      return new BigNumber(minAdaRequired);
-    });
-}
-
-/**
- * @deprecated
- */
-export function cardanoMinAdaRequiredFromAssets_coinsPerWord(tokens: MultiToken, coinsPerWord: BigNumber): BigNumber {
-  return cardanoMinAdaRequiredFromAssets(tokens, coinsPerWord_to_coinsPerByte(coinsPerWord));
-}
-
 export function cardanoMinAdaRequiredFromAssets(tokens: MultiToken, coinsPerByte: BigNumber): BigNumber {
   return RustModule.WasmScope(Module => {
     const output = Module.WalletV4.TransactionOutput.new(
