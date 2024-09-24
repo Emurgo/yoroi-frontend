@@ -290,6 +290,8 @@
   "settings.general.languageSelect.labelInfo": "The selected language translation is fully provided by the community",
   "settings.general.translation.acknowledgment": "Thank you to the following for their contribution: ",
   "settings.general.translation.contributors": "_",
+  "settings.general.theme.light": "Light Theme",
+  "settings.general.theme.dark": "Dark Theme",
   "settings.menu.analytics.link.label": "Analytics",
   "settings.menu.assetDeposit.link.label": "Locked assets deposit",
   "settings.menu.blockchain.link.label": "Blockchain",
