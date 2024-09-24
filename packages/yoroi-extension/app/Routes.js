@@ -28,6 +28,7 @@ import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
+import PagePreparation from './components/page-preparation/PagePreparation';
 // New UI pages
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
@@ -375,7 +376,7 @@ const WalletsSubpages = (stores, actions) => (
 const SwapSubpages = (stores, actions) => (
   <Switch>
     <Route exact path={ROUTES.SWAP.ROOT} component={props => <SwapPage {...props} stores={stores} actions={actions} />} />
-    <Route exact path={ROUTES.SWAP.ORDERS} component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />} />
+    <Route exact path={ROUTES.SWAP.ERROR} component={props => <PagePreparation {...props} stores={stores} actions={actions} />} />
     <Redirect to={ROUTES.SWAP.ROOT} />
   </Switch>
 );

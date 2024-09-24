@@ -72,7 +72,7 @@ export default function SwapInput({
         sx={{
           borderStyle: 'solid',
           borderWidth: (tokenInfo.id?.length > 0 && error) || focusState.value ? '2px' : '1px',
-          borderColor: error ? 'magenta.500' : isFocusedColor,
+          borderColor: error ? 'ds.sys_magenta_500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
           pr: '8px',
@@ -181,7 +181,7 @@ export default function SwapInput({
         </Box>
       </Box>
       {error && (
-        <Typography component="div" pt="4px" variant="caption" color="magenta.500">
+        <Typography component="div" pt="4px" variant="caption" color="ds.sys_magenta_500">
           {error}
         </Typography>
       )}

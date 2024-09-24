@@ -214,6 +214,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
 
         if (Number(diff) < Number(totalFee)) {
           actions.sellAmountErrorChanged('Not enough balance, please consider the fees');
+          return;
         }
       }
     }
