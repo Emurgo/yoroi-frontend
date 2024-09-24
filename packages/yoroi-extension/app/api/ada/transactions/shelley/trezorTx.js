@@ -168,14 +168,14 @@ function formatTrezorCertificates(
     if (cert.as_stake_registration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_REGISTRATION,
-        path: path,
+        path,
       });
       continue;
     }
     if (cert.as_stake_deregistration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DEREGISTRATION,
-        path: path,
+        path,
       });
       continue;
     }
@@ -183,8 +183,8 @@ function formatTrezorCertificates(
     if (delegationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
-        path: path,
-        pool: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
+        pool: delegationCert.pool_keyhash().to_hex(),
+        path,
       });
       continue;
     }
@@ -494,10 +494,7 @@ export function toTrezorSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
-  rawTxBody: Buffer,
 ): $Exact<CardanoSignTransaction> {
-  const parsedCbor = cbor.decode(rawTxBody);
-
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
     const formatted = [];
     for (const input of iterateLenGet(inputs)) {

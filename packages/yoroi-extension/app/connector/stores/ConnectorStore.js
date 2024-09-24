@@ -1064,7 +1064,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         ownUtxoAddressMap,
         ownStakeAddressMap,
         addressedUtxos,
-        rawTxBody,
       );
     } catch {
       runInAction(() => {
@@ -1145,7 +1144,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         ownUtxoAddressMap,
         ownStakeAddressMap,
         addressedUtxos,
-        rawTxBody,
         additionalRequiredSigners,
       );
     } catch (e) {

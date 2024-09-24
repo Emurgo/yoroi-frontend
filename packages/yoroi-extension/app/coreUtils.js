@@ -1,7 +1,5 @@
 // @flow
 
-import { extend } from 'lodash/object';
-
 export function bytesToHex(bytes: *): string {
   return Buffer.from(bytes).toString('hex');
 }
@@ -288,10 +286,6 @@ export class ExtendedIterable<T> implements Iterable<T> {
 }
 
 export class ExtendedIterableMap<K,V> extends ExtendedIterable<[K,V]> {
-
-  constructor(source: Iterable<[K,V]>) {
-    super(source)
-  }
 
   static fromTuples<X,Y>(col: Iterable<[X,Y]>): ExtendedIterableMap<X,Y> {
     return new ExtendedIterableMap<X, Y>(col);

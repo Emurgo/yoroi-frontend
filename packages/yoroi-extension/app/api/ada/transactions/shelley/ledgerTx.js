@@ -35,7 +35,6 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import { ChainDerivations, } from '../../../../config/numbersConfig';
-import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import { forceNonNull, iterateLenGet, maybe } from '../../../../coreUtils';
 
@@ -784,11 +783,8 @@ export function toLedgerSignRequest(
   ownUtxoAddressMap: AddressMap,
   ownStakeAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
-  rawTxBody: Buffer,
   additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
-  const parsedCbor = cbor.decode(rawTxBody);
-
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
     for (const input of iterateLenGet(inputs)) {
