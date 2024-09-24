@@ -644,6 +644,15 @@ const Handlers = Object.freeze({
       );
     }
   }),
+
+  'get-theme-mode': NewHandler.basic<
+    void,
+    'dark' | 'light'
+  >(async () => {
+    const localStorageApi = new LocalStorageApi();
+    const theme = await localStorageApi.getUserThemeMode();
+    return { ok: theme || 'light' };
+  }),
 });
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {

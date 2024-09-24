@@ -104,7 +104,7 @@ import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
   });
 })().catch(console.error);
 
-function getAddresses(): Promise<string> {
+function getFromBackground(functionName: string, params: andy): Promise<any> {
   const uid = Math.random();
   return new Promise((resolve, reject) => {
     chrome.runtime.onMessage.addListener((msg, sender) => {
@@ -121,17 +121,25 @@ function getAddresses(): Promise<string> {
       type: "connector_rpc_request",
       url: location.hostname,
       uid,
-      function: 'get_used_addresses',
-      params: [undefined],
+      function: functionName,
+      params,
       returnType: 'cbor',
     });
   });
 }
 
+function getAddresses(): Promise<string> {
+  return getFromBackground('get_used_addresses', [undefined]);
+}
+
+function getTheme(): Promise<'light' | 'dark'> {
+  return getFromBackground('get-theme-mode', [undefined]);
+}
+
 async function example() {
   try {
     const addrs = await getAddresses();
-    console.log('address', addrs[0]);
+    console.log('>>>address', addrs[0]);
   } catch (error) {
     if (error.message === 'no wallet') {
       console.log('no wallet');
@@ -139,6 +147,9 @@ async function example() {
       throw error;
     }
   }
+
+  const theme = await getTheme();
+  console.log('>>>theme:', theme);
 }
 
 example().catch(console.error);
