@@ -1,51 +1,43 @@
 // @flow
+import type { CardanoAddressedUtxo, } from '../types';
+import { verifyFromDerivationRoot } from '../../lib/storage/models/utils';
 import type {
-  CardanoAddressedUtxo,
-} from '../types';
-import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
-import type {
+  AnchorParams,
+  AssetGroup,
+  Certificate,
+  CredentialParams,
   DeviceOwnedAddress,
+  DRepParams,
+  SignTransactionRequest,
+  Token,
+  TxInput,
+  TxOutput,
   Withdrawal,
   Witness,
-  Certificate,
-  AssetGroup,
-  Token,
-  TxOutput,
-  TxInput,
-  SignTransactionRequest,
-  AnchorParams,
-  CredentialParams,
-  DRepParams,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type {
-  Address, Value, Addressing,
-} from '../../lib/storage/models/PublicDeriver/interfaces';
-import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import {
   AddressType,
   CertificateType,
-  TransactionSigningMode,
-  TxOutputDestinationType,
-  TxAuxiliaryDataType,
-  CredentialParamsType,
-  CIP36VoteRegistrationFormat,
-  TxRequiredSignerType,
-  DatumType,
-  TxOutputFormat,
   CIP36VoteDelegationType,
+  CIP36VoteRegistrationFormat,
+  CredentialParamsType,
+  DatumType,
   DRepParamsType,
+  TransactionSigningMode,
+  TxAuxiliaryDataType,
+  TxOutputDestinationType,
+  TxOutputFormat,
+  TxRequiredSignerType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
+import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import {
-  Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import {
-  ChainDerivations,
-} from '../../../../config/numbersConfig';
+import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
+import { ChainDerivations, } from '../../../../config/numbersConfig';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { forceNonNull } from '../../../../coreUtils';
+import { forceNonNull, iterateLenGet, maybe } from '../../../../coreUtils';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
@@ -208,16 +200,12 @@ function toLedgerTokenBundle(
   if (assets == null) return null;
   const assetGroup: Array<AssetGroup> = [];
 
-  const policyHashes = assets.keys();
-  for (let i = 0; i < policyHashes.len(); i++) {
-    const policyId = policyHashes.get(i);
+  for (const policyId of iterateLenGet(assets.keys())) {
     const assetsForPolicy = assets.get(policyId);
     if (assetsForPolicy == null) continue;
 
     const tokens: Array<Token> = [];
-    const assetNames = assetsForPolicy.keys();
-    for (let j = 0; j < assetNames.len(); j++) {
-      const assetName = assetNames.get(j);
+    for (const assetName of iterateLenGet(assetsForPolicy.keys())) {
       const amount = assetsForPolicy.get(assetName);
       if (amount == null) continue;
 
@@ -274,8 +262,7 @@ function _transformToLedgerOutputs(request: {|
 |}): Array<TxOutput> {
   const result = [];
 
-  for (let i = 0; i < request.txOutputs.len(); i++) {
-    const output = request.txOutputs.get(i);
+  for (const output of iterateLenGet(request.txOutputs)) {
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
@@ -318,9 +305,7 @@ function formatLedgerWithdrawals(
 ): Array<Withdrawal> {
   const result = [];
 
-  const withdrawalKeys = withdrawals.keys();
-  for (let i = 0; i < withdrawalKeys.len(); i++) {
-    const rewardAddress = withdrawalKeys.get(i);
+  for (const rewardAddress of iterateLenGet(withdrawals.keys())) {
     const withdrawalAmount = withdrawals.get(rewardAddress);
     if (withdrawalAmount == null) {
       throw new Error(`${nameof(formatLedgerWithdrawals)} should never happen`);
@@ -555,8 +540,7 @@ function formatLedgerCertificates(
   };
 
   const result = [];
-  for (let i = 0; i < certificates.len(); i++) {
-    const cert = certificates.get(i);
+  for (const cert of iterateLenGet(certificates)) {
     result.push(convertCertificate(cert, getPath));
   }
   return result;
@@ -807,8 +791,7 @@ export function toLedgerSignRequest(
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
+    for (const input of iterateLenGet(inputs)) {
       const hash = input.transaction_id().to_hex();
       const index = input.index();
       const ownUtxo = addressedUtxos.find(utxo =>
@@ -823,10 +806,10 @@ export function toLedgerSignRequest(
     return formatted;
   }
 
-  function formatOutput(
-    output: RustModule.WalletV4.TransactionOutput,
-    isPostAlonzoTransactionOutput: boolean,
-  ): TxOutput {
+  function formatOutput(output: RustModule.WalletV4.TransactionOutput): TxOutput {
+
+    const isPostAlonzoTransactionOutput = output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
+
     const addr = output.address();
     let destination;
 
@@ -979,22 +962,14 @@ export function toLedgerSignRequest(
   }
 
   const outputs = [];
-  for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(
-      formatOutput(
-        txBody.outputs().get(i),
-        parsedCbor.get(1)[i].constructor.name === 'Map',
-      )
-    );
+  for (const output of iterateLenGet(txBody.outputs())) {
+    outputs.push(formatOutput(output));
   }
 
   function getRequiredSignerHashHexes(): Array<string> {
     const set = new Set<string>();
-    const requiredSigners = txBody.required_signers();
-    if (requiredSigners) {
-      for (let i = 0; i < requiredSigners.len(); i++) {
-        set.add(requiredSigners.get(i).to_hex());
-      }
+    for (const requiredSigner of iterateLenGet(txBody.required_signers())) {
+      set.add(requiredSigner.to_hex());
     }
     return [...set];
   }
@@ -1084,14 +1059,7 @@ export function toLedgerSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  let formattedCollateralReturn = null;
-  const collateralReturn = txBody.collateral_return();
-  if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(
-      collateralReturn,
-      parsedCbor.get(16).constructor.name === 'Map',
-    );
-  }
+  const formattedCollateralReturn = maybe(txBody.collateral_return(), formatOutput);
 
   let formattedReferenceInputs = null;
   const referenceInputs = txBody.reference_inputs();

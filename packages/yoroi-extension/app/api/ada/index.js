@@ -79,7 +79,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { cip8Sign, v4PublicToV2, makeCip8Key, buildCoseSign1FromSignature } from './lib/cardanoCrypto/utils';
+import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
@@ -154,7 +154,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
+import { bytesToHex, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -2464,9 +2464,7 @@ function getDifferenceAfterTx(
   const sumOutForKey = new MultiToken([], defaultToken);
   {
     const txBody = utxoResponse.txBuilder.build();
-    const outputs = txBody.outputs();
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
+    for (const output of iterateLenGet(txBody.outputs())) {
       const address = Buffer.from(output.address().to_bytes()).toString('hex');
       if (addrContainsAccountKey(address, accountKeyString, true)) {
         sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));

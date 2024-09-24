@@ -11,6 +11,7 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import { iterateLenGet } from '../../../../coreUtils';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -108,10 +109,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
     const values = [];
 
-    const inputs = body.inputs();
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
-
+    for (const input of iterateLenGet(body.inputs())) {
       const key = {
         hash: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
         index: input.index(),
@@ -153,10 +151,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
     const values = [];
 
-    const outputs = body.outputs();
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
-
+    for (const output of iterateLenGet(body.outputs())) {
       values.push({
         value: multiTokenFromCardanoValue(
             output.amount(),
@@ -208,10 +203,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     const withdrawals = this.unsignedTx.build().withdrawals();
     if (withdrawals == null) return [];
 
-    const withdrawalKeys = withdrawals.keys();
     const result = [];
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const rewardAddress = withdrawalKeys.get(i);
+    for (const rewardAddress of iterateLenGet(withdrawals.keys())) {
       const withdrawalAmount = withdrawals.get(rewardAddress)?.to_str();
       if (withdrawalAmount == null) continue;
 
@@ -242,8 +235,8 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     if (certs == null) return [];
 
     const result = [];
-    for (let i = 0; i < certs.len(); i++) {
-      const cert = certs.get(i).as_stake_deregistration();
+    for (const c of iterateLenGet(certs)) {
+      const cert = c.as_stake_deregistration();
       if (cert == null) continue;
 
       const address = RustModule.WalletV4.RewardAddress.new(
@@ -271,25 +264,19 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   certificates(): Array<{| kind: $Values<CertificateKind>, payloadHex: string |}> {
     const res = [];
-    const certs = this.unsignedTx.build().certs();
-    if (certs != null) {
-      for (let i = 0; i < certs.len(); i++) {
-        const cert = certs.get(i);
-        res.push({
-          kind: cert.kind(),
-          payloadHex: cert.to_hex(),
-        });
-      }
+    for (const cert of iterateLenGet(this.unsignedTx.build().certs())) {
+      res.push({
+        kind: cert.kind(),
+        payloadHex: cert.to_hex(),
+      });
     }
     return res;
   }
 
   receivers(includeChange: boolean): Array<string> {
-    const outputs = this.unsignedTx.build().outputs();
-
     const outputStrings = [];
-    for (let i = 0; i < outputs.len(); i++) {
-      outputStrings.push(toHexOrBase58(outputs.get(i).address()));
+    for (const output of iterateLenGet(this.unsignedTx.build().outputs())) {
+      outputStrings.push(toHexOrBase58(output.address()));
     }
 
     if (!includeChange) {

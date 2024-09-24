@@ -40,6 +40,7 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import { fail, iterateLenGetMap, zipGenerators } from '../../../../coreUtils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -154,19 +155,14 @@ export async function createTrezorSignTxPayload(
 
 function formatTrezorWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
-  path: Array<Array<number>>,
+  paths: Array<Array<number>>,
 ): Array<CardanoWithdrawal> {
-  const result = [];
 
-  const withdrawalKeys = withdrawals.keys();
-  for (let i = 0; i < withdrawalKeys.len(); i++) {
-    const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));
-    if (withdrawalAmount == null) {
-      throw new Error(`${nameof(formatTrezorWithdrawals)} should never happen`);
-    }
+  const result = [];
+  for (const [[, withdrawalAmount], path] of iterateLenGetMap(withdrawals).zip(paths)) {
     result.push({
-      amount: withdrawalAmount.to_str(),
-      path: path[i],
+      amount: withdrawalAmount?.to_str() || fail('withdrawal amount is not defined (should not happen)'),
+      path,
     });
   }
   return result;

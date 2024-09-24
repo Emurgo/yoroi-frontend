@@ -202,3 +202,72 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
     return value;
   }
 }
+
+export type LenGet<T> = { +len: () => number, +get: number => T, ... };
+export type LenGetMap<K,V> = { +keys: () => LenGet<K>, +get: K => V, ... };
+
+export function iterateLenGet<T>(lenget: ?LenGet<T>): ExtendedIterable<T> {
+  return ExtendedIterable.from<T>((function*() {
+    if (lenget != null) {
+      const len = lenget.len();
+      for (let i = 0; i < len; i++) {
+        yield lenget.get(i);
+      }
+    }
+  })());
+}
+
+export function iterateLenGetMap<K, V>(map: ?LenGetMap<K,V>): ExtendedIterable<[K, V]> {
+  return ExtendedIterable.from<[K,V]>((function*() {
+    if (map) {
+      for (const k of iterateLenGet(map.keys())) {
+        yield [k, map.get(k)];
+      }
+    }
+  })());
+}
+
+export function zipGenerators<A,B>(iterA: Iterable<A>, iterB: Iterable<B>): ExtendedIterable<[A,B]> {
+  return ExtendedIterable.from<[A,B]>((function*() {
+    // $FlowIgnore
+    const as = iterA[Symbol.iterator]();
+    // $FlowIgnore
+    const bs = iterB[Symbol.iterator]();
+    while (true) {
+      const nextA = as.next();
+      const nextB = bs.next();
+      if (nextA.done || nextB.done) {
+        break;
+      }
+      yield [nextA.value, nextB.value];
+    }
+  })());
+}
+
+// $FlowIgnore
+export class ExtendedIterable<T> implements Iterable<T> {
+
+  __source: Iterable<T>;
+
+  constructor(source: Iterable<T>) {
+    this.__source = source;
+  }
+
+  static from<X>(col: Iterable<X>): ExtendedIterable<X> {
+    return new ExtendedIterable<X>(col);
+  }
+
+  // $FlowIgnore
+  [Symbol.iterator]()
+    : Iterator<T> {
+    return this.__source[Symbol.iterator]();
+  }
+
+  zip<B>(iterB: Iterable<B>): ExtendedIterable<[T,B]> {
+    return zipGenerators<T,B>(this.__source, iterB);
+  }
+
+  toArray(): Array<T> {
+    return [...this.__source];
+  }
+}

@@ -21,6 +21,7 @@ import { MultiToken, } from '../../common/lib/MultiToken';
 import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
+import { iterateLenGet } from '../../../coreUtils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -66,15 +67,11 @@ export function parseTokenList(
   if (assets == null) return [];
 
   const result = [];
-  const hashes = assets.keys();
-  for (let i = 0; i < hashes.len(); i++) {
-    const policyId = hashes.get(i);
+  for (const policyId of iterateLenGet(assets.keys())) {
     const assetsForPolicy = assets.get(policyId);
     if (assetsForPolicy == null) continue;
 
-    const policies = assetsForPolicy.keys();
-    for (let j = 0; j < policies.len(); j++) {
-      const assetName = policies.get(j);
+    for (const assetName of iterateLenGet(assetsForPolicy.keys())) {
       const amount = assetsForPolicy.get(assetName);
       if (amount == null) continue;
 
@@ -407,30 +404,6 @@ export function asAddressedUtxo(
       assets,
     };
   });
-}
-
-export function iterateWasm<T>(iterable: ?{| get: number => T |}, len: ?number): T[] {
-  const res = [];
-  if (iterable != null) {
-    // $FlowFixMe
-    const l = len ?? iterable.len();
-    for (let i = 0; i < l; i++) {
-      res.push(iterable.get(i));
-    }
-  }
-  return res;
-}
-
-export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K[]): [K, V][] {
-  const res = [];
-  if (iterable != null) {
-    // $FlowFixMe
-    const k = keys ?? iterateWasm(iterable.keys());
-    for (const key of k) {
-      res.push([key, iterable.get(key)]);
-    }
-  }
-  return res;
 }
 
 function cardanoUtxoMonadFromRemoteFormat(
