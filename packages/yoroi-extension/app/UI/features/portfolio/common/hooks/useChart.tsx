@@ -14,7 +14,7 @@ const useChart = (data: IChartData) => {
   //   { id: 'start1YearAgo', label: strings['1Y'], active: false },
   //   { id: 'ALL', label: strings['ALL'], active: false },
   // ]);
-  const [detailInfo, setDetailInfo] = useState<{ value?: number; label?: string, changeValue?: number, changePercent?: number }>({
+  const [detailInfo, setDetailInfo] = useState<{ value?: number; label?: string; changeValue?: number; changePercent?: number }>({
     label: data[0]?.label,
     value: data[0]?.value,
     changeValue: data[0]?.changeValue,
@@ -38,6 +38,7 @@ const useChart = (data: IChartData) => {
         dy={4}
         textAnchor="end"
         sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
+        stroke={theme.palette.ds.gray_700}
       >
         {payload.value.toFixed(1)}
       </Box>
@@ -123,20 +124,20 @@ const useChart = (data: IChartData) => {
 
     const value = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.value : 0;
     const changeValue = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.changeValue : 0;
-    const changePercent = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.changePercent : 0;
-    const label = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.label : "";
+    const changePercent =
+      props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.changePercent : 0;
+    const label = props.activePayload && props.activePayload.length > 0 ? props.activePayload[0].payload.label : '';
 
     if (!value || !changeValue) return;
     setDetailInfo({
       value,
       changeValue,
       changePercent,
-      label
+      label,
     });
   };
 
   const handleMouseDown = (props: any) => {
-    console.log(" handleMouseDown props", props)
     if (!props || !props.activePayload || props.activePayload.length <= 0) return;
 
     const value = props.activePayload[0].payload.value;
@@ -149,7 +150,7 @@ const useChart = (data: IChartData) => {
       value,
       changeValue,
       changePercent,
-      label
+      label,
     });
     setIsDragging(true);
   };
@@ -159,12 +160,10 @@ const useChart = (data: IChartData) => {
       value: data ? data[0]?.value : 0,
       changeValue: data ? data[0]?.changeValue : 0,
       changePercent: data ? data[0]?.changePercent : 0,
-      label: data ? data[0]?.label : "",
+      label: data ? data[0]?.label : '',
     });
     setIsDragging(false);
   };
-
-
 
   return {
     CustomYAxisTick,

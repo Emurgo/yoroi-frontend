@@ -86,9 +86,11 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" alignItems="center" gap="16px">
-              <Stack direction="row" alignItems="flex-end" textAlign="center" color="ds.gray_max">
+              <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
                 <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
-                <Typography variant="caption">&nbsp;{unitOfAccount}</Typography>
+                <Typography variant="caption" mt="3px">
+                  &nbsp;{unitOfAccount}
+                </Typography>
               </Stack>
               <Stack direction="row" gap="4px">
                 <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
@@ -126,6 +128,7 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
                   type={'number'}
                   tick={CustomYAxisTick}
                   tickCount={9}
+                  stroke="red"
                 />
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line

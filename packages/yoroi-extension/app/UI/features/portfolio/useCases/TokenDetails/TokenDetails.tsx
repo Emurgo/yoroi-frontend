@@ -32,6 +32,14 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
@@ -79,13 +87,15 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
             cursor: 'pointer',
           }}
         >
-          <BackIcon />
+          <IconWrapper>
+            <BackIcon />
+          </IconWrapper>
           <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium" sx={{ textTransform: 'uppercase' }}>
             {strings.backToPortfolio}
           </Typography>
         </Box>
         <Stack direction="row" spacing={theme.spacing(2)}>
-          <NavigationButton variant="contained" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
+          <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
         </Stack>
@@ -110,7 +120,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
                     <Typography
                       variant="body2"
                       fontWeight="500"
-                      color="ds.black_static"
+                      color="ds.text_gray_low"
                       sx={{
                         padding: `${theme.spacing(1)} 0`,
                       }}
