@@ -386,30 +386,23 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (walletType === 'mnemonic') {
       const { txError } = this.state;
       if (txError !== null) {
-        return (
-          <Stack direction="column" gap="8px" className={styles.txError} sx={{ backgroundColor: 'ds.sys_magenta_100' }}>
-            <Stack gap="8px" direction="row">
-              <AttentionIcon />
-              <Typography variant="body1" color="ds.sys_magenta_500">
-                Transaction error
-              </Typography>
-            </Stack>
-            <Typography variant="body1" color="ds.text-gray-medium">
-              The transaction cannot be done due to technical reasons. Try again or
-              <Link
-                className={styles.faq}
-                href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
-                target="_blank"
-                rel="noreferrer"
-                sx={{
-                  color: 'ds.text-primary-medium',
-                  marginLeft: '4px',
-                }}
-              >
-                Ask our support team
-              </Link>
-            </Typography>
-          </Stack>
+        return this.renderErrorBanner(
+          'Transaction error',
+          <div>
+            The transaction cannot be done due to technical reasons. Try again or
+            <Link
+              className={styles.faq}
+              href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+              target="_blank"
+              rel="noreferrer"
+              sx={{
+                color: 'ds.text-primary-medium',
+                marginLeft: '4px',
+              }}
+            >
+              Ask our support team
+            </Link>
+          </div>
         );
       }
       return null;
