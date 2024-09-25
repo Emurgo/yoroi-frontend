@@ -629,7 +629,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 <Typography
                   component="div"
                   variant="caption1"
-                  color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                  color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
                   sx={{ position: 'absolute', bottom: '10px', right: '0' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
@@ -663,7 +663,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="caption1"
-                color={invalidMemo ? 'magenta.500' : 'grayscale.600'}
+                color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
                 sx={{ position: 'absolute', bottom: '5px', right: '0' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
@@ -696,7 +696,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 variant="caption1"
                 sx={{
                   position: 'absolute',
-                  color: 'magenta.500',
+                  color: 'ds.sys_magenta_500',
                   left: '50%',
                   top: '-14px',
                   transform: 'translateX(-50%)',
@@ -715,12 +715,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   ? {
                       borderWidth: '2px',
                       borderStyle: 'solid',
-                      borderColor: 'magenta.500',
+                      borderColor: 'ds.sys_magenta_500',
                     }
                   : {
                       borderWidth: '1px',
                       borderStyle: 'solid',
-                      borderColor: 'grey.400',
+                      borderColor: 'ds.el_gray_min',
                     }),
               }}
             >
@@ -732,7 +732,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   left: '6px',
                   backgroundColor: 'ds.bg_color_max',
                   paddingX: '4px',
-                  color: shouldSendAll && 'grayscale.200',
+                  color: 'ds.text_gray_medium',
                   fontWeight: 400,
                   fontSize: '12px',
                   lineHeight: '16px',
@@ -794,6 +794,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   sx={{
                     '&.MuiButton-sizeSmall': {
                       lineHeight: '17px',
+                      padding: '8px',
+                      backgroundColor: 'ds.gray_100',
+                      color: 'ds.text_gray_low',
                     },
                   }}
                   disabled={maxSendableAmount.isExecuting}
@@ -823,11 +826,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 <Box
                   sx={{
                     margin: '16px 16px 0px 16px',
-                    pt: '16px',
-                    color: 'grayscale.600',
+                    pt: '24px',
+                    color: 'ds.text_gray_low',
                     fontSize: '16px',
                     letterSpacing: 0,
-                    borderTop: '1px solid var(--yoroi-comp-input-text-disabled)',
+                    borderTopWidth: '1px',
+                    borderTopStyle: 'solid',
+                    borderTopColor: 'ds.gray_200',
                   }}
                 >
                   {this.renderUnitOfAccountAmount(amountFieldProps.value)}
@@ -840,7 +845,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     position: 'absolute',
                     bottom: '-25px',
                     left: '17px',
-                    color: 'magenta.500',
+                    color: 'ds.text_error',
                     fontSize: '12px',
                   }}
                   id="wallet:send:addAssetsStep-amountError-text"

@@ -12,11 +12,7 @@ import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import TextField from '../common/TextField';
-import {
-  formattedAmountToNaturalUnits,
-  formattedAmountToBigNumber,
-  truncateToken,
-} from '../../utils/formatters';
+import { formattedAmountToNaturalUnits, formattedAmountToBigNumber, truncateToken } from '../../utils/formatters';
 import config from '../../config';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
@@ -50,10 +46,7 @@ type Props = {|
   +classicTheme: boolean,
   +walletAddress: string,
   +amount: ?BigNumber,
-  +validateAmount: (
-    amountInNaturalUnits: BigNumber,
-    tokenRow: $ReadOnly<TokenRow>
-  ) => Promise<[boolean, void | string]>,
+  +validateAmount: (amountInNaturalUnits: BigNumber, tokenRow: $ReadOnly<TokenRow>) => Promise<[boolean, void | string]>,
   +tokenInfo: $ReadOnly<TokenRow>,
 |};
 
@@ -90,10 +83,7 @@ export default class URIGenerateDialog extends Component<Props> {
                 return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
               }
               const formattedAmount = new BigNumber(
-                formattedAmountToNaturalUnits(
-                  amountValue,
-                  this.props.tokenInfo.Metadata.numberOfDecimals
-                )
+                formattedAmountToNaturalUnits(amountValue, this.props.tokenInfo.Metadata.numberOfDecimals)
               );
               return await this.props.validateAmount(formattedAmount, this.props.tokenInfo);
             },
@@ -158,11 +148,7 @@ export default class URIGenerateDialog extends Component<Props> {
             <NumericInputRP
               className="amount"
               {...amountFieldProps}
-              value={
-                amountFieldProps.value === ''
-                  ? null
-                  : formattedAmountToBigNumber(amountFieldProps.value)
-              }
+              value={amountFieldProps.value === '' ? null : formattedAmountToBigNumber(amountFieldProps.value)}
               decimalPlaces={this.props.tokenInfo.Metadata.numberOfDecimals}
               label={this.getAmountLabel()}
               error={amountField.error}

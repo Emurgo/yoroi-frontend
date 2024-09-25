@@ -40,7 +40,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-            <Typography color="ds.text_gray_medium">Min ADA</Typography>
+            <Typography color="ds.text_gray_low">Min ADA</Typography>
             {withInfo && (
               <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
             )}
@@ -52,7 +52,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_medium">Fees</Typography>
+          <Typography color="ds.text_gray_low">Fees</Typography>
           {withInfo && (
             <InfoTooltip
               content={
@@ -69,7 +69,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_medium">Minimum assets received</Typography>
+          <Typography color="ds.text_gray_low">Minimum assets received</Typography>
           {withInfo && <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />}
         </Box>
         <Box>
@@ -78,7 +78,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_medium">Liquidity provider fee</Typography>
+          <Typography color="ds.text_gray_low">Liquidity provider fee</Typography>
           {withInfo && (
             <InfoTooltip
               content={

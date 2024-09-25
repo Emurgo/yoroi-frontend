@@ -10,9 +10,17 @@ import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { NftImage } from '../../assets/NFTsList';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { splitAmount } from '../../../../utils/formatters';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +tokens: FormattedTokenDisplay[],
@@ -47,15 +55,15 @@ export default class AssetsDropdown extends Component<Props, State> {
   renderTokens(tokens: FormattedTokenDisplay[]): Node {
     return tokens.map(token => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals || 0;
-      const displayAmount = token.amount
-        ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
-        : '0';
+      const displayAmount = token.amount ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('') : '0';
 
       return (
         <div className={styles.token}>
           <div className={styles.label}>
-            <DefaultAssetIcon />
-            <div>{token.label}</div>
+            <IconWrapper>
+              <DefaultAssetIcon />
+            </IconWrapper>
+            <Typography color="ds.text_gray_medium">{token.label}</Typography>
           </div>
           <div className={styles.amount}>{displayAmount}</div>
         </div>
@@ -80,7 +88,7 @@ export default class AssetsDropdown extends Component<Props, State> {
           >
             <NftImage imageUrl={nft.image} name={nft.name} width="41px" height="44px" />
           </Box>
-          <div className={styles.name}>{nft.name}</div>
+          <Typography color="ds.text_gray_medium">{nft.name}</Typography>
         </div>
       );
     });
@@ -94,16 +102,20 @@ export default class AssetsDropdown extends Component<Props, State> {
       <div className={styles.component}>
         {tokens.length > 0 && (
           <div>
-            <button
-              type="button"
-              onClick={() => this.toggleDropdown('tokens')}
-              className={styles.header}
-            >
-              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
+            <button type="button" onClick={() => this.toggleDropdown('tokens')} className={styles.header}>
+              <Typography component="div" fontWeight={500} variant="body1" color="ds.text_gray_medium">
                 {intl.formatMessage(globalMessages.tokens)} ({tokens.length})
               </Typography>
               <div className={styles.headerRight}>
-                {isTokensOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                {isTokensOpen ? (
+                  <IconWrapper>
+                    <ArrowUpIcon />
+                  </IconWrapper>
+                ) : (
+                  <IconWrapper>
+                    <ArrowDownIcon />
+                  </IconWrapper>
+                )}
               </div>
             </button>
             {isTokensOpen && (
@@ -118,16 +130,22 @@ export default class AssetsDropdown extends Component<Props, State> {
 
         {nfts.length > 0 && (
           <div>
-            <button
-              type="button"
-              onClick={() => this.toggleDropdown('nfts')}
-              className={styles.header}
-            >
-              <Typography component="div" fontWeight={500} variant="body1" color="grayscale.700">
+            <button type="button" onClick={() => this.toggleDropdown('nfts')} className={styles.header}>
+              <Typography component="div" fontWeight={500} variant="body1" color="ds.text_gray_medium">
                 {intl.formatMessage(globalMessages.nfts)} ({nfts.length})
               </Typography>
               <div className={styles.headerRight}>
-                {isNftsOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+                {isNftsOpen ? (
+                  <IconWrapper>
+                    {' '}
+                    <ArrowUpIcon />
+                  </IconWrapper>
+                ) : (
+                  <IconWrapper>
+                    {' '}
+                    <ArrowDownIcon />
+                  </IconWrapper>
+                )}
               </div>
             </button>
 
