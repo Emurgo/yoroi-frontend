@@ -1,11 +1,10 @@
 //@flow
-import { useMemo, type Node } from 'react';
-import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
+import { type Node } from 'react';
+import { useSwap } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
-import { comparatorByGetter } from '../../../../coreUtils';
 import { useVerifiedSwapTokens } from '../hooks';
 
 type Props = {|
@@ -32,7 +31,7 @@ export default function SelectBuyTokenFromList({
     switchTokens,
   } = useSwapForm();
 
-  const { walletVerifiedAssets } = useVerifiedSwapTokens(store.assets);
+  const { walletVerifiedAssets } = useVerifiedSwapTokens(store.assets, sellTokenInfo);
 
   const { orderData, resetQuantities } = useSwap();
 
