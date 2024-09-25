@@ -39,10 +39,12 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const list = useMemo(() => [...data], [data]);
 
   const {
-    tokenActivity: { data24h },
+    tokenActivity: { data24h, data7d, data30d },
     // isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
+
+  console.log('data7d', data7d);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -106,24 +108,28 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }} sx={{ display: 'flex', marginTop: '10px' }}>
-            {data24h === null || ptActivity === null ? (
-              <Skeleton variant="text" width="50px" height="30px" />
-            ) : (
-              <TokenPriceChangeChip
-                secondaryTokenActivity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
-                primaryTokenActivity={ptActivity}
-                isPrimaryToken={row.info.policyId?.length === 0}
-              />
-            )}
+          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
+            <TokenPriceChangeChip
+              secondaryTokenActivity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
+              primaryTokenActivity={ptActivity}
+              isPrimaryToken={row.info.policyId?.length === 0}
+            />
+          </TableCell>
+
+          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
+            <TokenPriceChangeChip
+              secondaryTokenActivity={data7d && data7d[`${row.info.policyId}.${row.assetName}`]}
+              primaryTokenActivity={ptActivity}
+              isPrimaryToken={row.info.policyId?.length === 0}
+            />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenChip token={row} />
-          </TableCell>
-
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenChip token={row} />
+            <TokenPriceChangeChip
+              secondaryTokenActivity={data30d && data30d[`${row.info.policyId}.${row.assetName}`]}
+              primaryTokenActivity={ptActivity}
+              isPrimaryToken={row.info.policyId?.length === 0}
+            />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
@@ -175,6 +181,9 @@ const TokenDisplay = ({ token }) => {
 };
 
 const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
+  if (secondaryTokenActivity === null || primaryTokenActivity === null) {
+    return <Skeleton variant="text" width="50px" height="30px" />;
+  }
   const tokenPriceClose = isPrimaryToken
     ? primaryTokenActivity.close
     : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
@@ -186,9 +195,11 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
   return (
-    <PnlTag variant={variantPnl} withIcon>
-      <Typography fontSize="13px">{formatPriceChange(changePercent)}%</Typography>
-    </PnlTag>
+    <Box sx={{ display: 'flex' }}>
+      <PnlTag variant={variantPnl} withIcon>
+        <Typography fontSize="13px">{formatPriceChange(changePercent)}%</Typography>
+      </PnlTag>
+    </Box>
   );
 };
 

@@ -66,14 +66,15 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   }, [actions, queryClient]);
   // Use hook for each interval (24h, 1w, 1m)
   const { mutate: fetch24h, data: data24h, isLoading: loading24h } = useMultiTokenActivity('24h');
-  const { mutate: fetch1w, data: data1w, isLoading: loading1w } = useMultiTokenActivity('7d');
-  console.log('fetch1w', fetch1w);
+  const { mutate: fetch30d, data: data30d, isLoading: loading30d } = useMultiTokenActivity('30d');
+  const { mutate: fetch7d, data: data7d, isLoading: loading7d } = useMultiTokenActivity('7d');
+  console.log('data7d', data7d);
   // const { mutate: fetch1m, data: data1m, isLoading: loading1m } = useMultiTokenActivity('1m');
   React.useEffect(() => {
     if (state.secondaryTokenIds.length > 0) {
       fetch24h(state.secondaryTokenIds);
-      fetch1w(state.secondaryTokenIds);
-      // fetch1m(state.secondaryTokenIds);
+      fetch7d(state.secondaryTokenIds);
+      fetch30d(state.secondaryTokenIds);
     }
   }, [state.secondaryTokenIds, fetch24h]);
 
@@ -81,12 +82,12 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
     if (data24h) {
       const combinedData: any = {
         data24h: data24h,
-        // '1w': data1w,
-        // '1m': data1m,
+        data7d: data7d,
+        data30d: data30d,
       };
       actions.tokenActivityChanged(combinedData);
     }
-  }, [data24h, actions, loading24h, walletBalance?.ada]);
+  }, [data24h, actions, data30d, data7d, loading24h, loading30d, loading7d, walletBalance?.ada]);
 
   const value = React.useMemo(
     () => ({
@@ -94,7 +95,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       isLoading: loading24h,
       // || loading1w || loading1m, // Combine loading states from all intervals
     }),
-    [loading24h, state]
+    [loading24h, data7d, data30d, state]
   );
 
   return <PortfolioTokenActivityContext.Provider value={value}>{children}</PortfolioTokenActivityContext.Provider>;

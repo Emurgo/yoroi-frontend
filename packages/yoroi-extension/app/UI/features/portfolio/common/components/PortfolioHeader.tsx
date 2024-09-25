@@ -52,16 +52,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
     if (ptPrice == null) return `... ${currency}`;
 
-    console.log('DATATA', {
-      // tokenPrice,
-      showingAda,
-      currency,
-      quantity: primaryTokenInfo.quantity,
-      ptPrice,
-      unitOfAccount,
-      decimals,
-    });
-
     const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
 
     return totalAmount;
