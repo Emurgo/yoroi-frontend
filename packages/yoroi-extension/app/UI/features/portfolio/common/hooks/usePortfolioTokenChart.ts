@@ -98,15 +98,11 @@ export const useGetPortfolioTokenChart = (
     ...options,
     queryKey: ['useGetPortfolioTokenChart', tokenInfo.info?.id ?? '', timeInterval, currency],
     queryFn: async () => {
-      console.log('responseresponseresponse22222');
-
       // @ts-ignore
       const response = await fetchPtPriceActivity(getTimestampsTokenInterval(timeInterval));
-      console.log('responseresponseresponse', response);
       if (isRight(response)) {
         if (response.value.data.error) throw new Error(response.value.data.error);
 
-        console.log('AFTERR TEST', response);
         const tickers = response.value.data.tickers;
         // @ts-ignore
         const validCurrency = currency === ptTicker ? supportedCurrencies.USD : currency ?? supportedCurrencies.USD;
@@ -142,7 +138,6 @@ export const useGetPortfolioTokenChart = (
   //     return generateMockChartData(timeInterval);
   //   },
   // });
-  console.log('ptQuery', ptQuery.data);
 
   return ptQuery;
   // return tokenInfo && isPrimaryToken(tokenInfo.info) ? ptQuery : otherQuery;

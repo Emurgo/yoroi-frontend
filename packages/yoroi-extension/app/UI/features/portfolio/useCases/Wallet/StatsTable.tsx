@@ -3,16 +3,12 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import React, { useMemo, useState } from 'react';
-import { Chip } from '../../../../components';
-import { ChipTypes } from '../../../../components/Chip';
-import { Icon } from '../../../../components/icons';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
 import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';
 import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
-import { formatNumber } from '../../common/helpers/formatHelper';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
@@ -78,7 +74,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
-      isLoading={isLoading}
+      isLoading={false}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {getSortedData(list).map((row: any) => (
@@ -134,7 +130,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
             <TokenProcentage
               procentage={
                 row.info.policyId.length === 0 ? procentageData[''] : procentageData[`${row.info.policyId}.${row.assetName}`]
@@ -143,11 +139,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            {data24h === null ? (
-              <Skeleton variant="text" width="50px" height="30px" />
-            ) : (
-              <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
-            )}
+            <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
           </TableCell>
         </TableRow>
       ))}
@@ -186,7 +178,7 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
   const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
 
   if (secondaryTokenActivity === null || primaryTokenActivity === null || isFetching) {
-    return <Skeleton variant="text" width="50px" height="30px" />;
+    return <Skeleton variant="text" width="60px" height="30px" />;
   }
 
   const tokenPriceClose = isPrimaryToken
@@ -213,6 +205,15 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const theme: any = useTheme();
   const { accountPair, primaryTokenInfo, walletBalance } = usePortfolio();
+
+  if (secondaryToken24Activity === null) {
+    return (
+      <Stack direction="column" alignItems="flex-end">
+        <Skeleton sx={{ float: 'right' }} variant="text" width="100px" height="22px" />
+        <Skeleton sx={{ float: 'right' }} variant="text" width="50px" height="22px" />
+      </Stack>
+    );
+  }
 
   const isPrimary: boolean = token.info.policyId?.length === 0;
 
@@ -273,32 +274,6 @@ const TokenProcentage = ({ procentage }) => {
     <Typography variant="body2" color="ds.text_gray_medium">
       {procentage}%
     </Typography>
-  );
-};
-
-// MOCK DATA
-const TokenChip = ({ token }) => {
-  const theme = useTheme();
-  return (
-    <Chip
-      type={token['1M'] > 0 ? ChipTypes.ACTIVE : token['1M'] < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-      label={
-        <Stack justifyContent="space-between" alignItems="center">
-          {token['1M'] > 0 ? (
-            // @ts-ignore
-            <Icon.ChevronUp fill={theme.palette.ds.secondary_c800} />
-          ) : token['1M'] < 0 ? (
-            // @ts-ignore
-            <Icon.ChevronDown fill={theme.palette.ds.sys_magenta_c700} />
-          ) : null}
-          {/* @ts-ignore */}
-          <Typography variant="caption1">
-            {token['1M'] >= 0 ? formatNumber(token['1M']) : formatNumber(-1 * token['1M'])}%
-          </Typography>
-        </Stack>
-      }
-      sx={{ cursor: 'pointer' }}
-    />
   );
 };
 

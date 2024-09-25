@@ -21,13 +21,17 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
   padding: '6px !important',
   minWidth: '36px',
   backgroundColor:
-    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium) : `transparent`,
+    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `transparent`,
 
   '&.MuiButton-contained': {
-    color: theme.palette.ds.white_static,
+    color: theme.palette.ds.gray_min,
   },
   '&.MuiButton-secondary': {
     color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.text_primary_medium,
+  },
+  '&:hover': {
+    backgroundColor:
+      variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `transparent`,
   },
 }));
 
