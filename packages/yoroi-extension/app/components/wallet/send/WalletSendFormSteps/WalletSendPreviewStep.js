@@ -364,8 +364,25 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     return globalMessages.confirm;
   }
 
+  renderErrorBanner: (string, Node) => Node = (errorTitle, descriptionNode) => {
+    return (
+      <Stack direction="column" gap="8px" className={styles.txError} sx={{ backgroundColor: 'ds.sys_magenta_100' }}>
+        <Stack gap="8px" direction="row">
+          <AttentionIcon />
+          <Typography variant="body1" color="ds.sys_magenta_500">
+            {errorTitle}
+          </Typography>
+        </Stack>
+        <Typography variant="body1" color="ds.text-gray-medium">
+          {descriptionNode}
+        </Typography>
+      </Stack>
+    );
+  };
+
   renderError(): Node {
     const { walletType } = this.props;
+    const { intl } = this.context;
     if (walletType === 'mnemonic') {
       const { txError } = this.state;
       if (txError !== null) {
@@ -399,11 +416,17 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     }
     if (walletType === 'trezor') {
       const { trezorSendError } = this.props;
-      return <ErrorBlock error={trezorSendError} />;
+      if (trezorSendError !== null) {
+        return this.renderErrorBanner('Transaction error', intl.formatMessage(trezorSendError));
+      }
+      return null;
     }
     if (walletType === 'ledger') {
       const { ledgerSendError } = this.props;
-      return <ErrorBlock error={ledgerSendError} />;
+      if (ledgerSendError !== null) {
+        return this.renderErrorBanner('Transaction error', intl.formatMessage(ledgerSendError));
+      }
+      return null;
     }
     throw new Error('unexpected wallet type');
   }
