@@ -73,6 +73,7 @@ import {
   RemoveWalletFromWhiteList,
   GetConnectedSites,
 } from '../../chrome/extension/background/handlers/yoroi/connector';
+import { GetProtocolParameters } from '../../chrome/extension/background/handlers/yoroi/protocolParameters';
 import type {
   RemoveAllTransactionsRequest,
   RemoveAllTransactionsResponse,
@@ -80,7 +81,6 @@ import type {
 import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
-
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -374,6 +374,10 @@ export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = asy
   return await callBackground({ type: GetConnectedSites.typeTag });
 }
 
+export const getProtocolParameters: GetEntryFuncType<typeof GetProtocolParameters> = async (request) => {
+  return await callBackground({ type: GetProtocolParameters.typeTag, request });
+}
+  
 // Background -> UI notifications:
 const callbacks = Object.freeze({
   walletStateUpdate: [],

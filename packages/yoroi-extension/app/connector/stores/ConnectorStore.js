@@ -73,6 +73,12 @@ import {
   signWindowRetrieveData,
   userSignConfirm,
   userSignReject,
+  signFail,
+  signWindowRetrieveData,
+  connectWindowRetrieveData,
+  removeWalletFromWhiteList,
+  getConnectedSites,
+  getProtocolParameters,
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
@@ -779,6 +785,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('wallet has no used address');
     }
 
+    const protocolParameters = await getProtocolParameters(connectedWallet);
+
     const { unsignedTx, collateralOutputAddressSet } = await adaApi._createReorgTx(
       getNetworkById(connectedWallet.networkId),
       {
@@ -793,6 +801,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       addressedUtxos,
       connectedWallet.submittedTransactions,
       usedAddress,
+      protocolParameters,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating

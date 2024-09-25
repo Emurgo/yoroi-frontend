@@ -69,6 +69,7 @@ import { ChainDerivations, DREP_KEY_INDEX, STAKING_KEY_INDEX } from '../../../ap
 import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/api/ada/lib/cardanoCrypto/utils';
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 import type { WalletState } from '../background/types';
+import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -818,6 +819,7 @@ export async function connectorCreateCardanoTx(
   password: ?string,
   cardanoTxRequest: CardanoTxRequest,
   foreignUtxoFetcher: ForeignUtxoFetcher,
+  protocolParameters: ProtocolParameters,
 ): Promise<string> {
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -848,6 +850,7 @@ export async function connectorCreateCardanoTx(
       cardanoTxRequest,
       submittedTxs,
       utxos,
+      protocolParameters,
     },
     foreignUtxoFetcher,
   );

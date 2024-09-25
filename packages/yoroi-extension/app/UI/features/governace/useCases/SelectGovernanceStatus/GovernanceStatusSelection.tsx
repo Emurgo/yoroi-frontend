@@ -146,9 +146,9 @@ export const GovernanceStatusSelection = () => {
 
   if (walletAdaBalance !== null && walletAdaBalance === 0) {
     return (
-      <Stack mt="185px" alignItems="center">
+      <Stack alignItems="center" margin="0 auto" mt="185px" maxWidth="500px">
         <NoTransactions />
-        <Typography variant="h3" fontWeight="500" mt="84px">
+        <Typography variant="h3" fontSize="26px" fontWeight="500" mt="32px" textAlign="center" color="ds.text_gray_medium">
           To participate in governance you need to have ADA in your wallet.
         </Typography>
         {/* @ts-ignore */}
@@ -161,10 +161,10 @@ export const GovernanceStatusSelection = () => {
 
   return (
     <Container>
-      <Typography variant="h3" fontWeight="500" mb={2} gutterBottom>
+      <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="64px" gutterBottom>
+      <Typography variant="body1" mb="64px" gutterBottom color="ds.text_gray_low">
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Box display="flex" justifyContent="center" gap="24px">
@@ -196,11 +196,11 @@ export const GovernanceStatusSelection = () => {
           </Typography>
         )}
         {governanceStatus.status === 'none' && (
-          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
+          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" lineHeight="22px">
             {strings.becomeADrep}
           </Link>
         )}
-        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" variant="body1" lineHeight="22px">
+        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
           {strings.learnMore}
         </Link>
       </Stack>

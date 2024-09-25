@@ -29,12 +29,12 @@ export const TransactionSubmitted = ({
         {title ? title : <FormattedMessage {...globalMessages.transactionSubmitted} />}
       </Typography>
       {subtitle && (
-        <Typography variant="body1" color="ds.gray_c800" mt="8px">
+        <Typography variant="body1" color="ds.gray_gray_medium" mt="8px">
           {subtitle}
         </Typography>
       )}
 
-      <Typography variant="body1" mt="8px" color="ds.text_gray_medium" textAlign="center" mb="16px">
+      <Typography variant="body1" mt="8px" color="ds.text_gray_low" textAlign="center" mb="16px">
         {content ? content : <FormattedMessage {...globalMessages.transactionSubmittedInfo} />}
       </Typography>
       <Button

@@ -8,7 +8,7 @@ export const darkPalette = {
   primary_400: '#2E4BB0',
   primary_300: '#304489',
   primary_200: '#242D4F',
-  primary_100: '#171B28',
+  primary_100: '#1F253B',
 
   secondary_900: '#E4F7F3',
   secondary_800: '#C6F7ED',
@@ -39,8 +39,8 @@ export const darkPalette = {
   sys_magenta_700: '#FFC0D0',
   sys_magenta_600: '#FB9CB5',
   sys_magenta_500: '#FF7196',
-  sys_magenta_300: '#572835',
-  sys_magenta_100: '#2F171D',
+  sys_magenta_300: '#64303E',
+  sys_magenta_100: '#3B252A',
 
   sys_cyan_500: '#59B1F4',
   sys_cyan_100: '#112333',
@@ -51,9 +51,10 @@ export const darkPalette = {
   sys_orange_500: '#FAB357',
   sys_orange_100: '#291802',
 
-  bg_gradient_1: 'linear-gradient(195.39deg,  #1AE3BB 26%, #4B6DDE 10%,#4B6DDE 16%)',
-  bg_gradient_2: 'linear-gradient(205.51deg, #0B997D 48%, #08C29D 8%)',
-  bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 100%, #2B3E7D 100%)',
+  bg_gradient_1:
+    'linear-gradient(195deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.10) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
+  bg_gradient_2: 'linear-gradient(206deg, rgba(11, 153, 125, 0.48) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
+  bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 15.04%, #2B3E7D 84.96%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
   special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
 };

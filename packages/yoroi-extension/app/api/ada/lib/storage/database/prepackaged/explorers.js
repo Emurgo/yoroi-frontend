@@ -86,19 +86,6 @@ const CardanoMainnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-const CardanoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 4_00,
-    NetworkId: networks.CardanoTestnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://explorer.cardano-testnet.iohkdev.io/en/address?address=',
-      transaction: 'https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=',
-    },
-    Name: 'CardanoExplorer',
-  },
-];
-
 const CardanoPreprodTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   {
     ExplorerId: 4_50,
@@ -150,8 +137,6 @@ const CardanoSanchoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
 
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
-  // <TODO:PENDING_REMOVAL> Legacy Testnet
-  [networks.CardanoTestnet.NetworkId, CardanoTestnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
   [networks.CardanoSanchoTestnet.NetworkId, CardanoSanchoTestnetExplorers],
@@ -164,10 +149,6 @@ export const prepackagedDefaultExplorers:
   Map<number, $ReadOnly<ExplorerRow>> = new Map([
     [networks.CardanoMainnet.NetworkId, getOrThrow(
       CardanoMainnetExplorers.find(explorer => explorer.IsBackup)
-    )],
-  // <TODO:PENDING_REMOVAL> Legacy Testnet
-    [networks.CardanoTestnet.NetworkId, getOrThrow(
-      CardanoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
     [networks.CardanoPreprodTestnet.NetworkId, getOrThrow(
       CardanoPreprodTestnetExplorers.find(explorer => explorer.IsBackup)
