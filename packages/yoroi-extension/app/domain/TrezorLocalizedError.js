@@ -4,9 +4,7 @@ import LocalizableError, { UnexpectedError } from '../i18n/LocalizableError';
 import globalMessages from '../i18n/global-messages';
 import { defineMessages } from 'react-intl';
 
-import {
-  Logger,
-} from '../utils/logging';
+import { Logger } from '../utils/logging';
 
 const messages = defineMessages({
   signTxError101: {
@@ -19,7 +17,8 @@ const messages = defineMessages({
   },
   noWitnessError: {
     id: 'wallet.send.trezor.error.noWitness',
-    defaultMessage: '!!!Could not sign the transaction. Please ensure the passphrase you entered is the passhprase used to create this wallet.',
+    defaultMessage:
+      '!!!Could not sign the transaction. Please ensure the passphrase you entered is the passhprase used to create this wallet.',
   },
 });
 
@@ -34,38 +33,39 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     if (error.message.includes('no witness for')) {
       // from `buildSignedTransaction()`, the only realistic cause being passphrase mismatch
       localizableError = new LocalizableError(messages.noWitnessError);
+    } else if (/Cancelled/.test(error.message)) {
+      localizableError = new LocalizableError(messages.signTxError101);
     } else {
       // Trezor device related error happend, convert then to LocalizableError
       switch (error.message) {
-      case 'Iframe timeout':
-        localizableError = new LocalizableError(globalMessages.trezorError101);
-        break;
-      case 'Trezor signing error: Permissions not granted':
-        localizableError = new LocalizableError(globalMessages.hwError101);
-        break;
-      case 'Trezor signing error: Popup closed (code=Method_Interrupted)':
-        localizableError = new LocalizableError(globalMessages.trezorError103);
-        break;
-      case 'Trezor signing error: Cancelled (code=Failure_ActionCancelled)':
-      case 'Trezor signing error: Failed to execute \'transferIn\' on \'USBDevice\': A transfer error has occurred. (code=19)':
-        localizableError = new LocalizableError(messages.signTxError101);
-        break;
-      case 'Feature AuxiliaryData not supported by device firmware':
-        localizableError = new LocalizableError(messages.firmwareCatalystSupportError);
-        break;
-      default:
-        /** we are not able to figure out why Error is thrown
-          * make it, Something unexpected happened */
-        Logger.error(`TrezorLocalizedError::${nameof(convertToLocalizableError)}::error: ${error.message}`);
-        localizableError = new UnexpectedError();
-        break;
+        case 'Iframe timeout':
+          localizableError = new LocalizableError(globalMessages.trezorError101);
+          break;
+        case 'Trezor signing error: Permissions not granted':
+          localizableError = new LocalizableError(globalMessages.hwError101);
+          break;
+        case 'Trezor signing error: Popup closed (code=Method_Interrupted)':
+          localizableError = new LocalizableError(globalMessages.trezorError103);
+          break;
+        case "Trezor signing error: Failed to execute 'transferIn' on 'USBDevice': A transfer error has occurred. (code=19)":
+          localizableError = new LocalizableError(messages.signTxError101);
+          break;
+        case 'Feature AuxiliaryData not supported by device firmware':
+          localizableError = new LocalizableError(messages.firmwareCatalystSupportError);
+          break;
+        default:
+          /** we are not able to figure out why Error is thrown
+           * make it, Something unexpected happened */
+          Logger.error(`TrezorLocalizedError::${nameof(convertToLocalizableError)}::error: ${error.message}`);
+          localizableError = new UnexpectedError();
+          break;
       }
     }
   }
 
   if (!localizableError) {
     /** we are not able to figure out why Error is thrown
-      * make it, Something unexpected happened */
+     * make it, Something unexpected happened */
     localizableError = new UnexpectedError();
   }
 
