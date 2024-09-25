@@ -31,7 +31,6 @@ import config from '../../../../config';
 import WarningBox from '../../../widgets/WarningBox';
 import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
-import ErrorBlock from '../../../widgets/ErrorBlock';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
 
