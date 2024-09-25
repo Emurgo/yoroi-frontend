@@ -1,20 +1,20 @@
 import { Typography, Box, Button } from '@mui/material';
-import { Ilustration } from './Ilustration';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ROUTES } from '../../routes-config';
+import { ReactComponent as UnexpectedError } from '../../assets/images/revamp/page-unexpected-error.inline.svg';
 
 const messages = defineMessages({
   preparation: {
-    id: 'global.labels.preparation',
-    defaultMessage: '!!!Page preparation failed',
+    id: 'global.labels.unexpectedError',
+    defaultMessage: '!!!Something unexpected happened',
   },
   somethingWrong: {
-    id: 'global.labels.somethingWrong',
-    defaultMessage: '!!!Something went wrong when preparing this page.',
+    id: 'global.labels.contactSupport',
+    defaultMessage: '!!!If this keep happening, contact our support team. ',
   },
   goBack: {
     id: 'global.labels.pleaseGoBack',
@@ -43,15 +43,15 @@ export default class PagePreparation extends Component<StoresAndActionsProps> {
           marginTop: '117px',
         }}
       >
-        <Ilustration />
+        <UnexpectedError />
         <Typography variant="h3" fontWeight={500} mt="32px" mb="4px" color="ds.gray_max">
           {this.context.intl.formatMessage(messages.preparation)}
         </Typography>
         <Typography color="ds.gray_600" variant="body1">
-          {this.context.intl.formatMessage(messages.somethingWrong)}
+          {this.context.intl.formatMessage(messages.goBack)}
         </Typography>
         <Typography color="ds.gray_600" variant="body1" mb="16px">
-          {this.context.intl.formatMessage(messages.goBack)}
+          {this.context.intl.formatMessage(messages.somethingWrong)}
         </Typography>
         <Button
           variant="primary"
