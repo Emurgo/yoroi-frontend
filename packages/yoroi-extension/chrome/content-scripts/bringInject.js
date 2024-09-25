@@ -141,6 +141,15 @@ function getTheme(): Promise<'light' | 'dark'> {
   return getFromBackground('get-theme-mode', [undefined]);
 }
 
+function listenForActiveWalletOpen(callback) {
+  // todo: verify sender extension id
+  chrome.runtime.onMessage.addListener((msg, sender) => {
+    if (msg.type === 'active-wallet-open') {
+      callback(msg.activeWalletId);
+    }
+  });
+}
+
 async function example() {
   try {
     const addr = await getFirstAddress();
@@ -154,7 +163,11 @@ async function example() {
   }
 
   const theme = await getTheme();
-  console.log('>>>theme:', theme);
+  console.log('theme:', theme);
+
+  listenForActiveWalletOpen((walletId: ?number) => {
+    console.log('active wallet ID is:', walletId);
+  });
 }
 
 example().catch(console.error);
