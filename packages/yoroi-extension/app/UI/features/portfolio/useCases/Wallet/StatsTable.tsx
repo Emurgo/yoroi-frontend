@@ -106,14 +106,14 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }} sx={{ display: 'flex' }}>
+          <TableCell sx={{ padding: '16.8px 1rem' }} sx={{ display: 'flex', marginTop: '10px' }}>
             {data24h === null || ptActivity === null ? (
               <Skeleton variant="text" width="50px" height="30px" />
             ) : (
               <TokenPriceChangeChip
                 secondaryTokenActivity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
                 primaryTokenActivity={ptActivity}
-                isPrimaryToken={row.policyId?.length === 0}
+                isPrimaryToken={row.info.policyId?.length === 0}
               />
             )}
           </TableCell>
@@ -175,14 +175,15 @@ const TokenDisplay = ({ token }) => {
 };
 
 const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
-  if (secondaryTokenActivity === undefined) {
-    return <Skeleton variant="text" width="50px" height="30px" />;
-  }
-  const { close, open } = isPrimaryToken
-    ? primaryTokenActivity
-    : secondaryTokenActivity?.length && secondaryTokenActivity[1].price;
+  const tokenPriceClose = isPrimaryToken
+    ? primaryTokenActivity.close
+    : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
 
-  const { changePercent, variantPnl } = priceChange(open, close);
+  const tokenPriceOpen = isPrimaryToken
+    ? primaryTokenActivity.open
+    : secondaryTokenActivity && secondaryTokenActivity[1].price.open;
+
+  const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
   return (
     <PnlTag variant={variantPnl} withIcon>
@@ -193,11 +194,9 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 
 const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const theme: any = useTheme();
-  const { accountPair, primaryTokenInfo } = usePortfolio();
+  const { accountPair, primaryTokenInfo, walletBalance } = usePortfolio();
 
-  if (secondaryToken24Activity === undefined) {
-    return <Skeleton variant="text" width="50px" height="30px" />;
-  }
+  const isPrimary: boolean = token.info.policyId?.length === 0;
 
   const {
     ptActivity: { close: ptPrice },
@@ -209,43 +208,28 @@ const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const showingAda = accountPair?.from.name === 'ADA';
   const currency = accountPair?.from.name;
   const decimals = showingAda ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
-  if (token.name === 'INDY') {
-    console.log('@@@@@@@tokenPrice', {
-      id: token.info.id,
-      name: token.name,
-      token,
-      tokenPrice,
-      currency: accountPair?.from.name,
-      tokenQuantity: tokenQuantityAsBigInt,
-      ptPrice,
-      decimals,
-    });
-  }
 
   if (ptPrice == null) return `... ${currency}`;
 
-  const totalTokenPrice = atomicBreakdown(tokenQuantityAsBigInt, decimals)
+  const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, decimals)
     .bn.times(tokenPrice ?? 1)
     .times(showingAda ? 1 : String(ptPrice))
     .toFormat(decimals);
 
-  // const totalTokenPrice2 = calculateTokenValueWithPrecision(token.quantity, String(tokenPrice), decimals);
-
-  if (token.name === 'INDY') {
-    console.log('newTotalPrice', { totalTokenPrice, tokenQuantityAsBigInt });
-  }
+  const totalTokenPrice = isPrimary && showingAda ? accountPair?.to.value : totaPrice;
+  const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
         <Typography color="ds.text_gray_normal">
-          {token.totalAmount} {token.name}
+          {isPrimary ? walletBalance?.ada : token.totalAmount} {token.name}
         </Typography>
         {token.name === accountPair?.to.name ? (
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-            {totalTokenPrice} {accountPair?.from.name || 'USD'}
+            {totalTokenPrice} {totalTicker || 'USD'}
           </Typography>
         )}
       </Stack>
@@ -299,29 +283,6 @@ const TokenChip = ({ token }) => {
     />
   );
 };
-
-export function formatValue(value: BigNumber): string {
-  if (value.isZero()) {
-    return '0';
-  }
-  if (value.abs().lt(1)) {
-    return value.toFormat(6);
-  }
-  return value.toFixed(2);
-}
-
-function calculateTokenValueWithPrecision(quantity: BigNumber, price: string, decimals: number): string {
-  // Convert price to BigNumber for accurate multiplication
-  const bigPrice = new BigNumber(price);
-
-  // Multiply quantity by price
-  const totalValue = quantity.multipliedBy(bigPrice);
-
-  // Round the result to the specified number of decimals
-  const totalValueWithPrecision = totalValue.decimalPlaces(decimals);
-
-  return totalValueWithPrecision.toFixed(decimals);
-}
 
 function bigNumberToBigInt(bn: BigNumber): bigint {
   // Convert BigNumber to a string representation of a whole number
