@@ -73,11 +73,6 @@ import {
   signWindowRetrieveData,
   userSignConfirm,
   userSignReject,
-  signFail,
-  signWindowRetrieveData,
-  connectWindowRetrieveData,
-  removeWalletFromWhiteList,
-  getConnectedSites,
   getProtocolParameters,
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';

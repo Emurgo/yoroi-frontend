@@ -31,7 +31,7 @@ import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, fail, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
