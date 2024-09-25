@@ -16,7 +16,6 @@ const getSwapFromVerifiedAssets = (assets, onlyVerifiedTokens) => {
 };
 
 const getSwapToVerifiedAssets = (assets, onlyVerifiedTokens, sellTokenInfo) => {
-  console.error('getSwapToVerifiedAssets is called');
   const walletVerifiedAssets = useMemo(() => {
     const isSellingPt = sellTokenInfo.id === '';
     const pt = assets.find(a => a.id === '');
