@@ -917,7 +917,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             getCurrentPrice={this.props.getCurrentPrice}
             isClassicTheme={this.props.isClassicTheme}
             ledgerSendError={this.props.ledgerSendError}
-            trezorSendError={this.props.ledgerSendError}
+            trezorSendError={this.props.trezorSendError}
             ledgerSend={this.props.ledgerSend}
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}

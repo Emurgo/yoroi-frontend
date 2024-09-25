@@ -44,7 +44,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         case 'Trezor signing error: Permissions not granted':
           localizableError = new LocalizableError(globalMessages.hwError101);
           break;
-        case 'Trezor signing error: Popup closed (code=Method_Interrupted)':
+        case 'Popup closed':
           localizableError = new LocalizableError(globalMessages.trezorError103);
           break;
         case "Trezor signing error: Failed to execute 'transferIn' on 'USBDevice': A transfer error has occurred. (code=19)":
