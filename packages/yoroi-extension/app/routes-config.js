@@ -74,6 +74,7 @@ export const ROUTES = {
   },
   SWAP: {
     ROOT: '/swap',
+    ERROR: '/swap/page-error',
     ORDERS: '/swap/orders',
   },
   EXCHANGE_END: '/exchange-end',

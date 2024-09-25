@@ -37,6 +37,7 @@ type Props = {|
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
+  onError: () => void,
 |};
 
 const priceStrings = {
@@ -62,6 +63,7 @@ export default function ConfirmSwapTransaction({
   defaultTokenInfo,
   getTokenInfo,
   getFormattedPairingValue,
+  onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
   const {
@@ -80,12 +82,12 @@ export default function ConfirmSwapTransaction({
     onSuccess: data => {
       onRemoteOrderDataResolved(data).catch(e => {
         console.error('Failed to handle remote order resolution', e);
-        alert('Failed to prepare order transaction');
+        onError();
       });
     },
     onError: error => {
       console.error('useSwapCreateOrder fail', error);
-      alert('Failed to receive remote data for the order');
+      onError();
     },
   });
   useEffect(() => {
