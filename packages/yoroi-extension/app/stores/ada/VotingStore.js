@@ -29,6 +29,7 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey } from '../../api/thunk';
+import { bytesToHex } from '../../coreUtils';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -234,11 +235,9 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     let votingRegTxPromise;
 
     if (publicDeriver.type !== 'mnemonic') {
-      const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
+      const votingPublicKey = `0x${bytesToHex(catalystPrivateKey.to_public().as_bytes())}`;
 
-      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicDeriver.publicKey, 'hex')
-      );
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey);
 
       const stakingKey = derivePublicByAddressing({
         addressing: publicDeriver.stakingAddressing.addressing,
@@ -256,7 +255,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           trezorTWallet: {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
@@ -269,7 +268,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           ledgerNanoWallet: {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,

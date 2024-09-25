@@ -365,9 +365,8 @@ export async function rawGetTransactions(
             }
 
             RustModule.WasmScope(Module => {
-              const mir = Module.WalletV4.MoveInstantaneousRewardsCert.from_bytes(
-                Buffer.from(cert.certificate.Payload, 'hex')
-              ).move_instantaneous_reward().as_to_stake_creds();
+              const mir = Module.WalletV4.MoveInstantaneousRewardsCert.from_hex(cert.certificate.Payload)
+                .move_instantaneous_reward().as_to_stake_creds();
 
               for (const relatedAddr of cert.relatedAddresses) {
                 // recall: length of this list is usually just 1
@@ -375,9 +374,7 @@ export async function rawGetTransactions(
                   if (relatedAddr.AddressId === addr.AddressId) {
                     // this address got some rewards inside the cert
                     const rewardAddr = Module.WalletV4.RewardAddress.from_address(
-                      Module.WalletV4.Address.from_bytes(
-                        Buffer.from(addr.Hash, 'hex')
-                      )
+                      Module.WalletV4.Address.from_hex(addr.Hash)
                     );
                     if (rewardAddr == null) continue; // should never happen
                     const rewardAmount = mir?.get(rewardAddr.payment_cred());
@@ -2234,8 +2231,8 @@ export async function genCardanoAssetMap(
 
       const parts = identifierToCardanoAsset(tokenId);
 
-      const assetName = Buffer.from(parts.name.name()).toString('hex');
-      const policyId = Buffer.from(parts.policyId.to_bytes()).toString('hex');
+      const assetName = bytesToHex(parts.name.name());
+      const policyId = parts.policyId.to_hex();
 
       const tokenMetadata = metadata[tokenId];
       const tokenSupplyStr = supply[tokenId];
@@ -2610,12 +2607,10 @@ async function certificateToDb(
       const enterpriseAddressHex = RustModule.WasmScope(Module => {
         const stakeCredential = Module.WalletV4.Credential
           .from_bytes(hexToBytes(stakeCredentialHex));
-        return Buffer.from(
-          Module.WalletV4.EnterpriseAddress
-            .new(request.network, stakeCredential)
-            .to_address()
-            .to_bytes()
-        ).toString('hex');
+        return Module.WalletV4.EnterpriseAddress
+          .new(request.network, stakeCredential)
+          .to_address()
+          .to_hex();
       });
       const ownAddress = await findOwnAddress(enterpriseAddressHex);
       if (ownAddress != null) return ownAddress;
@@ -2769,18 +2764,14 @@ async function certificateToDb(
             const metadata = cert.poolParams.poolMetadata;
             poolMetadata = Module.WalletV4.PoolMetadata.new(
               Module.WalletV4.URL.new(metadata.url),
-              Module.WalletV4.PoolMetadataHash.from_bytes(
-                Buffer.from(metadata.metadataHash, 'hex')
-              )
+              Module.WalletV4.PoolMetadataHash.from_hex(metadata.metadataHash)
             );
           }
 
           const certificate = Module.WalletV4.PoolRegistration.new(
             Module.WalletV4.PoolParams.new(
               operatorKey,
-              Module.WalletV4.VRFKeyHash.from_bytes(
-                Buffer.from(cert.poolParams.vrfKeyHash, 'hex')
-              ),
+              Module.WalletV4.VRFKeyHash.from_hex(cert.poolParams.vrfKeyHash),
               Module.WalletV4.BigNum.from_str(cert.poolParams.pledge),
               Module.WalletV4.BigNum.from_str(cert.poolParams.cost),
               Module.WalletV4.UnitInterval.new(
@@ -3160,7 +3151,7 @@ export function toRequestAddresses(
       .reduce(
         (list, next) => {
           return RustModule.WasmScope(Module => {
-            const wasmAddr = Module.WalletV4.Address.from_bytes(Buffer.from(next.Hash, 'hex'));
+            const wasmAddr = Module.WalletV4.Address.from_hex(next.Hash);
             const enterpriseWasm = Module.WalletV4.EnterpriseAddress.from_address(wasmAddr);
             if (enterpriseWasm == null) return list;
             const keyHash = enterpriseWasm.payment_cred().to_keyhash();

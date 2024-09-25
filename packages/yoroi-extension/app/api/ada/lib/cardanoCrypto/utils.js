@@ -6,7 +6,7 @@ import { bytesToHex, hexToBytes } from '../../../../coreUtils';
 export function v4PublicToV2(
   v4Key: RustModule.WalletV4.Bip32PublicKey
 ): RustModule.WalletV2.PublicKey {
-  return RustModule.WalletV2.PublicKey.from_hex(Buffer.from(v4Key.as_bytes()).toString('hex'));
+  return RustModule.WalletV2.PublicKey.from_hex(bytesToHex(v4Key.as_bytes()));
 }
 
 export function addressHexToBech32(hex: string): string {

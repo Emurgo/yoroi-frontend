@@ -11,6 +11,7 @@ import {
 import * as crypto from 'crypto';
 
 import { RustModule } from './rustLoader';
+import { hexToBytes } from '../../../../coreUtils';
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
@@ -75,7 +76,7 @@ export function generateWalletRootKey(
  */
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
+    hexToBytes(bip39entropy),
     EMPTY_PASSWORD
   );
   return rootKey;
@@ -90,7 +91,7 @@ export function generatePrivateKeyForCatalyst(): RustModule.WalletV4.Bip32Privat
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
+    hexToBytes(bip39entropy),
     EMPTY_PASSWORD
   );
   return rootKey;
