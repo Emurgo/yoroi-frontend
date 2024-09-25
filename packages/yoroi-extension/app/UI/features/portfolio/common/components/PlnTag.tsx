@@ -1,6 +1,4 @@
-import Box from '@mui/material/Box';
-import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
+import { Box, Typography, styled } from '@mui/material';
 import React from 'react';
 import { Icon } from '../../../../components';
 
@@ -11,17 +9,35 @@ interface Props {
   style?: React.CSSProperties;
 }
 
+const IconWrapper = styled(Box)(({ theme, mode }) => ({
+  height: '16px',
+  '& svg': {
+    '& path': {
+      fill: mode === 'success' ? theme.palette.ds.secondary_800 : theme.palette.ds.sys_magenta_700,
+    },
+  },
+}));
 
-
-const PnlTag = ({ children, withIcon = false, variant = 'neutral', style, ...etc }: Props) => {
-  // const theme = useTheme();
-
-  const icon = variant === 'danger' ? <Icon.ChipArrowDown fill="red" /> : <Icon.ChipArrowUp />;
+const PnlTag = ({ children, withIcon = false, variant = 'neutral' }: Props) => {
+  const icon =
+    variant === 'danger' ? (
+      <IconWrapper mode={variant}>
+        <Icon.ChipArrowDown />
+      </IconWrapper>
+    ) : variant === 'success' ? (
+      <IconWrapper mode={variant}>
+        <Icon.ChipArrowUp />
+      </IconWrapper>
+    ) : (
+      <></>
+    );
 
   return (
-    <TagContainer mode={variant} style={style} {...etc}>
+    <TagContainer mode={variant}>
       {withIcon && variant !== 'neutral' && icon}
-      <StyledTypography mode={variant}>{children}</StyledTypography>
+      <StyledTypography mode={variant} fontSize="12px">
+        {children}
+      </StyledTypography>
     </TagContainer>
   );
 };
@@ -34,9 +50,11 @@ const TagContainer = styled(Box, {
   height: '25px',
   display: 'flex',
   alignItems: 'center',
-  borderRadius: '999px',
-  padding: '4px 6px',
+  justifyContent: 'center',
+  borderRadius: '20px',
+  padding: '4px 7px',
   backgroundColor: getBackgroundColor(theme, mode),
+  width: 'auto',
 }));
 
 const StyledTypography = styled(Typography, {
@@ -44,8 +62,8 @@ const StyledTypography = styled(Typography, {
 })<{
   mode: 'danger' | 'success' | 'neutral';
 }>(({ theme, mode }) => ({
-  //   ...theme.typography.body2,
   color: getTextColor(theme, mode),
+  fontSize: '12px',
 }));
 
 const getBackgroundColor = (theme, mode) => {
@@ -62,7 +80,7 @@ const getBackgroundColor = (theme, mode) => {
 const getTextColor = (theme, mode) => {
   switch (mode) {
     case 'success':
-      return theme.palette.ds.secondary_700;
+      return theme.palette.ds.secondary_800;
     case 'danger':
       return theme.palette.ds.sys_magenta_700;
     default:

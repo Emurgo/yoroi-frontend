@@ -106,7 +106,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem' }} sx={{ display: 'flex' }}>
             {data24h === null || ptActivity === null ? (
               <Skeleton variant="text" width="50px" height="30px" />
             ) : (
@@ -186,7 +186,7 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography>{formatPriceChange(changePercent)}%</Typography>
+      <Typography fontSize="13px">{formatPriceChange(changePercent)}%</Typography>
     </PnlTag>
   );
 };
