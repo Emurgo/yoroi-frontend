@@ -141,6 +141,10 @@ function getTheme(): Promise<'light' | 'dark'> {
   return getFromBackground('get-theme-mode', [undefined]);
 }
 
+function popUpWalletCreation(): void {
+  getFromBackground('pop-up-wallet-creation');
+}
+
 function listenForActiveWalletOpen(callback) {
   // todo: verify sender extension id
   chrome.runtime.onMessage.addListener((msg, sender) => {
@@ -157,6 +161,9 @@ async function example() {
   } catch (error) {
     if (error.message === 'no wallet') {
       console.log('no wallet');
+      if (window.confirm('no wallet, click OK to create')) {
+        popUpWalletCreation();
+      }
     } else {
       throw error;
     }

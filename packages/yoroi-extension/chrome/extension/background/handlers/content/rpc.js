@@ -653,6 +653,13 @@ const Handlers = Object.freeze({
     const theme = await localStorageApi.getUserThemeMode();
     return { ok: theme || 'light' };
   }),
+
+  'pop-up-wallet-creation': NewHandler.basic<
+    void,
+    void,
+  >(async () => {
+    chrome.tabs.create({ url: 'main_window.html' });
+  }),
 });
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {
@@ -706,7 +713,10 @@ export async function handleRpc(message: Object, sender: Object) {
         // fixme: unsafe
         const localStorageApi = new LocalStorageApi();
         const publicDeriverId = await localStorageApi.getSelectedWalletId();
-        if (publicDeriverId == null) {
+        if (publicDeriverId != null) {
+          connectedWallet = await getPublicDeriverById(publicDeriverId);
+        }
+        if (connectedWallet == null) {
           sendRpcResponse(
             {
               err: 'no wallet',
@@ -716,7 +726,6 @@ export async function handleRpc(message: Object, sender: Object) {
           );
           return;
         }
-        connectedWallet = await getPublicDeriverById(publicDeriverId);
       }
     }
 
