@@ -23,7 +23,10 @@ type Props = {|
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_gray_medium,
+      fill: theme.palette.ds.bg_color_max,
+    },
+    '& rect': {
+      fill: theme.palette.ds.text_primary_min,
     },
   },
 }));
@@ -39,7 +42,7 @@ function Stepper(props: Props & Intl): Node {
         const isCurrentStep = currentStepIdx === idx;
         const isPrevStep = idx < currentStepIdx;
         const isFutureStep = idx > currentStepIdx;
-        let stepColor = 'grey.400';
+        let stepColor = 'ds.text_gray_min';
         let cursor = 'pointer';
 
         if (isCurrentStep) stepColor = 'primary.600';
@@ -69,11 +72,11 @@ function Stepper(props: Props & Intl): Node {
                       borderStyle: 'solid',
                     }
                   : {}),
-                bgcolor: isCurrentStep ? 'primary.500' : 'unset',
+                bgcolor: isCurrentStep ? 'ds.text_primary_medium' : 'unset',
                 borderRadius: '50%',
                 transition: 'color 300ms ease',
                 cursor,
-                borderColor: isCurrentStep ? 'primary.500' : stepColor,
+                borderColor: isCurrentStep ? 'ds.text_primary_medium' : stepColor,
               }}
             >
               {isPrevStep ? (
@@ -85,14 +88,20 @@ function Stepper(props: Props & Intl): Node {
                   component="div"
                   variant="body2"
                   fontWeight={500}
-                  color={isCurrentStep ? 'ds.text_gray_medium' : stepColor}
+                  color={isCurrentStep ? 'ds.bg_color_max' : stepColor}
                   lineHeight="27px"
                 >
                   {idx + 1}
                 </Typography>
               )}
             </Box>
-            <Typography component="div" sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+            <Typography
+              component="div"
+              sx={{ cursor }}
+              variant="body1"
+              color={isCurrentStep ? 'ds.text_primary_medium' : stepColor}
+              fontWeight={500}
+            >
               {intl.formatMessage(message)}
             </Typography>
           </Stack>

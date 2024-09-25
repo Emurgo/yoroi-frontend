@@ -1,5 +1,5 @@
 //@flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
@@ -23,6 +23,10 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import { ROUTES } from '../../../routes-config';
+
+const GradientBox = styled(Box)(({ theme }: any) => ({
+  backgroundImage: theme.palette.ds.bg_gradient_3,
+}));
 
 type Props = {|
   slippageValue: string,
@@ -113,7 +117,7 @@ export default function ConfirmSwapTransaction({
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="ds.text_gray_medium">
+            <Typography component="div" variant="body1" color="ds.text_gray_low">
               Swap from
             </Typography>
           </Box>
@@ -129,7 +133,7 @@ export default function ConfirmSwapTransaction({
         </Box>
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="ds.text_gray_medium">
+            <Typography component="div" variant="body1" color="ds.text_gray_low">
               Swap to
             </Typography>
           </Box>
@@ -177,7 +181,7 @@ export default function ConfirmSwapTransaction({
           </SummaryRow>
         )}
       </Box>
-      <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
+      <GradientBox p="16px" borderRadius="8px" color="common.white">
         <Box display="flex" justifyContent="space-between">
           <Box>Total</Box>
           <Box>
@@ -200,7 +204,7 @@ export default function ConfirmSwapTransaction({
             {getFormattedPairingValue(ptAmount)}
           </Typography>
         </Box>
-      </Box>
+      </GradientBox>
       <Box>
         <TextField
           className="walletPassword"
@@ -221,7 +225,7 @@ export default function ConfirmSwapTransaction({
 const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="ds.text_gray_medium">
+      <Typography variant="body1" color="ds.text_gray_low">
         {col1}
       </Typography>
       {withInfo ? (
