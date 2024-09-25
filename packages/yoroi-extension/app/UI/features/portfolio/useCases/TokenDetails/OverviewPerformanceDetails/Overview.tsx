@@ -1,19 +1,17 @@
 import { Box, Link as LinkMui, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
-import { Skeleton } from '../../../../components/Skeleton';
-import { getNetworkUrl } from '../../../../utils/getNetworkUrl';
-import tokenPng from '../../common/assets/images/token.png';
-import { isPrimaryToken } from '../../common/helpers/isPrimary';
-import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { getNetworkUrl } from '../../../../../utils/getNetworkUrl';
+import tokenPng from '../../../common/assets/images/token.png';
+import { isPrimaryToken } from '../../../common/helpers/isPrimary';
+import { useStrings } from '../../../common/hooks/useStrings';
+import { usePortfolio } from '../../../module/PortfolioContextProvider';
 
 interface Props {
   tokenInfo: TokenInfoType;
-  isLoading: boolean;
 }
 
-const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+const Overview = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { networkId } = usePortfolio();
@@ -28,27 +26,20 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
-        {isLoading ? (
-          <Skeleton width="32px" height="32px" />
-        ) : (
-          <Box
-            width="32px"
-            height="32px"
-            sx={{
-              backgroundColor: theme.palette.ds.gray_300,
-              borderRadius: `50px`,
-            }}
-            component="img"
-            src={tokenInfo.tokenLogo || tokenPng}
-          ></Box>
-        )}
-        {isLoading ? (
-          <Skeleton width="53px" height="16px" />
-        ) : (
-          <Typography fontWeight="500" color="ds.gray_900">
-            {tokenInfo?.name}
-          </Typography>
-        )}
+        <Box
+          width="32px"
+          height="32px"
+          sx={{
+            backgroundColor: theme.palette.ds.gray_300,
+            borderRadius: `50px`,
+          }}
+          component="img"
+          src={tokenInfo.tokenLogo || tokenPng}
+        ></Box>
+
+        <Typography fontWeight="500" color="ds.gray_900">
+          {tokenInfo?.name}
+        </Typography>
       </Stack>
 
       <TokenOverviewSection label={strings.description} value={tokenInfo.info.metadata.description} />
@@ -78,7 +69,7 @@ const TokenDetailOverview = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   );
 };
 
-export default TokenDetailOverview;
+export default Overview;
 
 type TokenOverviewSectionTypes = {
   label: string;

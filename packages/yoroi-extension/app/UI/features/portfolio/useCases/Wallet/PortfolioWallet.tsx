@@ -40,9 +40,9 @@ const PortfolioWallet = (): JSX.Element => {
 
     const temp = assetList.filter(item => {
       return (
-        item.name.toLowerCase().includes(lowercaseKeyword) ||
-        item.id.toLowerCase().includes(lowercaseKeyword) ||
-        item.policyId.toLowerCase().includes(lowercaseKeyword)
+        item.info.name.toLowerCase().includes(lowercaseKeyword) ||
+        item.info.id.toLowerCase().includes(lowercaseKeyword) ||
+        item.info.policyId.toLowerCase().includes(lowercaseKeyword)
       );
     });
     if (temp && temp.length > 0) {

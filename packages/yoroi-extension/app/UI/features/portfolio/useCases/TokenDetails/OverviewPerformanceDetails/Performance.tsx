@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
-import { useStrings } from '../../common/hooks/useStrings';
+import { useStrings } from '../../../common/hooks/useStrings';
 
 // const PerformanceItemType = {
 //   FIAT: 'fiat',
@@ -11,10 +11,10 @@ import { useStrings } from '../../common/hooks/useStrings';
 
 interface Props {
   tokenInfo: TokenInfoType;
-  isLoading: boolean;
+  isLoading?: boolean;
 }
 
-const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
   console.log({ tokenInfo, isLoading });
   const theme = useTheme();
   const strings = useStrings();
@@ -97,4 +97,4 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
   );
 };
 
-export default TokenDetailPerformance;
+export default Performance;

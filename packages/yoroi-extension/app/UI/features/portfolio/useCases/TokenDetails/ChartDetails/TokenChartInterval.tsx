@@ -1,17 +1,16 @@
-import { Box, Button, Stack, Typography, styled } from '@mui/material';
+import { Box, Button, Stack, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip as RechartTooltip, ResponsiveContainer, YAxis } from 'recharts';
-import { Chip, ChipTypes, Icon, Skeleton } from '../../../../components';
-import { useCurrencyPairing } from '../../../../context/CurrencyContext';
-import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
-import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
-import { formatNumber } from '../../common/helpers/formatHelper';
-import { priceChange } from '../../common/helpers/priceChange';
-import useChart from '../../common/hooks/useChart';
-import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
-import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+import chartSkeletonPng from '../../../common/assets/images/token-detail-chart-skeleton.png';
+import { TOKEN_CHART_INTERVAL } from '../../../common/helpers/constants';
+import { priceChange } from '../../../common/helpers/priceChange';
+import useChart from '../../../common/hooks/useChart';
+import { useGetPortfolioTokenChart } from '../../../common/hooks/usePortfolioTokenChart';
+import { useStrings } from '../../../common/hooks/useStrings';
+import { usePortfolio } from '../../../module/PortfolioContextProvider';
+import { TokenMarketPriceOverview } from './MarketPriceOverview';
 
 // Styling for the period buttons
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
@@ -34,10 +33,11 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
 
 interface Props {
   tokenInfo: TokenInfoType;
-  isPrimaryToken: boolean;
 }
 
-export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.Element => {
+export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
+  const isPrimaryToken: boolean = tokenInfo.id === '-';
+
   const chartHeight = isPrimaryToken ? 153 : 257;
   const theme: any = useTheme();
   const strings = useStrings();
@@ -68,39 +68,27 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
     })) || [];
   const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo } = useChart(chartData);
 
+  if (!isPrimaryToken) {
+    return (
+      <TokenMarketPriceOverview
+        chartData={chartData}
+        detailInfo={detailInfo}
+        isLoading={isFetching || !data || chartData === undefined}
+      />
+    );
+  }
+
   return (
     <Stack
       direction="column"
       spacing={theme.spacing(4)}
       sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
     >
-      <Stack direction="row" justifyContent="space-between" alignItems="center">
-        {isFetching || !data ? (
-          <Skeleton width="131px" height="13px" />
-        ) : (
-          <Typography fontWeight="500" color="ds.gray_max">
-            {strings.marketPrice}
-          </Typography>
-        )}
-        <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-          {isFetching || !data || chartData === undefined ? (
-            <Skeleton width="64px" height="13px" />
-          ) : (
-            <Stack direction="row" alignItems="center" gap="16px">
-              <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
-                <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
-                <Typography variant="caption" mt="3px">
-                  &nbsp;{unitOfAccount}
-                </Typography>
-              </Stack>
-              <Stack direction="row" gap="4px">
-                <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
-                <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
-              </Stack>
-            </Stack>
-          )}
-        </Stack>
-      </Stack>
+      <TokenMarketPriceOverview
+        chartData={chartData}
+        detailInfo={detailInfo}
+        isLoading={isFetching || !data || chartData === undefined}
+      />
 
       <Box sx={{ userSelect: 'none', width: '100%' }}>
         <Box
@@ -167,42 +155,5 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
         </Stack>
       </Box>
     </Stack>
-  );
-};
-
-const PriceChangeChip = ({ value }: { value: number }) => {
-  const theme: any = useTheme();
-  return (
-    <>
-      <Chip
-        type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-        label={
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            {value > 0 ? (
-              <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
-            ) : value < 0 ? (
-              <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
-            ) : null}
-            {/* @ts-ignore */}
-            <Typography variant="caption1">{value >= 0 ? formatNumber(value) : formatNumber(-1 * value)}%</Typography>
-          </Stack>
-        }
-      />
-    </>
-  );
-};
-const PriceValueChip = ({ value, unitOfAccount }: { value: number; unitOfAccount: string }) => {
-  return (
-    <>
-      <Chip
-        type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
-        label={
-          <Typography variant="caption">
-            {value > 0 && '+'}
-            {formatNumber(value)} {unitOfAccount}
-          </Typography>
-        }
-      />
-    </>
   );
 };

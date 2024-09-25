@@ -1,0 +1,116 @@
+import { Button, Stack, Typography, styled } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import React from 'react';
+import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
+import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+import { formatNumber } from '../../../common/helpers/formatHelper';
+import { priceChange } from '../../../common/helpers/priceChange';
+import { useStrings } from '../../../common/hooks/useStrings';
+import { usePortfolio } from '../../../module/PortfolioContextProvider';
+
+// Styling for the period buttons
+const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
+  fontWeight: 500,
+  fontSize: '0.75rem',
+  lineHeight: '1.125rem',
+  height: '30px',
+  padding: '6px !important',
+  minWidth: '36px',
+  backgroundColor:
+    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium) : `transparent`,
+
+  '&.MuiButton-contained': {
+    color: theme.palette.ds.white_static,
+  },
+  '&.MuiButton-secondary': {
+    color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.text_primary_medium,
+  },
+}));
+
+interface Props {
+  chartData: any;
+  detailInfo: any;
+  isLoading: boolean;
+}
+
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, isLoading = false }: Props): JSX.Element => {
+  const theme: any = useTheme();
+  const strings = useStrings();
+  const { unitOfAccount } = usePortfolio();
+
+  // Fetch data based on the selected interval
+
+  const {
+    ptActivity: { close, open },
+    // config,
+  } = useCurrencyPairing();
+
+  const { changeValue, changePercent } = priceChange(open, close);
+
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      {isLoading ? (
+        <Skeleton width="131px" height="13px" />
+      ) : (
+        <Typography fontWeight="500" color="ds.gray_max">
+          {strings.marketPrice}
+        </Typography>
+      )}
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+        {isLoading || chartData === undefined ? (
+          <Skeleton width="64px" height="13px" />
+        ) : (
+          <Stack direction="row" alignItems="center" gap="16px">
+            <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
+              <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
+              <Typography variant="caption" mt="3px">
+                &nbsp;{unitOfAccount}
+              </Typography>
+            </Stack>
+            <Stack direction="row" gap="4px">
+              <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
+              <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
+            </Stack>
+          </Stack>
+        )}
+      </Stack>
+    </Stack>
+  );
+};
+
+const PriceChangeChip = ({ value }: { value: number }) => {
+  const theme: any = useTheme();
+  return (
+    <>
+      <Chip
+        type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+        label={
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            {value > 0 ? (
+              <Icon.ChipArrowUp fill={theme.palette.ds.secondary_800} />
+            ) : value < 0 ? (
+              <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
+            ) : null}
+            {/* @ts-ignore */}
+            <Typography variant="caption1">{value >= 0 ? formatNumber(value) : formatNumber(-1 * value)}%</Typography>
+          </Stack>
+        }
+      />
+    </>
+  );
+};
+const PriceValueChip = ({ value, unitOfAccount }: { value: number; unitOfAccount: string }) => {
+  return (
+    <>
+      <Chip
+        type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
+        label={
+          <Typography variant="caption">
+            {value > 0 && '+'}
+            {formatNumber(value)} {unitOfAccount}
+          </Typography>
+        }
+      />
+    </>
+  );
+};
