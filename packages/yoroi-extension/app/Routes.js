@@ -376,6 +376,7 @@ const WalletsSubpages = (stores, actions) => (
 const SwapSubpages = (stores, actions) => (
   <Switch>
     <Route exact path={ROUTES.SWAP.ROOT} component={props => <SwapPage {...props} stores={stores} actions={actions} />} />
+    <Route exact path={ROUTES.SWAP.ORDERS} component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />} />
     <Route exact path={ROUTES.SWAP.ERROR} component={props => <PagePreparation {...props} stores={stores} actions={actions} />} />
     <Redirect to={ROUTES.SWAP.ROOT} />
   </Switch>

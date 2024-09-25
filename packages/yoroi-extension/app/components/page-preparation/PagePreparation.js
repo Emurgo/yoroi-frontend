@@ -1,9 +1,7 @@
-import React from 'react';
-import { Stack, Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button } from '@mui/material';
 import { Ilustration } from './Ilustration';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { fontWeight } from '../../styles/themes/tokens/tokens';
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';

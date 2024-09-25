@@ -22,7 +22,6 @@ import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
-import { ROUTES } from '../../../routes-config';
 
 const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_3,

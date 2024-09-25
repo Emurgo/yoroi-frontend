@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const Ilustration = () => {
   return (
     <svg width="128" height="168" viewBox="0 0 128 168" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,8 +11,8 @@ export const Ilustration = () => {
         fill="#52FCFF"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M52.0584 94.2048C52.0584 94.7186 52.3268 95.2324 52.7293 95.8747C53.1318 96.517 53.6685 97.0309 54.2052 97.1593L64.4022 102.94C65.2073 103.325 65.744 103.454 66.1465 103.325C66.549 103.068 66.8173 102.683 67.2199 102.041C67.3028 101.644 67.3857 101.149 67.5003 100.464C67.5711 100.042 67.6541 99.5465 67.7565 98.9578C68.1591 97.2878 68.9641 96.0032 70.1716 95.104C71.3792 94.2048 73.1234 93.3056 75.2702 92.2779C78.3561 90.8648 80.6371 89.3233 82.113 87.7818C83.5888 86.2403 84.3939 83.9281 84.3939 80.5881C84.3939 77.762 83.4547 74.4221 81.8446 70.8253C80.1004 67.2284 77.4169 63.5031 73.7943 59.6493C70.1716 55.924 65.4756 52.3272 59.8404 49.1157C54.4735 45.9042 49.6433 44.2343 45.6182 43.8489C41.593 43.4635 38.5071 44.2343 36.3603 46.1612C34.2135 48.088 33.006 50.9141 32.8718 54.3825C32.8718 55.1533 33.1402 55.7956 33.5427 56.5663C34.0794 57.3371 34.6161 57.8509 35.2869 58.2363L44.2764 63.3747C45.7523 64.2739 46.6915 64.1454 47.2282 62.8608C48.7041 57.3371 52.5951 56.4379 59.3037 60.1632C62.2555 61.8331 64.6706 64.1454 66.8173 66.843C68.8299 69.6691 69.7691 72.2383 69.5008 74.8075C69.3666 76.349 68.6958 77.5051 67.6224 78.2759C66.4148 79.0466 64.6706 79.9458 62.3897 80.8451C59.3037 82.0012 57.0228 83.2858 55.2786 84.6988C53.5343 86.1119 52.5951 88.2957 52.1926 91.1218C52.0584 91.7641 52.0584 92.7917 52.0584 94.2048ZM51.5217 112.061C51.5217 112.703 51.6559 113.345 52.1926 114.116C52.7293 114.887 53.266 115.4 53.9368 115.657L64.1339 121.438C64.9389 121.952 65.4756 121.952 66.0123 121.823C66.4148 121.567 66.6832 121.181 66.6832 120.539V111.804C66.6832 111.161 66.4148 110.519 65.8781 109.748C65.4756 108.978 64.8048 108.464 64.1339 108.078L53.9368 102.298C53.266 101.912 52.7293 101.912 52.1926 102.041C51.7901 102.298 51.5217 102.683 51.5217 103.325V112.061Z"
         fill="url(#paint1_linear_1736_20209)"
       />
@@ -27,12 +25,12 @@ export const Ilustration = () => {
           y2="167.684"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_1736_20209"
@@ -42,15 +40,15 @@ export const Ilustration = () => {
           y2="43.3403"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
       </defs>
     </svg>
