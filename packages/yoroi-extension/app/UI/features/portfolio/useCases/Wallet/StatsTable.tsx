@@ -11,9 +11,11 @@ import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
 import Table from '../../common/components/Table';
 import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';
+import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { formatNumber } from '../../common/helpers/formatHelper';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import { useTokenPercentages } from '../../common/hooks/useTokenPercentages';
@@ -31,7 +33,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount, accountPair } = usePortfolio();
+  const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: null,
     orderBy: null,
@@ -43,8 +45,6 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
     // isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
-
-  console.log('data7d', data7d);
 
   const headCells: IHeadCell[] = [
     { id: 'name', label: strings.name, align: 'left', sortType: 'character' },
@@ -121,6 +121,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               secondaryTokenActivity={data7d && data7d[`${row.info.policyId}.${row.assetName}`]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={row.info.policyId?.length === 0}
+              timeInterval={TOKEN_CHART_INTERVAL.WEEK}
             />
           </TableCell>
 
@@ -129,6 +130,7 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
               secondaryTokenActivity={data30d && data30d[`${row.info.policyId}.${row.assetName}`]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={row.info.policyId?.length === 0}
+              timeInterval={TOKEN_CHART_INTERVAL.MONTH}
             />
           </TableCell>
 
@@ -180,10 +182,13 @@ const TokenDisplay = ({ token }) => {
   );
 };
 
-const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken }) => {
-  if (secondaryTokenActivity === null || primaryTokenActivity === null) {
+const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, isPrimaryToken, timeInterval }) => {
+  const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
+
+  if (secondaryTokenActivity === null || primaryTokenActivity === null || isFetching) {
     return <Skeleton variant="text" width="50px" height="30px" />;
   }
+
   const tokenPriceClose = isPrimaryToken
     ? primaryTokenActivity.close
     : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
@@ -197,7 +202,9 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={variantPnl} withIcon>
-        <Typography fontSize="13px">{formatPriceChange(changePercent)}%</Typography>
+        <Typography fontSize="13px">
+          {formatPriceChange(isPrimaryToken ? ptTokenDataInterval[50]?.changePercent : changePercent)}%
+        </Typography>
       </PnlTag>
     </Box>
   );

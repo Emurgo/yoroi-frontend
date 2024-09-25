@@ -5,10 +5,11 @@ import { CartesianGrid, Line, LineChart, Tooltip as RechartTooltip, ResponsiveCo
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import chartSkeletonPng from '../../common/assets/images/token-detail-chart-skeleton.png';
+import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { formatNumber } from '../../common/helpers/formatHelper';
 import { priceChange } from '../../common/helpers/priceChange';
 import useChart from '../../common/hooks/useChart';
-import { TOKEN_CHART_INTERVAL, useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
+import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 
@@ -128,7 +129,6 @@ export const TokenChartInterval = ({ tokenInfo, isPrimaryToken }: Props): JSX.El
                   type={'number'}
                   tick={CustomYAxisTick}
                   tickCount={9}
-                  stroke="red"
                 />
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line

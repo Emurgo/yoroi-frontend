@@ -34,8 +34,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const { tokenActivity } = usePortfolioTokenActivity();
 
   const {
-    currency: selectedCurrency,
-
     ptActivity: { open, close: ptPrice },
     config,
   } = useCurrencyPairing();
@@ -48,14 +46,13 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
     // const tokenPrice = tokenActivity?.data24h[amount?.info.id]?.price.close;
     const showingAda = accountPair?.from.name !== 'ADA';
     const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
-    const decimals = showingAda ? primaryTokenInfo.decimals : config.decimals;
 
     if (ptPrice == null) return `... ${currency}`;
 
     const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
 
     return totalAmount;
-  }, [tokenActivity, selectedCurrency, config.decimals, ptPrice]);
+  }, [tokenActivity, config.decimals, ptPrice]);
 
   const handleCurrencyChange = () => {
     changeUnitOfAccountPair({

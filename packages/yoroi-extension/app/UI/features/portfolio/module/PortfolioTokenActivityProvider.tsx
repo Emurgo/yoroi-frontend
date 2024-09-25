@@ -66,10 +66,8 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   }, [actions, queryClient]);
   // Use hook for each interval (24h, 1w, 1m)
   const { mutate: fetch24h, data: data24h, isLoading: loading24h } = useMultiTokenActivity('24h');
-  const { mutate: fetch30d, data: data30d, isLoading: loading30d } = useMultiTokenActivity('30d');
   const { mutate: fetch7d, data: data7d, isLoading: loading7d } = useMultiTokenActivity('7d');
-  console.log('data7d', data7d);
-  // const { mutate: fetch1m, data: data1m, isLoading: loading1m } = useMultiTokenActivity('1m');
+  const { mutate: fetch30d, data: data30d, isLoading: loading30d } = useMultiTokenActivity('30d');
   React.useEffect(() => {
     if (state.secondaryTokenIds.length > 0) {
       fetch24h(state.secondaryTokenIds);

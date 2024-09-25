@@ -4,16 +4,9 @@ import { useQuery, UseQueryOptions } from 'react-query';
 // import { useLanguage } from '../../../kernel/i18n';
 import { supportedCurrencies, time } from '../../../../utils/constants';
 import { fetchPtPriceActivity } from '../../../../utils/usePrimaryTokenActivity';
+import { TOKEN_CHART_INTERVAL } from '../helpers/constants';
+import { getTimestampsTokenInterval } from '../helpers/getTimestampsTokenInterval';
 import { priceChange } from '../helpers/priceChange';
-
-export const TOKEN_CHART_INTERVAL = {
-  DAY: '24 H',
-  WEEK: '1 W',
-  MONTH: '1 M',
-  SIX_MONTHS: '6 M',
-  YEAR: '1 Y',
-  ALL: 'ALL',
-} as const;
 
 export type TokenChartInterval = typeof TOKEN_CHART_INTERVAL[keyof typeof TOKEN_CHART_INTERVAL];
 
@@ -78,21 +71,6 @@ type TokenChartData = {
 //   return chartData;
 // }
 
-const getTimestamps = (timeInterval: TokenChartInterval) => {
-  const now = Date.now();
-  const [from, resolution]: any = {
-    [TOKEN_CHART_INTERVAL.DAY]: [now - time.oneDay, 96],
-    [TOKEN_CHART_INTERVAL.WEEK]: [now - time.oneWeek, 168],
-    [TOKEN_CHART_INTERVAL.MONTH]: [now - time.oneMonth, 180],
-    [TOKEN_CHART_INTERVAL.SIX_MONTHS]: [now - time.sixMonths, 180],
-    [TOKEN_CHART_INTERVAL.YEAR]: [now - time.oneYear, 365],
-    [TOKEN_CHART_INTERVAL.ALL]: [new Date('2018').getTime(), 256],
-  }[timeInterval];
-
-  const step: any = (now - from) / resolution;
-  return Array.from({ length: resolution }, (_, i) => from + Math.round(step * i));
-};
-
 const ptTicker = 'ADA';
 
 export const useGetPortfolioTokenChart = (
@@ -116,15 +94,19 @@ export const useGetPortfolioTokenChart = (
     refetchInterval: time.halfHour,
     useErrorBoundary: true,
     refetchOnMount: false,
-    enabled: tokenInfo && tokenInfo.info.id?.length === 0,
+    enabled: tokenInfo && tokenInfo.info?.id.length === 0,
     ...options,
-    queryKey: ['useGetPortfolioTokenChart', tokenInfo?.info.id ?? '', timeInterval, currency],
+    queryKey: ['useGetPortfolioTokenChart', tokenInfo.info?.id ?? '', timeInterval, currency],
     queryFn: async () => {
+      console.log('responseresponseresponse22222');
+
       // @ts-ignore
-      const response = await fetchPtPriceActivity(getTimestamps(timeInterval));
+      const response = await fetchPtPriceActivity(getTimestampsTokenInterval(timeInterval));
+      console.log('responseresponseresponse', response);
       if (isRight(response)) {
         if (response.value.data.error) throw new Error(response.value.data.error);
 
+        console.log('AFTERR TEST', response);
         const tickers = response.value.data.tickers;
         // @ts-ignore
         const validCurrency = currency === ptTicker ? supportedCurrencies.USD : currency ?? supportedCurrencies.USD;
@@ -143,7 +125,6 @@ export const useGetPortfolioTokenChart = (
             return { label, value, changePercent, changeValue };
           })
           .filter(Boolean) as TokenChartData[];
-
         return records;
       }
       throw new Error('Failed to fetch token chart data');
@@ -161,6 +142,7 @@ export const useGetPortfolioTokenChart = (
   //     return generateMockChartData(timeInterval);
   //   },
   // });
+  console.log('ptQuery', ptQuery.data);
 
   return ptQuery;
   // return tokenInfo && isPrimaryToken(tokenInfo.info) ? ptQuery : otherQuery;
