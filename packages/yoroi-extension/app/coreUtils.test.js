@@ -253,18 +253,28 @@ describe('ExtendedIterable', () => {
   test('zip', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const zipped = it.zip([10, 20, 30, 40, 50, 60]);
-    expect(zipped.toArray()).toEqual([[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]])
+    expect(zipped.toArray()).toEqual([[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]);
   });
   test('forEach', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const res = [];
     it.forEach(x => res.push(x * x));
-    expect(res).toEqual([1, 4, 9, 16, 25])
+    expect(res).toEqual([1, 4, 9, 16, 25]);
   });
   test('map', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const zipped = it.map(x => x * x);
-    expect(zipped.toArray()).toEqual([1, 4, 9, 16, 25])
+    expect(zipped.toArray()).toEqual([1, 4, 9, 16, 25]);
+  });
+  test('flatMap', () => {
+    const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
+    const zipped = it.flatMap(x => [x * 2, x * 3]);
+    expect(zipped.toArray()).toEqual([2, 3, 4, 6, 6, 9, 8, 12, 10, 15]);
+  });
+  test('flatMap with nested lenget', () => {
+    const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
+    const zipped = it.flatMap(x => iterateLenGet(createLenget(x * 2, x * 3)));
+    expect(zipped.toArray()).toEqual([2, 3, 4, 6, 6, 9, 8, 12, 10, 15]);
   });
   test('unique', () => {
     const it = iterateLenGet(createLenget(1, 1, null, 2, 2, 3, 3, 3, 'a', 'b', 'a', true, null, false, true, 'b', 2));
@@ -274,7 +284,7 @@ describe('ExtendedIterable', () => {
   test('nonNull', () => {
     const it = iterateLenGet(createLenget(1, null, 2, undefined, 'a', null, 'b', undefined, false));
     const unique = it.nonNull();
-    expect(unique.toArray()).toEqual([1, 2, 'a', 'b', false])
+    expect(unique.toArray()).toEqual([1, 2, 'a', 'b', false]);
   });
   test('filter', () => {
     const it = iterateLenGet(createLenget(1, null, 2, undefined, 'a', null, 'b', undefined, false));
@@ -288,5 +298,9 @@ describe('ExtendedIterable', () => {
   test('values', () => {
     const it = iterateLenGetMap(createLengetMap({ a: 1, b: 2, c: 3 }));
     expect(it.values().toArray()).toEqual([1, 2, 3]);
+  });
+  test('nonNullValue', () => {
+    const it = iterateLenGetMap(createLengetMap({ a: undefined, b: null, c: 3, d: false, e: '', f: [] }));
+    expect(it.nonNullValue().toArray()).toEqual([['c', 3], ['d', false], ['e', ''], ['f', []]]);
   });
 });

@@ -297,14 +297,14 @@ function formatLedgerWithdrawals(
 ): Array<Withdrawal> {
   const result = [];
 
-  for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals)) {
+  for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
     const rewardAddressPayload = rewardAddress.to_address().to_hex();
     const addressing = addressingMap(rewardAddressPayload);
     if (addressing == null) {
       throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own address ${rewardAddressPayload}`);
     }
     result.push({
-      amount: forceNonNull(withdrawalAmount).to_str(),
+      amount: withdrawalAmount.to_str(),
       stakeCredential: {
         type: CredentialParamsType.KEY_PATH,
         keyPath: addressing.path,

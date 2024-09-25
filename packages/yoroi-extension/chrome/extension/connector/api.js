@@ -49,7 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, forceNonNull, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
+import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -154,18 +154,17 @@ function stringToLibValue(s: string): LibValue {
     return RustModule.WasmScope(Module => {
       // $FlowFixMe
       function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
-        const mappedAssets = [];
-        for (const [policy, assets] of iterateLenGetMap(masset)) {
-          for (const [name, amount] of iterateLenGetMap(assets)) {
-            mappedAssets.push({
-              asset: {
-                policy: policy.to_bytes(),
-                name: name.to_bytes(),
-              },
-              amount: new LibAmount(forceNonNull(amount).to_str()),
-            })
-          }
-        }
+
+        const mappedAssets = iterateLenGetMap(masset).flatMap(([policy, assets]) => {
+          return iterateLenGetMap(assets).nonNullValue().map(([name, amount]) => ({
+            asset: {
+              policy: policy.to_bytes(),
+              name: name.to_bytes(),
+            },
+            amount: new LibAmount(amount.to_str()),
+          }));
+        }).toArray();
+
         return LibNativeAssets.from(mappedAssets);
       }
       const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
@@ -1004,28 +1003,20 @@ export async function connectorRecordSubmittedCardanoTransaction(
     fee.joinSubtractMutable(value);
   }
 
-  const withdrawals = txBody.withdrawals();
-  const withdrawalsData = [];
-  if (withdrawals) {
-    for (const [key, withdrawalAmount] of iterateLenGetMap(withdrawals)) {
-      if (!withdrawalAmount) {
-        throw new Error('unexpected missing withdrawal amount');
-      }
-      withdrawalsData.push({
-        address: Buffer.from(key.to_address().to_bytes()).toString('hex'),
-        value: new MultiToken(
-          [
-            {
-              amount: new BigNumber(withdrawalAmount.to_str()),
-              identifier: defaultToken.Identifier,
-              networkId: defaultToken.NetworkId,
-            }
-          ],
-          defaults
-        )
-      });
-    }
-  }
+  const withdrawalsData = iterateLenGetMap(txBody.withdrawals())
+    .nonNullValue()
+    .map(([key, withdrawalAmount]) => ({
+      address: key.to_address().to_hex(),
+      value: new MultiToken(
+        [{
+          amount: new BigNumber(withdrawalAmount.to_str()),
+          identifier: defaultToken.Identifier,
+          networkId: defaultToken.NetworkId,
+        }],
+        defaults,
+      )
+    }))
+    .toArray();
 
   const auxData = tx.auxiliary_data();
 

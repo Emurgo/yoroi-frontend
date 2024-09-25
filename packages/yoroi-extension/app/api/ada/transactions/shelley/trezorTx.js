@@ -31,7 +31,7 @@ import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { fail, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
+import { bytesToHex, fail, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -148,15 +148,15 @@ function formatTrezorWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
   paths: Array<Array<number>>,
 ): Array<CardanoWithdrawal> {
-
-  const result = [];
-  for (const [withdrawalAmount, path] of iterateLenGetMap(withdrawals).values().zip(paths)) {
-    result.push({
-      amount: withdrawalAmount?.to_str() || fail('withdrawal amount is not defined (should not happen)'),
+  return iterateLenGetMap(withdrawals)
+    .values()
+    .nonNull()
+    .zip(paths)
+    .map(([withdrawalAmount, path]) => ({
+      amount: withdrawalAmount.to_str(),
       path,
-    });
-  }
-  return result;
+    }))
+    .toArray();
 }
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
@@ -222,25 +222,27 @@ function toTrezorTokenBundle(
 |} {
   if (assets == null) return Object.freeze({});
 
-  const assetGroup: Array<CardanoAssetGroup> = [];
-  for (const [policyId, assetsForPolicy] of iterateLenGetMap(assets)) {
-    if (assetsForPolicy == null) continue;
+  const tokenBundle: Array<CardanoAssetGroup> = iterateLenGetMap(assets)
+    .nonNullValue()
+    .map(([policyId, assetsForPolicy]) => {
 
-    const tokenAmounts: Array<CardanoToken> = [];
-    for (const [assetName, amount] of iterateLenGetMap(assetsForPolicy)) {
-      if (amount == null) continue;
+      const tokenAmounts: Array<CardanoToken> = iterateLenGetMap(assetsForPolicy)
+        .nonNullValue()
+        .map(([assetName, amount]) => ({
+          assetNameBytes: bytesToHex(assetName.name()),
+          amount: amount.to_str(),
+        }))
+        .toArray();
 
-      tokenAmounts.push({
-        amount: amount.to_str(),
-        assetNameBytes: Buffer.from(assetName.name()).toString('hex'),
-      });
-    }
-    assetGroup.push({
-      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-      tokenAmounts,
-    });
-  }
-  return { tokenBundle: assetGroup };
+      return {
+        policyId: policyId.to_hex(),
+        tokenAmounts,
+      };
+
+    })
+    .toArray();
+
+  return { tokenBundle };
 }
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
@@ -731,11 +733,7 @@ export function toTrezorSignRequest(
   if (withdrawals) {
     const result = [];
 
-    for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals)) {
-      if (withdrawalAmount == null) {
-        throw new Error('missing withdraw amount should never happen');
-      }
-
+    for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
       const rewardAddressPayload = rewardAddress.to_address().to_hex();
       const path = ownStakeAddressMap[rewardAddressPayload];
       if (path == null) {

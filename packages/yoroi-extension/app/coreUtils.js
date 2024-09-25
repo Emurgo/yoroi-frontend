@@ -287,7 +287,18 @@ export class ExtendedIterable<T> implements Iterable<T> {
       for (const t of source) {
         yield f(t);
       }
-    })())
+    })());
+  }
+
+  flatMap<R>(f: T => Iterable<R>): ExtendedIterable<R> {
+    const source = this.__source;
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        for (const r of f(t)) {
+          yield r;
+        }
+      }
+    })());
   }
 
   filter(f: T => boolean): ExtendedIterable<T> {
@@ -327,5 +338,9 @@ export class ExtendedIterableMap<K,V> extends ExtendedIterable<[K,V]> {
 
   values(): ExtendedIterable<V> {
     return this.map(([,v]) => v);
+  }
+
+  nonNullValue(): ExtendedIterableMap<K,$NonMaybeType<V>> {
+    return ExtendedIterableMap.fromTuples(this.filter(([,v]) => v != null));
   }
 }

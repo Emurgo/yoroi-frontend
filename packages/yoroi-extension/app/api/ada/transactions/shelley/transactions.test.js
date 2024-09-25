@@ -454,10 +454,10 @@ describe('Create unsigned TX from UTXO', () => {
     }
 
     function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
-      const massetArray = [...iterateLenGetMap(masset)];
+      const massetArray = iterateLenGetMap(masset).toArray();
       expect(massetArray.length).toEqual(1);
       expect(massetArray[0][0].to_hex()).toEqual(policy);
-      const assetsArray = [...iterateLenGetMap(massetArray[0][1])];
+      const assetsArray = iterateLenGetMap(massetArray[0][1]).toArray();
       expect(assetsArray.length).toEqual(1);
       expect(bytesToHex(assetsArray[0][0].name())).toEqual(name);
       expect(assetsArray[0][1].to_str()).toEqual(amount);
