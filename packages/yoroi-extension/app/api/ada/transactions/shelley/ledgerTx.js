@@ -946,26 +946,25 @@ export function toLedgerSignRequest(
         ownStakeAddressMap[stakeAddress];
     }
 
-    const requiredSignerHashHexes = iterateLenGet(txBody.required_signers())
+    iterateLenGet(txBody.required_signers())
       .map(s => s.to_hex())
       .unique()
-      .toArray();
+      .forEach(hashHex => {
+        const ownAddressPath = hashHexToOwnAddressPath(hashHex);
+        if (ownAddressPath != null) {
+          formattedRequiredSigners.push({
+            type: TxRequiredSignerType.PATH,
+            path: ownAddressPath,
+          });
+          additionalWitnessPaths.push(ownAddressPath);
+        } else {
+          formattedRequiredSigners.push({
+            type: TxRequiredSignerType.HASH,
+            hashHex,
+          });
+        }
+      });
 
-    for (const hashHex of requiredSignerHashHexes) {
-      const ownAddressPath = hashHexToOwnAddressPath(hashHex);
-      if (ownAddressPath != null) {
-        formattedRequiredSigners.push({
-          type: TxRequiredSignerType.PATH,
-          path: ownAddressPath,
-        });
-        additionalWitnessPaths.push(ownAddressPath);
-      } else {
-        formattedRequiredSigners.push({
-          type: TxRequiredSignerType.HASH,
-          hashHex,
-        });
-      }
-    }
     for (const additionalHashHex of (additionalRequiredSigners || [])) {
       const ownAddressPath = hashHexToOwnAddressPath(additionalHashHex);
       if (ownAddressPath != null) {

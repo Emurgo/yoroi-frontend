@@ -501,14 +501,11 @@ export function getScriptRequiredSigningKeys(
   // eslint-disable-next-line no-shadow
   RustModule: typeof RustModule,
 ): Set<string> {
-  const set = new Set<string>();
   const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
-  for (const ns of iterateLenGet(nativeScripts)) {
-    for (const requiredKeyHash of iterateLenGet(ns.get_required_signers())) {
-      set.add(bytesToHex(requiredKeyHash.to_bytes()));
-    }
-  }
-  return set;
+  return iterateLenGet(nativeScripts)
+    .flatMap(ns => iterateLenGet(ns.get_required_signers()))
+    .map(requiredKeyHash => requiredKeyHash.to_hex())
+    .toSet()
 }
 
 function getTxRequiredSigningKeys(

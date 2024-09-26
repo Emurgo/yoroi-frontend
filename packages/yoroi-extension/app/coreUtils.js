@@ -278,7 +278,11 @@ export class ExtendedIterable<T> implements Iterable<T> {
   }
 
   toArray(): Array<T> {
-    return [...this.__source];
+    return Array.from(this.__source);
+  }
+
+  toSet(): Set<T> {
+    return new Set<T>(this.__source);
   }
 
   map<R>(f: T => R): ExtendedIterable<R> {
