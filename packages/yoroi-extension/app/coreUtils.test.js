@@ -303,4 +303,19 @@ describe('ExtendedIterable', () => {
     const it = iterateLenGetMap(createLengetMap({ a: undefined, b: null, c: 3, d: false, e: '', f: [] }));
     expect(it.nonNullValue().toArray()).toEqual([['c', 3], ['d', false], ['e', ''], ['f', []]]);
   });
+  test('toArray', () => {
+    const it = iterateLenGet(createLenget(1, true, 1, false, 'a', true, null, undefined, null));
+    const array = it.toArray();
+    expect(Array.isArray(array)).toEqual(true);
+    expect(array.length).toEqual(9);
+    expect(array).toEqual([1, true, 1, false, 'a', true, null, undefined, null]);
+  });
+  test('toSet', () => {
+    const it = iterateLenGet(createLenget(1, true, 1, false, 'a', true, null, undefined, null));
+    const set = it.toSet();
+    expect(Array.isArray(set)).toEqual(false);
+    expect(set instanceof Set).toEqual(true);
+    expect(set.size).toEqual(6);
+    expect([...set]).toEqual([1, true, false, 'a', null, undefined]);
+  });
 });
