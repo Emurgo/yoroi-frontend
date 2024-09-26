@@ -318,4 +318,11 @@ describe('ExtendedIterable', () => {
     expect(set.size).toEqual(6);
     expect([...set]).toEqual([1, true, false, 'a', null, undefined]);
   });
+  test('toSet vs unique', () => {
+    const it1 = iterateLenGet(createLenget(1, true, 1, false, 'a', true, null, undefined, null));
+    const it2 = iterateLenGet(createLenget(1, true, 1, false, 'a', true, null, undefined, null));
+    const set1 = it1.unique().toSet();
+    const set2 = it2.toSet();
+    expect(set1).toEqual(set2);
+  });
 });

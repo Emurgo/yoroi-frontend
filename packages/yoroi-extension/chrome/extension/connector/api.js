@@ -505,7 +505,6 @@ export function getScriptRequiredSigningKeys(
   return iterateLenGet(nativeScripts)
     .flatMap(ns => iterateLenGet(ns.get_required_signers()))
     .map(requiredKeyHash => requiredKeyHash.to_hex())
-    .unique()
     .toSet()
 }
 
