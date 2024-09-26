@@ -52,7 +52,6 @@
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
           }
-
           &.connectTrezor {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
           }
@@ -141,31 +140,18 @@
             color: var(--yoroi-palette-secondary-300);
           }
         }
-
         .optionImage {
-          &.cardano {
-            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
-          }
-          &.cardanoTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
-          }
-          &.alonzoWhiteTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
-          }
           // CONNECT HARDWARE WALLET
           &.connectLedger {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-classic.inline.svg);
           }
-
           &.connectTrezor {
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-classic.inline.svg);
           }
-
           // CREATE WALLET
           &.createWallet {
             background-image: url(../../../assets/images/add-wallet/create-wallet-classic.inline.svg);
           }
-
           // RESTORE WALLET
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-classic.inline.svg);
@@ -191,31 +177,11 @@
             color: var(--yoroi-palette-primary-300);
           }
         }
-
         .optionImage {
-          &.cardano {
-            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
-          }
-          &.cardanoTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
-          }
-          &.alonzoWhiteTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
-          }
-          // CONNECT HARDWARE WALLET
-          &.connectLedger {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
-          }
-
-          &.connectTrezor {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
-          }
-
           // CREATE WALLET
           &.createWallet {
             background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
           }
-
           // RESTORE WALLET
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
@@ -241,28 +207,11 @@
             color: var(--yoroi-palette-primary-300);
           }
         }
-
         .optionImage {
-          &.cardano {
-            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
-          }
-          &.cardanoTestnet {
-            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
-          }
-          // CONNECT HARDWARE WALLET
-          &.connectLedger {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
-          }
-
-          &.connectTrezor {
-            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
-          }
-
           // CREATE WALLET
           &.createWallet {
             background-image: url(../../../assets/images/add-wallet/create-wallet-modern.inline.svg);
           }
-
           // RESTORE WALLET
           &.restoreNormalWallet {
             background-image: url(../../../assets/images/add-wallet/option-dialog/restore-normal-wallet-modern.inline.svg);
