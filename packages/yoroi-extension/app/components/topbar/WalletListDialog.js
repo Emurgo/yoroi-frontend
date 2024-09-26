@@ -37,10 +37,6 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
   },
-  cardano: {
-    id: 'wallet.topbar.dialog.cardano',
-    defaultMessage: '!!!Cardano, ADA',
-  },
 });
 
 export type WalletInfo = {|
@@ -242,11 +238,6 @@ export default class WalletListDialog extends Component<Props, State> {
             sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}
             id="changeWalletDialog-walletList-box"
           >
-            {cardanoWalletsIdx.length > 0 && (
-              <div className={styles.sectionHeader}>
-                <h1>{intl.formatMessage(messages.cardano)}</h1>
-              </div>
-            )}
             <DragDropContext onDragEnd={result => this.onDragEnd('cardano', result)}>
               <Droppable droppableId="cardano-list-droppable">
                 {provided => (
