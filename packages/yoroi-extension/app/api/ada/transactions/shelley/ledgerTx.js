@@ -201,9 +201,9 @@ function toLedgerTokenBundle(
 
   const assetGroup: Array<AssetGroup> = iterateLenGetMap(assets).map(([policyId, assetsForPolicy]) => {
 
-    const tokens: Array<Token> = iterateLenGetMap(assetsForPolicy).map(([assetName, amount]) => ({
+    const tokens: Array<Token> = iterateLenGetMap(assetsForPolicy).nonNullValue().map(([assetName, amount]) => ({
       assetNameHex: bytesToHex(assetName.name()),
-      amount: forceNonNull(amount).to_str(),
+      amount: amount.to_str(),
     })).toArray();
 
     // sort by asset name to the order specified by rfc7049
