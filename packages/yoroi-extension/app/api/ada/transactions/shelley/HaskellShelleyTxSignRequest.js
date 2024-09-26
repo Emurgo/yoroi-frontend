@@ -212,9 +212,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +refund: MultiToken,
   |}> {
     const certs = this.unsignedTx.build().certs();
-    if (certs == null) return [];
-
-    const result = iterateLenGet(certs)
+    return iterateLenGet(certs)
       .map(c => c.as_stake_deregistration())
       .nonNull()
       .map(cert => {
@@ -236,29 +234,6 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
         return ({ rewardAddress, refund });
       })
       .toArray();
-
-    for (const cert of iterateLenGet(certs).map(c => c.as_stake_deregistration()).nonNull()) {
-      const address = RustModule.WalletV4.RewardAddress.new(
-        this.networkSettingSnapshot.ChainNetworkId,
-        cert.stake_credential(),
-      );
-      result.push({
-        rewardAddress: address.to_address().to_hex(),
-        // recall: for now you get the full deposit back. May change in the future
-        refund: new MultiToken(
-          [{
-            identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-            amount: this.networkSettingSnapshot.KeyDeposit,
-            networkId: this.networkSettingSnapshot.NetworkId,
-          }],
-          {
-            defaultNetworkId: this.networkSettingSnapshot.NetworkId,
-            defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-          }
-        ),
-      });
-    }
-    return result;
   }
 
   certificates(): Array<{| kind: $Values<CertificateKind>, payloadHex: string |}> {
