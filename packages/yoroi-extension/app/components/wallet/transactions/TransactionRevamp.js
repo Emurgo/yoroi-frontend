@@ -1041,7 +1041,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         <div className={styles.row}>
           <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
 
-          <Typography className={styles.rowData}>{metadata}</Typography>
+          <Typography component="div" className={styles.rowData}>{metadata}</Typography>
         </div>
       );
     }
