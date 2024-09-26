@@ -1,8 +1,12 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { atomicBreakdown } from '@yoroi/common';
 import React from 'react';
+import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
+import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
+import { bigNumberToBigInt } from '../../TokensTable/StatsTable';
 
 interface Props {
   tokenInfo: TokenInfoType;
@@ -15,12 +19,33 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.totalAmount;
 
-  // const {
-  //   tokenActivity: { data24h },
-  //   // isLoading: isActivityLoading,
-  // } = usePortfolioTokenActivity();
-  // const tokenPrice = data24h && data24h[1].price.close;
-  // // TODOOOO
+  if (tokenInfo.quantity === null) {
+    return <></>;
+  }
+
+  const {
+    ptActivity: { close: ptPrice },
+  } = useCurrencyPairing();
+
+  const {
+    tokenActivity: { data24h },
+    // isLoading: isActivityLoading,
+  } = usePortfolioTokenActivity();
+
+  const totaPriceCalc = React.useMemo(() => {
+    if (!isPrimaryToken) {
+      const tokenPrice = data24h && data24h[tokenInfo.info.id][1]?.price.close;
+      const tokenQuantityAsBigInt = bigNumberToBigInt(tokenInfo.quantity);
+      const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
+
+      const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
+        .bn.times(tokenPrice ?? 1)
+        .times(String(ptPrice))
+        .toFormat(tokenDecimals);
+      return totaPrice;
+    }
+    return 0;
+  }, [data24h, ptPrice]);
 
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
@@ -46,7 +71,8 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
         </Stack>
 
         <Typography color="ds.gray_600">
-          {tokenInfo.totalAmountFiat} {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+          {isPrimaryToken ? tokenInfo.totalAmountFiat : totaPriceCalc}{' '}
+          {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
         </Typography>
       </Stack>
     </Stack>

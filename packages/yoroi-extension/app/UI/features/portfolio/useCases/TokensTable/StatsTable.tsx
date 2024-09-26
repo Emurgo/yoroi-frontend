@@ -230,10 +230,12 @@ const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 
   if (ptPrice == null) return `... ${currency}`;
 
-  const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, decimals)
-    .bn.times(tokenPrice ?? 1)
-    .times(showingAda ? 1 : String(ptPrice))
-    .toFormat(decimals);
+  const totaPrice =
+    ptPrice &&
+    atomicBreakdown(tokenQuantityAsBigInt, decimals)
+      .bn.times(tokenPrice ?? 1)
+      .times(showingAda ? 1 : String(ptPrice))
+      .toFormat(decimals);
 
   const totalTokenPrice = isPrimary && showingAda ? accountPair?.to.value : totaPrice;
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
@@ -277,7 +279,7 @@ const TokenProcentage = ({ procentage }) => {
   );
 };
 
-function bigNumberToBigInt(bn: BigNumber): bigint {
+export function bigNumberToBigInt(bn: BigNumber): bigint {
   // Convert BigNumber to a string representation of a whole number
   const wholeNumberString = bn.toFixed(0); // 0 means no decimals
 

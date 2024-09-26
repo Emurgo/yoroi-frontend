@@ -47,19 +47,16 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isL
 
   const {
     tokenActivity: { data24h },
-    isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
-  const secondaryTokenPrice = !isPrimaryToken && data24h ? data24h[tokenInfo?.info?.id] : null;
 
-  console.log('secondaryTokenPrice', {
-    secondaryTokenPrice,
-    isPrimaryToken,
-    secondaryTokenPriceNUll: secondaryTokenPrice === null,
-    condition: isPrimaryToken && secondaryTokenPrice === null,
-  });
+  const priceChangeProcent = isPrimaryToken
+    ? detailInfo?.changePercent || changePercent
+    : data24h && data24h[tokenInfo?.info?.id][1].price.change;
+  const priceChangeValue = isPrimaryToken
+    ? detailInfo?.changeValue || changeValue
+    : data24h && data24h[tokenInfo?.info?.id][1].price.close;
 
-  const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : 0.1;
-  const priceChangeValue = isPrimaryToken ? detailInfo?.changeValue || changeValue : 0.23;
+  // console.log('priceChangeProcent', data24h && data24h[tokenInfo?.info?.id][1]?.price);
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: !isPrimaryToken && theme.spacing(3) }}>
@@ -80,8 +77,8 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isL
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" gap="4px">
-              <PriceChangeChip value={priceChangeProcent} />
-              <PriceValueChip value={priceChangeValue} unitOfAccount={unitOfAccount || 'USD'} />
+              <PriceChangeChip value={Number(priceChangeProcent)} />
+              <PriceValueChip value={Number(priceChangeValue)} unitOfAccount={unitOfAccount || 'USD'} />
             </Stack>
           )}
         </Stack>
