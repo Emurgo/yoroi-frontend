@@ -42,6 +42,20 @@
         background-size: contain;
         background-position: center 10px;
         background-repeat: no-repeat;
+          &.cardano {
+            background-image: url(../../../assets/images/my-wallets/symbol_ada.inline.svg);
+          }
+          &.cardanoTestnet {
+            background-image: url(../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg);
+          }
+          // CONNECT HARDWARE WALLET
+          &.connectLedger {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-ledger-modern.inline.svg);
+          }
+
+          &.connectTrezor {
+            background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
+          }
       }
 
       &:hover {
@@ -168,7 +182,7 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
+:global(.YoroiModern) {
   .optionBlockListItem {
     .optionBlockWrapper {
       .optionSubmitButton {
