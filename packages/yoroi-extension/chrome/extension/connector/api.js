@@ -49,7 +49,15 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, ensureArray, hexToBytes, iterateLenGet, iterateLenGetMap, maybe } from '../../../app/coreUtils';
+import {
+  bytesToHex,
+  ensureArray,
+  ExtendedIterable,
+  hexToBytes,
+  iterateLenGet,
+  iterateLenGetMap,
+  maybe
+} from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -569,30 +577,27 @@ function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
 
-  const result: Set<string> =
+  const certSigners =
     iterateLenGet(txBody.certs())
       .nonNull()
       .flatMap(cert => {
         for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
           // $FlowFixMe[incompatible-call]
           const result = maybe(convertFunc(cert), getKeyhashFunc);
-          if (result != null) return ensureArray(result);
+          if (result != null)
+            return ensureArray<RustModule.WalletV4.Ed25519KeyHash>(result);
         }
         return [];
-      })
-      .map(keyHash => keyHash.to_hex())
-      .toSet();
+      });
 
-  for (const voter of iterateLenGet(txBody.voting_procedures()?.get_voters())) {
-    if (!voter) {
-      throw new Error('unexpectedly missing voter');
-    }
-    const keyHash = voter.to_drep_credential()?.to_keyhash();
-    if (keyHash) {
-      result.add(keyHash.to_hex());
-    }
-  }
-  return result;
+  const votingSigners =
+    iterateLenGet(txBody.voting_procedures()?.get_voters()).nonNull()
+      .map(voter => voter.to_drep_credential()?.to_keyhash()).nonNull();
+
+  return certSigners
+    .join(votingSigners)
+    .map(hash => hash.to_hex())
+    .toSet();
 }
 
 /**
