@@ -11,7 +11,7 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import { forceNonNull, iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
+import { iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -189,12 +189,12 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +amount: MultiToken,
   |}> {
     const withdrawals = this.unsignedTx.build().withdrawals();
-    return iterateLenGetMap(withdrawals).map(([rewardAddress, withdrawalAmount]) => ({
+    return iterateLenGetMap(withdrawals).nonNullValue().map(([rewardAddress, withdrawalAmount]) => ({
       address: rewardAddress.to_address().to_hex(),
       amount: new MultiToken(
         [{
           identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-          amount: new BigNumber(forceNonNull(withdrawalAmount).to_str()),
+          amount: new BigNumber(withdrawalAmount.to_str()),
           networkId: this.networkSettingSnapshot.NetworkId,
         }],
         {
@@ -235,21 +235,15 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   certificates(): Array<{| kind: $Values<CertificateKind>, payloadHex: string |}> {
-    const res = [];
-    for (const cert of iterateLenGet(this.unsignedTx.build().certs())) {
-      res.push({
-        kind: cert.kind(),
-        payloadHex: cert.to_hex(),
-      });
-    }
-    return res;
+    return iterateLenGet(this.unsignedTx.build().certs()).map(cert => ({
+      kind: cert.kind(),
+      payloadHex: cert.to_hex(),
+    })).toArray();
   }
 
   receivers(includeChange: boolean): Array<string> {
-    const outputStrings = [];
-    for (const output of iterateLenGet(this.unsignedTx.build().outputs())) {
-      outputStrings.push(toHexOrBase58(output.address()));
-    }
+    const outputStrings = iterateLenGet(this.unsignedTx.build().outputs())
+      .map(o => toHexOrBase58(o.address())).toArray();
 
     if (!includeChange) {
       const changeAddrs = this.changeAddr.map(change => change.address);
