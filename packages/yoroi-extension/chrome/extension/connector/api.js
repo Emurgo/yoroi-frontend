@@ -49,15 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import {
-  bytesToHex,
-  ensureArray,
-  ExtendedIterable,
-  hexToBytes,
-  iterateLenGet,
-  iterateLenGetMap,
-  maybe
-} from '../../../app/coreUtils';
+import { bytesToHex, ensureArray, hexToBytes, iterateLenGet, iterateLenGetMap, maybe } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -776,18 +768,15 @@ async function __connectorSignCardanoTx(
     ...signingKey,
     password,
   });
-  const utxoIdSet: Set<string> = new Set();
-  for (const input of iterateLenGet(txBody.inputs())) {
-    const txHash = input.transaction_id().to_hex();
-    utxoIdSet.add(`${txHash}${String(input.index())}`);
-  }
-  for (const input of iterateLenGet(txBody.collateral())) {
-    const txHash = input.transaction_id().to_hex();
-    utxoIdSet.add(`${txHash}${String(input.index())}`);
-  }
-  const usedUtxos = addressedUtxos.filter(utxo =>
-    utxoIdSet.has(utxo.utxo_id)
-  );
+
+  const utxoIdSet: Set<string> =
+    iterateLenGet(txBody.inputs())
+      .join(iterateLenGet(txBody.collateral()))
+      .map(input => `${(input.transaction_id().to_hex())}${String(input.index())}`)
+      .toSet();
+
+  const usedUtxos = addressedUtxos
+    .filter(utxo => utxoIdSet.has(utxo.utxo_id));
 
   const signedTx = shelleySignTransaction(
     usedUtxos,
