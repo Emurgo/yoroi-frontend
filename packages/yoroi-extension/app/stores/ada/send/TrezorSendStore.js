@@ -141,9 +141,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       }
 
       const publicKeyInfo = {
-        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.wallet.publicKey, 'hex')
-        ),
+        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
         addressing: {
           startLevel: 1,
           path: request.wallet.pathToPublic,
@@ -212,9 +210,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         metadata,
       );
 
-      const txId = Buffer.from(
-        RustModule.WalletV4.hash_transaction(txBody).to_bytes()
-      ).toString('hex');
+      const txId = RustModule.WalletV4.hash_transaction(txBody).to_hex();
 
       await broadcastTransaction({
         publicDeriverId: request.wallet.publicDeriverId,

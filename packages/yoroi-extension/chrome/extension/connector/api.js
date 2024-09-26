@@ -637,7 +637,7 @@ export function resolveTxOrTxBody(
   let witnessSet: RustModule.WalletV4.TransactionWitnessSet;
   let auxiliaryData: ?RustModule.WalletV4.AuxiliaryData;
   let rawTxBody: Buffer;
-  const bytes = Buffer.from(txHex, 'hex');
+  const bytes = hexToBytes(txHex);
   try {
     const fullTx = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
     txBody = fullTx.body();
@@ -788,11 +788,11 @@ async function __connectorSignCardanoTx(
   });
   const utxoIdSet: Set<string> = new Set();
   for (const input of iterateLenGet(txBody.inputs())) {
-    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    const txHash = input.transaction_id().to_hex();
     utxoIdSet.add(`${txHash}${String(input.index())}`);
   }
   for (const input of iterateLenGet(txBody.collateral())) {
-    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    const txHash = input.transaction_id().to_hex();
     utxoIdSet.add(`${txHash}${String(input.index())}`);
   }
   const usedUtxos = addressedUtxos.filter(utxo =>
@@ -803,9 +803,7 @@ async function __connectorSignCardanoTx(
     usedUtxos,
     rawTxBody,
     withLevels.getParent().getPublicDeriverLevel(),
-    RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(normalizedKey.prvKeyHex, 'hex')
-    ),
+    RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
     new Set(), // stakingKeyWits
     auxiliaryData, // metadata
     otherRequiredSigners,
@@ -856,9 +854,7 @@ export async function connectorCreateCardanoTx(
   );
 
   if (password == null) {
-    return Buffer.from(
-      signRequest.unsignedTx.build_tx().to_bytes()
-    ).toString('hex');
+    return signRequest.unsignedTx.build_tx().to_hex();
   }
 
   const withSigningKey = asGetSigningKey(publicDeriver);
@@ -880,13 +876,11 @@ export async function connectorCreateCardanoTx(
     signRequest.senderUtxos,
     signRequest.unsignedTx,
     withLevels.getParent().getPublicDeriverLevel(),
-    RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(normalizedKey.prvKeyHex, 'hex')
-    ),
+    RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
     signRequest.neededStakingKeyHashes.wits,
     signRequest.metadata,
   );
-  return Buffer.from(signedTx.to_bytes()).toString('hex');
+  return signedTx.to_hex();
 }
 
 export async function connectorSendTxCardano(
@@ -942,9 +936,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     submittedTxs,
   );
 
-  const txId = Buffer.from(
-    RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
-  ).toString('hex');
+  const txId = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
   const defaultToken = publicDeriver.getParent().defaultToken;
   const defaults = {
     defaultNetworkId: defaultToken.NetworkId,
@@ -958,7 +950,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   const txBody = tx.body();
   const usedUtxos = [];
   for (const input of iterateLenGet(txBody.inputs())) {
-    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    const txHash = input.transaction_id().to_hex();
     const index = input.index();
     const utxo = utxos.find(u => u.tx_hash === txHash && u.tx_index === index);
 
@@ -992,7 +984,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
   }
   for (const output of iterateLenGet(txBody.outputs())) {
     const value = multiTokenFromCardanoValue(output.amount(), defaults);
-    const address = Buffer.from(output.address().to_bytes()).toString('hex');
+    const address = output.address().to_hex();
     addresses.to.push({
       address,
       value,
@@ -1035,7 +1027,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     block: null,
     certificates: [],
     ttl: new BigNumber(String(txBody.ttl())),
-    metadata: auxData ? Buffer.from(auxData.to_bytes()).toString('hex') : null,
+    metadata: auxData?.to_hex(),
     withdrawals: withdrawalsData,
     isValid: true,
   };
@@ -1078,11 +1070,11 @@ export function assetToRustMultiasset(
   const multiasset = W4.MultiAsset.new();
   for (const policyHex of Object.keys(groupedAssets)) {
     const assetGroup = groupedAssets[policyHex];
-    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const policyId = W4.ScriptHash.from_hex(policyHex);
     const assets = RustModule.WalletV4.Assets.new();
     for (const asset of assetGroup) {
       assets.insert(
-        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.AssetName.new(hexToBytes(asset.name)),
         W4.BigNum.from_str(asset.amount),
       );
     }
@@ -1101,9 +1093,7 @@ export async function transformCardanoUtxos(
   if (isCBOR) {
     return cardanoUtxos.map(u => {
       const input = W4.TransactionInput.new(
-        W4.TransactionHash.from_bytes(
-          Buffer.from(u.tx_hash, 'hex')
-        ),
+        W4.TransactionHash.from_hex(u.tx_hash),
         u.tx_index,
       );
       const value = W4.Value.new(W4.BigNum.from_str(u.amount));
@@ -1111,21 +1101,17 @@ export async function transformCardanoUtxos(
         value.set_multiasset(assetToRustMultiasset(u.assets));
       }
       const output = W4.TransactionOutput.new(
-        W4.Address.from_bytes(Buffer.from(u.receiver, 'hex')),
+        W4.Address.from_hex(u.receiver),
         value,
       );
-      return Buffer.from(
-        W4.TransactionUnspentOutput.new(input, output).to_bytes(),
-      ).toString('hex');
+      return W4.TransactionUnspentOutput.new(input, output).to_hex();
     })
   }
 
   return cardanoUtxos.map(u => {
     return {
         ...u,
-      receiver: W4.Address.from_bytes(
-        Buffer.from(u.receiver, 'hex'),
-      ).to_bech32(),
+      receiver: W4.Address.from_hex(u.receiver).to_bech32(),
     };
   });
 }

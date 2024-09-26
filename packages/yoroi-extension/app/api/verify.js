@@ -33,18 +33,3 @@ export function verifyTicker(
   }
   return verify(ticker, serializeTicker, ticker.signature, pubKeyData);
 }
-
-export function verifyPubKeyDataReplacement(
-  pubKeyData: string,
-  pubKeyDataSignature: string,
-  pubKeyMaster: string
-): boolean {
-  return RustModule.WasmScope(Scope => {
-    return verify(
-      pubKeyData,
-      s => Buffer.from(s),
-      pubKeyDataSignature,
-      Scope.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
-    );
-  });
-}

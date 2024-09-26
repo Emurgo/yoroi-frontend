@@ -61,7 +61,7 @@ import {
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
-import { iterateLenGet, noop } from '../../coreUtils';
+import { hexToBytes, iterateLenGet, noop } from '../../coreUtils';
 import {
   broadcastTransaction,
   connectWindowRetrieveData,
@@ -437,7 +437,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
 
     let txBody;
-    const bytes = Buffer.from(tx, 'hex');
+    const bytes = hexToBytes(tx);
     try {
       // <TODO:USE_METADATA_AND_WITNESSES>
       const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
@@ -466,7 +466,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     for (const input of iterateLenGet(txBody.inputs())) {
-      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+      const txHash = input.transaction_id().to_hex();
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
         signFail({
@@ -502,7 +502,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const outputs: Array<TxDataOutput> = [];
     for (const output of iterateLenGet(txBody.outputs())) {
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
+      const address = output.address().to_hex();
       outputs.push({
         address,
         isForeign: !ownAddresses.has(address),
@@ -1194,7 +1194,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(Buffer.from(publicDeriver.publicKey, 'hex')),
+      key: RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey),
       addressing: {
         startLevel: 1,
         path: publicDeriver.pathToPublic,

@@ -320,7 +320,7 @@ export function toTrezorAddressParameters(
         path: toDerivationPathString(path),
         // can't always know staking key path since address may not belong to the wallet
         // (mangled address)
-        stakingKeyHash: Buffer.from(hash.to_bytes()).toString('hex'),
+        stakingKeyHash: hash.to_hex(),
       };
     }
   }
@@ -399,7 +399,7 @@ export function buildSignedTransaction(
         key: publicKey.key,
       }
     });
-    const pubKey = Buffer.from(addressKey.to_raw_key().as_bytes()).toString('hex');
+    const pubKey = addressKey.to_raw_key().to_hex();
 
     const witness = findWitness(pubKey);
 
@@ -408,13 +408,11 @@ export function buildSignedTransaction(
       const byronAddr = RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver);
       const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
         RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
-        RustModule.WalletV4.Ed25519Signature.from_bytes(
-          Buffer.from(witness, 'hex')
-        ),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness),
         addressKey.chaincode(),
         byronAddr.attributes(),
       );
-      const asString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+      const asString = bootstrapWit.to_hex();
       if (seenBootstrapWit.has(asString)) {
         continue;
       }
@@ -425,11 +423,9 @@ export function buildSignedTransaction(
 
     const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
       RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
-      RustModule.WalletV4.Ed25519Signature.from_bytes(
-        Buffer.from(witness, 'hex')
-      ),
+      RustModule.WalletV4.Ed25519Signature.from_hex(witness),
     );
-    const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+    const asString = vkeyWit.to_hex();
     if (seenVKeyWit.has(asString)) {
       continue;
     }
@@ -439,7 +435,7 @@ export function buildSignedTransaction(
 
   // add any staking key needed
   const stakingPubKey = stakingKey
-    ? Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex')
+    ? bytesToHex(stakingKey.to_raw_key().as_bytes())
     : null;
 
   for (const witness of witnesses) {
@@ -449,9 +445,9 @@ export function buildSignedTransaction(
       }
       const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
         RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
-        RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.signature, 'hex')),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
       );
-      const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+      const asString = vkeyWit.to_hex();
       if (seenVKeyWit.has(asString)) {
         continue;
       }
@@ -688,7 +684,7 @@ export function toTrezorSignRequest(
         networkId,
         stakeCredential
       );
-      const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
+      const addressPayload = rewardAddr.to_address().to_hex();
       const addressing = ownStakeAddressMap[addressPayload];
       if (addressing == null) {
         throw new Error('not own address in certificate');

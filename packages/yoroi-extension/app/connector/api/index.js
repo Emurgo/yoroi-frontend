@@ -6,6 +6,7 @@ import type { WalletAuthEntry } from '../../../chrome/extension/connector/types'
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { cip8Sign } from '../../api/ada';
+import { bytesToHex, hexToBytes } from '../../coreUtils';
 
 
 type CreateAuthEntryParams = {|
@@ -38,9 +39,7 @@ export const _createAuthEntry: (
         ...signingKeyFromStorage,
         password,
       });
-      const signingKey = WasmScope.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      );
+      const signingKey = WasmScope.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex);
       const derivedSignKey = signingKey.derive(0).derive(0).to_raw_key();
       const stakingKey = signingKey.derive(2).derive(0).to_raw_key();
 
@@ -67,8 +66,8 @@ export const _createAuthEntry: (
 
       return {
         walletId: checksum.ImagePart,
-        pubkey: Buffer.from(appPubKey.as_bytes()).toString('hex'),
-        privkey: Buffer.from(appPrivKey.as_bytes()).toString('hex'),
+        pubkey: bytesToHex(appPubKey.as_bytes()),
+        privkey: bytesToHex(appPrivKey.as_bytes()),
       };
     };
 
@@ -76,8 +75,6 @@ export const authSignHexPayload: ({|
   privKey: string,
   payloadHex: string,
 |}) => Promise<string> = async ({ privKey, payloadHex }) => {
-  const appPrivKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(
-    Buffer.from(privKey, 'hex')
-  );
-  return appPrivKey.sign(Buffer.from(payloadHex, 'hex')).to_hex();
+  const appPrivKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(hexToBytes(privKey));
+  return appPrivKey.sign(hexToBytes(payloadHex)).to_hex();
 }
