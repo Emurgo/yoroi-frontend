@@ -207,6 +207,15 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
   }
 }
 
+/**
+ * Makes sure the result is an array.
+ * Either returns the passed array or wraps the item into an array.
+ * Might be useful with flat-mapping.
+ */
+export function ensureArray<T>(t: T | Array<T>): Array<T> {
+  return Array.isArray(t) ? t : [t];
+}
+
 export type LenGet<T> = { +len: () => number, +get: number => T, ... };
 export type LenGetMap<K,V> = { +keys: () => LenGet<K>, +get: K => V, ... };
 

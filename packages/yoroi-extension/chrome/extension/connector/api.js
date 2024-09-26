@@ -49,7 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../app/coreUtils';
+import { bytesToHex, ensureArray, hexToBytes, iterateLenGet, iterateLenGetMap, maybe } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -505,17 +505,15 @@ export function getScriptRequiredSigningKeys(
   return iterateLenGet(nativeScripts)
     .flatMap(ns => iterateLenGet(ns.get_required_signers()))
     .map(requiredKeyHash => requiredKeyHash.to_hex())
-    .toSet()
+    .toSet();
 }
 
 function getTxRequiredSigningKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
-  const set = new Set<string>();
-  for (const requiredKeyHash of iterateLenGet(txBody.required_signers())) {
-    set.add(bytesToHex(requiredKeyHash.to_bytes()));
-  }
-  return set;
+  return iterateLenGet(txBody.required_signers())
+    .map(requiredKeyHash => requiredKeyHash.to_hex())
+    .toSet();
 }
 
 type CertToKeyhashFuncs<CertType> = [
@@ -563,37 +561,27 @@ const CERT_TO_KEYHASH_FUNCS = [
   ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
-    cert => {
-      return [...iterateLenGet(cert.pool_params().pool_owners())];
-    },
+    cert => iterateLenGet(cert.pool_params().pool_owners()).toArray(),
   ]: CertToKeyhashFuncs<RustModule.WalletV4.PoolRegistration>),
 ];
 
 function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
-  const result: Set<string> = new Set();
 
-  for (const cert of iterateLenGet(txBody.certs())) {
-    if (!cert) {
-      throw new Error('unexpectedly missing certificate');
-    }
-    for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
-      const typedCert = convertFunc(cert);
-      if (typedCert) {
-        // $FlowFixMe[incompatible-call]
-        const getKeyhashResult = getKeyhashFunc(typedCert);
-        if (Array.isArray(getKeyhashResult)) {
-          for (const keyHash of getKeyhashResult) {
-            result.add(keyHash.to_hex());
-          }
-        } else if (getKeyhashResult) {
-          result.add(getKeyhashResult.to_hex());
+  const result: Set<string> =
+    iterateLenGet(txBody.certs())
+      .nonNull()
+      .flatMap(cert => {
+        for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
+          // $FlowFixMe[incompatible-call]
+          const result = maybe(convertFunc(cert), getKeyhashFunc);
+          if (result != null) return ensureArray(result);
         }
-        break;
-      }
-    }
-  }
+        return [];
+      })
+      .map(keyHash => keyHash.to_hex())
+      .toSet();
 
   for (const voter of iterateLenGet(txBody.voting_procedures()?.get_voters())) {
     if (!voter) {

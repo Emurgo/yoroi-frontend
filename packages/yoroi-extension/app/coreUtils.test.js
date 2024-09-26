@@ -1,6 +1,6 @@
 import {
   bytesToHex,
-  delay,
+  delay, ensureArray,
   hexToBytes,
   iterateLenGet,
   iterateLenGetMap,
@@ -9,6 +9,24 @@ import {
 } from './coreUtils';
 import type { LenGet, LenGetMap } from './coreUtils';
 import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
+
+describe('utils', () => {
+
+  test('ensureArray', () => {
+
+    expect(ensureArray(null)).toEqual([null]);
+    expect(ensureArray([null])).toEqual([null]);
+    expect(ensureArray([])).toEqual([]);
+    expect(ensureArray([[]])).toEqual([[]]);
+    expect(ensureArray([[[]]])).toEqual([[[]]]);
+    expect(ensureArray({})).toEqual([{}]);
+    expect(ensureArray([{}])).toEqual([{}]);
+    expect(ensureArray([[{}]])).toEqual([[{}]]);
+    expect(ensureArray(undefined)).toEqual([undefined]);
+    expect(ensureArray([undefined])).toEqual([undefined]);
+  });
+
+});
 
 describe('timeCached', () => {
 
