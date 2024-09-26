@@ -213,6 +213,7 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
  * Might be useful with flat-mapping.
  */
 export function ensureArray<T>(t: T | Array<T>): Array<T> {
+  // $FlowIgnore
   return Array.isArray(t) ? t : [t];
 }
 
@@ -284,6 +285,14 @@ export class ExtendedIterable<T> implements Iterable<T> {
 
   zip<B>(iterB: Iterable<B>): ExtendedIterable<[T,B]> {
     return zipGenerators<T,B>(this.__source, iterB);
+  }
+
+  join(iterB: Iterable<T>): ExtendedIterable<T> {
+    const source = this.__source;
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) yield t;
+      for (const t of iterB) yield t;
+    })());
   }
 
   toArray(): Array<T> {

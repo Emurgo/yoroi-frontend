@@ -273,6 +273,11 @@ describe('ExtendedIterable', () => {
     const zipped = it.zip([10, 20, 30, 40, 50, 60]);
     expect(zipped.toArray()).toEqual([[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]);
   });
+  test('join', () => {
+    const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
+    const zipped = it.join([10, 20, 30, 40, 50, 60]);
+    expect(zipped.toArray()).toEqual([1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 60]);
+  });
   test('forEach', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const res = [];
@@ -288,6 +293,11 @@ describe('ExtendedIterable', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const zipped = it.flatMap(x => [x * 2, x * 3]);
     expect(zipped.toArray()).toEqual([2, 3, 4, 6, 6, 9, 8, 12, 10, 15]);
+  });
+  test('flatMap with ensureArray', () => {
+    const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
+    const zipped = it.flatMap(x => ensureArray(x % 2 === 0 ? x * 10 : [x * 2, x * 3]));
+    expect(zipped.toArray()).toEqual([2, 3, 20, 6, 9, 40, 10, 15]);
   });
   test('flatMap with nested lenget', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
