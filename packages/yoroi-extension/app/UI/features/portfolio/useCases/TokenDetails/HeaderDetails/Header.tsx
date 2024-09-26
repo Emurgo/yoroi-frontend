@@ -15,6 +15,13 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.totalAmount;
 
+  // const {
+  //   tokenActivity: { data24h },
+  //   // isLoading: isActivityLoading,
+  // } = usePortfolioTokenActivity();
+  // const tokenPrice = data24h && data24h[1].price.close;
+  // // TODOOOO
+
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_900">

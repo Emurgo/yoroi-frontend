@@ -31,8 +31,6 @@ type PrimaryTokenInfo = {
 
 export type WalletBalance = {
   ada: string;
-  fiatAmount: string;
-  currency: string;
 };
 
 type GetCurrentPrice = (from: string, to: string) => number | Promise<number>; // Function type for getCurrentPrice

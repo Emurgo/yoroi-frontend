@@ -224,8 +224,6 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
-        fiatAmount: fiatDisplay || 0, // to be removed
-        currency: currency === null ? 'USD' : currency,
       },
       assetList: assetList,
     };

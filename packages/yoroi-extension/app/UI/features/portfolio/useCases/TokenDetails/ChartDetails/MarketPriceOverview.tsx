@@ -4,9 +4,10 @@ import React from 'react';
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import { formatNumber } from '../../../common/helpers/formatHelper';
-import { priceChange } from '../../../common/helpers/priceChange';
+import { formatPriceChange, priceChange } from '../../../common/helpers/priceChange';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
+import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
 
 // Styling for the period buttons
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
@@ -31,49 +32,74 @@ interface Props {
   chartData: any;
   detailInfo: any;
   isLoading: boolean;
+  tokenInfo: TokenInfoType;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, isLoading = false }: Props): JSX.Element => {
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isLoading = false }: Props): JSX.Element => {
+  const isPrimaryToken: boolean = tokenInfo === undefined;
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
-
   // Fetch data based on the selected interval
 
-  const {
-    ptActivity: { close, open },
-    // config,
-  } = useCurrencyPairing();
+  const ptActivity = useCurrencyPairing().ptActivity;
+  const { changeValue, changePercent } = priceChange(ptActivity.open, ptActivity.close);
 
-  const { changeValue, changePercent } = priceChange(open, close);
+  const {
+    tokenActivity: { data24h },
+    isLoading: isActivityLoading,
+  } = usePortfolioTokenActivity();
+  const secondaryTokenPrice = !isPrimaryToken && data24h ? data24h[tokenInfo?.info?.id] : null;
+
+  console.log('secondaryTokenPrice', {
+    secondaryTokenPrice,
+    isPrimaryToken,
+    secondaryTokenPriceNUll: secondaryTokenPrice === null,
+    condition: isPrimaryToken && secondaryTokenPrice === null,
+  });
+
+  const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : 0.1;
+  const priceChangeValue = isPrimaryToken ? detailInfo?.changeValue || changeValue : 0.23;
 
   return (
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      {isLoading ? (
-        <Skeleton width="131px" height="13px" />
-      ) : (
-        <Typography fontWeight="500" color="ds.gray_max">
-          {strings.marketPrice}
-        </Typography>
-      )}
+    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: !isPrimaryToken && theme.spacing(3) }}>
+      <Typography fontWeight="500" color="ds.gray_max">
+        {strings.marketPrice}
+      </Typography>
+
       <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
-        {isLoading || chartData === undefined ? (
-          <Skeleton width="64px" height="13px" />
-        ) : (
-          <Stack direction="row" alignItems="center" gap="16px">
-            <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
-              <Typography fontWeight="500">{formatNumber(detailInfo?.value || chartData[0]?.value)}</Typography>
-              <Typography variant="caption" mt="3px">
-                &nbsp;{unitOfAccount}
-              </Typography>
-            </Stack>
+        <Stack direction="row" alignItems="center" gap="16px">
+          <TokenPrice
+            ptActivity={ptActivity}
+            isPrimaryToken={isPrimaryToken}
+            unitOfAccount={unitOfAccount}
+            secondaryTokenActivity={data24h && data24h[tokenInfo?.info?.id]}
+          />
+
+          {chartData === undefined ? (
+            <Skeleton width="64px" height="13px" />
+          ) : (
             <Stack direction="row" gap="4px">
-              <PriceChangeChip value={detailInfo?.changePercent || changePercent} />
-              <PriceValueChip value={detailInfo?.changeValue || changeValue} unitOfAccount={unitOfAccount || 'USD'} />
+              <PriceChangeChip value={priceChangeProcent} />
+              <PriceValueChip value={priceChangeValue} unitOfAccount={unitOfAccount || 'USD'} />
             </Stack>
-          </Stack>
-        )}
+          )}
+        </Stack>
       </Stack>
+    </Stack>
+  );
+};
+
+const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity }) => {
+  const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+  if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
+
+  return (
+    <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
+      <Typography fontWeight="500">{formatPriceChange(tokenPrice)}</Typography>
+      <Typography variant="caption" mt="2px">
+        &nbsp;{unitOfAccount}
+      </Typography>
     </Stack>
   );
 };

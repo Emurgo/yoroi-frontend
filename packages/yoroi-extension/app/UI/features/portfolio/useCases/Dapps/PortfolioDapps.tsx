@@ -94,7 +94,7 @@ const PortfolioDapps = ({ data }: Props) => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
-        walletBalance={{ ada: '0', fiatAmount: '0', currency: 'USD' }}
+        walletBalance={{ ada: '0' }}
         setKeyword={setKeyword}
         isLoading={isLoading}
         tooltipTitle={

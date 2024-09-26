@@ -78,16 +78,13 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
         chartData={chartData}
         detailInfo={detailInfo}
         isLoading={isFetching || !data || chartData === undefined}
+        tokenInfo={tokenInfo}
       />
     );
   }
 
   return (
-    <Stack
-      direction="column"
-      spacing={theme.spacing(4)}
-      sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
-    >
+    <Stack direction="column" spacing={theme.spacing(4)} sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5) }}>
       <TokenMarketPriceOverview
         chartData={chartData}
         detailInfo={detailInfo}
