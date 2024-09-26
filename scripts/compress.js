@@ -6,6 +6,7 @@ module.paths.unshift(`${process.cwd()}/node_modules`);
 const fs = require('fs');
 const path = require('path');
 const ChromeExtension = require('crx');
+const { utfToBytes } = require('../packages/yoroi-extension/app/coreUtils');
 const argv = require('minimist')(process.argv.slice(2));
 /* eslint import/no-unresolved: 0 */
 
@@ -25,7 +26,7 @@ function getPrivateKey() {
   if (argv.key.startsWith('./')) {
     return readKeyFromFile(argv.key);
   }
-  return Buffer.from(argv.key, 'utf-8');
+  return utfToBytes(argv.key);
 }
 
 const privateKey = getPrivateKey();

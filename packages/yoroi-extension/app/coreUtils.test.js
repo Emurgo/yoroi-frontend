@@ -1,10 +1,11 @@
 import {
+  bytesToBase64,
   bytesToHex,
   delay, ensureArray,
-  hexToBytes,
+  hexToBytes, hexToUtf,
   iterateLenGet,
   iterateLenGetMap,
-  timeCached,
+  timeCached, utfToBytes,
   zipGenerators
 } from './coreUtils';
 import type { LenGet, LenGetMap } from './coreUtils';
@@ -12,8 +13,15 @@ import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
 
 describe('utils', () => {
 
-  test('ensureArray', () => {
+  test('encoders', () => {
+    expect(hexToBytes('cafebabe')).toEqual(Buffer.from('cafebabe', 'hex'));
+    expect(bytesToHex(Buffer.from('cafebabe', 'hex'))).toEqual('cafebabe');
+    expect(utfToBytes('quick brown fox')).toEqual(Buffer.from('quick brown fox', 'utf-8'));
+    expect(hexToUtf('cafebabe')).toEqual(Buffer.from('cafebabe', 'hex').toString('utf-8'));
+    expect(bytesToBase64(hexToBytes('cafebabe'))).toEqual(Buffer.from('cafebabe', 'hex').toString('base64'));
+  });
 
+  test('ensureArray', () => {
     expect(ensureArray(null)).toEqual([null]);
     expect(ensureArray([null])).toEqual([null]);
     expect(ensureArray([])).toEqual([]);

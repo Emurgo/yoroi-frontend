@@ -1,12 +1,12 @@
 // @flow
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
+import { utfToBytes } from '../coreUtils';
 
 function serializeTicker(ticker: ResponseTicker): Buffer {
-  return Buffer.from(
-    ticker.from + ticker.timestamp +
-      Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
-    'utf8'
+  return utfToBytes(
+    ticker.from + ticker.timestamp
+    + Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join('')
   );
 }
 

@@ -6,7 +6,7 @@ import type { WalletAuthEntry } from '../../../chrome/extension/connector/types'
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { asGetSigningKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { cip8Sign } from '../../api/ada';
-import { bytesToHex, hexToBytes } from '../../coreUtils';
+import { bytesToHex, hexToBytes, utfToBytes } from '../../coreUtils';
 
 
 type CreateAuthEntryParams = {|
@@ -55,7 +55,7 @@ export const _createAuthEntry: (
       const entropy = (await cip8Sign(
         Buffer.from(address.to_bytes()),
         derivedSignKey,
-        Buffer.from(`DAPP_LOGIN: ${appAuthID}`, 'utf8'),
+        utfToBytes(`DAPP_LOGIN: ${appAuthID}`),
       )).signature();
 
       const appPrivKey = WasmScope.WalletV4.Bip32PrivateKey.from_bip39_entropy(
