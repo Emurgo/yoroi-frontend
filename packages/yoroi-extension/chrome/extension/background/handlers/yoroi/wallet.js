@@ -28,6 +28,7 @@ import {
 import type { ReferenceTransaction, BaseGetTransactionsRequest } from '../../../../../app/api/common';
 import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
+import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -188,6 +189,9 @@ export const ResyncWallet: HandlerType<
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
     await syncWallet(publicDeriver, 'UI resync');
+    await updateProtocolParametersCacheFromNetwork(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
   },
 });
 

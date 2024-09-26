@@ -90,16 +90,17 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         ledgerErrors.deviceStatusError
       );
     }
+    if (/Action rejected by user/.test(error.message)) {
+      return new LocalizableError(
+        ledgerErrors.cancelOnDeviceError101
+      );
+    }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
       case 'TransportOpenUserCancelled: Access denied to use Ledger device':
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);
-        break;
-      case 'DeviceStatusError: Action rejected by user':
-        // Showing - Operation cancelled on Ledger device.
-        localizableError = new LocalizableError(ledgerErrors.cancelOnDeviceError101);
         break;
       case 'NotAllowedError: The operation either timed out or was not allowed. See: https://w3c.github.io/webauthn/#sec-assertion-privacy.':
       case 'AbortError: The operation was aborted. ':

@@ -28,7 +28,7 @@ import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localSt
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { getPrivateStakingKey } from '../../api/thunk';
+import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
 import { bytesToHex } from '../../coreUtils';
 
 export const ProgressStep = Object.freeze({
@@ -232,6 +232,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const firstAddress = publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
 
+    const protocolParameters = await getProtocolParameters(publicDeriver);
+
     let votingRegTxPromise;
 
     if (publicDeriver.type !== 'mnemonic') {
@@ -260,6 +262,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
       } else if (publicDeriver.type === 'ledger') {
         votingRegTxPromise = this.createVotingRegTx.execute({
@@ -273,6 +276,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
       } else {
         throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
@@ -301,6 +305,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         wallet: publicDeriver,
         absSlotNumber,
         normalWallet: { metadata: trxMeta },
+        protocolParameters,
       }).promise;
     }
 

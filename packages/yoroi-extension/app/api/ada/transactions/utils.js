@@ -21,7 +21,7 @@ import { MultiToken, } from '../../common/lib/MultiToken';
 import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
-import { iterateLenGet } from '../../../coreUtils';
+import { iterateLenGet, iterateLenGetMap } from '../../../coreUtils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -64,26 +64,14 @@ export function parseTokenList(
   name: string,
   amount: string,
 |}> {
-  if (assets == null) return [];
-
-  const result = [];
-  for (const policyId of iterateLenGet(assets.keys())) {
-    const assetsForPolicy = assets.get(policyId);
-    if (assetsForPolicy == null) continue;
-
-    for (const assetName of iterateLenGet(assetsForPolicy.keys())) {
-      const amount = assetsForPolicy.get(assetName);
-      if (amount == null) continue;
-
-      result.push({
-        amount: amount.to_str(),
-        assetId: cardanoAssetToIdentifier(policyId, assetName),
-        policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(assetName.name()).toString('hex'),
-      });
-    }
-  }
-  return result;
+  return iterateLenGetMap(assets).flatMap(([policyId, assetsForPolicy]) => {
+    return iterateLenGetMap(assetsForPolicy).nonNullValue().map(([assetName, amount]) => ({
+      amount: amount.to_str(),
+      assetId: cardanoAssetToIdentifier(policyId, assetName),
+      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
+      name: Buffer.from(assetName.name()).toString('hex'),
+    }));
+  }).toArray();
 }
 
 export function cardanoValueFromMultiToken(
@@ -441,38 +429,6 @@ function cardanoMinAdaRequiredFromOutput(
   const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
   const minAdaRequired = Module.WalletV4.min_ada_for_output(output, dataCost).to_str();
   return new BigNumber(minAdaRequired);
-}
-
-/**
- * <TODO:PENDING_REMOVAL> LEGACY
- * @deprecated
- */
-export function coinsPerWord_to_coinsPerByte(coinsPerWord: BigNumber): BigNumber {
-  return coinsPerWord.div(8).integerValue(BigNumber.ROUND_FLOOR);
-}
-
-/**
- * @deprecated
- */
-export function cardanoMinAdaRequiredFromRemoteFormat_coinsPerWord(u: RemoteUnspentOutput, coinsPerWord: BigNumber): BigNumber {
-  return cardanoMinAdaRequiredFromRemoteFormat(u, coinsPerWord_to_coinsPerByte(coinsPerWord));
-}
-
-export function cardanoMinAdaRequiredFromRemoteFormat(u: RemoteUnspentOutput, coinsPerByte: BigNumber): BigNumber {
-  return cardanoUtxoMonadFromRemoteFormat(u)
-    .unwrap<BigNumber>((wasmUtxo, Module) => {
-      const wasmCoinsPerByte = Module.WalletV4.BigNum.from_str(coinsPerByte.toString());
-      const dataCost = Module.WalletV4.DataCost.new_coins_per_byte(wasmCoinsPerByte);
-      const minAdaRequired = Module.WalletV4.min_ada_for_output(wasmUtxo.output(), dataCost).to_str();
-      return new BigNumber(minAdaRequired);
-    });
-}
-
-/**
- * @deprecated
- */
-export function cardanoMinAdaRequiredFromAssets_coinsPerWord(tokens: MultiToken, coinsPerWord: BigNumber): BigNumber {
-  return cardanoMinAdaRequiredFromAssets(tokens, coinsPerWord_to_coinsPerByte(coinsPerWord));
 }
 
 export function cardanoMinAdaRequiredFromAssets(tokens: MultiToken, coinsPerByte: BigNumber): BigNumber {

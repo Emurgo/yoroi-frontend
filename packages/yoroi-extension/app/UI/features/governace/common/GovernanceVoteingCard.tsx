@@ -27,16 +27,16 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
   width: '294px',
   height: '362px',
   borderRadius: '8px',
+  border: `2px solid ${theme.palette.ds?.primary_100}`,
 
-  ...(!selected && {
-    background: !pending && (theme.name === 'light-theme' ? theme.palette.ds?.bg_gradient_1 : theme.palette.ds?.bg_gradient_2),
-    backgroundOrigin: 'border-box',
-    boxShadow: 'inset 0 100vw white',
-    border: '2px solid transparent',
-  }),
+  ...(!selected &&
+    {
+      // backgroundColor: !pending && theme.palette.ds?.primary_100,
+    }),
   ...(selected && {
-    background: !pending && theme.palette.ds.bg_gradient_2,
-    border: 'none',
+    backgroundImage: !pending && theme.palette.ds.bg_gradient_2,
+    border: '2px solid transparent',
+    backgroundOrigin: 'border-box',
     pointerEvents: !isDrepSelected && 'none',
   }),
   cursor: 'pointer',
@@ -45,10 +45,11 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    background: !pending && theme.palette.ds.bg_gradient_1,
-    backgroundOrigin: 'content-box',
-    boxShadow: 'none',
-    transition: 'all 250ms ease-in-out',
+    backgroundImage: theme.palette.ds.bg_gradient_2,
+    border: '2px solid transparent',
+    backgroundOrigin: 'border-box',
+    // background: !pending && theme.palette.ds.bg_gradient_2,
+    transition: 'opacity 1s ease-in-out',
   },
 }));
 

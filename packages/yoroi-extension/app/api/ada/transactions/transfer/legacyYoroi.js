@@ -29,7 +29,7 @@ export async function yoroiTransferTxFromAddresses(payload: {|
   protocolParams: {|
     keyDeposit: RustModule.WalletV4.BigNum,
     linearFee: RustModule.WalletV4.LinearFee,
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |},
@@ -46,5 +46,6 @@ export async function yoroiTransferTxFromAddresses(payload: {|
     senderUtxos,
     protocolParams: payload.protocolParams,
     absSlotNumber: payload.absSlotNumber,
+    networkId: payload.network.NetworkId,
   });
 }

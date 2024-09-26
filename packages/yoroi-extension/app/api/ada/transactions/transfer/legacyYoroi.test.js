@@ -37,7 +37,7 @@ const network = networks.CardanoMainnet;
 function getProtocolParams(): {|
   keyDeposit: RustModule.WalletV4.BigNum,
   linearFee: RustModule.WalletV4.LinearFee,
-  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  coinsPerUtxoByte: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
   |} {
@@ -49,7 +49,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
     ),
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(baseConfig.CoinsPerUtxoWord),
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(baseConfig.CoinsPerUtxoByte),
     poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
     networkId: network.NetworkId,
   };
