@@ -206,13 +206,11 @@ export function NftImage({
   name,
   width,
   height,
-  contentHeight,
 }: {|
   imageUrl: ?string,
   name: string,
   width: string,
   height: string,
-  contentHeight?: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -235,7 +233,7 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height={contentHeight}>
+      <SvgWrapper height="100%">
         <DefaultNFT />
       </SvgWrapper>
     );
@@ -266,7 +264,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" contentHeight="334px" />
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>
       <Box>
         <Typography
