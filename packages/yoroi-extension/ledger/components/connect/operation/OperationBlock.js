@@ -21,6 +21,8 @@ import ConnectLedgerMultiKeysHintBlock from './connect/ConnectLedgerMultiKeysHin
 import SendTxHintBlock from './send/SendTxHintBlock';
 import VerifyAddressHintBlock from './verify/VerifyAddressHintBlock';
 import DeriveAddressHintBlock from './derive/DeriveAddressHintBlock';
+import SignMessageBlock from './send/SignMessageBlock';
+
 import type {
   DeriveAddressRequest,
   SignTransactionRequest,
@@ -132,6 +134,15 @@ export default class OperationBlock extends React.Component<Props> {
                 deviceCode={deviceCode}
                 deriveAddressInfo={deriveAddressInfo}
                 wasDeviceLocked={wasDeviceLocked}
+              />
+            );
+            break;
+          case OPERATION_NAME.SIGN_MESSAGE:
+            content = (
+              <SignMessageBlock
+                deviceCode={deviceCode}
+                wasDeviceLocked={wasDeviceLocked}
+                deviceVersion={deviceVersion}
               />
             );
             break;

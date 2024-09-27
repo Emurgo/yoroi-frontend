@@ -43,6 +43,14 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.catalyst.cip36.unsupported',
     defaultMessage: '!!!Catalyst registration requires Ledger app version 6.',
   },
+  deviceVersionNoDataSigning: {
+    id: 'wallet.hw.ledger.error.deviceVersionNoDataSigning',
+    defaultMessage: '!!!CIP-8 message signing not supported by your Ledger app version',
+  },
+  deviceStatusError: {
+    id: 'wallet.hw.ledger.error.deviceStatus',
+    defaultMessage: '!!!Invalid or oversized data for Ledger.',
+  },
 });
 
 export function convertToLocalizableError(error: Error): LocalizableError {
@@ -74,16 +82,25 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         });
       }
     }
+    if (/^DeviceVersionUnsupported/.test(error.message)) {
+      return new LocalizableError(ledgerErrors.deviceVersionNoDataSigning);
+    }
+    if (/Invalid data supplied to Ledger/.test(error.message)) {
+      return new LocalizableError(
+        ledgerErrors.deviceStatusError
+      );
+    }
+    if (/Action rejected by user/.test(error.message)) {
+      return new LocalizableError(
+        ledgerErrors.cancelOnDeviceError101
+      );
+    }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
       case 'TransportOpenUserCancelled: Access denied to use Ledger device':
         // Showing - Failed to connect. Please check your ledger device and retry.
         localizableError = new LocalizableError(globalMessages.ledgerError101);
-        break;
-      case 'DeviceStatusError: Action rejected by user':
-        // Showing - Operation cancelled on Ledger device.
-        localizableError = new LocalizableError(ledgerErrors.cancelOnDeviceError101);
         break;
       case 'NotAllowedError: The operation either timed out or was not allowed. See: https://w3c.github.io/webauthn/#sec-assertion-privacy.':
       case 'AbortError: The operation was aborted. ':

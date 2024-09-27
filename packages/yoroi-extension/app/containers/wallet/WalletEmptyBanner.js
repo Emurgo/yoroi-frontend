@@ -37,18 +37,19 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
           borderRadius: '8px',
           overflowY: 'hidden',
           position: 'relative',
-          padding: '24px',
+          padding: '16px',
+          height: '156px',
         }}
-        id='wallet|staking-emptyWalletBanner-box'
+        id="wallet|staking-emptyWalletBanner-box"
       >
-        <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
+        <Box sx={{ position: 'absolute', right: '1%', top: '0%' }}>
           <CoverBg />
         </Box>
         <Box>
-          <Typography component="div" variant="h3" color="ds.text_gray_medium" fontWeight={500} mb="8px">
+          <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
             {intl.formatMessage(messages.welcomeMessage)}
           </Typography>
-          <Typography component="div" variant="body1" color="ds.text_gray_medium" maxWidth="500px" mb="40px">
+          <Typography component="div" variant="body1" color="ds.gray_max" maxWidth="600px" mb="24px">
             {intl.formatMessage(messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>
@@ -59,7 +60,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
             size="medium"
             sx={{
               '&.MuiButton-sizeMedium': {
-                padding: '9px 25px',
+                padding: '9px 20px',
                 height: 'unset',
               },
             }}

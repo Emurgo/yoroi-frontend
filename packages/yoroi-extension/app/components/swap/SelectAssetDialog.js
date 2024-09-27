@@ -1,9 +1,10 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
+import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
@@ -107,7 +108,7 @@ export default function SelectAssetDialog({
             />
           </Box>
           <Box sx={{ marginBottom: '16px' }}>
-            <Typography component="div" variant="body2" color="grayscale.700">
+            <Typography component="div" variant="body2" color="ds.text_gray_low">
               {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
             </Typography>
           </Box>
@@ -176,6 +177,8 @@ export const AssetAndAmountRow = ({
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+  const theme = useTheme();
+  const defaultImage = theme.name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
 
   const isFrom = type === 'from';
 
@@ -199,7 +202,7 @@ export const AssetAndAmountRow = ({
     }
   }, [id]);
 
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
 
   const amount = displayAmount ?? assetAmount;
 
@@ -245,7 +248,7 @@ export const AssetAndAmountRow = ({
             src={imgSrc}
             alt={name}
             onError={e => {
-              e.target.src = defaultTokenImage;
+              e.target.src = defaultImage;
             }}
           />
         </Box>
