@@ -7,7 +7,9 @@ export function useSellVerifiedSwapTokens(
   assets: Array<AssetAmount>,
 ): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
 
-  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified();
+  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
+    useErrorBoundary: false,
+  });
 
   // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
 
@@ -29,7 +31,9 @@ export function useBuyVerifiedSwapTokens(
   sellTokenInfo: { id: string, ... },
 ): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
 
-  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified();
+  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
+    useErrorBoundary: false,
+  });
 
   // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
 
