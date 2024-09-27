@@ -10,6 +10,8 @@ import {
   defaultPortfolioState,
 } from './state';
 
+import BuySellDialog from '../../../../components/buySell/BuySellDialog';
+
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
   ...defaultPortfolioActions,
@@ -27,6 +29,7 @@ type PortfolioProviderProps = {
     accountPair: AccountPair;
   };
   currentWallet: CurrentWalletType;
+  openDialogWrapper: (dialog: React.ReactNode) => void;
 };
 
 export const PortfolioContextProvider = ({
@@ -37,6 +40,7 @@ export const PortfolioContextProvider = ({
     accountPair: null,
   },
   currentWallet,
+  openDialogWrapper,
 }: PortfolioProviderProps) => {
   const { walletBalance, assetList, selectedWallet, networkId, primaryTokenInfo } = currentWallet;
   if (selectedWallet === undefined) {
@@ -75,8 +79,10 @@ export const PortfolioContextProvider = ({
       assetList: assetList || [],
       networkId,
       primaryTokenInfo,
+      openBuyDialog: () => openDialogWrapper(BuySellDialog),
+      showWelcomeBanner: assetList.length === 1,
     }),
-    [state, actions]
+    [state, actions, assetList]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;

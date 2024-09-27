@@ -10,28 +10,23 @@ import StatsTable from '../TokensTable/StatsTable';
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance, assetList } = usePortfolio();
+  const { walletBalance, assetList, showWelcomeBanner } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState<TokenInfoType[]>(assetList);
-  const isShownWelcomeBanner: boolean = assetList.length === 1; // assumming only have ADA as default -> first time user
 
   useEffect(() => {
-    if (isShownWelcomeBanner) return;
-
     // FAKE FETCHING DATA TO SEE SKELETON
     // setIsLoading(true);
-
     // const timer = setTimeout(() => {
     //   setIsLoading(false);
     // }, 2000);
-
     // return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (!keyword || isShownWelcomeBanner) {
+    if (!keyword || showWelcomeBanner) {
       setTokenList(assetList);
       return;
     }
@@ -73,7 +68,7 @@ const PortfolioWallet = (): JSX.Element => {
         }
       />
       <StatsTable data={tokenList} isLoading={isLoading} />
-      {isShownWelcomeBanner && <WelcomeBanner />}
+      {showWelcomeBanner && <WelcomeBanner />}
     </Stack>
   );
 };

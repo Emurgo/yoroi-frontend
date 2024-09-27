@@ -204,135 +204,127 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
         <Switch>
-            <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} actions={actions} />} />
-            <Route
-              exact
-              path={ROUTES.NIGHTLY_INFO}
-              component={props => <NightlyPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.PROFILE.LANGUAGE_SELECTION}
-              component={props => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
-              component={props => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.PROFILE.TERMS_OF_USE}
-              component={props => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.PROFILE.URI_PROMPT}
-              component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
-              component={props => <OptForAnalyticsPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.MY_WALLETS}
-              component={props => <MyWalletsPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.STAKING}
-              component={props => <StakingPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              path={ROUTES.ASSETS.ROOT}
-              component={props => wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))}
-            />
-            <Route
-              path={ROUTES.NFTS.ROOT}
-              component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(stores, actions))}
-            />
-            <Route
-              exact
-              path={ROUTES.WALLETS.ADD}
-              component={props => <AddWalletPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.WALLETS.RESTORE_WALLET}
-              component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-              component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-              component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
-              component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.EXPERIMENTAL.THEMES}
-              component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              path={ROUTES.WALLETS.ROOT}
-              component={props => wrapWallet({ ...props, stores, actions }, WalletsSubpages(stores, actions))}
-            />
-            <Route
-              path={ROUTES.SETTINGS.ROOT}
-              component={props => wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))}
-            />
-            <Route
-              path={ROUTES.SWAP.ROOT}
-              component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
-            />
-            <Route path={ROUTES.TRANSFER.ROOT} component={props => <Transfer {...props} stores={stores} actions={actions} />} />
-            <Route
-              exact
-              path={ROUTES.SEND_FROM_URI.ROOT}
-              component={props => <URILandingPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-              component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.SWITCH}
-              component={props => <WalletSwitch {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.REVAMP.CATALYST_VOTING}
-              component={props => <VotingPage {...props} stores={stores} actions={actions} />}
-            />
-            <Route
-              exact
-              path={ROUTES.EXCHANGE_END}
-              component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
-            />
+          <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.NIGHTLY_INFO}
+            component={props => <NightlyPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.LANGUAGE_SELECTION}
+            component={props => <LanguageSelectionPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
+            component={props => <ComplexityLevelPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.TERMS_OF_USE}
+            component={props => <TermsOfUsePage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.URI_PROMPT}
+            component={props => <UriPromptPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
+            component={props => <OptForAnalyticsPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.MY_WALLETS}
+            component={props => <MyWalletsPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} actions={actions} />} />
+          <Route
+            path={ROUTES.ASSETS.ROOT}
+            component={props => wrapAssets({ ...props, stores, actions }, AssetsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.NFTS.ROOT}
+            component={props => wrapNFTs({ ...props, stores, actions }, NFTsSubPages(stores, actions))}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.ADD}
+            component={props => <AddWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.RESTORE_WALLET}
+            component={props => <RestoreWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.WALLETS.CREATE_NEW_WALLET}
+            component={props => <CreateWalletPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
+            component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
+            component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXPERIMENTAL.THEMES}
+            component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            path={ROUTES.WALLETS.ROOT}
+            component={props => wrapWallet({ ...props, stores, actions }, WalletsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.SETTINGS.ROOT}
+            component={props => wrapSettings({ ...props, stores, actions }, SettingsSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.SWAP.ROOT}
+            component={props => wrapSwap({ ...props, stores, actions }, SwapSubpages(stores, actions))}
+          />
+          <Route path={ROUTES.TRANSFER.ROOT} component={props => <Transfer {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.SEND_FROM_URI.ROOT}
+            component={props => <URILandingPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
+            component={props => <OAuthDropboxPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} actions={actions} />} />
+          <Route
+            exact
+            path={ROUTES.REVAMP.CATALYST_VOTING}
+            component={props => <VotingPage {...props} stores={stores} actions={actions} />}
+          />
+          <Route
+            exact
+            path={ROUTES.EXCHANGE_END}
+            component={props => <ExchangeEndPage {...props} stores={stores} actions={actions} />}
+          />
 
-            {/* NEW UI Routes */}
-            <Route
-              path={ROUTES.Governance.ROOT}
-              component={props => wrapGovernance({ ...props, stores, actions }, GovernanceSubpages(stores, actions))}
-            />
-            <Route
-              path={ROUTES.PORTFOLIO.ROOT}
-              component={props => wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))}
-            />
+          {/* NEW UI Routes */}
+          <Route
+            path={ROUTES.Governance.ROOT}
+            component={props => wrapGovernance({ ...props, stores, actions }, GovernanceSubpages(stores, actions))}
+          />
+          <Route
+            path={ROUTES.PORTFOLIO.ROOT}
+            component={props => wrapPortfolio({ ...props, stores, actions }, PortfolioSubpages(stores, actions))}
+          />
 
-            <Redirect to={ROUTES.MY_WALLETS} />
+          <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>
       </Suspense>
     </QueryClientProvider>
@@ -511,7 +503,6 @@ const GovernanceSubpages = (stores, actions) => (
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   // const queryClient = new QueryClient();
 
-
   const loader = (
     <FullscreenLayout bottomPadding={0}>
       <Stack alignItems="center" justifyContent="center" height="50vh">
@@ -591,9 +582,18 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
+  const openDialogWrapper = (dialog): void => {
+    portfolioProps.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
+    portfolioProps.actions.dialogs.open.trigger({ dialog });
+  };
+
   return (
     <CurrencyProvider currency={portfolioProps.stores.profile.unitOfAccount.currency || 'USD'}>
-      <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount} currentWallet={currentWalletInfo}>
+      <PortfolioContextProvider
+        settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+        currentWallet={currentWalletInfo}
+        openDialogWrapper={openDialogWrapper}
+      >
         <Suspense fallback={null} settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
           {children}
         </Suspense>

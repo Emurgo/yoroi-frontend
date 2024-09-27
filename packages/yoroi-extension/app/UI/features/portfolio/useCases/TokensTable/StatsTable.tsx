@@ -31,10 +31,12 @@ const StatsTable = ({ data, isLoading }: Props): JSX.Element => {
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
-    order: null,
-    orderBy: null,
+    order: 'asc',
+    orderBy: 'portfolioPercents',
   });
   const list = useMemo(() => [...data], [data]);
+
+  console.log('order', order, orderBy);
 
   const {
     tokenActivity: { data24h, data7d, data30d },
@@ -204,7 +206,27 @@ const TokenPriceChangeChip = ({ secondaryTokenActivity, primaryTokenActivity, is
 
 const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const theme: any = useTheme();
-  const { accountPair, primaryTokenInfo, walletBalance } = usePortfolio();
+  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
+
+  // TODO refactor this properly
+  if (showWelcomeBanner) {
+    return (
+      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+        <Stack direction="column">
+          <Typography color="ds.text_gray_normal">
+            {0} {token.name}
+          </Typography>
+          {token.name === accountPair?.to.name ? (
+            <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+          ) : (
+            <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+              {0} {accountPair?.to.name || 'USD'}
+            </Typography>
+          )}
+        </Stack>
+      </Stack>
+    );
+  }
 
   if (secondaryToken24Activity === null) {
     return (
@@ -270,11 +292,12 @@ const TokenPrice = ({ unitOfAccount, secondaryToken24Activity, ptActivity, isPri
 };
 
 const TokenProcentage = ({ procentage }) => {
+  const { showWelcomeBanner } = usePortfolio();
   if (procentage === undefined) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {procentage}%
+      {showWelcomeBanner ? 0 : procentage}%
     </Typography>
   );
 };
