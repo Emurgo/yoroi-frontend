@@ -1,10 +1,11 @@
 // @flow
 import { darkPalette } from '../base-palettes/dark-palette';
 import { tokens } from '../tokens/tokens';
+import type { DSColorPalette } from '../types';
 
 const { opacity } = tokens;
 
-export const dark = {
+export const dark: DSColorPalette = {
   ...darkPalette,
 
   text_primary_max: darkPalette.primary_700, // hover, text, button, links, text in tabs, chips

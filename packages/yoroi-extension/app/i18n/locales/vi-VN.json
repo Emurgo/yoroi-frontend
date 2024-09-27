@@ -896,7 +896,6 @@
   "wallet.syncingOverlay.explanation": "Vui lòng đợi trong khi chúng tôi xử lý dữ liệu ví. Điều này có thể mất một thời gian.",
   "wallet.syncingOverlay.return": "Quay lại ví của tôi",
   "wallet.syncingOverlay.title": "Đồng bộ ví",
-  "wallet.topbar.dialog.cardano": "Cardano, ADA",
   "wallet.topbar.dialog.tokenTypes": "Các kiểu token",
   "wallet.topbar.dialog.totalBalance": "Tổng số dư",
   "wallet.transaction.address.from": "Từ địa chỉ",
