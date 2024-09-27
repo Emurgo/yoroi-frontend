@@ -138,7 +138,7 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
     '--yoroi-palette-tx-status-low-background': theme.palette.ds.sys_magenta_100,
     '--yoroi-palette-tx-status-low-text': theme.palette.ds.text_gray_low,
 
-    '--yoroi-palette-background-banner-warning': theme.palette.ds.sys_magenta_600,
+    '--yoroi-palette-background-banner-warning': theme.palette.ds.sys_orange_500,
     '--yoroi-palette-background-walletAdd-title': theme.palette.ds.text_gray_medium,
     '--yoroi-palette-background-walletAdd-subtitle': theme.palette.ds.text_gray_low,
 
