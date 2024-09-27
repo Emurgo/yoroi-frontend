@@ -896,7 +896,6 @@
   "wallet.syncingOverlay.explanation": "Please wait while we process wallet data. This may take some time.",
   "wallet.syncingOverlay.return": "Return to my wallets",
   "wallet.syncingOverlay.title": "Wallet Syncing",
-  "wallet.topbar.dialog.cardano": "Cardano, ADA",
   "wallet.topbar.dialog.tokenTypes": "Token types",
   "wallet.topbar.dialog.totalBalance": "Total Balance",
   "wallet.transaction.address.from": "From address",
