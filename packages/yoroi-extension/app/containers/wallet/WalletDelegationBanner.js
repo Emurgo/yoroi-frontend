@@ -101,14 +101,8 @@ function WalletDelegationBanner({
       <Box sx={{ position: 'absolute', bottom: '-4px', right: '20px' }}>
         <StakingIllustration height="300px" />
       </Box>
-      <Box id='staking-delegationBanner-box'>
-        <Typography
-          component="div"
-          variant="h3"
-          fontWeight={500}
-          color="comon.black"
-          marginBottom="4px"
-        >
+      <Box id="staking-delegationBanner-box">
+        <Typography component="div" variant="h3" fontWeight={500} color="comon.black" marginBottom="4px">
           {intl.formatMessage(emptyDashboardMessages.title, { ticker })}
         </Typography>
         <Typography component="div" variant="body1" color="ds.text_gray_medium">
@@ -210,7 +204,6 @@ const WrapperBanner = styled(Box)({
   padding: '24px',
   borderRadius: '8px',
   overflowY: 'hidden',
-  border: '2px solid red',
 });
 
 const AvatarWrapper = styled(Box)({
