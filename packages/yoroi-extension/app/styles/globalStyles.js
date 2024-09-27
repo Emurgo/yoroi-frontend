@@ -76,7 +76,6 @@ type ColorPaletteForStyles = {|
 |};
 
 export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: string | number } {
-  console.log('theme', theme);
   // if (theme.name === 'light-theme' || theme.name === 'dark-theme') return {};
 
   return {
