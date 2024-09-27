@@ -9,6 +9,8 @@ export function useSellVerifiedSwapTokens(
 
   const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified();
 
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
+
   const swapFromVerifiedAssets = useMemo(() => {
     return assets
       .map(a => {
@@ -28,6 +30,8 @@ export function useBuyVerifiedSwapTokens(
 ): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
 
   const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified();
+
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
 
   const swapToVerifiedAssets = useMemo(() => {
     const isSellingPt = sellTokenInfo.id === '';
