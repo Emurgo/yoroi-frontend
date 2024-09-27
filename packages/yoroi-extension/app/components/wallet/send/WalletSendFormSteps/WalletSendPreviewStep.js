@@ -33,8 +33,6 @@ import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
-import { fontWeight } from '../../../../styles/themes/tokens/tokens';
-import { fontSize } from '../../../../styles/themes/tokens/tokens';
 
 const SBox = styled(Box)(({ theme }) => ({
   background: theme.palette.ds.bg_gradient_3,
