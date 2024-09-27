@@ -93,6 +93,7 @@ export function useRichOrders(
    */
   const { data: openOrdersData, isLoading: openOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusOpen', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusOpen().catch(e => {
       console.error('Failed to load open orders!', e);
       throw e;
@@ -104,6 +105,7 @@ export function useRichOrders(
    */
   const { data: completedOrdersData, isLoading: completedOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusCompleted', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusCompleted().catch(e => {
       console.error('Failed to load completed orders!', e);
       throw e;
