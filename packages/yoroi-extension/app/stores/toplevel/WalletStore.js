@@ -415,6 +415,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @action onRenameSelectedWallet: (string) => void = (newName) => {
     this.selectedWalletName = newName;
+    this.wallets[this.selectedIndex].name = newName;
   }
 }
 
