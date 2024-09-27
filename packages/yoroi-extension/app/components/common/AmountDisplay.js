@@ -47,11 +47,7 @@ export default class AmountDisplay extends Component<Props> {
 
     if (shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
-      fiatDisplay = (
-        <span>
-          {hiddenAmount} {currency}
-        </span>
-      );
+      fiatDisplay = <span>{hiddenAmount}</span>;
     } else {
       const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
@@ -90,7 +86,7 @@ export default class AmountDisplay extends Component<Props> {
         )}
         {showFiat === true && (
           <Typography mb="5px" color="ds.text_gray_medium" fontSize="12px" id={id + '-availableFiatBalance-text'}>
-            {fiatDisplay || '-'} {currency || 'USD'}
+            {fiatDisplay || '-'}&nbsp;{currency || 'USD'}
           </Typography>
         )}
       </>
