@@ -33,6 +33,8 @@ import AssetsDropdown from './AssetsDropdown';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
+import { fontWeight } from '../../../../styles/themes/tokens/tokens';
+import { fontSize } from '../../../../styles/themes/tokens/tokens';
 
 const SBox = styled(Box)(({ theme }) => ({
   background: theme.palette.ds.bg_gradient_3,
@@ -217,21 +219,33 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
     const { unitOfAccountSetting } = this.props;
     return unitOfAccountSetting.enabled ? (
-      <>
-        <div className={styles.totalAmount} id="wallet:send:confrimTransactionStep-totalAmount-text">
-          {formatValue(entry)}
-          <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
-        </div>
-        <div className={styles.totalFiatAmount} id="wallet:send:confrimTransactionStep-totalAmountInFiat-text">
-          {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
-          <span className={styles.currencySymbol}>&nbsp;{unitOfAccountSetting.currency}</span>
-        </div>
-      </>
+      <Stack direction="column" alignItems="flex-end">
+        <Stack direction="row" id="wallet:send:confrimTransactionStep-totalAmount-text">
+          <Typography variant="h4" color="ds.white_static" fontWeight={500} fontSize="20px">
+            {formatValue(entry)}
+          </Typography>
+          <Typography variant="h4" color="ds.white_static" fontWeight={500} fontSize="20px">
+            &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
+          </Typography>
+        </Stack>
+        <Stack direction="row" id="wallet:send:confrimTransactionStep-totalAmountInFiat-text">
+          <Typography variant="body1" color="ds.white_static" sx={{ opacity: '0.5' }}>
+            {this.convertedToUnitOfAccount(entry, unitOfAccountSetting.currency)}
+          </Typography>
+          <Typography variant="body1" color="ds.white_static" sx={{ opacity: '0.5' }}>
+            &nbsp;{unitOfAccountSetting.currency}
+          </Typography>
+        </Stack>
+      </Stack>
     ) : (
-      <div className={styles.totalAmount} id="wallet:send:confrimTransactionStep-totalAmount-text">
-        {formatValue(entry)}
-        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
-      </div>
+      <Stack direction="row" id="wallet:send:confrimTransactionStep-totalAmount-text">
+        <Typography variant="h4" color="ds.white_static" fontWeight={500} fontSize="20px">
+          {formatValue(entry)}
+        </Typography>
+        <Typography variant="h4" color="ds.white_static" fontWeight={500} fontSize="20px">
+          &nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}
+        </Typography>
+      </Stack>
     );
   };
   renderSingleFee: TokenEntry => Node = entry => {
@@ -497,19 +511,21 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
             </div>
 
             <SBox className={styles.totalAmountWrapper}>
-              <div className={styles.totalAmountLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}</div>
+              <Typography variant="body1" color="ds.white_static" fontWeight={400}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+              </Typography>
               <div>
                 <Box className={styles.totalAmountValue} mb="12px">
-                  <Typography variant="body2" color="ds.text_gray_medium">
-                    {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
-                  </Typography>
+                  {/* <Typography variant="body2" color="ds.text_gray_medium"> */}
+                  {this.renderTotalAmount(this.props.totalAmount.getDefaultEntry())}
+                  {/* </Typography> */}
                 </Box>
                 {amount.nonDefaultEntries().length > 0 && (
-                  <div className={styles.assetsCount}>
+                  <Typography variant="h4" color="ds.white_static" fontWeight={500} fontSize="20px" textAlign="right">
                     {intl.formatMessage(messages.nAssets, {
                       number: amount.nonDefaultEntries().length,
                     })}
-                  </div>
+                  </Typography>
                 )}
               </div>
             </SBox>
