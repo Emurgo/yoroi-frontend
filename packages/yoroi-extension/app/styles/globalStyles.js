@@ -2,6 +2,7 @@
 // @flow
 import type { Node } from 'react';
 import { GlobalStyles } from '@mui/material';
+import type { DSColorPalette } from './themes/types';
 
 const getColorPath = (themePalette: any, color: string) => {
   const path = [];
@@ -67,7 +68,15 @@ export const formatPalette = (palette: any, theme: any): FormatedPalette => {
   return formatedPalette;
 };
 
-export function getMainYoroiPalette(theme: Object): { [string]: string | number } {
+type ColorPaletteForStyles = {|
+  name: 'modern' | 'classic' | 'revamp-light',
+  palette: {|
+    ds: DSColorPalette,
+  |},
+|};
+
+export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: string | number } {
+  console.log('theme', theme);
   // if (theme.name === 'light-theme' || theme.name === 'dark-theme') return {};
 
   return {
@@ -82,57 +91,57 @@ export function getMainYoroiPalette(theme: Object): { [string]: string | number 
        to keep consistency and allow users to override few options from BASE if they want to
     */
     /* === BASE === */
-    '--yoroi-palette-common-white': theme.palette.common.white,
-    '--yoroi-palette-common-black': theme.palette.common.black,
+    '--yoroi-palette-common-white': theme.palette.ds.white_static,
+    '--yoroi-palette-common-black': theme.palette.ds.black_static,
 
-    '--yoroi-palette-primary-50': theme.palette.primary['50'],
-    '--yoroi-palette-primary-100': theme.palette.primary['100'],
-    '--yoroi-palette-primary-200': theme.palette.primary['200'],
-    '--yoroi-palette-primary-300': theme.palette.primary['300'],
-    '--yoroi-palette-primary-contrastText': theme.palette.primary.contrastText,
+    '--yoroi-palette-primary-50': theme.palette.ds.primary_100,
+    '--yoroi-palette-primary-100': theme.palette.ds.primary_100,
+    '--yoroi-palette-primary-200': theme.palette.ds.primary_200,
+    '--yoroi-palette-primary-300': theme.palette.ds.primary_300,
+    '--yoroi-palette-primary-contrastText': theme.palette.ds.text_gray_medium,
 
-    '--yoroi-palette-secondary-50': theme.palette.secondary['50'],
-    '--yoroi-palette-secondary-100': theme.palette.secondary['100'],
-    '--yoroi-palette-secondary-200': theme.palette.secondary['200'],
-    '--yoroi-palette-secondary-300': theme.palette.secondary['300'],
-    '--yoroi-palette-secondary-contrastText': theme.palette.secondary.contrastText,
+    '--yoroi-palette-secondary-50': theme.palette.ds.primary_100,
+    '--yoroi-palette-secondary-100': theme.palette.ds.primary_100,
+    '--yoroi-palette-secondary-200': theme.palette.ds.primary_200,
+    '--yoroi-palette-secondary-300': theme.palette.ds.primary_300,
+    '--yoroi-palette-secondary-contrastText': theme.palette.ds.text_gray_medium,
 
-    '--yoroi-palette-error-50': theme.palette?.error['50'],
-    '--yoroi-palette-error-100': theme.palette?.error['100'],
-    '--yoroi-palette-error-200': theme.palette?.error['200'],
+    '--yoroi-palette-error-50': theme.palette.ds.text_error,
+    '--yoroi-palette-error-100': theme.palette.ds.sys_magenta_100,
+    '--yoroi-palette-error-200': theme.palette.ds.sys_magenta_300,
 
-    '--yoroi-palette-cyan-50': theme.palette.cyan['50'],
-    '--yoroi-palette-cyan-100': theme.palette.cyan['100'],
+    '--yoroi-palette-cyan-50': theme.palette.ds.sys_cyan_100,
+    '--yoroi-palette-cyan-100': theme.palette.ds.sys_cyan_500,
 
-    '--yoroi-palette-gray-50': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['50'],
-    '--yoroi-palette-gray-100': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['100'],
-    '--yoroi-palette-gray-200': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['200'],
-    '--yoroi-palette-gray-300': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['300'],
-    '--yoroi-palette-gray-400': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['400'],
-    '--yoroi-palette-gray-500': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['500'],
-    '--yoroi-palette-gray-600': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['600'],
-    '--yoroi-palette-gray-700': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['700'],
-    '--yoroi-palette-gray-800': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['800'],
-    '--yoroi-palette-gray-900': (theme.palette.grey ? theme.palette.grey : theme.palette.grayscale)['900'],
-    '--yoroi-palette-gray-max': theme.palette.common.black,
-    '--yoroi-palette-gray-min': theme.palette.common.white,
-    '--yoroi-palette-background-overlay': theme.palette.background.overlay,
+    '--yoroi-palette-gray-50': theme.palette.ds.gray_50,
+    '--yoroi-palette-gray-100': theme.palette.ds.gray_100,
+    '--yoroi-palette-gray-200': theme.palette.ds.gray_200,
+    '--yoroi-palette-gray-300': theme.palette.ds.gray_300,
+    '--yoroi-palette-gray-400': theme.palette.ds.gray_400,
+    '--yoroi-palette-gray-500': theme.palette.ds.gray_500,
+    '--yoroi-palette-gray-600': theme.palette.ds.gray_600,
+    '--yoroi-palette-gray-700': theme.palette.ds.gray_700,
+    '--yoroi-palette-gray-800': theme.palette.ds.gray_800,
+    '--yoroi-palette-gray-900': theme.palette.ds.gray_900,
+    '--yoroi-palette-gray-max': theme.palette.ds.black_static,
+    '--yoroi-palette-gray-min': theme.palette.ds.white_static,
+    '--yoroi-palette-background-overlay': theme.palette.ds.bg_gradient_1,
 
-    '--yoroi-palette-tx-status-pending-background': theme.palette.txStatus?.pending.background,
-    '--yoroi-palette-tx-status-pending-text': theme.palette.txStatus?.pending.text,
-    '--yoroi-palette-tx-status-pending-stripes': theme.palette.txStatus?.pending.stripes,
-    '--yoroi-palette-tx-status-high-background': theme.palette.txStatus?.high.background,
-    '--yoroi-palette-tx-status-high-text': theme.palette.txStatus?.high.text,
-    '--yoroi-palette-tx-status-failed-background': theme.palette.txStatus?.failed.background,
-    '--yoroi-palette-tx-status-failed-text': theme.palette.txStatus?.failed.text,
-    '--yoroi-palette-tx-status-medium-background': theme.palette.txStatus?.medium.background,
-    '--yoroi-palette-tx-status-medium-text': theme.palette.txStatus?.medium.text,
-    '--yoroi-palette-tx-status-low-background': theme.palette.txStatus?.low.background,
-    '--yoroi-palette-tx-status-low-text': theme.palette.txStatus?.low.text,
+    '--yoroi-palette-tx-status-pending-background': theme.palette.ds.web_overlay,
+    '--yoroi-palette-tx-status-pending-text': theme.palette.ds.text_gray_medium,
+    '--yoroi-palette-tx-status-pending-stripes': theme.palette.ds.gray_200,
+    '--yoroi-palette-tx-status-high-background': theme.palette.ds.el_gray_max,
+    '--yoroi-palette-tx-status-high-text': theme.palette.ds.text_gray_medium,
+    '--yoroi-palette-tx-status-failed-background': theme.palette.ds.sys_magenta_300,
+    '--yoroi-palette-tx-status-failed-text': theme.palette.ds.text_error,
+    '--yoroi-palette-tx-status-medium-background': theme.palette.ds.gray_300,
+    '--yoroi-palette-tx-status-medium-text': theme.palette.ds.text_gray_medium,
+    '--yoroi-palette-tx-status-low-background': theme.palette.ds.sys_magenta_100,
+    '--yoroi-palette-tx-status-low-text': theme.palette.ds.text_gray_low,
 
-    '--yoroi-palette-background-banner-warning': theme.palette.background.banner.warning,
-    '--yoroi-palette-background-walletAdd-title': theme.palette.background.walletAdd.title,
-    '--yoroi-palette-background-walletAdd-subtitle': theme.palette.background.walletAdd.subtitle,
+    '--yoroi-palette-background-banner-warning': theme.palette.ds.sys_magenta_600,
+    '--yoroi-palette-background-walletAdd-title': theme.palette.ds.text_gray_medium,
+    '--yoroi-palette-background-walletAdd-subtitle': theme.palette.ds.text_gray_low,
 
     /* === BUTTON === */
     // button primary variant
@@ -206,9 +215,9 @@ export function getMainYoroiPalette(theme: Object): { [string]: string | number 
     '--yoroi-comp-dialog-min-width-md': '540px',
     '--yoroi-comp-dialog-min-width-lg': '600px',
 
-    '--yoroi-sidebar-text': theme.palette.background.sidebar.text,
-    '--yoroi-sidebar-background': `linear-gradient(22.58deg, ${theme.palette.background.sidebar.start} 0%, ${theme.palette.background.sidebar.end} 100%)`,
-    '--yoroi-sidebar-end': theme.palette.background.sidebar.end,
+    '--yoroi-sidebar-text': theme.palette.ds.text_gray_medium,
+    '--yoroi-sidebar-background': `linear-gradient(22.58deg, ${theme.palette.ds.el_primary_medium} 0%, ${theme.palette.ds.el_primary_min} 100%)`,
+    '--yoroi-sidebar-end': theme.palette.ds.el_primary_min,
 
     '--yoroi-notification-message-background': 'rgba(21, 209, 170, 0.8)',
 
