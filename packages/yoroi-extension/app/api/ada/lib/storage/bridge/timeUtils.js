@@ -11,7 +11,7 @@ export type RelativeSlot = {| epoch: number, slot: number |};
  */
 function createEraBoundaries(config: $ReadOnlyArray<CardanoHaskellConfig>): Array<[number, number, CardanoHaskellConfig]> {
   const res: Array<[number, number, CardanoHaskellConfig]> = [];
-  for (let i = 0; i < config.length - 1; i++) {
+  for (let i = 0; i < config.length - 2; i++) {
     res.push([
       config[i].StartAt ?? fail(`${nameof(createEraBoundaries)} missing start`),
       config[i + 1].StartAt ?? fail(`${nameof(createEraBoundaries)} missing end`),

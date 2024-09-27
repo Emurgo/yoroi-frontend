@@ -41,6 +41,7 @@ import {
   RemoveWalletFromWhiteList,
   GetConnectedSites,
 } from './connector';
+import { GetProtocolParameters } from './protocolParameters';
 import { subscribe } from '../../subscriptionManager';
 
 const handlerMap = Object.freeze({
@@ -83,6 +84,8 @@ const handlerMap = Object.freeze({
   [ConnectWindowRetrieveData.typeTag]: ConnectWindowRetrieveData.handle,
   [RemoveWalletFromWhiteList.typeTag]: RemoveWalletFromWhiteList.handle,
   [GetConnectedSites.typeTag]: GetConnectedSites.handle,
+
+  [GetProtocolParameters.typeTag]: GetProtocolParameters.handle,
 });
 
 type Handler = (
