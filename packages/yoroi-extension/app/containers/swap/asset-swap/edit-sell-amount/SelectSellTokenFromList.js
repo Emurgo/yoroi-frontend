@@ -5,7 +5,7 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
-import { useVerifiedSwapTokens } from '../hooks';
+import { useSellVerifiedSwapTokens } from '../hooks';
 
 type Props = {|
   store: SwapStore,
@@ -16,7 +16,7 @@ type Props = {|
 |};
 
 export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
-  const {walletVerifiedAssets} = useVerifiedSwapTokens(store.assets)
+  const { walletVerifiedAssets, isLoading } = useSellVerifiedSwapTokens(store.assets)
   
   const { orderData, resetQuantities } = useSwap();
   const {
@@ -51,6 +51,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
   return (
     <SelectAssetDialog
       assets={walletVerifiedAssets}
+      assetsStillLoading={isLoading}
       type="from"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}
