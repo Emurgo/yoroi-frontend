@@ -625,12 +625,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
                 sx={{
-                  "& .MuiFormHelperText-root": {
+                  '& .MuiFormHelperText-root': {
                     marginInline: 0,
                     mt: 0.5,
-                    fontSize: "0.750rem",
-                    lineHeight: "1rem",
-                    letterSpacing: "0.2px"
+                    fontSize: '0.750rem',
+                    lineHeight: '1rem',
+                    letterSpacing: '0.2px',
                   },
                 }}
               />
@@ -669,12 +669,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
                 id="wallet:send:enterAddressStep-enterMemo-input"
                 sx={{
-                  "& .MuiFormHelperText-root": {
+                  '& .MuiFormHelperText-root': {
                     marginInline: 0,
                     mt: 0.5,
-                    fontSize: "0.750rem",
-                    lineHeight: "1rem",
-                    letterSpacing: "0.2px"
+                    fontSize: '0.750rem',
+                    lineHeight: '1rem',
+                    letterSpacing: '0.2px',
                   },
                 }}
               />
