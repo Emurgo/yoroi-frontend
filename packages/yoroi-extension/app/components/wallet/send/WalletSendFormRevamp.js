@@ -624,6 +624,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                sx={{
+                  "& .MuiFormHelperText-root": {
+                    marginInline: 0,
+                    mt: 0.5,
+                    fontSize: "0.750rem",
+                    lineHeight: "1rem",
+                    letterSpacing: "0.2px"
+                  },
+                }}
               />
               {domainResolverResult != null ? (
                 <Typography
