@@ -61,7 +61,7 @@ import {
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
-import { noop } from '../../coreUtils';
+import { bytesToHex, noop } from '../../coreUtils';
 import {
   getWallets,
   signAndBroadcastTransaction,
@@ -1020,13 +1020,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     rawTxBody: Buffer,
     additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
-    const ownUtxoAddressMap: {| [string]: Array<number> |} = {};
-    const ownStakeAddressMap: {| [string]: Array<number> |} = {};
+    const ownAddressMap: {| [string]: Array<number> |} = {};
     for (const { address, path } of publicDeriver.allAddresses.utxoAddresses) {
-      ownUtxoAddressMap[address.Hash] = path;
+      ownAddressMap[address.Hash] = path;
     }
     for (const { address, path } of publicDeriver.allAddresses.accountingAddresses) {
-      ownStakeAddressMap[address.Hash] = path;
+      ownAddressMap[address.Hash] = path;
     }
 
 
@@ -1034,8 +1033,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       return this.ledgerSignTx(
         publicDeriver,
         rawTxBody,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        ownAddressMap,
         additionalRequiredSigners
       );
     }
@@ -1043,8 +1041,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       return this.trezorSignTx(
         publicDeriver,
         rawTxBody,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        ownAddressMap,
       );
     }
     throw new Error('unexpected wallet type');
@@ -1053,8 +1050,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   async trezorSignTx(
     publicDeriver: WalletState,
     rawTxBody: Buffer,
-    ownUtxoAddressMap: {| [string]: Array<number> |},
-    ownStakeAddressMap: {| [string]: Array<number> |},
+    ownAddressMap: {| [string]: Array<number> |},
   ): Promise<RustModule.WalletV4.Transaction> {
     const network = getNetworkById(publicDeriver.networkId);
     const config = getCardanoHaskellBaseConfig(network).reduce(
@@ -1066,18 +1062,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!addressedUtxos) {
       throw new Error('unexpected nullish addressed UTXOs');
     }
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
+    const txBodyHex = bytesToHex(rawTxBody);
 
     let trezorSignTxPayload;
     try {
       trezorSignTxPayload = toTrezorSignRequest(
-        txBody,
+        txBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        ownAddressMap,
         addressedUtxos,
-        rawTxBody,
       );
     } catch {
       runInAction(() => {
@@ -1124,14 +1118,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(txBody, trezorSignTxResp.witnesses, undefined);
+    return buildSignedTrezorTransaction(txBodyHex, trezorSignTxResp.witnesses, undefined);
   }
 
   async ledgerSignTx(
     publicDeriver: WalletState,
     rawTxBody: Buffer,
-    ownUtxoAddressMap: {| [string]: Array<number> |},
-    ownStakeAddressMap: {| [string]: Array<number> |},
+    ownAddressMap: {| [string]: Array<number> |},
     additionalRequiredSigners: Array<string> = [],
   ): Promise<RustModule.WalletV4.Transaction> {
     const network = getNetworkById(publicDeriver.networkId);
@@ -1144,21 +1137,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!addressedUtxos) {
       throw new Error('unexpected nullish addressed UTXOs');
     }
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
-
     const [drepAddressHex, drepAddressing] = getDrepRewardAddressHexAndAddressing(publicDeriver);
-    ownStakeAddressMap[drepAddressHex] = drepAddressing.addressing.path;
+    ownAddressMap[drepAddressHex] = drepAddressing.addressing.path;
+
+    const txBodyHex = bytesToHex(rawTxBody);
 
     let ledgerSignTxPayload;
     try {
       ledgerSignTxPayload = toLedgerSignRequest(
-        txBody,
+        txBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        ownAddressMap,
         addressedUtxos,
-        rawTxBody,
         additionalRequiredSigners,
       );
     } catch (e) {
@@ -1213,7 +1204,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     };
 
     return buildSignedLedgerTransaction(
-      txBody,
+      txBodyHex,
       ledgerSignResult.witnesses,
       publicKeyInfo,
       undefined

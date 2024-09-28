@@ -180,7 +180,6 @@
     "bs58check": "2.1.2",
     "buffer": "6.0.3",
     "cardano-wallet-browser": "1.2.2",
-    "cbor": "^8.1.0",
     "chacha": "2.1.0",
     "classnames": "2.5.1",
     "concurrently": "8.2.2",

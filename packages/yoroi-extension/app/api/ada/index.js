@@ -269,6 +269,12 @@ export type CreateLedgerSignTxDataRequest = {|
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   cip36: boolean,
 |};
+export type CreateLedgerSignTxDataRequestFromRawTx = {|
+  txBodyHex: string,
+  network: $ReadOnly<NetworkRow>,
+  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  cip36: boolean,
+|};
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
 |};

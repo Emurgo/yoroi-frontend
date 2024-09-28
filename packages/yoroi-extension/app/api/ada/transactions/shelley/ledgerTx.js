@@ -43,7 +43,6 @@ import {
 import {
   ChainDerivations,
 } from '../../../../config/numbersConfig';
-import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import { forceNonNull } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
@@ -806,16 +805,15 @@ type AddressMap = { [addressHex: string]: Array<number> };
 // this function is more generic because above functions deal only with Yoroi
 // extension "send" transactions.
 export function toLedgerSignRequest(
-  txBody: RustModule.WalletV4.TransactionBody,
+  txBodyHex: string,
   networkId: number,
   protocolMagic: number,
-  ownUtxoAddressMap: AddressMap,
-  ownStakeAddressMap: AddressMap,
+  ownAddressMap: AddressMap,
   addressedUtxos: Array<CardanoAddressedUtxo>,
-  rawTxBody: Buffer,
   additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
-  const parsedCbor = cbor.decode(rawTxBody);
+
+  const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     const formatted = [];
@@ -837,8 +835,11 @@ export function toLedgerSignRequest(
 
   function formatOutput(
     output: RustModule.WalletV4.TransactionOutput,
-    isPostAlonzoTransactionOutput: boolean,
   ): TxOutput {
+
+    const isPostAlonzoTransactionOutput =
+      output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
+
     const addr = output.address();
     let destination;
 
@@ -857,7 +858,7 @@ export function toLedgerSignRequest(
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
-      const ownAddressPath = ownUtxoAddressMap[addr.to_hex()];
+      const ownAddressPath = ownAddressMap[addr.to_hex()];
       if (ownAddressPath) {
         destination = {
           type: TxOutputDestinationType.DEVICE_OWNED,
@@ -884,14 +885,14 @@ export function toLedgerSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownUtxoAddressMap[paymentAddress];
+      const ownPaymentPath = ownAddressMap[paymentAddress];
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(
           networkId,
           stake,
         ).to_address().to_hex();
-        const ownStakePath = ownStakeAddressMap[stakeAddr];
+        const ownStakePath = ownAddressMap[stakeAddr];
         if (ownStakePath) {
           // stake address is ours
           destination = {
@@ -992,12 +993,7 @@ export function toLedgerSignRequest(
 
   const outputs = [];
   for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(
-      formatOutput(
-        txBody.outputs().get(i),
-        parsedCbor.get(1)[i].constructor.name === 'Map',
-      )
-    );
+    outputs.push(formatOutput(txBody.outputs().get(i)));
   }
 
   function getRequiredSignerHashHexes(): Array<string> {
@@ -1024,8 +1020,8 @@ export function toLedgerSignRequest(
         networkId,
         Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      return ownUtxoAddressMap[enterpriseAddress] ||
-        ownStakeAddressMap[stakeAddress];
+      return ownAddressMap[enterpriseAddress]
+        || ownAddressMap[stakeAddress];
     }
     const requiredSignerHashHexes = getRequiredSignerHashHexes();
     for (const hashHex of requiredSignerHashHexes) {
@@ -1052,7 +1048,7 @@ export function toLedgerSignRequest(
   });
 
   function addressingMap(addr: string): void | {| +path: Array<number> |} {
-    const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
+    const path = ownAddressMap[addr];
     if (path) {
       return { path };
     }
@@ -1099,10 +1095,7 @@ export function toLedgerSignRequest(
   let formattedCollateralReturn = null;
   const collateralReturn = txBody.collateral_return();
   if (collateralReturn) {
-    formattedCollateralReturn = formatOutput(
-      collateralReturn,
-      parsedCbor.get(16).constructor.name === 'Map',
-    );
+    formattedCollateralReturn = formatOutput(collateralReturn);
   }
 
   let formattedReferenceInputs = null;
@@ -1151,7 +1144,7 @@ export function toLedgerSignRequest(
 }
 
 export function buildConnectorSignedTransaction(
-  txBody: RustModule.WalletV4.TransactionBody,
+  txBodyHex: string,
   witnesses: Array<Witness>,
   publicKey: {|
     ...Addressing,
@@ -1159,6 +1152,9 @@ export function buildConnectorSignedTransaction(
   |},
   metadata: RustModule.WalletV4.AuxiliaryData | void
 ): RustModule.WalletV4.Transaction {
+
+  const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
+
   const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
 
   const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
