@@ -219,7 +219,7 @@ export default function ConfirmSwapTransaction({
           />
         </Box>
       )}
-    </Box>
+    </GradientBox>
   );
 }
 

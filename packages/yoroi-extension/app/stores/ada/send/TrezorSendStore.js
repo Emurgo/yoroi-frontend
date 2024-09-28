@@ -1,19 +1,12 @@
 // @flow
-import { action, observable  } from 'mobx';
+import { action, observable } from 'mobx';
 
 import Store from '../../base/Store';
 
 import { wrapWithFrame } from '../../lib/TrezorWrapper';
-import type {
-  SendUsingTrezorParams
-} from '../../../actions/ada/trezor-send-actions';
-import {
-  Logger,
-  stringifyError,
-} from '../../../utils/logging';
-import {
-  convertToLocalizableError
-} from '../../../domain/TrezorLocalizedError';
+import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
+import { Logger, stringifyError, } from '../../../utils/logging';
+import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ROUTES } from '../../../routes-config';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
@@ -201,10 +194,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         request.params.signRequest.self().set_auxiliary_data(metadata);
       }
 
-      const txBody = request.params.signRequest.self().build();
+      const tx = request.params.signRequest.self().build_tx();
 
       const signedTx = buildSignedTransaction(
-        txBody,
+        tx,
         request.params.signRequest.senderUtxos,
         trezorSignTxResp.payload.witnesses,
         publicKeyInfo,
@@ -213,7 +206,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       );
 
       const txId = Buffer.from(
-        RustModule.WalletV4.hash_transaction(txBody).to_bytes()
+        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
       ).toString('hex');
 
       await broadcastTransaction({

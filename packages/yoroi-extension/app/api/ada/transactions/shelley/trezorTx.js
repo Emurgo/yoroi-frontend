@@ -14,7 +14,7 @@ import type {
   CardanoAssetGroup,
   CardanoToken,
   CardanoSignedTxWitness,
-} from 'trezor-connect-flow';
+} from 'trezor-connect-flow/index';
 import {
   CardanoCertificateType,
   CardanoAddressType,
@@ -40,6 +40,8 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import cbor from 'cbor';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import { maybe } from '../../../../coreUtils';
+import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
@@ -84,7 +86,9 @@ export async function createTrezorSignTxPayload(
     inputs: trezorInputs,
     outputs: trezorOutputs,
     fee: txBody.fee().to_str(),
-    ttl: txBody.ttl()?.toString(),
+    ttl: txBody.ttl_bignum()?.to_str(),
+    validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str(),
+    scriptDataHash: txBody.script_data_hash()?.to_hex(),
     protocolMagic: byronNetworkMagic,
     networkId,
   };
@@ -273,7 +277,10 @@ function _generateTrezorOutputs(
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
+    // <TODO:UPDATE> support post-alonzo map
+
     const tokenBundle = toTrezorTokenBundle(output.amount().multiasset());
+    const dataHash = maybe(output.data_hash()?.to_hex(), datumHash => ({ datumHash })) ?? {};
 
     const changeAddr = changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
@@ -286,7 +293,8 @@ function _generateTrezorOutputs(
             stakingPath: stakingKeyPath,
           },
           amount: output.amount().coin().to_str(),
-          ...tokenBundle
+          ...tokenBundle,
+          ...dataHash,
         });
       } else if (RustModule.WalletV4.ByronAddress.from_address(address)) {
         result.push({
@@ -295,6 +303,7 @@ function _generateTrezorOutputs(
             path: changeAddr.addressing.path,
           },
           amount: output.amount().coin().to_str(),
+          ...dataHash,
         });
       } else {
         throw new Error('unexpected change address type');
@@ -307,6 +316,7 @@ function _generateTrezorOutputs(
           : byronWasm.to_base58(),
         amount: output.amount().coin().to_str(),
         ...tokenBundle,
+        ...dataHash,
       });
     }
   }
@@ -380,7 +390,7 @@ export function toTrezorAddressParameters(
 }
 
 export function buildSignedTransaction(
-  txBody: RustModule.WalletV4.TransactionBody,
+  tx: RustModule.WalletV4.Transaction,
   senderUtxos: Array<CardanoAddressedUtxo>,
   witnesses: Array<CardanoSignedTxWitness>,
   publicKey: {|
@@ -493,10 +503,14 @@ export function buildSignedTransaction(
     }
     witSet.set_vkeys(vkeyWitWasm);
   }
-  // TODO: handle script witnesses
+
+  const mergedWitnessSet = RustModule.WalletV4.TransactionWitnessSet.from_hex(
+    mergeWitnessSets(tx.witness_set().to_hex(), witSet.to_hex()),
+  );
+
   return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witSet,
+    tx.body(),
+    mergedWitnessSet,
     metadata
   );
 }
@@ -803,7 +817,6 @@ export function toTrezorSignRequest(
     formattedCollateral = formatInputs(collateral);
   }
 
-  const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str() ?? null;
   // temp workaround for buggy Mint.to_js_value()
   const formattedMint = JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyId, assets]) => ({
     policyId,
@@ -824,8 +837,11 @@ export function toTrezorSignRequest(
     includeNetworkId: txBody.network_id() != null,
   };
 
-  if (txBody.ttl()) {
-    result.ttl = String(txBody.ttl());
+  const ttl = txBody.ttl_bignum()?.to_str();
+  const validityIntervalStart = txBody.validity_start_interval_bignum()?.to_str();
+
+  if (ttl) {
+    result.ttl = ttl;
   }
   if (validityIntervalStart) {
     result.validityIntervalStart = validityIntervalStart;
