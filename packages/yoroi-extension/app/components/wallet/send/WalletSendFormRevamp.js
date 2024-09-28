@@ -659,6 +659,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
                 id="wallet:send:enterAddressStep-enterMemo-input"
+                sx={{
+                  "& .MuiFormHelperText-root": {
+                    marginInline: 0,
+                    mt: 0.5,
+                    fontSize: "0.750rem",
+                    lineHeight: "1rem",
+                    letterSpacing: "0.2px"
+                  },
+                }}
               />
               <Typography
                 component="div"
