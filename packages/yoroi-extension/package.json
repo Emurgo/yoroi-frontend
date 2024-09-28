@@ -220,7 +220,7 @@
     "semver": "7.6.0",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
-    "trezor-connect-flow": "Emurgo/trezor-connect-flow#92d6d8c8faef25c0ea1d481aa1ecb4ba77ce539c",
+    "trezor-connect-flow": "Emurgo/trezor-connect-flow#9f8ae584593a5e0f302fd4dd3b0968ccf6f73513",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
     "ua-parser-js": "1.0.37",
