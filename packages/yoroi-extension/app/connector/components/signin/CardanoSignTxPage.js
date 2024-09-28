@@ -428,14 +428,18 @@ class SignTxPage extends Component<Props, State> {
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
 
-          <Box mt="16px">
-            <TextField
-              type="password"
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-              id="walletPassword"
-            />
-          </Box>
+          <ErrorBlock error={hwWalletError} />
+
+          {walletType === 'mnemonic' && (
+            <Box mt="16px">
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+                id="walletPassword"
+              />
+            </Box>
+          )}
         </Box>
       );
       utxosContent = null;

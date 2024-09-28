@@ -1,15 +1,15 @@
 //@flow
+import { useSwap } from '@yoroi/swap';
 import type { Node } from 'react';
 import { useCallback, useEffect, useReducer, useState } from 'react';
+import { PRICE_PRECISION } from '../../../../components/swap/common';
+import type { AssetAmount } from '../../../../components/swap/types';
+import SwapStore from '../../../../stores/ada/SwapStore';
+import { Quantities } from '../../../../utils/quantities';
+import Context from './context';
+import { defaultSwapFormState } from './DefaultSwapFormState';
 import type { SwapFormAction, SwapFormState } from './types';
 import { StateWrap, SwapFormActionTypeValues } from './types';
-import type { AssetAmount } from '../../../../components/swap/types';
-import { useSwap } from '@yoroi/swap';
-import Context from './context';
-import { Quantities } from '../../../../utils/quantities';
-import SwapStore from '../../../../stores/ada/SwapStore';
-import { defaultSwapFormState } from './DefaultSwapFormState';
-import { PRICE_PRECISION } from '../../../../components/swap/common';
 // const PRECISION = 14;
 
 type Props = {|
@@ -107,10 +107,8 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   } = swapFormState;
 
   const actions = {
-    sellTouched: (token?: AssetAmount) =>
-      dispatch({ type: SwapFormActionTypeValues.SellTouched, token }),
-    buyTouched: (token?: AssetAmount) =>
-      dispatch({ type: SwapFormActionTypeValues.BuyTouched, token }),
+    sellTouched: (token?: AssetAmount) => dispatch({ type: SwapFormActionTypeValues.SellTouched, token }),
+    buyTouched: (token?: AssetAmount) => dispatch({ type: SwapFormActionTypeValues.BuyTouched, token }),
     switchTouched: () => dispatch({ type: SwapFormActionTypeValues.SwitchTouched }),
     switchTokens: () => {
       switchTokens();
@@ -127,18 +125,13 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       resetState();
       dispatch({ type: SwapFormActionTypeValues.ResetSwapForm });
     },
-    canSwapChanged: (canSwap: boolean) =>
-      dispatch({ type: SwapFormActionTypeValues.CanSwapChanged, canSwap }),
-    buyInputValueChanged: (value: string) =>
-      dispatch({ type: SwapFormActionTypeValues.BuyInputValueChanged, value }),
-    sellInputValueChanged: (value: string) =>
-      dispatch({ type: SwapFormActionTypeValues.SellInputValueChanged, value }),
+    canSwapChanged: (canSwap: boolean) => dispatch({ type: SwapFormActionTypeValues.CanSwapChanged, canSwap }),
+    buyInputValueChanged: (value: string) => dispatch({ type: SwapFormActionTypeValues.BuyInputValueChanged, value }),
+    sellInputValueChanged: (value: string) => dispatch({ type: SwapFormActionTypeValues.SellInputValueChanged, value }),
     limitPriceInputValueChanged: (value: string) =>
       dispatch({ type: SwapFormActionTypeValues.LimitPriceInputValueChanged, value }),
-    buyAmountErrorChanged: (error: string | null) =>
-      dispatch({ type: SwapFormActionTypeValues.BuyAmountErrorChanged, error }),
-    sellAmountErrorChanged: (error: string | null) =>
-      dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
+    buyAmountErrorChanged: (error: string | null) => dispatch({ type: SwapFormActionTypeValues.BuyAmountErrorChanged, error }),
+    sellAmountErrorChanged: (error: string | null) => dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
   };
 
   /**
@@ -173,7 +166,8 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
    */
   useEffect(() => {
     if (sellTokenId != null && buyTokenId != null && sellTokenId !== buyTokenId) {
-      pools.list.byPair({ tokenA: sellTokenId, tokenB: buyTokenId })
+      pools.list
+        .byPair({ tokenA: sellTokenId, tokenB: buyTokenId })
         .then(poolsArray => poolPairsChanged(poolsArray))
         .catch(err => console.error(`Failed to fetch pools for pair: ${sellTokenId}/${buyTokenId}`, err));
     }
@@ -184,10 +178,9 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     if (swapFormState.buyQuantity.error != null) actions.buyAmountErrorChanged(null);
   }, [actions, swapFormState.buyQuantity.error, swapFormState.sellQuantity.error]);
 
-  const baseSwapFieldChangeHandler = (
-    tokenInfo: any,
-    handler: ({| input: string, quantity: string |}) => void
-  ) => (text: string = '') => {
+  const baseSwapFieldChangeHandler = (tokenInfo: any, handler: ({| input: string, quantity: string |}) => void) => (
+    text: string = ''
+  ) => {
     if (tokenInfo.tokenId === '') {
       // empty input
       return;
@@ -207,13 +200,21 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     const sellAvailableAmount = swapFormState.sellTokenInfo.amount ?? '0';
     if (quantity !== '' && sellAvailableAmount !== '') {
       const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
-      const [, availableQuantity] = Quantities.parseFromText(
-        sellAvailableAmount,
-        decimals,
-        numberLocale,
-      );
+      const calculation = orderData.selectedPoolCalculation;
+
+      const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
+      const diff = Quantities.diff(availableQuantity, quantity);
+
       if (Quantities.isGreaterThan(quantity, availableQuantity)) {
         actions.sellAmountErrorChanged('Not enough balance');
+        return;
+      }
+      if (calculation?.cost) {
+        const totalFee = Quantities.sum([calculation.cost.batcherFee.quantity, calculation.cost.deposit.quantity]);
+
+        if (Number(diff) < Number(totalFee)) {
+          actions.sellAmountErrorChanged('Not enough balance, please consider the fees');
+        }
       }
     }
   };
@@ -232,20 +233,22 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     actions.limitPriceInputValueChanged(input);
   };
 
-  const onChangeSellQuantity = useCallback(
-    baseSwapFieldChangeHandler(swapFormState.sellTokenInfo, sellUpdateHandler),
-    [sellQuantityChanged, actions, clearErrors]
-  );
+  const onChangeSellQuantity = useCallback(baseSwapFieldChangeHandler(swapFormState.sellTokenInfo, sellUpdateHandler), [
+    sellQuantityChanged,
+    actions,
+    clearErrors,
+  ]);
 
-  const onChangeBuyQuantity = useCallback(
-    baseSwapFieldChangeHandler(swapFormState.buyTokenInfo, buyUpdateHandler),
-    [buyQuantityChanged, actions, clearErrors]
-  );
+  const onChangeBuyQuantity = useCallback(baseSwapFieldChangeHandler(swapFormState.buyTokenInfo, buyUpdateHandler), [
+    buyQuantityChanged,
+    actions,
+    clearErrors,
+  ]);
 
   const onChangeLimitPrice = useCallback(
     baseSwapFieldChangeHandler(
       { tokenId: 'priceDenomination', decimals: priceDenomination, precision: PRICE_PRECISION },
-      limitUpdateHandler,
+      limitUpdateHandler
     ),
     [limitPriceChanged, actions, clearErrors, priceDenomination]
   );
@@ -303,9 +306,5 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     onChangeLimitPrice,
   };
 
-  return (
-    <Context.Provider value={{ state: swapFormState, actions: allActions }}>
-      {children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={{ state: swapFormState, actions: allActions }}>{children}</Context.Provider>;
 }

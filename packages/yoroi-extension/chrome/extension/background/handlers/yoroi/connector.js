@@ -35,7 +35,7 @@ import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoa
 import { mergeWitnessSets } from '../../../../../app/api/ada/transactions/utils';
 import { hexToBytes } from '../../../../../app/coreUtils';
 import { Logger } from '../../../../../app/utils/logging';
-import { walletSignData } from '../../../../../app/api/ada';
+import { walletSignData, encodeHardwareWalletSignResult } from '../../../../../app/api/ada';
 
 type RpcUid = number;
 
@@ -140,6 +140,11 @@ type ConfirmedSignData = {|
   password: string,
   // hardware wallet:
   witnessSetHex?: ?string,
+  signedMessageData?: {|
+    signatureHex: string;
+    signingPublicKeyHex: string;
+    addressFieldHex: string;
+  |},
 |};
 
 export const UserSignConfirm: HandlerType<
@@ -232,28 +237,44 @@ export const UserSignConfirm: HandlerType<
           rpcResponse(request.tabId, request.uid, { err: 'unexpected error' });
           return;
         }
+
         const { address, payload } = responseData.continuationData;
+
         let dataSig;
-        try {
-          dataSig = await walletSignData(
-            wallet,
-            request.password,
-            address,
-            payload,
-          );
-        } catch (error) {
-          Logger.error(`error when signing data ${error}`);
-          rpcResponse(
-            request.tabId,
-            request.uid,
-            {
-              err: {
-                code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
-                info: error.message,
+
+        if (request.password !== '') {
+          try {
+            dataSig = await walletSignData(
+              wallet,
+              request.password,
+              address,
+              payload,
+            );
+          } catch (error) {
+            Logger.error(`error when signing data ${error}`);
+            rpcResponse(
+              request.tabId,
+              request.uid,
+              {
+                err: {
+                  code: DataSignErrorCodes.DATA_SIGN_PROOF_GENERATION,
+                  info: error.message,
+                }
               }
-            }
+            );
+            return;
+          }
+        } else {
+          const { signedMessageData } = request;
+          if (signedMessageData == null) {
+            throw new Error('unexpected user signed confirmation: missing hardware wallet signing response');
+          }
+          dataSig = await encodeHardwareWalletSignResult(
+            signedMessageData.addressFieldHex,
+            signedMessageData.signatureHex,
+            payload,
+            signedMessageData.signingPublicKeyHex,
           );
-          return;
         }
         rpcResponse(request.tabId, request.uid, { ok: dataSig });
       }

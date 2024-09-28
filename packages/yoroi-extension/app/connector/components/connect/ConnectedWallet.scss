@@ -13,6 +13,14 @@
     width: 40px;
   }
 
+  & .icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   & .wrapper {
     display: flex;
     align-items: center;

@@ -165,7 +165,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         </Box> */}
         {currentTheme === THEMES.YOROI_BASE && environment.isDev() && (
           <Box sx={{ mt: '20px' }}>
-            <ThemeToggler />
+            <ThemeToggler intl={intl} />
           </Box>
         )}
         {currentTheme !== THEMES.YOROI_BASE && (
@@ -183,19 +183,10 @@ export default class ThemeSettingsBlock extends Component<Props> {
               >
                 {intl.formatMessage(messages.selectColorTheme)}
               </Typography>
-              <Typography
-                component="div"
-                variant="body2"
-                color="var(--yoroi-support-settings-text)"
-                sx={{ marginBottom: '2px' }}
-              >
+              <Typography component="div" variant="body2" color="var(--yoroi-support-settings-text)" sx={{ marginBottom: '2px' }}>
                 <FormattedHTMLMessage {...messages.themeNote} />
               </Typography>
-              <Typography
-                component="div"
-                variant="body2"
-                color="var(--yoroi-support-settings-text)"
-              >
+              <Typography component="div" variant="body2" color="var(--yoroi-support-settings-text)">
                 <FormattedMessage {...messages.blog} values={{ blogLink }} />
               </Typography>
             </Box>
@@ -219,21 +210,11 @@ export default class ThemeSettingsBlock extends Component<Props> {
                   <Box>
                     <YoroiModernTheme />
                   </Box>
-                  <FormControlLabel
-                    value={THEMES.YOROI_MODERN}
-                    control={<Radio size="small" />}
-                    label="Modern"
-                  />
+                  <FormControlLabel value={THEMES.YOROI_MODERN} control={<Radio size="small" />} label="Modern" />
                 </Box>
-                <Box
-                  sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}
-                >
+                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
                   <YoroiClassicTheme />
-                  <FormControlLabel
-                    value={THEMES.YOROI_CLASSIC}
-                    control={<Radio size="small" />}
-                    label="classic"
-                  />
+                  <FormControlLabel value={THEMES.YOROI_CLASSIC} control={<Radio size="small" />} label="classic" />
                 </Box>
               </RadioGroup>
             </Box>

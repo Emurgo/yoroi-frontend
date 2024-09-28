@@ -146,7 +146,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       .catch(e => {
         console.error('Failed to load stored slippage', e);
       });
-    setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address))
+    setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address));
     props.stores.substores.ada.stateFetchStore.fetcher
       .getSwapFeeTiers({ network })
       .then(feeTiers => {
@@ -357,6 +357,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
+              onError={() => {
+                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ERROR });
+              }}
             />
           )}
           {orderStep === 2 && (
