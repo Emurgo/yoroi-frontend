@@ -112,7 +112,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
       const network = getNetworkById(request.wallet.networkId);
-      const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
+      const trezorSignTxDataResp = this.api.ada.createTrezorSignTxData({
         ...request.params,
         network,
       });

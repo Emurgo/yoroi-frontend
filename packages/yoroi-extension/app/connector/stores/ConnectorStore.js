@@ -1070,7 +1070,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         txBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownAddressMap,
+        s => ownAddressMap[s],
         addressedUtxos,
       );
     } catch {
@@ -1148,7 +1148,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         txBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownAddressMap,
+        s => ownAddressMap[s],
         addressedUtxos,
         additionalRequiredSigners,
       );

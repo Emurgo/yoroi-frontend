@@ -222,7 +222,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       const tx = request.signRequest.self().build_tx();
       const txId = transactionHexToHash(tx.to_hex());
 
-      const { ledgerSignTxPayload } = await this.api.ada.createLedgerSignTxData({
+      const { ledgerSignTxPayload } = this.api.ada.createLedgerSignTxData({
         signRequest: request.signRequest,
         network,
         addressingMap: request.addressingMap,

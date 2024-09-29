@@ -49,13 +49,13 @@ import { mergeWitnessSets } from '../utils';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
-export async function createLedgerSignTxPayload(request: {|
+export function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   cip36: boolean,
-|}): Promise<SignTransactionRequest> {
+|}): SignTransactionRequest {
   const txBody = request.signRequest.unsignedTx.build();
 
   // Inputs
@@ -798,7 +798,7 @@ export function buildSignedTransaction(
   );
 }
 
-type AddressMap = { [addressHex: string]: Array<number> };
+type AddressMap = (addressHex: string) => ?Array<number>;
 
 // Convert connector sign tx input into request to Ledger.
 // Note this function has some overlaps in functionality with above functions but
@@ -809,7 +809,7 @@ export function toLedgerSignRequest(
   networkId: number,
   protocolMagic: number,
   ownAddressMap: AddressMap,
-  addressedUtxos: Array<CardanoAddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
 
@@ -821,7 +821,7 @@ export function toLedgerSignRequest(
       const input = inputs.get(i);
       const hash = input.transaction_id().to_hex();
       const index = input.index();
-      const ownUtxo = addressedUtxos.find(utxo =>
+      const ownUtxo = senderUtxos.find(utxo =>
         utxo.tx_hash === hash && utxo.tx_index === index
       );
       formatted.push({
@@ -858,7 +858,7 @@ export function toLedgerSignRequest(
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
-      const ownAddressPath = ownAddressMap[addr.to_hex()];
+      const ownAddressPath = ownAddressMap(addr.to_hex());
       if (ownAddressPath) {
         destination = {
           type: TxOutputDestinationType.DEVICE_OWNED,
@@ -885,14 +885,14 @@ export function toLedgerSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownAddressMap[paymentAddress];
+      const ownPaymentPath = ownAddressMap(paymentAddress);
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(
           networkId,
           stake,
         ).to_address().to_hex();
-        const ownStakePath = ownAddressMap[stakeAddr];
+        const ownStakePath = ownAddressMap(stakeAddr);
         if (ownStakePath) {
           // stake address is ours
           destination = {
@@ -1020,8 +1020,8 @@ export function toLedgerSignRequest(
         networkId,
         Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      return ownAddressMap[enterpriseAddress]
-        || ownAddressMap[stakeAddress];
+      return ownAddressMap(enterpriseAddress)
+        || ownAddressMap(stakeAddress);
     }
     const requiredSignerHashHexes = getRequiredSignerHashHexes();
     for (const hashHex of requiredSignerHashHexes) {
@@ -1048,7 +1048,7 @@ export function toLedgerSignRequest(
   });
 
   function addressingMap(addr: string): void | {| +path: Array<number> |} {
-    const path = ownAddressMap[addr];
+    const path = ownAddressMap(addr);
     if (path) {
       return { path };
     }

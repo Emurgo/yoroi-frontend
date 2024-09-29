@@ -44,11 +44,11 @@ import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
 /** Generate a payload for Trezor SignTx */
-export async function createTrezorSignTxPayload(
+export function createTrezorSignTxPayload(
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
-): Promise<$Exact<CardanoSignTransaction>> {
+): $Exact<CardanoSignTransaction> {
   const stakingKeyPath = (() => {
     // TODO: this entire block is super hacky
     // need to instead pass in a mapping from wallet addresses to addressing
@@ -514,7 +514,7 @@ export function buildSignedTransaction(
   );
 }
 
-type AddressMap = { [addressHex: string]: Array<number> };
+type AddressMap = (addressHex: string) => ?Array<number>;
 
 // Convert connector sign tx input into request to Trezor.
 // Note this function has some overlaps in functionality with above functions but
@@ -525,7 +525,7 @@ export function toTrezorSignRequest(
   networkId: number,
   protocolMagic: number,
   ownAddressMap: AddressMap,
-  addressedUtxos: Array<CardanoAddressedUtxo>,
+  senderUtxos: Array<CardanoAddressedUtxo>,
 ): $Exact<CardanoSignTransaction> {
 
   const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
@@ -536,7 +536,7 @@ export function toTrezorSignRequest(
       const input = inputs.get(i);
       const hash = input.transaction_id().to_hex();
       const index = input.index();
-      const ownUtxo = addressedUtxos.find(utxo =>
+      const ownUtxo = senderUtxos.find(utxo =>
         utxo.tx_hash === hash && utxo.tx_index === index
       );
       const cardanoInput: CardanoInput = {
@@ -577,7 +577,7 @@ export function toTrezorSignRequest(
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
-      const ownAddressPath = ownAddressMap[addr.to_bech32()];
+      const ownAddressPath = ownAddressMap(addr.to_bech32());
       if (ownAddressPath) {
         result = ({
           addressParameters: {
@@ -600,14 +600,14 @@ export function toTrezorSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownAddressMap[paymentAddress];
+      const ownPaymentPath = ownAddressMap(paymentAddress);
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(
           networkId,
           stake,
         ).to_address().to_hex();
-        const ownStakePath = ownAddressMap[stakeAddr];
+        const ownStakePath = ownAddressMap(stakeAddr);
         if (ownStakePath) {
           // stake address is ours
           result = ({
@@ -704,8 +704,8 @@ export function toTrezorSignRequest(
         networkId,
         RustModule.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      const ownAddressPath = ownAddressMap[enterpriseAddress]
-        || ownAddressMap[stakeAddress];
+      const ownAddressPath = ownAddressMap(enterpriseAddress)
+        || ownAddressMap(stakeAddress);
       if (ownAddressPath) {
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
@@ -730,7 +730,7 @@ export function toTrezorSignRequest(
         stakeCredential
       );
       const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
-      const addressing = ownAddressMap[addressPayload];
+      const addressing = ownAddressMap(addressPayload);
       if (addressing == null) {
         throw new Error('not own address in certificate');
       }
@@ -785,7 +785,7 @@ export function toTrezorSignRequest(
       }
 
       const rewardAddressPayload = rewardAddress.to_address().to_hex();
-      const path = ownAddressMap[rewardAddressPayload];
+      const path = ownAddressMap(rewardAddressPayload);
       if (path == null) {
         throw new Error('foreign withdrawal reward address');
       }
