@@ -85,12 +85,15 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
       </Box>
     );
 
+    const startDateIsCorrect = startDate !== null && startDate.isValid() && startDate.isSameOrBefore(endDate);
+    const endDateIsCorrect = endDate !== null && endDate.isValid();
+
     const dialogActions = [
       {
         label: intl.formatMessage(globalMessages.exportButtonLabel),
         primary: true,
         isSubmitting: isActionProcessing || false,
-        disabled: !startDate || !endDate || startDate.isAfter(endDate) || !startDate.isValid() || !endDate.isValid(),
+        disabled: !startDateIsCorrect || !endDateIsCorrect,
         onClick: () => submit({ startDate, endDate }),
       },
     ];
