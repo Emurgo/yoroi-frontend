@@ -206,11 +206,13 @@ export function NftImage({
   name,
   width,
   height,
+  contentHeight,
 }: {|
   imageUrl: ?string,
   name: string,
   width: string,
   height: string,
+  contentHeight?: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -231,9 +233,9 @@ export function NftImage({
       );
   }, [url]);
 
-  if (error || url === null)
+  if (error || url !== null)
     return (
-      <SvgWrapper height="100%">
+      <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
         <DefaultNFT />
       </SvgWrapper>
     );

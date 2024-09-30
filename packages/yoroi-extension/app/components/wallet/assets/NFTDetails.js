@@ -190,11 +190,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 objectFit: 'unset',
               },
               backgroundColor: 'ds.bg_color_max',
-              height: '100%',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" />
           </ImageItem>
         </Grid>
 
