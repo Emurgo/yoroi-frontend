@@ -13,7 +13,7 @@ import globalMessages from '../../../i18n/global-messages';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange';
 import { Box } from '@mui/system';
-import { Moment } from 'moment';
+import moment, { Moment } from 'moment';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Checkbox, FormControlLabel } from '@mui/material';
@@ -85,12 +85,20 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
       </Box>
     );
 
+    const startDateIsCorrect = (): boolean => {
+      return startDate !== null && startDate.isValid() && startDate.isSameOrBefore(endDate)
+    }
+
+    const endDateIsCorrect = (): boolean => {
+      return endDate !== null && endDate.isValid() && endDate.isSameOrBefore(moment());
+    }
+
     const dialogActions = [
       {
         label: intl.formatMessage(globalMessages.exportButtonLabel),
         primary: true,
         isSubmitting: isActionProcessing || false,
-        disabled: !startDate || !endDate || startDate.isAfter(endDate) || !startDate.isValid() || !endDate.isValid(),
+        disabled: !startDateIsCorrect() || !endDateIsCorrect(),
         onClick: () => submit({ startDate, endDate }),
       },
     ];
