@@ -123,7 +123,7 @@ function getFromBackground(functionName: string, params: andy): Promise<any> {
       uid,
       function: functionName,
       params,
-      returnType: 'cbor',
+      returnType: 'json',
     });
   });
 }
