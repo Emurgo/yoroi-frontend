@@ -233,7 +233,7 @@ export function NftImage({
       );
   }, [url]);
 
-  if (error || url !== null)
+  if (error || url === null)
     return (
       <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
         <DefaultNFT />
