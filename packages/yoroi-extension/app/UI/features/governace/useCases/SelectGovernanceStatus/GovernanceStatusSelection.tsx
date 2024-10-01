@@ -148,7 +148,15 @@ export const GovernanceStatusSelection = () => {
     return (
       <Stack alignItems="center" margin="0 auto" mt="185px" maxWidth="500px">
         <NoTransactions />
-        <Typography variant="h3" fontSize="26px" fontWeight="500" mt="32px" textAlign="center" color="ds.text_gray_medium">
+        <Typography
+          variant="h3"
+          fontSize="20px"
+          lineHeight="30px"
+          fontWeight="500"
+          mt="32px"
+          textAlign="center"
+          color="ds.text_gray_medium"
+        >
           To participate in governance you need to have ADA in your wallet.
         </Typography>
         {/* @ts-ignore */}
