@@ -66,7 +66,7 @@ export const GovernanceStatusSelection = () => {
         </GovernanceProvider>
       ),
       width: '648px',
-      height: '336px',
+      height: '304px',
       isLoading: loadingUnsignTx,
     });
   };
