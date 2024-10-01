@@ -98,7 +98,7 @@ function WalletDelegationBanner({
         background: theme => theme.palette.ds.bg_gradient_2,
       }}
     >
-      <Box sx={{ position: 'absolute', bottom: '-4px', right: '20px' }}>
+      <Box sx={{ position: 'absolute', bottom: '-60px', right: '0px' }}>
         <StakingIllustration height="300px" />
       </Box>
       <Box id="staking-delegationBanner-box">
