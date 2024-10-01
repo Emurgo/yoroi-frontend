@@ -35,7 +35,7 @@ export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   return (
     <Stack justifyContent="flex-between">
       <Stack pb="48px">
-        <Typography variant="body1" textAlign="center" mb="24px">
+        <Typography variant="body1" textAlign="left" mb="24px">
           {strings.identifyDrep}
         </Typography>
         <TextInput
