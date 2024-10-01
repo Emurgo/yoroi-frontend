@@ -156,7 +156,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   }
 
   @computed get selected(): null | WalletState {
-    if (typeof this.selectedIndex === 'number') {
+    if (this.selectedIndex != null) {
       return this.wallets[this.selectedIndex];
     }
     return null;
@@ -415,6 +415,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   @action onRenameSelectedWallet: (string) => void = (newName) => {
     this.selectedWalletName = newName;
+    if (this.selectedIndex != null) {
+      this.wallets[this.selectedIndex].name = newName;
+    }
   }
 }
 

@@ -16,6 +16,7 @@ import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 import type { AssetAmount, PriceImpact } from './types';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -24,6 +25,7 @@ const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
+  assetsStillLoading: boolean,
   type: 'from' | 'to',
   onAssetSelected: any => void,
   onClose: void => void,
@@ -33,6 +35,7 @@ type Props = {|
 
 export default function SelectAssetDialog({
   assets = [],
+  assetsStillLoading,
   type,
   onAssetSelected,
   onClose,
@@ -115,7 +118,7 @@ export default function SelectAssetDialog({
         </>
       }
     >
-      {filteredAssets.length !== 0 && (
+      {(filteredAssets.length !== 0 && !assetsStillLoading) && (
         <Table
           rowGap="0px"
           columnNames={type === 'from' ? fromColumns : toColumns}
@@ -135,11 +138,15 @@ export default function SelectAssetDialog({
           })}
         </Table>
       )}
-      {filteredAssets.length === 0 && (
+      {(filteredAssets.length === 0 || assetsStillLoading) && (
         <Box py="8px">
           <Box display="flex" flexDirection="column" gap="16px" alignItems="center" justifyContent="center">
             <Box mt="60px">
-              <NoAssetsFound />
+              {assetsStillLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <NoAssetsFound />
+              )}
             </Box>
             <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
               {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
