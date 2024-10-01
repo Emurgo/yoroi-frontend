@@ -1092,7 +1092,7 @@
   "governance.selectNoConfidenc": "Select no confidence",
   "governance.participatingInGovernance": "Participating in the Cardano Governance gives you the opportunity to participate in the voting as well as withdraw your staking rewards",
   "governance.designatedSomeone": "You are designating someone else to cast your vote on your behalf for all proposals now and in the future.",
-  "governance.identifyDrep": "Identify your preferred DRep and enter their ID below to delegate your vote",
+  "governance.identifyDrep": "Identify your preferred DRep and enter their ID below to delegate your vote:",
   "governance.thanksForParticipation": "Thank you for participating in Governance",
   "governance.theTransactionCanTake": "This transaction can take a while!",
   "governance.goToGovernance": "GO to governance",
