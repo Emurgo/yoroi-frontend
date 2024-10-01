@@ -95,7 +95,7 @@ function WalletDelegationBanner({
   return isOpen ? (
     <WrapperBanner
       sx={{
-        background: theme => theme.palette.ds.bg_gradient_1,
+        background: theme => theme.palette.ds.bg_gradient_2,
       }}
     >
       <Box sx={{ position: 'absolute', bottom: '-4px', right: '20px' }}>

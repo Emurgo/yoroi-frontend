@@ -37,7 +37,7 @@ import { fontWeight } from '../../../../styles/themes/tokens/tokens';
 import { fontSize } from '../../../../styles/themes/tokens/tokens';
 
 const SBox = styled(Box)(({ theme }) => ({
-  background: theme.palette.ds.bg_gradient_3,
+  backgroundImage: theme.palette.ds.bg_gradient_3,
   color: 'grayscale.min',
 }));
 
