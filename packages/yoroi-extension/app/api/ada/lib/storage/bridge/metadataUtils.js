@@ -1,5 +1,6 @@
 // @flow
 import { RustModule } from '../../cardanoCrypto/rustLoader';
+import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 export type TransactionMetadata = {|
   label: string,
@@ -24,22 +25,28 @@ export function createMetadata(
   return auxData;
 }
 
-export function parseMetadata(hex: string): any {
-  return RustModule.WasmScope(Scope => {
-    const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
-    const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
-      metadatum, Scope.WalletV4.MetadataJsonSchema.BasicConversions
-    );
-    return metadataString;
-  });
+export function parseMetadata(s: any): string {
+  if (isHex(s)) {
+    return RustModule.WasmScope(Scope => {
+      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
+      const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
+        metadatum, Scope.WalletV4.MetadataJsonSchema.BasicConversions
+      );
+      return metadataString;
+    });
+  }
+  return JSON.stringify(s);
 }
 
-export function parseMetadataDetailed(hex: string): any {
-  return RustModule.WasmScope(Scope => {
-    const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
-    const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
-      metadatum, Scope.WalletV4.MetadataJsonSchema.DetailedSchema
-    );
-    return metadataString;
-  });
+export function parseMetadataDetailed(s: any): string {
+  if (isHex(s)) {
+    return RustModule.WasmScope(Scope => {
+      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
+      const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
+        metadatum, Scope.WalletV4.MetadataJsonSchema.DetailedSchema
+      );
+      return metadataString;
+    });
+  }
+  return JSON.stringify(s);
 }
