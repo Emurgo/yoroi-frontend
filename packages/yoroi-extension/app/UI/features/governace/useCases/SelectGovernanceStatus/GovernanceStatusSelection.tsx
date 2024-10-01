@@ -191,7 +191,7 @@ export const GovernanceStatusSelection = () => {
       <Stack gap="17px" mt="42px">
         {error && <Alert severity="error"> {error}</Alert>}
         {governanceStatus.drep !== null && (
-          <Typography variant="body2" align="center" color="textSecondary" gutterBottom>
+          <Typography variant="body2" align="center" color="ds.text_gray_medium" gutterBottom>
             {strings.drepId} {governanceStatus.drep}
           </Typography>
         )}
