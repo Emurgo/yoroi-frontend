@@ -51,7 +51,7 @@ export const lightPalette = {
   sys_orange_500: '#ED8600',
   sys_orange_100: '#FFF2E2',
 
-  bg_gradient_1: 'linear-gradient(180deg, #93F5E1 100%, #E4E8F7 100%)',
+  bg_gradient_1: 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)',
   bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
   bg_gradient_3: 'linear-gradient(30deg, #244ABF 0%, #4760FF 176.73%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
