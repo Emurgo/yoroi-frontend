@@ -100,7 +100,7 @@ export const LightButton: any = {
   ],
 };
 
-// Button in Figam: https://bit.ly/3Ky4uvo
+// Button in Figma: https://bit.ly/3Ky4uvo
 export const DarkButton: any = {
   ...ButtonCommonProps,
   variants: [
@@ -207,21 +207,25 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
     ':hover': {
       backgroundColor: themePalette.gray_50,
       color: themePalette[`${variant}_600`],
+      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_600`] },
+      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_600`] },
     },
     ':active': {
       backgroundColor: themePalette.gray_100,
       color: themePalette[`${variant}_700`],
+      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_700`] },
+      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_700`] },
     },
     ':focus': {
       outline: '2px solid',
       outlineColor: themePalette.sys_yellow_500,
     },
-    '&.Mui-disabled': {
-      border: '2px solid',
-      borderColor: themePalette[`${variant}_200`],
+    ':disabled': {
       color: themePalette[`${variant}_200`],
       cursor: 'not-allowed',
       pointerEvents: 'unset',
+      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_200`] },
+      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_200`] },
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
     '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
