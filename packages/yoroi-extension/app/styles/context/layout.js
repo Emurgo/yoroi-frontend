@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import type { Node } from 'react';
-import { THEMES } from '../themes';
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
 export type LayoutComponentMap = {|
