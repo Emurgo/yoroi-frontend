@@ -56,7 +56,7 @@ export const ModalManager = () => {
       >
         <Icon.CloseIcon />
       </IconButtonWrapper>
-      <DialogContent>{content}</DialogContent>
+      <DialogContent sx={{ paddingTop: 0, paddingBottom: 0 }}>{content}</DialogContent>
     </BootstrapDialog>
   );
 };
