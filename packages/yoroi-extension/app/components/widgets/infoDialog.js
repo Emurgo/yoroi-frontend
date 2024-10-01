@@ -43,7 +43,7 @@ function InfoDialog(props: Props & Intl): Node {
       onClose={onClose}
       TransitionComponent={Transition}
       sx={{
-        background: 'var(--yoroi-comp-dialog-overlay-background-color)',
+        background: 'ds.web_overlay',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -70,7 +70,8 @@ function InfoDialog(props: Props & Intl): Node {
           flexDirection: 'column',
         }}
       >
-        <Typography component="div"
+        <Typography
+          component="div"
           sx={{
             display: 'block',
             fontSize: '16px',
