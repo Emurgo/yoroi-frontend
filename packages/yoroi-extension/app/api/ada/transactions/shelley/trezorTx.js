@@ -892,12 +892,12 @@ export function toTrezorSignRequest(
 }
 
 export function buildConnectorSignedTransaction(
-  txBodyHex: string,
+  rawTxHex: string,
   witnesses: Array<CardanoSignedTxWitness>,
-  metadata: RustModule.WalletV4.AuxiliaryData | void,
-): RustModule.WalletV4.Transaction {
-  const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
-  const vkeyWitnesses = RustModule.WalletV4.Vkeywitnesses.new();
+): string {
+
+  const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
+
   for (const witness of witnesses) {
     if (witness.type === CardanoTxWitnessType.BYRON_WITNESS) {
       throw new Error('Byron wallet does not support connector API');
@@ -908,16 +908,14 @@ export function buildConnectorSignedTransaction(
         ),
         RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
       );
-      vkeyWitnesses.add(vkeyWitness);
+
+      fixedTx.add_vkey_witness(vkeyWitness);
+
     } else {
       throw new Error('unexpected witness type');
     }
   }
-  const witnessSet = RustModule.WalletV4.TransactionWitnessSet.new();
-  witnessSet.set_vkeys(vkeyWitnesses);
-  return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witnessSet,
-    metadata
-  );
+
+
+  return fixedTx.to_hex();
 }

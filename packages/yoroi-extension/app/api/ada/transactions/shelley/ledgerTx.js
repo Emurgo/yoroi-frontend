@@ -1144,20 +1144,16 @@ export function toLedgerSignRequest(
 }
 
 export function buildConnectorSignedTransaction(
-  txBodyHex: string,
+  rawTxHex: string,
   witnesses: Array<Witness>,
   publicKey: {|
     ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
-  metadata: RustModule.WalletV4.AuxiliaryData | void
-): RustModule.WalletV4.Transaction {
+): string {
 
-  const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
-
+  const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
   const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
-
-  const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
 
   for (const witness of witnesses) {
     const addressing = {
@@ -1177,14 +1173,9 @@ export function buildConnectorSignedTransaction(
       RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
       RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.witnessSignatureHex, 'hex')),
     );
-    vkeyWitWasm.add(vkeyWit);
-  }
-  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
-  witSet.set_vkeys(vkeyWitWasm);
 
-  return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witSet,
-    metadata
-  );
+    fixedTx.add_vkey_witness(vkeyWit);
+  }
+
+  return fixedTx.to_hex();
 }

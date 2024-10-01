@@ -2210,7 +2210,7 @@ export default class AdaApi {
     );
   }
 
-  // fixme: refactor this tmp function
+  // <TODO:TMP>
   async _addressedUtxosWithSubmittedTxs(
     originalUtxos: Array<CardanoAddressedUtxo>,
     publicDeriverId: number,
