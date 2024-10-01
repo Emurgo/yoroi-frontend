@@ -40,7 +40,6 @@ export default function SwapInput({
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
   const { name } = useTheme();
-  console.log('name', name);
 
   const handleChange = e => {
     if (!disabled) {
