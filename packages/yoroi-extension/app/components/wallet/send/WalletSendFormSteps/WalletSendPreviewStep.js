@@ -608,7 +608,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
               id="wallet:send:confrimTransactionStep-confirmTransaction-button"
             >
-              {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
+              {isSubmitting ? <LoadingSpinner small light /> : intl.formatMessage(this.getSendButtonText())}
             </Button>
           </Stack>
         </Box>
