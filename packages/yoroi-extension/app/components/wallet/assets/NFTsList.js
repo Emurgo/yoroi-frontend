@@ -282,10 +282,19 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
   );
 }
 
-const SearchInput = styled(OutlinedInput)(() => ({
+const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   width: '370px',
   height: '40px',
   padding: '10px 12px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_low,
+    },
+  },
+  '& input::placeholder': {
+    color: theme.palette.ds.el_gray_low,
+    opacity: 1,
+  }
 }));
 
 const SLink = styled(Link)({
