@@ -7,7 +7,7 @@ import { observer } from 'mobx-react';
 import { intlShape, defineMessages } from 'react-intl';
 import { buildURI } from '../../utils/URIHandling';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography, styled, useTheme } from '@mui/material';
 import classnames from 'classnames';
 import Dialog from '../widgets/Dialog';
 import DialogBackButton from '../widgets/DialogBackButton';
@@ -83,13 +83,12 @@ export default class URIDisplayDialog extends Component<Props> {
                 {intl.formatMessage(globalMessages.important)}
               </Typography>
             </Box>
+
             <Typography variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(messages.usabilityWarning)}
             </Typography>
           </WarningBox>
-          <div className={styles.qrCode}>
-            <QrCodeWrapper value={uri} size={152} />
-          </div>
+          <QRCodeSection uri={uri} />
           <div className={styles.uriDisplay}>
             <CopyableAddress
               id="uriDisplayDialog"
@@ -116,3 +115,12 @@ export default class URIDisplayDialog extends Component<Props> {
     );
   }
 }
+
+const QRCodeSection = ({ uri }) => {
+  const { name } = useTheme();
+  return (
+    <Box className={styles.qrCode} p="16px" sx={{ '& canvas': { borderRadius: '8px' } }}>
+      <QrCodeWrapper value={uri} size={152} includeMargin={name === 'dark-theme'} />
+    </Box>
+  );
+};

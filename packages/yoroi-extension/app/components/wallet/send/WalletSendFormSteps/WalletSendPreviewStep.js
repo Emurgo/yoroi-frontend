@@ -35,7 +35,7 @@ import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
 
 const SBox = styled(Box)(({ theme }) => ({
-  background: theme.palette.ds.bg_gradient_3,
+  backgroundImage: theme.palette.ds.bg_gradient_3,
   color: 'grayscale.min',
 }));
 
