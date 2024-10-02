@@ -100,7 +100,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       const { wallet, signRequest } = request.broadcastRequest.trezor;
       broadcastRequest = async () => {
         return await this.stores.substores.ada.trezorSend.signAndBroadcast({
-          params: { signRequest },
+          signRequest,
           wallet,
         });
       };

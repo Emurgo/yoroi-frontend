@@ -79,7 +79,7 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { cip8Sign, v4PublicToV2, makeCip8Key, buildCoseSign1FromSignature } from './lib/cardanoCrypto/utils';
+import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
@@ -129,10 +129,10 @@ import type { AddressRowWithPath, } from './lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay, getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
+  cardanoMinAdaRequiredFromAssets,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
-  cardanoMinAdaRequiredFromAssets,
 } from './transactions/utils';
 import type { TransactionExportRow } from '../export';
 
@@ -147,7 +147,8 @@ import type {
   SendTokenList,
 } from '../common/types';
 import {
-  getCardanoHaskellBaseConfig, getCardanoHaskellBaseConfigCombined,
+  getCardanoHaskellBaseConfig,
+  getCardanoHaskellBaseConfigCombined,
   getNetworkById,
 } from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos } from './transactions/transfer/utils';
@@ -230,10 +231,6 @@ export type SignAndBroadcastFunc = (
 
 // createTrezorSignTxData
 
-export type CreateTrezorSignTxDataRequest = {|
-  signRequest: HaskellShelleyTxSignRequest,
-  network: $ReadOnly<NetworkRow>,
-|};
 export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: $Exact<CardanoSignTransaction>,
@@ -751,9 +748,10 @@ export default class AdaApi {
     }
   }
 
-  createTrezorSignTxData(
-    request: CreateTrezorSignTxDataRequest
-  ): CreateTrezorSignTxDataResponse {
+  createTrezorSignTxData(request: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    network: $ReadOnly<NetworkRow>,
+  |}): CreateTrezorSignTxDataResponse {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
 

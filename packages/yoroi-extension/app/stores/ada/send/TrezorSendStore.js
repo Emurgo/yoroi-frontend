@@ -98,9 +98,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   }
 
   signAndBroadcast: {|
-    params: {|
-      signRequest: HaskellShelleyTxSignRequest,
-    |},
+    signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
       networkId: number,
@@ -110,10 +108,11 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       ...
     },
   |} => Promise<{| txId: string |}> = async (request) => {
+    const { signRequest } = request;
     try {
       const network = getNetworkById(request.wallet.networkId);
       const trezorSignTxDataResp = this.api.ada.createTrezorSignTxData({
-        ...request.params,
+        signRequest,
         network,
       });
 
@@ -153,13 +152,13 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       let metadata;
 
-      if (request.params.signRequest.trezorTCatalystRegistrationTxSignData) {
+      if (signRequest.trezorTCatalystRegistrationTxSignData) {
         const {
           votingPublicKey,
           stakingKey: stakingKeyHex,
           paymentAddress,
           nonce,
-        } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
+        } = signRequest.trezorTCatalystRegistrationTxSignData;
 
         const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
         if (
@@ -187,18 +186,18 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         //  ).toString('hex') ===
         // trezorSignTxResp.payload.auxiliaryDataSupplement.auxiliaryDataHash
       } else {
-        metadata = request.params.signRequest.metadata;
+        metadata = signRequest.metadata;
       }
 
       if (metadata) {
-        request.params.signRequest.self().set_auxiliary_data(metadata);
+        signRequest.self().set_auxiliary_data(metadata);
       }
 
-      const tx = request.params.signRequest.self().build_tx();
+      const tx = signRequest.self().build_tx();
 
       const signedTx = buildSignedTransaction(
         tx,
-        request.params.signRequest.senderUtxos,
+        signRequest.senderUtxos,
         trezorSignTxResp.payload.witnesses,
         publicKeyInfo,
         stakingKey,
