@@ -12,13 +12,18 @@ import { ROUTES } from '../../../routes-config';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
-import { buildSignedTransaction } from '../../../api/ada/transactions/shelley/trezorTx';
+import {
+  buildConnectorSignedTransaction,
+  buildSignedTransaction
+} from '../../../api/ada/transactions/shelley/trezorTx';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
+import { transactionHexToBodyHex, transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { fail } from '../../../coreUtils';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -133,9 +138,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       }
 
       const publicKeyInfo = {
-        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.wallet.publicKey, 'hex')
-        ),
+        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
         addressing: {
           startLevel: 1,
           path: request.wallet.pathToPublic,
@@ -211,6 +214,63 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       await broadcastTransaction({
         publicDeriverId: request.wallet.publicDeriverId,
         signedTxHex: signedTx.to_hex(),
+      });
+      return { txId };
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+  signAndBroadcastRawTx: {|
+    rawTxHex: string,
+    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    publicDeriverId: number,
+    networkId: number,
+  |} => Promise<{| txId: string |}> = async (request) => {
+    const { rawTxHex } = request;
+    try {
+      const network = getNetworkById(request.networkId);
+
+      const txBodyHex = transactionHexToBodyHex(rawTxHex);
+      const txId = transactionHexToHash(rawTxHex);
+
+      const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
+
+      const response = this.api.ada.createHwSignTxDataFromRawTx('trezor', {
+        txBodyHex,
+        network,
+        addressingMap: request.addressingMap,
+        senderUtxos: addressedUtxos,
+      });
+
+      const trezorSignTxPayload = response.hw === 'trezor' ? response.result.trezorSignTxPayload
+        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for trezor: ' + JSON.stringify(response));
+
+      const trezorSignTxResp = await wrapWithFrame(trezor => {
+        return trezor.cardanoSignTransaction(
+          JSON.parse(JSON.stringify({ ...trezorSignTxPayload }))
+        );
+      });
+
+      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
+        // this Error will be converted to LocalizableError()
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(trezorSignTxResp.payload.error);
+      }
+      if (!trezorSignTxResp.success) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} should never happen`);
+      }
+
+      const signedTxHex = buildConnectorSignedTransaction(
+        rawTxHex,
+        trezorSignTxResp.payload.witnesses,
+      );
+
+      await broadcastTransaction({
+        publicDeriverId: request.publicDeriverId,
+        signedTxHex,
       });
       return { txId };
     } catch (error) {
