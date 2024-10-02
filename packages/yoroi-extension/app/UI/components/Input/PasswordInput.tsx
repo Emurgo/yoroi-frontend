@@ -80,6 +80,6 @@ const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
   },
 
   '& .MuiFormLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_500,
+    color: error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.text_gray_low,
   },
 }));

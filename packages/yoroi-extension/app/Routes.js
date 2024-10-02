@@ -32,6 +32,7 @@ import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from './UI/context/CurrencyContext';
 
+import PagePreparation from './components/page-preparation/PagePreparation';
 // New UI pages
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
@@ -379,6 +380,7 @@ const SwapSubpages = (stores, actions) => (
   <Switch>
     <Route exact path={ROUTES.SWAP.ROOT} component={props => <SwapPage {...props} stores={stores} actions={actions} />} />
     <Route exact path={ROUTES.SWAP.ORDERS} component={props => <SwapOrdersPage {...props} stores={stores} actions={actions} />} />
+    <Route exact path={ROUTES.SWAP.ERROR} component={props => <PagePreparation {...props} stores={stores} actions={actions} />} />
     <Redirect to={ROUTES.SWAP.ROOT} />
   </Switch>
 );

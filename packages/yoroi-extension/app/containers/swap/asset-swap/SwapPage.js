@@ -88,9 +88,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
 
   const wallet = props.stores.wallets.selectedOrFail;
   const network = getNetworkById(wallet.networkId);
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
   const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
     props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
   const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
@@ -121,7 +119,7 @@ function SwapPage(props: StoresAndActionsProps): Node {
       .catch(e => {
         console.error('Failed to load stored slippage', e);
       });
-    setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address))
+    setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address));
     props.stores.substores.ada.stateFetchStore.fetcher
       .getSwapFeeTiers({ network })
       .then(feeTiers => {
@@ -324,6 +322,9 @@ function SwapPage(props: StoresAndActionsProps): Node {
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
+              onError={() => {
+                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ERROR });
+              }}
             />
           )}
           {orderStep === 2 && (

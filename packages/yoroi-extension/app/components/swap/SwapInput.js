@@ -40,7 +40,6 @@ export default function SwapInput({
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
   const { name } = useTheme();
-  console.log('name', name);
 
   const handleChange = e => {
     if (!disabled) {
@@ -76,10 +75,9 @@ export default function SwapInput({
         sx={{
           borderStyle: 'solid',
           borderWidth: (tokenInfo.id?.length > 0 && error) || focusState.value ? '2px' : '1px',
-          borderColor: error ? 'magenta.500' : isFocusedColor,
+          borderColor: error ? 'ds.sys_magenta_500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
-          pr: '8px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           gridTemplateRows: '1fr 1fr',
@@ -185,7 +183,7 @@ export default function SwapInput({
         </Box>
       </Box>
       {error && (
-        <Typography component="div" pt="4px" variant="caption" color="magenta.500">
+        <Typography component="div" pt="4px" variant="caption" color="ds.sys_magenta_500">
           {error}
         </Typography>
       )}

@@ -32,7 +32,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
     <Box>
       <Box
         sx={{
-          background: theme => theme.palette.ds.bg_gradient_1,
+          background: theme => theme.palette.ds.bg_gradient_2,
           marginBottom: '40px',
           borderRadius: '8px',
           overflowY: 'hidden',

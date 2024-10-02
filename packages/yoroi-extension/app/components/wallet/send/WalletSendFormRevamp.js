@@ -624,6 +624,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                sx={{
+                  '& .MuiFormHelperText-root': {
+                    marginInline: 0,
+                    mt: 0.5,
+                    fontSize: '0.750rem',
+                    lineHeight: '1rem',
+                    letterSpacing: '0.2px',
+                  },
+                }}
               />
               {domainResolverResult != null ? (
                 <Typography
@@ -659,6 +668,15 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     : intl.formatMessage(messages.memoFieldLabelInactive)
                 }
                 id="wallet:send:enterAddressStep-enterMemo-input"
+                sx={{
+                  '& .MuiFormHelperText-root': {
+                    marginInline: 0,
+                    mt: 0.5,
+                    fontSize: '0.750rem',
+                    lineHeight: '1rem',
+                    letterSpacing: '0.2px',
+                  },
+                }}
               />
               <Typography
                 component="div"
@@ -917,7 +935,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             getCurrentPrice={this.props.getCurrentPrice}
             isClassicTheme={this.props.isClassicTheme}
             ledgerSendError={this.props.ledgerSendError}
-            trezorSendError={this.props.ledgerSendError}
+            trezorSendError={this.props.trezorSendError}
             ledgerSend={this.props.ledgerSend}
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}

@@ -65,7 +65,9 @@ export default class AssetsDropdown extends Component<Props, State> {
             </IconWrapper>
             <Typography color="ds.text_gray_medium">{token.label}</Typography>
           </div>
-          <div className={styles.amount}>{displayAmount}</div>
+          <Typography color="ds.text_gray_medium" className={styles.amount}>
+            {displayAmount}
+          </Typography>
         </div>
       );
     });

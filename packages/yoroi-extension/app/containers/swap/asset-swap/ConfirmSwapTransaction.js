@@ -37,6 +37,7 @@ type Props = {|
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
+  onError: () => void,
 |};
 
 const priceStrings = {
@@ -62,6 +63,7 @@ export default function ConfirmSwapTransaction({
   defaultTokenInfo,
   getTokenInfo,
   getFormattedPairingValue,
+  onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
   const {
@@ -80,12 +82,12 @@ export default function ConfirmSwapTransaction({
     onSuccess: data => {
       onRemoteOrderDataResolved(data).catch(e => {
         console.error('Failed to handle remote order resolution', e);
-        alert('Failed to prepare order transaction');
+        onError();
       });
     },
     onError: error => {
       console.error('useSwapCreateOrder fail', error);
-      alert('Failed to receive remote data for the order');
+      onError();
     },
   });
   useEffect(() => {
@@ -180,9 +182,9 @@ export default function ConfirmSwapTransaction({
       </Box>
       <GradientBox p="16px" borderRadius="8px" color="common.white">
         <Box display="flex" justifyContent="space-between">
-          <Box>Total</Box>
+          <Typography color="ds.white_static">Total</Typography>
           <Box>
-            <Typography component="div" fontSize="20px" fontWeight="500" color="ds.text_gray_medium">
+            <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
               {formattedNonPtAmount ?? formattedPtAmount}
             </Typography>
           </Box>
@@ -190,14 +192,14 @@ export default function ConfirmSwapTransaction({
         {formattedNonPtAmount && (
           <Box display="flex" justifyContent="right">
             <Box>
-              <Typography component="div" fontSize="20px" fontWeight="500" color="ds.text_gray_medium">
+              <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
                 {formattedPtAmount}
               </Typography>
             </Box>
           </Box>
         )}
         <Box display="flex" justifyContent="right">
-          <Typography component="div" variant="body1" color="ds.text_gray_medium">
+          <Typography component="div" variant="body1" color="ds.white_static" sx={{ opacity: '0.5' }}>
             {getFormattedPairingValue(ptAmount)}
           </Typography>
         </Box>
