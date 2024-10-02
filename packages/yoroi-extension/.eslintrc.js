@@ -10,10 +10,7 @@ module.exports = {
       legacyDecorators: true,
     },
   },
-  extends: [
-    'airbnb',
-    'prettier',
-  ],
+  extends: ['airbnb', 'prettier'],
   env: {
     browser: true,
     mocha: true,
@@ -136,6 +133,7 @@ module.exports = {
     'no-floating-promise',
     'prettier',
     'eslint-plugin-simple-import-sort',
+    '@typescript-eslint',
   ],
   globals: {
     chrome: true,

@@ -1,8 +1,7 @@
-import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
+import { Box, Stack, Typography, styled } from '@mui/material';
 import React from 'react';
 import { WelcomeWallet } from '../../../../components/ilustrations/WelcomeWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { useNavigateTo } from '../hooks/useNavigateTo';
 import { useStrings } from '../hooks/useStrings';
 import NavigationButton from './NavigationButton';
 
@@ -14,8 +13,6 @@ const Container = styled(Box)(({ theme }: any) => ({
 }));
 
 const WelcomeBanner = () => {
-  const theme = useTheme();
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { openBuyDialog } = usePortfolio();
 

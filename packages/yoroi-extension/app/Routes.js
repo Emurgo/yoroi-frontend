@@ -576,6 +576,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
       txDelegationError={delegationTxError}
       tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
       triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+      getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>

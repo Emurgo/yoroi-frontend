@@ -4,7 +4,6 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 import { maybe } from '../../coreUtils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
-import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
 
@@ -95,33 +94,20 @@ const getAssetWalletAssetList = (stores: any) => {
     .filter((item: any) => item.info.IsNFT === false)
     .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
-      const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
-      const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
       const tokenId = getTokenIdentifierIfExists(token.info) ?? '-';
       const tokenLogo = `data:image/png;base64,${
         token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
       }`;
+      const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
+      const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
 
-      const getFiatCurrentPrice = stores.coinPriceStore.getCurrentPrice;
-      const { currency } = stores.profile.unitOfAccount;
-
-      const fiatPrice = getFiatCurrentPrice(tokenName, currency === null ? 'USD' : currency);
-      const coinShiftedAmount = new BigNumber(shiftedAmount);
-
-      const fiatDisplay = calculateAndFormatValue(coinShiftedAmount, fiatPrice);
       return {
-        name: tokenName,
         assetName: token.info.Metadata.assetName,
-        totalAmount: [beforeDecimal, afterDecimal].join(''),
-        amountForSorting: shiftedAmount,
-        tokenLogo: tokenLogo,
-        totalAmountFiat: fiatDisplay,
-        price: fiatPrice,
-
-        // TODO new structure here
         quantity: asQuantity(token.entry.amount),
         id: tokenId,
+        formatedAmount: [beforeDecimal, afterDecimal].join(''),
+
         info: {
           id: token.entry.identifier,
           name: tokenName,
@@ -129,15 +115,8 @@ const getAssetWalletAssetList = (stores: any) => {
           fingerprint: tokenId,
           metadata: extractMetadataInfo({ metadata: token.info.Metadata?.assetMintMetadata?.[0] || null }),
           numberOfDecimals,
+          image: tokenLogo,
         },
-        // TODO - refactor and add here any formated data/utils for token
-        // utils: {
-        //   totalAmountFiat: fiatDisplay,
-        //   price: fiatPrice,
-        //   totalAmount: [beforeDecimal, afterDecimal].join(''),
-        //   amountForSorting: shiftedAmount,
-        //   image: tokenLogo,
-        // },
       };
     });
 };
@@ -161,7 +140,7 @@ const groupTransactionsByDay = transactions => {
 };
 
 export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undefined => {
-  const { wallets, delegation, tokenInfoStore, coinPriceStore, profile } = stores;
+  const { wallets, delegation, tokenInfoStore } = stores;
 
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
@@ -191,17 +170,10 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
     const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
-    // Get Fiat price
-    const ticker = tokenInfo.Metadata.ticker;
-    const { currency } = profile.unitOfAccount;
-    const getFiatCurrentPrice = coinPriceStore?.getCurrentPrice;
-    const fiatPrice = getFiatCurrentPrice(ticker, currency === null ? 'USD' : currency);
-
-    const fiatDisplay = calculateAndFormatValue(Number(shiftedAmount), fiatPrice);
     const isHardware: boolean = selectedWallet.isHardware;
 
     // Asset List
-    const assetList = getAssetWalletAssetList(stores);
+    const ftAssetList = getAssetWalletAssetList(stores);
 
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
@@ -213,19 +185,17 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       walletAdaBalance: walletAdaBalance.toNumber(),
       unitOfAccount: stores.profile.unitOfAccount,
       defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
-      getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
       recentTransactions: groupedTx ? groupedTx : [],
       submitedTransactions: selectedWallet.submittedTransactions,
       backendService: BackendService,
       backendServiceZero: BackendServiceZero,
       isHardwareWallet: isHardware,
-      // primaryTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
       primaryTokenInfo: { ...primaryTokenFullInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
-      assetList: assetList,
+      ftAssetList: ftAssetList,
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);

@@ -42,7 +42,7 @@ export const PortfolioContextProvider = ({
   currentWallet,
   openDialogWrapper,
 }: PortfolioProviderProps) => {
-  const { walletBalance, assetList, selectedWallet, networkId, primaryTokenInfo } = currentWallet;
+  const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -76,13 +76,13 @@ export const PortfolioContextProvider = ({
       ...actions,
       settingFiatPairUnit,
       walletBalance,
-      assetList: assetList || [],
+      ftAssetList: ftAssetList || [],
       networkId,
       primaryTokenInfo,
       openBuyDialog: () => openDialogWrapper(BuySellDialog),
-      showWelcomeBanner: assetList.length === 1,
+      showWelcomeBanner: ftAssetList.length === 1,
     }),
-    [state, actions, assetList]
+    [state, actions, ftAssetList]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;

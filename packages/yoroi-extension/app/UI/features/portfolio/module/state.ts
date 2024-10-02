@@ -38,7 +38,10 @@ export type PortfolioState = {
   accountPair: AccountPair | null;
   walletBalance: WalletBalance | null;
   networkId: number | null;
-  assetList: any[];
+  ftAssetList: any[];
+  showWelcomeBanner: boolean;
+  primaryTokenInfo: any;
+  openBuyDialog: () => void;
 };
 
 // Define default state
@@ -51,7 +54,10 @@ export const defaultPortfolioState: PortfolioState = {
   accountPair: null,
   walletBalance: null,
   networkId: null,
-  assetList: [],
+  ftAssetList: [],
+  primaryTokenInfo: null,
+  showWelcomeBanner: false,
+  openBuyDialog: () => {},
 };
 
 // Define action handlers

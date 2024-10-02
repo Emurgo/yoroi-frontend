@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, styled } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React from 'react';
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
@@ -9,25 +9,6 @@ import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
 
-// Styling for the period buttons
-const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
-  fontWeight: 500,
-  fontSize: '0.75rem',
-  lineHeight: '1.125rem',
-  height: '30px',
-  padding: '6px !important',
-  minWidth: '36px',
-  backgroundColor:
-    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium) : `transparent`,
-
-  '&.MuiButton-contained': {
-    color: theme.palette.ds.white_static,
-  },
-  '&.MuiButton-secondary': {
-    color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.text_primary_medium,
-  },
-}));
-
 interface Props {
   chartData: any;
   detailInfo: any;
@@ -35,8 +16,8 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isLoading = false }: Props): JSX.Element => {
-  const isPrimaryToken: boolean = tokenInfo === undefined;
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: Props): JSX.Element => {
+  const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();

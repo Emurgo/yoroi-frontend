@@ -1,23 +1,26 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
-import { bigNumberToBigInt } from '../../TokensTable/StatsTable';
+import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
 
 interface Props {
   tokenInfo: TokenInfoType;
 }
 
 const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
+  console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, walletBalance } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-  const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.totalAmount;
+  console.log('isPrimaryToken', isPrimaryToken);
+  const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
 
   if (tokenInfo.quantity === null) {
     return <></>;
@@ -33,9 +36,9 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   } = usePortfolioTokenActivity();
 
   const totaPriceCalc = React.useMemo(() => {
-    if (!isPrimaryToken) {
+    if (!isPrimaryToken && data24h) {
       const tokenPrice = data24h && data24h[tokenInfo.info.id][1]?.price.close;
-      const tokenQuantityAsBigInt = bigNumberToBigInt(tokenInfo.quantity);
+      const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
       const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
 
       const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
@@ -50,7 +53,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_900">
-        {`${tokenInfo.name} ${strings.balance}`}
+        {`${tokenInfo.info.name} ${strings.balance}`}
       </Typography>
 
       <Stack direction="column" spacing={theme.spacing(0.5)}>
@@ -66,12 +69,12 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
               padding: `${theme.spacing(1)} 0`,
             }}
           >
-            {tokenInfo.name}
+            {tokenInfo.info.name}
           </Typography>
         </Stack>
 
         <Typography color="ds.gray_600">
-          {isPrimaryToken ? tokenInfo.totalAmountFiat : totaPriceCalc}{' '}
+          {isPrimaryToken ? tokenInfo.formatedAmount : totaPriceCalc}{' '}
           {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
         </Typography>
       </Stack>

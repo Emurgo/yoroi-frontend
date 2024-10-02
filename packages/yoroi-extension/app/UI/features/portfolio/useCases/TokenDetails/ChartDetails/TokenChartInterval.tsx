@@ -2,14 +2,10 @@ import { Box, Button, Stack, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip as RechartTooltip, ResponsiveContainer, YAxis } from 'recharts';
-import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import chartSkeletonPng from '../../../common/assets/images/token-detail-chart-skeleton.png';
 import { TOKEN_CHART_INTERVAL } from '../../../common/helpers/constants';
-import { priceChange } from '../../../common/helpers/priceChange';
 import useChart from '../../../common/hooks/useChart';
 import { useGetPortfolioTokenChart } from '../../../common/hooks/usePortfolioTokenChart';
-import { useStrings } from '../../../common/hooks/useStrings';
-import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { TokenMarketPriceOverview } from './MarketPriceOverview';
 
 // Styling for the period buttons
@@ -44,19 +40,10 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
 
   const chartHeight = isPrimaryToken ? 153 : 257;
   const theme: any = useTheme();
-  const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
 
   // Fetch data based on the selected interval
   const [timeInterval, setTimeInterval] = useState<any>(TOKEN_CHART_INTERVAL.DAY);
   const { data, isFetching } = useGetPortfolioTokenChart(timeInterval, tokenInfo);
-
-  const {
-    ptActivity: { close, open },
-    // config,
-  } = useCurrencyPairing();
-
-  const { changeValue, changePercent } = priceChange(open, close);
 
   const handlePeriodChange = (id: string) => {
     setTimeInterval(TOKEN_CHART_INTERVAL[id]);
@@ -93,6 +80,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
         chartData={chartData}
         detailInfo={detailInfo}
         isLoading={isFetching || !data || chartData === undefined}
+        tokenInfo={tokenInfo}
       />
 
       <Box sx={{ userSelect: 'none', width: '100%' }}>

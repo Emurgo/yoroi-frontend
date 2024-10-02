@@ -1,4 +1,5 @@
 import { Box, Stack, Typography, useTheme } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 import { SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -56,8 +57,8 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
   const handleCurrencyChange = () => {
     changeUnitOfAccountPair({
-      from: { name: showADA ? unitOfAccount : 'ADA', value: showADA ? totalTokenPrice : walletBalance.ada },
-      to: { name: showADA ? 'ADA' : unitOfAccount, value: showADA ? walletBalance.ada : totalTokenPrice },
+      from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
+      to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
     });
   };
 
@@ -109,13 +110,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
-          {/* {isLoading ? (
-            <Skeleton width="129px" height="16px" />
-          ) : (
-            <Typography color="ds.text_gray_medium">
-              {close.toFixed(config.decimals)} {unitOfAccount}
-            </Typography>
-          )} */}
           <HeaderPrice isLoading={tokenActivity === null} />
           {isLoading ? (
             <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>

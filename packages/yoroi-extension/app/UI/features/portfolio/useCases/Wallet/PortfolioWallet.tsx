@@ -10,11 +10,11 @@ import StatsTable from '../TokensTable/StatsTable';
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance, assetList, showWelcomeBanner } = usePortfolio();
+  const { walletBalance, ftAssetList, showWelcomeBanner } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState<TokenInfoType[]>(assetList);
+  const [tokenList, setTokenList] = useState(ftAssetList);
 
   useEffect(() => {
     // FAKE FETCHING DATA TO SEE SKELETON
@@ -27,13 +27,13 @@ const PortfolioWallet = (): JSX.Element => {
 
   useEffect(() => {
     if (!keyword || showWelcomeBanner) {
-      setTokenList(assetList);
+      setTokenList(ftAssetList);
       return;
     }
 
     const lowercaseKeyword = keyword.toLowerCase();
 
-    const temp = assetList.filter(item => {
+    const temp = ftAssetList.filter(item => {
       return (
         item.info.name.toLowerCase().includes(lowercaseKeyword) ||
         item.info.id.toLowerCase().includes(lowercaseKeyword) ||

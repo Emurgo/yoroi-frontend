@@ -1,6 +1,4 @@
 export const getNetworkUrl = (networkId: number): any => {
-  console.log('networkId !== 0', networkId);
-
   return isTestnet(networkId)
     ? {
         cardanoScan: 'https://testnet.cardanoscan.io/token',

@@ -22,7 +22,6 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
   // console.log('explorers', explorers);
 
   const isPrimary = isPrimaryToken(tokenInfo.info);
-  console.log('URLL', `${networkUrl}/${tokenInfo?.info.policyId}${tokenInfo?.assetName}`);
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
@@ -34,11 +33,11 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
             borderRadius: `50px`,
           }}
           component="img"
-          src={tokenInfo.tokenLogo || tokenPng}
+          src={tokenInfo.info.image || tokenPng}
         ></Box>
 
         <Typography fontWeight="500" color="ds.gray_900">
-          {tokenInfo?.name}
+          {tokenInfo?.info.name}
         </Typography>
       </Stack>
 

@@ -6,7 +6,6 @@ import { Card } from '../../../../components';
 import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { TokenChartInterval } from './ChartDetails/TokenChartInterval';
 import HeaderSection from './HeaderDetails/Header';
 import OverviewPerformance from './OverviewPerformanceDetails/OverviewPerformance';
@@ -24,7 +23,7 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const IconWrapper = styled(Box)(({ theme }) => ({
+const IconWrapper = styled(Box)(({ theme }: any) => ({
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
@@ -36,9 +35,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount, walletBalance } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-  const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.totalAmount;
 
   return (
     <Box sx={{ width: '100%' }}>

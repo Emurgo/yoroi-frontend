@@ -9,7 +9,7 @@ interface Props {
   style?: React.CSSProperties;
 }
 
-const IconWrapper = styled(Box)(({ theme, mode }) => ({
+const IconWrapper: any = styled(Box)(({ theme, mode }: any) => ({
   height: '16px',
   '& svg': {
     '& path': {
@@ -42,11 +42,9 @@ const PnlTag = ({ children, withIcon = false, variant = 'neutral' }: Props) => {
   );
 };
 
-const TagContainer = styled(Box, {
+const TagContainer: any = styled(Box, {
   shouldForwardProp: prop => prop !== 'mode',
-})<{
-  mode: 'danger' | 'success' | 'neutral';
-}>(({ theme, mode }) => ({
+})(({ theme, mode }: any) => ({
   height: '25px',
   display: 'flex',
   alignItems: 'center',
@@ -57,11 +55,9 @@ const TagContainer = styled(Box, {
   width: 'auto',
 }));
 
-const StyledTypography = styled(Typography, {
+const StyledTypography: any = styled(Typography, {
   shouldForwardProp: prop => prop !== 'mode',
-})<{
-  mode: 'danger' | 'success' | 'neutral';
-}>(({ theme, mode }) => ({
+})(({ theme, mode }: any) => ({
   color: getTextColor(theme, mode),
   fontSize: '12px',
 }));

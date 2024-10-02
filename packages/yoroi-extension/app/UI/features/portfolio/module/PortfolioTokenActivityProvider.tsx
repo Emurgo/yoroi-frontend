@@ -13,7 +13,7 @@ const defaultPortfolioTokenActivityState: PortfolioTokenActivityState = freeze(
   {
     secondaryTokenIds: [],
     aggregatedBalances: {},
-    tokenActivity: { data24h: null },
+    tokenActivity: { data24h: {}, data30d: {}, data7d: {} },
     activityWindow: Portfolio.Token.ActivityWindow.OneDay,
     isLoading: false,
   },
@@ -53,10 +53,10 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
     },
   }).current;
 
-  const { assetList, walletBalance } = usePortfolio();
+  const { ftAssetList, walletBalance } = usePortfolio();
 
   React.useEffect(() => {
-    const listForActivity: any = assetList
+    const listForActivity: any = ftAssetList
       .filter(item => item.info?.policyId?.length > 0)
       .map(item => `${item.info?.policyId}.${item.assetName}`); //
 
@@ -104,12 +104,16 @@ export const usePortfolioTokenActivity = () =>
 
 type PortfolioTokenActivityState = Readonly<{
   secondaryTokenIds: Portfolio.Token.Id[];
-  tokenActivity: { data24h: any };
+  tokenActivity: {
+    data24h: Portfolio.Api.TokenActivityResponse;
+    data7d: Portfolio.Api.TokenActivityResponse;
+    data30d: Portfolio.Api.TokenActivityResponse;
+  };
   activityWindow: Portfolio.Token.ActivityWindow;
   isLoading: boolean;
 }>;
 
-export enum PortfolioTokenActivityActionType {
+enum PortfolioTokenActivityActionType {
   SecondaryTokenIdsChanged = 'SecondaryTokenIdsChanged',
   TokenActivityChanged = 'TokenActivityChanged',
   ActivityWindowChanged = 'ActivityWindowChanged',
@@ -122,7 +126,11 @@ export type PortfolioTokenActivityAction =
     }
   | {
       type: PortfolioTokenActivityActionType.TokenActivityChanged;
-      tokenActivity: { data24h: any };
+      tokenActivity: {
+        data24h: Portfolio.Api.TokenActivityResponse;
+        data7d: Portfolio.Api.TokenActivityResponse;
+        data30d: Portfolio.Api.TokenActivityResponse;
+      };
     }
   | {
       type: PortfolioTokenActivityActionType.ActivityWindowChanged;
@@ -150,6 +158,10 @@ export const portfolioTokenActivityReducer = (
 
 export type PortfolioTokenActivityActions = Readonly<{
   secondaryTokenIdsChanged: (secondaryTokenIds: Portfolio.Token.Id[]) => void;
-  tokenActivityChanged: (tokenActivity: { data24: any }) => void;
+  tokenActivityChanged: (tokenActivity: {
+    data24h: Portfolio.Api.TokenActivityResponse;
+    data7d: Portfolio.Api.TokenActivityResponse;
+    data30d: Portfolio.Api.TokenActivityResponse;
+  }) => void;
   activityWindowChanged: (activityWindow: Portfolio.Token.ActivityWindow) => void;
 }>;

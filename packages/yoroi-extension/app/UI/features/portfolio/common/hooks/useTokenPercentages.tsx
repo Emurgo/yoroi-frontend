@@ -1,5 +1,4 @@
 import BigNumber from 'bignumber.js';
-import { useMemo } from 'react';
 
 type Token = {
   id: string;
@@ -16,22 +15,22 @@ type TokenWithPercentage = Token & {
 };
 
 export const useTokenPercentages = (tokens: any[]): TokenWithPercentage[] => {
-  const tokenPercentages = useMemo(() => {
-    if (!tokens || tokens.length === 0) return {};
+  // const tokenPercentages = useMemo(() => {
+  //   if (!tokens || tokens.length === 0) return {};
 
-    const totalQuantity = tokens.reduce((acc, token) => {
-      return acc.plus(token.quantity);
-    }, new BigNumber(0));
+  //   const totalQuantity = tokens.reduce((acc, token) => {
+  //     return acc.plus(token.quantity);
+  //   }, new BigNumber(0));
 
-    return tokens.reduce((acc, token) => {
-      const percentage = totalQuantity.isZero() ? '0.00' : token.quantity.dividedBy(totalQuantity).multipliedBy(100).toFixed(2);
+  //   return tokens.reduce((acc, token) => {
+  //     const percentage = totalQuantity.isZero() ? '0.00' : token.quantity.dividedBy(totalQuantity).multipliedBy(100).toFixed(2);
 
-      return {
-        ...acc,
-        [token.info.id]: percentage,
-      };
-    }, {} as any);
-  }, [tokens]);
+  //     return {
+  //       ...acc,
+  //       [token.info.id]: percentage,
+  //     };
+  //   }, {} as any);
+  // }, [tokens]);
 
   return {
     // @ts-ignore

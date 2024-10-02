@@ -9,16 +9,14 @@ type AssetInfo = {
   policyId: string;
   fingerprint: string;
   metadata: TokenInfoEntry;
+  image: string;
+  numberOfDecimals: number;
 };
 
 type TokenInfoType = {
-  name: string;
   assetName: string;
-  totalAmount: string;
   amountForSorting: string;
-  tokenLogo: string;
-  totalAmountFiat: string | number; // The value could be 'NaN', so we can represent it as either a string or a number.
-  price: number | null;
+  formatedAmount: string;
   quantity: string;
   id: string;
   info: AssetInfo;

@@ -9,31 +9,21 @@ type DefaultTokenInfo = {
   decimals: number;
 };
 
-type Metadata = {
-  type: string;
-  policyId: string;
-  assetName: string;
-  ticker: string;
-  logo: string | null;
-  longName: string | null;
-  numberOfDecimals: number;
-};
+// type Metadata = {
+//   type: string;
+//   policyId: string;
+//   assetName: string;
+//   ticker: string;
+//   logo: string | null;
+//   longName: string | null;
+//   numberOfDecimals: number;
+// };
 
-type PrimaryTokenInfo = {
-  TokenId: number;
-  NetworkId: number;
-  IsDefault: boolean;
-  IsNFT: boolean;
-  Identifier: string;
-  Digest: number;
-  Metadata: Metadata;
-};
+type PrimaryTokenInfo = any; // TODO - define the structure of PrimaryTokenInfo
 
 export type WalletBalance = {
   ada: string;
 };
-
-type GetCurrentPrice = (from: string, to: string) => number | Promise<number>; // Function type for getCurrentPrice
 
 export type CurrentWalletType = {
   currentPool: any;
@@ -51,6 +41,5 @@ export type CurrentWalletType = {
   isHardwareWallet: boolean;
   primaryTokenInfo: PrimaryTokenInfo;
   walletBalance: WalletBalance;
-  getCurrentPrice: GetCurrentPrice; // Added the function type here
-  assetList: any[];
+  ftAssetList: any[];
 };
