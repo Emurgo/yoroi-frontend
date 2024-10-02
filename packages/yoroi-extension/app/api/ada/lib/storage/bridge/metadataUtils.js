@@ -28,7 +28,7 @@ export function createMetadata(
 export function parseMetadata(s: any): string {
   if (isHex(s)) {
     return RustModule.WasmScope(Scope => {
-      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
+      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(s);
       const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
         metadatum, Scope.WalletV4.MetadataJsonSchema.BasicConversions
       );
@@ -41,7 +41,7 @@ export function parseMetadata(s: any): string {
 export function parseMetadataDetailed(s: any): string {
   if (isHex(s)) {
     return RustModule.WasmScope(Scope => {
-      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(hex);
+      const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(s);
       const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
         metadatum, Scope.WalletV4.MetadataJsonSchema.DetailedSchema
       );
