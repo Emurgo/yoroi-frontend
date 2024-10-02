@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 
 import styles from './WarningBox.scss';
+
 type Props = {|
   +children: ?Node,
 |};
