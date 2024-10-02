@@ -5,7 +5,7 @@ import Store from '../../base/Store';
 
 import { wrapWithFrame } from '../../lib/TrezorWrapper';
 import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
-import { Logger, stringifyError, } from '../../../utils/logging';
+import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
 import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ROUTES } from '../../../routes-config';
@@ -24,6 +24,7 @@ import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackage
 import { broadcastTransaction } from '../../../api/thunk';
 import { transactionHexToBodyHex, transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
+import { genAddressingLookup } from '../../stateless/addressStores';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -99,6 +100,48 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       this._setError(e);
     } finally {
       this._setActionProcessing(false);
+    }
+  }
+
+  signAndBroadcastFromWallet: {|
+    signRequest: HaskellShelleyTxSignRequest | string,
+    +wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      ...
+    },
+  |} => Promise<{| txId: string |}> = async (request) => {
+    try {
+      Logger.debug(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcastFromWallet)} called: ` + stringifyData(request));
+
+      const { signRequest, wallet } = request;
+
+      if (typeof signRequest === 'string') {
+
+        const addressingMap = genAddressingLookup(
+          request.wallet.networkId,
+          this.stores.addresses.addressSubgroupMap
+        );
+
+        return this.signAndBroadcastRawTx({
+          rawTxHex: signRequest,
+          addressingMap,
+          publicDeriverId: request.wallet.publicDeriverId,
+          networkId: request.wallet.networkId,
+        })
+      } else {
+        return this.signAndBroadcast({
+          signRequest,
+          wallet,
+        });
+      }
+
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
     }
   }
 

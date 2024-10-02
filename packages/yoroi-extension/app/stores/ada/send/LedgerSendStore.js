@@ -148,9 +148,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   signAndBroadcastFromWallet: {|
-    params: {|
-      signRequest: HaskellShelleyTxSignRequest | string,
-    |},
+    signRequest: HaskellShelleyTxSignRequest | string,
     +wallet: {
       publicDeriverId: number,
       publicKey: string,
@@ -161,12 +159,10 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     },
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
-      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request.params));
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} called: ` + stringifyData(request));
 
       const publicKeyInfo = {
-        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.wallet.publicKey, 'hex')
-        ),
+        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
         addressing: {
           startLevel: 1,
           path: request.wallet.pathToPublic,
@@ -175,17 +171,19 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
       const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
 
-      const signRequest = request.params.signRequest;
+      const signRequest = request.signRequest;
+
+      const addressingMap = genAddressingLookup(
+        request.wallet.networkId,
+        this.stores.addresses.addressSubgroupMap
+      );
 
       if (typeof signRequest === 'string') {
         return this.signAndBroadcastRawTx({
           rawTxHex: signRequest,
           publicKey: publicKeyInfo,
           publicDeriverId: request.wallet.publicDeriverId,
-          addressingMap: genAddressingLookup(
-            request.wallet.networkId,
-            this.stores.addresses.addressSubgroupMap
-          ),
+          addressingMap,
           expectedSerial,
           networkId: request.wallet.networkId,
         });
@@ -194,17 +192,14 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
           signRequest,
           publicKey: publicKeyInfo,
           publicDeriverId: request.wallet.publicDeriverId,
-          addressingMap: genAddressingLookup(
-            request.wallet.networkId,
-            this.stores.addresses.addressSubgroupMap
-          ),
+          addressingMap,
           expectedSerial,
           networkId: request.wallet.networkId,
         });
       }
 
     } catch (error) {
-      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);
     }
   };

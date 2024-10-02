@@ -90,7 +90,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       const { wallet, signRequest } = request.broadcastRequest.ledger;
       broadcastRequest = async () => {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
-          params: { signRequest },
+          signRequest,
           wallet,
         });
       };
@@ -99,7 +99,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     } else if (request.broadcastRequest.trezor) {
       const { wallet, signRequest } = request.broadcastRequest.trezor;
       broadcastRequest = async () => {
-        return await this.stores.substores.ada.trezorSend.signAndBroadcast({
+        return await this.stores.substores.ada.trezorSend.signAndBroadcastFromWallet({
           signRequest,
           wallet,
         });
