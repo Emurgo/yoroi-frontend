@@ -267,11 +267,21 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
-    const signedCancelTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: tx.cbor
-    });
+
+    const transactionHex = tx.cbor;
+    const walletType: string = wallet.type;
+
+    const baseSignRequest = { wallet, transactionHex };
+    const signRequest = wallet.isHardware
+      ? { [walletType]: baseSignRequest }
+      : { normal: { ...baseSignRequest, password } };
+
+    const signingResult =
+      // $FlowIgnore[incompatible-call]
+      await props.stores.substores.ada.wallets.adaSignTransactionHex({ signRequest });
+
+    const signedCancelTx = signingResult.signedTxHex;
+
     const signedTransactionHexes =
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]

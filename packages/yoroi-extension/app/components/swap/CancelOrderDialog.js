@@ -70,6 +70,7 @@ export default function CancelSwapOrderDialog({
       </Dialog>
     );
   }
+  const isPasswordWallet = walletType === 'mnemonic';
   return (
     <Dialog
       title="Cancel order"
@@ -107,20 +108,22 @@ export default function CancelSwapOrderDialog({
             {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
-        <Box>
-          <TextField
-            className="walletPassword"
-            value={password}
-            label="Password"
-            type="password"
-            onChange={e => {
-              setIncorrectPassword(false);
-              setPassword(e.target.value);
-            }}
-            error={isIncorrectPassword && 'Incorrect password!'}
-            disabled={isLoading}
-          />
-        </Box>
+        {isPasswordWallet ? (
+          <Box>
+            <TextField
+              className="walletPassword"
+              value={password}
+              label="Password"
+              type="password"
+              onChange={e => {
+                setIncorrectPassword(false);
+                setPassword(e.target.value);
+              }}
+              error={isIncorrectPassword && 'Incorrect password!'}
+              disabled={isLoading}
+            />
+          </Box>
+        ) : null}
       </Box>
       <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
@@ -141,7 +144,7 @@ export default function CancelSwapOrderDialog({
               alert('Failed to process order cancel! ' + stringifyError(e));
             }
           }}
-          disabled={isLoading || password.length === 0}
+          disabled={isLoading || (isPasswordWallet && password.length === 0)}
         >
           {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
         </Button>
