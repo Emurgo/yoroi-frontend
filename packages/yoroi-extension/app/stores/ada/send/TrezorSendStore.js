@@ -104,7 +104,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
   }
 
   signAndBroadcastFromWallet: {|
-    signRequest: HaskellShelleyTxSignRequest | string,
+    signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
       networkId: number,
@@ -119,25 +119,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       const { signRequest, wallet } = request;
 
-      if (typeof signRequest === 'string') {
-
-        const addressingMap = genAddressingLookup(
-          request.wallet.networkId,
-          this.stores.addresses.addressSubgroupMap
-        );
-
-        return this.signAndBroadcastRawTx({
-          rawTxHex: signRequest,
-          addressingMap,
-          publicDeriverId: request.wallet.publicDeriverId,
-          networkId: request.wallet.networkId,
-        })
-      } else {
-        return this.signAndBroadcast({
-          signRequest,
-          wallet,
-        });
-      }
+      return this.signAndBroadcast({
+        signRequest,
+        wallet,
+      });
 
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
@@ -265,18 +250,50 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  signAndBroadcastRawTx: {|
+
+  signRawTxFromWallet: {|
+    rawTxHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      ...
+    },
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
+    try {
+      Logger.debug(`${nameof(TrezorSendStore)}::${nameof(this.signRawTxFromWallet)} called: ` + stringifyData(request));
+
+      const { rawTxHex, wallet } = request;
+
+      const addressingMap = genAddressingLookup(
+        request.wallet.networkId,
+        this.stores.addresses.addressSubgroupMap,
+      );
+
+      return this.signRawTx({
+        rawTxHex,
+        addressingMap,
+        networkId: wallet.networkId,
+      });
+
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signRawTxFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+  signRawTx: {|
     rawTxHex: string,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    publicDeriverId: number,
     networkId: number,
-  |} => Promise<{| txId: string |}> = async (request) => {
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
     const { rawTxHex } = request;
     try {
       const network = getNetworkById(request.networkId);
 
       const txBodyHex = transactionHexToBodyHex(rawTxHex);
-      const txId = transactionHexToHash(rawTxHex);
 
       const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
 
@@ -311,11 +328,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         trezorSignTxResp.payload.witnesses,
       );
 
-      await broadcastTransaction({
-        publicDeriverId: request.publicDeriverId,
-        signedTxHex,
-      });
-      return { txId };
+      return { signedTxHex };
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

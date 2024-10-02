@@ -148,7 +148,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
 
   /** Generates a payload with Ledger format and tries Send ADA using Ledger signing */
   signAndBroadcastFromWallet: {|
-    signRequest: HaskellShelleyTxSignRequest | string,
+    signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
       publicKey: string,
@@ -178,25 +178,14 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         this.stores.addresses.addressSubgroupMap
       );
 
-      if (typeof signRequest === 'string') {
-        return this.signAndBroadcastRawTx({
-          rawTxHex: signRequest,
-          publicKey: publicKeyInfo,
-          publicDeriverId: request.wallet.publicDeriverId,
-          addressingMap,
-          expectedSerial,
-          networkId: request.wallet.networkId,
-        });
-      } else {
-        return this.signAndBroadcast({
-          signRequest,
-          publicKey: publicKeyInfo,
-          publicDeriverId: request.wallet.publicDeriverId,
-          addressingMap,
-          expectedSerial,
-          networkId: request.wallet.networkId,
-        });
-      }
+      return this.signAndBroadcast({
+        signRequest,
+        publicKey: publicKeyInfo,
+        publicDeriverId: request.wallet.publicDeriverId,
+        addressingMap,
+        expectedSerial,
+        networkId: request.wallet.networkId,
+      });
 
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
@@ -335,17 +324,60 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  signAndBroadcastRawTx: {|
+
+  signRawTxFromWallet: {|
+    rawTxHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
+    try {
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} called: ` + stringifyData(request));
+
+      const publicKeyInfo = {
+        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
+        addressing: {
+          startLevel: 1,
+          path: request.wallet.pathToPublic,
+        },
+      };
+
+      const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
+
+      const addressingMap = genAddressingLookup(
+        request.wallet.networkId,
+        this.stores.addresses.addressSubgroupMap,
+      );
+
+      return this.signRawTx({
+        rawTxHex: request.rawTxHex,
+        publicKey: publicKeyInfo,
+        addressingMap,
+        expectedSerial,
+        networkId: request.wallet.networkId,
+      });
+
+    } catch (error) {
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+  signRawTx: {|
     rawTxHex: string,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    publicDeriverId: number,
     networkId: number,
     expectedSerial: string | void,
-  |} => Promise<{| txId: string |}> = async (request) => {
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
 
     let ledgerConnect: ?LedgerConnect;
     try {
@@ -360,7 +392,6 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       const network = getNetworkById(request.networkId);
 
       const txBodyHex = transactionHexToBodyHex(rawTxHex);
-      const txId = transactionHexToHash(rawTxHex);
 
       const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
 
@@ -393,12 +424,7 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         request.publicKey,
       );
 
-      await broadcastTransaction({
-        publicDeriverId: request.publicDeriverId,
-        signedTxHex,
-      });
-
-      return { txId };
+      return { signedTxHex };
     } catch (error) {
       Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

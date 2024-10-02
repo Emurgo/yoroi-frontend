@@ -8,7 +8,7 @@ import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { createWallet } from '../../api/thunk';
+import { createWallet, signTransaction } from '../../api/thunk';
 import type {
   Addressing,
   QueriedUtxo,
@@ -128,6 +128,73 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       refreshWallet: request.refreshWallet,
       plateTextPart,
     });
+  };
+
+  adaSignTransactionHex: ({|
+    signRequest:
+      | {|
+          normal: {|
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              ...
+            },
+            transactionHex: string,
+            password: string,
+          |},
+        |}
+      | {|
+          trezor: {|
+            transactionHex: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              publicKey: string,
+              pathToPublic: Array<number>,
+              stakingAddressing: Addressing,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            },
+          |},
+        |}
+      | {|
+          ledger: {|
+            transactionHex: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              stakingAddressing: Addressing,
+              publicKey: string,
+              pathToPublic: Array<number>,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            }
+          |},
+        |},
+  |}) => Promise<{| signedTxHex: string |}> = async request => {
+    if (request.signRequest.ledger) {
+      const { wallet, transactionHex } = request.signRequest.ledger;
+      return this.stores.substores.ada.ledgerSend
+        .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
+    } else if (request.signRequest.trezor) {
+      const { wallet, transactionHex } = request.signRequest.trezor;
+      return this.stores.substores.ada.trezorSend
+        .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
+    } else if (request.signRequest.normal) {
+      const { wallet, transactionHex, password } = request.signRequest.normal;
+      const signedTxHex = await signTransaction({
+        publicDeriverId: wallet.publicDeriverId,
+        transactionHex,
+        password,
+      });
+      return { signedTxHex };
+    } else {
+      throw new Error(
+        `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
+      );
+    };
   };
 
   // =================== WALLET RESTORATION ==================== //
