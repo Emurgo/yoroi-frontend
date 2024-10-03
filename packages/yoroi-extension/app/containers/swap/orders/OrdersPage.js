@@ -27,7 +27,6 @@ import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import { signTransaction } from '../../../api/thunk';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';

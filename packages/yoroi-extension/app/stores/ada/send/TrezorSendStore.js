@@ -22,7 +22,7 @@ import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/der
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
-import { transactionHexToBodyHex, transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
 import { genAddressingLookup } from '../../stateless/addressStores';
 

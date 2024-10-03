@@ -208,18 +208,21 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       return this.stores.substores.ada.trezorSend
         .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
     } else if (request.signRequest.normal) {
-      const { wallet, transactionHex, password } = request.signRequest.normal;
+      const {
+        wallet,
+        transactionHex,
+        password
+      } = request.signRequest.normal;
       const signedTxHex = await signTransaction({
         publicDeriverId: wallet.publicDeriverId,
         transactionHex,
         password,
       });
       return { signedTxHex };
-    } else {
-      throw new Error(
-        `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
-      );
     }
+    throw new Error(
+      `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
+    );
   };
 
   // =================== WALLET RESTORATION ==================== //
