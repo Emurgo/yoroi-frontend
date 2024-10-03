@@ -805,7 +805,7 @@ const globalMessages: * = defineMessages({
   },
   auditAddressWarning: {
     id: 'wallet.receive.page.internalWarning2',
-    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should <strong>never</strong> be used.',
+    defaultMessage: '!!!addresses are shown here for personal auditing purposes and should never be used.',
   },
   lastSyncMessage: {
     id: 'myWallets.wallets.lastSyncText',
