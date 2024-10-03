@@ -245,11 +245,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    const signedCollateralReorgTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: collateralReorgTx.cbor
-    });
+
+    const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: collateralReorgTx.cbor, password });
+
     setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
@@ -268,19 +267,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
 
-    const transactionHex = tx.cbor;
-    const walletType: string = wallet.type;
-
-    const baseSignRequest = { wallet, transactionHex };
-    const signRequest = wallet.isHardware
-      ? { [walletType]: baseSignRequest }
-      : { normal: { ...baseSignRequest, password } };
-
-    const signingResult =
-      // $FlowIgnore[incompatible-call]
-      await props.stores.substores.ada.wallets.adaSignTransactionHex({ signRequest });
-
-    const signedCancelTx = signingResult.signedTxHex;
+    const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: tx.cbor, password });
 
     const signedTransactionHexes =
       signedCollateralReorgTx != null

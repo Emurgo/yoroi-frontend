@@ -130,6 +130,31 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
+  adaSignTransactionHexFromWallet: ({|
+    transactionHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      type: 'trezor' | 'ledger' | 'mnemonic',
+      isHardware: boolean,
+      ...
+    },
+    password: string,
+  |}) => Promise<{| signedTxHex: string |}> = async ({ wallet, transactionHex, password }) => {
+    const walletType: string = wallet.type;
+    const baseSignRequest = { wallet, transactionHex };
+    const signRequest = wallet.isHardware
+      ? { [walletType]: baseSignRequest }
+      : { normal: { ...baseSignRequest, password } };
+    // $FlowIgnore[incompatible-call]
+    return this.adaSignTransactionHex({ signRequest });
+  }
+
   adaSignTransactionHex: ({|
     signRequest:
       | {|
@@ -192,9 +217,9 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       return { signedTxHex };
     } else {
       throw new Error(
-        `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
+        `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
       );
-    };
+    }
   };
 
   // =================== WALLET RESTORATION ==================== //
