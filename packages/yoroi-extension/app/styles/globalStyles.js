@@ -106,8 +106,8 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
     '--yoroi-palette-secondary-contrastText': theme.palette.ds.text_gray_medium,
 
     '--yoroi-palette-error-50': theme.palette.ds.text_error,
-    '--yoroi-palette-error-100': theme.palette.ds.sys_magenta_100,
-    '--yoroi-palette-error-200': theme.palette.ds.sys_magenta_300,
+    '--yoroi-palette-error-100': theme.palette.ds.text_error,
+    '--yoroi-palette-error-200': theme.palette.ds.text_error,
 
     '--yoroi-palette-cyan-50': theme.palette.ds.sys_cyan_100,
     '--yoroi-palette-cyan-100': theme.palette.ds.sys_cyan_500,
