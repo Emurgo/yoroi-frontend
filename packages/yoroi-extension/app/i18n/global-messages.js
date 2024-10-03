@@ -294,7 +294,7 @@ const globalMessages: * = defineMessages({
   },
   attentionHeaderText: {
     id: 'widgets.warningBox.headerText',
-    defaultMessage: '!!!ATTENTION:',
+    defaultMessage: '!!!Attention',
   },
   recoveryPhraseDialogTitle: {
     id: 'wallet.backup.recovery.phrase.dialog.title',

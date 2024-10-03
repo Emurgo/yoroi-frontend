@@ -1032,7 +1032,7 @@
   "widgets.copyableaddress.addressCopyTooltipMessage": "Copy to clipboard",
   "widgets.copyableaddress.copied": "Copied",
   "widgets.explorer.tooltip": "Go to {websiteName}",
-  "widgets.warningBox.headerText": "ATTENTION:",
+  "widgets.warningBox.headerText": "Attention",
   "yoroiTransfer.error.noTransferTxError": "There is no transfer transaction to send.",
   "yoroiTransfer.error.transferFundsError": "Unable to transfer funds.",
   "yoroiTransfer.error.walletChangedError": "The wallet has changed. Please re-confirm your transaction.",
