@@ -10,6 +10,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
+  internalAddressesTitle: {
+    id: 'wallet.receive.page.internalAddressesTitle',
+    defaultMessage: '!!!Internal addresses',
+  },
   warning1: {
     id: 'wallet.receive.page.internalWarning1',
     defaultMessage:
@@ -38,39 +42,47 @@ export default class InternalHeader extends Component<Props> {
       <Link
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => this.props.onExternalLinkClick(event)}
-        underline='none'
+        underline="none"
         color="ds.primary_500"
       >
         {intl.formatMessage(globalMessages.blogLinkWrapper)}
       </Link>
     );
     return (
-      <WarningHeader
-        message={
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              justifyContent: 'flex-start',
-            }}
-          >
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {intl.formatMessage(messages.warning1)}
-            </Typography>
-            <Typography
-              variant="body1"
-              color="ds.text_gray_medium"
+      <Box>
+        <Typography
+          variant="body1"
+          sx={{
+            fontWeight: 500,
+            paddingBottom: '24px',
+          }}
+        >
+          {intl.formatMessage(messages.internalAddressesTitle)}
+        </Typography>
+        <WarningHeader
+          message={
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+              }}
             >
-              <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
-            </Typography>
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
-              {intl.formatMessage(globalMessages.auditAddressWarning)}
-            </Typography>
-          </Box>
-        }
-      />
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.warning1)}
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
+                {intl.formatMessage(globalMessages.auditAddressWarning)}
+              </Typography>
+            </Box>
+          }
+        />
+      </Box>
     );
   }
 }

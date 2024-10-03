@@ -689,6 +689,8 @@
   "wallet.receive.page.verifyAddressLabel": "Verify address",
   "wallet.receive.page.walletAddressLabel": "Your wallet address",
   "wallet.receive.page.walletReceiveInstructions": "Share this wallet address to receive payments.<br>To protect your privacy, new addresses are generated automatically once you use them.",
+  "wallet.receive.page.rewardAddressesTitle": "Reward addresses",
+  "wallet.receive.page.internalAddressesTitle": "Internal addresses",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Clear",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirm",
   "wallet.recovery.phrase.show.entry.dialog.button.labelRemoveLast": "Remove last",
