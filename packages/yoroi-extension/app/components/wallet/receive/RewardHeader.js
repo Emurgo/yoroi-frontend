@@ -37,10 +37,13 @@ export default class RewardHeader extends Component<Props> {
     const { intl } = this.context;
     return (
       <Box>
-        <Typography variant='body1' sx={{
-          fontWeight: 500,
-          paddingBottom: '24px',
-        }}>
+        <Typography
+          variant='body1'
+          sx={{
+            fontWeight: 500,
+            paddingBottom: '24px',
+          }}
+        >
           {intl.formatMessage(messages.rewardAddressesTitle)}
         </Typography>
         <WarningHeader

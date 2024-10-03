@@ -4,8 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './WarningHeader.scss';
-import { ReactComponent as InvalidURIImg } from '../../../assets/images/uri/invalid-uri.inline.svg';
-import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';

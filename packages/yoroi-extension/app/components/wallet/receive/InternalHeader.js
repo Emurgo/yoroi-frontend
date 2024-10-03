@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
 import globalMessages from '../../../i18n/global-messages';
