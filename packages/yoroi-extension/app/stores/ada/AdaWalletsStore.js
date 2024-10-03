@@ -203,16 +203,14 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
       const { wallet, transactionHex } = request.signRequest.ledger;
       return this.stores.substores.ada.ledgerSend
         .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
-    } else if (request.signRequest.trezor) {
+    }
+    if (request.signRequest.trezor) {
       const { wallet, transactionHex } = request.signRequest.trezor;
       return this.stores.substores.ada.trezorSend
         .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
-    } else if (request.signRequest.normal) {
-      const {
-        wallet,
-        transactionHex,
-        password
-      } = request.signRequest.normal;
+    }
+    if (request.signRequest.normal) {
+      const { wallet, transactionHex, password } = request.signRequest.normal;
       const signedTxHex = await signTransaction({
         publicDeriverId: wallet.publicDeriverId,
         transactionHex,
