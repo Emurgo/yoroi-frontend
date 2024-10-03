@@ -137,7 +137,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
         <Typography color="ds.text_gray_normal">
-          {isPrimary ? walletBalance?.ada : token.formatedAmount} {token.name}
+          {isPrimary ? walletBalance?.ada : token.formatedAmount} {token.info.name}
         </Typography>
         {token.name === accountPair?.to.name ? (
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
@@ -151,13 +151,29 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   );
 };
 
-export const TokenPrice = ({ unitOfAccount, secondaryToken24Activity, ptActivity, isPrimaryToken }) => {
+export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
+  const isPrimaryToken = token?.info.policyId.length === 0;
+  const { accountPair, primaryTokenInfo } = usePortfolio();
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
-  if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
+  if (secondaryToken24Activity === null) return <Skeleton variant="text" width="50px" height="30px" />;
+
+  const showingAda = accountPair?.from.name === 'ADA';
+  const tokenPriceFiat = new BigNumber(tokenPrice);
+
+  const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
+  const decimals = showingAda ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
+
+  const totaPrice =
+    ptActivity.close &&
+    atomicBreakdown(tokenQuantityAsBigInt, decimals)
+      .bn.times(tokenPriceFiat ?? 1)
+      .times(showingAda ? 1 : String(ptActivity.close))
+      .toFormat(decimals);
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {formatPriceChange(tokenPrice)} {unitOfAccount}
+      {formatPriceChange(accountPair?.from.name === 'ADA' ? tokenPrice : totaPrice / Number(token.shiftedAmount))}{' '}
+      {accountPair?.from.name}
     </Typography>
   );
 };

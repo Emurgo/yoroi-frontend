@@ -165,13 +165,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: connectorMessages.connector,
     isVisible: _request => true,
   },
-  // {
-  //   className: 'swap',
-  //   route: '/swap',
-  //   icon: swapIcon,
-  //   label: globalMessages.sidebarSwap,
-  //   isVisible: _request => true,
-  // },
+  {
+    className: 'swap',
+    route: '/swap',
+    icon: swapIcon,
+    label: globalMessages.sidebarSwap,
+    isVisible: _request => true,
+  },
   {
     className: 'governance',
     route: '/governance',

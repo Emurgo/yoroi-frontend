@@ -8,18 +8,17 @@ import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
 import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
+import { isEmpty } from 'lodash';
 
 interface Props {
   tokenInfo: TokenInfoType;
 }
 
 const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
-  console.log('tokenInfo', tokenInfo);
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, walletBalance } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-  console.log('isPrimaryToken', isPrimaryToken);
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
 
   if (tokenInfo.quantity === null) {
@@ -36,7 +35,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   } = usePortfolioTokenActivity();
 
   const totaPriceCalc = React.useMemo(() => {
-    if (!isPrimaryToken && data24h) {
+    if (!isPrimaryToken && !isEmpty(data24h)) {
       const tokenPrice = data24h && data24h[tokenInfo.info.id][1]?.price.close;
       const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
       const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;

@@ -74,7 +74,7 @@ export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network =
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
-
+  console.log("networkUrl",networkUrl)
   return (
     <Box>
       <Box backgroundColor="common.white">

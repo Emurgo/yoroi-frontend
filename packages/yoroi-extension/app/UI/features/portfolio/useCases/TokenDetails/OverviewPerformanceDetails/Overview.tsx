@@ -14,9 +14,7 @@ interface Props {
 const Overview = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const { networkId } = usePortfolio();
-  const networkUrl = networkId !== null ? getNetworkUrl(networkId) : '';
-  console.log('networkUrl', networkUrl);
+
   // const explorers = useExplorers('mainnet' as Chain.SupportedNetworks);
 
   // console.log('explorers', explorers);
@@ -61,7 +59,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
 
       <TokenOverviewSection
         label={strings.fingerprint}
-        value={`${networkUrl}/${tokenInfo.info.policyId}${tokenInfo?.assetName}`}
+        value={`${tokenInfo.info.policyId}${tokenInfo?.assetName}`}
         isNetworkUrl={true}
       />
     </Stack>
@@ -78,11 +76,13 @@ type TokenOverviewSectionTypes = {
 };
 
 const TokenOverviewSection = ({ label, value, isExternalLink = false, isNetworkUrl = false }: TokenOverviewSectionTypes) => {
-  console.log('value', value);
-  const theme: any = useTheme();
   if (!value) {
     return <></>;
   }
+
+  const { networkId } = usePortfolio();
+  const networkUrl = networkId !== null ? getNetworkUrl(networkId) : '';
+  const theme: any = useTheme();
 
   return (
     <Stack direction="column" spacing={theme.spacing(0.5)}>
@@ -93,7 +93,7 @@ const TokenOverviewSection = ({ label, value, isExternalLink = false, isNetworkU
         <Stack direction="row" gap="16px">
           <LinkMui
             target="_blank"
-            href={isNetworkUrl != null ? `${value}` : ''}
+            href={isNetworkUrl != null ? `${networkUrl.cardanoScan}/${value}` : ''}
             rel="noopener noreferrer"
             sx={{ textDecoration: 'none' }}
           >
@@ -101,7 +101,7 @@ const TokenOverviewSection = ({ label, value, isExternalLink = false, isNetworkU
           </LinkMui>
           <LinkMui
             target="_blank"
-            href={isNetworkUrl != null ? `${value}` : ''}
+            href={isNetworkUrl != null ? `${networkUrl.cexplorer}/${value}` : ''}
             rel="noopener noreferrer"
             sx={{ textDecoration: 'none' }}
           >

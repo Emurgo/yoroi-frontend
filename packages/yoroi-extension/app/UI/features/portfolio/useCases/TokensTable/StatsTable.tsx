@@ -29,6 +29,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     order: 'asc',
     orderBy: 'portfolioPercents',
   });
+  console.log('ASSET LIST', data);
   const list = useMemo(() => [...data], [data]);
 
   console.log('order', order, orderBy);
@@ -93,17 +94,12 @@ const StatsTable = ({ data }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPrice
-              isPrimaryToken={row.info.policyId?.length === 0}
-              ptActivity={ptActivity}
-              unitOfAccount={unitOfAccount}
-              secondaryToken24Activity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
-            />
+            <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
             <TokenPriceChangeChip
-              secondaryTokenActivity={data24h && data24h[`${row.info.policyId}.${row.assetName}`]}
+              secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={row.info.policyId?.length === 0}
             />
@@ -111,7 +107,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
             <TokenPriceChangeChip
-              secondaryTokenActivity={data7d && data7d[`${row.info.policyId}.${row.assetName}`]}
+              secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={row.info.policyId?.length === 0}
               timeInterval={TOKEN_CHART_INTERVAL.WEEK}
@@ -120,7 +116,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
-              secondaryTokenActivity={data30d && data30d[`${row.info.policyId}.${row.assetName}`]}
+              secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={row.info.policyId?.length === 0}
               timeInterval={TOKEN_CHART_INTERVAL.MONTH}
@@ -128,11 +124,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
-            <TokenProcentage
-              procentage={
-                row.info.policyId.length === 0 ? procentageData[''] : procentageData[`${row.info.policyId}.${row.assetName}`]
-              }
-            />
+            <TokenProcentage procentage={row.info.policyId.length === 0 ? procentageData[''] : procentageData[row.info.id]} />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>

@@ -8,6 +8,7 @@ import { formatPriceChange, priceChange } from '../../../common/helpers/priceCha
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
+import { isEmpty } from 'lodash';
 
 interface Props {
   chartData: any;
@@ -32,10 +33,10 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
 
   const priceChangeProcent = isPrimaryToken
     ? detailInfo?.changePercent || changePercent
-    : data24h && data24h[tokenInfo?.info?.id][1].price.change;
+    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.change;
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
-    : data24h && data24h[tokenInfo?.info?.id][1].price.close;
+    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.close;
 
   // console.log('priceChangeProcent', data24h && data24h[tokenInfo?.info?.id][1]?.price);
 

@@ -99,6 +99,7 @@ const getAssetWalletAssetList = (stores: any) => {
       const tokenLogo = `data:image/png;base64,${
         token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
       }`;
+
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
 
@@ -107,7 +108,7 @@ const getAssetWalletAssetList = (stores: any) => {
         quantity: asQuantity(token.entry.amount),
         id: tokenId,
         formatedAmount: [beforeDecimal, afterDecimal].join(''),
-
+        shiftedAmount,
         info: {
           id: token.entry.identifier,
           name: tokenName,
