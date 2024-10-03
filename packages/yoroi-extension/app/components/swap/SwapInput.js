@@ -40,7 +40,6 @@ export default function SwapInput({
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
   const { name } = useTheme();
-  console.log('name', name);
 
   const handleChange = e => {
     if (!disabled) {
@@ -79,7 +78,6 @@ export default function SwapInput({
           borderColor: error ? 'ds.sys_magenta_500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
-          pr: '8px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           gridTemplateRows: '1fr 1fr',

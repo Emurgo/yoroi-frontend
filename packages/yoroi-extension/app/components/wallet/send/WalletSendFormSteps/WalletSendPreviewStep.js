@@ -35,7 +35,7 @@ import { SEND_FORM_STEP } from '../../../../types/WalletSendTypes';
 import { ReactComponent as AttentionIcon } from '../../../../assets/images/attention-modern.inline.svg';
 
 const SBox = styled(Box)(({ theme }) => ({
-  background: theme.palette.ds.bg_gradient_3,
+  backgroundImage: theme.palette.ds.bg_gradient_3,
   color: 'grayscale.min',
 }));
 
@@ -608,7 +608,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
               disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
               id="wallet:send:confrimTransactionStep-confirmTransaction-button"
             >
-              {isSubmitting ? <LoadingSpinner light /> : intl.formatMessage(this.getSendButtonText())}
+              {isSubmitting ? <LoadingSpinner small light /> : intl.formatMessage(this.getSendButtonText())}
             </Button>
           </Stack>
         </Box>
