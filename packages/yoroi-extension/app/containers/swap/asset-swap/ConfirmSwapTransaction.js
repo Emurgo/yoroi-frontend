@@ -107,7 +107,7 @@ export default function ConfirmSwapTransaction({
   }, []);
 
   return (
-    <GradientBox width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
+    <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
         <Typography component="div" variant="h4" fontWeight={500} color="ds.text_gray_medium">
           Confirm swap transaction
@@ -219,7 +219,7 @@ export default function ConfirmSwapTransaction({
           />
         </Box>
       )}
-    </GradientBox>
+    </Box>
   );
 }
 
