@@ -61,7 +61,7 @@ import {
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
-import { hexToBytes, iterateLenGet, noop } from '../../coreUtils';
+import { hexToBytes, iterateLenGet, noop, purify } from '../../coreUtils';
 import {
   broadcastTransaction,
   connectWindowRetrieveData,
@@ -1081,7 +1081,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const signResult = await wrapWithFrame(trezor =>
         trezor.cardanoSignTransaction({
-          ...trezorSignTxPayload,
+          ...purify(trezorSignTxPayload),
           allowSeedlessDevice: true,
         })
       );

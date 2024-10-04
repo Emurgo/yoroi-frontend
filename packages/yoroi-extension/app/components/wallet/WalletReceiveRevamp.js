@@ -201,7 +201,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
                   linkType={address.type === CoreAddressTypes.CARDANO_REWARD ? 'stakeAddress' : 'address'}
                 >
                   <RawHash light={address.isUsed === true}>
-                    <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight="500">
+                    <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight="400">
                       {truncateAddressShort(address.address, 16)}
                     </Typography>
                   </RawHash>
