@@ -1,10 +1,7 @@
 // @flow
 import moment from 'moment';
-import FileSaver from 'file-saver';
 import { inspect } from 'util';
-
 import type { ConfigType } from '../../config/config-types';
-
 import environment from '../environment';
 
 const logger = console;
@@ -59,7 +56,10 @@ export const downloadLogs = (publicKey?: string) => {
   }
   errorLogs.unshift(header);
   const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
-  FileSaver.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
+
+  import('file-saver').then(FileSaver => {
+    FileSaver.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
+  });
 };
 
 // ========== STRINGIFY =========
