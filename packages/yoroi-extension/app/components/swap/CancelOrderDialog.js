@@ -71,13 +71,14 @@ export default function CancelSwapOrderDialog({
     );
   }
   const isPasswordWallet = walletType === 'mnemonic';
+  const dialogHeight = isPasswordWallet ? '496px' : '388px';
   return (
     <Dialog
       title="Cancel order"
       onClose={onDialogClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
+      styleOverride={{ maxWidth: '612px', height: dialogHeight, minWidth: '612px' }}
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
@@ -123,7 +124,7 @@ export default function CancelSwapOrderDialog({
               disabled={isLoading}
             />
           </Box>
-        ) : null}
+        ) : <Box paddingTop="12px" />}
       </Box>
       <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
