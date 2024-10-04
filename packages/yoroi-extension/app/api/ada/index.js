@@ -82,8 +82,8 @@ import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto
 import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
-import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
-import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
+import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
+import { createLedgerSignTxPayload, toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -121,8 +121,6 @@ import type {
   MultiAssetSupplyFunc,
   RemoteUnspentOutput,
   SendFunc,
-  SignedRequest,
-  SignedResponse,
   TokenInfoFunc,
   UtxoData,
 } from './lib/state-fetch/types';
@@ -131,10 +129,10 @@ import type { AddressRowWithPath, } from './lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay, getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
+  cardanoMinAdaRequiredFromAssets,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
-  cardanoMinAdaRequiredFromAssets,
 } from './transactions/utils';
 import type { TransactionExportRow } from '../export';
 
@@ -150,6 +148,7 @@ import type {
 } from '../common/types';
 import {
   getCardanoHaskellBaseConfig,
+  getCardanoHaskellBaseConfigCombined,
   getNetworkById,
 } from './lib/storage/database/prepackaged/networks';
 import { toSenderUtxos } from './transactions/transfer/utils';
@@ -157,7 +156,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
+import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -180,9 +179,6 @@ export type GetAllAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
-export type GetAllAddressesForDisplayFunc = (
-  request: GetAllAddressesForDisplayRequest
-) => Promise<GetAllAddressesForDisplayResponse>;
 
 // getChainAddressesForDisplay
 
@@ -192,9 +188,6 @@ export type GetChainAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
-export type GetChainAddressesForDisplayFunc = (
-  request: GetChainAddressesForDisplayRequest
-) => Promise<GetChainAddressesForDisplayResponse>;
 
 // refreshTransactions
 
@@ -238,28 +231,10 @@ export type SignAndBroadcastFunc = (
 
 // createTrezorSignTxData
 
-export type CreateTrezorSignTxDataRequest = {|
-  signRequest: HaskellShelleyTxSignRequest,
-  network: $ReadOnly<NetworkRow>,
-|};
 export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: $Exact<CardanoSignTransaction>,
 |};
-export type CreateTrezorSignTxDataFunc = (
-  request: CreateTrezorSignTxDataRequest
-) => Promise<CreateTrezorSignTxDataResponse>;
-
-// broadcastTrezorSignedTx
-
-export type BroadcastTrezorSignedTxRequest = {|
-  signedTxRequest: SignedRequest,
-  sendTx: SendFunc,
-|};
-export type BroadcastTrezorSignedTxResponse = SignedResponse;
-export type BroadcastTrezorSignedTxFunc = (
-  request: BroadcastTrezorSignedTxRequest
-) => Promise<BroadcastTrezorSignedTxResponse>;
 
 // createLedgerSignTxData
 
@@ -272,20 +247,16 @@ export type CreateLedgerSignTxDataRequest = {|
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
 |};
-export type CreateLedgerSignTxDataFunc = (
-  request: CreateLedgerSignTxDataRequest
-) => Promise<CreateLedgerSignTxDataResponse>;
 
-// broadcastLedgerSignedTx
+// createHwSignTxData
 
-export type BroadcastLedgerSignedTxRequest = {|
-  signedTxRequest: SignedRequest,
-  sendTx: SendFunc,
+export type CreateHWSignTxDataRequestFromRawTx = {|
+  txBodyHex: string,
+  network: $ReadOnly<NetworkRow>,
+  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  senderUtxos: Array<CardanoAddressedUtxo>,
+  additionalRequiredSigners?: Array<string>,
 |};
-export type BroadcastLedgerSignedTxResponse = SignedResponse;
-export type BroadcastLedgerSignedTxFunc = (
-  request: BroadcastLedgerSignedTxRequest
-) => Promise<BroadcastLedgerSignedTxResponse>;
 
 // createUnsignedTx
 
@@ -773,9 +744,10 @@ export default class AdaApi {
     }
   }
 
-  async createTrezorSignTxData(
-    request: CreateTrezorSignTxDataRequest
-  ): Promise<CreateTrezorSignTxDataResponse> {
+  createTrezorSignTxData(request: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    network: $ReadOnly<NetworkRow>,
+  |}): CreateTrezorSignTxDataResponse {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
 
@@ -783,7 +755,7 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const trezorSignTxPayload = await createTrezorSignTxPayload(
+      const trezorSignTxPayload = createTrezorSignTxPayload(
         request.signRequest,
         config.ByronNetworkId,
         Number.parseInt(config.ChainNetworkId, 10),
@@ -799,9 +771,9 @@ export default class AdaApi {
     }
   }
 
-  async createLedgerSignTxData(
+  createLedgerSignTxData(
     request: CreateLedgerSignTxDataRequest
-  ): Promise<CreateLedgerSignTxDataResponse> {
+  ): CreateLedgerSignTxDataResponse {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
 
@@ -809,7 +781,7 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const ledgerSignTxPayload = await createLedgerSignTxPayload({
+      const ledgerSignTxPayload = createLedgerSignTxPayload({
         signRequest: request.signRequest,
         byronNetworkMagic: config.ByronNetworkId,
         networkId: Number.parseInt(config.ChainNetworkId, 10),
@@ -824,6 +796,57 @@ export default class AdaApi {
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
 
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
+  createHwSignTxDataFromRawTx(
+    hw: 'ledger' | 'trezor',
+    request: CreateHWSignTxDataRequestFromRawTx
+  ): (
+    {| hw: 'ledger', result: CreateLedgerSignTxDataResponse |}
+    | {| hw: 'trezor', result: CreateTrezorSignTxDataResponse |}
+  ) {
+    try {
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} called`);
+
+      const config = getCardanoHaskellBaseConfigCombined(request.network);
+      const protocolMagic = config.ByronNetworkId ?? fail('Missing ByronNetworkId in network config!');
+
+      const addressMap = s => request.addressingMap(s)?.path;
+
+      if (hw === 'ledger') {
+
+        const ledgerSignTxPayload = toLedgerSignRequest(
+          request.txBodyHex,
+          Number(config.ChainNetworkId),
+          protocolMagic,
+          addressMap,
+          request.senderUtxos,
+          request.additionalRequiredSigners ?? [],
+        );
+
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(ledgerSignTxPayload));
+        return { hw, result: { ledgerSignTxPayload } };
+      }
+      if (hw === 'trezor') {
+
+        const trezorSignTxPayload = toTrezorSignRequest(
+          request.txBodyHex,
+          Number(config.ChainNetworkId),
+          protocolMagic,
+          addressMap,
+          request.senderUtxos,
+        );
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(trezorSignTxPayload));
+        return { hw, result: { trezorSignTxPayload } };
+      }
+
+      throw new Error('Now supported HW type: ' + hw);
+
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
@@ -1637,8 +1660,6 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
-        trezorTCatalystRegistrationTxSignData: undefined,
-        ledgerNanoCatalystRegistrationTxSignData: undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
@@ -2170,7 +2191,7 @@ export default class AdaApi {
     );
   }
 
-  // fixme: refactor this tmp function
+  // <TODO:TMP>
   async _addressedUtxosWithSubmittedTxs(
     originalUtxos: Array<CardanoAddressedUtxo>,
     publicDeriverId: number,

@@ -36,17 +36,18 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import { ChainDerivations, } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, forceNonNull, fail, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import { bytesToHex, fail, forceNonNull, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import { mergeWitnessSets } from '../utils';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
-export async function createLedgerSignTxPayload(request: {|
+export function createLedgerSignTxPayload(request: {|
   signRequest: HaskellShelleyTxSignRequest,
   byronNetworkMagic: number,
   networkId: number,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   cip36: boolean,
-|}): Promise<SignTransactionRequest> {
+|}): SignTransactionRequest {
   const txBody = request.signRequest.unsignedTx.build();
 
   // Inputs
@@ -83,8 +84,6 @@ export async function createLedgerSignTxPayload(request: {|
       request.addressingMap,
     ));
   }
-
-  const ttl = txBody.ttl();
 
   let auxiliaryData = undefined;
   if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
@@ -153,7 +152,8 @@ export async function createLedgerSignTxPayload(request: {|
     tx: {
       inputs: ledgerInputs,
       outputs: ledgerOutputs,
-      ttl: ttl === undefined ? ttl : ttl.toString(),
+      ttl: txBody.ttl_bignum()?.to_str() ?? null,
+      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       fee: txBody.fee().to_str(),
       network: {
         networkId: request.networkId,
@@ -162,9 +162,12 @@ export async function createLedgerSignTxPayload(request: {|
       withdrawals: ledgerWithdrawal.length === 0 ? null : ledgerWithdrawal,
       certificates: ledgerCertificates.length === 0 ? null : ledgerCertificates,
       auxiliaryData,
-      validityIntervalStart: undefined,
+      scriptDataHashHex: txBody.script_data_hash()?.to_hex() ?? null,
     },
     additionalWitnessPaths: [],
+    options: {
+      tagCborSets: false,
+    }
   };
 }
 
@@ -252,9 +255,12 @@ function _transformToLedgerOutputs(request: {|
 |}): Array<TxOutput> {
   const result = [];
 
+  // <TODO:UPDATE> support post-alonzo map
+
   for (const output of iterateLenGet(request.txOutputs)) {
     const address = output.address();
     const jsAddr = toHexOrBase58(address);
+    const datumHashHex = output.data_hash()?.to_hex() ?? null;
 
     const changeAddr = request.changeAddrs.find(change => jsAddr === change.address);
     if (changeAddr != null) {
@@ -272,6 +278,7 @@ function _transformToLedgerOutputs(request: {|
           type: TxOutputDestinationType.DEVICE_OWNED,
           params: addressParams,
         },
+        datumHashHex,
       });
     } else {
       result.push({
@@ -280,7 +287,8 @@ function _transformToLedgerOutputs(request: {|
         destination: {
           type: TxOutputDestinationType.THIRD_PARTY,
           params: { addressHex: address.to_hex() },
-        }
+        },
+        datumHashHex,
       });
     }
   }
@@ -621,7 +629,7 @@ export function toLedgerAddressParameters(request: {|
 }
 
 export function buildSignedTransaction(
-  txBody: RustModule.WalletV4.TransactionBody,
+  tx: RustModule.WalletV4.Transaction,
   senderUtxos: Array<CardanoAddressedUtxo>,
   witnesses: Array<Witness>,
   publicKey: {|
@@ -737,34 +745,40 @@ export function buildSignedTransaction(
     }
     witSet.set_vkeys(vkeyWitWasm);
   }
-  // TODO: handle script witnesses
+
+  const mergedWitnessSet = RustModule.WalletV4.TransactionWitnessSet.from_hex(
+    mergeWitnessSets(tx.witness_set().to_hex(), witSet.to_hex())
+  );
+
   return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witSet,
+    tx.body(),
+    mergedWitnessSet,
     metadata
   );
 }
 
-type AddressMap = { [addressHex: string]: Array<number> };
+type AddressMap = (addressHex: string) => ?Array<number>;
 
 // Convert connector sign tx input into request to Ledger.
 // Note this function has some overlaps in functionality with above functions but
 // this function is more generic because above functions deal only with Yoroi
 // extension "send" transactions.
 export function toLedgerSignRequest(
-  txBody: RustModule.WalletV4.TransactionBody,
+  txBodyHex: string,
   networkId: number,
   protocolMagic: number,
-  ownUtxoAddressMap: AddressMap,
-  ownStakeAddressMap: AddressMap,
-  addressedUtxos: Array<CardanoAddressedUtxo>,
+  ownAddressMap: AddressMap,
+  senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
+
+  const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
+
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
     return iterateLenGet(inputs).map(input => {
       const txHashHex = input.transaction_id().to_hex();
       const outputIndex = input.index();
-      const ownUtxo = addressedUtxos.find(utxo =>
+      const ownUtxo = senderUtxos.find(utxo =>
         utxo.tx_hash === txHashHex && utxo.tx_index === outputIndex
       );
       const path = ownUtxo?.addressing.path ?? null;
@@ -794,7 +808,7 @@ export function toLedgerSignRequest(
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
-      const ownAddressPath = ownUtxoAddressMap[addr.to_hex()];
+      const ownAddressPath = ownAddressMap(addr.to_hex());
       if (ownAddressPath) {
         destination = {
           type: TxOutputDestinationType.DEVICE_OWNED,
@@ -821,14 +835,14 @@ export function toLedgerSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownUtxoAddressMap[paymentAddress];
+      const ownPaymentPath = ownAddressMap(paymentAddress);
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(
           networkId,
           stake,
         ).to_address().to_hex();
-        const ownStakePath = ownStakeAddressMap[stakeAddr];
+        const ownStakePath = ownAddressMap(stakeAddr);
         if (ownStakePath) {
           // stake address is ours
           destination = {
@@ -942,8 +956,8 @@ export function toLedgerSignRequest(
         networkId,
         Module.WalletV4.Credential.from_keyhash(hash),
       ).to_address().to_hex();
-      return ownUtxoAddressMap[enterpriseAddress] ||
-        ownStakeAddressMap[stakeAddress];
+      return ownAddressMap(enterpriseAddress)
+        || ownAddressMap(stakeAddress);
     }
 
     iterateLenGet(txBody.required_signers())
@@ -974,7 +988,7 @@ export function toLedgerSignRequest(
   });
 
   function addressingMap(addr: string): void | {| +path: Array<number> |} {
-    const path = ownUtxoAddressMap[addr] || ownStakeAddressMap[addr];
+    const path = ownAddressMap(addr);
     if (path) {
       return { path };
     }
@@ -1041,11 +1055,11 @@ export function toLedgerSignRequest(
       inputs: formatInputs(txBody.inputs()),
       outputs,
       fee: txBody.fee().to_str(),
-      ttl: txBody.ttl(),
+      ttl: txBody.ttl_bignum()?.to_str() ?? null,
+      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       certificates: formattedCertificates,
       withdrawals: formattedWithdrawals,
       auxiliaryData: formattedAuxiliaryData,
-      validityIntervalStart: txBody.validity_start_interval_bignum()?.to_str() ?? null,
       mint: JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(
         ([policyIdHex, assets]) => ({
           policyIdHex,
@@ -1066,17 +1080,16 @@ export function toLedgerSignRequest(
 }
 
 export function buildConnectorSignedTransaction(
-  txBody: RustModule.WalletV4.TransactionBody,
+  rawTxHex: string,
   witnesses: Array<Witness>,
   publicKey: {|
     ...Addressing,
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
-  metadata: RustModule.WalletV4.AuxiliaryData | void
-): RustModule.WalletV4.Transaction {
-  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
+): string {
 
-  const vkeyWitWasm = RustModule.WalletV4.Vkeywitnesses.new();
+  const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
+  const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
 
   for (const witness of witnesses) {
     const addressing = {
@@ -1096,14 +1109,9 @@ export function buildConnectorSignedTransaction(
       RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
       RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
     );
-    vkeyWitWasm.add(vkeyWit);
-  }
-  const witSet = RustModule.WalletV4.TransactionWitnessSet.new();
-  witSet.set_vkeys(vkeyWitWasm);
 
-  return RustModule.WalletV4.Transaction.new(
-    txBody,
-    witSet,
-    metadata
-  );
+    fixedTx.add_vkey_witness(vkeyWit);
+  }
+
+  return fixedTx.to_hex();
 }

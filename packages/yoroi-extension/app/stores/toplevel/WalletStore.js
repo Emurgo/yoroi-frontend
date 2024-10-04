@@ -19,10 +19,12 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
-import { createFlagStorage } from '../../api/localStorage';
+import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
 import { forceNonNull, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
+import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
+import { asAddressedUtxo } from '../../api/ada/transactions/utils';
 
 /*::
 declare var chrome;
@@ -372,7 +374,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     refreshWallet: () => Promise<void>,
   |}) => Promise<{| txId: string |}> = async request => {
     this.sendMoneyRequest.reset();
-    const tx = await this.sendMoneyRequest.execute(async () => {
+    const resp = await this.sendMoneyRequest.execute(async () => {
       const result = await request.broadcastRequest();
 
       if (request.publicDeriverId != null) {
@@ -405,8 +407,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       }
       return result;
     }).promise;
-    if (tx == null) throw new Error(`Should never happen`);
-    return tx;
+    if (resp == null) throw new Error(`Should never happen`);
+    return resp;
   };
 
   isInitialSyncing: (number) => boolean = (publicDeriverId) => {
@@ -418,6 +420,17 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (this.selectedIndex != null) {
       this.wallets[this.selectedIndex].name = newName;
     }
+  }
+
+  async getAddressedUtxos(): Promise<Array<CardanoAddressedUtxo>> {
+    const wallet = this.selectedOrFail;
+    const submittedTxs = await loadSubmittedTransactions() || [];
+    return this.api.ada._addressedUtxosWithSubmittedTxs(
+      asAddressedUtxo(wallet.utxos),
+      wallet.publicDeriverId,
+      wallet.allUtxoAddresses,
+      submittedTxs,
+    );
   }
 }
 

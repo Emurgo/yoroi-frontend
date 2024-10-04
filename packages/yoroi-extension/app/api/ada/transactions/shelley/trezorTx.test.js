@@ -239,6 +239,8 @@ test('Create Trezor transaction', async () => {
     ttl: '500',
     networkId: 1,
     protocolMagic: 764824073,
+    scriptDataHash: undefined,
+    validityIntervalStart: undefined,
     inputs: [{
       path: `m/44'/1815'/0'/1/1`,
       prev_hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
