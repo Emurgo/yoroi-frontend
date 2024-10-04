@@ -45,7 +45,7 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: theme.palette.ds.bg_gradient_2,
+    backgroundImage: theme.palette.ds.bg_gradient_1,
     border: '2px solid transparent',
     backgroundOrigin: 'border-box',
     // background: !pending && theme.palette.ds.bg_gradient_2,

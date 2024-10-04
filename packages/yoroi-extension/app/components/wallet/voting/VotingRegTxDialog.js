@@ -146,9 +146,11 @@ export default class VotingRegTxDialog extends Component<Props> {
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ color: 'ds.text_gray_medium' }}>
+            {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          </Typography>
           <br />
-          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+          <Typography color="ds.text_gray_medium">{intl.formatMessage(globalMessages.staleTxnWarningLine2)}</Typography>
         </WarningBox>
       </div>
     );

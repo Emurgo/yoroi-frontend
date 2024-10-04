@@ -20,7 +20,7 @@ import {
 } from '../../../connector/api';
 import { createAuthEntry } from '../../../../../app/connector/api';
 import { getWalletChecksum } from '../../../../../app/api/export/utils';
-import type CardanoTxRequest from '../../../../../app/api/ada';
+import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { RemoteUnspentOutput } from '../../../../../app/api/ada/lib/state-fetch/types';
 import {
   DataSignErrorCodes,

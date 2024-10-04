@@ -19,7 +19,7 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import WalletCard from './WalletCard';
 import globalMessages from '../../i18n/global-messages';
-import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
+import AmountDisplay from '../common/AmountDisplay';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { Typography, styled } from '@mui/material';
@@ -36,10 +36,6 @@ const messages = defineMessages({
   totalBalance: {
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
-  },
-  cardano: {
-    id: 'wallet.topbar.dialog.cardano',
-    defaultMessage: '!!!Cardano, ADA',
   },
 });
 
@@ -242,11 +238,6 @@ export default class WalletListDialog extends Component<Props, State> {
             sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}
             id="changeWalletDialog-walletList-box"
           >
-            {cardanoWalletsIdx.length > 0 && (
-              <div className={styles.sectionHeader}>
-                <h1>{intl.formatMessage(messages.cardano)}</h1>
-              </div>
-            )}
             <DragDropContext onDragEnd={result => this.onDragEnd('cardano', result)}>
               <Droppable droppableId="cardano-list-droppable">
                 {provided => (
@@ -293,27 +284,16 @@ export default class WalletListDialog extends Component<Props, State> {
 
   renderWalletsTotal(): ?Node {
     const { unitOfAccountSetting, cardanoWallets, shouldHideBalance, getCurrentPrice } = this.props;
-    if (unitOfAccountSetting.enabled) {
-      const adaFiat = this.sumWallets(cardanoWallets).fiat;
-      if (adaFiat != null) {
-        const totalFiat = adaFiat;
-        const { currency } = unitOfAccountSetting;
-        return <FiatDisplay shouldHideBalance={shouldHideBalance} amount={totalFiat} currency={currency} />;
-      }
-    }
-    // either unit of account is not enabled, or fails to convert to fiat
-    const amount = this.sumWallets(cardanoWallets).sum;
-    const totalAmountId = `changeWalletDialog:total`;
     return (
       <AmountDisplay
         shouldHideBalance={shouldHideBalance}
-        amount={amount}
+        amount={this.sumWallets(cardanoWallets).sum}
         getTokenInfo={this.props.getTokenInfo}
         showFiat={false}
         showAmount
         unitOfAccountSetting={unitOfAccountSetting}
         getCurrentPrice={getCurrentPrice}
-        id={totalAmountId}
+        id="changeWalletDialog:total"
       />
     );
   }
