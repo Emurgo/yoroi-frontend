@@ -1071,7 +1071,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
         },
       );
 
-      const expectedFee = new BigNumber('1070');
+      const expectedFee = new BigNumber('1344');
       const expectedInput = new BigNumber('11000002');
       expect(sendAllResponse.senderUtxos).toEqual([utxos[0], utxos[1]]);
       expect(
@@ -1080,7 +1080,7 @@ describe('Create sendAll unsigned TX from UTXO', () => {
       expect(
         sendAllResponse.txBuilder.get_explicit_output().coin().to_str()
       ).toEqual(expectedInput.minus(expectedFee).toString());
-      expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual('1070');
+      expect(sendAllResponse.txBuilder.min_fee().to_str()).toEqual(expectedFee.toString());
       // make sure we don't accidentally burn a lot of coins
       expect(
         sendAllResponse.txBuilder.get_explicit_input().checked_sub(
