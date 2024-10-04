@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography, Button } from '@mui/material';
+import { Stack, Box, Typography, Button, styled } from '@mui/material';
 import StepController from './StepController';
 import styles from './VerifyRecoveryPhraseStep.scss';
 import classnames from 'classnames';
@@ -41,6 +41,10 @@ type Props = {|
   prevStep: () => void,
   isRecoveryPhraseEntered: boolean,
 |};
+
+const SBox = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.primary_100,
+}));
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, isRecoveryPhraseEntered, nextStep, prevStep } = props;
@@ -106,9 +110,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                   enteredRecoveryPhrase[idx + 1] === null);
 
               const Word = (
-                <Box
+                <SBox
                   sx={{
-                    background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
                     borderRadius: '8px',
                     width: '93px',
                     height: '40px',
@@ -129,7 +132,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                   >
                     {word}
                   </Typography>
-                </Box>
+                </SBox>
               );
               return (
                 <Stack
