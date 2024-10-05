@@ -183,7 +183,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         >
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             const isAdded = addedWordsIndxes.has(idx);
-            const wrongWordBorderColor = (wrondWordId, currentId) => wrongWordIdx === currentId ? 'magenta.500' : 'transparent';
+            const wrongWordBorderColor = (wrondWordId, currentId) => wrongWordIdx === currentId ? 'ds.sys_magenta_500' : 'transparent';
             const wordBorderColor = (wrondWordId, currentId) => isAdded ? 'primary.200' : wrongWordBorderColor(wrondWordId, currentId);
             const isAddedOrIsWrong = isAdded || wrongWordIdx === idx
             const button = (
@@ -230,7 +230,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box height="28px" mt="16px">
           {wrongWordIdx !== null && (
-            <Typography component="div" variant="body2" color="magenta.500" id="incorrectOrderMessage">
+            <Typography component="div" variant="body2" color="ds.sys_magenta_500" id="incorrectOrderMessage">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}
