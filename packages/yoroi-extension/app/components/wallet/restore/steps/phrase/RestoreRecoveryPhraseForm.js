@@ -14,7 +14,6 @@ import config from '../../../../../config';
 import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import { Box, Button, Fade, Stack, Typography } from '@mui/material';
-import styles from './EnterRecoveryPhraseStep.scss';
 import environment from '../../../../../environment';
 
 const messages = defineMessages({
@@ -146,7 +145,13 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     if (isValidPhrase && !form.submitted) this.submit();
 
     return (
-      <Box className={styles.verifyRecoveryPhraseArea}>
+      <Box
+        sx={{
+          width: '100%',
+          borderRadius: '8px',
+          marginBottom: '16px',
+        }}
+      >
         <Stack
           gap="8px"
           p="16px 0px"
@@ -181,7 +186,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   }}
                   variant="body1"
                 >
-                  <Typography component="div" variant="body1" color="primary.400" width="24px">
+                  <Typography component="div" variant="body1" color="primary.500" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -234,7 +239,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
             </Fade>
 
             <Fade in={!isValidPhrase && allWordsEntered}>
-              <Typography component="div" variant="body2" color="#FF1351" id="mnemonicErrorText">
+              <Typography component="div" variant="body2" color="ds.sys_magenta_500" id="mnemonicErrorText">
                 {mnemonicError}
               </Typography>
             </Fade>
@@ -244,7 +249,13 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage">
+            <Typography
+              component="div"
+              variant="body1"
+              fontWeight={500}
+              id="validPhraseMessage"
+              color="grayscale.900"
+            >
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>
