@@ -19,7 +19,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
 
   // console.log('explorers', explorers);
 
-  const isPrimary = isPrimaryToken(tokenInfo.info);
+  const isPrimary = isPrimaryToken(tokenInfo);
   return (
     <Stack direction="column" spacing={theme.spacing(2)}>
       <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>

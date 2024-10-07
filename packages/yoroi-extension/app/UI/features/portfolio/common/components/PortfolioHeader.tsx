@@ -1,6 +1,7 @@
 import { Box, Stack, Typography, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import React from 'react';
+import LocalStorageApi from '../../../../../api/localStorage/index';
 import { SearchInput, Skeleton, Tooltip } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { WalletBalance } from '../../../../types/currrentWallet';
@@ -33,6 +34,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const theme: any = useTheme();
   const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
+  const localStorageApi = new LocalStorageApi();
 
   const {
     ptActivity: { open, close: ptPrice },
@@ -44,7 +46,6 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const showADA = accountPair?.from.name === 'ADA';
 
   const totalTokenPrice = React.useMemo(() => {
-    // const tokenPrice = tokenActivity?.data24h[amount?.info.id]?.price.close;
     const showingAda = accountPair?.from.name !== 'ADA';
     const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
 
@@ -55,7 +56,12 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
     return totalAmount;
   }, [tokenActivity, config.decimals, ptPrice]);
 
-  const handleCurrencyChange = () => {
+  const handleCurrencyChange = async () => {
+    localStorageApi.setSetPortfolioFiatPair({
+      from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
+      to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
+    });
+
     changeUnitOfAccountPair({
       from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
       to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
@@ -63,20 +69,25 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   };
 
   React.useEffect(() => {
-    changeUnitOfAccountPair({
-      from: { name: 'ADA', value: walletBalance?.ada || '0' },
-      to: { name: unitOfAccount || 'USD', value: totalTokenPrice || '0' },
-    });
-  }, [walletBalance, unitOfAccount, totalTokenPrice]);
+    const setFiatPair = async () => {
+      const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
+      const portfolioStoragePairObj = JSON.parse(portfolioStoragePair);
 
-  // const amount = React.useMemo(
-  //   () =>
-  //     aggregatePrimaryAmount({
-  //       primaryTokenInfo,
-  //       tokenActivity: tokenActivity.data24h,
-  //     }),
-  //   [primaryTokenInfo, tokenActivity, ptPrice]
-  // );
+      if (portfolioStoragePairObj) {
+        changeUnitOfAccountPair({
+          from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
+          to: { name: portfolioStoragePairObj.to.name, value: portfolioStoragePairObj.to.value },
+        });
+      } else {
+        localStorageApi.setSetPortfolioFiatPair({
+          from: { name: 'ADA', value: walletBalance?.ada || '0' },
+          to: { name: unitOfAccount || 'USD', value: totalTokenPrice || '0' },
+        });
+      }
+    };
+
+    setFiatPair();
+  }, [walletBalance, unitOfAccount, totalTokenPrice]);
 
   return (
     <Stack direction="row" justifyContent="space-between">
@@ -91,7 +102,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
           )}
           <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
             <Typography component="span" variant="body2" fontWeight="500" color="ds.text_gray_medium">
-              {accountPair?.from.name}
+              {accountPair?.from?.name}
             </Typography>
             <Typography
               component="span"
@@ -104,7 +115,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
                 display: 'inline',
               }}
             >
-              /{accountPair?.to.name}
+              /{accountPair?.to?.name}
             </Typography>
           </Typography>
         </Stack>

@@ -1,7 +1,7 @@
 import { invalid } from '@yoroi/common';
 import { Portfolio } from '@yoroi/types';
 import { freeze, produce } from 'immer';
-import React from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 
 import { queryInfo } from '../../../utils/query-client';
@@ -30,9 +30,9 @@ type Props = {
 
 export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const queryClient = useQueryClient();
-  const [state, dispatch] = React.useReducer(portfolioTokenActivityReducer, defaultPortfolioTokenActivityState);
+  const [state, dispatch] = useReducer(portfolioTokenActivityReducer, defaultPortfolioTokenActivityState);
 
-  const actions = React.useRef<PortfolioTokenActivityActions>({
+  const actions = useRef<PortfolioTokenActivityActions>({
     secondaryTokenIdsChanged: secondaryTokenIds => {
       dispatch({
         type: PortfolioTokenActivityActionType.SecondaryTokenIdsChanged,
@@ -53,47 +53,39 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
     },
   }).current;
 
-  const { ftAssetList, walletBalance } = usePortfolio();
+  const { ftAssetList } = usePortfolio();
 
-  React.useEffect(() => {
-    const listForActivity: any = ftAssetList
+  useEffect(() => {
+    const listForActivity: string[] = ftAssetList
       .filter(item => item.info?.policyId?.length > 0)
-      .map(item => `${item.info?.policyId}.${item.assetName}`); //
+      .map(item => `${item.info?.policyId}.${item.assetName}`);
 
     actions.secondaryTokenIdsChanged(listForActivity);
+    queryClient.invalidateQueries(queryKey);
+  }, [actions, ftAssetList, queryClient]);
 
-    queryClient.invalidateQueries([queryKey]);
-  }, [actions, queryClient]);
-  // Use hook for each interval (24h, 1w, 1m)
-  const { mutate: fetch24h, data: data24h, isLoading: loading24h } = useMultiTokenActivity('24h');
-  const { mutate: fetch7d, data: data7d, isLoading: loading7d } = useMultiTokenActivity('7d');
-  const { mutate: fetch30d, data: data30d, isLoading: loading30d } = useMultiTokenActivity('30d');
-  React.useEffect(() => {
-    if (state.secondaryTokenIds.length > 0) {
-      fetch24h(state.secondaryTokenIds);
-      fetch7d(state.secondaryTokenIds);
-      fetch30d(state.secondaryTokenIds);
-    }
-  }, [state.secondaryTokenIds, fetch24h]);
+  // Use `useQuery` hooks to fetch and cache the token activity data for each interval
+  const { data: data24h, isLoading: loading24h } = useMultiTokenActivity(state.secondaryTokenIds, '24h');
+  const { data: data7d, isLoading: loading7d } = useMultiTokenActivity(state.secondaryTokenIds, '7d');
+  const { data: data30d, isLoading: loading30d } = useMultiTokenActivity(state.secondaryTokenIds, '30d');
 
-  React.useEffect(() => {
-    if (data24h) {
+  useEffect(() => {
+    if (data24h || data7d || data30d) {
       const combinedData: any = {
-        data24h: data24h,
-        data7d: data7d,
-        data30d: data30d,
+        data24h: data24h || {},
+        data7d: data7d || {},
+        data30d: data30d || {},
       };
       actions.tokenActivityChanged(combinedData);
     }
-  }, [data24h, actions, data30d, data7d, loading24h, loading30d, loading7d, walletBalance?.ada]);
+  }, [data24h, data7d, data30d, actions]);
 
   const value = React.useMemo(
     () => ({
       ...state,
-      isLoading: loading24h,
-      // || loading1w || loading1m, // Combine loading states from all intervals
+      isLoading: loading24h || loading7d || loading30d,
     }),
-    [loading24h, data7d, data30d, state]
+    [loading24h, loading7d, loading30d, state]
   );
 
   return <PortfolioTokenActivityContext.Provider value={value}>{children}</PortfolioTokenActivityContext.Provider>;

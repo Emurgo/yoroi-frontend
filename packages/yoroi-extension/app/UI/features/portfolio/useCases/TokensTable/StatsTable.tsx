@@ -1,19 +1,21 @@
 import { TableCell, TableRow } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { isEmpty } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import Table from '../../common/components/Table';
 import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';
 import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
+import { isPrimaryToken } from '../../common/helpers/isPrimary';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
-import { useTokenPercentages } from '../../common/hooks/useTokenPercentages';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { TokenDisplay, TokenPrice, TokenPriceChangeChip, TokenPriceTotal, TokenProcentage } from './TableColumnsChip';
+import { useProcessedTokenData2 } from './useProcentage';
 
 interface Props {
   data: TokenType[];
@@ -26,13 +28,12 @@ const StatsTable = ({ data }: Props): JSX.Element => {
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
-    order: 'asc',
-    orderBy: 'portfolioPercents',
+    order: '',
+    orderBy: '',
   });
-  console.log('ASSET LIST', data);
   const list = useMemo(() => [...data], [data]);
 
-  console.log('order', order, orderBy);
+  // console.log('order', order, orderBy);
 
   const {
     tokenActivity: { data24h, data7d, data30d },
@@ -60,22 +61,23 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data });
-
   // TODO refactor and add calculation based on fiat toatl value - endpoint not working
-  const procentageData = useTokenPercentages(data);
+  const assetFormatedList = useProcessedTokenData2({ data: list, ptActivity, data24h });
+  console.log('TABE HOOK procentageData2', assetFormatedList);
+
+  const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
   return (
     <Table
       name="stat"
       headCells={headCells}
-      data={getSortedData(list)}
+      data={getSortedData(assetFormatedList)}
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
-      isLoading={false}
+      isLoading={isEmpty(data24h)}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(list).map((row: any) => (
+      {getSortedData(assetFormatedList).map((row: any) => (
         <TableRow
           key={row.id}
           onClick={() => navigateTo.portfolioDetail(row.id)}
@@ -101,7 +103,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
-              isPrimaryToken={row.info.policyId?.length === 0}
+              isPrimaryToken={isPrimaryToken(row)}
             />
           </TableCell>
 
@@ -109,7 +111,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
-              isPrimaryToken={row.info.policyId?.length === 0}
+              isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.WEEK}
             />
           </TableCell>
@@ -118,13 +120,13 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
-              isPrimaryToken={row.info.policyId?.length === 0}
+              isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.MONTH}
             />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
-            <TokenProcentage procentage={row.info.policyId.length === 0 ? procentageData[''] : procentageData[row.info.id]} />
+            <TokenProcentage procentage={row.percentage} />
           </TableCell>
 
           <TableCell sx={{ padding: '16.8px 1rem' }}>

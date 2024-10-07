@@ -1,5 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { isEmpty } from 'lodash';
 import React from 'react';
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
@@ -8,7 +9,6 @@ import { formatPriceChange, priceChange } from '../../../common/helpers/priceCha
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
-import { isEmpty } from 'lodash';
 
 interface Props {
   chartData: any;
@@ -37,8 +37,6 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
     : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.close;
-
-  // console.log('priceChangeProcent', data24h && data24h[tokenInfo?.info?.id][1]?.price);
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: !isPrimaryToken && theme.spacing(3) }}>
@@ -71,11 +69,16 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
 
 const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity }) => {
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+
+  const sPrice = secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+  const ptPrice = ptActivity.close;
+  const ptUnitPrice = sPrice * ptPrice;
+
   if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
     <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
-      <Typography fontWeight="500">{formatPriceChange(tokenPrice)}</Typography>
+      <Typography fontWeight="500">{formatPriceChange(isPrimaryToken ? ptPrice : ptUnitPrice, 4)}</Typography>
       <Typography variant="caption" mt="2px">
         &nbsp;{unitOfAccount}
       </Typography>

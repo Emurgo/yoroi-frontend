@@ -68,7 +68,10 @@ export const TokenPriceChangeChip = ({
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={variantPnl} withIcon>
         <Typography fontSize="13px">
-          {formatPriceChange(isPrimaryToken ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0)}%
+          {formatPriceChange(
+            isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
+          )}
+          %
         </Typography>
       </PnlTag>
     </Box>
@@ -108,7 +111,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
     );
   }
 
-  const isPrimary: boolean = token.info.policyId?.length === 0;
+  const isPrimary: boolean = token.id === '-';
 
   const {
     ptActivity: { close: ptPrice },
@@ -119,19 +122,32 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 
   const showingAda = accountPair?.from.name === 'ADA';
   const currency = accountPair?.from.name;
-  const decimals = showingAda ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
+  const decimals = isPrimary ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
 
-  if (ptPrice == null) return `... ${currency}`;
+  if (ptPrice === null) return `... ${currency}`;
 
   const totaPrice =
     ptPrice &&
     atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : String(ptPrice))
+      .times(showingAda ? 1 : new BigNumber(ptPrice))
       .toFormat(decimals);
 
-  const totalTokenPrice = isPrimary && showingAda ? accountPair?.to.value : totaPrice;
+  // if (token.info.name === 'SHIBA') {
+  //   console.log('Token CALC DETAILS', {
+  //     ptPrice,
+  //     tokenQuantityAsBigInt,
+  //     tokenPrice,
+  //     name: token.info.name,
+  //     decimals,
+  //     confff: config.decimals,
+  //     showingAda,
+  //   });
+
+  //   console.log('totaPrice', totaPrice);
+  // }
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
+  const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || 'USD'}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
@@ -143,7 +159,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-            {totalTokenPrice} {totalTicker || 'USD'}
+            {totalTokenPrice}
           </Typography>
         )}
       </Stack>
@@ -152,28 +168,15 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 };
 
 export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
-  const isPrimaryToken = token?.info.policyId.length === 0;
-  const { accountPair, primaryTokenInfo } = usePortfolio();
-  const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
-  if (secondaryToken24Activity === null) return <Skeleton variant="text" width="50px" height="30px" />;
-
-  const showingAda = accountPair?.from.name === 'ADA';
-  const tokenPriceFiat = new BigNumber(tokenPrice);
-
-  const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
-  const decimals = showingAda ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
-
-  const totaPrice =
-    ptActivity.close &&
-    atomicBreakdown(tokenQuantityAsBigInt, decimals)
-      .bn.times(tokenPriceFiat ?? 1)
-      .times(showingAda ? 1 : String(ptActivity.close))
-      .toFormat(decimals);
+  const { unitOfAccount } = usePortfolio();
+  const isPrimaryToken = token.id === '-';
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  const ptPrice = ptActivity.close;
+  const ptUnitPrice = tokenPrice * ptPrice;
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {formatPriceChange(accountPair?.from.name === 'ADA' ? tokenPrice : totaPrice / Number(token.shiftedAmount))}{' '}
-      {accountPair?.from.name}
+      {parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4)} {unitOfAccount}
     </Typography>
   );
 };
@@ -184,7 +187,7 @@ export const TokenProcentage = ({ procentage }) => {
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {showWelcomeBanner ? 0 : procentage}%
+      {showWelcomeBanner ? 0 : parseFloat(procentage).toFixed(2)}%
     </Typography>
   );
 };
