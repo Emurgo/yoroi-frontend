@@ -29,7 +29,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h }) => {
     const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity.close)));
 
     const totalTokenPrice = isPrimaryToken ? primaryTokenFiatTotalAmount : totalValue;
-    const unitPrice = accountPair?.from.name === 'ADA' ? tokenPrice : totalTokenPrice / Number(token.shiftedAmount);
+    const unitPrice = accountPair?.from.name === 'ADA' ? tokenPrice : Number(totalTokenPrice) / Number(token.shiftedAmount);
 
     return { totalValue: totalTokenPrice, unitPrice };
   };
@@ -45,7 +45,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h }) => {
     }, {});
 
     // Calculate total portfolio value
-    const totalPortfolioValue = Object.values(tokenFiatValues).reduce((sum, value) => {
+    const totalPortfolioValue: any = Object.values(tokenFiatValues).reduce((sum, value: any) => {
       return Number(sum) + Number(value?.totalValue);
     }, 0);
 

@@ -56,7 +56,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const { ftAssetList } = usePortfolio();
 
   useEffect(() => {
-    const listForActivity: string[] = ftAssetList
+    const listForActivity: any[] = ftAssetList
       .filter(item => item.info?.policyId?.length > 0)
       .map(item => `${item.info?.policyId}.${item.assetName}`);
 

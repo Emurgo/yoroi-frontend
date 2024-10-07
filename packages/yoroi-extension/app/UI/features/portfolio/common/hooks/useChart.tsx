@@ -6,7 +6,12 @@ import { IChartData } from '../types/chart';
 const useChart = (data: IChartData) => {
   const theme: any = useTheme();
 
-  const [detailInfo, setDetailInfo] = useState<{ value?: number; label?: string; changeValue?: number; changePercent?: number }>({
+  const [detailInfo, setDetailInfo] = useState<{
+    value?: number;
+    label?: string;
+    changeValue?: number;
+    changePercent?: number;
+  }>({
     label: data[0]?.label,
     value: data[0]?.value,
     changeValue: data[0]?.changeValue,
