@@ -11,7 +11,7 @@ import { handleExternalLinkClick } from '../../../utils/routing';
 import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
-import { CATALYST_DISPLAYED_MIN_AMOUNT, CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
+import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
 import InsufficientFundsPage from './InsufficientFundsPage';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import environment from '../../../environment';
@@ -129,7 +129,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
           currentBalance={balance
             .getDefaultEntry()
             .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
-          requiredBalance={CATALYST_DISPLAYED_MIN_AMOUNT.shiftedBy(
+          requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(
             -tokenInfo.Metadata.numberOfDecimals
           )}
           tokenName={getTokenName(tokenInfo)}
