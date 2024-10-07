@@ -78,7 +78,7 @@ export function useRichOrders(
    */
   const { data: tokensMap } = useQuery({
     suspense: true,
-    queryKey: ['useSwapTokensOnlyVerified'],
+    queryKey: ['useSwapTokensOnlyVerifiedMap'],
     useErrorBoundary: false,
     queryFn: () => tokens.list.onlyVerified()
       .then(tokensArray => tokensArray.reduce((map, t) => ({ ...map, [t.id]: t }), {}))
