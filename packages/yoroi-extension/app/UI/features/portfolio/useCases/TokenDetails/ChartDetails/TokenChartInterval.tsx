@@ -116,7 +116,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                   activeDot={(props: any) => (
                     <CustomActiveDot
                       chartBottom={chartHeight}
-                      rectWidth={93}
+                      rectWidth={120}
                       rectHeight={34}
                       dataLength={chartData.length}
                       {...props}

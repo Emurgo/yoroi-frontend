@@ -12,10 +12,9 @@ import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { TokenDisplay, TokenPrice, TokenPriceChangeChip, TokenPriceTotal, TokenProcentage } from './TableColumnsChip';
-import { useProcessedTokenData2 } from './useProcentage';
+import { useProcessedTokenData } from './useProcentage';
 
 interface Props {
   data: TokenType[];
@@ -26,18 +25,14 @@ const StatsTable = ({ data }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: '',
     orderBy: '',
   });
   const list = useMemo(() => [...data], [data]);
 
-  // console.log('order', order, orderBy);
-
   const {
     tokenActivity: { data24h, data7d, data30d },
-    // isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 
@@ -61,9 +56,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  // TODO refactor and add calculation based on fiat toatl value - endpoint not working
-  const assetFormatedList = useProcessedTokenData2({ data: list, ptActivity, data24h });
-  console.log('TABE HOOK procentageData2', assetFormatedList);
+  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h });
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
   return (

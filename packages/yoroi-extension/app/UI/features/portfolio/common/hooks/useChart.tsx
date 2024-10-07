@@ -6,14 +6,6 @@ import { IChartData } from '../types/chart';
 const useChart = (data: IChartData) => {
   const theme: any = useTheme();
 
-  // const [periodButtonProps, setPeriodButtonProps] = useState<ITabButtonProps[]>([
-  //   { id: 'start24HoursAgo', label: strings['24H'], active: true },
-  //   { id: 'start1WeekAgo', label: strings['1W'], active: false },
-  //   { id: 'start1MonthAgo', label: strings['1M'], active: false },
-  //   { id: 'start6MonthAgo', label: strings['6M'], active: false },
-  //   { id: 'start1YearAgo', label: strings['1Y'], active: false },
-  //   { id: 'ALL', label: strings['ALL'], active: false },
-  // ]);
   const [detailInfo, setDetailInfo] = useState<{ value?: number; label?: string; changeValue?: number; changePercent?: number }>({
     label: data[0]?.label,
     value: data[0]?.value,
@@ -33,14 +25,14 @@ const useChart = (data: IChartData) => {
     return (
       <Box
         component="text"
-        x={x - 9}
+        x={x - 2}
         y={y}
-        dy={4}
+        dy={1}
         textAnchor="end"
         sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
         stroke={theme.palette.ds.gray_700}
       >
-        {payload.value.toFixed(1)}
+        {payload.value.toFixed(2)}
       </Box>
     );
   };
@@ -91,6 +83,7 @@ const useChart = (data: IChartData) => {
               fill={theme.palette.ds.primary_500}
               rx={5}
               ry={5}
+              pr={7}
             ></Box>
             <Box
               component="text"
@@ -104,6 +97,7 @@ const useChart = (data: IChartData) => {
                 fontSize: '0.75rem',
                 fontWeight: 400,
                 paddingRight: '5px',
+                paddingLeft: '10px',
               }}
             >
               {detailInfo.label}

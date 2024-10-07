@@ -5,7 +5,7 @@ import { formatValue } from '../../common/components/PortfolioHeader';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { bigNumberToBigInt } from './TableColumnsChip';
 
-export const useProcessedTokenData2 = ({ data, ptActivity, data24h }) => {
+export const useProcessedTokenData = ({ data, ptActivity, data24h }) => {
   const { accountPair, primaryTokenInfo } = usePortfolio();
 
   // Helper function to calculate total fiat value for each token
