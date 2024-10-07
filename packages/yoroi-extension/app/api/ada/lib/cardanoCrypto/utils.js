@@ -24,6 +24,20 @@ export function transactionHexToWitnessSet(txHex: string): string {
     bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_witness_set()));
 }
 
+export function transactionBodyHexToTransaction(txBodyHex: string): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.FixedTransaction.new(
+      hexToBytes(txBodyHex),
+      Module.WalletV4.TransactionWitnessSet.new().to_bytes(),
+      true,
+    ).to_hex());
+}
+
+export function transactionHexToBodyHex(txHex: string): string {
+  return RustModule.WasmScope(Module =>
+    bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_body()));
+}
+
 export function transactionHexToHash(txHex: string): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.hash_transaction(Module.WalletV4.FixedTransaction.from_hex(txHex).body()).to_hex());
