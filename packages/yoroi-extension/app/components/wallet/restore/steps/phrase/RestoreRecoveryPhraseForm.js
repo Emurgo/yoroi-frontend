@@ -186,7 +186,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   }}
                   variant="body1"
                 >
-                  <Typography component="div" variant="body1" color="primary.500" width="24px">
+                  <Typography component="div" variant="body1" color="ds.primary_500" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -254,7 +254,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
               variant="body1"
               fontWeight={500}
               id="validPhraseMessage"
-              color="grayscale.900"
+              color="ds.gray_900"
             >
               {intl.formatMessage(messages.verified)}
             </Typography>

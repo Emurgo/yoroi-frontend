@@ -197,7 +197,7 @@ function Autocomplete({
         sx={{
           boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
           maxHeight: 44 * maxVisibleOptions + 'px',
-          color: 'grayscale.900',
+          color: 'ds.gray_900',
           borderRadius: '8px',
           width: '120px',
           '&::-webkit-scrollbar': { display: 'none' },
@@ -206,7 +206,7 @@ function Autocomplete({
         {isOpen && (
           <>
             {filteredList.length === 0 ? (
-              <Box sx={{ padding: '16px', bgcolor: 'background.bg_color_max' }}>{noResultsMessage}</Box>
+              <Box sx={{ padding: '16px', bgcolor: 'ds.bg_color_max' }}>{noResultsMessage}</Box>
             ) : (
               <Box sx={{ paddingY: '8px' }}>
                 {filteredList.map((item, index) => {
@@ -216,7 +216,7 @@ function Autocomplete({
                       key={`${item}${index}`}
                       sx={{
                         padding: '16px',
-                        backgroundColor: highlightedIndex === index ? 'grayscale.50' : 'background.bg_color_max',
+                        backgroundColor: highlightedIndex === index ? 'ds.gray_50' : 'ds.bg_color_max',
                         cursor: 'pointer',
                       }}
                       {...getItemProps({ item, index })}
@@ -281,7 +281,7 @@ const InputWrapper = styled(Box)(
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
-    border: 2px solid ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.primary[300]};
+    border: 2px solid ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.primary_300};
     border-radius: 8px;
     height: 40px;
     box-sizing: border-box;
@@ -295,8 +295,8 @@ const InputWrapper = styled(Box)(
         ? `&:not([value=""]):not(:focus) {
         border-color: transparent;
         border: 0;
-        background: ${isVerified ? theme.palette.ds.el_secondary : theme.palette.primary[100]};
-        color: ${isVerified ? theme.palette.static.black : theme.palette.primary[600]}
+        background: ${isVerified ? theme.palette.ds.el_secondary : theme.palette.ds.primary_100};
+        color: ${isVerified ? theme.palette.ds.black_static : theme.palette.ds.primary_600};
       }`
         : ''
     }

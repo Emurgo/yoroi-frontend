@@ -94,7 +94,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           sx={{
             border: 'double 2px transparent',
             borderRadius: '8px',
-            borderColor: 'primary.100',
+            borderColor: 'ds.primary_200',
             marginBottom: '16px',
           }}
         >
@@ -184,7 +184,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             const isAdded = addedWordsIndxes.has(idx);
             const wrongWordBorderColor = (wrondWordId, currentId) => wrongWordIdx === currentId ? 'ds.sys_magenta_500' : 'transparent';
-            const wordBorderColor = (wrondWordId, currentId) => isAdded ? 'primary.200' : wrongWordBorderColor(wrondWordId, currentId);
+            const wordBorderColor = (wrondWordId, currentId) => isAdded ? 'ds.primary_200' : wrongWordBorderColor(wrondWordId, currentId);
             const isAddedOrIsWrong = isAdded || wrongWordIdx === idx
             const button = (
               <Box
@@ -195,7 +195,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 sx={{
                   height: '40px',
                   width: '123px',
-                  backgroundColor: isAddedOrIsWrong ? 'transparent' : 'primary.100',
+                  backgroundColor: isAddedOrIsWrong ? 'transparent' : 'ds.primary_100',
                   border: isAddedOrIsWrong ? 2 : 0,
                   borderRadius: '8px',
                   borderColor: wordBorderColor(wrongWordIdx, idx),
