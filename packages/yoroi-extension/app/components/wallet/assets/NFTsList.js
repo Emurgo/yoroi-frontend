@@ -206,11 +206,13 @@ export function NftImage({
   name,
   width,
   height,
+  contentHeight,
 }: {|
   imageUrl: ?string,
   name: string,
   width: string,
   height: string,
+  contentHeight?: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -233,7 +235,7 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height="100%">
+      <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
         <DefaultNFT />
       </SvgWrapper>
     );
@@ -280,10 +282,19 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
   );
 }
 
-const SearchInput = styled(OutlinedInput)(() => ({
+const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   width: '370px',
   height: '40px',
   padding: '10px 12px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_low,
+    },
+  },
+  '& input::placeholder': {
+    color: theme.palette.ds.el_gray_low,
+    opacity: 1,
+  }
 }));
 
 const SLink = styled(Link)({

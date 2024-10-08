@@ -355,10 +355,14 @@ test('Create Ledger transaction', async () => {
   });
 
   expect(response).toStrictEqual(({
+    options: {
+      tagCborSets: false,
+    },
     signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
     tx: {
       fee: '1000',
       ttl: '500',
+      scriptDataHashHex: null,
       network: {
         networkId: 1,
         protocolMagic: 764824073,
@@ -412,6 +416,7 @@ test('Create Ledger transaction', async () => {
           type: TxOutputDestinationType.THIRD_PARTY,
         },
         amount: `5326134`,
+        datumHashHex: null,
         tokenBundle: null,
       }],
       withdrawals: null,
@@ -431,13 +436,13 @@ test('Create Ledger transaction', async () => {
         type: CertificateType.STAKE_REGISTRATION,
       }],
       auxiliaryData: undefined,
-      validityIntervalStart: undefined,
+      validityIntervalStart: null,
     },
     additionalWitnessPaths: [],
   }: SignTransactionRequest));
 
   buildSignedTransaction(
-    txBuilder.build(),
+    txBuilder.build_tx(),
     signRequest.senderUtxos,
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation

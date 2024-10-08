@@ -168,6 +168,13 @@ export function cast<T>(t: any): T {
 }
 
 /**
+ * Stringifies and then parses the passed argument, removing any functions or proxies
+ */
+export function purify<T>(t: any): T {
+  return JSON.parse(JSON.stringify(t));
+}
+
+/**
  * Async pause, does nothing except stops time and yields when awaited
  */
 export async function delay(time: number): Promise<void> {

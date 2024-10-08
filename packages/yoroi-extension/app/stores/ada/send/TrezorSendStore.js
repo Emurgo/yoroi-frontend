@@ -1,31 +1,30 @@
 // @flow
-import { action, observable  } from 'mobx';
+import { action, observable } from 'mobx';
 
 import Store from '../../base/Store';
 
 import { wrapWithFrame } from '../../lib/TrezorWrapper';
-import type {
-  SendUsingTrezorParams
-} from '../../../actions/ada/trezor-send-actions';
-import {
-  Logger,
-  stringifyError,
-} from '../../../utils/logging';
-import {
-  convertToLocalizableError
-} from '../../../domain/TrezorLocalizedError';
+import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
+import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
+import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ROUTES } from '../../../routes-config';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
-import { buildSignedTransaction } from '../../../api/ada/transactions/shelley/trezorTx';
+import {
+  buildConnectorSignedTransaction,
+  buildSignedTransaction
+} from '../../../api/ada/transactions/shelley/trezorTx';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { derivePublicByAddressing } from '../../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
+import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { fail } from '../../../coreUtils';
+import { genAddressingLookup } from '../../stateless/addressStores';
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -104,10 +103,8 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  signAndBroadcast: {|
-    params: {|
-      signRequest: HaskellShelleyTxSignRequest,
-    |},
+  signAndBroadcastFromWallet: {|
+    signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
       networkId: number,
@@ -118,9 +115,37 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     },
   |} => Promise<{| txId: string |}> = async (request) => {
     try {
+      Logger.debug(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcastFromWallet)} called: ` + stringifyData(request));
+
+      const { signRequest, wallet } = request;
+
+      return this.signAndBroadcast({
+        signRequest,
+        wallet,
+      });
+
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+  signAndBroadcast: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    +wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      ...
+    },
+  |} => Promise<{| txId: string |}> = async (request) => {
+    const { signRequest } = request;
+    try {
       const network = getNetworkById(request.wallet.networkId);
-      const trezorSignTxDataResp = await this.api.ada.createTrezorSignTxData({
-        ...request.params,
+      const trezorSignTxDataResp = this.api.ada.createTrezorSignTxData({
+        signRequest,
         network,
       });
 
@@ -141,9 +166,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       }
 
       const publicKeyInfo = {
-        key: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.wallet.publicKey, 'hex')
-        ),
+        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
         addressing: {
           startLevel: 1,
           path: request.wallet.pathToPublic,
@@ -160,13 +183,13 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
       let metadata;
 
-      if (request.params.signRequest.trezorTCatalystRegistrationTxSignData) {
+      if (signRequest.trezorTCatalystRegistrationTxSignData) {
         const {
           votingPublicKey,
           stakingKey: stakingKeyHex,
           paymentAddress,
           nonce,
-        } = request.params.signRequest.trezorTCatalystRegistrationTxSignData;
+        } = signRequest.trezorTCatalystRegistrationTxSignData;
 
         const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
         if (
@@ -194,18 +217,18 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         //  ).toString('hex') ===
         // trezorSignTxResp.payload.auxiliaryDataSupplement.auxiliaryDataHash
       } else {
-        metadata = request.params.signRequest.metadata;
+        metadata = signRequest.metadata;
       }
 
       if (metadata) {
-        request.params.signRequest.self().set_auxiliary_data(metadata);
+        signRequest.self().set_auxiliary_data(metadata);
       }
 
-      const txBody = request.params.signRequest.self().build();
+      const tx = signRequest.self().build_tx();
 
       const signedTx = buildSignedTransaction(
-        txBody,
-        request.params.signRequest.senderUtxos,
+        tx,
+        signRequest.senderUtxos,
         trezorSignTxResp.payload.witnesses,
         publicKeyInfo,
         stakingKey,
@@ -213,7 +236,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       );
 
       const txId = Buffer.from(
-        RustModule.WalletV4.hash_transaction(txBody).to_bytes()
+        RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
       ).toString('hex');
 
       await broadcastTransaction({
@@ -221,6 +244,91 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         signedTxHex: signedTx.to_hex(),
       });
       return { txId };
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+
+  signRawTxFromWallet: {|
+    rawTxHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      networkId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      ...
+    },
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
+    try {
+      Logger.debug(`${nameof(TrezorSendStore)}::${nameof(this.signRawTxFromWallet)} called: ` + stringifyData(request));
+
+      const { rawTxHex, wallet } = request;
+
+      const addressingMap = genAddressingLookup(
+        request.wallet.networkId,
+        this.stores.addresses.addressSubgroupMap,
+      );
+
+      return this.signRawTx({
+        rawTxHex,
+        addressingMap,
+        networkId: wallet.networkId,
+      });
+
+    } catch (error) {
+      Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signRawTxFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  }
+
+  signRawTx: {|
+    rawTxHex: string,
+    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    networkId: number,
+  |} => Promise<{| signedTxHex: string |}> = async (request) => {
+    const { rawTxHex } = request;
+    try {
+      const network = getNetworkById(request.networkId);
+
+      const txBodyHex = transactionHexToBodyHex(rawTxHex);
+
+      const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
+
+      const response = this.api.ada.createHwSignTxDataFromRawTx('trezor', {
+        txBodyHex,
+        network,
+        addressingMap: request.addressingMap,
+        senderUtxos: addressedUtxos,
+      });
+
+      const trezorSignTxPayload = response.hw === 'trezor' ? response.result.trezorSignTxPayload
+        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for trezor: ' + JSON.stringify(response));
+
+      const trezorSignTxResp = await wrapWithFrame(trezor => {
+        return trezor.cardanoSignTransaction(
+          JSON.parse(JSON.stringify({ ...trezorSignTxPayload }))
+        );
+      });
+
+      if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
+        // this Error will be converted to LocalizableError()
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(trezorSignTxResp.payload.error);
+      }
+      if (!trezorSignTxResp.success) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} should never happen`);
+      }
+
+      const signedTxHex = buildConnectorSignedTransaction(
+        rawTxHex,
+        trezorSignTxResp.payload.witnesses,
+      );
+
+      return { signedTxHex };
     } catch (error) {
       Logger.error(`${nameof(TrezorSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);

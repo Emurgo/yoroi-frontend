@@ -27,7 +27,6 @@ import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import { signTransaction } from '../../../api/thunk';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
@@ -245,11 +244,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    const signedCollateralReorgTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: collateralReorgTx.cbor
-    });
+
+    const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: collateralReorgTx.cbor, password });
+
     setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
@@ -267,11 +265,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
-    const signedCancelTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: tx.cbor
-    });
+
+    const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: tx.cbor, password });
+
     const signedTransactionHexes =
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]

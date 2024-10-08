@@ -43,7 +43,7 @@ export const DREP_KEY_INDEX = 0;
  */
 export const CARDANO_STABLE_SIZE = 2160;
 
-// Catalyst fund 4 *technically* requires > 450 ADA to participate
-// However, the official min amount is 500 ADA
-export const CATALYST_MIN_AMOUNT: BigNumber = new BigNumber(450 * 1_000_000);
-export const CATALYST_DISPLAYED_MIN_AMOUNT: BigNumber = new BigNumber(500 * 1_000_000);
+/**
+ * Since Fund13 min required is 25 ADA only (instead of previous 500)
+ */
+export const CATALYST_MIN_AMOUNT: BigNumber = new BigNumber(25_000_000);

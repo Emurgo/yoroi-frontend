@@ -104,7 +104,7 @@ const CopyButton = styled(Button)(({ theme }) => ({
   ml: '-8px',
   mb: '24px',
   fontSize: '14px',
-  color: 'grayscale.900',
+  color: theme.palette.ds.el_gray_medium,
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
@@ -118,6 +118,10 @@ const SImageButton = styled(IconButton)(({ theme }) => ({
       fill: theme.palette.ds.el_gray_medium,
     },
   },
+}));
+
+const STypography = styled(Typography)(({ theme }) => ({
+  color: theme.palette.ds.el_gray_medium
 }));
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
@@ -190,11 +194,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 objectFit: 'unset',
               },
               backgroundColor: 'ds.bg_color_max',
-              height: '100%',
             }}
             onClick={() => nftImage !== null && setOpenAndTrack()}
           >
-            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" />
           </ImageItem>
         </Grid>
 
@@ -352,9 +355,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   {intl.formatMessage(messages.copyMetadata)}
                 </CopyButton>
               )}
-              <Typography component="pre" variant="body2" lineHeight="22px">
+              <STypography component="pre" variant="body2" lineHeight="22px">
                 {nftInfo.metadata ? JSON.stringify(nftInfo.metadata, null, 2) : intl.formatMessage(messages.missingMetadata)}
-              </Typography>
+              </STypography>
             </TabPanel>
           </TabContext>
         </Grid>
