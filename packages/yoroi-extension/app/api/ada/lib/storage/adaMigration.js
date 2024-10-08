@@ -62,6 +62,7 @@ export async function migrateToLatest(
      * We changed the place where Yoroi data is stored so  we must process this migration first
      * to ensure other migrations look at the right place for storage
      */
+    /* disable this since window.localStorage is not available to manifest v3 service worker
     ['<1.9.0', async () => {
       const applied = await moveStorage(localStorageApi);
       if (applied) {
@@ -70,6 +71,7 @@ export async function migrateToLatest(
       }
       return applied;
     }],
+    */
     ['<1.4.0', async () => await bip44Migration()],
     ['<1.10.0', async () => await storageV2Migration(persistentDb)],
     ['=1.10.0', async () => await cardanoTxHistoryReset(persistentDb)],
