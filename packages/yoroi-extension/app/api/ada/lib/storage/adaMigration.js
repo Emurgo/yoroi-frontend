@@ -136,6 +136,7 @@ async function testMigration(localStorageApi: LocalStorageApi): Promise<boolean>
  * since version 1.9 this storage needs to be moved to storage.local.
  * This function must go before other modifications because they will work over storage.local.
  */
+// eslint-disable-next-line no-unused-vars
 async function moveStorage(localStorageApi: LocalStorageApi): Promise<boolean> {
   // Note: this function assumes nobody is using Yoroi as a  website (at least before 1.9.0)
   const oldStorage = await localStorageApi.getOldStorage();

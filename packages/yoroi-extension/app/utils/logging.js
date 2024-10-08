@@ -59,6 +59,9 @@ export const downloadLogs = (publicKey?: string) => {
 
   import('file-saver').then(FileSaver => {
     FileSaver.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
+    return null;
+  }).catch((error) => {
+    Logger.error(`error when downloading error log ${error}`);
   });
 };
 
