@@ -71,7 +71,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   React.useEffect(() => {
     const setFiatPair = async () => {
       const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
-      const portfolioStoragePairObj = JSON.parse(portfolioStoragePair);
+      const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
       if (portfolioStoragePairObj) {
         changeUnitOfAccountPair({
