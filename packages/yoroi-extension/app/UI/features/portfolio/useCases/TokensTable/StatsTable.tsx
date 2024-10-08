@@ -12,6 +12,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
 import { TokenType } from '../../common/types/index';
 import { IHeadCell } from '../../common/types/table';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { TokenDisplay, TokenPrice, TokenPriceChangeChip, TokenPriceTotal, TokenProcentage } from './TableColumnsChip';
 import { useProcessedTokenData } from './useProcentage';
@@ -23,6 +24,7 @@ interface Props {
 
 const StatsTable = ({ data }: Props): JSX.Element => {
   const theme: any = useTheme();
+  const { showWelcomeBanner } = usePortfolio();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
@@ -67,7 +69,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
-      isLoading={isEmpty(data24h)}
+      isLoading={isEmpty(data24h) && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {getSortedData(assetFormatedList).map((row: any) => (

@@ -34,7 +34,7 @@ const WelcomeBanner = () => {
           </Stack>
         </Stack>
 
-        <Box sx={{ position: 'absolute', right: 2 }}>
+        <Box sx={{ position: 'absolute', right: 0 }}>
           <WelcomeWallet />
         </Box>
       </Stack>

@@ -17,15 +17,6 @@ const PortfolioWallet = (): JSX.Element => {
   const [tokenList, setTokenList] = useState(ftAssetList);
 
   useEffect(() => {
-    // FAKE FETCHING DATA TO SEE SKELETON
-    // setIsLoading(true);
-    // const timer = setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 2000);
-    // return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     if (!keyword || showWelcomeBanner) {
       setTokenList(ftAssetList);
       return;

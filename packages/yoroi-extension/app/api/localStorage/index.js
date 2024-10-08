@@ -106,12 +106,13 @@ export default class LocalStorageApi {
 
   setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
 
-
   // ========== Portfolio FIAT Pair ========== //
 
   getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
 
   setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+
+  resetPortfolioFiatPair: void => Promise<void> = () => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, '');
 
   // ========== Theme Migration ========== //
 
@@ -469,8 +470,8 @@ export function createStorageFlag(key: string, defaultValue: boolean): StorageFi
 }
 
 export function createFlagStorage(): StorageAPI {
-    return {
-      get: async s => (await getLocalItem(s)) ?? null,
-      set: setLocalItem,
-    };
+  return {
+    get: async s => (await getLocalItem(s)) ?? null,
+    set: setLocalItem,
+  };
 }

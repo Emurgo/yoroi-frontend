@@ -16,6 +16,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
+import LocalStorageApi from '../api/localStorage/index';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -23,6 +24,8 @@ type Props = {|
   menu?: Node,
   pageBanner?: Node,
 |};
+
+const localStorage = new LocalStorageApi();
 
 @observer
 export default class NavBarContainerRevamp extends Component<Props> {
@@ -38,12 +41,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
-  onSelectWallet: (number) => void = newWalletId => {
+  onSelectWallet: number => Promise<void> = async newWalletId => {
     const { delegation, app } = this.props.stores;
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
-
+    await localStorage.resetPortfolioFiatPair();
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
     this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
   };
@@ -59,18 +62,16 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
   render(): Node {
     const { stores, pageBanner } = this.props;
-    const { profile, wallets} = stores;
+    const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
 
     const DropdownHead = () => {
       if (!selected || !selectedWalletName) {
         return null;
       }
-      const { plate }= selected;
+      const { plate } = selected;
 
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
-        selected
-      );
+      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(selected);
 
       return (
         <NavWalletDetailsRevamp
@@ -81,9 +82,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           rewards={rewards}
           walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-            selected.networkId,
-          )}
+          defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId)}
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
@@ -119,9 +118,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
       const cardanoWallets = [];
 
       wallets.forEach(wallet => {
-        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
-          wallet
-        );
+        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
 
         const walletMap = {
           walletId: wallet.publicDeriverId,
@@ -170,20 +167,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       const { numberOfDecimals } = getTokenInfo(selected.balance.getDefaultEntry()).Metadata;
 
-      const receiveAdaAddress = addressToDisplayString(
-        selected.receiveAddress.addr.Hash,
-        getNetworkById(selected.networkId)
-      );
+      const receiveAdaAddress = addressToDisplayString(selected.receiveAddress.addr.Hash, getNetworkById(selected.networkId));
 
       return (
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          onExchangeCallback={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
-          }
-          currentBalanceAda={
-            selected.balance.getDefault().shiftedBy(-numberOfDecimals)
-          }
+          onExchangeCallback={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })}
+          currentBalanceAda={selected.balance.getDefault().shiftedBy(-numberOfDecimals)}
           receiveAdaAddress={receiveAdaAddress}
         />
       );
