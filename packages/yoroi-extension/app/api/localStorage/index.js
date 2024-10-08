@@ -112,7 +112,7 @@ export default class LocalStorageApi {
 
   setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-  resetPortfolioFiatPair: void => Promise<void> = () => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, '');
+  unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
 
   // ========== Theme Migration ========== //
 
@@ -357,6 +357,7 @@ export default class LocalStorageApi {
     await this.unsetToggleSidebar();
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
+    await this.unsetPortfolioFiatPair();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);

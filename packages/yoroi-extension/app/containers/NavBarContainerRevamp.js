@@ -46,7 +46,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
-    await localStorage.resetPortfolioFiatPair();
+    await localStorage.unsetPortfolioFiatPair();
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
     this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
   };
