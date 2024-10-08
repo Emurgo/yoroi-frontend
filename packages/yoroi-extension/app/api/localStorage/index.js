@@ -256,7 +256,7 @@ export default class LocalStorageApi {
 
   unsetCoinPricePubKeyData: void => Promise<void> = async () => {
     try {
-      removeLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+      await removeLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
     } catch (_) {
       // ignore the error
     }
