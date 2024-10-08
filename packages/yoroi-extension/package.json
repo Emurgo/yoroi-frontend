@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.3.301",
+  "version": "5.3.311",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -163,6 +163,7 @@
     "@mui/material": "^5.0.4",
     "@mui/x-date-pickers": "^5.0.8",
     "@svgr/webpack": "5.5.0",
+    "@vespaiach/axios-fetch-adapter": "^0.3.1",
     "@yoroi/exchange": "2.0.1",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/staking": "^1.5.1",

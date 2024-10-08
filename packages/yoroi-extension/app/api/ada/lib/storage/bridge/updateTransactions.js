@@ -150,6 +150,7 @@ import type {
 import { UtxoStorageApi } from '../models/utils';
 import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
 import type { RelativeSlot } from './timeUtils';
+import { getLocalItem, setLocalItem } from '../../../../localStorage/primitives';
 
 type TxData = {|
   addressLookupMap: Map<number, string>,
@@ -3091,16 +3092,16 @@ async function certificateToDb(
   return result;
 }
 
-function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>): boolean {
+async function compareAndSetIfNewAddressSetHash(id: number, addresses: Array<string>): Promise<boolean> {
   const requestAddresseSet = new Set(addresses);
   const requestAddresseHash = ObjectHash.sha1(requestAddresseSet);
   const localStorageKey = `TMP/UTXO_REQUEST_ADDRESSES_HASH/${id}`;
-  const prevRequestAddressHash = localStorage.getItem(localStorageKey);
+  const prevRequestAddressHash = await getLocalItem(localStorageKey);
   const isUpdating = prevRequestAddressHash == null || prevRequestAddressHash !== requestAddresseHash;
   if (isUpdating) {
     // <TODO:REMOVE_AFTER_YOROI_LIB_UPGRADE>
     console.debug('/// utxo state must be cleared:', id, requestAddresseHash, prevRequestAddressHash);
-    localStorage.setItem(localStorageKey, requestAddresseHash);
+    await setLocalItem(localStorageKey, requestAddresseHash);
   }
   return isUpdating;
 }
@@ -3137,7 +3138,7 @@ async function rawUpdateUtxos(
     utxoAddresses: addresses.utxoAddresses.map(a => a.address),
     accountingAddresses: addresses.accountingAddresses.map(a => a.address),
   });
-  if (compareAndSetIfNewAddressSetHash(publicDeriver.getPublicDeriverId(), requestAddresses)) {
+  if (await compareAndSetIfNewAddressSetHash(publicDeriver.getPublicDeriverId(), requestAddresses)) {
     await utxoStorageApi.clearUtxoState();
   }
   await utxoService.syncUtxoState(requestAddresses);
