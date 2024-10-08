@@ -284,11 +284,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.actions.profile.setSelectedNetwork.trigger(
       getNetworkById(this.wallets[walletIndex].networkId)
     );
+    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex);
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
     // Cache select wallet
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
-    subscribe(publicDeriverId);
+    subscribe(publicDeriverId, changed);
   };
 
   getLastSelectedWallet: void => ?WalletState = () => {

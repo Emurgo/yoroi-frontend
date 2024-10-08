@@ -95,19 +95,20 @@ export function getHandler(typeTag: string): ?Handler {
   if (typeTag === 'subscribe') {
     return async (request, sender, sendResponse) => {
       subscribe(sender.tab.id, request.request.activeWalletId);
-      // notify content scripts in all tabs
-      chrome.tabs.query({}, (tabs) => {
-        for (const tab of tabs) {
-          console.log('>>>notifiying tab', tab.id);
-          chrome.tabs.sendMessage(
-            tab.id,
-            {
-              type: 'active-wallet-open',
-              activeWalletId: request.request.activeWalletId
-            }
-          );
-        }
-      });
+      if (request.request.changed) {
+        // notify content scripts in all tabs
+        chrome.tabs.query({}, (tabs) => {
+          for (const tab of tabs) {
+            chrome.tabs.sendMessage(
+              tab.id,
+              {
+                type: 'active-wallet-open',
+                activeWalletId: request.request.activeWalletId
+              }
+            );
+          }
+        });
+      }
       sendResponse(undefined);
     };
   }
