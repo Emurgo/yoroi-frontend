@@ -23,7 +23,6 @@ import { bech32 } from 'bech32';
 import { getAddressHintBlock } from '../../../widgets/hint/AddressHintBlock';
 
 import styles from './SendTxHintBlock.scss';
-import { hexToBytes } from '../../../../../app/coreUtils';
 
 const message = defineMessages({
   sStartNewTx: {
@@ -266,7 +265,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
       if (semverGte(request.deviceVersion, '2.4.1')) {
         poolId = bech32.encode(
           'pool',
-          bech32.toWords(hexToBytes(params.poolKeyHashHex))
+          bech32.toWords(Buffer.from(params.poolKeyHashHex, 'hex'))
         );
       } else {
         poolId = params.poolKeyHashHex;
