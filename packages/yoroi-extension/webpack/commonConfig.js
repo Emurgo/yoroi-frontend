@@ -209,6 +209,10 @@ const resolve = () /*: * */ => ({
     assert: require.resolve('assert/'),
     util: require.resolve('util/'),
     url: require.resolve('url/'),
+    // need these so that @yoroi/common (a dependent of @yoroi/exchange) doesn't break Webpack
+    'react-native': false,
+    'react-native-mmkv': false,
+    'process/browser': require.resolve('process/browser'),
   },
   alias: { process: 'process/browser' },
 });
