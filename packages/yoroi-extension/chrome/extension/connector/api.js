@@ -49,7 +49,7 @@ import {
 import TimeUtils from '../../../app/api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoTxRequest, ForeignUtxoFetcher, } from '../../../app/api/ada';
 import AdaApi, { getDRepKeyAndAddressing, pubKeyAndAddressingByChainAndIndex } from '../../../app/api/ada';
-import { bytesToHex, hexToBytes } from '../../../app/coreUtils';
+import { bytesToHex, ensureArray, hexToBytes, iterateLenGet, iterateLenGetMap, maybe } from '../../../app/coreUtils';
 import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { CardanoShelleyTransactionCtorData } from '../../../app/domain/CardanoShelleyTransaction';
 import type { CardanoAddressedUtxo, } from '../../../app/api/ada/transactions/types';
@@ -155,30 +155,17 @@ function stringToLibValue(s: string): LibValue {
     return RustModule.WasmScope(Module => {
       // $FlowFixMe
       function multiAssetToLibAssets(masset: ?RustModule.WalletV4.MultiAsset): LibNativeAssets {
-        const mappedAssets = [];
-        if (masset != null) {
-          const policies = masset.keys();
-          for (let i = 0; i < policies.len(); i++) {
-            const policy = policies.get(i);
-            const assets = masset.get(policy);
-            if (assets != null) {
-              const names = assets.keys();
-              for (let j = 0; j < names.len(); j++) {
-                const name = names.get(j);
-                const amount = assets.get(name);
-                if (amount != null) {
-                  mappedAssets.push({
-                    asset: {
-                      policy: policy.to_bytes(),
-                      name: name.to_bytes(),
-                    },
-                    amount: new LibAmount(amount.to_str()),
-                  })
-                }
-              }
-            }
-          }
-        }
+
+        const mappedAssets = iterateLenGetMap(masset).flatMap(([policy, assets]) => {
+          return iterateLenGetMap(assets).nonNullValue().map(([name, amount]) => ({
+            asset: {
+              policy: policy.to_bytes(),
+              name: name.to_bytes(),
+            },
+            amount: new LibAmount(amount.to_str()),
+          }));
+        }).toArray();
+
         return LibNativeAssets.from(mappedAssets);
       }
       const value = Module.WalletV4.Value.from_bytes(hexToBytes(s));
@@ -514,33 +501,19 @@ export function getScriptRequiredSigningKeys(
   // eslint-disable-next-line no-shadow
   RustModule: typeof RustModule,
 ): Set<string> {
-  const set = new Set<string>();
   const nativeScripts: ?RustModule.WalletV4.NativeScripts = witnessSet?.native_scripts();
-  if (nativeScripts != null && nativeScripts.len() > 0) {
-    for (let i = 0; i < nativeScripts.len(); i++) {
-      const ns = nativeScripts.get(i);
-      const scriptRequiredSigners = ns.get_required_signers();
-      for (let j = 0; j < scriptRequiredSigners.len(); j++) {
-        const requiredKeyHash = scriptRequiredSigners.get(j);
-        set.add(bytesToHex(requiredKeyHash.to_bytes()));
-      }
-    }
-  }
-  return set;
+  return iterateLenGet(nativeScripts)
+    .flatMap(ns => iterateLenGet(ns.get_required_signers()))
+    .map(requiredKeyHash => requiredKeyHash.to_hex())
+    .toSet();
 }
 
 function getTxRequiredSigningKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
-  const set = new Set<string>();
-  const requiredSigners: ?RustModule.WalletV4.Ed25519KeyHashes = txBody.required_signers();
-  if (requiredSigners != null && requiredSigners.len() > 0) {
-    for (let i = 0; i < requiredSigners.len(); i++) {
-      const requiredKeyHash = requiredSigners.get(i);
-      set.add(bytesToHex(requiredKeyHash.to_bytes()));
-    }
-  }
-  return set;
+  return iterateLenGet(txBody.required_signers())
+    .map(requiredKeyHash => requiredKeyHash.to_hex())
+    .toSet();
 }
 
 type CertToKeyhashFuncs<CertType> = [
@@ -588,61 +561,35 @@ const CERT_TO_KEYHASH_FUNCS = [
   ]: CertToKeyhashFuncs<RustModule.WalletV4.DRepUpdate>),
   ([
     cert => cert.as_pool_registration(),
-    cert => {
-      const result = [];
-      const hashes = cert.pool_params().pool_owners();
-      for (let j = 0; j < hashes.len(); j++) {
-        result.push(hashes.get(j));
-      }
-      return result;
-    },
+    cert => iterateLenGet(cert.pool_params().pool_owners()).toArray(),
   ]: CertToKeyhashFuncs<RustModule.WalletV4.PoolRegistration>),
 ];
 
 function getCertificatesRequiredSignKeys(
   txBody: RustModule.WalletV4.TransactionBody,
 ): Set<string> {
-  const result: Set<string> = new Set();
 
-  const certs = txBody.certs();
-  if (certs) {
-    for (let i = 0; i < certs.len(); i++) {
-      const cert = certs.get(i);
-      if (!cert) {
-        throw new Error('unexpectedly missing certificate');
-      }
-      for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
-        const typedCert = convertFunc(cert);
-        if (typedCert) {
+  const certSigners =
+    iterateLenGet(txBody.certs())
+      .nonNull()
+      .flatMap(cert => {
+        for (const [convertFunc, getKeyhashFunc] of CERT_TO_KEYHASH_FUNCS) {
           // $FlowFixMe[incompatible-call]
-          const getKeyhashResult = getKeyhashFunc(typedCert);
-          if (Array.isArray(getKeyhashResult)) {
-            for (const keyHash of getKeyhashResult) {
-              result.add(keyHash.to_hex());
-            }
-          } else if (getKeyhashResult) {
-            result.add(getKeyhashResult.to_hex());
-          }
-          break;
+          const result = maybe(convertFunc(cert), getKeyhashFunc);
+          if (result != null)
+            return ensureArray<RustModule.WalletV4.Ed25519KeyHash>(result);
         }
-      }
-    }
-  }
+        return [];
+      });
 
-  const voters = txBody.voting_procedures()?.get_voters();
-  if (voters) {
-    for (let i = 0; i < voters.len(); i++) {
-      const voter = voters.get(i);
-      if (!voter) {
-        throw new Error('unexpectedly missing voter');
-      }
-      const keyHash = voter.to_drep_credential()?.to_keyhash();
-      if (keyHash) {
-        result.add(keyHash.to_hex());
-      }
-    }
-  }
-  return result;
+  const votingSigners =
+    iterateLenGet(txBody.voting_procedures()?.get_voters()).nonNull()
+      .map(voter => voter.to_drep_credential()?.to_keyhash()).nonNull();
+
+  return certSigners
+    .join(votingSigners)
+    .map(hash => hash.to_hex())
+    .toSet();
 }
 
 /**
@@ -821,24 +768,15 @@ async function __connectorSignCardanoTx(
     ...signingKey,
     password,
   });
-  const utxoIdSet: Set<string> = new Set();
-  const txBodyInputs = txBody.inputs();
-  for (let i = 0; i < txBodyInputs.len(); i++) {
-    const input = txBodyInputs.get(i);
-    const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
-    utxoIdSet.add(`${txHash}${String(input.index())}`);
-  }
-  const txBodyCollateralInputs = txBody.collateral();
-  if (txBodyCollateralInputs != null) {
-    for (let i = 0; i < txBodyCollateralInputs.len(); i++) {
-      const input = txBodyCollateralInputs.get(i);
-      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
-      utxoIdSet.add(`${txHash}${String(input.index())}`);
-    }
-  }
-  const usedUtxos = addressedUtxos.filter(utxo =>
-    utxoIdSet.has(utxo.utxo_id)
-  );
+
+  const utxoIdSet: Set<string> =
+    iterateLenGet(txBody.inputs())
+      .join(iterateLenGet(txBody.collateral()))
+      .map(input => `${(input.transaction_id().to_hex())}${String(input.index())}`)
+      .toSet();
+
+  const usedUtxos = addressedUtxos
+    .filter(utxo => utxoIdSet.has(utxo.utxo_id));
 
   const signedTx = shelleySignTransaction(
     usedUtxos,
@@ -997,10 +935,8 @@ export async function connectorRecordSubmittedCardanoTransaction(
   const addresses = { from: [], to: [] };
   let isIntraWallet = true;
   const txBody = tx.body();
-  const txInputs = txBody.inputs();
   const usedUtxos = [];
-  for (let i = 0; i < txInputs.len(); i++) {
-    const input = txInputs.get(i);
+  for (const input of iterateLenGet(txBody.inputs())) {
     const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
     const index = input.index();
     const utxo = utxos.find(u => u.tx_hash === txHash && u.tx_index === index);
@@ -1033,9 +969,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     }
     fee.joinAddMutable(value);
   }
-  const txOutputs = txBody.outputs();
-  for (let i = 0; i < txOutputs.len(); i++) {
-    const output = txOutputs.get(i);
+  for (const output of iterateLenGet(txBody.outputs())) {
     const value = multiTokenFromCardanoValue(output.amount(), defaults);
     const address = Buffer.from(output.address().to_bytes()).toString('hex');
     addresses.to.push({
@@ -1051,31 +985,20 @@ export async function connectorRecordSubmittedCardanoTransaction(
     fee.joinSubtractMutable(value);
   }
 
-  const withdrawals = txBody.withdrawals();
-  const withdrawalsData = [];
-  if (withdrawals) {
-    const withdrawalKeys = withdrawals.keys();
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const key = withdrawalKeys.get(i);
-      const withdrawalAmount = withdrawals.get(key);
-      if (!withdrawalAmount) {
-        throw new Error('unexpected missing withdrawal amount');
-      }
-      withdrawalsData.push({
-        address: Buffer.from(key.to_address().to_bytes()).toString('hex'),
-        value: new MultiToken(
-          [
-            {
-              amount: new BigNumber(withdrawalAmount.to_str()),
-              identifier: defaultToken.Identifier,
-              networkId: defaultToken.NetworkId,
-            }
-          ],
-          defaults
-        )
-      });
-    }
-  }
+  const withdrawalsData = iterateLenGetMap(txBody.withdrawals())
+    .nonNullValue()
+    .map(([key, withdrawalAmount]) => ({
+      address: key.to_address().to_hex(),
+      value: new MultiToken(
+        [{
+          amount: new BigNumber(withdrawalAmount.to_str()),
+          identifier: defaultToken.Identifier,
+          networkId: defaultToken.NetworkId,
+        }],
+        defaults,
+      )
+    }))
+    .toArray();
 
   const auxData = tx.auxiliary_data();
 

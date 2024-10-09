@@ -62,7 +62,7 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
-import { forceNonNull, last } from '../../../../coreUtils';
+import { forceNonNull, iterateLenGet, last } from '../../../../coreUtils';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
@@ -557,31 +557,17 @@ export function toRemoteByronTx(
   const body = signedTx.body();
   const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
 
-  const wasmOutputs = body.outputs();
-  const outputs = [];
-  for (let i = 0; i < wasmOutputs.len(); i++) {
-    const output = wasmOutputs.get(i);
-    const value = output.amount();
+  const outputs = iterateLenGet(body.outputs()).map(output => ({
+    address: toHexOrBase58(output.address()),
+    amount: output.amount().coin().to_str(),
+    assets: parseTokenList(output.amount().multiasset())
+  })).toArray();
 
-    const assets = parseTokenList(value.multiasset());
+  const inputs = iterateLenGet(body.inputs()).map(input => ({
+    id: input.transaction_id().to_hex(),
+    index: input.index(),
+  })).toArray();
 
-    outputs.push({
-      address: toHexOrBase58(output.address()),
-      amount: value.coin().to_str(),
-      assets
-    });
-  }
-
-  const wasmInputs = body.inputs();
-  const inputs = [];
-  for (let i = 0; i < wasmInputs.len(); i++) {
-    const input = wasmInputs.get(i);
-
-    inputs.push({
-      id: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
-      index: input.index(),
-    });
-  }
   const base = {
     hash,
     last_update: new Date().toString(),

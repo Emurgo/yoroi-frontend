@@ -156,7 +156,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, fail, hexToBytes, hexToUtf } from '../../coreUtils';
+import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -2505,11 +2505,8 @@ function getDifferenceAfterTx(
   const sumOutForKey = new MultiToken([], defaultToken);
   {
     const txBody = utxoResponse.txBuilder.build();
-    const outputs = txBody.outputs();
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
-      if (addrContainsAccountKey(address, accountKeyString, true)) {
+    for (const output of iterateLenGet(txBody.outputs())) {
+      if (addrContainsAccountKey(output.address().to_hex(), accountKeyString, true)) {
         sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }

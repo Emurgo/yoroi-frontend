@@ -26,7 +26,7 @@ import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
-import { hexToBytes, logErr } from '../../../../coreUtils';
+import { hexToBytes, iterateLenGet, logErr } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig, getNetworkById } from '../../lib/storage/database/prepackaged/networks';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
@@ -821,8 +821,7 @@ export async function maxSendableADA(
       adaLockedForAssets = new BigNumber(adaStr);
     }
 
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
+    for (const output of iterateLenGet(outputs)) {
       const value = output.amount();
       const assets = value.multiasset();
       if (assets == null || assets.len() === 0) {
