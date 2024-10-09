@@ -68,6 +68,7 @@ import {
   getConnectedSites,
   getProtocolParameters,
   getWallets,
+  removeWalletFromWhiteList,
   signAndBroadcastTransaction,
   signFail,
   signWindowRetrieveData,
