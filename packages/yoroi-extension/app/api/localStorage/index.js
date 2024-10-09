@@ -228,50 +228,35 @@ export default class LocalStorageApi {
 
   // ========== Unit of account ========== //
 
-  getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = () =>
-    new Promise((resolve, reject) => {
-      try {
-        const unitOfAccount = localStorage.getItem(storageKeys.UNIT_OF_ACCOUNT);
-        if (unitOfAccount == null) resolve(unitOfAccountDisabledValue);
-        else resolve(JSON.parse(unitOfAccount));
-      } catch (error) {
-        return reject(error);
-      }
-    });
+  getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = async () => {
+    const unitOfAccount = await getLocalItem(storageKeys.UNIT_OF_ACCOUNT);
+    if (unitOfAccount == null) {
+      return unitOfAccountDisabledValue;
+    }
+    return JSON.parse(unitOfAccount);
+  };
 
-  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = currency =>
-    new Promise((resolve, reject) => {
-      try {
-        localStorage.setItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
-        resolve();
-      } catch (error) {
-        return reject(error);
-      }
-    });
+  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
+    await setLocalItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
+  };
 
-  unsetUnitOfAccount: void => Promise<void> = () =>
-    new Promise(resolve => {
-      try {
-        localStorage.removeItem(storageKeys.UNIT_OF_ACCOUNT);
-      } catch (_error) {
-        // ignore the error
-      }
-      resolve();
-    });
+  unsetUnitOfAccount: void => Promise<void> = async () => {
+    await removeLocalItem(storageKeys.UNIT_OF_ACCOUNT);
+  };
 
   // ========== Coin price data public key  ========== //
 
   getCoinPricePubKeyData: void => Promise<?string> = async () => {
-    return localStorage.getItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+    return await getLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
   };
 
   setCoinPricePubKeyData: string => Promise<void> = async pubKeyData => {
-    localStorage.setItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
+    await setLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
   };
 
   unsetCoinPricePubKeyData: void => Promise<void> = async () => {
     try {
-      localStorage.removeItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+      await removeLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
     } catch (_) {
       // ignore the error
     }
