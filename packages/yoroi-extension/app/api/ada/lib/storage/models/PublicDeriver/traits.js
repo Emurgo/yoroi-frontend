@@ -1150,7 +1150,7 @@ const Cip1852PickReceiveMixin = (
     if (keyHash == null) {
       throw new Error(`${nameof(Cip1852PickReceive)}::${nameof(this.rawPickReceive)} internal address is a script`);
     }
-    const stakingKey = Buffer.from(keyHash.to_bytes()).toString('hex');
+    const stakingKey = keyHash.to_hex();
     const ourBaseAddress = body.addrs
       .filter(addr => addr.Type === CoreAddressTypes.CARDANO_BASE)
       .filter(addr => addr.Hash.includes(stakingKey));
@@ -1761,9 +1761,7 @@ const ScanShelleyAccountUtxoMixin = (
       derivationTables
     );
 
-    const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(body.accountPublicKey, 'hex')
-    );
+    const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(body.accountPublicKey);
 
     const stakingKey = derivePublicByAddressing({
       addressing: stakingAddressDbRow.addressing,

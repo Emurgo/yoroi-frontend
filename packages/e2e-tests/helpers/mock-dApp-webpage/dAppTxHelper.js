@@ -69,10 +69,9 @@ export const getCslUtxos = utxosHex => {
   return cslUtxos;
 };
 
-export const getCslValue = valueHex => CSL.Value.from_bytes(Buffer.from(valueHex, 'hex'));
+export const getCslValue = valueHex => CSL.Value.from_hex(valueHex);
 
-export const getAmountInHex = amount =>
-  Buffer.from(CSL.Value.new(CSL.BigNum.from_str(amount)).to_bytes()).toString('hex');
+export const getAmountInHex = amount => CSL.Value.new(CSL.BigNum.from_str(amount)).to_hex();
 
 export const getLargestFirstMultiAsset = () => CSL.CoinSelectionStrategyCIP2.LargestFirstMultiAsset;
 

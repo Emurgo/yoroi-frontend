@@ -467,7 +467,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
 
     for (const input of iterateLenGet(txBody.inputs())) {
-      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+      const txHash = input.transaction_id().to_hex();
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
         signFail({
@@ -503,7 +503,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const outputs: Array<TxDataOutput> = [];
     for (const output of iterateLenGet(txBody.outputs())) {
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
+      const address = output.address().to_hex();
       outputs.push({
         address,
         isForeign: !ownAddresses.has(address),
@@ -1188,7 +1188,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(Buffer.from(publicDeriver.publicKey, 'hex')),
+      key: RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey),
       addressing: {
         startLevel: 1,
         path: publicDeriver.pathToPublic,

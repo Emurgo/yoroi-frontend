@@ -89,9 +89,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   txId(): string {
-    return Buffer.from(RustModule.WalletV4.hash_transaction(
-      this.unsignedTx.build()
-    ).to_bytes()).toString('hex');
+    return RustModule.WalletV4.hash_transaction(this.unsignedTx.build()).to_hex();
   }
 
   size(): {| full: number, outputs: number[] |} {
@@ -153,7 +151,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
         },
       ),
       isForeign: false,
-      address: Buffer.from(output.address().to_bytes()).toString('hex'),
+      address: output.address().to_hex(),
     })).toArray();
   }
 
@@ -278,5 +276,5 @@ export function shelleyTxEqual(
   req1: RustModule.WalletV4.TransactionBuilder,
   req2: RustModule.WalletV4.TransactionBuilder,
 ): boolean {
-  return Buffer.from(req1.build().to_bytes()).toString('hex') === Buffer.from(req2.build().to_bytes()).toString('hex');
+  return req1.build().to_hex() === req2.build().to_hex();
 }

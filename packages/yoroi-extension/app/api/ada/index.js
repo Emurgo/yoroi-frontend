@@ -709,17 +709,13 @@ export default class AdaApi {
           request.signRequest.senderUtxos,
           request.signRequest.unsignedTx,
           request.publicDeriver.getParent().getPublicDeriverLevel(),
-          Scope.WalletV4.Bip32PrivateKey.from_bytes(
-            Buffer.from(normalizedKey.prvKeyHex, 'hex')
-          ),
+          Scope.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
           request.signRequest.neededStakingKeyHashes.wits,
           request.signRequest.metadata,
         );
 
         return {
-          txHash: Buffer.from(
-            Scope.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-          ).toString('hex'),
+          txHash: Scope.WalletV4.hash_transaction(signedTx.body()).to_hex(),
           encodedTx: signedTx.to_bytes(),
         }
       })
@@ -733,7 +729,7 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData({ txId })
       );
-      return { txId, signedTxHex: Buffer.from(encodedTx).toString('hex') };
+      return { txId, signedTxHex: bytesToHex(encodedTx) };
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
@@ -1353,9 +1349,7 @@ export default class AdaApi {
         networkId: networkInfo.NetworkId,
       };
 
-      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(wallet.publicKey, 'hex')
-      );
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(wallet.publicKey);
 
       const stakingKey = derivePublicByAddressing({
         addressing: wallet.stakingAddressing.addressing,
@@ -1427,13 +1421,8 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
-      const stakeCredentialHex = RustModule.WasmScope(Scope => {
-        return Buffer.from(
-            Scope.WalletV4.Credential
-              .from_keyhash(stakingKey.hash())
-              .to_bytes()
-          ).toString('hex')
-      });
+      const stakeCredentialHex = RustModule.WasmScope(Scope =>
+        Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex());
 
       const signTxRequest = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
@@ -1495,9 +1484,7 @@ export default class AdaApi {
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
         const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(withdrawal.rewardAddress, 'hex')
-          )
+          RustModule.WalletV4.Address.from_hex(withdrawal.rewardAddress)
         );
         if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
         const paymentCred = wasmAddr.payment_cred();
@@ -1510,7 +1497,7 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
-          neededKeys.neededHashes.add(Buffer.from(paymentCred.to_bytes()).toString('hex'));
+          neededKeys.neededHashes.add(paymentCred.to_hex());
         }
       }
       const accountStates = await request.getAccountState({
@@ -1536,16 +1523,14 @@ export default class AdaApi {
           }
 
           const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-            RustModule.WalletV4.Address.from_bytes(
-              Buffer.from(address, 'hex')
-            )
+            RustModule.WalletV4.Address.from_hex(address)
           );
           if (rewardAddress == null) {
             throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
           }
           {
             const stakeCredential = rewardAddress.payment_cred();
-            neededKeys.neededHashes.add(Buffer.from(stakeCredential.to_bytes()).toString('hex'));
+            neededKeys.neededHashes.add(stakeCredential.to_hex());
           }
           list.push({
             address: rewardAddress,
@@ -1591,10 +1576,10 @@ export default class AdaApi {
           if (withdrawal.privateKey != null) {
             const { privateKey } = withdrawal;
             neededKeys.wits.add(
-              Buffer.from(RustModule.WalletV4.make_vkey_witness(
+              RustModule.WalletV4.make_vkey_witness(
                 RustModule.WalletV4.hash_transaction(body),
                 privateKey
-              ).to_bytes()).toString('hex')
+              ).to_hex()
             );
           }
         }
@@ -2033,7 +2018,7 @@ export default class AdaApi {
         signRequest: await this.createUnsignedTxForUtxos({
           absSlotNumber: request.absSlotNumber,
           receivers: [{
-            address: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+            address: receiveAddress.to_address().to_hex(),
             addressing: {
               path: [
                 WalletTypePurpose.CIP1852,
@@ -2080,9 +2065,7 @@ export default class AdaApi {
       }
       const wallet = await createHardwareCip1852Wallet({
         db: request.db,
-        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.publicKey, 'hex')
-        ),
+        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_hex(request.publicKey),
         accountIndex: request.addressing.path[
         Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
           ],
@@ -2470,10 +2453,8 @@ function getDifferenceAfterTx(
   defaultToken: DefaultTokenEntry,
 ): MultiToken {
 
-  const accountKeyString = RustModule.WasmScope(Scope => {
-    const stakeCredential = Scope.WalletV4.Credential.from_keyhash(stakingKey.hash());
-    return Buffer.from(stakeCredential.to_bytes()).toString('hex')
-  })
+  const accountKeyString = RustModule.WasmScope(Scope =>
+    Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex())
 
   const sumInForKey = new MultiToken([], defaultToken);
   {
@@ -2526,9 +2507,7 @@ export async function genOwnStakingKey(request: {|
       ...signingKeyFromStorage,
       password: request.password,
     });
-    const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(normalizedKey.prvKeyHex, 'hex')
-    );
+    const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex);
     const normalizedStakingKey = derivePrivateByAddressing({
       addressing: stakingAddr.addressing,
       startingFrom: {
@@ -2683,24 +2662,22 @@ export async function walletSignData(
   const signingKey = derivePrivateByAddressing({
     addressing: addressing.addressing,
     startingFrom: {
-      key: RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      ),
+      key: RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
       level: withLevels.getParent().getPublicDeriverLevel(),
     },
   }).to_raw_key();
 
   const coseSign1 = await cip8Sign(
-    Buffer.from(address, 'hex'),
+    hexToBytes(address),
     signingKey,
-    Buffer.from(payload, 'hex'),
+    hexToBytes(payload),
   );
 
   const key = makeCip8Key(signingKey.to_public().as_bytes());
 
   return {
-    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
-    key: Buffer.from(key.to_bytes()).toString('hex'),
+    signature: bytesToHex(coseSign1.to_bytes()),
+    key: bytesToHex(key.to_bytes()),
   };
 }
 
@@ -2711,16 +2688,16 @@ export async function encodeHardwareWalletSignResult(
   signingPublicKeyHex: string,
 ): Promise<{| signature: string, key: string |}> {
   const coseSign1 = await buildCoseSign1FromSignature (
-    Buffer.from(addressHex, 'hex'),
-    Buffer.from(signatureHex, 'hex'),
-    Buffer.from(payloadHex, 'hex'),
+    hexToBytes(addressHex),
+    hexToBytes(signatureHex),
+    hexToBytes(payloadHex),
   );
 
-  const key = makeCip8Key(Buffer.from(signingPublicKeyHex, 'hex'));
+  const key = makeCip8Key(hexToBytes(signingPublicKeyHex));
 
   return {
-    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
-    key: Buffer.from(key.to_bytes()).toString('hex'),
+    signature: bytesToHex(coseSign1.to_bytes()),
+    key: bytesToHex(key.to_bytes()),
   };
 }
 

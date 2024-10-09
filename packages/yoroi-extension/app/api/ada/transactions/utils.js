@@ -21,7 +21,7 @@ import { MultiToken, } from '../../common/lib/MultiToken';
 import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
-import { iterateLenGet, iterateLenGetMap } from '../../../coreUtils';
+import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../coreUtils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -30,7 +30,7 @@ export function cardanoAssetToIdentifier(
   name: RustModule.WalletV4.AssetName,
 ): string {
   // note: possible for name to be empty causing a trailing hyphen
-  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.name()).toString('hex')}`;
+  return `${policyId.to_hex()}.${bytesToHex(name.name())}`;
 }
 export function identifierToCardanoAsset(
   identifier: string,
@@ -41,8 +41,8 @@ export function identifierToCardanoAsset(
   // recall: 'a.'.split() gives ['a', ''] as desired
   const parts = identifier.split('.');
   return {
-    policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
-    name: RustModule.WalletV4.AssetName.new(Buffer.from(parts[1], 'hex')),
+    policyId: RustModule.WalletV4.ScriptHash.from_hex(parts[0]),
+    name: RustModule.WalletV4.AssetName.new(hexToBytes(parts[1])),
   };
 }
 export function identifierSplit(
@@ -68,8 +68,8 @@ export function parseTokenList(
     return iterateLenGetMap(assetsForPolicy).nonNullValue().map(([assetName, amount]) => ({
       amount: amount.to_str(),
       assetId: cardanoAssetToIdentifier(policyId, assetName),
-      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-      name: Buffer.from(assetName.name()).toString('hex'),
+      policyId: policyId.to_hex(),
+      name: bytesToHex(assetName.name()),
     }));
   }).toArray();
 }
@@ -378,8 +378,8 @@ export function asAddressedUtxo(
       return {
         amount: token.amount,
         assetId: token.tokenId,
-        policyId: Buffer.from(pieces.policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(pieces.name.name()).toString('hex'),
+        policyId: pieces.policyId.to_hex(),
+        name: bytesToHex(pieces.name.name()),
       };
     });
     return {
@@ -452,11 +452,11 @@ export function assetToRustMultiasset(
   const multiasset = W4.MultiAsset.new();
   for (const policyHex of Object.keys(groupedAssets)) {
     const assetGroup = groupedAssets[policyHex];
-    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const policyId = W4.ScriptHash.from_hex(policyHex);
     const assets = RustModule.WalletV4.Assets.new();
     for (const asset of assetGroup) {
       assets.insert(
-        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.AssetName.new(hexToBytes(asset.name)),
         W4.BigNum.from_str(asset.amount),
       );
     }

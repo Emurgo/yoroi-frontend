@@ -16,6 +16,10 @@ export function hexToUtf(hex: string): string {
   return hexToBytes(hex).toString('utf-8');
 }
 
+export function utfToBytes(utf: string): Buffer {
+  return Buffer.from(utf, 'utf-8');
+}
+
 export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
   try {
     return f();

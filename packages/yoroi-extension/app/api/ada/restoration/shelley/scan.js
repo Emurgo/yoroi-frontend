@@ -60,7 +60,7 @@ export async function addShelleyChimericAccountAddress(
     ...insertRequest,
     address: {
       type: CoreAddressTypes.CARDANO_REWARD,
-      data: Buffer.from(accountAddr.to_address().to_bytes()).toString('hex'),
+      data: accountAddr.to_address().to_hex(),
     },
   });
 
@@ -94,14 +94,14 @@ export async function addShelleyUtxoAddress(
     ...insertRequest,
     address: {
       type: CoreAddressTypes.CARDANO_ENTERPRISE,
-      data: Buffer.from(wasmEnterpriseAddr.to_address().to_bytes()).toString('hex'),
+      data: wasmEnterpriseAddr.to_address().to_hex(),
     },
   });
   await addByHash({
     ...insertRequest,
     address: {
       type: CoreAddressTypes.CARDANO_BASE,
-      data: Buffer.from(baseAddr.to_address().to_bytes()).toString('hex'),
+      data: baseAddr.to_address().to_hex(),
     },
   });
   return {
@@ -165,9 +165,7 @@ export async function scanShelleyCip1852Account(request: {|
   addByHash: AddByHashFunc,
   stakingKey: RustModule.WalletV4.PublicKey,
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
-  const key = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-    Buffer.from(request.accountPublicKey, 'hex'),
-  );
+  const key = RustModule.WalletV4.Bip32PublicKey.from_hex(request.accountPublicKey);
 
   const config = getCardanoHaskellBaseConfig(
     request.network

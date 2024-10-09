@@ -197,12 +197,8 @@ export default class LedgerConnectStore
     bip44Key,
     cip1852Key,
   ) => {
-    const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(bip44Key, 'hex')
-    );
-    const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(cip1852Key, 'hex')
-    );
+    const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(bip44Key);
+    const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(cip1852Key);
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._checkAndStoreHWDeviceInfo)} no network selected`);

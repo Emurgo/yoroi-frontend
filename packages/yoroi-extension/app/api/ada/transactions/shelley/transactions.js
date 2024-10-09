@@ -617,8 +617,8 @@ export async function newAdaUnsignedTxFromUtxo(
             const [policyId, assetName] = t.identifier.split('.');
             return {
               asset: {
-                policy: Buffer.from(policyId, 'hex'),
-                name: Buffer.from(assetName, 'hex'),
+                policy: hexToBytes(policyId),
+                name: hexToBytes(assetName),
               },
               amount: new LibAmount(t.amount.toString()),
             };
@@ -960,8 +960,8 @@ async function newAdaUnsignedTxFromUtxoForConnector(
             const [policyId, assetName] = t.identifier.split('.');
             return {
               asset: {
-                policy: Buffer.from(policyId, 'hex'),
-                name: Buffer.from(assetName, 'hex'),
+                policy: hexToBytes(policyId),
+                name: hexToBytes(assetName),
               },
               amount: new LibAmount(t.amount.toString()),
             };
@@ -1054,7 +1054,7 @@ export function signTransaction(
       throw new Error(`${nameof(signTransaction)} utxo not a valid Shelley address`);
     }
     const keyHash = getCardanoSpendingKeyHash(wasmAddr);
-    const addrHex = Buffer.from(wasmAddr.to_bytes()).toString('hex');
+    const addrHex = wasmAddr.to_hex();
     if (keyHash === null) {
       if (!seenByronKeys.has(addrHex)) {
         seenByronKeys.add(addrHex);
@@ -1066,7 +1066,7 @@ export function signTransaction(
       throw new Error(`${nameof(signTransaction)} cannot sign script inputs`);
     }
     {
-      const keyHex = Buffer.from(keyHash.to_bytes()).toString('hex');
+      const keyHex = keyHash.to_hex();
       if (!seenKeyHashes.has(keyHex)) {
         seenKeyHashes.add(keyHex);
         deduped.push(item);
@@ -1127,11 +1127,7 @@ export function signTransaction(
       continue;
     }
     stakingKeySigSet.add(witness);
-    vkeyWits.add(
-      RustModule.WalletV4.Vkeywitness.from_bytes(
-        Buffer.from(witness, 'hex')
-      )
-    );
+    vkeyWits.add(RustModule.WalletV4.Vkeywitness.from_hex(witness));
   }
 
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
@@ -1155,9 +1151,7 @@ function utxoToTxInput(
   utxo: RemoteUnspentOutput,
 ): RustModule.WalletV4.TransactionInput {
   return RustModule.WalletV4.TransactionInput.new(
-    RustModule.WalletV4.TransactionHash.from_bytes(
-      Buffer.from(utxo.tx_hash, 'hex'),
-    ),
+    RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
     utxo.tx_index,
   );
 }
@@ -1287,8 +1281,8 @@ export async function toLibUTxO(utxo: RemoteUnspentOutput): any {
         utxo.assets.map(asset => (
           {
             asset: {
-              policy: Buffer.from(asset.policyId, 'hex'),
-              name: Buffer.from(asset.name, 'hex'),
+              policy: hexToBytes(asset.policyId),
+              name: hexToBytes(asset.name),
             },
             amount: new LibAmount(asset.amount),
           }
