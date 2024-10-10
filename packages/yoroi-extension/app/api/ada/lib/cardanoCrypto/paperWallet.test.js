@@ -18,6 +18,7 @@ import {
 } from '../storage/database/index';
 import config from '../../../../config';
 import { networks } from '../storage/database/prepackaged/networks';
+import { bytesToHex } from '../../../../coreUtils';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -65,6 +66,6 @@ test('Unscramble Yoroi paper matches expected address', async () => {
   expect(words).toBeTruthy();
   if (words != null) {
     const rootPk = generateWalletRootKey(words);
-    expect(Buffer.from(rootPk.as_bytes()).toString('hex')).toEqual(VALID_YOROI_PAPER.privateKey);
+    expect(bytesToHex(rootPk.as_bytes())).toEqual(VALID_YOROI_PAPER.privateKey);
   }
 });

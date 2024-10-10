@@ -6,7 +6,7 @@ import {
   getCSLPubKeyHash,
   getCslValue,
   getDRepIDHexAndBechFromHex,
-  mapCborUtxos,
+  mapCborUtxos, bytesToHex,
 } from './dAppTxHelper.js';
 
 class MockDAppWebpageError extends Error {}
@@ -385,9 +385,9 @@ export class MockDAppWebpage {
 
     let payloadHex;
     if (payload.startsWith('0x')) {
-      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+      payloadHex = payload.replace('^0x', '');
     } else {
-      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+      payloadHex = bytesToHex(Buffer.from(payload, 'utf8'));
     }
     this.logger.info(`MockDApp::requestSigningData Payload HEX: ${payloadHex}`);
 
@@ -625,9 +625,9 @@ export class MockDAppWebpage {
 
     let payloadHex;
     if (payload.startsWith('0x')) {
-      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+      payloadHex = payload.replace('^0x', '');
     } else {
-      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+      payloadHex = bytesToHex(Buffer.from(payload, 'utf8'));
     }
     this.logger.info(`MockDApp::requestSigningDataCIP95 Payload HEX: ${payloadHex}`);
 

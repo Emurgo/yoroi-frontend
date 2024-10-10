@@ -165,10 +165,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         const wasmAddr = WasmScope.WalletV4.BaseAddress.from_address(
           WasmScope.WalletV4.Address.from_bech32(address)
         )?.stake_cred();
-        if (wasmAddr == null) return null; // should never happen
-        const hash = wasmAddr.to_keyhash() ?? wasmAddr.to_scripthash();
-        if (hash == null) return null; // should never happen
-        return Buffer.from(hash.to_bytes()).toString('hex');
+        return (wasmAddr?.to_keyhash() ?? wasmAddr?.to_scripthash())?.to_hex();
       }
     };
 
@@ -204,7 +201,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
         const spendingKey = getCardanoSpendingKeyHash(wasmAddr);
         if (spendingKey === null) return null; // legacy address ignored
         if (spendingKey === undefined) return null; // TODO: handle script outputs
-        return Buffer.from(spendingKey.to_bytes()).toString('hex');
+        return spendingKey.to_hex();
       }
     };
 
