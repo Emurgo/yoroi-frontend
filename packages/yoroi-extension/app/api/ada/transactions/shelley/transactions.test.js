@@ -27,8 +27,8 @@ import {
 } from '../../../../config/numbersConfig';
 import { defaultAssets, networks, } from '../../lib/storage/database/prepackaged/networks';
 import { MultiToken, } from '../../../common/lib/MultiToken';
-import { identifierSplit, iterateWasmKeyValue } from '../utils';
-import { bytesToHex } from '../../../../coreUtils';
+import { identifierSplit } from '../utils';
+import { bytesToHex, iterateLenGetMap } from '../../../../coreUtils';
 
 const network = networks.CardanoMainnet;
 const defaultIdentifier = defaultAssets.filter(
@@ -36,6 +36,10 @@ const defaultIdentifier = defaultAssets.filter(
 )[0].Identifier;
 
 const testAssetId = 'd27197682d71905c087c5c3b61b10e6d746db0b9bef351014d75bb26.6e69636f696e';
+
+function bech32ToHex(s: string): string {
+  return RustModule.WalletV4.Address.from_bech32(s).to_hex();
+}
 
 const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   {
@@ -64,10 +68,10 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   },
   {
     amount: '30000000',
-    receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+    receiver: bech32ToHex(
       // external addr 0, staking key 0
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
-    ).to_bytes()).toString('hex'),
+    ),
     tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
     tx_index: 0,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55500',
@@ -75,10 +79,10 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   },
   {
     amount: '2000001',
-    receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+    receiver: bech32ToHex(
       // external addr 0, staking key 0
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
-    ).to_bytes()).toString('hex'),
+    ),
     tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
     tx_index: 1,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55501',
@@ -91,10 +95,10 @@ const genSampleUtxos: void => Array<RemoteUnspentOutput> = () => [
   },
   {
     amount: '1000001',
-    receiver: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+    receiver: bech32ToHex(
       // external addr 0, staking key 0
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
-    ).to_bytes()).toString('hex'),
+    ),
     tx_hash: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de5550',
     tx_index: 2,
     utxo_id: '86e36b6a65d82c9dcc0370b0ee3953aee579db0b837753306405c28a74de55502',
@@ -130,9 +134,9 @@ const genSampleAdaAddresses: void => Array<{| ...Address, ...Addressing |}> = ()
     },
   },
   {
-    address: Buffer.from(RustModule.WalletV4.Address.from_bech32(
+    address: bech32ToHex(
       'addr1q8gpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqphf76y'
-    ).to_bytes()).toString('hex'),
+    ),
     addressing: {
       path: [0, 0],
       startLevel: Bip44DerivationLevels.CHAIN.level,
@@ -472,10 +476,10 @@ describe('Create unsigned TX from UTXO', () => {
     }
 
     function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
-      const massetArray = iterateWasmKeyValue(masset);
+      const massetArray = iterateLenGetMap(masset).toArray();
       expect(massetArray.length).toEqual(1);
       expect(massetArray[0][0].to_hex()).toEqual(policy);
-      const assetsArray = iterateWasmKeyValue(massetArray[0][1]);
+      const assetsArray = iterateLenGetMap(massetArray[0][1]).toArray();
       expect(assetsArray.length).toEqual(1);
       expect(bytesToHex(assetsArray[0][0].name())).toEqual(name);
       expect(assetsArray[0][1].to_str()).toEqual(amount);
@@ -794,11 +798,8 @@ describe('Create signed transactions', () => {
 
     jest.spyOn(global.Math, 'random').mockRestore();
 
-    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
-        'hex'
-      ),
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+      '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
     );
     const signedTx = signTransaction(
       unsignedTxResponse.senderUtxos,
@@ -816,35 +817,32 @@ describe('Create signed transactions', () => {
     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
     expect(bootstrapWits.len()).toEqual(1);
 
-    expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
+    expect(bootstrapWits.get(0).to_hex()).toEqual(
       '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c0584029239c4ecf5123beb4256558be536c2745595a9be9348cede7e71138c03aaed70acdc6847165e51843e5e30d6a4bc96d3f68191d1ee35d04e5dfc0df0fd4ed0858202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 
   it('Witness should with addressing from root', () => {
-    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
-        'hex'
-      ),
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+      '70afd5ff1f7f551c481b7e3f3541f7c63f5f6bcb293af92565af3deea0bcd6481a6e7b8acbe38f3906c63ccbe8b2d9b876572651ac5d2afc0aca284d9412bb1b4839bf02e1d990056d0f06af22ce4bcca52ac00f1074324aab96bbaaaccf290d',
     );
     const inputs = RustModule.WalletV4.TransactionInputs.new();
     inputs.add(
       RustModule.WalletV4.TransactionInput.new(
-        RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from('05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f', 'hex')),
+        RustModule.WalletV4.TransactionHash.from_hex('05ec4a4a7f4645fa66886cef2e34706907a3a7f9d88e0d48b313ad2cdf76fb5f'),
         0
       )
     );
     inputs.add(
       RustModule.WalletV4.TransactionInput.new(
-        RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from('6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe', 'hex')),
+        RustModule.WalletV4.TransactionHash.from_hex('6930f123df83e4178b0324ae617b2028c0b38c6ff4660583a2abf1f7b08195fe'),
         0
       )
     );
     const outputs = RustModule.WalletV4.TransactionOutputs.new();
     outputs.add(
       RustModule.WalletV4.TransactionOutput.new(
-        RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4'), 'hex')),
+        RustModule.WalletV4.Address.from_hex(byronAddrToHex('Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4')),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5001'))
       )
     );
@@ -896,17 +894,14 @@ describe('Create signed transactions', () => {
     if (bootstrapWits == null) throw new Error('Bootstrap witnesses should not be null');
     expect(bootstrapWits.len()).toEqual(1); // note: only one witness since we got rid of duplicates
 
-    expect(Buffer.from(bootstrapWits.get(0).to_bytes()).toString('hex')).toEqual(
+    expect(bootstrapWits.get(0).to_hex()).toEqual(
       '8458208fb03c3aa052f51c086c54bd4059ead2d2e426ac89fa4b3ce41cbfd8800b51c058401edebb108c74a991bef5b28458778fc0713499349d77fb98acc63e4219cfcd1b51321ccaccdf2ce2e80d7c2687f3d79feea32daedcfbc19792dff0358af5950358202623fceb96b07408531a5cb259f53845a38d6b68928e7c0c7e390f07545d0e6241a0'
     );
   });
 
   it('Transaction should support certificates', async () => {
-    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        'hex',
-      ),
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
     );
     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
 
@@ -943,7 +938,7 @@ describe('Create signed transactions', () => {
         RustModule.WalletV4.Certificate.new_stake_delegation(
           RustModule.WalletV4.StakeDelegation.new(
             RustModule.WalletV4.Credential.from_keyhash(stakingKey.to_public().hash()),
-            RustModule.WalletV4.Ed25519KeyHash.from_bytes(Buffer.from('1b268f4cba3faa7e36d8a0cc4adca2096fb856119412ee7330f692b5', 'hex'))
+            RustModule.WalletV4.Ed25519KeyHash.from_hex('1b268f4cba3faa7e36d8a0cc4adca2096fb856119412ee7330f692b5')
           )
         ),
       ],
@@ -957,7 +952,7 @@ describe('Create signed transactions', () => {
       unsignedTxResponse.txBuilder.build().to_bytes(),
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set([Buffer.from(
+      new Set([
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
             RustModule.WalletV4.TransactionBody.from_bytes(
@@ -965,8 +960,8 @@ describe('Create signed transactions', () => {
             ),
           ),
           stakingKey,
-        ).to_bytes()
-      ).toString('hex')]),
+        ).to_hex()
+      ]),
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -979,8 +974,8 @@ describe('Create signed transactions', () => {
 
     // set is used so order not defined so we sort the list
     const witArray = [
-      Buffer.from(vKeyWits.get(0).to_bytes()).toString('hex'),
-      Buffer.from(vKeyWits.get(1).to_bytes()).toString('hex')
+      vKeyWits.get(0).to_hex(),
+      vKeyWits.get(1).to_hex(),
     ].sort();
 
     expect(witArray).toEqual([
@@ -990,11 +985,8 @@ describe('Create signed transactions', () => {
   });
 
   it('Transaction should support withdrawals', async () => {
-    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        'hex',
-      ),
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
     );
     const stakingKey = accountPrivateKey.derive(2).derive(STAKING_KEY_INDEX).to_raw_key();
     const stakingKeyCredential = RustModule.WalletV4.Credential.from_keyhash(
@@ -1037,7 +1029,7 @@ describe('Create signed transactions', () => {
       unsignedTxResponse.txBuilder.build().to_bytes(),
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set([Buffer.from(
+      new Set([
         RustModule.WalletV4.make_vkey_witness(
           RustModule.WalletV4.hash_transaction(
             RustModule.WalletV4.TransactionBody.from_bytes(
@@ -1045,8 +1037,8 @@ describe('Create signed transactions', () => {
             ),
           ),
           stakingKey,
-        ).to_bytes()
-      ).toString('hex')]),
+        ).to_hex(),
+      ]),
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -1073,8 +1065,8 @@ describe('Create signed transactions', () => {
 
     // set is used so order not defined so we sort the list
     const witArray = [
-      Buffer.from(vKeyWits.get(0).to_bytes()).toString('hex'),
-      Buffer.from(vKeyWits.get(1).to_bytes()).toString('hex')
+      vKeyWits.get(0).to_hex(),
+      vKeyWits.get(1).to_hex(),
     ].sort();
 
     expect(witArray).toEqual([

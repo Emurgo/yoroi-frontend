@@ -11,6 +11,7 @@ import {
 } from '../../../../config/numbersConfig';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { walletChecksum } from '@emurgo/cip4-js';
+import { bytesToHex } from '../../../../coreUtils';
 
 export type PlateResponse = {|
   addresses: Array<string>,
@@ -35,9 +36,7 @@ export const generateShelleyPlate = (
     .derive(STAKING_KEY_INDEX)
     .to_raw_key();
 
-  const plate = walletChecksum(
-    Buffer.from(accountPublic.as_bytes()).toString('hex')
-  );
+  const plate = walletChecksum(bytesToHex(accountPublic.as_bytes()));
   const generateAddressFunc = genBaseAddressBatchFunc(
     chainKey,
     stakingKey,

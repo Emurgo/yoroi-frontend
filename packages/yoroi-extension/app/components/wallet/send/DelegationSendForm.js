@@ -15,6 +15,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
+import { bytesToHex } from '../../../coreUtils';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -39,7 +40,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
     return isHex(id);
   };
   try {
-    const payload = Buffer.from(bech32.fromWords(bech32.decode(poolId, 1000).words)).toString('hex');
+    const payload = bytesToHex(bech32.fromWords(bech32.decode(poolId, 1000).words));
     if (validateHex(payload)) {
       updatePool(payload);
       return true;

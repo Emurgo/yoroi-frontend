@@ -56,6 +56,7 @@ import {
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
+import { hexToBytes } from '../../../../../../coreUtils';
 
 // ===========================
 //   DerivePublicFromPrivate
@@ -104,7 +105,7 @@ export async function derivePublicDeriver<Row>(
                   ? pubDeriverKey.prvKeyHex
                   : encryptWithPassword(
                     body.encryptPublicDeriverPassword,
-                    Buffer.from(pubDeriverKey.prvKeyHex, 'hex')
+                    hexToBytes(pubDeriverKey.prvKeyHex)
                   ),
                 IsEncrypted: true,
                 PasswordLastUpdate: null,

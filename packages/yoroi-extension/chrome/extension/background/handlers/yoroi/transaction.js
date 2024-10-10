@@ -102,17 +102,15 @@ export const SignAndBroadcastTransaction: HandlerType<
             password: request.password,
           });
           if (neededHashes.includes(
-            Buffer.from(
               Scope.WalletV4.Credential.from_keyhash(
                 stakingKey.to_public().hash()
-              ).to_bytes()
-            ).toString('hex')
+              ).to_hex()
           )) {
             wits.push(
-              Buffer.from(Scope.WalletV4.make_vkey_witness(
+              Scope.WalletV4.make_vkey_witness(
                 Scope.WalletV4.TransactionHash.from_hex(txHash),
                 stakingKey
-              ).to_bytes()).toString('hex')
+              ).to_hex()
             );
           } else {
             throw new Error('missing witness but it was not ours');
