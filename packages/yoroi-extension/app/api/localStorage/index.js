@@ -22,10 +22,8 @@ const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
-  THEME: networkForLocalStorage + '-THEME',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   IS_REVAMP_THEME_ANNOUNCED: 'IS_REVAMP_THEME_ANNOUNCED',
-  CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
@@ -43,6 +41,10 @@ const storageKeys = {
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
+
+  // ========== LEGACY USED FOR MIGRATIONS ========== //
+  CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
+  THEME: networkForLocalStorage + '-THEME',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -91,14 +93,6 @@ export default class LocalStorageApi {
 
   unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL);
 
-  // ========== User Theme ========== //
-
-  getUserTheme: void => Promise<?string> = () => getLocalItem(storageKeys.THEME);
-
-  setUserTheme: string => Promise<void> = theme => setLocalItem(storageKeys.THEME, theme);
-
-  unsetUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.THEME);
-
   // ========== User Theme Mode========== //
 
   getUserThemeMode: void => Promise<?string> = () => getLocalItem(storageKeys.USER_THEME);
@@ -134,20 +128,22 @@ export default class LocalStorageApi {
     localStorage.setItem(storageKeys.SELECTED_WALLET, id.toString());
   };
 
-  // ========== Custom User Theme ========== //
+  // ========== Legacy Theme ========== //
 
-  getCustomUserTheme: void => Promise<?string> = () => getLocalItem(storageKeys.CUSTOM_THEME);
+  hasAnyLegacyThemeFlags: void => Promise<boolean> = async () => {
+    const [a, b] = await Promise.all([
+      getLocalItem(storageKeys.THEME),
+      getLocalItem(storageKeys.CUSTOM_THEME),
+    ]);
+    return a != null || b != null;
+  }
 
-  setCustomUserTheme: SetCustomUserThemeRequest => Promise<void> = ({ cssCustomPropObject }) =>
-    new Promise((resolve, reject) => {
-      try {
-        return setLocalItem(storageKeys.CUSTOM_THEME, JSON.stringify(cssCustomPropObject));
-      } catch (error) {
-        return reject(error);
-      }
-    });
-
-  unsetCustomUserTheme: void => Promise<void> = () => removeLocalItem(storageKeys.CUSTOM_THEME);
+  unsetLegacyThemeFlags: void => Promise<void> = async () => {
+    await Promise.all([
+      removeLocalItem(storageKeys.THEME),
+      removeLocalItem(storageKeys.CUSTOM_THEME),
+    ]);
+  }
 
   // ========== Last Launch Version Number ========== //
 
@@ -323,7 +319,6 @@ export default class LocalStorageApi {
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
-    await this.unsetUserTheme();
     await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
