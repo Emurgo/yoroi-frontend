@@ -101,6 +101,7 @@ export async function migrateToLatest(
     ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
     }],
+    ['<5.4', () => unsetLegacyThemeFlags(localStorageApi)],
   ];
 
   let appliedMigration = false;
@@ -414,5 +415,14 @@ export async function populateNewUtxodata(
     }
   }
 
+  return true;
+}
+
+async function unsetLegacyThemeFlags(localStorageApi: LocalStorageApi): Promise<boolean> {
+  const hasLegacyFlags = await localStorageApi.hasAnyLegacyThemeFlags();
+  if (!hasLegacyFlags) {
+    return false;
+  }
+  await localStorageApi.unsetLegacyThemeFlags();
   return true;
 }

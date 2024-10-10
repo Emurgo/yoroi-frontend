@@ -75,12 +75,13 @@ class App extends Component<Props, State> {
 
     Logger.debug(`[yoroi] messages merged`);
 
-    const themeVars = Object.assign(stores.profile.currentThemeVars, {
+    const themeVars = {
       // show wingdings on dev builds when no font is set to easily find
       // missing font bugs. However, on production, we use Times New Roman
       // which looks ugly but at least it's readable.
       '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
-    });
+    };
+
     const currentTheme = stores.profile.currentTheme || THEMES.YOROI_BASE;
 
     changeToplevelTheme(currentTheme);
