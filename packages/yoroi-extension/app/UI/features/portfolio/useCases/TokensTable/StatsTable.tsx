@@ -1,6 +1,5 @@
 import { TableCell, TableRow } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { isEmpty } from 'lodash';
 import React, { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import Table from '../../common/components/Table';
@@ -35,6 +34,8 @@ const StatsTable = ({ data }: Props): JSX.Element => {
 
   const {
     tokenActivity: { data24h, data7d, data30d },
+    isLoading,
+    error,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 
@@ -69,7 +70,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
-      isLoading={isEmpty(data24h) && !showWelcomeBanner}
+      isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {getSortedData(assetFormatedList).map((row: any) => (

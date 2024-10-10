@@ -9,10 +9,11 @@ interface ApiError {
 
 export const useMultiTokenActivity = (
   tokenIds: string[],
-  interval: '24h' | '7d' | '30d'
+  interval: '24h' | '7d' | '30d',
+  backend: string
 ): UseQueryResult<Portfolio.Api.TokenActivityResponse, AxiosError<ApiError>> => {
   const fetchTokenActivity = async (): Promise<Portfolio.Api.TokenActivityResponse> => {
-    const response = await axios.post(`https://zero.yoroiwallet.com/tokens/activity/multi/${interval}`, tokenIds, {
+    const response = await axios.post(`${backend}/tokens/activity/multi/${interval}`, tokenIds, {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',

@@ -30,6 +30,7 @@ type Props = {
 
 export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const queryClient = useQueryClient();
+  const { backendServiceZero } = usePortfolio();
   const [state, dispatch] = useReducer(portfolioTokenActivityReducer, defaultPortfolioTokenActivityState);
 
   const actions = useRef<PortfolioTokenActivityActions>({
@@ -65,16 +66,28 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   }, [actions, ftAssetList, queryClient]);
 
   // Use `useQuery` hooks to fetch and cache the token activity data for each interval
-  const { data: data24h, isLoading: loading24h } = useMultiTokenActivity(state.secondaryTokenIds, '24h');
-  const { data: data7d, isLoading: loading7d } = useMultiTokenActivity(state.secondaryTokenIds, '7d');
-  const { data: data30d, isLoading: loading30d } = useMultiTokenActivity(state.secondaryTokenIds, '30d');
+  const { data: data24h, isLoading: loading24h, error: data24hError } = useMultiTokenActivity(
+    state.secondaryTokenIds,
+    '24h',
+    backendServiceZero
+  );
+  const { data: data7d, isLoading: loading7d, error: data7dError } = useMultiTokenActivity(
+    state.secondaryTokenIds,
+    '7d',
+    backendServiceZero
+  );
+  const { data: data30d, isLoading: loading30d, error: data30dError } = useMultiTokenActivity(
+    state.secondaryTokenIds,
+    '30d',
+    backendServiceZero
+  );
 
   useEffect(() => {
     if (data24h || data7d || data30d) {
       const combinedData: any = {
-        data24h: data24h || {},
-        data7d: data7d || {},
-        data30d: data30d || {},
+        data24h: data24hError ? [] : data24h || {},
+        data7d: data7dError ? [] : data7d || {},
+        data30d: data30dError ? [] : data30d || {},
       };
       actions.tokenActivityChanged(combinedData);
     }
@@ -83,7 +96,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   const value = React.useMemo(
     () => ({
       ...state,
-      isLoading: loading24h || loading7d || loading30d,
+      isLoading: loading24h,
     }),
     [loading24h, loading7d, loading30d, state]
   );
