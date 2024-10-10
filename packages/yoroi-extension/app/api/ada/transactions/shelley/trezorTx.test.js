@@ -171,7 +171,7 @@ test('Create Trezor transaction', async () => {
       txBuilder.add_bootstrap_input(
         RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver),
         RustModule.WalletV4.TransactionInput.new(
-          RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
+          RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
           1
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
@@ -180,7 +180,7 @@ test('Create Trezor transaction', async () => {
       txBuilder.add_key_input(
         keyHash,
         RustModule.WalletV4.TransactionInput.new(
-          RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
+          RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
           1
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
@@ -189,18 +189,15 @@ test('Create Trezor transaction', async () => {
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
-      RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe'), 'hex')),
+      RustModule.WalletV4.Address.from_hex(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe')),
       RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();
 
   // note: key doesn't belong to the account signing. Just used to test witness generation
-  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-    Buffer.from(
-      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-      'hex',
-    ),
+  const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+    '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
   );
   const stakingKey = accountKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).derive(0);
   const stakeCredential = RustModule.WalletV4.Credential.from_keyhash(
@@ -230,7 +227,7 @@ test('Create Trezor transaction', async () => {
         NetworkId: network.NetworkId,
       },
       neededStakingKeyHashes: {
-        neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
+        neededHashes: new Set([stakeCredential.to_hex()]),
         wits: new Set() // not needed for this test, but something should be here
       },
     }),
@@ -242,6 +239,8 @@ test('Create Trezor transaction', async () => {
     ttl: '500',
     networkId: 1,
     protocolMagic: 764824073,
+    scriptDataHash: undefined,
+    validityIntervalStart: undefined,
     inputs: [{
       path: `m/44'/1815'/0'/1/1`,
       prev_hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',

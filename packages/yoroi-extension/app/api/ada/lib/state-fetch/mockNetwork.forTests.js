@@ -62,13 +62,11 @@ import type {
   UtxoDiffSincePointRequest
 } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
-import { forceNonNull, last } from '../../../../coreUtils';
+import { bytesToHex, forceNonNull, hexToBytes, iterateLenGet, last } from '../../../../coreUtils';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
   if (RustModule.WalletV4.ByronAddress.is_valid(byronAddrOrHex)) {
-    return Buffer.from(
-      RustModule.WalletV4.ByronAddress.from_base58(byronAddrOrHex).to_bytes()
-    ).toString('hex');
+    return bytesToHex(RustModule.WalletV4.ByronAddress.from_base58(byronAddrOrHex).to_bytes());
   }
   return byronAddrOrHex;
 }
@@ -91,10 +89,9 @@ function fixAddresses(
           RustModule.WalletV4.Ed25519KeyHash.from_bech32(address)
         )
       );
-      return Buffer.from(enterpriseAddr.to_address().to_bytes()).toString('hex');
+      return enterpriseAddr.to_address().to_hex();
     }
-    const payload = bech32.fromWords(bech32Info.words);
-    return Buffer.from(payload).toString('hex');
+    return bytesToHex(bech32.fromWords(bech32Info.words));
   } catch (_e) {
     return address;
   }
@@ -127,7 +124,7 @@ export function genCheckAddressesInUse(
         } else {
           const enterpriseWasm = toEnterprise(found);
           if (enterpriseWasm != null) {
-            const enterprise = Buffer.from(enterpriseWasm.to_address().to_bytes()).toString('hex');
+            const enterprise = enterpriseWasm.to_address().to_hex();
             if (addressSet.has(enterprise)) {
               origAddr = mapToOriginal[enterprise];
             }
@@ -153,7 +150,7 @@ function isOurAddress(
   }
   const enterpriseWasm = toEnterprise(address);
   if (enterpriseWasm != null) {
-    const enterprise = Buffer.from(enterpriseWasm.to_address().to_bytes()).toString('hex');
+    const enterprise = enterpriseWasm.to_address().to_hex();
     if (ownAddresses.has(enterprise)) {
       return true;
     }
@@ -370,12 +367,11 @@ export function getSingleAddressString(
   path: Array<number>,
   isLedger: boolean = false,
 ): string {
-  const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
     : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(bip39entropy, 'hex'),
+      hexToBytes(mnemonicToEntropy(mnemonic)),
       EMPTY_PASSWORD
     );
   const derivedKey = derivePath(rootKey, path);
@@ -385,7 +381,7 @@ export function getSingleAddressString(
 
   if (path[0] === WalletTypePurpose.BIP44) {
     const v2Key = RustModule.WalletV2.PublicKey.from_hex(
-      Buffer.from(derivedKey.to_public().as_bytes()).toString('hex')
+      bytesToHex(derivedKey.to_public().as_bytes())
     );
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
       protocol_magic: baseConfig.ByronNetworkId,
@@ -401,7 +397,7 @@ export function getSingleAddressString(
         derivedKey.to_public().to_raw_key().hash()
       ),
     );
-    return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+    return addr.to_address().to_hex();
   }
   throw new Error('Unexpected purpose');
 }
@@ -412,12 +408,11 @@ export function getMangledAddressString(
   stakingKey: Buffer,
   isLedger: boolean = false,
 ): string {
-  const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
     : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(bip39entropy, 'hex'),
+      hexToBytes(mnemonicToEntropy(mnemonic)),
       EMPTY_PASSWORD
     );
   const derivedKey = derivePath(rootKey, path);
@@ -437,7 +432,7 @@ export function getMangledAddressString(
         )
       )
     );
-    return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+    return addr.to_address().to_hex();
   }
   throw new Error('Unexpected purpose');
 }
@@ -447,10 +442,9 @@ export function getAddressForType(
   path: Array<number>,
   type: CoreAddressT,
 ): string {
-  const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
+    hexToBytes(mnemonicToEntropy(mnemonic)),
     EMPTY_PASSWORD
   );
   const derivedKey = derivePath(rootKey, path);
@@ -476,7 +470,7 @@ export function getAddressForType(
           stakingKey.to_public().to_raw_key().hash()
         ),
       );
-      return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+      return addr.to_address().to_hex();
     }
     case CoreAddressTypes.CARDANO_PTR: {
       throw new Error(`${nameof(getAddressForType)} Not implemented`);
@@ -488,7 +482,7 @@ export function getAddressForType(
           derivedKey.to_public().to_raw_key().hash()
         ),
       );
-      return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+      return addr.to_address().to_hex();
     }
     case CoreAddressTypes.CARDANO_REWARD: {
       const addr = RustModule.WalletV4.RewardAddress.new(
@@ -497,7 +491,7 @@ export function getAddressForType(
           derivedKey.to_public().to_raw_key().hash()
         ),
       );
-      return Buffer.from(addr.to_address().to_bytes()).toString('hex');
+      return addr.to_address().to_hex();
     }
     default: throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
   }
@@ -555,33 +549,19 @@ export function toRemoteByronTx(
   const signedTx = RustModule.WalletV4.Transaction.from_bytes(Buffer.from(tx, 'base64'));
 
   const body = signedTx.body();
-  const hash = Buffer.from(RustModule.WalletV4.hash_transaction(body).to_bytes()).toString('hex');
+  const hash = RustModule.WalletV4.hash_transaction(body).to_hex();
 
-  const wasmOutputs = body.outputs();
-  const outputs = [];
-  for (let i = 0; i < wasmOutputs.len(); i++) {
-    const output = wasmOutputs.get(i);
-    const value = output.amount();
+  const outputs = iterateLenGet(body.outputs()).map(output => ({
+    address: toHexOrBase58(output.address()),
+    amount: output.amount().coin().to_str(),
+    assets: parseTokenList(output.amount().multiasset())
+  })).toArray();
 
-    const assets = parseTokenList(value.multiasset());
+  const inputs = iterateLenGet(body.inputs()).map(input => ({
+    id: input.transaction_id().to_hex(),
+    index: input.index(),
+  })).toArray();
 
-    outputs.push({
-      address: toHexOrBase58(output.address()),
-      amount: value.coin().to_str(),
-      assets
-    });
-  }
-
-  const wasmInputs = body.inputs();
-  const inputs = [];
-  for (let i = 0; i < wasmInputs.len(); i++) {
-    const input = wasmInputs.get(i);
-
-    inputs.push({
-      id: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
-      index: input.index(),
-    });
-  }
   const base = {
     hash,
     last_update: new Date().toString(),
@@ -837,7 +817,7 @@ export class MockUtxoApi implements UtxoApiContract {
         const output = tx.outputs[outputIndex];
         if (!(
           hexAddresses.includes(byronAddressToHex(output.address)) ||
-            hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+            hexAddresses.includes(toEnterprise(output.address)?.to_address().to_hex() ?? '')
         )) {
           continue;
         }
@@ -909,7 +889,7 @@ export class MockUtxoApi implements UtxoApiContract {
         tx.outputs.forEach((output, outputIndex) => {
           if (!(
             hexAddresses.includes(byronAddressToHex(output.address)) ||
-              hexAddresses.includes(Buffer.from(toEnterprise(output.address)?.to_address().to_bytes() || '').toString('hex'))
+              hexAddresses.includes(toEnterprise(output.address)?.to_address().to_hex() ?? '')
           )) {
             return;
           }
@@ -938,7 +918,7 @@ export class MockUtxoApi implements UtxoApiContract {
         });
         tx.inputs.filter(input =>
           hexAddresses.includes(byronAddressToHex(input.address)) ||
-          hexAddresses.includes(Buffer.from(toEnterprise(input.address)?.to_address().to_bytes() || '').toString('hex'))
+          hexAddresses.includes(toEnterprise(input.address)?.to_address().to_hex() ?? '')
         ).forEach(input => {
           utxoDiffItems.push(
             ({

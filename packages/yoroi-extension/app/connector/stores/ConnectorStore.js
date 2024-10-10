@@ -27,8 +27,8 @@ import Request from '../../stores/lib/LocalizedRequest';
 import Store from '../../stores/base/Store';
 import {
   getCardanoHaskellBaseConfig,
-  isCardanoHaskell,
   getNetworkById,
+  isCardanoHaskell,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -56,27 +56,31 @@ import { convertToLocalizableError as convertToLocalizableTrezorError } from '..
 import {
   transactionHashMismatchError,
   trezorSignDataUnsupportedError,
-  unsupportedTransactionError,
   unknownAddressError,
+  unsupportedTransactionError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
-import { noop } from '../../coreUtils';
+import { iterateLenGet, hexToBytes, noop, purify } from '../../coreUtils';
 import {
-  getWallets,
-  signAndBroadcastTransaction,
   broadcastTransaction,
-  userSignConfirm,
-  userSignReject,
-  signFail,
-  signWindowRetrieveData,
   connectWindowRetrieveData,
-  removeWalletFromWhiteList,
   getConnectedSites,
   getProtocolParameters,
+  getWallets,
+  removeWalletFromWhiteList,
+  signAndBroadcastTransaction,
+  signFail,
+  signWindowRetrieveData,
+  userSignConfirm,
+  userSignReject,
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { addressBech32ToHex } from '../../api/ada/lib/cardanoCrypto/utils';
+import {
+  addressBech32ToHex, transactionBodyHexToTransaction,
+  transactionHexToBodyHex, transactionHexToHash,
+  transactionHexToWitnessSet
+} from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi, { findPath } from '../../api/ada';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
@@ -130,7 +134,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable adaTransaction: ?CardanoConnectorSignRequest = null;
 
   // store the transaction body for hw wallet signing
-  rawTxBody: ?Buffer = null;
+  rawTx: ?string = null;
   addressedUtxos: ?Array<CardanoAddressedUtxo> = null;
 
   reorgTxSignRequest: ?HaskellShelleyTxSignRequest = null;
@@ -260,8 +264,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ) {
       const tx = toJS(signingMessage.sign.tx);
       if (wallet.type !== 'mnemonic') {
-        const { rawTxBody } = this;
-        if (!rawTxBody) {
+        const { rawTx } = this;
+        if (!rawTx) {
           throw new Error('unexpected nullish transaction');
         }
 
@@ -271,14 +275,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             : [...(getScriptRequiredSigningKeys(witnessSet, Module))];
         });
 
-        const witnessSetHex =
-          (await this.hwSignTx(
+        const witnessSetHex = transactionHexToWitnessSet(
+          await this.hwSignTxHex(
             wallet,
-            rawTxBody,
+            rawTx,
             additionalRequiredSigners,
-          ))
-          .witness_set()
-          .to_hex();
+          )
+        );
 
         userSignConfirm({
           tx,
@@ -437,17 +440,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId);
 
     let txBody;
-    const bytes = Buffer.from(tx, 'hex');
     try {
-      // <TODO:USE_METADATA_AND_WITNESSES>
-      const transaction = RustModule.WalletV4.FixedTransaction.from_bytes(bytes);
-      this.rawTxBody = Buffer.from(transaction.raw_body());
+      const transaction = RustModule.WalletV4.FixedTransaction.from_hex(tx);
+      this.rawTx = tx;
       txBody = transaction.body();
     } catch {
       try {
         // Try parsing as body for backward compatibility
-        txBody = RustModule.WalletV4.TransactionBody.from_bytes(bytes);
-        this.rawTxBody = bytes;
+        txBody = RustModule.WalletV4.TransactionBody.from_hex(tx);
+        this.rawTx = transactionBodyHexToTransaction(tx);
       } catch {
         runInAction(() => {
           this.unrecoverableError = 'Unable to parse input transaction.';
@@ -465,9 +466,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       )
     );
 
-    for (let i = 0; i < txBody.inputs().len(); i++) {
-      const input = txBody.inputs().get(i);
-      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    for (const input of iterateLenGet(txBody.inputs())) {
+      const txHash = input.transaction_id().to_hex();
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
         signFail({
@@ -502,9 +502,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ].map(a => a.address.Hash));
 
     const outputs: Array<TxDataOutput> = [];
-    for (let i = 0; i < txBody.outputs().len(); i++) {
-      const output = txBody.outputs().get(i);
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
+    for (const output of iterateLenGet(txBody.outputs())) {
+      const address = output.address().to_hex();
       outputs.push({
         address,
         isForeign: !ownAddresses.has(address),
@@ -571,8 +570,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const cip95Info = [];
     const certs = txBody.certs();
     if (certs) {
-      for (let i = 0; i < certs.len(); i++) {
-        const cert = certs.get(i);
+      for (const cert of iterateLenGet(certs)) {
         if (!cert) {
           throw new Error('unexpectedly missing certificate');
         }
@@ -703,17 +701,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const votingProcedures = txBody.voting_procedures();
     if (votingProcedures) {
-      const voters = votingProcedures.get_voters();
-      for (let i = 0; i < voters.len(); i++) {
-        const voter = voters.get(i);
+      for (const voter of iterateLenGet(votingProcedures.get_voters())) {
         if (!voter) {
           throw new Error('unexpectedly missing voter');
         }
-        const govActionIds = votingProcedures.get_governance_action_ids_by_voter(
-          voter
-        );
-        for (let j = 0; j < govActionIds.len(); j++) {
-          const govActionId = govActionIds.get(j);
+        const govActionIds = votingProcedures.get_governance_action_ids_by_voter(voter);
+        for (const govActionId of iterateLenGet(govActionIds)) {
           if (!govActionId) {
             throw new Error('unexpectedly missing governance action id');
           }
@@ -740,9 +733,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const votingProposals = txBody.voting_proposals();
     if (votingProposals) {
-      for (let i = 0; i < votingProposals.len(); i++) {
-        // eslint-disable-next-line no-unused-vars
-        const _votingProposal = votingProposals.get(i);
+      // eslint-disable-next-line no-unused-vars
+      for (const _votingProposal of iterateLenGet(votingProposals)) {
         //  wait for CSL update
       }
     }
@@ -851,6 +843,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected nullish sign request');
     }
 
+    const rawTxHex = signRequest.unsignedTx.build_tx().to_hex();
+
     if (publicDeriver.type === 'mnemonic') {
       await signAndBroadcastTransaction({
         signRequest,
@@ -858,19 +852,17 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         publicDeriverId: publicDeriver.publicDeriverId
       });
     } else {
-      const signedTx = await this.hwSignTx(
+      const signedTxHex = await this.hwSignTxHex(
         publicDeriver,
-        Buffer.from(signRequest.unsignedTx.build().to_bytes())
+        rawTxHex,
       );
       await broadcastTransaction({
-        signedTxHex: signedTx.to_hex(),
+        signedTxHex,
         publicDeriverId: publicDeriver.publicDeriverId,
         addressedUtxos,
       });
     }
-    return RustModule.WalletV4.hash_transaction(
-      signRequest.unsignedTx.build()
-    ).to_hex();
+    return transactionHexToHash(rawTxHex);
   };
   getUtxosAfterReorg: string => Array<RemoteUnspentOutput> = txId => {
     const allOutputs = this.adaTransaction?.outputs;
@@ -1015,36 +1007,33 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  async hwSignTx(
+  async hwSignTxHex(
     publicDeriver: WalletState,
-    rawTxBody: Buffer,
+    rawTxHex: string,
     additionalRequiredSigners: Array<string> = [],
-  ): Promise<RustModule.WalletV4.Transaction> {
-    const ownUtxoAddressMap: {| [string]: Array<number> |} = {};
-    const ownStakeAddressMap: {| [string]: Array<number> |} = {};
+  ): Promise<string> {
+    const ownAddressMap: {| [string]: Array<number> |} = {};
     for (const { address, path } of publicDeriver.allAddresses.utxoAddresses) {
-      ownUtxoAddressMap[address.Hash] = path;
+      ownAddressMap[address.Hash] = path;
     }
     for (const { address, path } of publicDeriver.allAddresses.accountingAddresses) {
-      ownStakeAddressMap[address.Hash] = path;
+      ownAddressMap[address.Hash] = path;
     }
 
 
     if (publicDeriver.type === 'ledger') {
       return this.ledgerSignTx(
         publicDeriver,
-        rawTxBody,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        rawTxHex,
+        ownAddressMap,
         additionalRequiredSigners
       );
     }
     if (publicDeriver.type === 'trezor') {
       return this.trezorSignTx(
         publicDeriver,
-        rawTxBody,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        rawTxHex,
+        ownAddressMap,
       );
     }
     throw new Error('unexpected wallet type');
@@ -1052,10 +1041,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   async trezorSignTx(
     publicDeriver: WalletState,
-    rawTxBody: Buffer,
-    ownUtxoAddressMap: {| [string]: Array<number> |},
-    ownStakeAddressMap: {| [string]: Array<number> |},
-  ): Promise<RustModule.WalletV4.Transaction> {
+    rawTxHex: string,
+    ownAddressMap: {| [string]: Array<number> |},
+  ): Promise<string> {
     const network = getNetworkById(publicDeriver.networkId);
     const config = getCardanoHaskellBaseConfig(network).reduce(
       (acc, next) => Object.assign(acc, next),
@@ -1066,18 +1054,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!addressedUtxos) {
       throw new Error('unexpected nullish addressed UTXOs');
     }
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
+    const rawTxBodyHex = transactionHexToBodyHex(rawTxHex);
 
     let trezorSignTxPayload;
     try {
       trezorSignTxPayload = toTrezorSignRequest(
-        txBody,
+        rawTxBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        s => ownAddressMap[s],
         addressedUtxos,
-        rawTxBody,
       );
     } catch {
       runInAction(() => {
@@ -1091,7 +1077,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     try {
       const signResult = await wrapWithFrame(trezor =>
         trezor.cardanoSignTransaction({
-          ...trezorSignTxPayload,
+          ...purify(trezorSignTxPayload),
           allowSeedlessDevice: true,
         })
       );
@@ -1114,7 +1100,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (
       trezorSignTxResp.hash !==
       blake2b(256 / 8)
-        .update(rawTxBody)
+        .update(hexToBytes(rawTxBodyHex))
         .digest('hex')
     ) {
       runInAction(() => {
@@ -1124,16 +1110,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(txBody, trezorSignTxResp.witnesses, undefined);
+    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses);
   }
 
   async ledgerSignTx(
     publicDeriver: WalletState,
-    rawTxBody: Buffer,
-    ownUtxoAddressMap: {| [string]: Array<number> |},
-    ownStakeAddressMap: {| [string]: Array<number> |},
+    rawTxHex: string,
+    ownAddressMap: {| [string]: Array<number> |},
     additionalRequiredSigners: Array<string> = [],
-  ): Promise<RustModule.WalletV4.Transaction> {
+  ): Promise<string> {
     const network = getNetworkById(publicDeriver.networkId);
     const config = getCardanoHaskellBaseConfig(network).reduce(
       (acc, next) => Object.assign(acc, next),
@@ -1144,21 +1129,19 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (!addressedUtxos) {
       throw new Error('unexpected nullish addressed UTXOs');
     }
-    const txBody = RustModule.WalletV4.TransactionBody.from_bytes(rawTxBody);
-
     const [drepAddressHex, drepAddressing] = getDrepRewardAddressHexAndAddressing(publicDeriver);
-    ownStakeAddressMap[drepAddressHex] = drepAddressing.addressing.path;
+    ownAddressMap[drepAddressHex] = drepAddressing.addressing.path;
+
+    const rawTxBodyHex = transactionHexToBodyHex(rawTxHex);
 
     let ledgerSignTxPayload;
     try {
       ledgerSignTxPayload = toLedgerSignRequest(
-        txBody,
+        rawTxBodyHex,
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
-        ownUtxoAddressMap,
-        ownStakeAddressMap,
+        s => ownAddressMap[s],
         addressedUtxos,
-        rawTxBody,
         additionalRequiredSigners,
       );
     } catch (e) {
@@ -1194,7 +1177,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     if (
       ledgerSignResult.txHashHex !==
       blake2b(256 / 8)
-        .update(rawTxBody)
+        .update(hexToBytes(rawTxBodyHex))
         .digest('hex')
     ) {
       runInAction(() => {
@@ -1205,7 +1188,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(Buffer.from(publicDeriver.publicKey, 'hex')),
+      key: RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey),
       addressing: {
         startLevel: 1,
         path: publicDeriver.pathToPublic,
@@ -1213,10 +1196,9 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     };
 
     return buildSignedLedgerTransaction(
-      txBody,
+      rawTxHex,
       ledgerSignResult.witnesses,
       publicKeyInfo,
-      undefined
     );
   }
 

@@ -1,12 +1,12 @@
 // @flow
 import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
+import { utfToBytes } from '../coreUtils';
 
 function serializeTicker(ticker: ResponseTicker): Buffer {
-  return Buffer.from(
-    ticker.from + ticker.timestamp +
-      Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join(''),
-    'utf8'
+  return utfToBytes(
+    ticker.from + ticker.timestamp
+    + Object.keys(ticker.prices).sort().map(to => to + ticker.prices[to]).join('')
   );
 }
 
@@ -32,19 +32,4 @@ export function verifyTicker(
     throw new Error('ticker has no signature');
   }
   return verify(ticker, serializeTicker, ticker.signature, pubKeyData);
-}
-
-export function verifyPubKeyDataReplacement(
-  pubKeyData: string,
-  pubKeyDataSignature: string,
-  pubKeyMaster: string
-): boolean {
-  return RustModule.WasmScope(Scope => {
-    return verify(
-      pubKeyData,
-      s => Buffer.from(s),
-      pubKeyDataSignature,
-      Scope.WalletV4.PublicKey.from_bytes(Buffer.from(pubKeyMaster, 'hex'))
-    );
-  });
 }

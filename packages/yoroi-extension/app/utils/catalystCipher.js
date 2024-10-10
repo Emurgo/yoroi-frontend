@@ -3,11 +3,12 @@
 import pbkdf2 from 'pbkdf2';
 import chacha from 'chacha';
 import cryptoRandomString from 'crypto-random-string';
+import { bytesToHex, hexToBytes } from '../coreUtils';
 
 const PBKDF_ITERATIONS = 12983;
 const KEY_SIZE = 32;
 const DIGEST = 'sha512';
-const PROTO_VERSION = Buffer.from('01', 'hex');
+const PROTO_VERSION = hexToBytes('01');
 
 /*
 	----------------------------------------------------------
@@ -28,10 +29,10 @@ export async function encryptWithPassword(
   passwordBuf: Uint8Array,
   dataBytes: Uint8Array
 ): Promise<string> {
-  const salt = Buffer.from(cryptoRandomString({ length: 2 * 16 }), 'hex');
-  const nonce = Buffer.from(cryptoRandomString({ length: 2 * 12 }), 'hex');
+  const salt = hexToBytes(cryptoRandomString({ length: 2 * 16 }));
+  const nonce = hexToBytes(cryptoRandomString({ length: 2 * 12 }));
   const data = Buffer.from(dataBytes);
-  const aad = Buffer.from('', 'hex');
+  const aad = hexToBytes('');
 
   const key = await promisifyPbkdf2(passwordBuf, salt);
 
@@ -42,6 +43,5 @@ export async function encryptWithPassword(
   const final = cipher.final();
   const tag = cipher.getAuthTag();
 
-  const cipherText = Buffer.concat([PROTO_VERSION, salt, nonce, head, final, tag]);
-  return cipherText.toString('hex');
+  return bytesToHex(Buffer.concat([PROTO_VERSION, salt, nonce, head, final, tag]));
 }

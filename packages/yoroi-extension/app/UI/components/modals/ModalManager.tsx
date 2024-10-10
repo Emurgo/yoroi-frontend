@@ -10,7 +10,7 @@ import { useModal } from './ModalContext';
 
 const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: string; height: string; theme: any }) => ({
   '& .MuiDialogContent-root': {
-    padding: '24px',
+    padding: '0 24px',
     backgroundColor: theme.palette.ds.bg_color_max,
   },
   '& .MuiDialog-root': {

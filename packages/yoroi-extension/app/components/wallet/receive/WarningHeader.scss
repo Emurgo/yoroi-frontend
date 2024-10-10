@@ -8,36 +8,17 @@
 
     .warningSection {
       border-radius: 8px;
-      box-shadow: var(--yoroi-warning-box-bg-shadow);
-      width: 80%;
-      .attentionLabel {
-        font-weight: 500;
-        font-size: 16px;
-        line-height: 19px;
-        // color: var(--yoroi-palette-error-200);
-
-        padding-top: 24px;
-        margin-bottom: 12px;
-      }
+      width: 100%;
+      padding-left: 16px;
+      padding-top: 12px;
+      padding-right: 15px;
+      padding-bottom: 16px;
 
       .text {
         font-weight: 400;
-        font-size: 14px;
-        line-height: 22px;
-        // color: var(--yoroi-palette-gray-900);
-        padding-top: 8px;
-        padding-bottom: 12px;
-        padding-right: 12px;
-      }
-
-      p {
-        padding-left: 24px;
+        font-size: 16px;
+        line-height: 24px;
       }
     }
   }
-}
-
-.invalidURIImg {
-  display: block;
-  text-align: center;
 }

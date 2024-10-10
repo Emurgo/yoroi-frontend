@@ -112,7 +112,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             color="primary"
             disableRipple={false}
             onClick={onClose}
-            style={{ width: '100%', height: '48px', fontSize: '16px' }}
+            style={{ width: '100%', height: '48px', fontSize: '16px' , borderWidth: 2}}
             id='duplicatedWalletDialog-cancel-button'
           >
             {intl.formatMessage(globalMessages.cancel)}

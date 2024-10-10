@@ -78,9 +78,10 @@ export function useRichOrders(
    */
   const { data: tokensMap } = useQuery({
     suspense: true,
-    queryKey: ['useSwapTokensOnlyVerified'],
+    queryKey: ['useSwapTokensOnlyVerifiedMap'],
+    useErrorBoundary: false,
     queryFn: () => tokens.list.onlyVerified()
-      .then(tokensArray => tokensArray.reduce((map, t) => ({ ...map, [t.id]: t }), {}))
+      .then(tokensArray => tokensArray.reduce((map, t) => (t ? { ...map, [t.id]: t } : map), {}))
       .catch(e => {
         console.error('Failed to load verified tokens!', e);
         throw e;
@@ -92,6 +93,7 @@ export function useRichOrders(
    */
   const { data: openOrdersData, isLoading: openOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusOpen', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusOpen().catch(e => {
       console.error('Failed to load open orders!', e);
       throw e;
@@ -103,6 +105,7 @@ export function useRichOrders(
    */
   const { data: completedOrdersData, isLoading: completedOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusCompleted', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusCompleted().catch(e => {
       console.error('Failed to load completed orders!', e);
       throw e;

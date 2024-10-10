@@ -59,7 +59,7 @@ class SidebarContainer extends Component<AllProps, State> {
   }
 
   categoryFeatureFlagEnabled(category: SidebarCategoryRevamp): boolean {
-    return category.featureFlagName == null || this.state.featureFlags[category.featureFlagName];
+    return category.featureFlagName == null || this.state.featureFlags[category.featureFlagName] === true;
   }
 
   render(): Node {
