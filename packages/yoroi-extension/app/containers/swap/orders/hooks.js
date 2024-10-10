@@ -78,10 +78,10 @@ export function useRichOrders(
    */
   const { data: tokensMap } = useQuery({
     suspense: true,
-    queryKey: ['useSwapTokensOnlyVerified'],
+    queryKey: ['useSwapTokensOnlyVerifiedMap'],
     useErrorBoundary: false,
     queryFn: () => tokens.list.onlyVerified()
-      .then(tokensArray => tokensArray.reduce((map, t) => ({ ...map, [t.id]: t }), {}))
+      .then(tokensArray => tokensArray.reduce((map, t) => (t ? { ...map, [t.id]: t } : map), {}))
       .catch(e => {
         console.error('Failed to load verified tokens!', e);
         throw e;

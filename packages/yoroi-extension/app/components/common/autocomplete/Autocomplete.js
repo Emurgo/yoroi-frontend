@@ -197,7 +197,7 @@ function Autocomplete({
         sx={{
           boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
           maxHeight: 44 * maxVisibleOptions + 'px',
-          color: 'black',
+          color: 'ds.gray_900',
           borderRadius: '8px',
           width: '120px',
           '&::-webkit-scrollbar': { display: 'none' },
@@ -206,32 +206,27 @@ function Autocomplete({
         {isOpen && (
           <>
             {filteredList.length === 0 ? (
-              <Box sx={{ padding: '16px', bgcolor: 'var(--yoroi-palette-common-white)' }}>
-                {noResultsMessage}
-              </Box>
+              <Box sx={{ padding: '16px', bgcolor: 'ds.bg_color_max' }}>{noResultsMessage}</Box>
             ) : (
-              filteredList.map((item, index) => {
-                const regularPart = inputValue != null
-                  ? item.replace(inputValue.toLowerCase(), '')
-                  : item;
-                return (
-                  <Box
-                    key={`${item}${index}`}
-                    sx={{
-                      padding: '16px',
-                      backgroundColor:
-                        highlightedIndex === index
-                          ? 'var(--yoroi-palette-gray-50)'
-                          : 'var(--yoroi-palette-common-white)',
-                      cursor: 'pointer',
-                    }}
-                    {...getItemProps({ item, index })}
-                  >
-                    <span style={{ fontWeight: 'bold' }}>{inputValue?.toLowerCase()}</span>
-                    <span>{regularPart}</span>
-                  </Box>
-                );
-              })
+              <Box sx={{ paddingY: '8px' }}>
+                {filteredList.map((item, index) => {
+                  const regularPart = inputValue != null ? item.replace(inputValue.toLowerCase(), '') : item;
+                  return (
+                    <Box
+                      key={`${item}${index}`}
+                      sx={{
+                        padding: '16px',
+                        backgroundColor: highlightedIndex === index ? 'ds.gray_50' : 'ds.bg_color_max',
+                        cursor: 'pointer',
+                      }}
+                      {...getItemProps({ item, index })}
+                    >
+                      <span style={{ fontWeight: 'bold' }}>{inputValue?.toLowerCase()}</span>
+                      <span>{regularPart}</span>
+                    </Box>
+                  );
+                })}
+              </Box>
             )}
           </>
         )}
@@ -249,9 +244,9 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
 };
 
-const ULList = styled(Box)({
+const ULList = styled(Box)(({ theme }) => ({
   width: '100%',
-  background: 'var(--yoroi-palette-common-white)',
+  background: theme.palette.ds.bg_color_max,
   margin: 0,
   borderTop: 0,
   position: 'absolute',
@@ -264,12 +259,12 @@ const ULList = styled(Box)({
   outline: '0',
   transition: 'opacity .1s ease',
   borderRadius: 0,
-});
+}));
 
 const InputWrapper = styled(Box)(
   ({ theme, error, isVerified }) => `
   width: 100%;
-  background-color: ${theme.palette.common.white};
+  background-color: transparent;
   height: 40px;
   align-content: baseline;
   display: inline-flex;
@@ -286,13 +281,13 @@ const InputWrapper = styled(Box)(
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
-    border: 2px solid ${error ? '#FF1351' : theme.palette.primary[300]};
+    border: 2px solid ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.primary_300};
     border-radius: 8px;
     height: 40px;
     box-sizing: border-box;
 
     &:focus {
-      border-color: ${error ? '#FF1351' : theme.palette.primary[600]};
+      border-color: ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.el_primary_medium};
     }
 
     ${
@@ -300,11 +295,8 @@ const InputWrapper = styled(Box)(
         ? `&:not([value=""]):not(:focus) {
         border-color: transparent;
         border: 0;
-        background: ${
-          isVerified
-            ? 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)'
-            : 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)'
-        };
+        background: ${isVerified ? theme.palette.ds.el_secondary : theme.palette.ds.primary_100};
+        color: ${isVerified ? theme.palette.ds.black_static : theme.palette.ds.primary_600};
       }`
         : ''
     }

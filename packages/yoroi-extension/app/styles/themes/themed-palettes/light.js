@@ -34,7 +34,7 @@ export const light: DSColorPalette = {
   el_gray_low: lightPalette.gray_600, // icons, shapes, inputs, bottom navigation bar
   el_gray_min: lightPalette.gray_400, // input stroke, disabled state for most components
 
-  el_secondary: lightPalette.secondary_400, // success state
+  el_secondary: lightPalette.secondary_300, // success state
 
   web_overlay: `${lightPalette.black_static}${opacity._70}`, // extension modal overlay
   web_sidebar_item_active: `${lightPalette.black_static}${opacity._16}`, // extension active sidebar item background

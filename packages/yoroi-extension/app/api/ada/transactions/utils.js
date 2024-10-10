@@ -21,6 +21,7 @@ import { MultiToken, } from '../../common/lib/MultiToken';
 import type { WasmMonad } from '../lib/cardanoCrypto/rustLoader';
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 import { PRIMARY_ASSET_CONSTANTS } from '../lib/storage/database/primitives/enums';
+import { bytesToHex, hexToBytes, iterateLenGet, iterateLenGetMap } from '../../../coreUtils';
 
 const RANDOM_BASE_ADDRESS = 'addr_test1qzz6hulv54gzf2suy2u5gkvmt6ysasfdlvvegy3fmf969y7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qy0adz0';
 
@@ -29,7 +30,7 @@ export function cardanoAssetToIdentifier(
   name: RustModule.WalletV4.AssetName,
 ): string {
   // note: possible for name to be empty causing a trailing hyphen
-  return `${Buffer.from(policyId.to_bytes()).toString('hex')}.${Buffer.from(name.name()).toString('hex')}`;
+  return `${policyId.to_hex()}.${bytesToHex(name.name())}`;
 }
 export function identifierToCardanoAsset(
   identifier: string,
@@ -40,8 +41,8 @@ export function identifierToCardanoAsset(
   // recall: 'a.'.split() gives ['a', ''] as desired
   const parts = identifier.split('.');
   return {
-    policyId: RustModule.WalletV4.ScriptHash.from_bytes(Buffer.from(parts[0], 'hex')),
-    name: RustModule.WalletV4.AssetName.new(Buffer.from(parts[1], 'hex')),
+    policyId: RustModule.WalletV4.ScriptHash.from_hex(parts[0]),
+    name: RustModule.WalletV4.AssetName.new(hexToBytes(parts[1])),
   };
 }
 export function identifierSplit(
@@ -63,30 +64,14 @@ export function parseTokenList(
   name: string,
   amount: string,
 |}> {
-  if (assets == null) return [];
-
-  const result = [];
-  const hashes = assets.keys();
-  for (let i = 0; i < hashes.len(); i++) {
-    const policyId = hashes.get(i);
-    const assetsForPolicy = assets.get(policyId);
-    if (assetsForPolicy == null) continue;
-
-    const policies = assetsForPolicy.keys();
-    for (let j = 0; j < policies.len(); j++) {
-      const assetName = policies.get(j);
-      const amount = assetsForPolicy.get(assetName);
-      if (amount == null) continue;
-
-      result.push({
-        amount: amount.to_str(),
-        assetId: cardanoAssetToIdentifier(policyId, assetName),
-        policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(assetName.name()).toString('hex'),
-      });
-    }
-  }
-  return result;
+  return iterateLenGetMap(assets).flatMap(([policyId, assetsForPolicy]) => {
+    return iterateLenGetMap(assetsForPolicy).nonNullValue().map(([assetName, amount]) => ({
+      amount: amount.to_str(),
+      assetId: cardanoAssetToIdentifier(policyId, assetName),
+      policyId: policyId.to_hex(),
+      name: bytesToHex(assetName.name()),
+    }));
+  }).toArray();
 }
 
 export function cardanoValueFromMultiToken(
@@ -393,8 +378,8 @@ export function asAddressedUtxo(
       return {
         amount: token.amount,
         assetId: token.tokenId,
-        policyId: Buffer.from(pieces.policyId.to_bytes()).toString('hex'),
-        name: Buffer.from(pieces.name.name()).toString('hex'),
+        policyId: pieces.policyId.to_hex(),
+        name: bytesToHex(pieces.name.name()),
       };
     });
     return {
@@ -407,30 +392,6 @@ export function asAddressedUtxo(
       assets,
     };
   });
-}
-
-export function iterateWasm<T>(iterable: ?{| get: number => T |}, len: ?number): T[] {
-  const res = [];
-  if (iterable != null) {
-    // $FlowFixMe
-    const l = len ?? iterable.len();
-    for (let i = 0; i < l; i++) {
-      res.push(iterable.get(i));
-    }
-  }
-  return res;
-}
-
-export function iterateWasmKeyValue<K, V>(iterable: ?{| get: K => V |}, keys: ?K[]): [K, V][] {
-  const res = [];
-  if (iterable != null) {
-    // $FlowFixMe
-    const k = keys ?? iterateWasm(iterable.keys());
-    for (const key of k) {
-      res.push([key, iterable.get(key)]);
-    }
-  }
-  return res;
 }
 
 function cardanoUtxoMonadFromRemoteFormat(
@@ -491,11 +452,11 @@ export function assetToRustMultiasset(
   const multiasset = W4.MultiAsset.new();
   for (const policyHex of Object.keys(groupedAssets)) {
     const assetGroup = groupedAssets[policyHex];
-    const policyId = W4.ScriptHash.from_bytes(Buffer.from(policyHex, 'hex'));
+    const policyId = W4.ScriptHash.from_hex(policyHex);
     const assets = RustModule.WalletV4.Assets.new();
     for (const asset of assetGroup) {
       assets.insert(
-        W4.AssetName.new(Buffer.from(asset.name, 'hex')),
+        W4.AssetName.new(hexToBytes(asset.name)),
         W4.BigNum.from_str(asset.amount),
       );
     }
@@ -527,8 +488,7 @@ export function getTransactionTotalOutputFromCbor(txHex: string, defaults: Defau
     return RustModule.WasmScope(Module => {
       const outputs = Module.WalletV4.FixedTransaction.from_hex(txHex).body().outputs();
       const sum = new MultiToken([], defaults);
-      for (let i = 0; i < outputs.len(); i++) {
-        const output = outputs.get(i);
+      for (const output of iterateLenGet(outputs)) {
         sum.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaults));
       }
       return sum;
@@ -555,8 +515,8 @@ export function mergeWitnessSets(
     let vkeys = wset1.vkeys();
     const newVkeys = wset2.vkeys();
     if (vkeys && newVkeys) {
-      for (let i = 0; i < newVkeys.len(); i++) {
-        vkeys.add(newVkeys.get(i));
+      for (const newVkey of iterateLenGet(newVkeys)) {
+        vkeys.add(newVkey);
       }
     } else if (newVkeys) {
       vkeys = newVkeys;
@@ -568,8 +528,8 @@ export function mergeWitnessSets(
     let nativeScripts = wset1.native_scripts();
     const newNativeScripts = wset2.native_scripts();
     if (nativeScripts && newNativeScripts) {
-      for (let i = 0; i < newNativeScripts.len(); i++) {
-        nativeScripts.add(newNativeScripts.get(i));
+      for (const newNativeScript of iterateLenGet(newNativeScripts)) {
+        nativeScripts.add(newNativeScript);
       }
     } else if (newNativeScripts) {
       nativeScripts = newNativeScripts;
@@ -581,8 +541,8 @@ export function mergeWitnessSets(
     let bootstraps = wset1.bootstraps();
     const newBootstraps = wset2.bootstraps();
     if (bootstraps && newBootstraps) {
-      for (let i = 0; i < newBootstraps.len(); i++) {
-        bootstraps.add(newBootstraps.get(i));
+      for (const newBootstrap of iterateLenGet(newBootstraps)) {
+        bootstraps.add(newBootstrap);
       }
     } else if (newBootstraps) {
       bootstraps = newBootstraps;
@@ -594,8 +554,8 @@ export function mergeWitnessSets(
     let plutusScripts = wset1.plutus_scripts();
     const newPlutusScripts = wset2.plutus_scripts();
     if (plutusScripts && newPlutusScripts) {
-      for (let i = 0; i < newPlutusScripts.len(); i++) {
-        plutusScripts.add(newPlutusScripts.get(i));
+      for (const newPlutusScript of iterateLenGet(newPlutusScripts)) {
+        plutusScripts.add(newPlutusScript);
       }
     } else if (newPlutusScripts) {
       plutusScripts = newPlutusScripts;
@@ -607,8 +567,8 @@ export function mergeWitnessSets(
     let plutusData = wset1.plutus_data();
     const newPlutusData = wset2.plutus_data();
     if (plutusData && newPlutusData) {
-      for (let i = 0; i < newPlutusData.len(); i++) {
-        plutusData.add(newPlutusData.get(i));
+      for (const newPlutusDatum of iterateLenGet(newPlutusData)) {
+        plutusData.add(newPlutusDatum);
       }
     } else if (newPlutusData) {
       plutusData = newPlutusData;
@@ -620,8 +580,8 @@ export function mergeWitnessSets(
     let redeemers = wset1.redeemers();
     const newRedeemers = wset2.redeemers();
     if (redeemers && newRedeemers) {
-      for (let i = 0; i < newRedeemers.len(); i++) {
-        redeemers.add(newRedeemers.get(i));
+      for (const newRedeemer of iterateLenGet(newRedeemers)) {
+        redeemers.add(newRedeemer);
       }
     } else if (newRedeemers) {
       redeemers = newRedeemers;
