@@ -994,9 +994,8 @@ export async function connectorRecordSubmittedCardanoTransaction(
     .toArray();
 
   let isDrepDelegation = false;
-  const certs = txBody.certs();
-  for (let i = 0; i < certs.len(); i++) {
-    if (isCertificateKindDrepDelegation(certs.get(i).kind())) {
+  for (const cert of iterateLenGet(txBody.certs())) {
+    if (isCertificateKindDrepDelegation(cert.kind())) {
       isDrepDelegation = true;
       break;
     }
@@ -1019,7 +1018,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     metadata: auxData?.to_hex(),
     withdrawals: withdrawalsData,
     isValid: true,
-    isDrepDelegation,
   };
 
   submittedTxs.push({
@@ -1027,6 +1025,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     transaction: submittedTx,
     networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     usedUtxos,
+    isDrepDelegation,
   });
   await persistSubmittedTransactions(submittedTxs);
 }
