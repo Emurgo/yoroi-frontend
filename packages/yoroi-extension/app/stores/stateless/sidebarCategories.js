@@ -16,6 +16,7 @@ import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-a
 import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type SidebarCategory = {|
   +className: string,
