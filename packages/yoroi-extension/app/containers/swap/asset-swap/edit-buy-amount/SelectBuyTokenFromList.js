@@ -6,6 +6,8 @@ import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { useBuyVerifiedSwapTokens } from '../hooks';
+import { ampli } from '../../../../../ampli/index';
+import { identifierToPolicy } from '../../../../api/assetUtils';
 
 type Props = {|
   store: SwapStore,
@@ -36,7 +38,7 @@ export default function SelectBuyTokenFromList({
   const { orderData, resetQuantities } = useSwap();
 
   const handleAssetSelected = token => {
-    const { id, decimals } = token;
+    const { id, decimals, ticker, name } = token;
     const shouldUpdateToken = id !== orderData.amounts.buy.tokenId || !isBuyTouched || decimals !== buyTokenInfo.decimals;
     const shouldSwitchTokens = id === orderData.amounts.sell.tokenId && isSellTouched;
     // useCase - switch tokens when selecting the same already selected token on the other side
@@ -46,8 +48,15 @@ export default function SelectBuyTokenFromList({
     }
 
     if (shouldUpdateToken) {
-      onTokenInfoChanged({ decimals: decimals ?? 0, id });
       buyTouched(token);
+      onTokenInfoChanged({ decimals: decimals ?? 0, id });
+      ampli.swapAssetToChanged({
+        to_asset: [{
+          asset_name: name,
+          asset_ticker: ticker,
+          policy_id: identifierToPolicy(id),
+        }],
+      });
     }
 
     onClose();
