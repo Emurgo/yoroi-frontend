@@ -31,6 +31,7 @@ import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
 import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -284,11 +285,26 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]
         : [signedCancelTx];
+
     await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
     });
+
     setCancellationState(null);
+
+    alert('Cancel submitted');
+
+    try {
+      ampli.swapCancelationSubmitted({
+        ...tokenInfoToAnalyticsFromAndToAssets(order.from.token, order.to.token),
+        from_amount: Quantities.format(order.from.quantity, order.from.token.decimals || 0),
+        to_amount: Quantities.format(order.to.quantity, order.to.token.decimals || 0),
+        pool_source: order.provider,
+      });
+    } catch (e) {
+      console.error('analytics fail', e);
+    }
   };
 
   const columnContext = { completedOrders: showCompletedOrders };
