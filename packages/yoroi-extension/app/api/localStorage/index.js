@@ -374,6 +374,7 @@ export type PersistedSubmittedTransaction = {|
   publicDeriverId: number,
   transaction: CardanoShelleyTransactionCtorData,
   usedUtxos: ?Array<{| txHash: string, index: number |}>,
+  isDrepDelegation?: boolean,
 |};
 
 const STORAGE_API =
@@ -391,11 +392,12 @@ export async function loadSubmittedTransactions(): Promise<Array<PersistedSubmit
   if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
     return [];
   }
-  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
     networkId,
     publicDeriverId,
     transaction: deserializeTransactionCtorData(transaction),
     usedUtxos,
+    isDrepDelegation,
   }));
 }
 

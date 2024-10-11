@@ -70,6 +70,7 @@ import { pubKeyHashToRewardAddress, transactionHexToHash } from '../../../app/ap
 import { sendTx } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 import type { WalletState } from '../background/types';
 import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
+import { isCertificateKindDrepDelegation } from '../../../app/api/ada/lib/storage/bridge/utils';
 
 function paginateResults<T>(results: T[], paginate: ?Paginate): T[] {
   if (paginate != null) {
@@ -915,7 +916,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     submittedTxs,
   );
 
-  const txId = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
+  const txId = transactionHexToHash(tx.to_hex());
   const defaultToken = publicDeriver.getParent().defaultToken;
   const defaults = {
     defaultNetworkId: defaultToken.NetworkId,
@@ -992,6 +993,14 @@ export async function connectorRecordSubmittedCardanoTransaction(
     }))
     .toArray();
 
+  let isDrepDelegation = false;
+  for (const cert of iterateLenGet(txBody.certs())) {
+    if (isCertificateKindDrepDelegation(cert.kind())) {
+      isDrepDelegation = true;
+      break;
+    }
+  }
+
   const auxData = tx.auxiliary_data();
 
   const submittedTx: CardanoShelleyTransactionCtorData = {
@@ -1016,6 +1025,7 @@ export async function connectorRecordSubmittedCardanoTransaction(
     transaction: submittedTx,
     networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
     usedUtxos,
+    isDrepDelegation,
   });
   await persistSubmittedTransactions(submittedTxs);
 }

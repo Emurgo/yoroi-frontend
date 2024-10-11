@@ -32,7 +32,7 @@ const initialGovernanceProvider = {
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
-  submitedTransactions: [{ isDrepDelegation: false }],
+  submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
