@@ -162,7 +162,7 @@ export function fail<T>(...params: any[]): T {
 /**
  * Returns the passed argument with no changes and just force-casts it to defined type
  */
-export function forceNonNull<T>(t: ?T): T {
+export function forceNonNull<T>(t: ?T | null): T {
   // $FlowIgnore
   return t;
 }
