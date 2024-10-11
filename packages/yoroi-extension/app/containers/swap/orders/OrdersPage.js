@@ -298,8 +298,8 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     try {
       ampli.swapCancelationSubmitted({
         ...tokenInfoToAnalyticsFromAndToAssets(order.from.token, order.to.token),
-        from_amount: Quantities.format(order.from.quantity, order.from.token.decimals || 0),
-        to_amount: Quantities.format(order.to.quantity, order.to.token.decimals || 0),
+        from_amount: Number(Quantities.format(order.from.quantity, order.from.token.decimals || 0)),
+        to_amount: Number(Quantities.format(order.to.quantity, order.to.token.decimals || 0)),
         pool_source: order.provider,
       });
     } catch (e) {
