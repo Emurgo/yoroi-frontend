@@ -2,9 +2,6 @@
 
 import { identifierToPolicy } from '../../api/assetUtils';
 import { maybe } from '../../coreUtils';
-import { ampli } from '../../../ampli/index';
-import { useSwap } from '@yoroi/swap';
-import useSwapForm from './context/swap-form/useSwapForm';
 
 type AnalyticsAsset = {|
   asset_name?: string,
