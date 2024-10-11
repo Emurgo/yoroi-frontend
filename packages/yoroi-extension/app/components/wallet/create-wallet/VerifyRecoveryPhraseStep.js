@@ -18,8 +18,7 @@ import { ampli } from '../../../../ampli/index';
 const messages = defineMessages({
   description: {
     id: 'wallet.create.thirdStep.description',
-    defaultMessage:
-      '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
+    defaultMessage: '!!!<strong>Select</strong> each word in <strong>the correct order</strong> to confirm your recovery phrase.',
   },
   incorrectOrder: {
     id: 'wallet.create.thirdStep.incorrectOrder',
@@ -97,18 +96,20 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
             justifyContent="center"
             sx={{
               paddingY: '16px',
+              borderWidth: '2px',
+              borderColor: 'ds.primary_200',
+              borderRadius: '8px',
+              borderStyle: 'solid',
             }}
           >
             {enteredRecoveryPhrase.map((word, idx) => {
               const isLastEnteredWord =
-                !isRecoveryPhraseEntered &&
-                (idx === enteredRecoveryPhrase.length - 1 ||
-                  enteredRecoveryPhrase[idx + 1] === null);
+                !isRecoveryPhraseEntered && (idx === enteredRecoveryPhrase.length - 1 || enteredRecoveryPhrase[idx + 1] === null);
 
               const Word = (
                 <Box
                   sx={{
-                    background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 99.98%)',
+                    backgroundColor: 'ds.primary_100',
                     borderRadius: '8px',
                     width: '93px',
                     height: '40px',
@@ -118,7 +119,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     ml: '4px',
                   }}
                 >
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     sx={{
                       display: 'block',
                       cursor: 'default',
@@ -167,13 +169,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           </Stack>
         </Box>
 
-        <Stack
-          flexDirection="row"
-          flexWrap="wrap"
-          alignItems="center"
-          justifyContent="center"
-          gap="8px"
-        >
+        <Stack flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="center" gap="8px">
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             const isAdded = addedWordsIndxes.has(idx);
             const button = (
@@ -190,7 +186,8 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 }}
                 id={'verifyRecoveryPhraseWord' + idx}
               >
-                <Typography component="div"
+                <Typography
+                  component="div"
                   sx={{
                     width: '100%',
                     whiteSpace: 'nowrap',
@@ -218,7 +215,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box height="28px" mt="16px">
           {wrongWordIdx !== null && (
-            <Typography component="div" variant="body2" color="error.100" id="incorrectOrderMessage">
+            <Typography component="div" variant="body2" color="ds.text_error" id="incorrectOrderMessage">
               {intl.formatMessage(messages.incorrectOrder)}
             </Typography>
           )}

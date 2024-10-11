@@ -43,26 +43,24 @@ function InfoDialog(props: Props & Intl): Node {
       onClose={onClose}
       TransitionComponent={Transition}
       sx={{
-        background: 'ds.web_overlay',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        background: 'ds.bg_color_min',
         '& .MuiPaper-root': {
-          background: 'none',
           maxWidth: 'unset',
+          backgroundImage: 'none',
         },
       }}
       id="infoDialog"
     >
       <Box
         sx={{
+          background: 'ds.bg_color_min',
+
           width: '648px',
-          background: 'var(--yoroi-palette-common-white)',
           borderRadius: '8px',
-          boxShadow: '0px 13px 20px -1px rgba(0, 0, 0, 0.15)',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: 'grey.200',
+
           padding: '24px',
           display: 'flex',
           alignitems: 'center',
@@ -72,6 +70,7 @@ function InfoDialog(props: Props & Intl): Node {
       >
         <Typography
           component="div"
+          color="ds.text_gray_medium"
           sx={{
             display: 'block',
             fontSize: '16px',

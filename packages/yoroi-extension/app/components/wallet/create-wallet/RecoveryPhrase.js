@@ -41,7 +41,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
               key={word}
               columns={7}
               sx={{
-                background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
+                backgroundColor: 'ds.primary_100',
                 textAlign: 'center',
                 borderRadius: '8px',
                 display: 'flex',
@@ -53,7 +53,8 @@ function RecoveryPhrase(props: Props & Intl): Node {
               }}
               id={'recoveryPhraseWord' + idx}
             >
-              <Typography component="div"
+              <Typography
+                component="div"
                 sx={{
                   width: '124px',
                   whiteSpace: 'nowrap',
@@ -87,11 +88,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
       >
         {shouldShowRecoveryPhrase ? <ClosedEyeIcon /> : <OpenedEyeIcon />}
         <Typography component="div" variant="body2" fontWeight="500">
-          {intl.formatMessage(
-            shouldShowRecoveryPhrase
-              ? messages.hideRecoveryPhraseBtn
-              : messages.showRecoveryPhraseBtn
-          )}
+          {intl.formatMessage(shouldShowRecoveryPhrase ? messages.hideRecoveryPhraseBtn : messages.showRecoveryPhraseBtn)}
         </Typography>
       </Button>
     </Box>
