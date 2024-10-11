@@ -30,6 +30,9 @@ import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackage
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
+import { ampli } from '../../../../ampli/index';
+import { identifierToPolicy } from '../../../api/assetUtils';
+import { maybe } from '../../../coreUtils';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -123,6 +126,23 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
+    // MOUNT
+
+    ampli.swapInitiated({
+      from_asset: [{
+        asset_ticker: sellTokenInfo?.ticker,
+        asset_name: sellTokenInfo?.name,
+        policy_id: maybe(sellTokenInfo?.id, identifierToPolicy),
+      }],
+      to_asset: [{
+        asset_ticker: buyTokenInfo?.ticker,
+        asset_name: buyTokenInfo?.name,
+        policy_id: maybe(buyTokenInfo?.id, identifierToPolicy),
+      }],
+      slippage_tolerance: defaultSlippage,
+      order_type: orderType,
+    });
+
     disclaimerFlag
       .get()
       .then(setDisclaimerStatus)
