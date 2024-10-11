@@ -132,11 +132,12 @@ function patchWalletState(walletState: Object): WalletState {
   );
 
   walletState.submittedTransactions = walletState.submittedTransactions.map(
-    ({ networkId, publicDeriverId, transaction, usedUtxos }) => ({
+    ({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
       networkId,
       publicDeriverId,
       transaction: deserializeShelleyTransactionCtorData(transaction),
       usedUtxos,
+      isDrepDelegation,
     })
   );
   walletState.balance = MultiToken.from(walletState.balance);
