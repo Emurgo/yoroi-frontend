@@ -5,18 +5,16 @@ import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   publicDeriverId: number,
 |};
 
 @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
+export default class ChangeWalletPasswordDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
 
   render(): Node {
     const { actions } = this.props;
-    const { uiDialogs, profile } = this.props.stores;
-    const { walletSettings } = this.props.stores;
+    const { uiDialogs, profile, walletSettings } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
 
