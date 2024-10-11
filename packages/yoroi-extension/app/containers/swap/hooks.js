@@ -71,5 +71,6 @@ export function useSwapFeeDisplay(
     nonPtAmount: sellAmount,
     formattedNonPtAmount: formattedSell,
     formattedFee,
+    formattedFeeQuantity,
   };
 }
