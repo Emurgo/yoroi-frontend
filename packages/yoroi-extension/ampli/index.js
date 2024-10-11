@@ -74,6 +74,13 @@ var ConnectorPageViewed = /** @class */ (function () {
     return ConnectorPageViewed;
 }());
 export { ConnectorPageViewed };
+var CreateWalletDetailsSettled = /** @class */ (function () {
+    function CreateWalletDetailsSettled() {
+        this.event_type = 'Create Wallet Details Settled';
+    }
+    return CreateWalletDetailsSettled;
+}());
+export { CreateWalletDetailsSettled };
 var CreateWalletDetailsStepViewed = /** @class */ (function () {
     function CreateWalletDetailsStepViewed() {
         this.event_type = 'Create Wallet Details Step Viewed';
@@ -176,6 +183,47 @@ var DappPopupSignTransactionSubmitted = /** @class */ (function () {
     return DappPopupSignTransactionSubmitted;
 }());
 export { DappPopupSignTransactionSubmitted };
+var GovernanceChooseDrepPageViewed = /** @class */ (function () {
+    function GovernanceChooseDrepPageViewed() {
+        this.event_type = 'Governance Choose Drep Page Viewed';
+    }
+    return GovernanceChooseDrepPageViewed;
+}());
+export { GovernanceChooseDrepPageViewed };
+var GovernanceConfirmTransactionPageViewed = /** @class */ (function () {
+    function GovernanceConfirmTransactionPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Governance Confirm Transaction Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return GovernanceConfirmTransactionPageViewed;
+}());
+export { GovernanceConfirmTransactionPageViewed };
+var GovernanceDashboardPageViewed = /** @class */ (function () {
+    function GovernanceDashboardPageViewed() {
+        this.event_type = 'Governance Dashboard Page Viewed';
+    }
+    return GovernanceDashboardPageViewed;
+}());
+export { GovernanceDashboardPageViewed };
+var GovernanceTransactionSuccessPageViewed = /** @class */ (function () {
+    function GovernanceTransactionSuccessPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Governance Transaction Success Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return GovernanceTransactionSuccessPageViewed;
+}());
+export { GovernanceTransactionSuccessPageViewed };
+var NetworkSelected = /** @class */ (function () {
+    function NetworkSelected(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Network Selected';
+        this.event_properties = event_properties;
+    }
+    return NetworkSelected;
+}());
+export { NetworkSelected };
 var NftGalleryDetailsImageViewed = /** @class */ (function () {
     function NftGalleryDetailsImageViewed() {
         this.event_type = 'NFT Gallery Details Image Viewed';
@@ -235,6 +283,72 @@ var NftGallerySearchActivated = /** @class */ (function () {
     return NftGallerySearchActivated;
 }());
 export { NftGallerySearchActivated };
+var PortfolioTokenDetails = /** @class */ (function () {
+    function PortfolioTokenDetails(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Portfolio Token Details';
+        this.event_properties = event_properties;
+    }
+    return PortfolioTokenDetails;
+}());
+export { PortfolioTokenDetails };
+var PortfolioTokensListPageViewed = /** @class */ (function () {
+    function PortfolioTokensListPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Portfolio Tokens List Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return PortfolioTokensListPageViewed;
+}());
+export { PortfolioTokensListPageViewed };
+var PortfolioTokensListSearchActivated = /** @class */ (function () {
+    function PortfolioTokensListSearchActivated(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Portfolio Tokens List Search Activated';
+        this.event_properties = event_properties;
+    }
+    return PortfolioTokensListSearchActivated;
+}());
+export { PortfolioTokensListSearchActivated };
+var ReceiveAmountGeneratedPageViewed = /** @class */ (function () {
+    function ReceiveAmountGeneratedPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Receive Amount Generated Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return ReceiveAmountGeneratedPageViewed;
+}());
+export { ReceiveAmountGeneratedPageViewed };
+var ReceiveAmountPageViewed = /** @class */ (function () {
+    function ReceiveAmountPageViewed() {
+        this.event_type = 'Receive Amount Page Viewed';
+    }
+    return ReceiveAmountPageViewed;
+}());
+export { ReceiveAmountPageViewed };
+var ReceiveCopyAddressClicked = /** @class */ (function () {
+    function ReceiveCopyAddressClicked(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Receive Copy Address Clicked';
+        this.event_properties = event_properties;
+    }
+    return ReceiveCopyAddressClicked;
+}());
+export { ReceiveCopyAddressClicked };
+var ReceiveGenerateNewAddressClicked = /** @class */ (function () {
+    function ReceiveGenerateNewAddressClicked() {
+        this.event_type = 'Receive Generate New Address Clicked';
+    }
+    return ReceiveGenerateNewAddressClicked;
+}());
+export { ReceiveGenerateNewAddressClicked };
+var ReceivePageListViewed = /** @class */ (function () {
+    function ReceivePageListViewed() {
+        this.event_type = 'Receive Page List Viewed';
+    }
+    return ReceivePageListViewed;
+}());
+export { ReceivePageListViewed };
 var ReceivePageViewed = /** @class */ (function () {
     function ReceivePageViewed() {
         this.event_type = 'Receive Page Viewed';
@@ -242,6 +356,20 @@ var ReceivePageViewed = /** @class */ (function () {
     return ReceivePageViewed;
 }());
 export { ReceivePageViewed };
+var ReceiveShareAddressClicked = /** @class */ (function () {
+    function ReceiveShareAddressClicked() {
+        this.event_type = 'Receive Share Address Clicked';
+    }
+    return ReceiveShareAddressClicked;
+}());
+export { ReceiveShareAddressClicked };
+var RestoreWalletDetailsSettled = /** @class */ (function () {
+    function RestoreWalletDetailsSettled() {
+        this.event_type = 'Restore Wallet Details Settled';
+    }
+    return RestoreWalletDetailsSettled;
+}());
+export { RestoreWalletDetailsSettled };
 var RestoreWalletDetailsStepViewed = /** @class */ (function () {
     function RestoreWalletDetailsStepViewed() {
         this.event_type = 'Restore Wallet Details Step Viewed';
@@ -249,13 +377,6 @@ var RestoreWalletDetailsStepViewed = /** @class */ (function () {
     return RestoreWalletDetailsStepViewed;
 }());
 export { RestoreWalletDetailsStepViewed };
-var RestoreWalletDetailsSubmitted = /** @class */ (function () {
-    function RestoreWalletDetailsSubmitted() {
-        this.event_type = 'Restore Wallet Details Submitted';
-    }
-    return RestoreWalletDetailsSubmitted;
-}());
-export { RestoreWalletDetailsSubmitted };
 var RestoreWalletEnterPhraseStepStatus = /** @class */ (function () {
     function RestoreWalletEnterPhraseStepStatus(event_properties) {
         this.event_properties = event_properties;
@@ -559,7 +680,8 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Assets%20Page%20Viewed)
      *
-     * This event tracks when a user views the Assets page. Note: only available on Yoroi Extension.
+     * This event tracks when a user views the Assets page.
+     *  On mobile  is available on the wallet page (First item from main menu) in the assets tab.
      *
      * @param options Amplitude event options.
      */
@@ -571,9 +693,9 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20ADA%20Page%20Viewed)
      *
-     * This event tracks when a user views the page to claim Claim /Transfer ADA page in ExtensionEvent: Claim ADA Page Viewed
+     * This event tracks when a user views the page to claim Claim /Transfer ADA page in Extension.
      *
-     * Description: This event tracks when a user views the page to claim ADA tokens. It provides insights into the number of users who are interested in claiming ADA tokens and can be used to analyze user engagement and conversion rates on the claim page
+     * You can find that page under Staking section.
      *
      * @param options Amplitude event options.
      */
@@ -591,6 +713,18 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.connectorPageViewed = function (options) {
         return this.track(new ConnectorPageViewed(), options);
+    };
+    /**
+     * Create Wallet Details Settled
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Create%20Wallet%20Details%20Settled)
+     *
+     * When the wallet is created correctly. This event signifies the completion of the process of setting up wallet details during the creation of a new wallet
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.createWalletDetailsSettled = function (options) {
+        return this.track(new CreateWalletDetailsSettled(), options);
     };
     /**
      * Create Wallet Details Step Viewed
@@ -749,7 +883,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Sign%20Transaction%20Page%20Viewed)
      *
-     * This event tracks when a user loads transaction screenThis event tracks when a user signs a transaction within a Dapp popup within a Dapp Connector Popup
+     * This event tracks when a user loads a sign transaction screen on the dapp connector. Valid for extension and mobile.
      *
      * @param options Amplitude event options.
      */
@@ -761,12 +895,75 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Sign%20Transaction%20Submitted)
      *
-     * This event tracks the click "confirm" button on submission of a sign transaction request within the Dapp Connector Popup This event tracks the submission of a sign transaction request within the Dapp Popup feature
+     * This event tracks the submission of a sign transaction request within the Dapp Connector screen. It's a Popup on extension and a full screen in Mobile.
      *
      * @param options Amplitude event options.
      */
     Ampli.prototype.dappPopupSignTransactionSubmitted = function (options) {
         return this.track(new DappPopupSignTransactionSubmitted(), options);
+    };
+    /**
+     * Governance Choose Drep Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Choose%20Drep%20Page%20Viewed)
+     *
+     * This event tracks when user loads the bottom sheet on mobile or the popup on extension to introduce the Drep ID. To arrive to this page the user has to click on “Delegate to a Drep” section.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.governanceChooseDrepPageViewed = function (options) {
+        return this.track(new GovernanceChooseDrepPageViewed(), options);
+    };
+    /**
+     * Governance Confirm Transaction Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Confirm%20Transaction%20Page%20Viewed)
+     *
+     * This event tracks when a user loads the confirm transaction page on the Governance flow. On Extension user would insert the password in that page. On extension user would do it in a bottom sheet afterwards.
+     *
+     * @param properties The event's properties (e.g. governance_selection)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.governanceConfirmTransactionPageViewed = function (properties, options) {
+        return this.track(new GovernanceConfirmTransactionPageViewed(properties), options);
+    };
+    /**
+     * Governance Dashboard Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Dashboard%20Page%20Viewed)
+     *
+     * This event tracks when a user loads the Governance Dashboard Page. The page is reached via the main navigation menu in extension and in the bottom menu icon on Extension.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.governanceDashboardPageViewed = function (options) {
+        return this.track(new GovernanceDashboardPageViewed(), options);
+    };
+    /**
+     * Governance Transaction Success Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Transaction%20Success%20Page%20Viewed)
+     *
+     * This event tracks when a user loads the success page at the end of the governance flow.
+     *
+     * @param properties The event's properties (e.g. governance_selection)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.governanceTransactionSuccessPageViewed = function (properties, options) {
+        return this.track(new GovernanceTransactionSuccessPageViewed(properties), options);
+    };
+    /**
+     * Network Selected
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Network%20Selected)
+     *
+     * Event to track when a user selects a network
+     *
+     * @param properties The event's properties (e.g. from_network)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.networkSelected = function (properties, options) {
+        return this.track(new NetworkSelected(properties), options);
     };
     /**
      * NFT Gallery Details Image Viewed
@@ -858,11 +1055,112 @@ var Ampli = /** @class */ (function () {
         return this.track(new NftGallerySearchActivated(properties), options);
     };
     /**
+     * Portfolio Token Details
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Token%20Details)
+     *
+     * When user visit the detailed information about a specific token within a user's portfolio. In mobile there's 3 tabs that would be implemented in different iterations.
+     *
+     * @param properties The event's properties (e.g. token_details_tab)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.portfolioTokenDetails = function (properties, options) {
+        return this.track(new PortfolioTokenDetails(properties), options);
+    };
+    /**
+     * Portfolio Tokens List Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Tokens%20List%20Page%20Viewed)
+     *
+     * Event to track when a user views the list of tokens in their portfolio.
+     *
+     * @param properties The event's properties (e.g. tokens_tab)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.portfolioTokensListPageViewed = function (properties, options) {
+        return this.track(new PortfolioTokensListPageViewed(properties), options);
+    };
+    /**
+     * Portfolio Tokens List Search Activated
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Tokens%20List%20Search%20Activated)
+     *
+     * This event tracks when a user activates and starts a search in the Tokens list page. Delay of 0.5 seconds.
+     *
+     * @param properties The event's properties (e.g. search_term)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.portfolioTokensListSearchActivated = function (properties, options) {
+        return this.track(new PortfolioTokensListSearchActivated(properties), options);
+    };
+    /**
+     * Receive Amount Generated Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Amount%20Generated%20Page%20Viewed)
+     *
+     * When the bottom sheet or popup with a generated address with an specific amount is loaded
+     *
+     * @param properties The event's properties (e.g. ada_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receiveAmountGeneratedPageViewed = function (properties, options) {
+        return this.track(new ReceiveAmountGeneratedPageViewed(properties), options);
+    };
+    /**
+     * Receive Amount Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Amount%20Page%20Viewed)
+     *
+     * When a user visit the page to insert specific amount of ADA that would be needed to generate a wallet address with that specific details.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receiveAmountPageViewed = function (options) {
+        return this.track(new ReceiveAmountPageViewed(), options);
+    };
+    /**
+     * Receive Copy Address Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Copy%20Address%20Clicked)
+     *
+     * When a user click on the any CTA to copy their address
+     *
+     * @param properties The event's properties (e.g. copy_address_location)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receiveCopyAddressClicked = function (properties, options) {
+        return this.track(new ReceiveCopyAddressClicked(properties), options);
+    };
+    /**
+     * Receive Generate New Address Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Generate%20New%20Address%20Clicked)
+     *
+     * When a user click on the Generate new address button on the main receive page on the multiple address flow.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receiveGenerateNewAddressClicked = function (options) {
+        return this.track(new ReceiveGenerateNewAddressClicked(), options);
+    };
+    /**
+     * Receive Page List Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Page%20List%20Viewed)
+     *
+     * When user has enabled multiple addresses and goes to the page where he can see the list of generated wallet addresses
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receivePageListViewed = function (options) {
+        return this.track(new ReceivePageListViewed(), options);
+    };
+    /**
      * Receive Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Page%20Viewed)
      *
-     * This event tracks when a user views the Receive page of the Wallet menu.
+     * When user loads the Receive funds screen, where user can see their wallet address with a QR Code
      *
      * @param options Amplitude event options.
      */
@@ -870,28 +1168,40 @@ var Ampli = /** @class */ (function () {
         return this.track(new ReceivePageViewed(), options);
     };
     /**
+     * Receive Share Address Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Receive%20Share%20Address%20Clicked)
+     *
+     * When a user click on the link to share the address
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.receiveShareAddressClicked = function (options) {
+        return this.track(new ReceiveShareAddressClicked(), options);
+    };
+    /**
+     * Restore Wallet Details Settled
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Restore%20Wallet%20Details%20Settled)
+     *
+     * This event captures the details of a wallet restoration process that has been successfully completed
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.restoreWalletDetailsSettled = function (options) {
+        return this.track(new RestoreWalletDetailsSettled(), options);
+    };
+    /**
      * Restore Wallet Details Step Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Restore%20Wallet%20Details%20Step%20Viewed)
      *
-     * Event has no description in tracking plan.
+     * Track when user loads the page where user inserts wallet name and password
      *
      * @param options Amplitude event options.
      */
     Ampli.prototype.restoreWalletDetailsStepViewed = function (options) {
         return this.track(new RestoreWalletDetailsStepViewed(), options);
-    };
-    /**
-     * Restore Wallet Details Submitted
-     *
-     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Restore%20Wallet%20Details%20Submitted)
-     *
-     * Event has no description in tracking plan.
-     *
-     * @param options Amplitude event options.
-     */
-    Ampli.prototype.restoreWalletDetailsSubmitted = function (options) {
-        return this.track(new RestoreWalletDetailsSubmitted(), options);
     };
     /**
      * Restore Wallet Enter Phrase Step Status
@@ -1177,7 +1487,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Transactions%20Page%20Viewed)
      *
-     * This event tracks when a user views the transactions page within the wallet.
+     * This event tracks when a user views the transactions page within the wallet. On mobile is available on the wallet page (First item from main navigation item) in the transactions tab.
      *
      * @param options Amplitude event options.
      */
@@ -1189,7 +1499,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Voting%20Page%20Viewed)
      *
-     * This event tracks when a user views the Voting page.
+     * This event tracks when a user views the Catalyst Voting page.
      *
      * @param options Amplitude event options.
      */
@@ -1201,7 +1511,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Viewed)
      *
-     * ThThis event tracks when a user views the wallet page. Wallet page is the deffault page when the user logs in to the app (Once the initial setup is done)
+     * Wallet page is the default page when the user logs into the app and selects the wallet that is going to be using (Once the initial setup is done)
      *
      * @param options Amplitude event options.
      */
