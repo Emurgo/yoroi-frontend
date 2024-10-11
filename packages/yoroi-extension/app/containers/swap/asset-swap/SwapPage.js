@@ -184,6 +184,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       slippage.save(newSlippage);
       slippageChanged(newSlippage);
       setSlippageValue(String(newSlippage));
+      ampli.swapSlippageChanged({
+        slippage_tolerance: newSlippage,
+      });
     });
   };
 
