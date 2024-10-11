@@ -8,7 +8,7 @@ import type { FormattedTokenValue } from './util';
 import { Box, Button } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import {
   getTransactionFeeFromCbor,
@@ -30,6 +30,7 @@ import { createFormattedTokenValues } from './util';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
+import { ampli } from '../../../../ampli/index';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -98,6 +99,16 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
+
+  useEffect(() => {
+
+    // on change open/closed orders tab
+
+    ampli.swapConfirmedPageViewed({
+      swap_tab: showCompletedOrders ? 'Completed Orders' : 'Open Orders',
+    });
+
+  }, [showCompletedOrders]);
 
   const {
     wallets,
