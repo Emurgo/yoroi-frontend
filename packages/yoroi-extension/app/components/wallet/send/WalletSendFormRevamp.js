@@ -54,12 +54,12 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
-import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
+import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
+import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -224,8 +224,8 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendActions,
-  +trezorSend: TrezorSendActions,
+  +ledgerSend: LedgerSendStore,
+  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({

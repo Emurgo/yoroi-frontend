@@ -4,7 +4,6 @@ import { action, observable } from 'mobx';
 import Store from '../../base/Store';
 
 import { wrapWithFrame } from '../../lib/TrezorWrapper';
-import type { SendUsingTrezorParams } from '../../../actions/ada/trezor-send-actions';
 import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
 import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -25,6 +24,11 @@ import { broadcastTransaction } from '../../../api/thunk';
 import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
 import { genAddressingLookup } from '../../stateless/addressStores';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+
+export type SendUsingTrezorParams = {|
+  signRequest: ISignRequest<any>,
+|};
 
 /** Note: Handles Trezor Signing */
 export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
@@ -36,20 +40,12 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
 
   // =================== API RELATED =================== //
 
-  setup(): void {
-    super.setup();
-    const trezorSendAction = this.actions.ada.trezorSend;
-    trezorSendAction.sendUsingTrezor.listen(this._sendWrapper);
-    trezorSendAction.cancel.listen(this._cancel);
-    trezorSendAction.reset.listen(this._reset);
-  }
-
-  _reset: void => void = () => {
+  reset: void => void = () => {
     this._setActionProcessing(false);
     this._setError(null);
   }
 
-  _sendWrapper: {|
+  sendUsingTrezor: {|
     params: SendUsingTrezorParams,
     onSuccess?: void => void,
     +wallet: {
@@ -69,7 +65,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
         throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
       if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
-        throw new Error(`${nameof(this._sendWrapper)} wrong tx sign request`);
+        throw new Error(`${nameof(this.sendUsingTrezor)} wrong tx sign request`);
       }
       const { signRequest } = request.params;
 
@@ -93,7 +89,7 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
       } else {
         this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
       }
-      this._reset();
+      this.reset();
 
       Logger.info('SUCCESS: ADA sent using Trezor SignTx');
     } catch (e) {
@@ -333,10 +329,10 @@ export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  _cancel: void => void = () => {
+  cancel: void => void = () => {
     if (!this.isActionProcessing) {
       this.actions.dialogs.closeActiveDialog.trigger();
-      this._reset();
+      this.reset();
     }
   }
 

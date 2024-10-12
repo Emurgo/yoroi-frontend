@@ -25,8 +25,7 @@ import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpe
 import { truncateToken } from '../../utils/formatters';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
   +onSubmit: void => void,
 |};
@@ -40,7 +39,7 @@ const messages = defineMessages({
 
 // TODO: probably a lot of this can be de-duplicated with TransferSendPage
 @observer
-export default class UpgradeTxDialogContainer extends Component<Props> {
+export default class UpgradeTxDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -57,7 +56,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     expectedSerial: string | void,
     networkId: number,
   |} => Promise<void> = async (request) => {
-    await this.props.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
+    await this.props.stores.substores.ada.ledgerSend.sendUsingLedgerKey({
       ...request,
     });
     this.props.onSubmit();

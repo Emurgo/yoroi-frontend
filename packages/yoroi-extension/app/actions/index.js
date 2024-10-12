@@ -15,8 +15,6 @@ import TxBuilderActions from './common/tx-builder-actions';
 import ExplorerActions from './common/explorer-actions';
 import DelegationActions from './common/delegation-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
-import adaActionsMap from './ada/index';
-import type { AdaActionsMap } from './ada/index';
 import  ConnectorActionsMap from '../connector/actions/connector-actions';
 import ServerConnectionActions from './server-connection-actions';
 
@@ -37,7 +35,6 @@ export type ActionsMap = {|
   walletRestore: WalletRestoreActions,
   delegation: DelegationActions,
   explorers: ExplorerActions,
-  ada: AdaActionsMap,
   connector: ConnectorActionsMap,
   serverConnection: ServerConnectionActions,
 |};
@@ -60,7 +57,6 @@ const actionsMap: ActionsMap = Object.freeze({
   transactions: new TransactionsActions(),
   explorers: new ExplorerActions(),
   connector: new ConnectorActionsMap(),
-  ada: adaActionsMap,
   serverConnection: new ServerConnectionActions(),
 });
 

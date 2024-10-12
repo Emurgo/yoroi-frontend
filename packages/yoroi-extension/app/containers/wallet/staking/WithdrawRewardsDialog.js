@@ -53,13 +53,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
 |};
 
 @observer
-export default class WithdrawRewardsDialog extends Component<Props> {
+export default class WithdrawRewardsDialog extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -72,27 +71,29 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.props.stores.wallets.sendMoneyRequest.reset();
-    this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
-    this.props.actions.ada.ledgerSend.cancel.trigger();
-    this.props.actions.ada.trezorSend.cancel.trigger();
+    const { stores } = this.props;
+    stores.wallets.sendMoneyRequest.reset();
+    stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
+    stores.substores.ada.ledgerSend.cancel();
+    stores.substores.ada.trezorSend.cancel();
   }
 
   submit: void => Promise<void> = async () => {
-    const selected = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const selected = stores.wallets.selected;
     if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
-    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
+    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
       if (selected.type === 'trezor') {
-        await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
+        await stores.substores.ada.trezorSend.sendUsingTrezor({
           params: { signRequest },
           wallet: selected,
         });
       }
       if (selected.type === 'ledger') {
-        await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
+        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
           params: { signRequest },
           wallet: selected,
         });

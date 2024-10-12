@@ -239,8 +239,8 @@ class WalletSendPage extends Component<AllProps> {
             sendMoney={this.props.actions.wallets.sendMoney.trigger}
             ledgerSendError={this.props.stores.substores.ada.ledgerSend.error || null}
             trezorSendError={this.props.stores.substores.ada.trezorSend.error || null}
-            ledgerSend={this.props.actions.ada.ledgerSend}
-            trezorSend={this.props.actions.ada.trezorSend}
+            ledgerSend={this.props.stores.substores.ada.ledgerSend}
+            trezorSend={this.props.stores.substores.ada.trezorSend}
           />
           {this.renderDialog()}
         </>
@@ -390,9 +390,8 @@ class WalletSendPage extends Component<AllProps> {
         infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
         sendUsingHWButtonLabel: messages.sendUsingLedgerNano,
       };
-      const ledgerSendAction = this.props.actions.ada.ledgerSend;
-      ledgerSendAction.init.trigger();
       const ledgerSendStore = this.props.stores.substores.ada.ledgerSend;
+      ledgerSendStore.init();
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
           staleTx={transactionBuilderStore.txMismatch}
@@ -407,13 +406,13 @@ class WalletSendPage extends Component<AllProps> {
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
           onSubmit={
-            () => ledgerSendAction.sendUsingLedgerWallet.trigger({
+            () => ledgerSendStore.sendUsingLedgerWallet({
               params: { signRequest },
               onSuccess: this.openTransactionSuccessDialog,
               wallet: selected,
             })
           }
-          onCancel={ledgerSendAction.cancel.trigger}
+          onCancel={ledgerSendStore.cancel}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>
             addressToDisplayString(addr, getNetworkById(selected.networkId))
@@ -426,7 +425,6 @@ class WalletSendPage extends Component<AllProps> {
         infoLine2: globalMessages.txConfirmationTrezorTLine2,
         sendUsingHWButtonLabel: messages.sendUsingTrezorT,
       };
-      const trezorSendAction = this.props.actions.ada.trezorSend;
       const trezorSendStore = this.props.stores.substores.ada.trezorSend;
       hwSendConfirmationDialog = (
         <HWSendConfirmationDialog
@@ -442,13 +440,13 @@ class WalletSendPage extends Component<AllProps> {
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
           onSubmit={
-            () => trezorSendAction.sendUsingTrezor.trigger({
+            () => trezorSendStore.sendUsingTrezor({
               params: { signRequest },
               onSuccess: this.openTransactionSuccessDialog,
               wallet: selected,
             })
           }
-          onCancel={trezorSendAction.cancel.trigger}
+          onCancel={trezorSendStore.cancel}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>
             addressToDisplayString(addr, getNetworkById(selected.networkId))
