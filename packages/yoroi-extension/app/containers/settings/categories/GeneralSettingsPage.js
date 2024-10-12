@@ -58,13 +58,14 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
   onSelectUnitOfAccount: string => Promise<void> = async value => {
     const unitOfAccount =
       value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
-    await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
   };
 
   render(): Node {
     const { intl } = this.context;
-    const profileStore = this.props.stores.profile;
-    const coinPriceStore = this.props.stores.coinPriceStore;
+    const { stores } = this.props;
+    const profileStore = stores.profile;
+    const coinPriceStore = stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
@@ -100,7 +101,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           </Typography>
         )}
         <GeneralSettings
-          onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
+          onSelectLanguage={stores.profile.updateLocale}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
@@ -115,7 +116,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock />
-        <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
+        <AboutYoroiSettingsBlock wallet={stores.wallets.selected} />
       </Box>
     );
   }

@@ -21,7 +21,7 @@ export default class OptForAnalyticsPage extends Component<StoresAndActionsProps
       <Box height="100vh" paddingBottom="24px" sx={{ overflowY: 'auto' }}>
         <IntroBanner isNightly={environment.isNightly()} />
         <OptForAnalyticsForm
-          onOpt={this.props.actions.profile.optForAnalytics.trigger}
+          onOpt={this.props.stores.profile.onOptForAnalytics}
           variant="startup"
           isOptedIn={false}
         />

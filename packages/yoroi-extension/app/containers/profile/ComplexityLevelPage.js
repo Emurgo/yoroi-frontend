@@ -27,10 +27,10 @@ export default class ComplexityLevelPage extends Component<StoresAndActionsProps
   };
 
   render(): Node {
+    const { stores } = this.props;
+    const { checkAdaServerStatus } = stores.serverConnectionStore;
 
-    const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
-
-    const { selected } = this.props.stores.wallets;
+    const { selected } = stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
@@ -50,10 +50,10 @@ export default class ComplexityLevelPage extends Component<StoresAndActionsProps
         banner={displayedBanner}
       >
         <ComplexityLevel
-          complexityLevel={this.props.stores.profile.selectedComplexityLevel}
-          onSubmit={this.props.actions.profile.selectComplexityLevel.trigger}
-          isSubmitting={this.props.stores.profile.setComplexityLevelRequest.isExecuting}
-          error={this.props.stores.profile.setComplexityLevelRequest.error}
+          complexityLevel={stores.profile.selectedComplexityLevel}
+          onSubmit={stores.profile.selectComplexityLevel}
+          isSubmitting={stores.profile.setComplexityLevelRequest.isExecuting}
+          error={stores.profile.setComplexityLevelRequest.error}
         />
       </TopBarLayout>
     );

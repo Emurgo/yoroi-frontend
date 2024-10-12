@@ -161,7 +161,7 @@ export default class ConnectContainer extends Component<
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   render(): Node {

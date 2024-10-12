@@ -17,15 +17,14 @@ import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   title: Node,
   menu?: Node,
   pageBanner?: Node,
 |};
 
 @observer
-export default class NavBarContainerRevamp extends Component<Props> {
+export default class NavBarContainerRevamp extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -35,7 +34,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   onSelectWallet: (number) => void = newWalletId => {

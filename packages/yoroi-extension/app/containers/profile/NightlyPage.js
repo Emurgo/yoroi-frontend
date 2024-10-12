@@ -24,7 +24,7 @@ export default class NightlyPage extends Component<StoresAndActionsProps> {
   };
 
   acceptNightly: void => void = () => {
-    this.props.actions.profile.acceptNightly.trigger();
+    this.props.stores.profile.acceptNightly();
   };
 
   render(): Node {

@@ -9,7 +9,6 @@ import {
 import type { Ticker, PriceDataRow } from '../../api/ada/lib/storage/database/prices/tables';
 import { getPrice, getPriceKey } from '../../api/common/lib/storage/bridge/prices';
 import type { ConfigType } from '../../../config/config-types';
-import BaseProfileActions from '../../actions/base/base-profile-actions';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { listenForCoinPriceUpdate, getHistoricalCoinPrices, refreshCurrentCoinPrice } from '../../api/thunk';
 
@@ -25,10 +24,9 @@ export default class BaseCoinPriceStore
         ...,
       },
       ...,
-    },
-    TActions: { +profile: BaseProfileActions, ... }
+    }
   >
-  extends Store<TStores, TActions>
+  extends Store<TStores, any>
 {
   @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number|null = null;

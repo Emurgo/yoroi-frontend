@@ -36,20 +36,20 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
     if (profileStore.isCurrentLocaleSet) {
       const prevLang = profileStore.currentLocale;
       // tentatively set language to their previous selection
-      this.props.actions.profile.updateTentativeLocale.trigger({ locale: prevLang });
+      this.props.stores.profile.updateTentativeLocale({ locale: prevLang });
     }
 
-    await this.props.actions.profile.resetLocale.trigger();
+    await this.props.stores.profile.resetLocale();
   }
 
   onSelectLanguage: {| locale: string |} => void = (values) => {
-    this.props.actions.profile.updateTentativeLocale.trigger(values);
+    this.props.stores.profile.updateTentativeLocale(values);
   };
 
   onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
     // Important! The order of triggering these two events must not be exchanged!
     await this.props.actions.profile.acceptTermsOfUse.trigger();
-    await this.props.actions.profile.commitLocaleToStorage.trigger();
+    await this.props.stores.profile.acceptLocale();
   };
 
   renderByron(props: StoresAndActionsProps): Node {

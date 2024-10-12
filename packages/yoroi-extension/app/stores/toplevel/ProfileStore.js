@@ -6,14 +6,14 @@ import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
 import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
+import { noop } from '../../coreUtils';
 
-export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
+export default class ProfileStore extends BaseProfileStore<StoresMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
 
   /**
@@ -64,7 +64,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.profile.selectComplexityLevel.trigger(ComplexityLevels.Simple);
+        noop(this.stores.profile.selectComplexityLevel(ComplexityLevels.Simple));
       },
     },
     {

@@ -89,7 +89,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
       balance: duplicatedWallet.balance,
       shouldHideBalance: profileData.shouldHideBalance,
       tokenInfo: tokenInfoStore.tokenInfo,
-      updateHideBalance: () => profile.updateHideBalance.trigger(),
+      updateHideBalance: () => stores.profile.updateHideBalance(),
     };
   };
 

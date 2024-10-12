@@ -275,7 +275,7 @@ class Wallet extends Component<AllProps> {
       return (
         <RevampAnnouncementDialog
           onClose={() => {
-            this.props.actions.profile.markRevampAsAnnounced.trigger();
+            this.props.stores.profile.markRevampAsAnnounced();
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
         />

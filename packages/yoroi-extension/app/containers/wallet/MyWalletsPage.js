@@ -1,14 +1,14 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { ComponentType, Node } from 'react';
+import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { LayoutComponentMap } from '../../styles/context/layout';
-import { Component } from 'react';
+import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -31,10 +31,8 @@ import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-type Props = StoresAndActionsProps;
-
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
 
 @observer
 class MyWalletsPage extends Component<AllProps> {
@@ -51,7 +49,7 @@ class MyWalletsPage extends Component<AllProps> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   handleWalletNavItemClick: number => void = (
@@ -240,4 +238,4 @@ class MyWalletsPage extends Component<AllProps> {
     return walletSubRow;
   };
 }
-export default (withLayout(MyWalletsPage): ComponentType<Props>);
+export default (withLayout(MyWalletsPage): ComponentType<StoresAndActionsProps>);

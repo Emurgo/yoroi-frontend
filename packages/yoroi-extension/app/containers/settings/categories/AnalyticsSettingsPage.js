@@ -16,7 +16,7 @@ export default class AnalyticsSettingsPage extends Component<StoresAndActionsPro
   render(): Node {
     return (
       <OptForAnalyticsForm
-        onOpt={this.props.actions.profile.optForAnalytics.trigger}
+        onOpt={this.props.stores.profile.onOptForAnalytics}
         variant="settings"
         isOptedIn={this.props.stores.profile.analyticsOption}
       />

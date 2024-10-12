@@ -35,8 +35,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
   +mode: RestoreModeType,
   +introMessage?: string,
@@ -44,7 +43,7 @@ type Props = {|
 |};
 
 @observer
-export default class WalletRestoreDialogContainer extends Component<Props> {
+export default class WalletRestoreDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -79,7 +78,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   openToTransactions: (number) => void = publicDeriverId => {
