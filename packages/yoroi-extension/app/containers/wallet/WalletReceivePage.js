@@ -136,7 +136,7 @@ class WalletReceivePage extends Component<AllProps> {
     const notification = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     const selectedExplorerForNetwork =
-      this.props.stores.explorers.selectedExplorer.get(
+      stores.explorers.selectedExplorer.get(
         publicDeriver.networkId
       ) ??
       (() => {
@@ -147,7 +147,7 @@ class WalletReceivePage extends Component<AllProps> {
       defaultNetworkId: publicDeriver.networkId,
       defaultIdentifier: publicDeriver.defaultTokenId,
     };
-    const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
+    const defaultTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
     });
@@ -164,9 +164,9 @@ class WalletReceivePage extends Component<AllProps> {
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
-            error={this.props.stores.addresses.error}
-            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={stores.addresses.createAddressRequest.isExecuting}
+            error={stores.addresses.error}
+            isFilterActive={stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -205,9 +205,9 @@ class WalletReceivePage extends Component<AllProps> {
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
-            error={this.props.stores.addresses.error}
-            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={stores.addresses.createAddressRequest.isExecuting}
+            error={stores.addresses.error}
+            isFilterActive={stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -235,13 +235,13 @@ class WalletReceivePage extends Component<AllProps> {
         <WalletReceiveComp
           hierarchy={{
             path: getSelectedHierarchyPath(),
-            filter: this.props.stores.addresses.addressFilter,
+            filter: stores.addresses.addressFilter,
           }}
           header={header}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorerForNetwork}
           walletAddresses={applyAddressFilter({
-            addressFilter: this.props.stores.addresses.addressFilter,
+            addressFilter: stores.addresses.addressFilter,
             addresses: addressTypeStore.request.all,
           })
             .slice()
@@ -249,7 +249,7 @@ class WalletReceivePage extends Component<AllProps> {
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
           onVerifyAddress={async (request: $ReadOnly<StandardAddress>) => {
-            await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
+            await stores.substores.ada.hwVerifyAddress.selectAddress(request);
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={
@@ -353,8 +353,8 @@ class WalletReceivePage extends Component<AllProps> {
             }}
             notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
             isHardware={isHwWallet}
-            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
-            cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
+            verify={() => stores.substores.ada.hwVerifyAddress.verifyAddress(publicDeriver)}
+            cancel={stores.substores.ada.hwVerifyAddress.closeAddressDetailDialog}
             classicTheme={profile.isClassicTheme}
             complexityLevel={profile.selectedComplexityLevel}
           />

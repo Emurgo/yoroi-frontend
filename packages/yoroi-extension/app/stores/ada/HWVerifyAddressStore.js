@@ -43,24 +43,20 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const actions = this.actions.ada.hwVerifyAddress;
-    actions.selectAddress.listen(this._selectAddress);
-    actions.verifyAddress.listen(this._verifyAddress);
-    actions.closeAddressDetailDialog.listen(this._closeAddressDetailDialog);
   }
 
-  @action _verifyAddress: (WalletState) => Promise<void> = async (
+  @action verifyAddress: (WalletState) => Promise<void> = async (
     wallet,
   ) => {
-    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called`);
+    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.verifyAddress)} called`);
 
     if (!this.selectedAddress) {
-      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with no address selected`);
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.verifyAddress)} called with no address selected`);
     }
     // remove null/undefined type to satisfy Flow
     const selectedAddress = this.selectedAddress;
     if (!selectedAddress.addressing) {
-      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with no addressing information`);
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.verifyAddress)} called with no addressing information`);
     }
 
     // need to unwrap observable otherwise bridge will fail
@@ -75,7 +71,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     } else if (wallet.type === 'trezor') {
       await this.trezorVerifyAddress(path, address, getNetworkById(wallet.networkId));
     } else {
-      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this._verifyAddress)} called with unrecognized hardware wallet`);
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.verifyAddress)} called with unrecognized hardware wallet`);
     }
 
     this._setActionProcessing(false);
@@ -159,8 +155,8 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  @action _selectAddress: $ReadOnly<StandardAddress> => Promise<void> = async (params) => {
-    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this._selectAddress)} called: ` + params.address);
+  @action selectAddress: $ReadOnly<StandardAddress> => Promise<void> = async (params) => {
+    Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.selectAddress)} called: ` + params.address);
     this.selectedAddress = params;
   }
 
@@ -172,7 +168,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     this.error = error;
   }
 
-  @action _closeAddressDetailDialog: void => void = () => {
+  @action closeAddressDetailDialog: void => void = () => {
     if (this.ledgerConnect != null) {
       this.ledgerConnect.dispose();
     }
