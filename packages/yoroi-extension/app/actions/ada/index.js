@@ -1,5 +1,4 @@
 // @flow
-import AdaWalletsActions from './ada-wallets-actions';
 import HWConnectActions from './hw-connect-actions';
 import TrezorSendActions from './trezor-send-actions';
 import LedgerSendActions from './ledger-send-actions';
@@ -8,7 +7,6 @@ import DelegationTransactionActions from './delegation-transaction-actions';
 import VotingActions from './voting-actions';
 
 export type AdaActionsMap = {|
-  wallets: AdaWalletsActions,
   trezorConnect: HWConnectActions,
   trezorSend: TrezorSendActions,
   ledgerConnect: HWConnectActions,
@@ -19,7 +17,6 @@ export type AdaActionsMap = {|
 |};
 
 const adaActionsMap: AdaActionsMap = Object.freeze({
-  wallets: new AdaWalletsActions(),
   trezorConnect: new HWConnectActions(),
   trezorSend: new TrezorSendActions(),
   ledgerConnect: new HWConnectActions(),

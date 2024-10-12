@@ -5,18 +5,17 @@ import { observer } from 'mobx-react';
 import WalletCreateDialog from '../../../components/wallet/WalletCreateDialog';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
 |};
 
 @observer
-export default class WalletCreateDialogContainer extends Component<Props> {
+export default class WalletCreateDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   render(): Node {
     return (
       <WalletCreateDialog
         classicTheme={this.props.stores.profile.isClassicTheme}
-        onSubmit={this.props.actions.ada.wallets.startWalletCreation.trigger}
+        onSubmit={request => this.props.stores.substores.ada.wallets.startWalletCreation(request)}
         onCancel={this.props.onClose}
       />
     );

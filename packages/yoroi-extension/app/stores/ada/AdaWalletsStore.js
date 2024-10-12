@@ -29,10 +29,8 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const { ada, walletBackup } = this.actions;
+    const { walletBackup } = this.actions;
     walletBackup.finishWalletBackup.listen(this._createInDb);
-    ada.wallets.startWalletCreation.listen(this._startWalletCreation);
-    ada.wallets.createWallet.listen(this._createWallet)
   }
 
   // =================== SEND MONEY ==================== //
@@ -225,13 +223,13 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _startWalletCreation: ({|
+  startWalletCreation: ({|
     name: string,
     password: string,
   |}) => Promise<void> = async params => {
     const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
     if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
     }
     this.actions.walletBackup.initiateWalletBackup.trigger({
       recoveryPhrase,
@@ -244,7 +242,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
 
     if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
     }
 
     return recoveryPhrase;
@@ -252,14 +250,14 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
-    await this._createWallet({
+    await this.createWallet({
       recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
       walletPassword: this.stores.walletBackup.password,
       walletName: this.stores.walletBackup.name,
     });
   };
 
-  _createWallet: {|
+  createWallet: {|
     recoveryPhrase: Array<string>,
     walletPassword: string,
     walletName: string,
