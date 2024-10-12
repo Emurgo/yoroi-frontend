@@ -12,12 +12,6 @@ import WarningBox from '../../components/widgets/WarningBox';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
 
-type Props = {|
-  ...StoresAndActionsProps,
-  +onNext: void => void,
-  +alwaysShowDeregister: boolean,
-|};
-
 const dialogMessages = defineMessages({
   title: {
     id: 'wallet.transfer.deregister.title',
@@ -60,17 +54,23 @@ const dialogMessages = defineMessages({
   },
 });
 
+type LocalProps = {|
+  +onNext: void => void,
+  +alwaysShowDeregister: boolean,
+|};
+
 @observer
-export default class DeregisterDialogContainer extends Component<Props> {
+export default class DeregisterDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   componentDidMount() {
-    this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+    const { stores } = this.props;
+    stores.substores.ada.delegationTransaction.setShouldDeregister(false);
     if (
       this.props.alwaysShowDeregister === false &&
-      this.props.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
+      stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
     ) {
       this.props.onNext();
     }
@@ -85,7 +85,7 @@ export default class DeregisterDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-
+    const { actions, stores } = this.props;
     return (
       <DangerousActionDialog
         title={intl.formatMessage(dialogMessages.title)}
@@ -95,16 +95,16 @@ export default class DeregisterDialogContainer extends Component<Props> {
         secondaryButton={{
           label: intl.formatMessage(dialogMessages.keep),
           onClick: () => {
-            this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+            stores.substores.ada.delegationTransaction.setShouldDeregister(false);
             this.props.onNext();
           },
           primary: true,
         }}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={actions.dialogs.closeActiveDialog.trigger}
         primaryButton={{
           label: intl.formatMessage(dialogMessages.deregisterOption),
           onClick: () => {
-            this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(true);
+            stores.substores.ada.delegationTransaction.setShouldDeregister(true);
             this.props.onNext();
           },
         }}

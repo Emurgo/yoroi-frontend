@@ -21,7 +21,7 @@ import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContai
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
-import { maybe } from '../../../coreUtils';
+import { maybe, noop } from '../../../coreUtils';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 
 @observer
@@ -33,7 +33,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   @observable notificationElementId: string = '';
 
   componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
+    this.props.stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
   }
 
   render(): Node {
@@ -239,9 +239,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           alwaysShowDeregister
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
-            this.props.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
-              wallet,
-            });
+            noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
             this.props.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
           }}
         />
@@ -253,9 +251,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           actions={actions}
           stores={stores}
           onClose={() => {
-            this.props.actions.ada.delegationTransaction.reset.trigger({
-              justTransaction: false,
-            });
+            stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
         />

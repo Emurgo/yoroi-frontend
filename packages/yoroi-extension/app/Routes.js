@@ -557,21 +557,20 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(governanceProps.stores);
-
-  const { delegationTransaction } = governanceProps.stores.substores.ada;
+  const { stores, actions } = governanceProps;
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
-
   return (
     <GovernanceContextProvider
       currentWallet={currentWalletInfo}
-      createDrepDelegationTransaction={governanceProps.stores.delegation.createDrepDelegationTransaction}
-      signDelegationTransaction={governanceProps.actions.ada.delegationTransaction.signTransaction.trigger}
+      createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+      signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
       txDelegationResult={delegationTxResult}
       txDelegationError={delegationTxError}
-      tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
-      triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+      tokenInfo={stores.tokenInfoStore.tokenInfo}
+      triggerBuySellAdaDialog={() => actions.dialogs.open.trigger({ dialog: BuySellDialog })}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
