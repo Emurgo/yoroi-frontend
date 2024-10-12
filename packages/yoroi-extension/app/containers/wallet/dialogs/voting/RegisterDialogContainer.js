@@ -37,7 +37,7 @@ class RegisterDialogContainer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { submit, cancel, onError, classicTheme, stepsList } = this.props;
+    const { submit, cancel, onError, classicTheme, stepsList, stores } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
@@ -52,9 +52,7 @@ class RegisterDialogContainer extends Component<AllProps> {
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {
-            await this.props.actions.ada.voting.createTransaction.trigger(
-              walletPassword
-            );
+            await stores.substores.ada.votingStore.createTransaction(walletPassword);
             await submit();
           } catch (error) {
             onError(error);

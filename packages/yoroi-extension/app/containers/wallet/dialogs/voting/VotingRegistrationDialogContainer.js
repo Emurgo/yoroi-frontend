@@ -15,6 +15,7 @@ import TransactionDialogContainer from './TransactionDialogContainer';
 import RegisterDialogContainer from './RegisterDialogContainer';
 import globalMessages from '../../../../i18n/global-messages';
 import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
+import { noop } from '../../../../coreUtils';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -31,25 +32,25 @@ type AllProps = {| ...Props, ...InjectedLayoutProps |};
 class VotingRegistrationDialogContainer extends Component<AllProps> {
   cancel: () => void = () => {
     this.props.onClose();
-    this.props.actions.ada.voting.cancel.trigger();
+    this.props.stores.substores.ada.votingStore.cancel();
   };
 
   componentDidMount() {
-    this.props.actions.ada.voting.generateCatalystKey.trigger();
+    // <TODO:SUS> there should be a better way to trigger key generation then a component mount
+    noop(this.props.stores.substores.ada.votingStore.generateCatalystKey());
   }
   async componentWillUnmount() {
-    this.props.actions.ada.voting.cancel.trigger();
+    this.props.stores.substores.ada.votingStore.cancel();
   }
 
   render(): null | Node {
     const { actions, stores } = this.props;
-    const votingStore = this.props.stores.substores.ada.votingStore;
+    const votingStore = stores.substores.ada.votingStore;
     if (votingStore.createVotingRegTx.isExecuting) {
       return <CreateTxExecutingDialog />;
     }
 
     const { profile } = this.props.stores;
-    const votingActions = this.props.actions.ada.voting;
     const walletType = this.props.walletType;
     const stepsList = [
       { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
@@ -70,7 +71,7 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             pin={votingStore.pin}
-            next={votingActions.submitGenerate.trigger}
+            next={votingStore.submitGenerate}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             onBack={this.props.onClose}
@@ -84,9 +85,9 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             isRevamp={this.props.isRevampLayout}
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
-            goBack={votingActions.goBackToGenerate.trigger}
-            submit={votingActions.submitConfirm.trigger}
-            error={votingActions.submitConfirmError.trigger}
+            goBack={votingStore.goBackToGenerate}
+            submit={votingStore.submitConfirm}
+            error={votingStore.submitConfirmError}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             pinValidation={enteredPin => {
@@ -103,11 +104,11 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             actions={actions}
             stores={stores}
             stepsList={stepsList}
-            submit={votingActions.submitRegister.trigger}
-            goBack={votingActions.goBackToRegister.trigger}
+            submit={votingStore.submitRegister}
+            goBack={votingStore.goBackToRegister}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
-            onError={votingActions.submitRegisterError.trigger}
+            onError={votingStore.submitRegisterError}
           />
         );
         break;
@@ -119,9 +120,9 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             stepsList={stepsList}
             classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
-            submit={votingActions.submitTransaction.trigger}
-            goBack={votingActions.goBackToRegister.trigger}
-            onError={votingActions.submitTransactionError.trigger}
+            submit={votingStore.submitTransaction}
+            goBack={votingStore.goBackToRegister}
+            onError={votingStore.submitTransactionError}
             walletType={walletType}
           />
         );
@@ -132,7 +133,7 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={votingActions.finishQRCode.trigger}
+            submit={votingStore.finishQRCode}
             cancel={this.cancel}
             classicTheme={profile.isClassicTheme}
             votingKey={votingStore.encryptedKey}
