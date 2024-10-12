@@ -72,14 +72,6 @@ export default class TrezorConnectStore
   setup(): void {
     super.setup();
     this._reset();
-    const trezorConnectAction = this.actions.ada.trezorConnect;
-    trezorConnectAction.init.listen(this._init);
-    trezorConnectAction.cancel.listen(this._cancel);
-    trezorConnectAction.submitCheck.listen(this._submitCheck);
-    trezorConnectAction.goBackToCheck.listen(this._goBackToCheck);
-    trezorConnectAction.submitConnect.listen(this._submitConnect);
-    trezorConnectAction.submitSave.listen(this._submitSave);
-
     try {
       const trezorManifest = getTrezorManifest();
       wrapWithoutFrame(trezor => trezor.manifest(trezorManifest));
@@ -90,8 +82,8 @@ export default class TrezorConnectStore
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
-  _init: void => void = () => {
-    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._init)} called`);
+  init: void => void = () => {
+    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this.init)} called`);
   }
 
   teardown(): void {
@@ -109,13 +101,13 @@ export default class TrezorConnectStore
     this.trezorEventDevice = undefined;
   };
 
-  @action _cancel: void => void = () => {
+  @action cancel: void => void = () => {
     this.teardown();
   };
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck: void => void = () => {
+  @action submitCheck: void => void = () => {
     this.error = undefined;
     this.trezorEventDevice = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
@@ -125,14 +117,14 @@ export default class TrezorConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck: void => void = () => {
+  @action goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect: void => Promise<void> = async () => {
+  @action submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
@@ -268,7 +260,7 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave: string => Promise<void> = async (
+  @action submitSave: string => Promise<void> = async (
     walletName,
   ) => {
     this.error = null;

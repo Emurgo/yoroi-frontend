@@ -59,23 +59,15 @@ export default class LedgerConnectStore
   setup(): void {
     super.setup();
     this._reset();
-    const ledgerConnectAction = this.actions.ada.ledgerConnect;
-    ledgerConnectAction.init.listen(this._init);
-    ledgerConnectAction.cancel.listen(this._cancel);
-    ledgerConnectAction.submitCheck.listen(this._submitCheck);
-    ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
-    ledgerConnectAction.submitConnect.listen(this._submitConnect);
-    ledgerConnectAction.submitSave.listen(this._submitSave);
-    ledgerConnectAction.finishTransfer.listen(this._finishTransfer);
   }
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
-  _init: void => void = () => {
-    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._init)} called`);
+  init: void => void = () => {
+    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this.init)} called`);
   }
 
-  @action _cancel: void => void = () => {
+  @action cancel: void => void = () => {
     this.teardown();
     if (this.ledgerConnect) {
       this.ledgerConnect.dispose();
@@ -108,7 +100,7 @@ export default class LedgerConnectStore
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck: void => void = () => {
+  @action submitCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
@@ -117,14 +109,14 @@ export default class LedgerConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck: void => void = () => {
+  @action goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect: void => Promise<void> = async () => {
+  @action submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
@@ -318,7 +310,7 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave: (string) => Promise<void> = async (
+  @action submitSave: (string) => Promise<void> = async (
     walletName,
   ) => {
     this.error = null;
@@ -420,7 +412,7 @@ export default class LedgerConnectStore
     }
   }
 
-  _finishTransfer: void => void = () => {
+  finishTransfer: void => void = () => {
     this.actions.dialogs.closeActiveDialog.trigger();
     this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
 

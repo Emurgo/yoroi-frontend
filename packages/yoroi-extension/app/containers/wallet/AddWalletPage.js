@@ -81,7 +81,7 @@ class AddWalletPage extends Component<AllProps> {
         dialog: WalletTrezorConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
-      this.props.actions.ada.trezorConnect.init.trigger();
+      stores.substores.ada.trezorConnect.init();
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
@@ -91,7 +91,7 @@ class AddWalletPage extends Component<AllProps> {
         dialog: WalletLedgerConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
-      this.props.actions.ada.ledgerConnect.init.trigger();
+      stores.substores.ada.ledgerConnect.init();
     };
 
     let activeDialog = null;
