@@ -38,7 +38,6 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -54,7 +53,6 @@ class DelegationSuccessDialog extends Component<Props & InjectedLayoutProps> {
       <SuccessPage
         title={intl.formatMessage(messages.title)}
         text={intl.formatMessage(messages.explanation)}
-        classicTheme={this.props.classicTheme}
         closeInfo={{
           onClose: this.props.onClose,
           closeLabel: intl.formatMessage(messages.buttonLabel),

@@ -241,7 +241,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.saveTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}
@@ -275,7 +274,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.updateTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}
@@ -341,7 +339,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.saveTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}
@@ -375,7 +372,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.updateTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}

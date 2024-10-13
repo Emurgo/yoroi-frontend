@@ -58,7 +58,6 @@ type Props = {|
   +onCopyAddressTooltip: string => void,
   +isHardware: boolean,
   +addressInfo: $ReadOnly<StandardAddress>,
-  +classicTheme: boolean,
   +complexityLevel: ?ComplexityLevelType,
 |};
 
@@ -69,7 +68,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
   };
 
   getLabelStyle: void => string = () => {
-    return this.props.classicTheme ? 'SimpleFormField_label FormFieldOverridesClassic_label' : styles.label;
+    return styles.label;
   };
 
   render(): Node {

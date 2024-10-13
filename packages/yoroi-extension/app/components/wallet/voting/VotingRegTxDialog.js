@@ -57,7 +57,6 @@ type Props = {|
   +onCancel: void => void,
   +goBack: void => void,
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
-  +classicTheme: boolean,
   +error: ?LocalizableError,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletType: WalletType,
@@ -138,7 +137,6 @@ export default class VotingRegTxDialog extends Component<Props> {
       this.props.walletType === 'mnemonic' ? (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
-          classicTheme={this.props.classicTheme}
           isSubmitting={this.props.isSubmitting}
         />
       ) : undefined; // hardware wallet
@@ -194,7 +192,6 @@ export default class VotingRegTxDialog extends Component<Props> {
           <ProgressStepBlock
             stepsList={this.props.stepsList}
             progressInfo={this.props.progressInfo}
-            classicTheme={this.props.classicTheme}
           />
         )}
         {this.props.staleTx && staleTxWarning}

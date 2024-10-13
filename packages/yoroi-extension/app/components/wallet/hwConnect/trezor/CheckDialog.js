@@ -18,7 +18,6 @@ import HWErrorBlock from '../common/HWErrorBlock';
 
 import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
 import { ReactComponent as AboutPrerequisiteIconSVG }  from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
-import { ReactComponent as AboutPrerequisiteTrezorSVG }  from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
 import { ReactComponent as AboutTrezorSvg }  from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
@@ -60,7 +59,6 @@ type Props = {|
   +submit: void => void,
   +cancel: void => void,
   +onBack: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -79,12 +77,11 @@ export default class CheckDialog extends Component<Props> {
       onExternalLinkClick,
       submit,
       cancel,
-      classicTheme,
     } = this.props;
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        {!classicTheme && <AboutTrezorSvg />}
+        <AboutTrezorSvg/>
 
         <div className={styles.prerequisiteBlock}>
           <div>
@@ -110,12 +107,6 @@ export default class CheckDialog extends Component<Props> {
             <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
           </ul>
         </div>
-
-        {classicTheme && (
-          <div className={styles.hwImageBlock}>
-            <AboutPrerequisiteTrezorSVG />
-          </div>
-        )}
       </div>);
 
     const dailogActions = [{
@@ -135,10 +126,10 @@ export default class CheckDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {middleBlock}
         {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);

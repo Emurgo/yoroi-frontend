@@ -139,7 +139,6 @@ class WalletSendPage extends Component<AllProps> {
 
     const {
       uiDialogs,
-      profile,
       transactionBuilderStore,
       protocolParameters,
     } = this.props.stores;
@@ -199,7 +198,6 @@ class WalletSendPage extends Component<AllProps> {
             onSubmit={txBuilderActions.updateTentativeTx.trigger}
             totalInput={transactionBuilderStore.totalInput}
             hasAnyPending={hasAnyPending}
-            isClassicTheme={profile.isClassicTheme}
             shouldSendAll={transactionBuilderStore.shouldSendAll}
             updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
             updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
@@ -264,7 +262,6 @@ class WalletSendPage extends Component<AllProps> {
           onSubmit={onSubmit}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
-          classicTheme={profile.isClassicTheme}
           updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
           updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
@@ -309,7 +306,6 @@ class WalletSendPage extends Component<AllProps> {
         <TransactionSuccessDialog
           process={process}
           onClose={this.closeTransactionSuccessDialog}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />
       );
     }
@@ -556,7 +552,6 @@ class WalletSendPage extends Component<AllProps> {
         onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        classicTheme={this.props.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveTokens={txBuilderActions.removeTokens.trigger}

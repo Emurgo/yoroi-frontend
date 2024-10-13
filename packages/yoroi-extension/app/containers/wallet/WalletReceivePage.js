@@ -288,7 +288,6 @@ class WalletReceivePage extends Component<AllProps> {
             onGenerate={(address, amount) => {
               this.generateURI(address, amount);
             }}
-            classicTheme={profile.isClassicTheme}
             tokenInfo={defaultTokenInfo}
             validateAmount={(amount, tokenRow) =>
               validateAmount(
@@ -355,7 +354,6 @@ class WalletReceivePage extends Component<AllProps> {
             isHardware={isHwWallet}
             verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
-            classicTheme={profile.isClassicTheme}
             complexityLevel={profile.selectedComplexityLevel}
           />
         ) : null}

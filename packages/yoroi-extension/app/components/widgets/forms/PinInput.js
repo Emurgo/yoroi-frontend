@@ -13,7 +13,6 @@ import { Box } from '@mui/material';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +disabled: boolean,
   +pinMatches: string => boolean,
   +fieldName: string,
@@ -50,9 +49,7 @@ export default class PinInput extends Component<Props> {
       [this.props.fieldName]: {
         onChange: this.props.onChange,
         label: this.props.placeholder,
-        placeholder: this.props.classicTheme
-          ? this.props.placeholder
-          : '',
+        placeholder: '',
         value: (this.props.initValues) || '',
         validators: [({ field }) => {
           return [

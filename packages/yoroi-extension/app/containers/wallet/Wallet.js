@@ -193,7 +193,6 @@ class Wallet extends Component<AllProps> {
           {this.props.children}
           {isInitialSyncing && (
             <WalletSyncingOverlay
-              classicTheme={this.props.stores.profile.isClassicTheme}
               onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
             />
           )}

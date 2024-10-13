@@ -102,7 +102,6 @@ type Props = {|
   +isSubmitting: boolean,
   +onCancel: void => void,
   +onSubmit: ({| password?: string |}) => PossiblyAsync<void>,
-  +classicTheme: boolean,
   +error: ?LocalizableError,
 |};
 
@@ -140,7 +139,6 @@ class DelegationTxDialog extends Component<Props & InjectedLayoutProps> {
     const spendingPasswordForm = this.props.isHardware ? undefined : (
       <SpendingPasswordInput
         setForm={form => this.setSpendingPasswordForm(form)}
-        classicTheme={this.props.classicTheme}
         isSubmitting={this.props.isSubmitting}
       />
     );

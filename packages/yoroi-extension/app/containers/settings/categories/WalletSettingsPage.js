@@ -82,7 +82,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
           onCancelEditing={() => cancelEditingWalletField.trigger()}
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
-          classicTheme={profile.isClassicTheme}
         />
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
@@ -92,7 +91,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
               })
             }
             walletPasswordUpdateDate={signingKeyUpdateDate}
-            classicTheme={profile.isClassicTheme}
           />
         )}
         <ResyncBlock

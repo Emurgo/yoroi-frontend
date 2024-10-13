@@ -16,7 +16,6 @@ type Props = {|
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
-  +classicTheme: boolean,
   +onError: Error => void,
   +walletType: WalletType,
 |};
@@ -64,7 +63,6 @@ class TransactionDialogContainer extends Component<AllProps> {
               onError(error);
             }
           }}
-          classicTheme={this.props.classicTheme}
           error={votingStore.error}
           walletType={walletType}
           isRevamp={this.props.isRevampLayout}

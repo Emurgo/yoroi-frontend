@@ -21,7 +21,6 @@ type Props = {|
   +cancel: void => void,
   +goBack: void => void,
   +onError: Error => void,
-  +classicTheme: boolean,
 |};
 
 type InjectedLayoutProps = {|
@@ -37,7 +36,7 @@ class RegisterDialogContainer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { submit, cancel, onError, classicTheme, stepsList } = this.props;
+    const { submit, cancel, onError, stepsList } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
@@ -62,7 +61,6 @@ class RegisterDialogContainer extends Component<AllProps> {
         }}
         isProcessing={votingStore.isActionProcessing}
         cancel={cancel}
-        classicTheme={classicTheme}
         isRevamp={this.props.isRevampLayout}
       />
     );

@@ -31,7 +31,6 @@ type Props = {|
   +progressInfo: ProgressInfo,
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
   +isProcessing: boolean,
   +isRevamp: boolean,
 |};
@@ -49,7 +48,7 @@ export default class RegisterDialog extends Component<Props> {
   }
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, cancel, classicTheme, isProcessing } = this.props;
+    const { stepsList, progressInfo, cancel, isProcessing } = this.props;
 
     const dailogActions = [
       {
@@ -92,7 +91,6 @@ export default class RegisterDialog extends Component<Props> {
             <ProgressStepBlock
               stepsList={stepsList}
               progressInfo={progressInfo}
-              classicTheme={classicTheme}
             />
             <div className={classnames([styles.lineText, styles.firstItem])}>
               {intl.formatMessage(messages.line1)}
@@ -102,7 +100,6 @@ export default class RegisterDialog extends Component<Props> {
         <div className={styles.spendingPassword}>
           <SpendingPasswordInput
             setForm={form => this.setSpendingPasswordForm(form)}
-            classicTheme={this.props.classicTheme}
             isSubmitting={isProcessing}
           />
         </div>

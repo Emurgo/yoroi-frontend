@@ -19,7 +19,6 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -30,12 +29,10 @@ export default class YoroiTransferSuccessPage extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { classicTheme } = this.props;
 
     return (<SuccessPage
       title={intl.formatMessage(messages.title)}
       text={intl.formatMessage(messages.text)}
-      classicTheme={classicTheme}
     />);
   }
 }

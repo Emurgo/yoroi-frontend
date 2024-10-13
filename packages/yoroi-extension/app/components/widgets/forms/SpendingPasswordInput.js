@@ -12,7 +12,6 @@ import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +initValues?: string,
   +isSubmitting: boolean,
 |};
@@ -35,7 +34,6 @@ class SpendingPasswordInput extends Component<Props & InjectedLayoutProps> {
       <PasswordInput
         setForm={this.props.setForm}
         disabled={this.props.isSubmitting}
-        classicTheme={this.props.classicTheme}
         passwordMatches={_password => true}
         fieldName="walletPassword"
         validCheck={_password => true}

@@ -10,7 +10,6 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
-  +classicTheme: boolean,
   +onClose: void => PossiblyAsync<void>,
 |};
 

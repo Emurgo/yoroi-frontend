@@ -330,20 +330,6 @@ export default class BaseProfileStore
   /**
    * <TODO:PENDING_REMOVAL>
    */
-  @computed get isModernTheme(): boolean {
-    return false;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isClassicTheme(): boolean {
-    return false;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
   @computed get isCurrentThemeSet(): boolean {
     return true;
   }

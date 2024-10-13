@@ -34,7 +34,6 @@ type Props = {|
   +next: void => void,
   +cancel: void => void,
   +onBack: void => void,
-  +classicTheme: boolean,
   +pin: Array<number>,
   +isRevamp: boolean,
 |};
@@ -47,7 +46,7 @@ export default class GeneratePinDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, next, cancel, classicTheme, pin, isRevamp } = this.props;
+    const { stepsList, progressInfo, next, cancel, pin, isRevamp } = this.props;
 
     const dialogActions = [
       {
@@ -111,7 +110,7 @@ export default class GeneratePinDialog extends Component<Props> {
           </>
         ) : (
           <>
-            <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} classicTheme={classicTheme} />
+            <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} />
 
             <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
               <FormattedHTMLMessage {...messages.line1} />

@@ -40,7 +40,6 @@ type Props = {|
   +isValid: string => boolean,
   +validationErrorMessage: string,
   +successfullyUpdated: boolean,
-  +classicTheme: boolean,
   id: string,
 |};
 

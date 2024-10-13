@@ -100,7 +100,6 @@ type Props = {|
   ) => Promise<[boolean, void | string]>,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +classicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -193,9 +192,7 @@ export default class WalletSendForm extends Component<Props> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverLabel),
-          placeholder: this.props.classicTheme
-            ? this.context.intl.formatMessage(messages.receiverHint)
-            : '',
+          placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             ({ field }) => {
@@ -226,7 +223,7 @@ export default class WalletSendForm extends Component<Props> {
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.classicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams

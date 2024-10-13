@@ -47,7 +47,6 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}
-        isClassicTheme={profile.isClassicTheme}
         isRevampTheme={profile.isRevampTheme}
       />
     );

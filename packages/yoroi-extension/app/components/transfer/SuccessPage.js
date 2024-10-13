@@ -15,7 +15,6 @@ import type { InjectedLayoutProps } from '../../styles/context/layout';
 type Props = {|
   +title: string,
   +text: string,
-  +classicTheme: boolean,
   +closeInfo?: {|
     +onClose: void => PossiblyAsync<void>,
     +closeLabel: string,

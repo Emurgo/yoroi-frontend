@@ -9,7 +9,6 @@ import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
 import Dialog from '../../widgets/Dialog';
-import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import MnemonicWord from './MnemonicWord';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseEntryDialog.scss';
@@ -70,7 +69,6 @@ type Props = {|
   +onFinishBackup: void => PossiblyAsync<void>,
   +removeWord: void => void,
   +hasWord: boolean,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -97,11 +95,8 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       onCancelBackup,
       onFinishBackup,
       hasWord,
-      classicTheme,
     } = this.props;
     const dialogClasses = classnames([styles.component, 'WalletRecoveryPhraseEntryDialog']);
-
-    const enteredPhraseString = enteredPhrase.reduce((phrase, { word }) => `${phrase} ${word}`, '');
 
     const actions = [];
 
@@ -129,7 +124,6 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
       });
     }
 
-    const phraseOld = enteredPhraseString;
     const phrase = enteredPhrase.length ? (
       <div className={styles.phraseWrapper}>
         {enteredPhrase.map((item, i) => (
@@ -160,17 +154,10 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={!isValid ? <DialogBackButton onBack={onRestartBackup} /> : null}
       >
-        {!isValid && classicTheme ? (
-          <WalletRecoveryInstructions
-            instructionsText={intl.formatMessage(messages.verificationInstructions)}
-          />
-        ) : null}
-
         {!isValid && (
           <WalletRecoveryPhraseMnemonic
-            filled={!classicTheme && Boolean(enteredPhrase.length)}
-            phrase={classicTheme ? phraseOld : phrase}
-            classicTheme={classicTheme}
+            filled={Boolean(enteredPhrase.length)}
+            phrase={phrase}
             phraseDoesNotMatch={phraseDoesNotMatchError}
           />
         )}
@@ -189,7 +176,6 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
                       onAddWord(value);
                     }
                   }}
-                  classicTheme={classicTheme}
                 />
               ) : null
             )}

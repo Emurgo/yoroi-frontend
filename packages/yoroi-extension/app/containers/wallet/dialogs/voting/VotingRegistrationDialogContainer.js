@@ -48,7 +48,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
       return <CreateTxExecutingDialog />;
     }
 
-    const { profile } = this.props.stores;
     const votingActions = this.props.actions.ada.voting;
     const walletType = this.props.walletType;
     const stepsList = [
@@ -72,7 +71,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             pin={votingStore.pin}
             next={votingActions.submitGenerate.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onBack={this.props.onClose}
             isRevamp={this.props.isRevampLayout}
           />
@@ -88,7 +86,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             submit={votingActions.submitConfirm.trigger}
             error={votingActions.submitConfirmError.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             pinValidation={enteredPin => {
               const pin = votingStore.pin.join('');
               return pin === enteredPin;
@@ -106,7 +103,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             submit={votingActions.submitRegister.trigger}
             goBack={votingActions.goBackToRegister.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onError={votingActions.submitRegisterError.trigger}
           />
         );
@@ -117,7 +113,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             actions={actions}
             stores={stores}
             stepsList={stepsList}
-            classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
             submit={votingActions.submitTransaction.trigger}
             goBack={votingActions.goBackToRegister.trigger}
@@ -134,7 +129,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             onExternalLinkClick={handleExternalLinkClick}
             submit={votingActions.finishQRCode.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             votingKey={votingStore.encryptedKey}
           />
         );

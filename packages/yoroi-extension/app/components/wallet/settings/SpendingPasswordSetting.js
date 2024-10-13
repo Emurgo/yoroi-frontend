@@ -39,7 +39,6 @@ const messages = defineMessages({
 type Props = {|
   +walletPasswordUpdateDate: ?Date,
   +openDialog: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -50,7 +49,7 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { walletPasswordUpdateDate, classicTheme, renderLayoutComponent } = this.props;
+    const { walletPasswordUpdateDate, renderLayoutComponent } = this.props;
     const passwordMessage =
       walletPasswordUpdateDate == null
         ? intl.formatMessage(messages.unchangedPassword)
@@ -64,7 +63,6 @@ class SpendingPasswordSetting extends Component<Props & InjectedLayoutProps> {
         value={passwordMessage}
         isSet
         onClick={this.props.openDialog}
-        classicTheme={classicTheme}
       />
     );
 

@@ -36,7 +36,6 @@ type Props = {|
   +submit: void => PossiblyAsync<void>,
   +error: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
   +pinValidation: string => boolean,
   +isProcessing: boolean,
   +isRevamp: boolean,
@@ -61,7 +60,6 @@ export default class ConfirmPinDialog extends Component<Props> {
       progressInfo,
       goBack,
       cancel,
-      classicTheme,
       pinValidation,
       isProcessing,
     } = this.props;
@@ -108,7 +106,6 @@ export default class ConfirmPinDialog extends Component<Props> {
             <ProgressStepBlock
               stepsList={stepsList}
               progressInfo={progressInfo}
-              classicTheme={classicTheme}
             />
             <div className={classnames([styles.lineText, styles.firstItem])}>
               <FormattedHTMLMessage {...messages.line1} />
@@ -119,7 +116,6 @@ export default class ConfirmPinDialog extends Component<Props> {
           <PinInput
             setForm={form => this.setPinForm(form)}
             disabled={false}
-            classicTheme={classicTheme}
             pinMatches={pinValidation}
             fieldName="pin"
             validCheck={_pin => true}

@@ -120,7 +120,6 @@ export default class TransferSendPage extends Component<Props> {
         <YoroiTransferErrorPage
           error={this.props.transactionRequest.error}
           onCancel={this.props.onClose.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />
       );
     }
@@ -159,7 +158,6 @@ export default class TransferSendPage extends Component<Props> {
       ? (
         <SpendingPasswordInput
           setForm={(form) => this.setSpendingPasswordForm(form)}
-          classicTheme={this.props.stores.profile.isClassicTheme}
           isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
         />
       ) : null;

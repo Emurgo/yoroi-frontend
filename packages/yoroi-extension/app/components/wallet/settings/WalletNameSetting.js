@@ -35,7 +35,6 @@ type Props = {|
   +isSubmitting: boolean,
   +isInvalid: boolean,
   +lastUpdatedField: ?string,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -66,7 +65,6 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
       isSubmitting,
       isInvalid,
       lastUpdatedField,
-      classicTheme,
       isRevampLayout,
     } = this.props;
     return (
@@ -89,7 +87,6 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             isValid={nameValidator}
             validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
             successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
-            classicTheme={classicTheme}
             id="settings:wallet:walletName"
           />
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}

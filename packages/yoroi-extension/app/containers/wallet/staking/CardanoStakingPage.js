@@ -259,7 +259,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
         }
         hash={selectedPoolInfo.poolId}
         moreInfo={moreInfo}
-        classicTheme={this.props.stores.profile.isClassicTheme}
         onCopyAddressTooltip={(address, elementId) => {
           if (!this.props.stores.uiNotifications.isOpen(elementId)) {
             runInAction(() => {
@@ -422,7 +421,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
               dialog: DelegationSuccessDialog,
             });
           }}
-          classicTheme={this.props.stores.profile.isClassicTheme}
           error={this.props.stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
             this.props.stores.explorers.selectedExplorer.get(
@@ -439,7 +437,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return (
         <DelegationSuccessDialog
           onClose={this.props.actions.ada.delegationTransaction.complete.trigger}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />
       );
     }

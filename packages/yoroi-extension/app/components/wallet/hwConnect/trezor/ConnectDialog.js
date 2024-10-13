@@ -19,9 +19,6 @@ import HWErrorBlock from '../common/HWErrorBlock';
 import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
 import { ReactComponent as ConnectErrorImage }  from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
 
-import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
-import { ReactComponent as ConnectErrorSVG }  from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
-
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import { StepState } from '../../../widgets/ProgressSteps';
 
@@ -30,8 +27,6 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-const connectStartGIF = connectLoadGIF;
 
 const messages = defineMessages({
   connectIntroTextLine1: {
@@ -52,7 +47,6 @@ type Props = {|
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -71,19 +65,9 @@ export default class ConnectDialog extends Component<Props> {
       goBack,
       submit,
       cancel,
-      classicTheme
     } = this.props;
 
-    const introBlock = classicTheme ? (
-      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
-        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
-        <br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
-        <br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span>
-        <br />
-      </div>
-    ) : (
+    const introBlock = (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <span>
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
@@ -101,24 +85,21 @@ export default class ConnectDialog extends Component<Props> {
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
-            <img src={classicTheme ? connectLoadGIF : connectLoadImage} alt="" />
+            <img src={connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
-            <img src={classicTheme ? connectStartGIF : connectLoadImage} alt="" />
+            <img src={connectLoadImage} alt="" />
           </div>);
         break;
       case StepState.ERROR:
         backButton = (<DialogBackButton onBack={goBack} />);
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            {classicTheme
-              ? <ConnectErrorSVG />
-              : <ConnectErrorImage />
-            }
+            <ConnectErrorImage/>
           </div>);
         break;
       default:
@@ -143,11 +124,11 @@ export default class ConnectDialog extends Component<Props> {
         backButton={backButton}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
         {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);
