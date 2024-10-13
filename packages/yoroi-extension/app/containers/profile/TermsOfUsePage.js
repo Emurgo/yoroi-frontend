@@ -20,9 +20,10 @@ export default class TermsOfUsePage extends Component<StoresAndActionsProps> {
   };
 
   render(): Node {
-    const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
-    const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = Boolean(selected && selected.isTestnet);
+    const { stores } = this.props;
+    const { checkAdaServerStatus } = stores.serverConnectionStore;
+    const { selected } = stores.wallets;
+    const isWalletTestnet = Boolean(selected?.isTestnet);
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
@@ -37,9 +38,9 @@ export default class TermsOfUsePage extends Component<StoresAndActionsProps> {
         />
 
         <TermsOfUseForm
-          localizedTermsOfUse={this.props.stores.profile.termsOfUse}
-          localizedPrivacyNotice={this.props.stores.profile.privacyNotice}
-          onSubmit={this.props.actions.profile.acceptTermsOfUse.trigger}
+          localizedTermsOfUse={stores.profile.termsOfUse}
+          localizedPrivacyNotice={stores.profile.privacyNotice}
+          onSubmit={stores.profile.acceptTermsOfUse}
           isSubmitting={false}
           error={undefined}
         />

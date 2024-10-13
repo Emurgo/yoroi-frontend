@@ -155,16 +155,11 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
 
   setup(): void {
     super.setup();
-    this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
-    this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
-    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
-    this.actions.profile.setSelectedNetwork.listen(this._setSelectedNetwork);
     this.registerReactions([
       this._checkSetupSteps,
     ]);
-    this.actions.profile.updateSortedWalletList.listen(this._updateSortedWalletList);
     this._getUriSchemeAcceptance(); // eagerly cache
-    this._getSortedWalletList()
+    noop(this._getSortedWalletList());
   }
 
   teardown(): void {
@@ -184,7 +179,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     return this.__selectedNetwork;
   }
 
-  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
+  @action setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
     this.__selectedNetwork = type;
   };
 
@@ -207,7 +202,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     return this.getUriSchemeAcceptanceRequest.result === true;
   }
 
-  _acceptUriScheme: void => Promise<void> = async () => {
+  acceptUriScheme: void => Promise<void> = async () => {
     await this.setUriSchemeAcceptanceRequest.execute();
     await this.getUriSchemeAcceptanceRequest.execute(); // eagerly cache
   };
@@ -226,7 +221,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     return result === true;
   }
 
-  _toggleSidebar: void => Promise<void> = async () => {
+  toggleSidebar: void => Promise<void> = async () => {
     const isSidebarExpanded = this.isSidebarExpanded;
     await this.setToggleSidebarRequest.execute(isSidebarExpanded);
     await this.getToggleSidebarRequest.execute();
@@ -259,7 +254,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     await this.getWalletsNavigationRequest.execute();
   };
 
-  _updateSortedWalletList: WalletsNavigation => Promise<void>
+  updateSortedWalletList: WalletsNavigation => Promise<void>
     = async (walletsNavigation) => {
     await this.setWalletsNavigationRequest.execute(walletsNavigation);
     await this.getWalletsNavigationRequest.execute();

@@ -44,7 +44,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     // this is because on close, asynchronous unmount actions get triggered
     // so there is no safe time at which we can un-select the API
     // so instead, the API gets reset before we start any dialog flow
-    this.props.actions.profile.setSelectedNetwork.trigger(undefined);
+    this.props.stores.profile.setSelectedNetwork(undefined);
 
     this.props.actions.dialogs.open.trigger({ dialog });
   };
@@ -80,15 +80,15 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       activeDialog = (
         <PickCurrencyDialogContainer
           onClose={this.onClose}
-          onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
+          onCardano={() => stores.profile.setSelectedNetwork(networks.CardanoMainnet)}
           onCardanoPreprodTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoPreprodTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoPreprodTestnet)
           }
           onCardanoPreviewTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoPreviewTestnet)
           }
           onCardanoSanchoTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoSanchoTestnet)
           }
         />
       );

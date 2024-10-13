@@ -39,8 +39,9 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
 
   onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
     // Important! The order of triggering these two events must not be exchanged!
-    await this.props.actions.profile.acceptTermsOfUse.trigger();
-    await this.props.stores.profile.acceptLocale();
+    const { stores } = this.props;
+    await stores.profile.acceptTermsOfUse();
+    await stores.profile.acceptLocale();
   };
 
   renderByron(props: StoresAndActionsProps): Node {

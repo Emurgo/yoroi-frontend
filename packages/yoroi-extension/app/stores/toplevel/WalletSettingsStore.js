@@ -144,7 +144,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
       'cardano': walletsNavigation.cardano.filter(
         walletId => walletId !== request.publicDeriverId)
     }
-    await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+    await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
     // ==================== Disconnect related dApps ====================
     await this.actions.connector.getConnectorWhitelist.trigger();

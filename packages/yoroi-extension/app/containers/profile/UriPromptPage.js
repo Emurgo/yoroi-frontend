@@ -18,6 +18,7 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { noop } from '../../coreUtils';
 
 @observer
 export default class UriPromptPage extends Component<StoresAndActionsProps> {
@@ -37,7 +38,7 @@ export default class UriPromptPage extends Component<StoresAndActionsProps> {
   };
 
   onSkip: void => void = () => {
-    this.props.actions.profile.acceptUriScheme.trigger()
+    noop(this.props.stores.profile.acceptUriScheme());
   };
 
   onBack: void => void = () => {
@@ -56,7 +57,7 @@ export default class UriPromptPage extends Component<StoresAndActionsProps> {
 
     if (this.isAccepted) {
         return <UriAccept
-          onConfirm={this.props.actions.profile.acceptUriScheme.trigger}
+          onConfirm={this.props.stores.profile.acceptUriScheme}
           onBack={this.onBack}
         />;
     }

@@ -279,7 +279,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
     }
-    this.actions.profile.setSelectedNetwork.trigger(
+    this.stores.profile.setSelectedNetwork(
       getNetworkById(this.wallets[walletIndex].networkId)
     );
     this.selectedIndex = walletIndex;
@@ -297,7 +297,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action unsetActiveWallet: void => void = () => {
-    this.actions.profile.setSelectedNetwork.trigger(undefined);
+    this.stores.profile.setSelectedNetwork(undefined);
     this.selectedIndex = null;
     this.selectedWalletName = null;
   };

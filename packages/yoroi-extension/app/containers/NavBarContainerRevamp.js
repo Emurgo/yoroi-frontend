@@ -157,7 +157,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
             this.props.actions.dialogs.closeActiveDialog.trigger();
             stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
           }}
-          updateSortedWalletList={this.props.actions.profile.updateSortedWalletList.trigger}
+          updateSortedWalletList={stores.profile.updateSortedWalletList}
           walletsNavigation={stores.profile.walletsNavigation}
           unitOfAccountSetting={stores.profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}

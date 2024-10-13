@@ -21,7 +21,7 @@ export default class SidebarContainer extends Component<StoresAndActionsProps, S
   };
 
   toggleSidebar: void => Promise<void> = async () => {
-    await this.props.actions.profile.toggleSidebar.trigger();
+    await this.props.stores.profile.toggleSidebar();
   };
 
   componentDidMount(): * {

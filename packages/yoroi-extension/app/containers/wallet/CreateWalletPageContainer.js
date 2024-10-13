@@ -23,7 +23,7 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
         <CreateWalletPage
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
           createWallet={request => stores.substores.ada.wallets.createWallet(request)}
-          setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+          setSelectedNetwork={stores.profile.setSelectedNetwork}
           selectedNetwork={stores.profile.selectedNetwork}
           openDialog={dialog => this.props.actions.dialogs.open.trigger({ dialog })}
           closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}

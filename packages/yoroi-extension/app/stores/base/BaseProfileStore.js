@@ -328,7 +328,7 @@ export default class BaseProfileStore
     });
   }
 
-  _acceptTermsOfUse: void => Promise<void> = async () => {
+  acceptTermsOfUse: void => Promise<void> = async () => {
     runInAction(() => {
       this._acceptedTosVersion.version = CURRENT_TOS_VERSION;
     });

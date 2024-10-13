@@ -62,8 +62,7 @@ type Props = {|
 |};
 
 function RestoreWalletPage(props: Props & Intl): Node {
-  const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { profile } = actions;
+  const { intl, stores, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
   const {
     walletRestore,
     profile: profileData,
@@ -117,7 +116,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
       component: (
         <SelectNetworkStep
           onSelect={network => {
-            profile.setSelectedNetwork.trigger(network);
+            stores.profile.setSelectedNetwork(network);
             setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
             ampli.restoreWalletTypeStepViewed();
           }}
@@ -133,7 +132,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           onNext={mode => {
             resetRestoreWalletData();
             if (!environment.isDev() && !environment.isNightly())
-              profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
+              stores.profile.setSelectedNetwork(networks.CardanoMainnet);
             runInAction(() => {
               setSelectedRestoreMode(mode);
               setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
