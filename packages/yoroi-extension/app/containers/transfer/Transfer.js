@@ -41,9 +41,6 @@ class Transfer extends Component<AllProps> {
 
   render(): Node {
     const { actions, stores } = this.props;
-    if (this.props.stores.profile.isRevampTheme) {
-      return null;
-    }
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const navbar = (
       <NavBarContainer

@@ -43,7 +43,6 @@ type Props = {|
   +onPasswordSwitchToggle: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +isRevampTheme: boolean,
 |};
 
 @observer

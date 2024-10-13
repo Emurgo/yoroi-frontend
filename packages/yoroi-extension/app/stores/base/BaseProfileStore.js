@@ -165,7 +165,6 @@ export default class BaseProfileStore
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
     noop(this.isRevampAnnounced);
-    noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',
@@ -319,41 +318,6 @@ export default class BaseProfileStore
   @computed get currentTheme(): Theme {
     return THEMES.YOROI_BASE;
   }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isRevampTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isCurrentThemeSet(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get didUserMigratedToRevampTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get hasLoadedCurrentTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  hasCustomTheme: void => boolean = (): boolean => {
-    return false;
-  };
 
   // ========== Terms of Use ========== //
 

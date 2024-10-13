@@ -26,7 +26,7 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
   };
 
   render(): Node {
-    const { profile, walletSettings } = this.props.stores;
+    const { walletSettings } = this.props.stores;
     const { intl } = this.context;
     const { actions } = this.props;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
@@ -58,11 +58,9 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
     return (
       <div id="walletSettingsPage">
         {this.getDialog(selectedWallet.publicDeriverId)}
-        {profile.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
-            {intl.formatMessage(globalMessages.walletLabel)}
-          </Typography>
-        )}
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          {intl.formatMessage(globalMessages.walletLabel)}
+        </Typography>
         <WalletNameSetting
           error={renameModelRequest.error}
           walletName={selectedWallet.name}

@@ -1,48 +1,32 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
-import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
+import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
-import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children: Node,
 |};
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
-const messages = defineMessages({
-  backButton: {
-    id: 'wallet.nav.backButton',
-    defaultMessage: '!!!Back to my wallets',
-  },
-});
-
 @observer
-class Wallet extends Component<AllProps> {
+export default class Wallet extends Component<{| ...Props, ...StoresAndActionsProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -53,10 +37,8 @@ class Wallet extends Component<AllProps> {
   }
 
   checkRoute(): void | string {
-    const isRevamp = this.props.stores.profile.isRevampTheme;
-    const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
-
-    if (isRevamp && this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
+    const categories = allSubcategoriesRevamp;
+    if (this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
       return ROUTES.WALLETS.TRANSACTIONS;
     }
 
@@ -104,7 +86,7 @@ class Wallet extends Component<AllProps> {
       return <Redirect to={newRoute} />;
     }
     const { intl } = this.context;
-    const selectedWallet = stores.wallets.selected;
+    const selectedWallet = stores.wallets.selectedOrFail;
 
     if (!selectedWallet) {
       return (
@@ -121,7 +103,6 @@ class Wallet extends Component<AllProps> {
       );
     }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-    if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
     const spendableBalance = stores.transactions.balance;
@@ -155,60 +136,16 @@ class Wallet extends Component<AllProps> {
     );
 
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const walletClassic = (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainer
-            actions={actions}
-            stores={stores}
-            title={
-              <NavBarBack
-                route={ROUTES.MY_WALLETS}
-                onBackClick={this.navigateToMyWallets}
-                title={intl.formatMessage(messages.backButton)}
-              />
-            }
-          />
-        }
-        showInContainer
-        showAsCard
-      >
-        {warning}
-        <WalletWithNavigation
-          categories={allCategories
-            .filter(c => c.isVisible(visibilityContext))
-            .map(category => ({
-              className: category.className,
-              icon: category.icon,
-              label: category.label,
-              isActive: this.props.stores.app.currentRoute.startsWith(category.route),
-              onClick: () =>
-                this.props.actions.router.goToRoute.trigger({
-                  route: category.route,
-                }),
-            }))}
-        >
-          {this.props.children}
-          {isInitialSyncing && (
-            <WalletSyncingOverlay
-              onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-            />
-          )}
-        </WalletWithNavigation>
-      </TopBarLayout>
-    );
 
-    const walletRevamp = (
+    return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer actions={actions} stores={stores}/>}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
             actions={actions}
             stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)}/>}
             menu={isInitialSyncing ? null : menu}
           />
         }
@@ -217,7 +154,7 @@ class Wallet extends Component<AllProps> {
       >
         {warning}
         {isInitialSyncing ? (
-          <WalletLoadingAnimation />
+          <WalletLoadingAnimation/>
         ) : (
           <>
             {this.props.children}
@@ -226,8 +163,6 @@ class Wallet extends Component<AllProps> {
         )}
       </TopBarLayout>
     );
-
-    return this.props.renderLayoutComponent({ CLASSIC: walletClassic, REVAMP: walletRevamp });
   }
 
   getWarning: (number) => void | Node = publicDeriverId => {
@@ -283,4 +218,3 @@ class Wallet extends Component<AllProps> {
     return null;
   };
 }
-export default (withLayout(Wallet): ComponentType<Props>);

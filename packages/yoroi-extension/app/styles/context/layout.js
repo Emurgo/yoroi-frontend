@@ -1,8 +1,9 @@
 // @flow
-import React from 'react';
 import type { Node } from 'react';
+import React from 'react';
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
+// <TODO:PENDING_REMOVAL> disabling legacy UI
 export type LayoutComponentMap = {|
   [key: Layouts]: Node,
 |};
@@ -17,18 +18,15 @@ const LayoutContext = React.createContext();
 
 const LayoutProvider = (props: Object): Node => {
   const { layout } = props;
-  const localLayout: 'REVAMP' = 'REVAMP';
-
   return (
     <LayoutContext.Provider
       value={{
-        selectedLayout: localLayout,
+        selectedLayout: 'REVAMP',
         currentTheme: layout,
         isRevampLayout: true,
         // <TODO:PENDING_REMOVAL> disabling legacy UI
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
-          const selectedComponent = layoutMap[localLayout];
-          return selectedComponent;
+          return layoutMap.REVAMP;
         },
       }}
       {...props}

@@ -63,11 +63,6 @@ class AddWalletPage extends Component<AllProps> {
     this.props.actions.dialogs.open.trigger({ dialog });
   };
 
-  componentDidMount() {
-    const { isRevampTheme } = this.props.stores.profile;
-    if (!isRevampTheme) this.props.actions.wallets.unselectWallet.trigger();
-  }
-
   render(): Node {
     const { selectedNetwork } = this.props.stores.profile;
     const { actions, stores } = this.props;
