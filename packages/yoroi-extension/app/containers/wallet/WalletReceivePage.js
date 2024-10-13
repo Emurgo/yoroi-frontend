@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
@@ -25,11 +25,8 @@ import { Logger } from '../../utils/logging';
 import { handleExternalLinkClick } from '../../utils/routing';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import { withLayout } from '../../styles/context/layout';
 import BigNumber from 'bignumber.js';
 import config from '../../config';
-import WalletReceive from '../../components/wallet/WalletReceive';
-import StandardHeader from '../../components/wallet/receive/StandardHeader';
 import InternalHeader from '../../components/wallet/receive/InternalHeader';
 import RewardHeader from '../../components/wallet/receive/RewardHeader';
 import MangledHeader from '../../components/wallet/receive/MangledHeader';
@@ -46,15 +43,8 @@ import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
 import { maybe } from '../../coreUtils';
 
-type Props = {|
-  ...StoresAndActionsProps,
-|};
-
-type InjectedLayoutProps = {| +isRevampLayout: boolean |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
 @observer
-class WalletReceivePage extends Component<AllProps> {
+export default class WalletReceivePage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   @observable notificationElementId: string = '';
@@ -106,8 +96,6 @@ class WalletReceivePage extends Component<AllProps> {
       );
     }
 
-    const { isRevampLayout } = this.props;
-
     // get info about the latest address generated for special rendering
     const lastAddress = addressTypeStore.request.all[addressTypeStore.request.all.length - 1];
     const walletAddress = lastAddress != null ? lastAddress.address : '';
@@ -153,11 +141,10 @@ class WalletReceivePage extends Component<AllProps> {
     });
 
     const header = (() => {
-      const HeaderComp = isRevampLayout ? StandardHeaderRevamp : StandardHeader;
 
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.external) {
         return (
-          <HeaderComp
+          <StandardHeaderRevamp
             walletAddress={walletAddress}
             selectedExplorer={selectedExplorerForNetwork}
             isWalletAddressUsed={isWalletAddressUsed}
@@ -198,7 +185,7 @@ class WalletReceivePage extends Component<AllProps> {
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.all) {
         return (
-          <HeaderComp
+          <StandardHeaderRevamp
             walletAddress={walletAddress}
             selectedExplorer={selectedExplorerForNetwork}
             isWalletAddressUsed={isWalletAddressUsed}
@@ -225,14 +212,12 @@ class WalletReceivePage extends Component<AllProps> {
       ];
     };
 
-    const WalletReceiveComp = isRevampLayout ? WalletReceiveRevamp : WalletReceive;
-
     const paramAddress = uiDialogs.getParam<string>('address') ?? '';
     const paramAmount = uiDialogs.getParam<?string>('amount') ?? '0';
 
     return (
       <VerticalFlexContainer>
-        <WalletReceiveComp
+        <WalletReceiveRevamp
           hierarchy={{
             path: getSelectedHierarchyPath(),
             filter: this.props.stores.addresses.addressFilter,
@@ -404,5 +389,3 @@ class WalletReceivePage extends Component<AllProps> {
     });
   };
 }
-
-export default (withLayout(WalletReceivePage): ComponentType<Props>);

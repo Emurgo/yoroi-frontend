@@ -1,12 +1,11 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Logger } from '../../../../utils/logging';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { withLayout } from '../../../../styles/context/layout';
 import { ProgressStep } from '../../../../stores/ada/VotingStore';
 import GeneratePinDialog from '../../../../components/wallet/voting/GeneratePinDialog';
 import ConfirmPinDialog from '../../../../components/wallet/voting/ConfirmPinDialog';
@@ -17,18 +16,14 @@ import globalMessages from '../../../../i18n/global-messages';
 import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +onClose: void => void,
   +walletType: WalletType,
 |};
-type InjectedLayoutProps = {|
-  +isRevampLayout: boolean,
-|};
 
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
 
 @observer
-class VotingRegistrationDialogContainer extends Component<AllProps> {
+export default class VotingRegistrationDialogContainer extends Component<AllProps> {
   cancel: () => void = () => {
     this.props.onClose();
     this.props.actions.ada.voting.cancel.trigger();
@@ -72,14 +67,12 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             next={votingActions.submitGenerate.trigger}
             cancel={this.cancel}
             onBack={this.props.onClose}
-            isRevamp={this.props.isRevampLayout}
           />
         );
         break;
       case ProgressStep.CONFIRM:
         component = (
           <ConfirmPinDialog
-            isRevamp={this.props.isRevampLayout}
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             goBack={votingActions.goBackToGenerate.trigger}
@@ -145,5 +138,3 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
     return component;
   }
 }
-
-export default (withLayout(VotingRegistrationDialogContainer): ComponentType<Props>);

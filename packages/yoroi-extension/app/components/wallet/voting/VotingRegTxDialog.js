@@ -21,7 +21,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import { AmountInput } from '../../common/NumericInputRP';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
-import ProgressStepBlock from './ProgressStepBlock';
 import WarningBox from '../../widgets/WarningBox';
 import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
@@ -60,7 +59,6 @@ type Props = {|
   +error: ?LocalizableError,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletType: WalletType,
-  +isRevamp: boolean,
 |};
 
 @observer
@@ -179,7 +177,7 @@ export default class VotingRegTxDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
-        {this.props.isRevamp ? (
+        {(
           <Stepper
             currentStep={String(this.props.progressInfo.currentStep)}
             steps={this.props.stepsList.map(step => ({
@@ -187,11 +185,6 @@ export default class VotingRegTxDialog extends Component<Props> {
               stepId: String(step.step),
             }))}
             setCurrentStep={() => {}}
-          />
-        ) : (
-          <ProgressStepBlock
-            stepsList={this.props.stepsList}
-            progressInfo={this.props.progressInfo}
           />
         )}
         {this.props.staleTx && staleTxWarning}

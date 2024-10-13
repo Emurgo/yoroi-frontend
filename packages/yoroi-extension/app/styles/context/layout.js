@@ -9,7 +9,6 @@ export type LayoutComponentMap = {|
 |};
 
 export type InjectedLayoutProps = {|
-  +isRevampLayout: boolean,
   +renderLayoutComponent: (layoutMap: LayoutComponentMap) => Node,
 |};
 
@@ -19,7 +18,6 @@ const LayoutProvider = (props: Object): Node => {
   return (
     <LayoutContext.Provider
       value={{
-        isRevampLayout: true,
         // <TODO:PENDING_REMOVAL> disabling legacy UI
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {
           return layoutMap.REVAMP;

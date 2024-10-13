@@ -13,7 +13,6 @@ import Stepper from '../../common/stepper/Stepper';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
 import classnames from 'classnames';
-import ProgressStepBlock from './ProgressStepBlock';
 import styles from './GeneratePinDialog.scss';
 
 const messages = defineMessages({
@@ -35,7 +34,6 @@ type Props = {|
   +cancel: void => void,
   +onBack: void => void,
   +pin: Array<number>,
-  +isRevamp: boolean,
 |};
 
 @observer
@@ -46,7 +44,7 @@ export default class GeneratePinDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, next, cancel, pin, isRevamp } = this.props;
+    const { stepsList, progressInfo, next, cancel, pin } = this.props;
 
     const dialogActions = [
       {
@@ -60,7 +58,7 @@ export default class GeneratePinDialog extends Component<Props> {
       <div className={classnames([styles.pinContainer, styles.lastItem])}>
         {pin.map((value, index) => {
           // eslint-disable-next-line react/no-array-index-key
-          return isRevamp ? (
+          return (
             <Box
               key={index}
               sx={{
@@ -78,10 +76,6 @@ export default class GeneratePinDialog extends Component<Props> {
                 {value}
               </Typography>
             </Box>
-          ) : (
-            <div key={index} className={styles.pin}>
-              <span>{value}</span>
-            </div>
           );
         })}
       </div>
@@ -97,24 +91,27 @@ export default class GeneratePinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        {this.props.isRevamp ? (
+        {(
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
-              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
-              setCurrentStep={() => {}}
+              steps={stepsList.map(step => ({
+                message: step.message,
+                stepId: String(step.step)
+              }))}
+              setCurrentStep={() => {
+              }}
             />
-            <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="ds.text_gray_medium">
+            <Typography
+              component="div"
+              textAlign="center"
+              pt="24px"
+              pb="40px"
+              variant="body1"
+              color="ds.text_gray_medium"
+            >
               <FormattedHTMLMessage {...messages.line1} />
             </Typography>
-          </>
-        ) : (
-          <>
-            <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} />
-
-            <div className={classnames([styles.lineText, styles.firstItem, styles.importantText])}>
-              <FormattedHTMLMessage {...messages.line1} />
-            </div>
           </>
         )}
         {pinCards}
