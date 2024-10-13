@@ -15,7 +15,7 @@ import { LayoutProvider } from './styles/context/layout';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
-import { changeToplevelTheme, MuiThemes, THEMES } from './styles/themes';
+import { changeToplevelTheme, MuiThemes } from './styles/themes';
 import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
@@ -82,17 +82,14 @@ class App extends Component<Props, State> {
       '--default-font': !environment.isProduction() ? 'wingdings' : 'Times New Roman',
     };
 
-    const currentTheme = stores.profile.currentTheme || THEMES.YOROI_BASE;
-
+    const currentTheme = stores.profile.currentTheme;
     changeToplevelTheme(currentTheme);
-
     const muiTheme = MuiThemes[currentTheme];
-
     Logger.debug(`[yoroi] themes changed`);
 
     return (
       <div style={{ height: '100%' }}>
-        <LayoutProvider layout={currentTheme}>
+        <LayoutProvider>
           <ColorModeProvider currentTheme={currentTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}

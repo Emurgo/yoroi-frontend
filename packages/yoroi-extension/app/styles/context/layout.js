@@ -1,6 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import React from 'react';
+import { THEMES } from '../themes';
 
 export type Layouts = 'CLASSIC' | 'REVAMP';
 // <TODO:PENDING_REMOVAL> disabling legacy UI
@@ -17,12 +18,11 @@ export type InjectedLayoutProps = {|
 const LayoutContext = React.createContext();
 
 const LayoutProvider = (props: Object): Node => {
-  const { layout } = props;
   return (
     <LayoutContext.Provider
       value={{
         selectedLayout: 'REVAMP',
-        currentTheme: layout,
+        currentTheme: THEMES.YOROI_BASE,
         isRevampLayout: true,
         // <TODO:PENDING_REMOVAL> disabling legacy UI
         renderLayoutComponent: (layoutMap: LayoutComponentMap = {}) => {

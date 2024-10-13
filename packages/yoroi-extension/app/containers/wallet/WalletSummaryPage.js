@@ -13,7 +13,6 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
 import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
@@ -34,6 +33,7 @@ import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { noop } from '../../coreUtils';
 
 type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {|
@@ -76,7 +76,7 @@ class WalletSummaryPage extends Component<AllProps> {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
-    this.props.stores.delegation.checkPoolTransition();
+    noop(this.props.stores.delegation.checkPoolTransition());
 
     const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
 
@@ -104,16 +104,9 @@ class WalletSummaryPage extends Component<AllProps> {
     const notificationToolTip = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     if (recent.length > 0) {
-      const mapWalletTransactionLayout = {
-        CLASSIC: WalletTransactionsList,
-        REVAMP: WalletTransactionsListRevamp,
-      };
-
-      const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
-
       if (isLoading || hasAny) {
         walletTransactions = (
-          <WalletTransactionsListComp
+          <WalletTransactionsListRevamp
             transactions={recent}
             lastSyncBlock={selected.lastSyncInfo.Height}
             memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}

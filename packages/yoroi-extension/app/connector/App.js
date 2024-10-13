@@ -106,12 +106,11 @@ class App extends Component<Props, State> {
 
     const currentTheme = stores.profile.currentTheme;
     const muiTheme = MuiThemes[currentTheme];
-
     changeToplevelTheme(currentTheme);
 
     return (
       <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
-        <LayoutProvider layout={currentTheme}>
+        <LayoutProvider>
           <ThemeProvider theme={muiTheme}>
             <CssBaseline />
             {globalStyles(muiTheme)}

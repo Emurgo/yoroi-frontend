@@ -6,6 +6,8 @@ import { baseLightTheme } from './themes/light-theme-mui';
 import { classicTheme } from './themes/legacy/classic-theme';
 import { modernTheme } from './themes/legacy/modern-theme';
 
+// <TODO:PENDING_REMOVAL> legacy themes
+
 export const THEMES = Object.freeze({
   YOROI_CLASSIC: 'YoroiClassic',
   YOROI_MODERN: 'YoroiModern',
