@@ -1,12 +1,11 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Logger } from '../../../../utils/logging';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { withLayout } from '../../../../styles/context/layout';
 import { ProgressStep } from '../../../../stores/ada/VotingStore';
 import GeneratePinDialog from '../../../../components/wallet/voting/GeneratePinDialog';
 import ConfirmPinDialog from '../../../../components/wallet/voting/ConfirmPinDialog';
@@ -18,18 +17,14 @@ import CreateTxExecutingDialog from '../../../../components/wallet/voting/Create
 import { noop } from '../../../../coreUtils';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +onClose: void => void,
   +walletType: WalletType,
 |};
-type InjectedLayoutProps = {|
-  +isRevampLayout: boolean,
-|};
 
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
 
 @observer
-class VotingRegistrationDialogContainer extends Component<AllProps> {
+export default class VotingRegistrationDialogContainer extends Component<AllProps> {
   cancel: () => void = () => {
     this.props.onClose();
     this.props.stores.substores.ada.votingStore.cancel();
@@ -50,7 +45,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
       return <CreateTxExecutingDialog />;
     }
 
-    const { profile } = this.props.stores;
     const walletType = this.props.walletType;
     const stepsList = [
       { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
@@ -73,23 +67,19 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             pin={votingStore.pin}
             next={votingStore.submitGenerate}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onBack={this.props.onClose}
-            isRevamp={this.props.isRevampLayout}
           />
         );
         break;
       case ProgressStep.CONFIRM:
         component = (
           <ConfirmPinDialog
-            isRevamp={this.props.isRevampLayout}
             stepsList={stepsList}
             progressInfo={votingStore.progressInfo}
             goBack={votingStore.goBackToGenerate}
             submit={votingStore.submitConfirm}
             error={votingStore.submitConfirmError}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             pinValidation={enteredPin => {
               const pin = votingStore.pin.join('');
               return pin === enteredPin;
@@ -107,7 +97,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             submit={votingStore.submitRegister}
             goBack={votingStore.goBackToRegister}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onError={votingStore.submitRegisterError}
           />
         );
@@ -118,7 +107,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             actions={actions}
             stores={stores}
             stepsList={stepsList}
-            classicTheme={profile.isClassicTheme}
             cancel={this.cancel}
             submit={votingStore.submitTransaction}
             goBack={votingStore.goBackToRegister}
@@ -135,7 +123,6 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
             onExternalLinkClick={handleExternalLinkClick}
             submit={votingStore.finishQRCode}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             votingKey={votingStore.encryptedKey}
           />
         );
@@ -152,5 +139,3 @@ class VotingRegistrationDialogContainer extends Component<AllProps> {
     return component;
   }
 }
-
-export default (withLayout(VotingRegistrationDialogContainer): ComponentType<Props>);

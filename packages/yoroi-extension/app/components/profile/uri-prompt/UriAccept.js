@@ -19,7 +19,6 @@ const messages = defineMessages({
 type Props = {|
   +onConfirm: void => PossiblyAsync<void>,
   +onBack: void => void,
-  +classicTheme: boolean
 |};
 
 @observer

@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -7,12 +7,8 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { observer } from 'mobx-react';
-import { ReactComponent as NoDappsFoundImg } from '../../../assets/images/dapp-connector/no-dapps-connected.inline.svg';
 import { ReactComponent as NoDappsConnected } from '../../../assets/images/revamp/no-dapps-connected.inline.svg';
 import { connectorMessages } from '../../../i18n/global-messages';
-import { withLayout } from '../../../styles/context/layout';
-import styles from './ConnectedWebsitesPage.scss';
-import WalletRow from './WalletRow';
 import WalletRowRevamp from './WalletRowRevamp';
 import { Box, Typography } from '@mui/material';
 import type { WalletState } from '../../../../chrome/extension/background/types';
@@ -25,10 +21,6 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +shouldHideBalance: boolean,
 |};
-
-type InjectedProps = {| isRevampLayout: boolean |};
-
-type AllProps = {| ...Props, ...InjectedProps |};
 
 const messages = defineMessages({
   connectedWallets: {
@@ -58,12 +50,12 @@ const messages = defineMessages({
 });
 
 @observer
-class ConnectedWebsitesPage extends Component<AllProps> {
+export default class ConnectedWebsitesPage extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  renderRevamp(): Node {
+  render(): Node {
     const { intl } = this.context;
     const genNoResult = () => (
       <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center">
@@ -151,79 +143,4 @@ class ConnectedWebsitesPage extends Component<AllProps> {
       </Box>
     );
   }
-
-  render(): Node {
-    const { isRevampLayout } = this.props;
-
-    if (isRevampLayout) return this.renderRevamp();
-
-    const { intl } = this.context;
-    const genNoResult = () => (
-      <div className={styles.component}>
-        <div className={styles.noDappsFound}>
-          <NoDappsFoundImg />
-          <h3>{intl.formatMessage(messages.noWebsitesConnected)} </h3>
-          <div>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
-        </div>
-      </div>
-    );
-
-    const { whitelistEntries, wallets } = this.props;
-    if (
-      whitelistEntries == null ||
-      whitelistEntries.length === 0 ||
-      wallets == null ||
-      wallets.length === 0
-    ) {
-      return genNoResult();
-    }
-
-    const cardanoNodes = whitelistEntries
-      .map(({ url, publicDeriverId, image }) => {
-        const wallet = wallets.find(
-          cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
-        );
-        if (wallet == null) {
-          return null;
-        }
-
-        return (
-          <WalletRow
-            key={url}
-            url={url}
-            websiteIcon={image}
-            isActiveSite={this.props.activeSites.includes(url)}
-            onRemoveWallet={this.props.onRemoveWallet}
-            balance={wallet.balance}
-            plate={wallet.plate}
-            shouldHideBalance={this.props.shouldHideBalance}
-            getTokenInfo={this.props.getTokenInfo}
-            walletName={wallet.name}
-            walletType={wallet.type}
-          />
-        );
-      })
-      .filter(x => x != null);
-
-    return (
-      <div className={styles.component}>
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <div>{intl.formatMessage(messages.walletsLabel)}</div>
-            <div>{intl.formatMessage(messages.dappsLabel)}</div>
-          </div>
-          <div>
-            {cardanoNodes.length > 0 && (
-              <div className={styles.chain}>
-                <h1>{intl.formatMessage(messages.cardanoLabel)}</h1>
-                {cardanoNodes}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
 }
-
-export default (withLayout(ConnectedWebsitesPage): ComponentType<Props>);

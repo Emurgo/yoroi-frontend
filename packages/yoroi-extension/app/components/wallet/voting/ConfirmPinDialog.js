@@ -12,7 +12,6 @@ import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
-import ProgressStepBlock from './ProgressStepBlock';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import PinInput from '../../widgets/forms/PinInput';
 
@@ -36,10 +35,8 @@ type Props = {|
   +submit: void => PossiblyAsync<void>,
   +error: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
   +pinValidation: string => boolean,
   +isProcessing: boolean,
-  +isRevamp: boolean,
 |};
 
 @observer
@@ -61,7 +58,6 @@ export default class ConfirmPinDialog extends Component<Props> {
       progressInfo,
       goBack,
       cancel,
-      classicTheme,
       pinValidation,
       isProcessing,
     } = this.props;
@@ -86,14 +82,18 @@ export default class ConfirmPinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        {this.props.isRevamp ? (
+        {(
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
-              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
+              steps={stepsList.map(step => ({
+                message: step.message,
+                stepId: String(step.step)
+              }))}
               setCurrentStep={() => goBack()}
             />
-            <Typography component="div"
+            <Typography
+              component="div"
               textAlign="center"
               pt="24px"
               pb="40px"
@@ -103,23 +103,11 @@ export default class ConfirmPinDialog extends Component<Props> {
               <FormattedHTMLMessage {...messages.line1} />
             </Typography>
           </>
-        ) : (
-          <>
-            <ProgressStepBlock
-              stepsList={stepsList}
-              progressInfo={progressInfo}
-              classicTheme={classicTheme}
-            />
-            <div className={classnames([styles.lineText, styles.firstItem])}>
-              <FormattedHTMLMessage {...messages.line1} />
-            </div>
-          </>
         )}
         <div className={styles.pinInputContainer}>
           <PinInput
             setForm={form => this.setPinForm(form)}
             disabled={false}
-            classicTheme={classicTheme}
             pinMatches={pinValidation}
             fieldName="pin"
             validCheck={_pin => true}

@@ -94,12 +94,10 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
       : 'ADA';
 
     return (
-      <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
-        {profileStore.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
-            {intl.formatMessage(settingsMenuMessages.general)}
-          </Typography>
-        )}
+      <Box sx={{ pb: '50px' }}>
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          {intl.formatMessage(settingsMenuMessages.general)}
+        </Typography>
         <GeneralSettings
           onSelectLanguage={stores.profile.updateLocale}
           isSubmitting={isSubmittingLocale}

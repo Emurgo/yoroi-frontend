@@ -1,15 +1,13 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletNameSetting.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -35,11 +33,10 @@ type Props = {|
   +isSubmitting: boolean,
   +isInvalid: boolean,
   +lastUpdatedField: ?string,
-  +classicTheme: boolean,
 |};
 
 @observer
-class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
+export default class WalletNameSetting extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -66,17 +63,13 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
       isSubmitting,
       isInvalid,
       lastUpdatedField,
-      classicTheme,
-      isRevampLayout,
     } = this.props;
     return (
       <>
-        {isRevampLayout && (
-          <Typography component="div" variant="body1" fontWeight={500} mb="16px">
-            {intl.formatMessage(messages.title)}
-          </Typography>
-        )}
-        <Box sx={{ width: isRevampLayout ? '506px' : '100%' }}>
+        <Typography component="div" variant="body1" fontWeight={500} mb="16px">
+          {intl.formatMessage(messages.title)}
+        </Typography>
+        <Box sx={{ width: '506px' }}>
           <InlineEditingInput
             className="walletName"
             inputFieldLabel={intl.formatMessage(messages.name)}
@@ -89,7 +82,6 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
             isValid={nameValidator}
             validationErrorMessage={intl.formatMessage(globalMessages.invalidWalletName)}
             successfullyUpdated={!isSubmitting && lastUpdatedField === 'name' && !isInvalid}
-            classicTheme={classicTheme}
             id="settings:wallet:walletName"
           />
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
@@ -98,5 +90,3 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
     );
   }
 }
-
-export default (withLayout(WalletNameSetting): ComponentType<Props>);

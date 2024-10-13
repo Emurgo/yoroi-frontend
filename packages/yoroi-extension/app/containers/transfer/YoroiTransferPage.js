@@ -99,7 +99,6 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
 
   render(): null | Node {
     const { actions, stores } = this.props;
-    const { profile } = stores;
     const yoroiTransfer = this.props.stores.yoroiTransfer;
 
     const publicDeriver = this.props.stores.wallets.selected;
@@ -121,7 +120,6 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
             passwordMatches={_password => true}
             includeLengthCheck={false}
-            classicTheme={profile.isClassicTheme}
           />
         );
       case TransferStatus.DISPLAY_CHECKSUM:
@@ -185,14 +183,11 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           <YoroiTransferErrorPage
             error={yoroiTransfer.error}
             onCancel={this.cancelTransferFunds}
-            classicTheme={profile.isClassicTheme}
           />
         );
       case TransferStatus.SUCCESS:
         return (
-          <YoroiTransferSuccessPage
-            classicTheme={profile.isClassicTheme}
-          />
+          <YoroiTransferSuccessPage />
         );
       default:
         return null;

@@ -1,5 +1,5 @@
 // @flow
-import { action, observable, computed, runInAction } from 'mobx';
+import { action, computed, observable, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';
@@ -110,24 +110,11 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
             stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
             return;
           }
-          const isRevamp = stores.profile.isRevampTheme;
-          if (isRevamp) {
-            const lastSelectedWallet = stores.wallets.getLastSelectedWallet();
-            stores.app.goToRoute({
-              route: ROUTES.WALLETS.ROOT,
-              publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
-            });
-          } else if (wallets.wallets.length === 1) {
-            // if user only has 1 wallet, just go to it directly as a shortcut
-            stores.app.goToRoute({
-              route: ROUTES.WALLETS.ROOT,
-              publicDeriverId: firstWallet.publicDeriverId,
-            });
-          } else {
-            stores.app.goToRoute({
-              route: ROUTES.MY_WALLETS,
-            });
-          }
+          const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
+          stores.app.goToRoute({
+            route: ROUTES.WALLETS.ROOT,
+            publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
+          });
         }
         if (stores.loading.shouldRedirect) {
           stores.loading.redirect();

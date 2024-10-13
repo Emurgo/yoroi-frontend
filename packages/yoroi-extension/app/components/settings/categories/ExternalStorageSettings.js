@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { Button, Typography } from '@mui/material';
@@ -8,7 +8,6 @@ import type { SelectedExternalStorageProvider } from '../../../domain/ExternalSt
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   sectionTitle: {
@@ -36,10 +35,8 @@ type Props = {|
   selectedExternalStorage: ?SelectedExternalStorageProvider,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class ExternalStorageSettings extends Component<Props & InjectedProps> {
+export default class ExternalStorageSettings extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -47,7 +44,6 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
   render(): Node {
     const { onConnect, onDisconnect, externalStorageProviders, selectedExternalStorage } = this.props;
     const { intl } = this.context;
-    const { isRevampLayout } = this.props;
 
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {
@@ -57,7 +53,7 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
       providersButtons.push(
         <Button
           key={provider}
-          variant={isRevampLayout ? 'contained' : 'primary'}
+          variant="contained"
           onClick={() => (showDisconnect === true ? onDisconnect() : onConnect(authorizeUrl))}
           disabled={disabledCondition}
           sx={{
@@ -84,5 +80,3 @@ class ExternalStorageSettings extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(ExternalStorageSettings): ComponentType<Props>);

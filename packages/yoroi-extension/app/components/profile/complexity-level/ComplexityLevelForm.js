@@ -1,17 +1,14 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './ComplexityLevelForm.scss';
-import classnames from 'classnames';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { LoadingButton } from '@mui/lab';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import { withLayout } from '../../../styles/context/layout';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
 
@@ -55,14 +52,11 @@ const messages = defineMessages({
 type Props = {|
   +complexityLevel: ?ComplexityLevelType,
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
-  +isSubmitting: boolean,
   +error?: ?LocalizableError,
   +baseTheme?: string,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
-class ComplexityLevel extends Component<Props & InjectedProps> {
+export default class ComplexityLevel extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -73,7 +67,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { complexityLevel, isSubmitting, isRevampLayout, baseTheme } = this.props;
+    const { complexityLevel, baseTheme } = this.props;
 
     const levels = [
       {
@@ -92,17 +86,15 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
     return (
       <Box className={styles.component}>
-        {isRevampLayout && (
-          <Typography component="div" textAlign="center" color="grayscale.900" mb="16px" variant="h3" fontWeight={500}>
-            {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
-          </Typography>
-        )}
+        <Typography component="div" textAlign="center" color="grayscale.900" mb="16px" variant="h3" fontWeight={500}>
+          {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
+        </Typography>
 
         <Typography
           component="div"
           textAlign="center"
           variant="body1"
-          color={isRevampLayout ? 'grayscale.800' : 'var(--yoroi-palette-gray-600)'}
+          color="grayscale.800"
         >
           {intl.formatMessage(messages.subtitle)}
         </Typography>
@@ -116,7 +108,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
             sx={{
               textAlign: 'center',
               '& strong': {
-                color: isRevampLayout ? 'primary.500' : 'var(--yoroi-comp-button-secondary-text)',
+                color: 'primary.500',
                 fontWeight: 500,
                 textTransform: 'uppercase',
               },
@@ -133,7 +125,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
           </Typography>
         )}
 
-        {isRevampLayout ? (
+        {(
           <Box
             sx={{
               display: 'flex',
@@ -166,8 +158,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
                           ? theme.palette.gradients.green
                           : theme.palette.gradients_2
                         : baseTheme === 'light-theme'
-                        ? 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)'
-                        : theme.palette.ds.bg_gradient_3,
+                          ? 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)'
+                          : theme.palette.ds.bg_gradient_3,
                     backgroundClip: 'content-box, border-box',
                     backgroundOrigin: 'border-box',
                     borderRadius: '8px',
@@ -209,32 +201,8 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
               );
             })}
           </Box>
-        ) : (
-          <div className={styles.cardsWrapper}>
-            {levels.map(level => (
-              <div className={styles.card} key={level.key}>
-                <div className={classnames([styles.cardImage, styles[level.key]])}>{level.image}</div>
-                <div className={styles.cardContent}>
-                  <div>
-                    <h3>{level.name}</h3>
-                    <div>{level.description}</div>
-                  </div>
-                  <LoadingButton
-                    variant={isRevampLayout ? 'contained' : 'primary'}
-                    loading={isSubmitting}
-                    disabled={complexityLevel === level.key}
-                    onClick={() => this.props.onSubmit(level.key)}
-                  >
-                    {intl.formatMessage(messages.labelChoose)}
-                  </LoadingButton>
-                </div>
-              </div>
-            ))}
-          </div>
         )}
       </Box>
     );
   }
 }
-
-export default (withLayout(ComplexityLevel): ComponentType<Props>);

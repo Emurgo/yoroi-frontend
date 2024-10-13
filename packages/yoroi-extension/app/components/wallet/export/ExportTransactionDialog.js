@@ -1,5 +1,5 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -9,12 +9,9 @@ import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
-import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange';
 import { Box } from '@mui/system';
 import { Moment } from 'moment';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Checkbox, FormControlLabel } from '@mui/material';
 import type { TransactionRowsToExportRequest } from '../../../stores/toplevel/TransactionsStore';
 
@@ -48,7 +45,7 @@ type State = {|
 |};
 
 @observer
-class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, State> {
+export default class ExportTransactionDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -66,7 +63,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
 
   render(): Node {
     const { intl } = this.context;
-    const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds, isRevampLayout } = this.props;
+    const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (
       <Box
@@ -108,7 +105,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
         onClose={cancel}
         id="exportTransactionsDialog"
       >
-        <Box width={isRevampLayout ? '600px' : '100%'}>
+        <Box width="600px">
           {infoBlock}
           <DateRange
             date={{ startDate, endDate }}
@@ -121,7 +118,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
             initialId="exportTransactionsDialog"
           />
 
-          {isRevampLayout ? (
+          {(
             <FormControlLabel
               sx={{
                 ml: '-1px',
@@ -130,15 +127,9 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
                 },
                 color: 'ds.text_gray_medium',
               }}
-              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
+              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds}/>}
               label={intl.formatMessage(messages.includeTxIds)}
               id="exportTransactionsDialog-includeTxIds-checkbox"
-            />
-          ) : (
-            <CheckboxLabel
-              label={intl.formatMessage(messages.includeTxIds)}
-              onChange={toggleIncludeTxIds}
-              checked={shouldIncludeTxIds}
             />
           )}
 
@@ -148,5 +139,3 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
     );
   }
 }
-
-export default (withLayout(ExportTransactionDialog): ComponentType<Props>);

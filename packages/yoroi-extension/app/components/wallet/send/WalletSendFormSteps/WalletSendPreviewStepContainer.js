@@ -35,7 +35,6 @@ type Props = {|
   +onUpdateStep: (step: number) => void,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +isClassicTheme: boolean,
   +openTransactionSuccessDialog: void => void,
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
@@ -109,7 +108,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       selectedWallet,
       selectedExplorer,
       sendMoneyRequest,
-      isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
       receiverHandle,
@@ -152,7 +150,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         }
         onSubmit={this.onSubmit}
         isSubmitting={sendMoneyRequest.isExecuting}
-        classicTheme={isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={addr => addressToDisplayString(addr, network)}
         selectedNetwork={network}

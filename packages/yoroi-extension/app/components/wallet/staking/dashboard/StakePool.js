@@ -83,7 +83,6 @@ type Props = {|
     // rewards: string,
     // age: string,
   |},
-  +classicTheme: boolean,
   +poolName: string,
   +hash: string,
   +moreInfo: void | MoreInfoProp,

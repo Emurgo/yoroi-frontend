@@ -1,11 +1,9 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -19,23 +17,16 @@ import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
 import SidebarContainer from '../SidebarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 import moment from 'moment';
-import NavBarAddButton from '../../components/topbar/NavBarAddButton';
-import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
-import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
-
 @observer
-class MyWalletsPage extends Component<AllProps> {
+export default class MyWalletsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -77,21 +68,6 @@ class MyWalletsPage extends Component<AllProps> {
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const { wallets } = stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
-    const navbarElementClassic = (
-      <NavBar
-        title={navbarTitle}
-        button={
-          <NavBarAddButton
-            onClick={() =>
-              stores.app.goToRoute({ route: ROUTES.WALLETS.ADD })
-            }
-          />
-        }
-        buyButton={
-          <BuySellAdaButton onBuySellClick={() => this.openDialogWrapper(BuySellDialog)} />
-        }
-      />
-    );
 
     const navbarElementRevamp = (
       <NavBarRevamp
@@ -105,18 +81,13 @@ class MyWalletsPage extends Component<AllProps> {
       />
     );
 
-    const navbarElement = this.props.renderLayoutComponent({
-      CLASSIC: navbarElementClassic,
-      REVAMP: navbarElementRevamp,
-    });
-
     const walletsList = <Box flex={1}>{wallets.map(wallet => this.generateRow(wallet))}</Box>;
 
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={sidebarContainer}
-        navbar={navbarElement}
+        navbar={navbarElementRevamp}
         showInContainer
       >
         <MyWallets>{walletsList}</MyWallets>
@@ -238,4 +209,3 @@ class MyWalletsPage extends Component<AllProps> {
     return walletSubRow;
   };
 }
-export default (withLayout(MyWalletsPage): ComponentType<StoresAndActionsProps>);

@@ -47,7 +47,6 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
   +votingKey: string | null,
 |};
 
@@ -60,7 +59,7 @@ export default class QrCodeDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, submit, cancel, classicTheme, votingKey } = this.props;
+    const { stepsList, progressInfo, submit, cancel, votingKey } = this.props;
 
     const dialogActions = [
       {
@@ -84,7 +83,7 @@ export default class QrCodeDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock stepsList={stepsList} progressInfo={progressInfo} />
 
         <Typography className={classnames([styles.lineTitle, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.lineTitle)}

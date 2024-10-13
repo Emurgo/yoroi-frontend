@@ -48,7 +48,6 @@ type Props = {|
   +onCancel: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?string,
@@ -66,8 +65,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder) : '',
+        placeholder: '',
         value: '',
         validators: [({ field }) => {
           if (field.value === '') {

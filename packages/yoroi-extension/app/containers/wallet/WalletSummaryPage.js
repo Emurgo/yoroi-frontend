@@ -1,21 +1,16 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { FormattedHTMLMessage, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { Notification } from '../../types/notification.types';
-import NotificationMessage from '../../components/widgets/NotificationMessage';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import { ReactComponent as successIcon } from '../../assets/images/success-small.inline.svg';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import WalletTransactionsList from '../../components/wallet/transactions/WalletTransactionsList';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
-import WalletSummary from '../../components/wallet/summary/WalletSummary';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
 import AddMemoDialog from '../../components/wallet/memos/AddMemoDialog';
@@ -27,8 +22,6 @@ import config from '../../config';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { withLayout } from '../../styles/context/layout';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
 import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
@@ -36,21 +29,8 @@ import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { noop } from '../../coreUtils';
 
-type Props = StoresAndActionsProps;
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-  +selectedLayout: string,
-|};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
-const targetNotificationIds = [
-  globalMessages.walletCreatedNotificationMessage.id,
-  globalMessages.walletRestoredNotificationMessage.id,
-  globalMessages.integratedNotificationMessage.id,
-];
-
 @observer
-class WalletSummaryPage extends Component<AllProps> {
+export default class WalletSummaryPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -102,16 +82,9 @@ class WalletSummaryPage extends Component<AllProps> {
     const notificationToolTip = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     if (recent.length > 0) {
-      const mapWalletTransactionLayout = {
-        CLASSIC: WalletTransactionsList,
-        REVAMP: WalletTransactionsListRevamp,
-      };
-
-      const WalletTransactionsListComp = mapWalletTransactionLayout[this.props.selectedLayout];
-
       if (isLoading || hasAny) {
         walletTransactions = (
-          <WalletTransactionsListComp
+          <WalletTransactionsListRevamp
             transactions={recent}
             lastSyncBlock={selected.lastSyncInfo.Height}
             memoMap={stores.memos.txMemoMap.get(walletId) || new Map()}
@@ -169,8 +142,6 @@ class WalletSummaryPage extends Component<AllProps> {
       }
     }
 
-    const notification = this._getThisPageActiveNotification();
-
     let exportDialog = (
       <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <VerticalFlexContainer>
@@ -197,111 +168,7 @@ class WalletSummaryPage extends Component<AllProps> {
       );
     }
 
-    const walletSummaryPageClassic = (
-      <VerticalFlexContainer>
-        <NotificationMessage icon={successIcon} show={!!notification}>
-          {!!notification && (
-            <FormattedHTMLMessage
-              {...notification.message}
-              values={notification.values == null ? undefined : notification.values(intl)}
-            />
-          )}
-        </NotificationMessage>
-        <WalletSummary
-          pendingAmount={unconfirmedAmount}
-          shouldHideBalance={profile.shouldHideBalance}
-          isLoadingTransactions={
-            /**
-             * only use first load
-             * to avoid wallet summary disappearing when wallet tx list is updating
-             */
-            isLoading
-          }
-          openExportTxToFileDialog={this.openExportTransactionDialog}
-          unitOfAccountSetting={profile.unitOfAccount}
-          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
-        />
-
-        {walletTransactions}
-
-        {uiDialogs.isOpen(ExportTransactionDialog) ? exportDialog : null}
-
-        {uiDialogs.isOpen(AddMemoDialog) ? (
-          <AddMemoDialog
-            selectedWalletId={selected.publicDeriverId}
-            selectedTransaction={(() => {
-              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
-              return memos.selectedTransaction;
-            })()}
-            error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
-            onSubmit={values => {
-              return actions.memos.saveTxMemo.trigger(values);
-            }}
-            classicTheme={profile.isClassicTheme}
-            plateTextPart={selected.plate.TextPart}
-          />
-        ) : null}
-
-        {uiDialogs.isOpen(MemoNoExternalStorageDialog) ? (
-          <MemoNoExternalStorageDialog
-            onCancel={actions.memos.closeMemoDialog.trigger}
-            addExternal={() => {
-              actions.memos.closeMemoDialog.trigger();
-              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
-            }}
-            onAcknowledge={() => {
-              stores.uiDialogs.getParam<(void) => void>('continuation')?.();
-            }}
-          />
-        ) : null}
-
-        {uiDialogs.isOpen(EditMemoDialog) ? (
-          <EditMemoDialog
-            selectedWalletId={selected.publicDeriverId}
-            existingMemo={(() => {
-              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
-              const txid = memos.selectedTransaction.txid;
-              const memo = stores.memos.txMemoMap.get(walletId)?.get(txid);
-              if (memo == null) throw new Error('Should never happen');
-              return memo;
-            })()}
-            error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
-            onClickDelete={this.openDeleteMemoDialog}
-            onSubmit={values => {
-              return actions.memos.updateTxMemo.trigger(values);
-            }}
-            classicTheme={profile.isClassicTheme}
-            plateTextPart={selected.plate.TextPart}
-          />
-        ) : null}
-
-        {uiDialogs.isOpen(DeleteMemoDialog) ? (
-          <DeleteMemoDialog
-            selectedTransaction={(() => {
-              if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
-              return memos.selectedTransaction;
-            })()}
-            error={memos.error}
-            onCancel={() => {
-              actions.memos.closeMemoDialog.trigger();
-            }}
-            onClose={actions.memos.closeMemoDialog.trigger}
-            onDelete={txHash => {
-              return actions.memos.deleteTxMemo.trigger({
-                publicDeriverId: selected.publicDeriverId,
-                plateTextPart: selected.plate.TextPart,
-                txHash,
-              });
-            }}
-          />
-        ) : null}
-      </VerticalFlexContainer>
-    );
-
-    const walletSummaryPageRevamp = (
+    return (
       <Box>
         <WalletSummaryRevamp
           pendingAmount={unconfirmedAmount}
@@ -319,7 +186,8 @@ class WalletSummaryPage extends Component<AllProps> {
           getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
           shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
-            <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
+            <WalletEmptyBanner
+              onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })}/>
           }
         />
 
@@ -339,7 +207,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.saveTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}
@@ -373,7 +240,6 @@ class WalletSummaryPage extends Component<AllProps> {
             onSubmit={values => {
               return actions.memos.updateTxMemo.trigger(values);
             }}
-            classicTheme={profile.isClassicTheme}
             plateTextPart={selected.plate.TextPart}
           />
         ) : null}
@@ -400,24 +266,7 @@ class WalletSummaryPage extends Component<AllProps> {
         ) : null}
       </Box>
     );
-
-    return this.props.renderLayoutComponent({
-      CLASSIC: walletSummaryPageClassic,
-      REVAMP: walletSummaryPageRevamp,
-    });
   }
-
-  _getThisPageActiveNotification: void => ?Notification = () => {
-    let notification = null;
-
-    const { mostRecentActiveNotification } = this.props.stores.uiNotifications;
-    const activeNotificationId = mostRecentActiveNotification ? mostRecentActiveNotification.id : '';
-    if (targetNotificationIds.includes(activeNotificationId)) {
-      notification = mostRecentActiveNotification;
-    }
-
-    return notification;
-  };
 
   openExportTransactionDialog: void => void = () => {
     const { actions } = this.props;
@@ -451,4 +300,3 @@ class WalletSummaryPage extends Component<AllProps> {
       || delegation.hasRewardHistory(publicDeriverId);
   };
 }
-export default (withLayout(WalletSummaryPage): ComponentType<Props>);

@@ -1,18 +1,15 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { InjectedLayoutProps } from '../../styles/context/layout';
+import type { Node } from 'react';
 import { Component } from 'react';
-import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import { withLayout } from '../../styles/context/layout';
-import { Box, FormControlLabel, Checkbox as MuiCheckbox } from '@mui/material';
+import { observer } from 'mobx-react';
+import { Box, Checkbox as MuiCheckbox, FormControlLabel } from '@mui/material';
 import classnames from 'classnames';
 import DialogCloseButton from './DialogCloseButton';
 import Dialog from './Dialog';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
-import CheckboxLabel from '../common/CheckboxLabel';
 import styles from './DangerousActionDialog.scss';
 
 type Props = {|
@@ -38,14 +35,14 @@ type Props = {|
 |};
 
 @observer
-class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
+export default class DangerousActionDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error, renderLayoutComponent, id } = this.props;
+    const { isSubmitting, error, id } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);
 
@@ -68,48 +65,6 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
       },
     ];
 
-    const classicLayout = (
-      <div>
-        {this.props.children}
-        <div className={styles.checkbox}>
-          <CheckboxLabel
-            label={this.props.checkboxAcknowledge}
-            onChange={this.props.toggleCheck}
-            checked={this.props.isSubmitting || this.props.isChecked}
-            id={id + '-acknowledgeAction'}
-          />
-        </div>
-
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
-      </div>
-    );
-
-    const revampLayout = (
-      <Box maxWidth="600px">
-        {this.props.children}
-        <Box mb="24px" ml="3px">
-          <FormControlLabel
-            label={this.props.checkboxAcknowledge}
-            control={
-              <MuiCheckbox
-                onChange={this.props.toggleCheck}
-                checked={this.props.isSubmitting || this.props.isChecked}
-                sx={{ marginRight: '8px', width: '16px', height: '16px', fontSize: '16px' }}
-              />
-            }
-            id={id + '-acknowledgeAction-checkbox'}
-            sx={{ marginLeft: '-0px' }}
-          />
-        </Box>
-        {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
-      </Box>
-    );
-
-    const content = renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
-
     return (
       <Dialog
         title={this.props.title}
@@ -120,10 +75,32 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
         id={id}
       >
-        {content}
+        {(
+          <Box maxWidth="600px">
+            {this.props.children}
+            <Box mb="24px" ml="3px">
+              <FormControlLabel
+                label={this.props.checkboxAcknowledge}
+                control={
+                  <MuiCheckbox
+                    onChange={this.props.toggleCheck}
+                    checked={this.props.isSubmitting || this.props.isChecked}
+                    sx={{
+                      marginRight: '8px',
+                      width: '16px',
+                      height: '16px',
+                      fontSize: '16px'
+                    }}
+                  />
+                }
+                id={id + '-acknowledgeAction-checkbox'}
+                sx={{ marginLeft: '-0px' }}
+              />
+            </Box>
+            {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
+          </Box>
+        )}
       </Dialog>
     );
   }
 }
-
-export default (withLayout(DangerousActionDialog): ComponentType<Props>);

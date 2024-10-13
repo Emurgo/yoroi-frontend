@@ -27,7 +27,6 @@ import MaxAssetsError from '../MaxAssetsError';
 type Props = {|
   +onClose: void => void,
   +spendableBalance: ?MultiToken,
-  +classicTheme: boolean,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
   +onAddToken: ({|

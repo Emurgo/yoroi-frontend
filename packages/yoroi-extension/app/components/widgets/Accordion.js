@@ -1,13 +1,11 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 
 import { ReactComponent as ArrowDownSVG } from '../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './Accordion.scss';
-import { withLayout } from '../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../styles/context/layout';
 
 type Props = {|
   +header: Node,
@@ -23,7 +21,7 @@ type State = {|
 |};
 
 @observer
-class Accordion extends Component<Props & InjectedLayoutProps, State> {
+export default class Accordion extends Component<Props, State> {
   state: State = {
     isToggle: true,
   };
@@ -33,13 +31,13 @@ class Accordion extends Component<Props & InjectedLayoutProps, State> {
   };
 
   render(): Node {
-    const { header, children, style, isRevampLayout } = this.props;
+    const { header, children, style } = this.props;
     const { isToggle } = this.state;
 
     const activeButtonClasses = classnames([
       styles.accordionTitle,
       isToggle && styles.activeArrow,
-      isRevampLayout && styles.revamp,
+      styles.revamp,
       this.props.activeHeader && styles.activeHead,
     ]);
 
@@ -69,5 +67,3 @@ class Accordion extends Component<Props & InjectedLayoutProps, State> {
     );
   }
 }
-
-export default (withLayout(Accordion): ComponentType<Props>);

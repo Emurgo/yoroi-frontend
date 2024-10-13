@@ -1,5 +1,5 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -7,18 +7,15 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import PasswordInput from './PasswordInput';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +initValues?: string,
   +isSubmitting: boolean,
 |};
 
 @observer
-class SpendingPasswordInput extends Component<Props & InjectedLayoutProps> {
+export default class SpendingPasswordInput extends Component<Props> {
   static defaultProps: {| initValues: void |} = {
     initValues: undefined,
   };
@@ -29,24 +26,18 @@ class SpendingPasswordInput extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { isRevampLayout } = this.props;
 
     return (
       <PasswordInput
         setForm={this.props.setForm}
         disabled={this.props.isSubmitting}
-        classicTheme={this.props.classicTheme}
         passwordMatches={_password => true}
         fieldName="walletPassword"
         validCheck={_password => true}
-        placeholder={intl.formatMessage(
-          isRevampLayout ? globalMessages.passwordLabel : globalMessages.walletPasswordLabel
-        )}
+        placeholder={intl.formatMessage(globalMessages.passwordLabel)}
         allowEmptyInput={false}
         initValues={this.props.initValues}
       />
     );
   }
 }
-
-export default (withLayout(SpendingPasswordInput): ComponentType<Props>);

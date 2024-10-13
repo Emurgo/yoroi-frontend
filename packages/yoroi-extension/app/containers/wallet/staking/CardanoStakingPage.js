@@ -1,12 +1,12 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import Dialog from '../../../components/widgets/Dialog';
@@ -20,6 +20,7 @@ import DelegationSuccessDialog from '../../../components/wallet/staking/Delegati
 import type { PoolMeta, PoolTransition } from '../../../stores/toplevel/DelegationStore';
 import DelegationTxDialog from '../../../components/wallet/staking/DelegationTxDialog';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
+import type { PoolData } from './SeizaFetcher';
 import SeizaFetcher from './SeizaFetcher';
 import config from '../../../config';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -27,28 +28,23 @@ import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHe
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
-import { withLayout } from '../../../styles/context/layout';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { Box } from '@mui/system';
-import type { PoolData } from './SeizaFetcher';
-import { isTestnet, getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
-  ...StoresAndActionsProps,
   urlTemplate: ?string,
   poolTransition: ?PoolTransition,
 |};
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
+
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
+
 type State = {|
   firstPool: PoolData | void,
   selectedPoolId: ?string,
 |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
 @observer
-class CardanoStakingPage extends Component<AllProps, State> {
+export default class CardanoStakingPage extends Component<AllProps, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -110,24 +106,7 @@ class CardanoStakingPage extends Component<AllProps, State> {
       const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
       const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
-      const classicCardanoStakingPage = (
-        <div id="classicCardanoStakingPage">
-          {this.getDialog()}
-          <SeizaFetcher
-            urlTemplate={urlTemplate}
-            locale={locale}
-            bias={stakingListBias}
-            totalAda={totalAda}
-            poolList={poolList}
-            stakepoolSelectedAction={async poolId => {
-              this.setState({ selectedPoolId: poolId });
-              await this.props.stores.delegation.createDelegationTransaction(poolId);
-            }}
-          />
-        </div>
-      );
-
-      const revampCardanoStakingPage = (
+      return (
         <>
           {!isCurrentlyDelegating ? (
             <WalletDelegationBanner
@@ -168,11 +147,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
           </Box>
         </>
       );
-
-      return this.props.renderLayoutComponent({
-        CLASSIC: classicCardanoStakingPage,
-        REVAMP: revampCardanoStakingPage,
-      });
     }
 
     return (
@@ -261,7 +235,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
         }
         hash={selectedPoolInfo.poolId}
         moreInfo={moreInfo}
-        classicTheme={this.props.stores.profile.isClassicTheme}
         onCopyAddressTooltip={(address, elementId) => {
           if (!this.props.stores.uiNotifications.isOpen(elementId)) {
             runInAction(() => {
@@ -425,7 +398,6 @@ class CardanoStakingPage extends Component<AllProps, State> {
               dialog: DelegationSuccessDialog,
             });
           }}
-          classicTheme={stores.profile.isClassicTheme}
           error={stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
             stores.explorers.selectedExplorer.get(
@@ -442,12 +414,9 @@ class CardanoStakingPage extends Component<AllProps, State> {
       return (
         <DelegationSuccessDialog
           onClose={() => stores.substores.ada.delegationTransaction.complete()}
-          classicTheme={stores.profile.isClassicTheme}
         />
       );
     }
     return undefined;
   };
 }
-
-export default (withLayout(CardanoStakingPage): ComponentType<Props>);

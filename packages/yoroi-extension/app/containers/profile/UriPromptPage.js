@@ -51,7 +51,6 @@ export default class UriPromptPage extends Component<StoresAndActionsProps> {
         return <UriPromptForm
           onAccept={this.onAccept}
           onSkip={this.onSkip}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />;
     }
 
@@ -59,7 +58,6 @@ export default class UriPromptPage extends Component<StoresAndActionsProps> {
         return <UriAccept
           onConfirm={this.props.actions.profile.acceptUriScheme.trigger}
           onBack={this.onBack}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />;
     }
 

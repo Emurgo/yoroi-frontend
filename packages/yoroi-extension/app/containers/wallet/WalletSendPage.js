@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable, runInAction } from 'mobx';
@@ -8,7 +8,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
-import WalletSendFormClassic from '../../components/wallet/send/WalletSendForm';
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
 
 // Web Wallet Confirmation
@@ -16,14 +15,11 @@ import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmat
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { withLayout } from '../../styles/context/layout';
 
 // Hardware Wallet Confirmation
 import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
@@ -54,17 +50,8 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  ...StoresAndActionsProps,
-|};
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-  +selectedLayout: string,
-|};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
 @observer
-class WalletSendPage extends Component<AllProps> {
+export default class WalletSendPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -140,7 +127,6 @@ class WalletSendPage extends Component<AllProps> {
 
     const {
       uiDialogs,
-      profile,
       transactionBuilderStore,
       protocolParameters,
     } = this.props.stores;
@@ -162,129 +148,73 @@ class WalletSendPage extends Component<AllProps> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const targetDialog = selected.type === 'mnemonic'
-      ? WalletSendConfirmationDialog
-      : HWSendConfirmationDialog;
-
-    const onSubmit = () => {
-      actions.dialogs.push.trigger({
-        dialog: targetDialog,
-      });
-      txBuilderActions.updateTentativeTx.trigger();
-    };
-
     const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
       selected.networkId
     );
     const network  = getNetworkById(selected.networkId);
 
-    if (this.props.selectedLayout === 'REVAMP') {
-      const addressStore = this.props.stores.substores.ada.addresses;
-      const resolveDomainAddressFunc = addressStore.domainResolverSupported()
-        ? addressStore.resolveDomainAddress.bind(addressStore)
-        : null;
-      return (
-        <>
-          <WalletSendFormRevamp
-            resolveDomainAddress={resolveDomainAddressFunc}
-            supportedAddressDomainBannerState={{
-              isDisplayed: this.showSupportedAddressDomainBanner,
-              onClose: this.onSupportedAddressDomainBannerClose,
-            }}
-            selectedNetwork={network}
-            selectedWallet={selected}
-            selectedExplorer={this.props.stores.explorers.selectedExplorer}
-            selectedToken={transactionBuilderStore.selectedToken}
-            defaultToken={defaultToken}
-            getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-            onSubmit={txBuilderActions.updateTentativeTx.trigger}
-            totalInput={transactionBuilderStore.totalInput}
-            hasAnyPending={hasAnyPending}
-            isClassicTheme={profile.isClassicTheme}
-            shouldSendAll={transactionBuilderStore.shouldSendAll}
-            updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
-            updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-            updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
-            fee={transactionBuilderStore.fee}
-            isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
-            reset={txBuilderActions.reset.trigger}
-            error={transactionBuilderStore.createUnsignedTx.error}
-            // Min ADA for all tokens that is already included in the tx
-            minAda={transactionBuilderStore.minAda}
-            uriParams={this.props.stores.loading.uriParams}
-            resetUriParams={this.props.stores.loading.resetUriParams}
-            memo={transactionBuilderStore.memo}
-            showMemo={this.showMemo}
-            updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
-            onAddMemo={() =>
-              this.showMemoDialog({
-                dialog: MemoNoExternalStorageDialog,
-                continuation: this.toggleShowMemo,
-              })}
-            spendableBalance={this.props.stores.transactions.balance}
-            onAddToken={txBuilderActions.addToken.trigger}
-            onRemoveTokens={txBuilderActions.removeTokens.trigger}
-            plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
-            isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
-            openDialog={this.openDialog}
-            closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
-            isOpen={uiDialogs.isOpen}
-            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
-            unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-            getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-            calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
-            maxSendableAmount={transactionBuilderStore.maxSendableAmount}
-            signRequest={transactionBuilderStore.tentativeTx}
-            staleTx={transactionBuilderStore.txMismatch}
-            sendMoneyRequest={this.props.stores.wallets.sendMoneyRequest}
-            sendMoney={this.props.actions.wallets.sendMoney.trigger}
-            ledgerSendError={this.props.stores.substores.ada.ledgerSend.error || null}
-            trezorSendError={this.props.stores.substores.ada.trezorSend.error || null}
-            ledgerSend={this.props.stores.substores.ada.ledgerSend}
-            trezorSend={this.props.stores.substores.ada.trezorSend}
-          />
-          {this.renderDialog()}
-        </>
-      );
-    }
-
+    const addressStore = this.props.stores.substores.ada.addresses;
+    const resolveDomainAddressFunc = addressStore.domainResolverSupported()
+      ? addressStore.resolveDomainAddress.bind(addressStore)
+      : null;
     return (
       <>
-        <WalletSendFormClassic
+        <WalletSendFormRevamp
+          resolveDomainAddress={resolveDomainAddressFunc}
+          supportedAddressDomainBannerState={{
+            isDisplayed: this.showSupportedAddressDomainBanner,
+            onClose: this.onSupportedAddressDomainBannerClose,
+          }}
           selectedNetwork={network}
-          validateAmount={amount =>
-            validateAmount(
-              amount,
-              transactionBuilderStore.selectedToken ?? defaultToken,
-              transactionBuilderStore.minAda.getDefault(),
-              this.context.intl
-            )
-          }
+          selectedWallet={selected}
+          selectedExplorer={this.props.stores.explorers.selectedExplorer}
+          selectedToken={transactionBuilderStore.selectedToken}
           defaultToken={defaultToken}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          onSubmit={onSubmit}
+          onSubmit={txBuilderActions.updateTentativeTx.trigger}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
-          classicTheme={profile.isClassicTheme}
+          shouldSendAll={transactionBuilderStore.shouldSendAll}
           updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
           updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-          updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
-          shouldSendAll={transactionBuilderStore.shouldSendAll}
           updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
           fee={transactionBuilderStore.fee}
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
           reset={txBuilderActions.reset.trigger}
           error={transactionBuilderStore.createUnsignedTx.error}
+          // Min ADA for all tokens that is already included in the tx
+          minAda={transactionBuilderStore.minAda}
           uriParams={this.props.stores.loading.uriParams}
           resetUriParams={this.props.stores.loading.resetUriParams}
+          memo={transactionBuilderStore.memo}
           showMemo={this.showMemo}
-          onAddMemo={() => this.showMemoDialog({
-            dialog: MemoNoExternalStorageDialog,
-            continuation: this.toggleShowMemo,
-          })}
+          updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
+          onAddMemo={() =>
+            this.showMemoDialog({
+              dialog: MemoNoExternalStorageDialog,
+              continuation: this.toggleShowMemo,
+            })}
           spendableBalance={this.props.stores.transactions.balance}
           onAddToken={txBuilderActions.addToken.trigger}
-          selectedToken={transactionBuilderStore.selectedToken}
+          onRemoveTokens={txBuilderActions.removeTokens.trigger}
+          plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+          isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
+          openDialog={this.openDialog}
+          closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
+          isOpen={uiDialogs.isOpen}
+          openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
+          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
+          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+          calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
+          maxSendableAmount={transactionBuilderStore.maxSendableAmount}
+          signRequest={transactionBuilderStore.tentativeTx}
+          staleTx={transactionBuilderStore.txMismatch}
+          sendMoneyRequest={this.props.stores.wallets.sendMoneyRequest}
+          sendMoney={this.props.actions.wallets.sendMoney.trigger}
+          ledgerSendError={this.props.stores.substores.ada.ledgerSend.error || null}
+          trezorSendError={this.props.stores.substores.ada.trezorSend.error || null}
+          ledgerSend={this.props.stores.substores.ada.ledgerSend}
+          trezorSend={this.props.stores.substores.ada.trezorSend}
         />
         {this.renderDialog()}
       </>
@@ -310,7 +240,6 @@ class WalletSendPage extends Component<AllProps> {
         <TransactionSuccessDialog
           process={process}
           onClose={this.closeTransactionSuccessDialog}
-          classicTheme={this.props.stores.profile.isClassicTheme}
         />
       );
     }
@@ -555,7 +484,6 @@ class WalletSendPage extends Component<AllProps> {
         onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        classicTheme={this.props.stores.profile.isClassicTheme}
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveTokens={txBuilderActions.removeTokens.trigger}
@@ -593,5 +521,3 @@ class WalletSendPage extends Component<AllProps> {
     );
   };
 }
-
-export default (withLayout(WalletSendPage): ComponentType<Props>);

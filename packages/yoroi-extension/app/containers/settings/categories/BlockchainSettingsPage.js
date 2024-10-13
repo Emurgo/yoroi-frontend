@@ -20,9 +20,7 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
   };
 
   render(): Node {
-    const { stores } = this.props;
-    const profileStore = stores.profile;
-    const { selected } = stores.wallets;
+    const { selected } = this.props.stores.wallets;
     if (selected == null) {
       return <NoWalletMessage />;
 
@@ -41,11 +39,9 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
 
     return (
       <>
-        {profileStore.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
-            {intl.formatMessage(settingsMenuMessages.blockchain)}
-          </Typography>
-        )}
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          {intl.formatMessage(settingsMenuMessages.blockchain)}
+        </Typography>
         <ExplorerSettings
           onSelectExplorer={({ explorerId }) =>
             stores.explorers.setSelectedExplorer(

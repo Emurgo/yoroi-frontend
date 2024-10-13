@@ -120,7 +120,6 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
             onCancel={this.onCancel}
             onBack={this.props.onBack}
             error={restoreRequest.error}
-            classicTheme={this.props.stores.profile.isClassicTheme}
             initValues={walletRestore.walletRestoreMeta}
             introMessage={this.props.introMessage || ''}
           />
@@ -214,7 +213,6 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
             onClose={this.onCancel}
             onSkip={walletRestoreActions.startRestore.trigger}
             onCheck={walletRestoreActions.startCheck.trigger}
-            classicTheme={this.props.stores.profile.isClassicTheme}
             isSubmitting={restoreRequest.isExecuting}
           />
         );
@@ -231,7 +229,6 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
     const { yoroiTransfer } = this.props.stores;
 
     const walletRestoreActions = this.props.actions.walletRestore;
-    const { profile } = this.props.stores;
     const { intl } = this.context;
 
     switch (yoroiTransfer.status) {
@@ -289,7 +286,6 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
               onCancel={this.onCancel}
               title=""
               backButtonLabel={intl.formatMessage(globalMessages.cancel)}
-              classicTheme={profile.isClassicTheme}
             />
           );
         }
@@ -297,7 +293,6 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
           <SuccessPage
             title={intl.formatMessage(globalMessages.success)}
             text={intl.formatMessage(messages.walletUpgradeNoop)}
-            classicTheme={profile.isClassicTheme}
             closeInfo={{
               closeLabel: intl.formatMessage(globalMessages.continue),
               onClose: walletRestoreActions.startRestore.trigger,

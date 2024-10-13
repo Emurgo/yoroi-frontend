@@ -2,10 +2,9 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import environment from '../../environment';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
@@ -13,14 +12,6 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-const messages = defineMessages({
-  title: {
-    id: 'profile.languageSelect.title',
-    defaultMessage: '!!!Language Select',
-  },
-});
 
 @observer
 export default class LanguageSelectionPage extends Component<StoresAndActionsProps> {
@@ -53,15 +44,8 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
   };
 
   renderByron(props: StoresAndActionsProps): Node {
-    const topBarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
     const { selected } = this.props.stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
-    const topBar = props.stores.profile.isClassicTheme ? (
-      <TopBar
-        title={topBarTitle}
-      />) : undefined;
     const displayedBanner = props.stores
       .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
@@ -71,7 +55,6 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
       />;
     return (
       <TopBarLayout
-        topbar={topBar}
         languageSelectionBackground
         banner={displayedBanner}
       >

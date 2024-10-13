@@ -14,7 +14,6 @@ export default class WalletCreateDialogContainer extends Component<{| ...StoresA
   render(): Node {
     return (
       <WalletCreateDialog
-        classicTheme={this.props.stores.profile.isClassicTheme}
         onSubmit={request => this.props.stores.substores.ada.wallets.startWalletCreation(request)}
         onCancel={this.props.onClose}
       />
