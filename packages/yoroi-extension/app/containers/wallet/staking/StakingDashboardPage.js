@@ -37,11 +37,12 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   }
 
   render(): Node {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const delegationStore = this.props.stores.delegation;
+    const delegationStore = stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver.publicDeriverId);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -54,7 +55,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     );
 
     const showRewardAmount = errorIfPresent == null
-      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
+      && stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
 
     const dashboard = (
       <StakingDashboard
@@ -62,12 +63,12 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           stakePools.pools == null
             ? undefined
             : {
-                currentPage: this.props.stores.delegation.selectedPage,
+                currentPage: stores.delegation.selectedPage,
                 numPages: stakePools.pools.length,
-                goToPage: page => this.props.actions.delegation.setSelectedPage.trigger(page),
+                goToPage: page => stores.delegation.setSelectedPage(page),
               }
         }
-        hasAnyPending={this.props.stores.transactions.hasAnyPending}
+        hasAnyPending={stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
           wallet: publicDeriver,
@@ -77,18 +78,18 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           delegationRequests,
           networkId: publicDeriver.networkId,
           defaultTokenId: publicDeriver.defaultTokenId,
-          currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(
+          currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(
             publicDeriver
           ).currentEpoch,
-          shouldHideBalance: this.props.stores.profile.shouldHideBalance,
-          getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
-          tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+          getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         })}
-        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
+        isUnregistered={!stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
-            this.props.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
+            stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
           )
         )}
       />

@@ -124,13 +124,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const { delegation } = this.actions;
     this.registerReactions([this._changeWallets]);
-    delegation.setSelectedPage.listen(this._setSelectedPage);
   }
 
   @action
-  _setSelectedPage: number => void = newPage => {
+  setSelectedPage: number => void = newPage => {
     this.selectedPage = newPage;
   };
 
