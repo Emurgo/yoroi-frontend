@@ -7,7 +7,6 @@ import NotificationsActions from './notifications-actions';
 import LoadingActions from './loading-actions';
 import MemosActions from './memos-actions';
 import WalletActions from './wallet-actions';
-import AddressesActions from './common/addresses-actions';
 import TransactionsActions from './common/transactions-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
@@ -30,7 +29,6 @@ export type ActionsMap = {|
   memos: MemosActions,
   loading: LoadingActions,
   wallets: WalletActions,
-  addresses: AddressesActions,
   transactions: TransactionsActions,
   walletRestore: WalletRestoreActions,
   delegation: DelegationActions,
@@ -51,7 +49,6 @@ const actionsMap: ActionsMap = Object.freeze({
   memos: new MemosActions(),
   loading: new LoadingActions(),
   wallets: new WalletActions(),
-  addresses: new AddressesActions(),
   walletRestore: new WalletRestoreActions(),
   delegation: new DelegationActions(),
   transactions: new TransactionsActions(),

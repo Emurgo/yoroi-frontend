@@ -36,13 +36,6 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-
-    const actions = this.actions.addresses;
-    actions.createAddress.listen(this._createAddress);
-    actions.resetErrors.listen(this._resetErrors);
-    actions.setFilter.listen(this._setFilter);
-    actions.resetFilter.listen(this._resetFilter);
-
     for (const store of allAddressSubgroups) {
       this._addressSubgroupMap.set(store.class, new store.class({
         stores: this.stores,
@@ -56,7 +49,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return this._addressSubgroupMap;
   }
 
-  _createAddress: WalletState => Promise<void> = async (
+  createAddress: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     try {
@@ -76,7 +69,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return address;
   };
 
-  @action _resetErrors: void => void = () => {
+  @action resetErrors: void => void = () => {
     this.error = null;
   };
 
@@ -191,11 +184,11 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return addresses;
   }
 
-  @action _setFilter: AddressFilterKind => void = (filter) => {
+  @action setFilter: AddressFilterKind => void = (filter) => {
     this.addressFilter = filter;
   }
 
-  @action _resetFilter: void => void = () => {
+  @action resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
   }
 }

@@ -11,13 +11,12 @@ import { routeForStore, allAddressSubgroups } from '../../stores/stateless/addre
 import { Box } from '@mui/material';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +children?: Node,
 |};
 
 @observer
-export default class Receive extends Component<Props> {
+export default class Receive extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -50,7 +49,7 @@ export default class Receive extends Component<Props> {
     }
   }
   componentWillUnmount() {
-    this.props.actions.addresses.resetFilter.trigger();
+    this.props.stores.addresses.resetFilter();
   }
 
   render(): Node {
@@ -85,7 +84,7 @@ export default class Receive extends Component<Props> {
       <Box display="flex" mx="auto">
         <ReceiveWithNavigation
           addressStores={storesForWallet}
-          setFilter={filter => this.props.actions.addresses.setFilter.trigger(filter)}
+          setFilter={filter => this.props.stores.addresses.setFilter(filter)}
           activeFilter={this.props.stores.addresses.addressFilter}
         >
           {this.props.children}

@@ -62,22 +62,24 @@ class WalletReceivePage extends Component<AllProps> {
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();
-    this.props.actions.addresses.resetFilter.trigger();
+    this.props.stores.addresses.resetFilter();
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver != null) {
+      // <TODO:IMPROVE> there's gotta be a better way to render loading while waiting for a request result
       this.props.actions.dialogs.open.trigger({
         dialog: LoadingSpinner,
       });
-      await this.props.actions.addresses.createAddress.trigger(publicDeriver);
+      await stores.addresses.createAddress(publicDeriver);
       this.props.actions.dialogs.closeActiveDialog.trigger();
     }
   };
 
   resetErrors: void => void = () => {
-    this.props.actions.addresses.resetErrors.trigger();
+    this.props.stores.addresses.resetErrors();
   };
 
   closeNotification: void => void = () => {
