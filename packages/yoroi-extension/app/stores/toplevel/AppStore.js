@@ -8,19 +8,13 @@ import type { StoresMap } from '../index';
 
 export default class AppStore extends Store<StoresMap, ActionsMap> {
 
-  setup(): void {
-    super.setup();
-    this.actions.router.goToRoute.listen(this._updateRouteLocation);
-    this.actions.router.redirect.listen(this._redirect);
-  }
-
   @computed get currentRoute(): string {
     return this.stores.router.location.pathname;
   }
 
-  _redirect: {|
+  redirect: {|
     route: string,
-    params: ?Object,
+    params?: Object,
   |} => void = (
     options
   ) => {
@@ -28,9 +22,9 @@ export default class AppStore extends Store<StoresMap, ActionsMap> {
     this.stores.router.replace(routePath);
   };
 
-  _updateRouteLocation: {|
+  goToRoute: {|
     route: string,
-    params: ?Object,
+    params?: Object,
     publicDeriverId?: null | number,
   |} => void = (
     options

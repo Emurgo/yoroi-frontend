@@ -63,13 +63,13 @@ class SidebarContainer extends Component<AllProps, State> {
   }
 
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { profile } = stores;
 
     const SidebarComponent = (
       <Sidebar
         onCategoryClicked={category => {
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: category.route,
           });
         }}
@@ -89,12 +89,12 @@ class SidebarContainer extends Component<AllProps, State> {
     const SidebarRevampComponent = (
       <SidebarRevamp
         onLogoClick={() => {
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: ROUTES.WALLETS.ROOT,
           });
         }}
         onCategoryClicked={category => {
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: category.route,
           });
         }}

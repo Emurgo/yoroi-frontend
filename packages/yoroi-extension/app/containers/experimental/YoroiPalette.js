@@ -24,7 +24,7 @@ class YoroiPaletteContainer extends Component<AllProps> {
 
   componentDidMount() {
     if(!environment.isNightly() && !environment.isDev()) {
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS })
+      this.props.stores.app.goToRoute({ route: ROUTES.MY_WALLETS })
     }
   }
 
@@ -37,7 +37,7 @@ class YoroiPaletteContainer extends Component<AllProps> {
         sidebar={sidebarContainer}
         navbar={
           (<Navbar
-            goToRoute={(route) => this.props.actions.router.goToRoute.trigger({ route })}
+            goToRoute={(route) => stores.app.goToRoute({ route })}
           />)
         }
       >

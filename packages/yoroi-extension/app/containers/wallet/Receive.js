@@ -25,24 +25,25 @@ export default class Receive extends Component<{| ...StoresAndActionsProps, ...L
   };
 
   componentDidMount() {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     const rootRoute = buildRoute(ROUTES.WALLETS.RECEIVE.ROOT);
 
     const storesForWallet = allAddressSubgroups.filter(store => store.isRelated());
-    if (this.props.stores.app.currentRoute === rootRoute) {
+    if (stores.app.currentRoute === rootRoute) {
       // if no store is specified, we just send the user to the first store in the list
       const firstRoute = routeForStore(storesForWallet[0].name);
       // we redirect otherwise it would break the back button
-      this.props.actions.router.redirect.trigger({ route: firstRoute });
+      stores.app.redirect({ route: firstRoute });
     } else {
       const currentSelectedStore = storesForWallet.find(
-        store => routeForStore(store.name) === this.props.stores.app.currentRoute
+        store => routeForStore(store.name) === stores.app.currentRoute
       );
       // if user switched to a different wallet that doesn't support the store type selected
       if (currentSelectedStore == null) {
         // just send user to the first store supported by this wallet
-        this.props.actions.router.redirect.trigger({
+        stores.app.redirect({
           route: routeForStore(storesForWallet[0].name),
         });
       }
@@ -53,13 +54,14 @@ export default class Receive extends Component<{| ...StoresAndActionsProps, ...L
   }
 
   render(): Node {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
 
     const storesForWallet = allAddressSubgroups
       .filter(store => store.isRelated())
       .map(store => {
-        const request = this.props.stores.addresses.addressSubgroupMap.get(store.class);
+        const request = stores.addresses.addressSubgroupMap.get(store.class);
         if (request == null) throw new Error('Should never happen');
         return {
           meta: store,
@@ -68,11 +70,11 @@ export default class Receive extends Component<{| ...StoresAndActionsProps, ...L
       })
       .filter(storeInfo => !storeInfo.meta.isHidden({ result: storeInfo.request.all }))
       .map(storeInfo => ({
-        isActiveStore: this.props.stores.app.currentRoute.startsWith(
+        isActiveStore: stores.app.currentRoute.startsWith(
           routeForStore(storeInfo.meta.name)
         ),
         setAsActiveStore: () =>
-          this.props.actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: routeForStore(storeInfo.meta.name),
           }),
         name: storeInfo.meta.name,
@@ -84,8 +86,8 @@ export default class Receive extends Component<{| ...StoresAndActionsProps, ...L
       <Box display="flex" mx="auto">
         <ReceiveWithNavigation
           addressStores={storesForWallet}
-          setFilter={filter => this.props.stores.addresses.setFilter(filter)}
-          activeFilter={this.props.stores.addresses.addressFilter}
+          setFilter={filter => stores.addresses.setFilter(filter)}
+          activeFilter={stores.addresses.addressFilter}
         >
           {this.props.children}
         </ReceiveWithNavigation>

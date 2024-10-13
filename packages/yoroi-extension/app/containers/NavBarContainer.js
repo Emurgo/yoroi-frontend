@@ -33,14 +33,14 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
   };
 
   switchToNewWallet: (number) => void = publicDeriverId => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: this.props.stores.app.currentRoute,
       publicDeriverId,
     });
   };
 
   openDialogWrapper: any => void = dialog => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.MY_WALLETS });
+    this.props.stores.app.goToRoute({ route: ROUTES.MY_WALLETS });
     this.props.actions.dialogs.open.trigger({ dialog });
   };
 
@@ -59,7 +59,7 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
           key={wallet.publicDeriverId}
           plateComponent={<NavPlate plate={wallet.plate} walletType={wallet.type} name={wallet.name} />}
           onSelect={() => this.switchToNewWallet(wallet.publicDeriverId)}
-          isCurrentWallet={wallet === this.props.stores.wallets.selected}
+          isCurrentWallet={wallet === stores.wallets.selected}
           syncTime={lastSyncInfo?.Time ? moment(lastSyncInfo.Time).fromNow() : null}
           detailComponent={
             <NavWalletDetails
@@ -67,13 +67,13 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
               rewards={rewards}
               onUpdateHideBalance={this.updateHideBalance}
               shouldHideBalance={profile.shouldHideBalance}
-              getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-              defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+              getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+              defaultToken={stores.tokenInfoStore.getDefaultTokenInfo(
                 wallet.networkId
               )}
               showEyeIcon={false}
               unitOfAccountSetting={profile.unitOfAccount}
-              getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+              getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
               purpose='allWallets'
             />
           }
@@ -97,7 +97,7 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
           return <NoWalletsDropdown />;
         }
 
-        const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(
+        const rewards: MultiToken = stores.delegation.getRewardBalanceOrZero(
           publicDeriver
         );
 
@@ -107,12 +107,12 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
             shouldHideBalance={profile.shouldHideBalance}
             rewards={rewards}
             walletAmount={publicDeriver.balance}
-            getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-            defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+            getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+            defaultToken={stores.tokenInfoStore.getDefaultTokenInfo(
               publicDeriver.networkId
             )}
             unitOfAccountSetting={profile.unitOfAccount}
-            getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+            getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
             purpose='topBar'
           />
         );
@@ -123,7 +123,7 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
           headerComponent={getDropdownHead()}
           contentComponents={dropdownContent}
           onAddWallet={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD })
           }
           openBuySellDialog={() => this.openDialogWrapper(BuySellDialog)}
         />

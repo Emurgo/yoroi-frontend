@@ -73,12 +73,13 @@ class WalletSendPage extends Component<AllProps> {
   @observable showSupportedAddressDomainBanner: boolean = true;
 
   closeTransactionSuccessDialog: void => void = () => {
-    const redirect = this.props.stores.loading.sellAdaParams?.redirect;
+    const { stores } = this.props;
+    const redirect = stores.loading.sellAdaParams?.redirect;
     if (redirect) {
       window.document.location = redirect;
     } else {
       this.props.actions.dialogs.closeActiveDialog.trigger();
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 
@@ -477,13 +478,13 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   noCloudWarningDialog: void => Node = () => {
-    const { actions } = this.props;
+    const { actions, stores } = this.props;
     return (
       <MemoNoExternalStorageDialog
         onCancel={actions.memos.closeMemoDialog.trigger}
         addExternal={() => {
           actions.memos.closeMemoDialog.trigger();
-          actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+          stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
         }}
         onAcknowledge={() => {
           this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();

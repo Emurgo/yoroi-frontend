@@ -111,22 +111,23 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
       this._setError(null);
       this._setActionProcessing(true);
 
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      const { stores } = this;
+      await stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest,
             wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+        refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
 
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.stores.wallets.sendMoneyRequest.reset();
+      stores.wallets.sendMoneyRequest.reset();
       if (request.onSuccess) {
         request.onSuccess();
       } else {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+        stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
       }
 
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');

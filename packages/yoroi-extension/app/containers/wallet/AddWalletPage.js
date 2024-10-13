@@ -48,7 +48,7 @@ class AddWalletPage extends Component<AllProps> {
 
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+      this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
     }
     this.props.actions.dialogs.closeActiveDialog.trigger();
   };
@@ -69,8 +69,8 @@ class AddWalletPage extends Component<AllProps> {
   }
 
   render(): Node {
-    const { selectedNetwork } = this.props.stores.profile;
     const { actions, stores } = this.props;
+    const { selectedNetwork } = stores.profile;
     const { uiDialogs } = stores;
 
     const openTrezorConnectDialog = () => {
@@ -211,7 +211,7 @@ class AddWalletPage extends Component<AllProps> {
       </TopBarLayout>
     );
 
-    const { hasAnyWallets } = this.props.stores.wallets;
+    const { hasAnyWallets } = stores.wallets;
     if (!hasAnyWallets) {
       addWalletPageClassic = (
         <TopBarLayout
@@ -229,14 +229,14 @@ class AddWalletPage extends Component<AllProps> {
       );
     }
 
-    const goToRoute = this.props.actions.router.goToRoute;
+    const goToRoute = stores.app.goToRoute;
     const addWalletPageComponent = (
       <>
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
-          onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
-          onRestore={() => goToRoute.trigger({ route: ROUTES.WALLETS.RESTORE_WALLET })}
-          goToCurrentWallet={() => goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
+          onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}
+          goToCurrentWallet={() => goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
           hasAnyWallets={hasAnyWallets === true}
         />
         {activeDialog}
@@ -263,7 +263,7 @@ class AddWalletPage extends Component<AllProps> {
   }
 
   _goToSettingsRoot: () => void = () => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.SETTINGS.ROOT,
     });
   };

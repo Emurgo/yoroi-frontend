@@ -312,7 +312,7 @@ class StakingPageContent extends Component<AllProps> {
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog actions={actions} onClose={this.onClose} intl={this.context.intl} />
+          <GovernanceParticipateDialog actions={actions} stores={stores} onClose={this.onClose} intl={this.context.intl} />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />

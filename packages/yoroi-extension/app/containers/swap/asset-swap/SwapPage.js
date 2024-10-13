@@ -57,8 +57,9 @@ type Intl = {|
 |};
 
 function SwapPage(props: StoresAndActionsProps & Intl): Node {
+  const { stores } = props;
   const [openedDialog, setOpenedDialog] = useState('');
-  const { orderStep, setOrderStepValue } = props.stores.substores.ada.swapStore;
+  const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
   const {
     slippage,
@@ -74,15 +75,15 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   } = useSwap();
   const { sellTokenInfo, buyTokenInfo, resetSwapForm, sellQuantity, buyQuantity } = useSwapForm();
 
-  const wallet = props.stores.wallets.selectedOrFail;
+  const wallet = stores.wallets.selectedOrFail;
   const walletType: string = wallet.type;
   const isHardwareWallet = wallet.isHardware;
   const network = getNetworkById(wallet.networkId);
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
+  const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
   const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
-    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
+    stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
   const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
     getTokenInfoBatch([id])[id].then(res => res ?? {});
 
@@ -125,7 +126,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
 
   const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
 
-  const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
+  const disclaimerFlag = stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
     // MOUNT
@@ -160,7 +161,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
         console.error('Failed to load stored slippage', e);
       });
     setSelectedWalletAddress(addressHexToBech32(wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address));
-    props.stores.substores.ada.stateFetchStore.fetcher
+    stores.substores.ada.stateFetchStore.fetcher
       .getSwapFeeTiers({ network })
       .then(feeTiers => {
         const aggregatorFeeTiers = feeTiers?.[SWAP_AGGREGATOR] ?? [];
@@ -195,9 +196,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
 
   // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated
   const getFormattedPairingValue = (lovelaces: string): string => {
-    const { currency } = props.stores.profile.unitOfAccount;
+    const { currency } = stores.profile.unitOfAccount;
     if (currency == null || defaultTokenInfo.ticker == null) return '-';
-    const price = props.stores.coinPriceStore.getCurrentPrice(defaultTokenInfo.ticker, currency);
+    const price = stores.coinPriceStore.getCurrentPrice(defaultTokenInfo.ticker, currency);
     const shiftedAmount = new BigNumber(lovelaces).shiftedBy(-(defaultTokenInfo.decimals ?? 0));
     const val = price ? calculateAndFormatValue(shiftedAmount, price) : '-';
     return `${val} ${currency}`;
@@ -271,9 +272,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       : { normal: { ...baseBroadcastRequest, password },
     };
     try {
-      const refreshWallet = () => props.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
+      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
       // $FlowIgnore[incompatible-call]
-      await props.stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
       try {
         ampli.swapOrderSubmitted({
@@ -343,7 +344,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       ptFees,
       poolProvider,
     };
-    const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     runInAction(() => {
       setSignRequest(txSignRequest);
     });
@@ -366,7 +367,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
         <Box sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }} borderBottom="1px solid" borderColor="grayscale.200">
           {orderStep === 0 && (
             <CreateSwapOrder
-              swapStore={props.stores.substores.ada.swapStore}
+              swapStore={stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               onSetNewSlippage={onSetNewSlippage}
               defaultTokenInfo={defaultTokenInfo}
@@ -387,7 +388,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
               onError={() => {
-                props.actions.router.goToRoute.trigger({ route: ROUTES.SWAP.ERROR });
+                stores.app.goToRoute({ route: ROUTES.SWAP.ERROR });
               }}
             />
           )}
@@ -396,7 +397,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               txSubmitErrorState={txSubmitErrorState}
               onTryAgain={processBackToStart}
               onSuccess={() => {
-                props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+                stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
               }}
             />
           )}
@@ -454,7 +455,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
         <SwapDisclaimerDialog
           onDialogConfirm={onAcceptDisclaimer}
           onDialogRefuse={() => {
-            props.actions.router.redirect.trigger({ route: ROUTES.WALLETS.ROOT });
+            stores.app.redirect({ route: ROUTES.WALLETS.ROOT });
           }}
         />
       )}

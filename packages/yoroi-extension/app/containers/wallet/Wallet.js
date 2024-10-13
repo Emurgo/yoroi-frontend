@@ -93,7 +93,7 @@ class Wallet extends Component<AllProps> {
   }
 
   navigateToMyWallets: string => void = destination => {
-    this.props.actions.router.goToRoute.trigger({ route: destination });
+    this.props.stores.app.goToRoute({ route: destination });
   };
 
   render(): Node {
@@ -127,11 +127,11 @@ class Wallet extends Component<AllProps> {
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
+    const currentPool = stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
@@ -148,8 +148,8 @@ class Wallet extends Component<AllProps> {
             label: intl.formatMessage(category.label),
             route: category.route,
           }))}
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={route => this.props.stores.app.currentRoute.startsWith(route)}
+        onItemClick={route => stores.app.goToRoute({ route })}
+        isActiveItem={route => stores.app.currentRoute.startsWith(route)}
         locationId="wallet"
       />
     );
@@ -183,9 +183,9 @@ class Wallet extends Component<AllProps> {
               className: category.className,
               icon: category.icon,
               label: category.label,
-              isActive: this.props.stores.app.currentRoute.startsWith(category.route),
+              isActive: stores.app.currentRoute.startsWith(category.route),
               onClick: () =>
-                this.props.actions.router.goToRoute.trigger({
+                stores.app.goToRoute({
                   route: category.route,
                 }),
             }))}
@@ -240,14 +240,15 @@ class Wallet extends Component<AllProps> {
   };
 
   getDialogs: (any, any) => Node = (intl, currentPool) => {
-    const isOpen = this.props.stores.uiDialogs.isOpen;
+    const { stores } = this.props;
+    const isOpen = stores.uiDialogs.isOpen;
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
-    const selectedWallet = this.props.stores.wallets.selected;
-    const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(selectedWallet);
+    const selectedWallet = stores.wallets.selected;
+    const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
 
 
     if (
-      this.props.stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
+      stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
       !isRevampDialogOpen &&
       poolTransitionInfo?.shouldShowTransitionFunnel
     )
@@ -255,16 +256,16 @@ class Wallet extends Component<AllProps> {
         <PoolTransitionDialog
           intl={intl}
           onClose={() => {
-            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
+            stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
           }}
           poolTransition={poolTransitionInfo}
           currentPoolId={currentPool ?? ''}
           onUpdatePool={() => {
-            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
+            stores.delegation.setPoolTransitionConfig(selectedWallet, {
               show: 'idle',
               shouldUpdatePool: true,
             });
-            this.props.actions.router.goToRoute.trigger({
+            stores.app.goToRoute({
               route: ROUTES.STAKING,
             });
           }}
@@ -275,7 +276,7 @@ class Wallet extends Component<AllProps> {
       return (
         <RevampAnnouncementDialog
           onClose={() => {
-            this.props.stores.profile.markRevampAsAnnounced();
+            stores.profile.markRevampAsAnnounced();
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
         />

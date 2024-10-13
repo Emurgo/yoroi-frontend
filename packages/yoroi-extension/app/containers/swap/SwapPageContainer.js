@@ -53,7 +53,7 @@ class SwapPageContainer extends Component<AllProps> {
 
     const menu = (
       <SwapMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
+        onItemClick={route => stores.app.goToRoute({ route })}
         isActiveItem={this.isActivePage}
       />
     );

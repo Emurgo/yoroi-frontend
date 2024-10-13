@@ -32,7 +32,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
         ampli.createWalletLanguagePageViewed();
       },
     },
@@ -43,7 +43,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
         ampli.createWalletTermsPageViewed();
       },
     },
@@ -54,7 +54,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
@@ -74,7 +74,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
@@ -84,52 +84,53 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
       isDone: () => this.hasRedirected,
       action: async () => {
-        const { wallets } = this.stores;
+        const { stores } = this;
+        const { wallets } = stores;
 
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
-        await this.stores.memos.loadFromStorage();
-        await this.stores.tokenInfoStore.refreshTokenInfo();
-        await this.stores.coinPriceStore.loadFromStorage();
+        await stores.memos.loadFromStorage();
+        await stores.tokenInfoStore.refreshTokenInfo();
+        await stores.coinPriceStore.loadFromStorage();
 
         await wallets.restoreWalletsFromStorage();
         subscribe();
-        if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
-          this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+        if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
+          stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
           const firstWallet =
             wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
           if (firstWallet == null) {
-            this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
             return;
           }
-          const isRevamp = this.stores.profile.isRevampTheme;
+          const isRevamp = stores.profile.isRevampTheme;
           if (isRevamp) {
-            const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
-            this.actions.router.goToRoute.trigger({
+            const lastSelectedWallet = stores.wallets.getLastSelectedWallet();
+            stores.app.goToRoute({
               route: ROUTES.WALLETS.ROOT,
               publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
             });
           } else if (wallets.wallets.length === 1) {
             // if user only has 1 wallet, just go to it directly as a shortcut
-            this.actions.router.goToRoute.trigger({
+            stores.app.goToRoute({
               route: ROUTES.WALLETS.ROOT,
               publicDeriverId: firstWallet.publicDeriverId,
             });
           } else {
-            this.actions.router.goToRoute.trigger({
+            stores.app.goToRoute({
               route: ROUTES.MY_WALLETS,
             });
           }
         }
-        if (this.stores.loading.shouldRedirect) {
-          this.stores.loading.redirect();
+        if (stores.loading.shouldRedirect) {
+          stores.loading.redirect();
         }
         runInAction(() => {
           this.hasRedirected = true;

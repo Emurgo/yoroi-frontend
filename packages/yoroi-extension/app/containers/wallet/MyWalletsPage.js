@@ -55,7 +55,7 @@ class MyWalletsPage extends Component<AllProps> {
   handleWalletNavItemClick: number => void = (
     publicDeriverId
   ) => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.WALLETS.ROOT,
       publicDeriverId,
     });
@@ -65,7 +65,7 @@ class MyWalletsPage extends Component<AllProps> {
     this.props.actions.wallets.setActiveWallet.trigger({
       publicDeriverId
     });
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.SETTINGS.WALLET,
     });
   };
@@ -75,7 +75,7 @@ class MyWalletsPage extends Component<AllProps> {
     const { actions, stores } = this.props;
 
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const { wallets } = this.props.stores.wallets;
+    const { wallets } = stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
     const navbarElementClassic = (
       <NavBar
@@ -83,7 +83,7 @@ class MyWalletsPage extends Component<AllProps> {
         button={
           <NavBarAddButton
             onClick={() =>
-              this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
+              stores.app.goToRoute({ route: ROUTES.WALLETS.ADD })
             }
           />
         }

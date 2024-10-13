@@ -36,11 +36,11 @@ class ConnectedWebsitesPageContainer extends Component<AllProps> {
   async componentDidMount() {
     // User should not be able to access the route when using Yoroi Light
     if (environment.isLight) {
-      this.props.actions.router.goToRoute.trigger({
+      this.props.stores.app.goToRoute({
         route: ROUTES.MY_WALLETS,
       });
     }
-    this.props.actions.connector.refreshActiveSites.trigger();
+    await this.props.actions.connector.refreshActiveSites.trigger();
     await this.props.actions.connector.getConnectorWhitelist.trigger();
   }
 

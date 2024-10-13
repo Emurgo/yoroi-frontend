@@ -33,7 +33,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
   };
 
   goToCreateWallet: void => void = () => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
   }
 
   setupTransferFundsWithPaperMnemonic: ((payload: {|
@@ -60,18 +60,15 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   transferFunds: void => Promise<void> = async () => {
     // broadcast transfer transaction then call continuation
-    const walletsStore = this.props.stores.wallets;
-    const yoroiTransfer = this.props.stores.yoroiTransfer;
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
-    }
+    const { stores } = this.props;
+    const { wallets: walletsStore, yoroiTransfer } = stores;
+    const wallet = stores.wallets.selectedOrFail;
     await this.props.actions.yoroiTransfer.transferFunds.trigger({
-      network: getNetworkById(publicDeriver.networkId),
+      network: getNetworkById(wallet.networkId),
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
-          await walletsStore.refreshWalletFromRemote(publicDeriver.publicDeriverId);
+          await walletsStore.refreshWalletFromRemote(wallet.publicDeriverId);
         } catch (_e) {
           // still need to re-route even if refresh failed
         }
@@ -79,7 +76,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
         await new Promise(resolve => {
           setTimeout(() => {
             if (walletsStore.selected != null) {
-              this.props.actions.router.goToRoute.trigger({
+              stores.app.goToRoute({
                 route: ROUTES.WALLETS.TRANSACTIONS
               });
             }
@@ -87,7 +84,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           }, Math.max(SUCCESS_PAGE_STAY_TIME - timeToRefresh, 0));
         });
       },
-      getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
+      getDestinationAddress: yoroiTransfer.nextInternalAddress(wallet),
       rebuildTx: true,
     });
   }

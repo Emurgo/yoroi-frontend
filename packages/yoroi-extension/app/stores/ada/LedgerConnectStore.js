@@ -392,18 +392,19 @@ export default class LedgerConnectStore
 
   async _onSaveSuccess(wallet: WalletState): Promise<void> {
     // close the active dialog
+    const { stores } = this;
     Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
-    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+    if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
       this.actions.dialogs.closeActiveDialog.trigger();
     }
 
-    await this.stores.wallets.addHwWallet(wallet);
+    await stores.wallets.addHwWallet(wallet);
     this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
-    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
       // show success notification
-      this.stores.wallets.showLedgerWalletIntegratedNotification();
+      stores.wallets.showLedgerWalletIntegratedNotification();
 
       this.teardown();
       Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
@@ -414,7 +415,7 @@ export default class LedgerConnectStore
 
   finishTransfer: void => void = () => {
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
     this.stores.wallets.showLedgerWalletIntegratedNotification();

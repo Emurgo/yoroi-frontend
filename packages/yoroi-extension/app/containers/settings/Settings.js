@@ -53,7 +53,7 @@ class Settings extends Component<AllProps> {
 
     const menu = (
       <SettingsMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
+        onItemClick={route => stores.app.goToRoute({ route })}
         isActiveItem={this.isActivePage}
       />
     );

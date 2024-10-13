@@ -1,5 +1,4 @@
 // @flow
-import RouterActions from './router-actions';
 import WalletBackupActions from './wallet-backup-actions';
 import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
@@ -15,7 +14,6 @@ import  ConnectorActionsMap from '../connector/actions/connector-actions';
 export type ActionsMap = {|
   txBuilderActions: TxBuilderActions,
   walletSettings: WalletSettingsActions,
-  router: RouterActions,
   walletBackup: WalletBackupActions,
   profile: ProfileActions,
   dialogs: DialogsActions,
@@ -30,7 +28,6 @@ export type ActionsMap = {|
 const actionsMap: ActionsMap = Object.freeze({
   txBuilderActions: new TxBuilderActions(),
   walletSettings: new WalletSettingsActions(),
-  router: new RouterActions(),
   walletBackup: new WalletBackupActions(),
   profile: new ProfileActions(),
   dialogs: new DialogsActions(),

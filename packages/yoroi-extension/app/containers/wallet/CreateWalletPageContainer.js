@@ -28,7 +28,7 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
           openDialog={dialog => this.props.actions.dialogs.open.trigger({ dialog })}
           closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
-          goToRoute={route => actions.router.goToRoute.trigger({ route })}
+          goToRoute={route => stores.app.goToRoute({ route })}
         />
       </Suspense>
     );

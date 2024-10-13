@@ -352,12 +352,13 @@ export default class TrezorConnectStore
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
     this.actions.dialogs.closeActiveDialog.trigger();
 
-    await this.stores.wallets.addHwWallet(wallet);
+    const { stores } = this;
+    await stores.wallets.addHwWallet(wallet);
     this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    this.stores.wallets.showTrezorTWalletIntegratedNotification();
+    stores.wallets.showTrezorTWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

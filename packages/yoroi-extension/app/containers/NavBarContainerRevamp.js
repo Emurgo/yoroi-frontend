@@ -44,15 +44,17 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
+    this.props.stores.app.goToRoute({ route, publicDeriverId: newWalletId });
   };
 
   checkAndResetGovRoutes: void => void = () => {
+    const { stores } = this.props;
+    const currentRoute = stores.app.currentRoute;
     if (
-      this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
-      this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
+      currentRoute === ROUTES.Governance.FAIL ||
+      currentRoute === ROUTES.Governance.SUBMITTED
     ) {
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
+      stores.app.goToRoute({ route: ROUTES.Governance.ROOT });
     }
   };
 
@@ -111,14 +113,15 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
   }
 
   getDialog: void => Node = () => {
-    const { selected, wallets } = this.props.stores.wallets;
-    const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
+    const { stores } = this.props;
+    const { selected, wallets } = stores.wallets;
+    const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
 
-    if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
+    if (stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
 
       wallets.forEach(wallet => {
-        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
+        const rewards = stores.delegation.getRewardBalanceOrZero(
           wallet
         );
 
@@ -146,23 +149,23 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
             this.checkAndResetGovRoutes();
             this.props.actions.dialogs.closeActiveDialog.trigger();
           }}
-          shouldHideBalance={this.props.stores.profile.shouldHideBalance}
+          shouldHideBalance={stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
           onAddWallet={() => {
             this.props.actions.dialogs.closeActiveDialog.trigger();
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
           }}
           updateSortedWalletList={this.props.actions.profile.updateSortedWalletList.trigger}
-          walletsNavigation={this.props.stores.profile.walletsNavigation}
-          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+          walletsNavigation={stores.profile.walletsNavigation}
+          unitOfAccountSetting={stores.profile.unitOfAccount}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         />
       );
     }
 
-    if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
+    if (stores.uiDialogs.isOpen(BuySellDialog)) {
       if (!selected) {
         return null;
       }
@@ -178,7 +181,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
         <BuySellDialog
           onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
           onExchangeCallback={() =>
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })
+            stores.app.goToRoute({ route: ROUTES.EXCHANGE_END })
           }
           currentBalanceAda={
             selected.balance.getDefault().shiftedBy(-numberOfDecimals)

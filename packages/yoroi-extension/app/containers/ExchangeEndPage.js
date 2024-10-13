@@ -37,7 +37,7 @@ class ExchangeEndPage extends Component<Props> {
         showAsCard
       >
         <ExchangeEndPageContent
-          onConfirm={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          onConfirm={() => stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
         />
       </TopBarLayout>
     );

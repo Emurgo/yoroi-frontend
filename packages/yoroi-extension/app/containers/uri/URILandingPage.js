@@ -11,14 +11,15 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 @observer
 export default class URILandingPage extends Component<StoresAndActionsProps> {
   onClose: void => void = () => {
+    const { stores } = this.props;
     this.props.actions.dialogs.closeActiveDialog.trigger();
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
-    this.props.stores.loading.resetUriParams();
+    stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+    stores.loading.resetUriParams();
   };
 
   onConfirm: void => void = () => {
     // this will automatically reroute to the right page if no wallet exists
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.WALLETS.SEND,
       publicDeriverId: this.firstSelectedWalletId(),
     });

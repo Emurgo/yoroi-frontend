@@ -113,7 +113,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   @action
   redirect: void => void = () => {
     this._shouldRedirect = false;
-    this.actions.router.goToRoute.trigger({
+    this.stores.app.goToRoute({
       route: this._redirectUri
     });
   }
@@ -122,19 +122,20 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
   postLoadingScreenEnd(): void {
     super.postLoadingScreenEnd();
-    if (this._redirectRegex.test(this.stores.app.currentRoute)) {
+    const { stores } = this;
+    if (this._redirectRegex.test(stores.app.currentRoute)) {
       this._shouldRedirect = true;
-      this._redirectUri = this.stores.app.currentRoute;
+      this._redirectUri = stores.app.currentRoute;
     }
     // before redirecting, save origin route in case we need to come back to
     // it later (this is the case when user comes from a URI link)
     runInAction(() => {
       this._originRoute = {
-        route: this.stores.app.currentRoute,
+        route: stores.app.currentRoute,
         location: window.location.href,
       };
     });
-    this.actions.router.goToRoute.trigger({ route: ROUTES.ROOT });
+    stores.app.goToRoute({ route: ROUTES.ROOT });
   }
 
   getTabIdKey(): string {

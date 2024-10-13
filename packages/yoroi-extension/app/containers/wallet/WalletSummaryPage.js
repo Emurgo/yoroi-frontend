@@ -152,7 +152,7 @@ class WalletSummaryPage extends Component<AllProps> {
             addressLookup={genAddressLookup(
               selected.networkId,
               intl,
-              route => this.props.actions.router.goToRoute.trigger({ route }),
+              route => stores.app.goToRoute({ route }),
               stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
@@ -249,7 +249,7 @@ class WalletSummaryPage extends Component<AllProps> {
             onCancel={actions.memos.closeMemoDialog.trigger}
             addExternal={() => {
               actions.memos.closeMemoDialog.trigger();
-              actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
               stores.uiDialogs.getParam<(void) => void>('continuation')?.();
@@ -349,7 +349,7 @@ class WalletSummaryPage extends Component<AllProps> {
             onCancel={actions.memos.closeMemoDialog.trigger}
             addExternal={() => {
               actions.memos.closeMemoDialog.trigger();
-              actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
               stores.uiDialogs.getParam<(void) => void>('continuation')?.();

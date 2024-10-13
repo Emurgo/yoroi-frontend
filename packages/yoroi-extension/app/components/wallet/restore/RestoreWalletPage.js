@@ -63,7 +63,7 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { profile, router, wallets: walletsActions } = actions;
+  const { profile, wallets: walletsActions } = actions;
   const {
     walletRestore,
     profile: profileData,
@@ -103,7 +103,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   };
 
   function handleGoToRoute(route) {
-    router.goToRoute.trigger(route);
+    stores.app.goToRoute(route);
   }
 
   function goToAddWalletScreen() {

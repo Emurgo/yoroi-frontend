@@ -35,7 +35,8 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
     }
 
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+    const { stores } = this;
+    await stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
           wallet: request.wallet,
@@ -43,15 +44,15 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
           signRequest: request.signRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+      refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
 
     this.actions.dialogs.closeActiveDialog.trigger();
-    this.stores.wallets.sendMoneyRequest.reset();
+    stores.wallets.sendMoneyRequest.reset();
     if (request.onSuccess) {
       request.onSuccess();
     } else {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 
