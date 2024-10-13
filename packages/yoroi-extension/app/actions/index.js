@@ -11,7 +11,6 @@ import YoroiTransferActions from './common/yoroi-transfer-actions';
 import TxBuilderActions from './common/tx-builder-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
 import  ConnectorActionsMap from '../connector/actions/connector-actions';
-import ServerConnectionActions from './server-connection-actions';
 
 export type ActionsMap = {|
   txBuilderActions: TxBuilderActions,
@@ -26,7 +25,6 @@ export type ActionsMap = {|
   wallets: WalletActions,
   walletRestore: WalletRestoreActions,
   connector: ConnectorActionsMap,
-  serverConnection: ServerConnectionActions,
 |};
 
 const actionsMap: ActionsMap = Object.freeze({
@@ -42,7 +40,6 @@ const actionsMap: ActionsMap = Object.freeze({
   wallets: new WalletActions(),
   walletRestore: new WalletRestoreActions(),
   connector: new ConnectorActionsMap(),
-  serverConnection: new ServerConnectionActions(),
 });
 
 export default actionsMap;
