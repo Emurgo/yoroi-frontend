@@ -1,22 +1,20 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
 
 type Props = {|
   +registerUriScheme: void => void,
   +isFirefox: boolean,
 |};
-type InjectedProps = {| +isRevampLayout: boolean |};
 
 @observer
-class UriSettingsBlock extends Component<Props & InjectedProps> {
+export default class UriSettingsBlock extends Component<Props> {
   @observable hasPressed: boolean = false;
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -25,7 +23,6 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { isRevampLayout } = this.props;
 
     // On firefox since there is no prompt,
     // We need to give the user feedback that they pressed the button
@@ -35,22 +32,22 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
       <Box
         sx={{
           pb: '24px',
-          pt: !isRevampLayout && '24px',
-          borderTop: !isRevampLayout && '1px solid',
-          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+          pt: false,
+          borderTop: false,
+          borderColor: false,
         }}
       >
-        <Typography component="div" variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
+        <Typography component="div" variant="body1" fontWeight={500} mb="12px">
           {intl.formatMessage(globalMessages.uriSchemeLabel)}
         </Typography>
 
-        <Typography component="div" variant={isRevampLayout ? 'body1' : 'body2'} color="ds.text_gray_medium">
-          {intl.formatMessage(isRevampLayout ? globalMessages.uriExplanationRevamp : globalMessages.uriExplanation)}
+        <Typography component="div" variant="body1" color="ds.text_gray_medium">
+          {intl.formatMessage(globalMessages.uriExplanationRevamp)}
         </Typography>
 
         <Button
           className="allowButton"
-          variant={isRevampLayout ? 'contained' : 'primary'}
+          variant="contained"
           onClick={() => {
             this.props.registerUriScheme();
             runInAction(() => {
@@ -59,10 +56,10 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           }}
           disabled={isDisabled}
           sx={{
-            width: isRevampLayout ? 'fit-content' : '287px',
-            marginTop: isRevampLayout ? '40px' : '20px',
+            width: 'fit-content',
+            marginTop: '40px',
             '&.MuiButton-sizeMedium': {
-              p: isRevampLayout && '13px 24px',
+              p: '13px 24px',
             },
           }}
           id="settings:blockchain-allowPaymentURL-button"
@@ -73,5 +70,3 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(UriSettingsBlock): ComponentType<Props>);
