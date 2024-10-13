@@ -129,7 +129,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
           }
         }
         if (this.stores.loading.shouldRedirect) {
-          this.actions.loading.redirect.trigger();
+          this.stores.loading.redirect();
         }
         runInAction(() => {
           this.hasRedirected = true;

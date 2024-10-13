@@ -40,7 +40,6 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
 
 
   setup(): void {
-    this.actions.loading.redirect.listen(this._redirect);
     const params = new URLSearchParams(document.location.search);
     if (params.get('action') === 'sell-ada') {
       const addr = params.get('addr');
@@ -112,7 +111,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap
   }
 
   @action
-  _redirect: void => void = () => {
+  redirect: void => void = () => {
     this._shouldRedirect = false;
     this.actions.router.goToRoute.trigger({
       route: this._redirectUri
