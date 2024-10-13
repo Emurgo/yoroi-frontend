@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { TransactionRowsToExportRequest } from '../../../actions/common/transactions-actions';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -17,6 +16,7 @@ import { Moment } from 'moment';
 import { withLayout } from '../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import type { TransactionRowsToExportRequest } from '../../../stores/toplevel/TransactionsStore';
 
 const messages = defineMessages({
   dialogTitle: {

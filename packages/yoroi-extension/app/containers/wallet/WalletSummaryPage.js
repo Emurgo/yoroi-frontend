@@ -34,6 +34,7 @@ import BuySellDialog from '../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { noop } from '../../coreUtils';
 
 type Props = StoresAndActionsProps;
 type InjectedLayoutProps = {|
@@ -57,8 +58,7 @@ class WalletSummaryPage extends Component<AllProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const actions = this.props.actions;
-    const { wallets } = this.props.stores;
+    const { actions, stores } = this.props;
     const {
       hasAny,
       hasMoreToLoad,
@@ -68,21 +68,19 @@ class WalletSummaryPage extends Component<AllProps> {
       isExporting,
       exportError,
       isLoading,
-    } = this.props.stores.transactions;
-    const { selected } = wallets;
+    } = stores.transactions;
+    const { selected } = stores.wallets;
     let walletTransactions = null;
     // Guard against potential null values
     if (selected == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
-    this.props.stores.delegation.checkPoolTransition();
-
-    const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
+    noop(stores.delegation.checkPoolTransition());
 
     const walletId = selected.plate.TextPart;
 
-    const { uiDialogs, profile, memos, uiNotifications } = this.props.stores;
+    const { uiDialogs, profile, memos, uiNotifications } = stores;
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -116,9 +114,9 @@ class WalletSummaryPage extends Component<AllProps> {
           <WalletTransactionsListComp
             transactions={recent}
             lastSyncBlock={selected.lastSyncInfo.Height}
-            memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}
+            memoMap={stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(
+              stores.explorers.selectedExplorer.get(
                 selected.networkId
               ) ??
               (() => {
@@ -127,7 +125,7 @@ class WalletSummaryPage extends Component<AllProps> {
             }
             isLoadingTransactions={isLoadingMore}
             hasMoreToLoad={hasMoreToLoad}
-            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(selected)}
+            onLoadMore={() => stores.transactions.loadMoreTransactions(selected)}
             assuranceMode={selected.assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={transaction =>
@@ -149,20 +147,20 @@ class WalletSummaryPage extends Component<AllProps> {
               })
             }
             unitOfAccountSetting={profile.unitOfAccount}
-            getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
-            getTokenInfo={genLookupOrNull(this.props.stores.tokenInfoStore.tokenInfo)}
+            getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
+            getTokenInfo={genLookupOrNull(stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               selected.networkId,
               intl,
               route => this.props.actions.router.goToRoute.trigger({ route }),
-              this.props.stores.addresses.addressSubgroupMap
+              stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             addressToDisplayString={addr =>
               addressToDisplayString(addr, getNetworkById(selected.networkId))
             }
-            complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+            complexityLevel={stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
         );
@@ -187,14 +185,14 @@ class WalletSummaryPage extends Component<AllProps> {
           isActionProcessing={isExporting}
           error={exportError}
           submit={exportRequest =>
-            exportTransactionsToFile.trigger({
+            stores.transactions.exportTransactionsToFile({
               exportRequest,
               publicDeriver: selected,
             })
           }
-          toggleIncludeTxIds={this.props.stores.transactions.toggleIncludeTxIds}
-          shouldIncludeTxIds={this.props.stores.transactions.shouldIncludeTxIds}
-          cancel={closeExportTransactionDialog.trigger}
+          toggleIncludeTxIds={stores.transactions.toggleIncludeTxIds}
+          shouldIncludeTxIds={stores.transactions.shouldIncludeTxIds}
+          cancel={stores.transactions.closeExportTransactionDialog}
         />
       );
     }
@@ -221,8 +219,8 @@ class WalletSummaryPage extends Component<AllProps> {
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
         />
 
         {walletTransactions}
@@ -254,7 +252,7 @@ class WalletSummaryPage extends Component<AllProps> {
               actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
-              this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();
+              stores.uiDialogs.getParam<(void) => void>('continuation')?.();
             }}
           />
         ) : null}
@@ -265,7 +263,7 @@ class WalletSummaryPage extends Component<AllProps> {
             existingMemo={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
-              const memo = this.props.stores.memos.txMemoMap.get(walletId)?.get(txid);
+              const memo = stores.memos.txMemoMap.get(walletId)?.get(txid);
               if (memo == null) throw new Error('Should never happen');
               return memo;
             })()}
@@ -317,8 +315,8 @@ class WalletSummaryPage extends Component<AllProps> {
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
           shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
             <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
@@ -354,7 +352,7 @@ class WalletSummaryPage extends Component<AllProps> {
               actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
-              this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();
+              stores.uiDialogs.getParam<(void) => void>('continuation')?.();
             }}
           />
         ) : null}
@@ -365,7 +363,7 @@ class WalletSummaryPage extends Component<AllProps> {
             existingMemo={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
-              const memo = this.props.stores.memos.txMemoMap.get(walletId)?.get(txid);
+              const memo = stores.memos.txMemoMap.get(walletId)?.get(txid);
               if (memo == null) throw new Error('Should never happen');
               return memo;
             })()}
