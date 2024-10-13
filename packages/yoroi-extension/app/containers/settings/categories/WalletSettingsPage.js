@@ -50,11 +50,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
       throw new Error('unexpected nullish wallet name');
     }
 
-    let signingKeyUpdateDate = null;
-    if (selectedWallet.signingKeyUpdateDate) {
-      signingKeyUpdateDate = new Date(selectedWallet.signingKeyUpdateDate);
-    }
-
     return (
       <div id="walletSettingsPage">
         {this.getDialog(selectedWallet.publicDeriverId)}
@@ -88,7 +83,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
-            walletPasswordUpdateDate={signingKeyUpdateDate}
           />
         )}
         <ResyncBlock

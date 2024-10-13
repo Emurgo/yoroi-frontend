@@ -1,12 +1,9 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
-import styles from './FullscreenMessage.scss';
 import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 import { observer } from 'mobx-react';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Box, Stack, Typography } from '@mui/material';
 
 type Props = {|
@@ -16,26 +13,14 @@ type Props = {|
 |};
 
 @observer
-class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
+export default class FullscreenMessage extends Component<Props> {
   static defaultProps: {| image: void |} = {
     image: undefined,
   };
 
   render(): Node {
-    const { title, subtitle, image, renderLayoutComponent } = this.props;
-    const classicLayout = (
-      <FullscreenLayout bottomPadding={57}>
-        <VerticallyCenteredLayout>
-          <div className={styles.component}>
-            <div className={styles.title}>{title}</div>
-            <br />
-            <div className={styles.subtitle}>{subtitle}</div>
-          </div>
-        </VerticallyCenteredLayout>
-      </FullscreenLayout>
-    );
-
-    const revampLayout = (
+    const { title, subtitle, image } = this.props;
+    return (
       <FullscreenLayout bottomPadding={57}>
         <VerticallyCenteredLayout>
           <Stack
@@ -59,12 +44,5 @@ class FullscreenMessage extends Component<Props & InjectedLayoutProps> {
         </VerticallyCenteredLayout>
       </FullscreenLayout>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 }
-
-export default (withLayout(FullscreenMessage): ComponentType<Props>);

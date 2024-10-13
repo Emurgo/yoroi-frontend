@@ -1,18 +1,16 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
 import tosStyles from './TermsOfUseText.scss';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
 const messages = defineMessages({
@@ -41,7 +39,7 @@ type State = {|
 |};
 
 @observer
-class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
+export default class TermsOfUseForm extends Component<Props, State> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -78,51 +76,9 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
 
   renderForm(): Node {
     const { intl } = this.context;
-    const { isSubmitting, error, renderLayoutComponent } = this.props;
+    const { isSubmitting, error } = this.props;
     const { areTermsOfUseAccepted } = this.state;
-
-    const classicLayout = (
-      <div className={styles.component}>
-        <div className={styles.centeredBox}>
-          <div className={styles.title}>{intl.formatMessage(messages.updateTitle)}</div>
-          <div className={styles.text}>{intl.formatMessage(messages.updateText)}</div>
-
-          <div className={styles.agreement}>
-            <FormControlLabel
-              onClick={this.onClickTosLabel}
-              label={
-                <span className={styles.tosAgreement}>
-                  <FormattedHTMLMessage {...globalMessages.tosAgreement} />
-                </span>
-              }
-              control={
-                <Checkbox
-                  checked={areTermsOfUseAccepted}
-                  onChange={this.toggleAcceptance.bind(this)}
-                />
-              }
-              sx={{ margin: '0px' }}
-            />
-          </div>
-
-          <div className={styles.submit}>
-            <LoadingButton
-              variant="primary"
-              disabled={!areTermsOfUseAccepted}
-              onClick={this.props.onSubmit}
-              loading={isSubmitting}
-              sx={{ width: '350px', margin: 'auto' }}
-            >
-              {intl.formatMessage(globalMessages.continue)}
-            </LoadingButton>
-          </div>
-
-          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
-        </div>
-      </div>
-    );
-
-    const revampLayout = (
+    return (
       <Box mt="48px">
         <Box
           sx={{
@@ -194,39 +150,16 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
         </Box>
       </Box>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 
   renderMarkdown(markdown: string): Node {
     const { intl } = this.context;
-    const { renderLayoutComponent } = this.props;
-
-    const classicLayout = (
-      <>
-        <div className={styles.component}>
-          <div className={styles.tosBox}>
-            <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false} />
-            </div>
-          </div>
-        </div>
-        <div className={styles.back}>
-          <button type="button" onClick={this.onClickBack}>
-            &#129120;{intl.formatMessage(globalMessages.backButtonLabel)}
-          </button>
-        </div>
-      </>
-    );
-    const revampLayout = (
+    return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
           <div className={styles.tosBox}>
             <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false} />
+              <ReactMarkdown source={markdown} escapeHtml={false}/>
             </div>
           </div>
         </Box>
@@ -237,17 +170,13 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
             top: '24px',
             left: '24px',
           }}
-          startIcon={<BackIcon />}
+          startIcon={<BackIcon/>}
           onClick={this.onClickBack}
         >
           {intl.formatMessage(globalMessages.backButtonLabel)}
         </Button>
       </>
     );
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 
   render(): Node {
@@ -261,5 +190,3 @@ class TermsOfUseForm extends Component<Props & InjectedLayoutProps, State> {
     return this.renderMarkdown(this.props.localizedPrivacyNotice);
   }
 }
-
-export default (withLayout(TermsOfUseForm): ComponentType<Props>);
