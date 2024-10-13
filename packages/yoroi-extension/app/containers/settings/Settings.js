@@ -74,7 +74,6 @@ class Settings extends Component<AllProps> {
           />
         }
         showInContainer
-        showAsCard
       >
         <SettingsLayout menu={menu}>{children != null ? children : null}</SettingsLayout>
       </TopBarLayout>
@@ -96,7 +95,6 @@ class Settings extends Component<AllProps> {
           />
         }
         showInContainer
-        showAsCard
       >
         {children}
       </TopBarLayout>

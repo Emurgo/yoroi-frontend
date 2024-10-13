@@ -94,7 +94,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
           banner={<BannerContainer actions={actions} stores={stores} />}
           navbar={<NavBarContainer title="" actions={actions} stores={stores} />}
           showInContainer
-          showAsCard
         >
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -150,7 +149,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
           />
         }
         showInContainer
-        showAsCard
       >
         {warning}
         {isInitialSyncing ? (

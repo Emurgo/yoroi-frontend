@@ -25,7 +25,6 @@ export default class ExchangeEndPage extends Component<StoresAndActionsProps> {
         banner={<BannerContainer actions={actions} stores={stores}/>}
         sidebar={<SidebarContainer actions={actions} stores={stores}/>}
         showInContainer
-        showAsCard
       >
         <ExchangeEndPageContent
           onConfirm={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}

@@ -7,7 +7,7 @@ import type { ConfigType } from '../config/config-types';
 import type { ActionsMap } from './actions/index';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
-import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
+import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
@@ -149,7 +149,6 @@ const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
-  AddAnotherWalletPromise,
   StakingPageContentPromise,
   CreateWalletPagePromise,
   RestoreWalletPagePromise,

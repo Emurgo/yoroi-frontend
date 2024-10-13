@@ -51,7 +51,6 @@ class VotingPage extends Component<AllProps> {
           />
         }
         showInContainer
-        showAsCard
       >
         {content}
       </TopBarLayout>

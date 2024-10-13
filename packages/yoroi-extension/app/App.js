@@ -90,7 +90,7 @@ class App extends Component<Props, State> {
     return (
       <div style={{ height: '100%' }}>
         <LayoutProvider>
-          <ColorModeProvider currentTheme={currentTheme}>
+          <ColorModeProvider>
             <CssBaseline />
             {globalStyles(muiTheme)}
             <ThemeManager cssVariables={themeVars} />

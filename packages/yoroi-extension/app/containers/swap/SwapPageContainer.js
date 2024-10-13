@@ -73,7 +73,6 @@ class SwapPageContainer extends Component<AllProps> {
           />
         }
         showInContainer
-        showAsCard
         withPadding={false}
       >
         <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
