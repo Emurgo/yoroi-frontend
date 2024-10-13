@@ -10,15 +10,13 @@ import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer, } from '../
 import type { GetAllExplorersResponse } from '../../api/ada/lib/storage/bridge/explorers';
 import { prepackagedExplorers, } from '../../api/ada/lib/storage/database/prepackaged/explorers';
 import { SelectedExplorer, defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
-import ExplorerActions from '../../actions/common/explorer-actions';
 
 export default class BaseExplorerStore
   <
     TStores: {
       ...,
-    },
-    TActions: { +explorers: ExplorerActions, ... },
-  > extends Store<TStores, TActions> {
+    }
+  > extends Store<TStores, any> {
 
   @observable getSelectedExplorerRequest: Request<typeof getSelectedExplorer>
     = new Request(getSelectedExplorer);
@@ -28,10 +26,6 @@ export default class BaseExplorerStore
 
   @observable getAllExplorerRequest: Request<typeof getAllExplorers>
     = new Request(getAllExplorers);
-
-  setup(): void {
-    this.actions.explorers.updateSelectedExplorer.listen(this.setSelectedExplorer);
-  }
 
   // ========== Selected Explorer ========== //
 

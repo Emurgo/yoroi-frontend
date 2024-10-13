@@ -20,13 +20,13 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
   };
 
   render(): Node {
-    const profileStore = this.props.stores.profile;
-    const { selected } = this.props.stores.wallets;
+    const { stores } = this.props;
+    const profileStore = stores.profile;
+    const { selected } = stores.wallets;
     if (selected == null) {
       return <NoWalletMessage />;
-    }
 
-    const { stores } = this.props;
+    }
     const { intl } = this.context;
 
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
@@ -48,7 +48,7 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
         )}
         <ExplorerSettings
           onSelectExplorer={({ explorerId }) =>
-            this.props.actions.explorers.updateSelectedExplorer.trigger(
+            stores.explorers.setSelectedExplorer(
               { explorerId, networkId: selected.networkId }
             )
           }
