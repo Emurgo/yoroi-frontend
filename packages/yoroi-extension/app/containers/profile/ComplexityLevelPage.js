@@ -52,7 +52,6 @@ export default class ComplexityLevelPage extends Component<StoresAndActionsProps
         <ComplexityLevel
           complexityLevel={this.props.stores.profile.selectedComplexityLevel}
           onSubmit={this.props.actions.profile.selectComplexityLevel.trigger}
-          isSubmitting={this.props.stores.profile.setComplexityLevelRequest.isExecuting}
           error={this.props.stores.profile.setComplexityLevelRequest.error}
         />
       </TopBarLayout>

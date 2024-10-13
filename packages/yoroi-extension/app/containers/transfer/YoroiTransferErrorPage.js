@@ -12,7 +12,6 @@ import { GenerateTransferTxError } from '../../api/common/errors';
 type Props = {|
   +error?: ?LocalizableError,
   +onCancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -27,7 +26,7 @@ export default class YoroiTransferErrorPage extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { error, onCancel, classicTheme } = this.props;
+    const { error, onCancel } = this.props;
 
     return (
       <ErrorPage
@@ -35,7 +34,6 @@ export default class YoroiTransferErrorPage extends Component<Props> {
         backButtonLabel={intl.formatMessage(globalMessages.cancel)}
         onCancel={onCancel}
         error={error}
-        classicTheme={classicTheme}
       />
     );
   }

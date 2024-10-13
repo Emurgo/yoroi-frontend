@@ -1,11 +1,10 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SubMenuItem.scss';
 import { Box, Typography } from '@mui/material';
-import { withLayout } from '../../styles/context/layout';
 
 type Props = {|
   +label: string,
@@ -16,10 +15,8 @@ type Props = {|
   locationId: string,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class SubMenuItem extends Component<Props & InjectedProps> {
+export default class SubMenuItem extends Component<Props> {
   static defaultProps: {| disabled: boolean |} = {
     disabled: false,
   };
@@ -70,5 +67,3 @@ function getStyles(active: boolean): Object {
     marginRight: '24px',
   };
 }
-
-export default (withLayout(SubMenuItem): ComponentType<Props>);

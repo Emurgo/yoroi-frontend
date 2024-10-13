@@ -169,7 +169,6 @@ type Props = {|
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +isClassicTheme: boolean,
   +updateReceiver: (void | string) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -381,7 +380,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
-          placeholder: this.props.isClassicTheme ? this.context.intl.formatMessage(messages.receiverHint) : '',
+          placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
@@ -428,7 +427,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams ? formatValue(this.props.uriParams.amount.getDefaultEntry()) : null;
@@ -933,7 +932,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             sendMoney={this.props.sendMoney}
             getTokenInfo={this.props.getTokenInfo}
             getCurrentPrice={this.props.getCurrentPrice}
-            isClassicTheme={this.props.isClassicTheme}
             ledgerSendError={this.props.ledgerSendError}
             trezorSendError={this.props.trezorSendError}
             ledgerSend={this.props.ledgerSend}

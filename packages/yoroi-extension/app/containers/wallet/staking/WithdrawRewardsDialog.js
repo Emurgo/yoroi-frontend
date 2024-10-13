@@ -161,7 +161,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const formatValue = genFormatTokenAmount(genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo));
 
     if (createWithdrawalTx.error != null)
-      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} classicTheme={false} />;
+      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} />;
 
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
@@ -194,7 +194,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       publicDeriver.type !== 'mnemonic' ? undefined : (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
-          classicTheme={false}
           isSubmitting={isSubmitting}
         />
       );

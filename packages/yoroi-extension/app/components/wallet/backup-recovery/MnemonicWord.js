@@ -11,13 +11,12 @@ type Props = {|
   +index: number,
   +isActive: boolean,
   +onClick: {| index: number, word: string |} => void,
-  +classicTheme: boolean
 |};
 
 @observer
 export default class MnemonicWord extends Component<Props> {
   render(): Node {
-    const { word, index, isActive, onClick, classicTheme } = this.props;
+    const { word, index, isActive, onClick } = this.props;
     const handleClick = onClick.bind(null, { word, index });
 
     const componentClasses = classnames([
@@ -26,7 +25,7 @@ export default class MnemonicWord extends Component<Props> {
 
     return (
       <Button
-        variant={classicTheme ? 'secondary' : 'primary'}
+        variant={'primary'}
         className={componentClasses}
         disabled={!isActive}
         onClick={handleClick}

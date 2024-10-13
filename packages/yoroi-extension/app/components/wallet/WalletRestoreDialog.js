@@ -66,7 +66,6 @@ type Props = {|
   +error?: ?LocalizableError,
   +validWords: Array<string>,
   +isVerificationMode?: boolean,
-  +classicTheme: boolean,
   +initValues?: ?WalletRestoreDialogValues,
   +introMessage?: string,
 |};
@@ -105,8 +104,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     fields: {
       walletName: this.props.isVerificationMode === true ? undefined : {
         label: this.context.intl.formatMessage(messages.walletNameInputLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.walletNameInputHint) : '',
+        placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletName) || '',
         validators: [({ field }) => (
           [
@@ -117,8 +115,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       },
       recoveryPhrase: {
         label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
+        placeholder: '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
@@ -140,8 +137,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       walletPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder) : '',
+        placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -157,8 +153,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       repeatPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder) : '',
+        placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;

@@ -55,7 +55,6 @@ type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -76,8 +75,7 @@ export default class SaveDialog extends Component<Props> {
       fields: {
         walletName: {
           label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
-          placeholder: this.props.classicTheme ?
-            intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputPH) : '',
+          placeholder: '',
           value: defaultWalletName,
           validators: [({ field }) => (
             [
@@ -109,7 +107,6 @@ export default class SaveDialog extends Component<Props> {
       error,
       onExternalLinkClick,
       cancel,
-      classicTheme
     } = this.props;
 
     const walletNameFieldClasses = classnames([
@@ -142,28 +139,19 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            {classicTheme
-              ? <SaveLoadSVG />
-              : <SaveLoadImage />
-            }
+            <SaveLoadImage/>
           </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            {classicTheme
-              ? <SaveStartSVG />
-              : <SaveLoadImage />
-            }
+            <SaveLoadImage/>
           </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            {classicTheme
-              ? <SaveErrorSVG />
-              : <SaveErrorImage />
-            }
+            <SaveErrorImage/>
           </div>);
         break;
       default:
@@ -193,11 +181,11 @@ export default class SaveDialog extends Component<Props> {
         onClose={cancel}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {walletNameBlock}
         {middleBlock}
         {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>);

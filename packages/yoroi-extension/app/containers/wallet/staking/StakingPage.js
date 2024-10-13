@@ -52,7 +52,6 @@ class StakingPage extends Component<StoresAndActionsProps> {
           />
         }
         showInContainer
-        showAsCard
       >
         <Suspense fallback={null}>
           <StakingPageContent stores={this.props.stores} actions={this.props.actions} />

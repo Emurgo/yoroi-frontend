@@ -62,11 +62,6 @@ export const ROUTES = {
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
   },
-  EXPERIMENTAL: {
-    YOROI_PALETTE: '/experimental/yoroi-palette',
-    YOROI_COMPONENTS: '/experimental/components',
-    THEMES: '/experimental/themes',
-  },
   // Revamp specific routes:
   REVAMP: {
     // `voting` is part of the sidebar

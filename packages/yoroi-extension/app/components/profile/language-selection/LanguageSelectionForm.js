@@ -1,11 +1,12 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
-import { MenuItem, Checkbox, FormControlLabel, Typography, Box, Button } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, MenuItem, Typography } from '@mui/material';
 import Select from '../../common/Select';
-import { intlShape, FormattedHTMLMessage } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { FormattedHTMLMessage, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -13,11 +14,8 @@ import styles from './LanguageSelectionForm.scss';
 import FlagLabel from '../../widgets/FlagLabel';
 import { tier1Languages } from '../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactMarkdown from 'react-markdown';
 import tosStyles from '../terms-of-use/TermsOfUseText.scss';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 
 type Props = {|
@@ -36,7 +34,7 @@ type State = {|
 |};
 
 @observer
-class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State> {
+export default class LanguageSelectionForm extends Component<Props, State> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -93,7 +91,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
   renderForm(): Node {
     const { intl } = this.context;
     const { form } = this;
-    const { languages, isSubmitting, currentLocale, error, renderLayoutComponent } = this.props;
+    const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
     const tosAgreement = form.$('tosAgreement');
     const languageOptions = languages.map(language => ({
@@ -102,88 +100,12 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
       svg: language.svg,
     }));
 
-    const classicLayout = (
-      <div className={styles.component}>
-        <div className={styles.centeredBox}>
-          <Select
-            formControlProps={{ sx: { marginBottom: '25px' } }}
-            labelProps={{
-              sx: {
-                width: '100%',
-                left: '0',
-                top: '-55px',
-                textAlign: 'center',
-                fontSize: '1rem',
-                fontWeight: '500',
-                textTransform: 'uppercase',
-              },
-            }}
-            labelId="languages-select"
-            value={currentLocale}
-            {...languageId.bind()}
-            onChange={this.selectLanguage}
-            notched={false}
-            shrink={false}
-          >
-            {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value}>
-                <FlagLabel svg={option.svg} label={option.label} />
-              </MenuItem>
-            ))}
-          </Select>
-
-          {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
-
-          <FormControlLabel
-            onClick={this.onClickTosLabel}
-            label={
-              <span className={styles.tosAgreement}>
-                <FormattedHTMLMessage {...globalMessages.tosAgreement} />
-              </span>
-            }
-            control={
-              <Checkbox
-                checked={tosAgreement.value}
-                onChange={event => {
-                  tosAgreement.value = event.target.checked;
-                }}
-              />
-            }
-            sx={{
-              width: '600px',
-              marginLeft: '0px',
-              marginBottom: '20px',
-            }}
-          />
-
-          <LoadingButton
-            variant="primary"
-            fullWidth
-            loading={isSubmitting}
-            onClick={this.submit}
-            disabled={!tosAgreement.value}
-          >
-            {intl.formatMessage(globalMessages.continue)}
-          </LoadingButton>
-
-          {!tier1Languages.includes(currentLocale) && (
-            <div className={styles.info}>
-              <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
-              <div>
-                {intl.formatMessage(globalMessages.languageSelectInfo)}{' '}
-                {listOfTranslators(
-                  intl.formatMessage(globalMessages.translationContributors),
-                  intl.formatMessage(globalMessages.translationAcknowledgment)
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-
-    const revampLayout = (
-      <Box sx={{ maxWidth: '530px', mx: 'auto', mt: '48px' }}>
+    return (
+      <Box sx={{
+        maxWidth: '530px',
+        mx: 'auto',
+        mt: '48px'
+      }}>
         <div className={styles.centeredBox}>
           <Typography component="div" variant="h5" fontWeight={500} mb="24px" textAlign="center">
             {this.context.intl.formatMessage(globalMessages.languageSelectLabelShort)}
@@ -211,7 +133,7 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
           >
             {languageOptions.map(option => (
               <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
-                <FlagLabel svg={option.svg} label={option.label} />
+                <FlagLabel svg={option.svg} label={option.label}/>
               </MenuItem>
             ))}
           </Select>
@@ -287,37 +209,16 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
         </div>
       </Box>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 
   renderMarkdown(markdown: string): Node {
     const { intl } = this.context;
-    const { renderLayoutComponent } = this.props;
-    const classicLayout = (
-      <>
-        <div className={styles.component}>
-          <div className={styles.tosBox}>
-            <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false} />
-            </div>
-          </div>
-        </div>
-        <button type="button" className={styles.back} onClick={this.onClickBack}>
-          &#129120;{intl.formatMessage(globalMessages.backButtonLabel)}
-        </button>
-      </>
-    );
-
-    const revampLayout = (
+    return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
           <div className={styles.tosBox}>
             <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false} />
+              <ReactMarkdown source={markdown} escapeHtml={false}/>
             </div>
           </div>
         </Box>
@@ -328,18 +229,13 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
             top: '24px',
             left: '24px',
           }}
-          startIcon={<BackIcon />}
+          startIcon={<BackIcon/>}
           onClick={this.onClickBack}
         >
           {intl.formatMessage(globalMessages.backButtonLabel)}
         </Button>
       </>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 
   render(): Node {
@@ -353,5 +249,3 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
     return this.renderMarkdown(this.props.localizedPrivacyNotice);
   }
 }
-
-export default (withLayout(LanguageSelectionForm): ComponentType<Props>);

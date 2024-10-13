@@ -30,7 +30,6 @@ type Props = {|
   +onClose: void => void,
   +onSkip: void => PossiblyAsync<void>,
   +onCheck: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
   +isSubmitting: boolean,
 |};
 
@@ -43,9 +42,6 @@ export default class LegacyExplanation extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      classicTheme
-    } = this.props;
     const dialogClasses = classnames([
       styles.component,
       'LegacyExplanation',
@@ -77,7 +73,7 @@ export default class LegacyExplanation extends Component<Props> {
         closeButton={<DialogCloseButton onClose={this.props.onClose} />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
       >
-        {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
+        <span className={styles.recoveryImage}><RecoveryWatchingSvg/></span>
         <WalletRecoveryInstructions
           instructionsText={(
             <span>

@@ -7,7 +7,6 @@ import styles from './WalletRecoveryPhraseMnemonic.scss';
 
 type Props = {|
   +phrase: string | Element<any>,
-  +classicTheme: boolean,
   +filled?: boolean,
   +phraseDoesNotMatch?: string,
 |};

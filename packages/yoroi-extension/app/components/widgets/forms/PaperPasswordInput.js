@@ -11,7 +11,6 @@ import PasswordInput from './PasswordInput';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +passwordMatches: string => boolean,
   +includeLengthCheck: boolean,
   +initValues?: string,
@@ -33,7 +32,6 @@ export default class PaperPasswordInput extends Component<Props> {
     return (<PasswordInput
       setForm={this.props.setForm}
       disabled={false}
-      classicTheme={this.props.classicTheme}
       passwordMatches={this.props.passwordMatches}
       fieldName="paperPassword"
       validCheck={password => !this.props.includeLengthCheck || isValidPaperPassword(password)}

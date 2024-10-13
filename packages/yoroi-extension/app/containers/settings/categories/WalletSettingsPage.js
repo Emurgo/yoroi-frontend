@@ -26,7 +26,7 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
   };
 
   render(): Node {
-    const { profile, walletSettings } = this.props.stores;
+    const { walletSettings } = this.props.stores;
     const { intl } = this.context;
     const { actions } = this.props;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
@@ -50,19 +50,12 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
       throw new Error('unexpected nullish wallet name');
     }
 
-    let signingKeyUpdateDate = null;
-    if (selectedWallet.signingKeyUpdateDate) {
-      signingKeyUpdateDate = new Date(selectedWallet.signingKeyUpdateDate);
-    }
-
     return (
       <div id="walletSettingsPage">
         {this.getDialog(selectedWallet.publicDeriverId)}
-        {profile.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
-            {intl.formatMessage(globalMessages.walletLabel)}
-          </Typography>
-        )}
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          {intl.formatMessage(globalMessages.walletLabel)}
+        </Typography>
         <WalletNameSetting
           error={renameModelRequest.error}
           walletName={selectedWallet.name}
@@ -82,7 +75,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
           onCancelEditing={() => cancelEditingWalletField.trigger()}
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
-          classicTheme={profile.isClassicTheme}
         />
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
@@ -91,8 +83,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
-            walletPasswordUpdateDate={signingKeyUpdateDate}
-            classicTheme={profile.isClassicTheme}
           />
         )}
         <ResyncBlock

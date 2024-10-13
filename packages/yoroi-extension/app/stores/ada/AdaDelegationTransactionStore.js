@@ -1,6 +1,6 @@
 // @flow
 
-import { observable, action, reaction } from 'mobx';
+import { action, observable, reaction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -194,8 +194,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   goToDashboardRoute(): void {
-    const isRevamp = this.stores.profile.isRevampTheme;
-    const route = buildRoute(isRevamp ? ROUTES.STAKING : ROUTES.WALLETS.DELEGATION_DASHBOARD);
+    const route = buildRoute(ROUTES.STAKING);
     this.actions.router.goToRoute.trigger({ route });
   }
 

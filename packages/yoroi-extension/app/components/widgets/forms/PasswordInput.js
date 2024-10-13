@@ -12,7 +12,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +disabled: boolean,
   +passwordMatches: string => boolean,
   +fieldName: string,
@@ -52,9 +51,7 @@ export default class PasswordInput extends Component<Props> {
         type: 'password',
         onChange: this.props.onChange,
         label: this.props.placeholder,
-        placeholder: this.props.classicTheme
-          ? this.props.placeholder
-          : '',
+        placeholder: '',
         value: (this.props.initValues) || '',
         validators: [({ field }) => {
           return [

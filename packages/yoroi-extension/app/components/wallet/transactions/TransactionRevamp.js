@@ -67,7 +67,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> | null,
   +complexityLevel: ?ComplexityLevelType,
   id: string,
   txIndex: number,
@@ -209,8 +209,9 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     if (this.props.unitOfAccountSetting.enabled) {
       const tokenInfo = this.props.getTokenInfo(request.entry);
-      const shiftedAmount = request.entry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
-      const ticker = tokenInfo.Metadata.ticker;
+      const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+      const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
+      const ticker = tokenInfo?.Metadata.ticker;
       if (ticker == null) {
         throw new Error('unexpected main token type');
       }
@@ -293,16 +294,16 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
-    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).abs();
-
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
+    const decimalPlaces = tokenInfo?.Metadata.numberOfDecimals ?? 0;
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-decimalPlaces).abs();
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, decimalPlaces);
 
     if (this.props.unitOfAccountSetting.enabled) {
       const { currency } = this.props.unitOfAccountSetting;
       if (currency == null) {
         throw new Error(`unexpected unit of account ${String(currency)}`);
       }
-      const ticker = tokenInfo.Metadata.ticker;
+      const ticker = tokenInfo?.Metadata.ticker;
       if (ticker == null) {
         throw new Error('unexpected main token type');
       }

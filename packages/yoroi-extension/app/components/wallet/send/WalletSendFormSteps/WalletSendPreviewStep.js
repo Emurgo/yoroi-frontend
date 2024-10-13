@@ -54,7 +54,6 @@ type Props = {|
   +onSubmit: ({| password: string |}) => PossiblyAsync<void>,
   +addressToDisplayString: string => string,
   +isSubmitting: boolean,
-  +classicTheme: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?string,
@@ -133,9 +132,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.props.classicTheme
-            ? this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder)
-            : '',
+          placeholder: '',
           value: '',
           validators: [
             ({ field }) => {

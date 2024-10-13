@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -15,22 +15,18 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { withLayout } from '../../styles/context/layout';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children?: Node,
 |};
 
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
 
 @observer
-class Transfer extends Component<AllProps> {
+export default class Transfer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -41,9 +37,6 @@ class Transfer extends Component<AllProps> {
 
   render(): Node {
     const { actions, stores } = this.props;
-    if (this.props.stores.profile.isRevampTheme) {
-      return null;
-    }
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const navbar = (
       <NavBarContainer
@@ -92,4 +85,3 @@ class Transfer extends Component<AllProps> {
     );
   };
 }
-export default (withLayout(Transfer): ComponentType<Props>);

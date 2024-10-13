@@ -45,7 +45,6 @@ export default class AssetsWrapper extends Component<Props> {
           />
         }
         showInContainer
-        showAsCard
       >
         {this.props.children}
       </TopBarLayout>

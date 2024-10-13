@@ -33,7 +33,6 @@ type Props = {|
   +togglePrivacyNotice: void => void,
   +onContinue: void => void,
   +onCancelBackup: void => void,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -52,7 +51,6 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       onCancelBackup,
       isPrivacyNoticeAccepted,
       onContinue,
-      classicTheme
     } = this.props;
     const countdownDisplay = countdownRemaining > 0 ? ` (${countdownRemaining})` : '';
     const dialogClasses = classnames([
@@ -78,7 +76,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
       >
-        {!classicTheme && <span className={styles.recoveryImage}><RecoveryWatchingSvg /></span>}
+        <span className={styles.recoveryImage}><RecoveryWatchingSvg/></span>
         <WalletRecoveryInstructions
           instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
         />

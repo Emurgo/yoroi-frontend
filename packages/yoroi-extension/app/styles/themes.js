@@ -3,20 +3,14 @@
 import { createTheme } from '@mui/material/styles';
 import { deepmerge } from '@mui/utils';
 import { baseLightTheme } from './themes/light-theme-mui';
-import { classicTheme } from './themes/legacy/classic-theme';
-import { modernTheme } from './themes/legacy/modern-theme';
 
 export const THEMES = Object.freeze({
-  YOROI_CLASSIC: 'YoroiClassic',
-  YOROI_MODERN: 'YoroiModern',
   YOROI_BASE: 'YoroiBase',
 });
 export type Theme = $Values<typeof THEMES>;
 // Old way
 export const baseTheme: Object = createTheme(deepmerge({ name: 'base' }, baseLightTheme));
 export const MuiThemes: {| [Theme]: Object |} = Object.freeze({
-  [THEMES.YOROI_CLASSIC]: classicTheme,
-  [THEMES.YOROI_MODERN]: modernTheme,
   [THEMES.YOROI_BASE]: baseTheme,
 });
 

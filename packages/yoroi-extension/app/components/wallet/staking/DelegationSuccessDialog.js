@@ -1,13 +1,10 @@
 // @flow
 
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
-import SuccessPage from '../../transfer/SuccessPage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { defineMessages, intlShape } from 'react-intl';
 import { SuccessPageRevamp } from '../../transfer/SuccessPageRevamp';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -38,31 +35,17 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
 |};
 
 @observer
-class DelegationSuccessDialog extends Component<Props & InjectedLayoutProps> {
+export default class DelegationSuccessDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-
-    const classicLayout = (
-      <SuccessPage
-        title={intl.formatMessage(messages.title)}
-        text={intl.formatMessage(messages.explanation)}
-        classicTheme={this.props.classicTheme}
-        closeInfo={{
-          onClose: this.props.onClose,
-          closeLabel: intl.formatMessage(messages.buttonLabel),
-        }}
-      />
-    );
-
-    const revampLayout = (
+    return (
       <SuccessPageRevamp
         title={intl.formatMessage(globalMessages.success)}
         text={intl.formatMessage(messages.explanationRevamp)}
@@ -72,12 +55,5 @@ class DelegationSuccessDialog extends Component<Props & InjectedLayoutProps> {
         }}
       />
     );
-
-    return this.props.renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 }
-
-export default (withLayout(DelegationSuccessDialog): ComponentType<Props>);

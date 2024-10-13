@@ -10,7 +10,6 @@ const ComplexityLevelSettingsPage: any = observer(({ stores, actions }) => {
     <ComplexityLevel
       complexityLevel={stores.profile.selectedComplexityLevel}
       onSubmit={actions.profile.selectComplexityLevel.trigger}
-      isSubmitting={stores.profile.setComplexityLevelRequest.isExecuting}
       error={stores.profile.setComplexityLevelRequest.error}
       baseTheme={name}
     />

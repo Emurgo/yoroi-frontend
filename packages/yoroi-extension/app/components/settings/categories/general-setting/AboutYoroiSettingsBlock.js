@@ -1,6 +1,7 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
@@ -16,13 +17,8 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
-import RawHash from '../../../widgets/hashWrappers/RawHash';
-import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Link, Typography } from '@mui/material';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -138,96 +134,17 @@ type Props = {|
 |};
 
 @observer
-class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
+export default class AboutYoroiSettingsBlock extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { wallet, isRevampLayout, renderLayoutComponent } = this.props;
+    const { wallet } = this.props;
     const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
 
-    const classicLayout = (
-      <Box
-        sx={{
-          pb: '20px',
-          mt: isRevampLayout ? '40px' : '32px',
-          pt: !isRevampLayout && '30px',
-          borderTop: !isRevampLayout && '1px solid var(--yoroi-palette-gray-200)',
-        }}
-        className={styles.component}
-      >
-        <Typography
-          component="h2"
-          variant={isRevampLayout ? 'body1' : 'h5'}
-          fontWeight={500}
-          mb={isRevampLayout ? '16px' : '12px'}
-          color="grayscale.900"
-        >
-          {intl.formatMessage(messages.aboutYoroiLabel)}
-        </Typography>
-
-        {network && (
-          <div className={styles.aboutLine}>
-            <strong>{intl.formatMessage(messages.networkLabel)}</strong>&nbsp;
-            {intl.formatMessage(messages[network])}
-          </div>
-        )}
-        <div className={styles.aboutLine}>
-          <strong>{intl.formatMessage(messages.versionLabel)}</strong>&nbsp;
-          <ExplorableHash
-            websiteName="Github"
-            url={baseGithubUrl + 'releases/'}
-            light={false}
-            placementTooltip="bottom"
-            onExternalLinkClick={handleExternalLinkClick}
-          >
-            <RawHash light={false}>{environment.getVersion()}</RawHash>
-          </ExplorableHash>
-        </div>
-        <div className={styles.aboutLine}>
-          <strong>{intl.formatMessage(messages.commitLabel)}</strong>&nbsp;
-          <ExplorableHash
-            websiteName="Github"
-            url={baseGithubUrl + 'commit/' + environment.commit}
-            light={false}
-            placementTooltip="bottom-start"
-            onExternalLinkClick={handleExternalLinkClick}
-          >
-            <RawHash light={false}>{environment.commit}</RawHash>
-          </ExplorableHash>
-        </div>
-        {!environment.isProduction() && (
-          <div className={styles.aboutLine}>
-            <strong>{intl.formatMessage(messages.branchLabel)}</strong>&nbsp;
-            <ExplorableHash
-              websiteName="Github"
-              url={baseGithubUrl + 'tree/' + environment.branch}
-              light={false}
-              placementTooltip="bottom-start"
-              onExternalLinkClick={handleExternalLinkClick}
-            >
-              <RawHash light={false}>{environment.branch}</RawHash>
-            </ExplorableHash>
-          </div>
-        )}
-        <div className={styles.aboutSocial}>
-          <GridFlexContainer rowSize={socialMediaLinks.length}>
-            {socialMediaLinks.map(link => (
-              <LinkButton
-                key={link.url}
-                {...link}
-                textClassName={styles.socialMediaLinkText}
-                onExternalLinkClick={handleExternalLinkClick}
-              />
-            ))}
-          </GridFlexContainer>
-        </div>
-      </Box>
-    );
-
-    const revampLayout = (
+    return (
       <Box
         sx={{
           pb: '20px',
@@ -283,11 +200,6 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
         </div>
       </Box>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 }
 
@@ -329,5 +241,3 @@ function LabelWithValue({
 LabelWithValue.defaultProps = {
   url: undefined,
 };
-
-export default (withLayout(AboutYoroiSettingsBlock): ComponentType<Props>);

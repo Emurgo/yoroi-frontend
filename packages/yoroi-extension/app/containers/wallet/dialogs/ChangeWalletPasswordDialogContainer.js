@@ -15,7 +15,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
 
   render(): Node {
     const { actions } = this.props;
-    const { uiDialogs, profile } = this.props.stores;
+    const { uiDialogs } = this.props.stores;
     const { walletSettings } = this.props.stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
@@ -47,8 +47,6 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}
-        isClassicTheme={profile.isClassicTheme}
-        isRevampTheme={profile.isRevampTheme}
       />
     );
   }

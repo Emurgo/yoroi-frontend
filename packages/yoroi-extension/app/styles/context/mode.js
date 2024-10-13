@@ -3,9 +3,9 @@ import type { Node } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import { baseLightTheme } from '../themes/light-theme-mui';
 import { baseDarkTheme } from '../themes/dark-theme-mui';
-import { MuiThemes, THEMES } from '../themes';
 import LocalStorageApi from '../../api/localStorage/index';
 import React, { useEffect } from 'react';
+import { noop } from '../../coreUtils';
 
 export type Modes = 'light' | 'dark';
 
@@ -15,12 +15,12 @@ function getDesignTokens(mode: string): Object {
   return mode === 'light' ? baseLightTheme : baseDarkTheme;
 }
 
-function ColorModeProvider({ children, currentTheme }: any): Node {
+function ColorModeProvider({ children }: any): Node {
   const [mode, setMode] = React.useState<Modes>('light');
   const localStorageApi = new LocalStorageApi();
 
   useEffect(() => {
-    getCurrentThemeFromStorage();
+    noop(getCurrentThemeFromStorage());
   }, []);
 
   const colorMode = React.useMemo(
@@ -35,15 +35,14 @@ function ColorModeProvider({ children, currentTheme }: any): Node {
   const getCurrentThemeFromStorage = async () => {
     const currentThemeMode = await localStorageApi.getUserThemeMode();
     if (currentThemeMode) {
-      setMode(currentThemeMode === 'light' ? 'light' : 'dark');
+      setMode(currentThemeMode === 'dark' ? 'dark' : 'light');
     }
   };
 
   // Update the theme only if the mode changes
   const theme = React.useMemo(() => {
-    if (currentTheme === THEMES.YOROI_BASE) return getDesignTokens(mode);
-    return MuiThemes[currentTheme];
-  }, [mode, currentTheme]);
+    return getDesignTokens(mode);
+  }, [mode]);
 
   return (
     <ColorModeContext.Provider value={colorMode}>

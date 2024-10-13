@@ -1,12 +1,11 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
 
 export const messages: * = defineMessages({
   titleLabel: {
@@ -23,33 +22,31 @@ type Props = {|
   +openDialog: void => void,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class ExportWallet extends Component<Props & InjectedProps> {
+export default class ExportWallet extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { isRevampLayout, openDialog } = this.props;
+    const { openDialog } = this.props;
 
     return (
       <Box
         sx={{
           pb: '20px',
-          mt: isRevampLayout ? '20px' : '32px',
-          pt: !isRevampLayout && '30px',
-          borderTop: !isRevampLayout && '1px solid',
-          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+          mt: '20px',
+          pt: false,
+          borderTop: false,
+          borderColor: false,
         }}
       >
         <Typography
           component="div"
-          variant={isRevampLayout ? 'body1' : 'h5'}
+          variant="body1"
           fontWeight={500}
-          mb={isRevampLayout ? '16px' : '12px'}
+          mb="16px"
           color="grayscale.900"
         >
           {intl.formatMessage(messages.titleLabel)}
@@ -57,21 +54,21 @@ class ExportWallet extends Component<Props & InjectedProps> {
 
         <Typography
           component="div"
-          variant={isRevampLayout ? 'body1' : 'body2'}
+          variant="body1"
           color="ds.text_gray_medium"
-          mb={isRevampLayout ? '16px' : '12px'}
+          mb="16px"
         >
           {intl.formatMessage(messages.exportExplanation)}
         </Typography>
 
         <Button
-          variant={isRevampLayout ? 'contained' : 'primary'}
-          size={isRevampLayout ? 'flat' : 'medium'}
+          variant="contained"
+          size="flat"
           className="exportWallet"
           onClick={openDialog}
           sx={{
-            marginTop: !isRevampLayout && '20px',
-            width: isRevampLayout ? 'fit-content' : '400px',
+            marginTop: false,
+            width: 'fit-content',
           }}
           id="settings:wallet-exportWallet-button"
         >
@@ -81,5 +78,3 @@ class ExportWallet extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(ExportWallet): ComponentType<Props>);

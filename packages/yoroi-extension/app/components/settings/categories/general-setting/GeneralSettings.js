@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
@@ -14,8 +14,6 @@ import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -37,7 +35,7 @@ const messages = defineMessages({
 });
 
 @observer
-class GeneralSettings extends Component<Props & InjectedLayoutProps> {
+export default class GeneralSettings extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -53,18 +51,14 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(
-          this.props.isRevampLayout
-            ? messages.languageSelectLabel
-            : globalMessages.languageSelectLabel
-        ),
+        label: this.context.intl.formatMessage(messages.languageSelectLabel),
         value: this.props.currentLocale,
       },
     },
   });
 
   render(): Node {
-    const { languages, isSubmitting, error, isRevampLayout } = this.props;
+    const { languages, isSubmitting, error } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
@@ -77,14 +71,12 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
 
     return (
       <div className={componentClassNames}>
-        {isRevampLayout && (
-          <Typography component="div" variant="body1" mb="16px" color="grayscale.900" fontWeight={500}>
-            {intl.formatMessage(messages.languageLabel)}
-          </Typography>
-        )}
+        <Typography component="div" variant="body1" mb="16px" color="grayscale.900" fontWeight={500}>
+          {intl.formatMessage(messages.languageLabel)}
+        </Typography>
         <Box
           sx={{
-            width: isRevampLayout ? '506px' : '100%',
+            width: '506px',
           }}
         >
           <Select
@@ -123,5 +115,3 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
     );
   }
 }
-
-export default (withLayout(GeneralSettings): ComponentType<Props>);

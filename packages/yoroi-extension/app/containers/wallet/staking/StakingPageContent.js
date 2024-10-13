@@ -1,11 +1,10 @@
 // @flow
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
-import { withLayout } from '../../../styles/context/layout';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { Box, styled } from '@mui/system';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
@@ -27,7 +26,6 @@ import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -35,13 +33,8 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
-
-type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
 @observer
-class StakingPageContent extends Component<AllProps> {
+export default class StakingPageContent extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -365,7 +358,6 @@ class StakingPageContent extends Component<AllProps> {
     );
   }
 }
-export default (withLayout(StakingPageContent): ComponentType<StoresAndActionsProps>);
 
 const WrapperCards = styled(Box)({
   display: 'flex',

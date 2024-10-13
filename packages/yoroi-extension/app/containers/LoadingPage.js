@@ -16,7 +16,6 @@ export default class LoadingPage extends Component<JointStoresAndActionsProps> {
       <CenteredLayout>
         <Loading
           hasLoadedCurrentLocale={this.props.stores.profile.hasLoadedCurrentLocale}
-          hasLoadedCurrentTheme={this.props.stores.profile.hasLoadedCurrentTheme}
           isLoadingDataForNextScreen={this.props.stores.loading.isLoading}
           error={this.props.stores.loading.error}
           onExternalLinkClick={handleExternalLinkClick}

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import environmnent from '../../../environment';
@@ -8,8 +8,6 @@ import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import type { SubMenuOption } from '../../topbar/SubMenu';
 
 export const settingsMenuMessages: Object = defineMessages({
@@ -40,14 +38,14 @@ type Props = {|
   +onItemClick: string => void,
 |};
 @observer
-class SettingsMenu extends Component<Props & InjectedLayoutProps> {
+export default class SettingsMenu extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, isRevampLayout } = this.props;
+    const { onItemClick, isActiveItem } = this.props;
     const isProduction = environmnent.isProduction();
     const settingOptions: Array<SubMenuOption> = [
       {
@@ -72,9 +70,7 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         hidden: isProduction,
       },
       {
-        label: intl.formatMessage(
-          isRevampLayout ? globalMessages.termsOfService : globalMessages.termsOfUse
-        ),
+        label: intl.formatMessage(globalMessages.termsOfService),
         route: ROUTES.SETTINGS.TERMS_OF_USE,
         className: 'termsOfUse',
       },
@@ -92,7 +88,6 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
-        hidden: !isRevampLayout,
       },
     ];
 
@@ -106,5 +101,3 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
     );
   }
 }
-
-export default (withLayout(SettingsMenu): ComponentType<Props>);
