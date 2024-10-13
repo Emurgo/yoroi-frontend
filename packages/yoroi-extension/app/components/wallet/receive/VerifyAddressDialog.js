@@ -2,13 +2,12 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -23,7 +22,6 @@ import {
   normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import { withLayout } from '../../../styles/context/layout';
 import classnames from 'classnames';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import Dialog from '../../widgets/Dialog';
@@ -62,7 +60,7 @@ type Props = {|
 |};
 
 @observer
-class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
+export default class VerifyAddressDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -281,5 +279,3 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     );
   };
 }
-
-export default (withLayout(VerifyAddressDialog): ComponentType<Props>);

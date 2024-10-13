@@ -11,7 +11,6 @@ import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { locales, translations } from './i18n/translations';
 import { Logger } from './utils/logging';
-import { LayoutProvider } from './styles/context/layout';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
 import { globalStyles } from './styles/globalStyles';
@@ -89,17 +88,15 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <LayoutProvider>
-          <ColorModeProvider>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            <ThemeManager cssVariables={themeVars} />
-            {/* Automatically pass a theme prop to all components in this subtree. */}
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ColorModeProvider>
-        </LayoutProvider>
+        <ColorModeProvider>
+          <CssBaseline />
+          {globalStyles(muiTheme)}
+          <ThemeManager cssVariables={themeVars} />
+          {/* Automatically pass a theme prop to all components in this subtree. */}
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            {this.getContent()}
+          </IntlProvider>
+        </ColorModeProvider>
       </div>
     );
   }

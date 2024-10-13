@@ -31,7 +31,6 @@ import { Logger } from '../utils/logging';
 import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
-import { LayoutProvider } from '../styles/context/layout';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
@@ -110,16 +109,14 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
-        <LayoutProvider>
-          <ThemeProvider theme={muiTheme}>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            <ThemeManager />
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </LayoutProvider>
+        <ThemeProvider theme={muiTheme}>
+          <CssBaseline />
+          {globalStyles(muiTheme)}
+          <ThemeManager />
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            {this.getContent()}
+          </IntlProvider>
+        </ThemeProvider>
       </div>
     );
   }

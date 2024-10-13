@@ -1,12 +1,10 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { LayoutComponentMap } from '../../styles/context/layout';
-import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -28,12 +26,8 @@ import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDia
 import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 
-type Props = StoresAndActionsProps;
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
 @observer
-class AddWalletPage extends Component<AllProps> {
+export default class AddWalletPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -211,4 +205,3 @@ class AddWalletPage extends Component<AllProps> {
     });
   };
 }
-export default (withLayout(AddWalletPage): ComponentType<Props>);

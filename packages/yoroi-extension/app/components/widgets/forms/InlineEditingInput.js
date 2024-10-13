@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import classnames from 'classnames';
@@ -10,8 +10,6 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   change: {
@@ -48,7 +46,7 @@ type State = {|
 |};
 
 @observer
-class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
+export default class InlineEditingInput extends Component<Props, State> {
   static defaultProps: {| className: void |} = {
     className: undefined,
   };
@@ -189,5 +187,3 @@ class InlineEditingInput extends Component<Props & InjectedLayoutProps, State> {
     );
   }
 }
-
-export default (withLayout(InlineEditingInput): ComponentType<Props>);
