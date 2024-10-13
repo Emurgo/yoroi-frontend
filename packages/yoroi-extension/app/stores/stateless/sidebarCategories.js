@@ -31,6 +31,7 @@ export type SidebarCategory = {|
   |}) => boolean,
 |};
 
+// <TODO:PENDING_REMOVAL>
 export const allCategories: Array<SidebarCategory> = [];
 function registerCategory(category: SidebarCategory): SidebarCategory {
   allCategories.push(category);
