@@ -14,14 +14,8 @@ import { signAndBroadcastTransaction } from '../../../api/thunk';
 
 export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
 
-  setup(): void {
-    super.setup();
-    const { wallets, } = this.actions;
-    wallets.sendMoney.listen(this._sendMoney);
-  }
-
   /** Send money and then return to transaction screen */
-  _sendMoney:  {|
+  sendMoney:  {|
     signRequest: ISignRequest<any>,
     password: string,
     +wallet: {
@@ -32,7 +26,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
-      throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
+      throw new Error(`${nameof(this.sendMoney)} wrong tx sign request`);
     }
 
     const { stores } = this;

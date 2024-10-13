@@ -399,7 +399,7 @@ export default class LedgerConnectStore
     }
 
     await stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
+    stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
     if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
       stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 

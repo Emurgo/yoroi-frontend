@@ -122,21 +122,21 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   }
 
   render(): Node {
-    const { selected } = this.props.stores.wallets;
+    const { actions, stores } = this.props;
+    const { selected } = stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
     const {
       uiDialogs,
       transactionBuilderStore,
       protocolParameters,
-    } = this.props.stores;
+    } = stores;
 
     if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
       return null;
     }
 
-    const { actions } = this.props;
-    const { hasAnyPending } = this.props.stores.transactions;
+    const { hasAnyPending } = stores.transactions;
     const { txBuilderActions } = this.props.actions;
 
     // disallow sending when pending tx exists
@@ -148,12 +148,12 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+    const defaultToken = stores.tokenInfoStore.getDefaultTokenInfo(
       selected.networkId
     );
     const network  = getNetworkById(selected.networkId);
 
-    const addressStore = this.props.stores.substores.ada.addresses;
+    const addressStore = stores.substores.ada.addresses;
     const resolveDomainAddressFunc = addressStore.domainResolverSupported()
       ? addressStore.resolveDomainAddress.bind(addressStore)
       : null;
@@ -167,10 +167,10 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           }}
           selectedNetwork={network}
           selectedWallet={selected}
-          selectedExplorer={this.props.stores.explorers.selectedExplorer}
+          selectedExplorer={stores.explorers.selectedExplorer}
           selectedToken={transactionBuilderStore.selectedToken}
           defaultToken={defaultToken}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           onSubmit={txBuilderActions.updateTentativeTx.trigger}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
@@ -184,8 +184,8 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           error={transactionBuilderStore.createUnsignedTx.error}
           // Min ADA for all tokens that is already included in the tx
           minAda={transactionBuilderStore.minAda}
-          uriParams={this.props.stores.loading.uriParams}
-          resetUriParams={this.props.stores.loading.resetUriParams}
+          uriParams={stores.loading.uriParams}
+          resetUriParams={stores.loading.resetUriParams}
           memo={transactionBuilderStore.memo}
           showMemo={this.showMemo}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
@@ -194,7 +194,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
               dialog: MemoNoExternalStorageDialog,
               continuation: this.toggleShowMemo,
             })}
-          spendableBalance={this.props.stores.transactions.balance}
+          spendableBalance={stores.transactions.balance}
           onAddToken={txBuilderActions.addToken.trigger}
           onRemoveTokens={txBuilderActions.removeTokens.trigger}
           plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
@@ -203,18 +203,18 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
           isOpen={uiDialogs.isOpen}
           openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
-          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+          unitOfAccountSetting={stores.profile.unitOfAccount}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
           maxSendableAmount={transactionBuilderStore.maxSendableAmount}
           signRequest={transactionBuilderStore.tentativeTx}
           staleTx={transactionBuilderStore.txMismatch}
-          sendMoneyRequest={this.props.stores.wallets.sendMoneyRequest}
-          sendMoney={this.props.actions.wallets.sendMoney.trigger}
-          ledgerSendError={this.props.stores.substores.ada.ledgerSend.error || null}
-          trezorSendError={this.props.stores.substores.ada.trezorSend.error || null}
-          ledgerSend={this.props.stores.substores.ada.ledgerSend}
-          trezorSend={this.props.stores.substores.ada.trezorSend}
+          sendMoneyRequest={stores.wallets.sendMoneyRequest}
+          sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
+          ledgerSendError={stores.substores.ada.ledgerSend.error || null}
+          trezorSendError={stores.substores.ada.trezorSend.error || null}
+          ledgerSend={stores.substores.ada.ledgerSend}
+          trezorSend={stores.substores.ada.trezorSend}
         />
         {this.renderDialog()}
       </>

@@ -14,16 +14,14 @@ import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackage
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
-type DialogProps = {|
+type LocalProps = {|
   +signRequest: ISignRequest<any>,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-|};
-type Props = {|
-  ...StoresAndActionsProps,
-  ...DialogProps,
   +openTransactionSuccessDialog: () => void,
 |};
+
+type Props = {| ...StoresAndActionsProps, ...LocalProps |};
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
@@ -44,7 +42,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     if (publicDeriver == null)
       throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
 
-    const { sendMoney } = actions.wallets;
     const { sendMoneyRequest } = stores.wallets;
 
     const totalInput = signRequest.totalInput();
@@ -65,15 +62,15 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             publicDeriver.networkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
-        getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+        getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+        getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         amount={totalInput.joinSubtractCopy(fee)}
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
         transactionSize={showSize ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})` : null}
         onSubmit={async ({ password }) => {
-          await sendMoney.trigger({
+          await stores.substores.ada.mnemonicSend.sendMoney({
             signRequest,
             password,
             wallet: publicDeriver,

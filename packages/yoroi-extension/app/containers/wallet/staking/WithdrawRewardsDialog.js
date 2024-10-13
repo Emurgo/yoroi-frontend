@@ -102,7 +102,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresAndActi
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-          await this.props.actions.wallets.sendMoney.trigger({
+          await stores.substores.ada.mnemonicSend.sendMoney({
             signRequest,
             password: walletPassword,
             wallet: selected,

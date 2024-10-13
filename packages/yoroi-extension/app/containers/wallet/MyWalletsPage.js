@@ -53,7 +53,7 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
   };
 
   openToSettings: (number) => void = publicDeriverId => {
-    this.props.actions.wallets.setActiveWallet.trigger({
+    this.props.stores.wallets.setActiveWallet({
       publicDeriverId
     });
     this.props.stores.app.goToRoute({

@@ -63,7 +63,7 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { profile, wallets: walletsActions } = actions;
+  const { profile } = actions;
   const {
     walletRestore,
     profile: profileData,
@@ -179,7 +179,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           }}
           openDuplicatedWallet={lastDuplicatedWalletId => {
             resetRestoreWalletData();
-            walletsActions.setActiveWallet.trigger({ publicDeriverId: lastDuplicatedWalletId });
+            wallets.setActiveWallet({ publicDeriverId: lastDuplicatedWalletId });
             handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
           }}
           onSubmit={async enteredRecoveryPhrase => {

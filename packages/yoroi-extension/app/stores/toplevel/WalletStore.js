@@ -20,7 +20,7 @@ import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thu
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
-import { forceNonNull, timeCached } from '../../coreUtils';
+import { forceNonNull, noop, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
@@ -79,10 +79,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const { wallets } = this.actions;
-    wallets.unselectWallet.listen(this._unsetActiveWallet);
-    wallets.setActiveWallet.listen(this._setActiveWallet);
-
     this.flagStorage = createFlagStorage();
 
     listenForWalletStateUpdate(async (params) => {
@@ -182,7 +178,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
     runInAction(() => {
       this.wallets.push(newWallet);
-      this._setActiveWallet({
+      this.setActiveWallet({
         publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
@@ -278,7 +274,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
+  @action setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
     const walletIndex = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
     if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
@@ -290,7 +286,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.selectedWalletName = this.wallets[walletIndex].name;
     // Cache select wallet
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
-    subscribe(publicDeriverId);
+    noop(subscribe(publicDeriverId));
+    // Catalyst update // todo: maybe check if network changed
+    noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
   };
 
   getLastSelectedWallet: void => ?WalletState = () => {
@@ -298,7 +296,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 
-  @action _unsetActiveWallet: void => void = () => {
+  @action unsetActiveWallet: void => void = () => {
     this.actions.profile.setSelectedNetwork.trigger(undefined);
     this.selectedIndex = null;
     this.selectedWalletName = null;

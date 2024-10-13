@@ -4,7 +4,6 @@ import ProfileActions from './profile-actions';
 import DialogsActions from './dialogs-actions';
 import NotificationsActions from './notifications-actions';
 import MemosActions from './memos-actions';
-import WalletActions from './wallet-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
 import TxBuilderActions from './common/tx-builder-actions';
@@ -20,7 +19,6 @@ export type ActionsMap = {|
   notifications: NotificationsActions,
   yoroiTransfer: YoroiTransferActions,
   memos: MemosActions,
-  wallets: WalletActions,
   walletRestore: WalletRestoreActions,
   connector: ConnectorActionsMap,
 |};
@@ -34,7 +32,6 @@ const actionsMap: ActionsMap = Object.freeze({
   notifications: new NotificationsActions(),
   yoroiTransfer: new YoroiTransferActions(),
   memos: new MemosActions(),
-  wallets: new WalletActions(),
   walletRestore: new WalletRestoreActions(),
   connector: new ConnectorActionsMap(),
 });

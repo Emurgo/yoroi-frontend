@@ -133,10 +133,11 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
-    this.actions.wallets.unselectWallet.trigger(); // deselect before deleting
+    const { stores } = this;
+    stores.wallets.unsetActiveWallet(); // deselect before deleting
 
     // Remove this wallet from wallet sort list
-    const walletsNavigation = this.stores.profile.walletsNavigation
+    const walletsNavigation = stores.profile.walletsNavigation
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
@@ -147,7 +148,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
 
     // ==================== Disconnect related dApps ====================
     await this.actions.connector.getConnectorWhitelist.trigger();
-    const connectorWhitelist = this.stores.connector.currentConnectorWhitelist;
+    const connectorWhitelist = stores.connector.currentConnectorWhitelist;
     const connectedDapps = connectorWhitelist.filter(
       dapp => dapp.publicDeriverId === request.publicDeriverId
     );

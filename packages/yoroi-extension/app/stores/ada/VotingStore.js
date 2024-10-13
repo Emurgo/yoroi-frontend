@@ -83,23 +83,22 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     this.reset({ justTransaction: false });
-    this.actions.wallets.setActiveWallet.listen(() => {noop(this._updateCatalystRoundInfo())});
-    noop(this._loadCatalystRoundInfo());
-    noop(this._updateCatalystRoundInfo());
+    noop(this.loadCatalystRoundInfo());
+    noop(this.updateCatalystRoundInfo());
   }
 
   get isActionProcessing(): boolean {
     return this.progressInfo.stepState === StepState.PROCESS;
   }
 
-  _loadCatalystRoundInfo: void => Promise<void> = async () => {
+  loadCatalystRoundInfo: void => Promise<void> = async () => {
     const data = await loadCatalystRoundInfo();
     runInAction(() => {
       this.catalystRoundInfo = data;
     });
   }
 
-  @action _updateCatalystRoundInfo: void => Promise<void> = async () => {
+  @action updateCatalystRoundInfo: void => Promise<void> = async () => {
     runInAction(() => {
       this.loadingCatalystRoundInfo = true
     })

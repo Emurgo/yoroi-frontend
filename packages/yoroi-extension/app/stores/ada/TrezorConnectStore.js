@@ -354,7 +354,7 @@ export default class TrezorConnectStore
 
     const { stores } = this;
     await stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
+    stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
     stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
