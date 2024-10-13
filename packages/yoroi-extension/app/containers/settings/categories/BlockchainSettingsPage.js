@@ -20,7 +20,8 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
   };
 
   render(): Node {
-    const { selected } = this.props.stores.wallets;
+    const { stores } = this.props;
+    const { selected } = stores.wallets;
     if (selected == null) {
       return <NoWalletMessage />;
 

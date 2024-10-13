@@ -189,7 +189,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
 
   goToDashboardRoute(): void {
     const route = buildRoute(ROUTES.STAKING);
-    this.stores.app.goToRoute.trigger({ route });
+    this.stores.app.goToRoute({ route });
   }
 
   @action.bound

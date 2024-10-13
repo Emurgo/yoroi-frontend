@@ -51,7 +51,7 @@ export default class SidebarContainer extends Component<StoresAndActionsProps, S
   }
 
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     return (
       <SidebarRevamp
         onLogoClick={() => {
