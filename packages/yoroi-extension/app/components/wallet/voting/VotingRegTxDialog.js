@@ -31,22 +31,20 @@ import { truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { WalletType, StepsList } from './types';
 import Stepper from '../../common/stepper/Stepper';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.trx.line1',
-    defaultMessage:
-      '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
+    defaultMessage: '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Trezor device to your computer, press the Register button.',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Register button.',
   },
   txConfirmationLedgerNanoLine1: {
     id: 'wallet.voting.dialog.step.trx.ledger.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
   },
 });
 
@@ -99,9 +97,9 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     if (walletType === 'mnemonic') {
       return (
-        <div className={classnames([styles.lineText, styles.firstItem])}>
+        <Typography className={classnames([styles.lineText, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line1)}
-        </div>
+        </Typography>
       );
     }
 
@@ -148,17 +146,16 @@ export default class VotingRegTxDialog extends Component<Props> {
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ color: 'ds.text_gray_medium' }}>
+            {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+          </Typography>
           <br />
-          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+          <Typography color="ds.text_gray_medium">{intl.formatMessage(globalMessages.staleTxnWarningLine2)}</Typography>
         </WarningBox>
       </div>
     );
 
-    const confirmButtonClasses = classnames([
-      'confirmButton',
-      this.props.isSubmitting ? styles.submitButtonSpinning : null,
-    ]);
+    const confirmButtonClasses = classnames(['confirmButton', this.props.isSubmitting ? styles.submitButtonSpinning : null]);
 
     const actions = [
       {
@@ -221,9 +218,7 @@ export default class VotingRegTxDialog extends Component<Props> {
         </div>
         {spendingPasswordForm}
         {this.props.error ? (
-          <div className={styles.error}>
-            {intl.formatMessage(this.props.error, this.props.error.values)}
-          </div>
+          <div className={styles.error}>{intl.formatMessage(this.props.error, this.props.error.values)}</div>
         ) : null}
       </Dialog>
     );

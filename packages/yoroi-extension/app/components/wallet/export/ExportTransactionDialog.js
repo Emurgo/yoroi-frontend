@@ -25,8 +25,7 @@ const messages = defineMessages({
   },
   infoText1: {
     id: 'wallet.transaction.export.dialog.infoText1',
-    defaultMessage:
-      '!!!The entire transaction history within your wallet will be exported to a file',
+    defaultMessage: '!!!The entire transaction history within your wallet will be exported to a file',
   },
   includeTxIds: {
     id: 'wallet.transaction.export.dialog.includeTxIds',
@@ -67,15 +66,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      isActionProcessing,
-      error,
-      submit,
-      cancel,
-      toggleIncludeTxIds,
-      shouldIncludeTxIds,
-      isRevampLayout,
-    } = this.props;
+    const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds, isRevampLayout } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (
       <Box
@@ -94,17 +85,15 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
       </Box>
     );
 
+    const startDateIsCorrect = startDate !== null && startDate.isValid() && startDate.isSameOrBefore(endDate);
+    const endDateIsCorrect = endDate !== null && endDate.isValid();
+
     const dialogActions = [
       {
         label: intl.formatMessage(globalMessages.exportButtonLabel),
         primary: true,
         isSubmitting: isActionProcessing || false,
-        disabled:
-          !startDate ||
-          !endDate ||
-          startDate.isAfter(endDate) ||
-          !startDate.isValid() ||
-          !endDate.isValid(),
+        disabled: !startDateIsCorrect || !endDateIsCorrect,
         onClick: () => submit({ startDate, endDate }),
       },
     ];
@@ -139,6 +128,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
                 '.MuiCheckbox-root': {
                   mr: '10px',
                 },
+                color: 'ds.text_gray_medium',
               }}
               control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
               label={intl.formatMessage(messages.includeTxIds)}

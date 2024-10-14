@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import styles from './WalletAccountIcon.scss';
 import Blockies from 'react-blockies';
 import tinycolor from 'tinycolor2';
+import { hexToBytes } from '../../coreUtils';
 
 type Props = {|
   +iconSeed: string,
@@ -46,7 +47,10 @@ export default class WalletAccountIcon extends Component<Props> {
 
   render(): Node {
     const { iconSeed, scalePx, size, saturationFactor } = this.props;
-    const colorIdx = Buffer.from(iconSeed, 'hex')[0] % COLORS.length;
+    if (iconSeed === '') {
+      return (<div style={{ width: '42px', height: '42px' }} />);
+    }
+    const colorIdx = hexToBytes(iconSeed)[0] % COLORS.length;
     const color = COLORS[colorIdx];
     return (<Blockies
       seed={iconSeed}

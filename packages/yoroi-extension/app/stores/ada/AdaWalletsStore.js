@@ -5,14 +5,17 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { asGetAllUtxos } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { createWallet, signTransaction } from '../../api/thunk';
+import type {
+  Addressing,
+  QueriedUtxo,
+} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { fail, first, sorted } from '../../coreUtils';
-import type { QueriedUtxo } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import BigNumber from 'bignumber.js';
+import type{ WalletState } from '../../../chrome/extension/background/types';
 
 const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
@@ -38,60 +41,186 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     broadcastRequest:
       | {|
           normal: {|
-            publicDeriver: PublicDeriver<>,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              ...
+            },
             signRequest: HaskellShelleyTxSignRequest,
             password: string,
           |},
         |}
       | {|
           trezor: {|
-            publicDeriver: PublicDeriver<>,
             signRequest: HaskellShelleyTxSignRequest,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              publicKey: string,
+              pathToPublic: Array<number>,
+              stakingAddressing: Addressing,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            },
           |},
         |}
       | {|
           ledger: {|
-            publicDeriver: PublicDeriver<>,
             signRequest: HaskellShelleyTxSignRequest,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              stakingAddressing: Addressing,
+              publicKey: string,
+              pathToPublic: Array<number>,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            }
           |},
         |},
     refreshWallet: () => Promise<void>,
   |}) => Promise<void> = async request => {
-    const broadcastRequest = async () => {
-      if (request.broadcastRequest.ledger) {
+    let broadcastRequest;
+    let publicDeriverId;
+    let plateTextPart;
+
+    if (request.broadcastRequest.ledger) {
+      const { wallet, signRequest } = request.broadcastRequest.ledger;
+      broadcastRequest = async () => {
         return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
-          params: { signRequest: request.broadcastRequest.ledger.signRequest },
-          publicDeriver: request.broadcastRequest.ledger.publicDeriver,
+          signRequest,
+          wallet,
         });
-      }
-      if (request.broadcastRequest.trezor) {
-        return await this.stores.substores.ada.trezorSend.signAndBroadcast({
-          params: { signRequest: request.broadcastRequest.trezor.signRequest },
-          publicDeriver: request.broadcastRequest.trezor.publicDeriver,
+      };
+      publicDeriverId = wallet.publicDeriverId;
+      plateTextPart = wallet.plate.TextPart;
+    } else if (request.broadcastRequest.trezor) {
+      const { wallet, signRequest } = request.broadcastRequest.trezor;
+      broadcastRequest = async () => {
+        return await this.stores.substores.ada.trezorSend.signAndBroadcastFromWallet({
+          signRequest,
+          wallet,
         });
-      }
-      if (request.broadcastRequest.normal) {
-        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast(
-          request.broadcastRequest.normal
-        );
-      }
+      };
+      publicDeriverId = request.broadcastRequest.trezor.wallet.publicDeriverId;
+      plateTextPart = request.broadcastRequest.trezor.wallet.plate.TextPart;
+    } else if (request.broadcastRequest.normal) {
+      const { wallet, signRequest, password } = request.broadcastRequest.normal;
+      broadcastRequest = async () => {
+        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast({
+          signRequest,
+          password,
+          publicDeriverId: wallet.publicDeriverId,
+        });
+      };
+      publicDeriverId = wallet.publicDeriverId;
+      plateTextPart = wallet.plate.TextPart;
+    } else {
       throw new Error(
         `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
       );
     };
-    const publicDeriver = (() => {
-      if (request.broadcastRequest.ledger) return request.broadcastRequest.ledger.publicDeriver;
-      if (request.broadcastRequest.trezor) return request.broadcastRequest.trezor.publicDeriver;
-      if (request.broadcastRequest.normal) return request.broadcastRequest.normal.publicDeriver;
-      throw new Error(
-        `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
-      );
-    })();
     await this.stores.wallets.sendAndRefresh({
-      publicDeriver,
+      publicDeriverId,
       broadcastRequest,
       refreshWallet: request.refreshWallet,
+      plateTextPart,
     });
+  };
+
+  adaSignTransactionHexFromWallet: ({|
+    transactionHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      +plate: { TextPart: string, ... },
+      publicKey: string,
+      pathToPublic: Array<number>,
+      stakingAddressing: Addressing,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      type: 'trezor' | 'ledger' | 'mnemonic',
+      isHardware: boolean,
+      ...
+    },
+    password: string,
+  |}) => Promise<{| signedTxHex: string |}> = async ({ wallet, transactionHex, password }) => {
+    const walletType: string = wallet.type;
+    const baseSignRequest = { wallet, transactionHex };
+    const signRequest = wallet.isHardware
+      ? { [walletType]: baseSignRequest }
+      : { normal: { ...baseSignRequest, password } };
+    // $FlowIgnore[incompatible-call]
+    return this.adaSignTransactionHex({ signRequest });
+  }
+
+  adaSignTransactionHex: ({|
+    signRequest:
+      | {|
+          normal: {|
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              ...
+            },
+            transactionHex: string,
+            password: string,
+          |},
+        |}
+      | {|
+          trezor: {|
+            transactionHex: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              publicKey: string,
+              pathToPublic: Array<number>,
+              stakingAddressing: Addressing,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            },
+          |},
+        |}
+      | {|
+          ledger: {|
+            transactionHex: string,
+            +wallet: {
+              publicDeriverId: number,
+              +plate: { TextPart: string, ... },
+              stakingAddressing: Addressing,
+              publicKey: string,
+              pathToPublic: Array<number>,
+              networkId: number,
+              hardwareWalletDeviceId: ?string,
+              ...
+            }
+          |},
+        |},
+  |}) => Promise<{| signedTxHex: string |}> = async request => {
+    if (request.signRequest.ledger) {
+      const { wallet, transactionHex } = request.signRequest.ledger;
+      return this.stores.substores.ada.ledgerSend
+        .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
+    }
+    if (request.signRequest.trezor) {
+      const { wallet, transactionHex } = request.signRequest.trezor;
+      return this.stores.substores.ada.trezorSend
+        .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
+    }
+    if (request.signRequest.normal) {
+      const { wallet, transactionHex, password } = request.signRequest.normal;
+      const signedTxHex = await signTransaction({
+        publicDeriverId: wallet.publicDeriverId,
+        transactionHex,
+        password,
+      });
+      return { signedTxHex };
+    }
+    throw new Error(
+      `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
+    );
   };
 
   // =================== WALLET RESTORATION ==================== //
@@ -123,23 +252,11 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   /** Create the wallet and go to wallet summary screen */
   _createInDb: void => Promise<void> = async () => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
-    }
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
-    await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet({
-        db: persistentDb,
-        walletName: this.stores.walletBackup.name,
-        walletPassword: this.stores.walletBackup.password,
-        recoveryPhrase: this.stores.walletBackup.recoveryPhrase.join(' '),
-        network: selectedNetwork,
-        accountIndex: this.stores.walletBackup.selectedAccount,
-      });
-      return wallet;
-    }).promise;
+    await this._createWallet({
+      recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
+      walletPassword: this.stores.walletBackup.password,
+      walletName: this.stores.walletBackup.name,
+    });
   };
 
   _createWallet: {|
@@ -147,29 +264,22 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     walletPassword: string,
     walletName: string,
   |} => Promise<void> = async (request) => {
-    const persistentDb = this.stores.loading.getDatabase();
-    if (persistentDb == null) {
-      throw new Error(`${nameof(this._createInDb)} db not loaded. Should never happen`);
-    }
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await this.api.ada.createWallet({
-        db: persistentDb,
+      const wallet = await createWallet({
         walletName: request.walletName,
         walletPassword: request.walletPassword,
         recoveryPhrase: request.recoveryPhrase.join(' '),
-        network: selectedNetwork,
+        networkId: selectedNetwork.NetworkId,
         accountIndex: 0 + HARD_DERIVATION_START,
       });
       return wallet;
     }).promise;
   };
 
-  pickCollateralUtxo: ({| wallet: PublicDeriver<> |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
-    const withUtxos = asGetAllUtxos(wallet)
-      ?? fail(`${nameof(this.pickCollateralUtxo)} missing utxo functionality`);
-    const allUtxos: Array<QueriedUtxo> = await withUtxos.getAllUtxos();
+  pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
+    const allUtxos = wallet.utxos;
     if (allUtxos.length === 0) {
       fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
     }

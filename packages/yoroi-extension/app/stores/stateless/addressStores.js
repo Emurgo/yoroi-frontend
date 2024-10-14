@@ -1,6 +1,5 @@
 // @flow
 
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import {
   AddressBookSubgroup,
   ByronAllAddressesSubgroup,
@@ -13,13 +12,9 @@ import {
   EnterpriseInternalAddressesSubgroup,
   RewardAddressesSubgroup,
 } from '../base/AddressSubgroupStore';
-import { CoinTypes, } from '../../config/numbersConfig';
-import type { CoinTypesT, } from '../../config/numbersConfig';
 import {
-  asHasUtxoChains, asHasLevels, asGetAllUtxos, asPickReceive,
+  asHasUtxoChains, asGetAllUtxos, asPickReceive,
 } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
-import { Bip44Wallet } from '../../api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { Cip1852Wallet } from '../../api/ada/lib/storage/models/Cip1852Wallet/wrapper';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { AddressFilterKind, StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
 import {
@@ -29,20 +24,18 @@ import {
   addressSubgroupName,
   addressGroupName,
 } from '../../types/AddressFilterTypes';
-import {
-  ConceptualWallet
-} from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { StoresMap } from '../index';
 import type { ActionsMap } from '../../actions';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
-import { CardanoForks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
 import type {
   Addressing,
   BaseSingleAddressPath,
   IPublicDeriver,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type SubgroupCtorData = {|
   stores: StoresMap,
@@ -57,13 +50,11 @@ export interface IAddressTypeStore {
   constructor(data: SubgroupCtorData): IAddressTypeStore;
   +all: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
   +wasExecuted: boolean,
-  +addObservedWallet: PublicDeriver<> => void,
-  +refreshAddressesFromDb: PublicDeriver<> => Promise<void>,
+  +addObservedWallet: WalletState => void,
+  +refreshAddressesFromDb: WalletState => Promise<void>,
 }
 export type AddressSubgroupMeta<+T: IAddressTypeStore> = {|
-  +isRelated: {|
-    selected: PublicDeriver<>,
-  |} => (boolean),
+  +isRelated: () => boolean,
   +class: Class<T>,
   +validFilters: $ReadOnlyArray<AddressFilterKind>,
   +name: AddressTypeName,
@@ -80,28 +71,6 @@ function registerAddressSubgroup<T: IAddressTypeStore>(
   return category;
 }
 
-function matchParent(
-  publicDeriver: PublicDeriver<>,
-  match: ?ConceptualWallet => boolean
-): boolean {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  if (withLevels == null) return match(null);
-  const parent = withLevels.getParent();
-  return match(parent);
-}
-function matchCoinType(
-  publicDeriver: PublicDeriver<>,
-  match: CoinTypesT => boolean
-): boolean {
-  return match(publicDeriver.parent.getNetworkInfo().CoinType);
-}
-function matchForkType(
-  publicDeriver: PublicDeriver<>,
-  match: number => boolean
-): boolean {
-  return match(publicDeriver.parent.getNetworkInfo().Fork);
-}
-
 const standardFilter = [
   AddressFilter.None,
   AddressFilter.Unused,
@@ -112,11 +81,7 @@ const standardFilter = [
 export const BYRON_ALL: AddressSubgroupMeta<
   ByronAllAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) == null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
+  isRelated: () => false,
   class: ByronAllAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -128,11 +93,7 @@ export const BYRON_ALL: AddressSubgroupMeta<
 export const BYRON_EXTERNAL: AddressSubgroupMeta<
   ByronExternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
+  isRelated: () => false,
   class: ByronExternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -144,11 +105,7 @@ export const BYRON_EXTERNAL: AddressSubgroupMeta<
 export const BYRON_INTERNAL: AddressSubgroupMeta<
   ByronInternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Bip44Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO)
-  ),
+  isRelated: () => false,
   class: ByronInternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -160,12 +117,7 @@ export const BYRON_INTERNAL: AddressSubgroupMeta<
 export const BASE_EXTERNAL: AddressSubgroupMeta<
   BaseExternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: BaseExternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -177,12 +129,7 @@ export const BASE_EXTERNAL: AddressSubgroupMeta<
 export const BASE_INTERNAL: AddressSubgroupMeta<
   BaseInternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: BaseInternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -194,11 +141,7 @@ export const BASE_INTERNAL: AddressSubgroupMeta<
 export const BASE_MANGLED: AddressSubgroupMeta<
   BaseMangledAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: BaseMangledAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -210,12 +153,7 @@ export const BASE_MANGLED: AddressSubgroupMeta<
 export const ENTERPRISE_EXTERNAL: AddressSubgroupMeta<
   EnterpriseExternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: EnterpriseExternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -230,12 +168,7 @@ export const ENTERPRISE_EXTERNAL: AddressSubgroupMeta<
 export const ENTERPRISE_INTERNAL: AddressSubgroupMeta<
   EnterpriseInternalAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    asHasUtxoChains(request.selected) != null &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: EnterpriseInternalAddressesSubgroup,
   validFilters: standardFilter,
   name: {
@@ -250,11 +183,7 @@ export const ENTERPRISE_INTERNAL: AddressSubgroupMeta<
 export const REWARD_ADDRESS: AddressSubgroupMeta<
   RewardAddressesSubgroup
 > = registerAddressSubgroup({
-  isRelated: request => (
-    matchParent(request.selected, parent => parent instanceof Cip1852Wallet) &&
-    matchCoinType(request.selected, coinType => coinType === CoinTypes.CARDANO) &&
-    matchForkType(request.selected, fork => fork === CardanoForks.Haskell)
-  ),
+  isRelated: () => true,
   class: RewardAddressesSubgroup,
   validFilters: [AddressFilter.None],
   name: {
@@ -267,7 +196,7 @@ export const REWARD_ADDRESS: AddressSubgroupMeta<
 export const ADDRESS_BOOK: AddressSubgroupMeta<
   AddressBookSubgroup
 > = registerAddressSubgroup({
-  isRelated: _publicDeriver => true,
+  isRelated: () => true,
   class: AddressBookSubgroup,
   validFilters: [AddressFilter.None],
   name: {
@@ -316,7 +245,7 @@ export const routeForStore = (name: AddressTypeName): string => buildRoute(
  * a given address belongs to the wallet and which store it belongs to
  */
 export function genAddressStoreLookup(
-  publicDeriver: PublicDeriver<>,
+  networkId: number,
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
 ): (string /* payload - not presentational */ => (
   void |
@@ -326,9 +255,9 @@ export function genAddressStoreLookup(
   |}
 )) {
   return (address) => {
-    const networkInfo = publicDeriver.getParent().getNetworkInfo();
+    const networkInfo = getNetworkById(networkId);
     for (const addressStore of allAddressSubgroups) {
-      if (!addressStore.isRelated({ selected: publicDeriver })) {
+      if (!addressStore.isRelated()) {
         continue;
       }
       const request = addressSubgroupMap.get(addressStore.class);
@@ -366,12 +295,12 @@ export function genAddressStoreLookup(
  * a given address belongs to the wallet and which store it belongs to
  */
 export function genAddressingLookup(
-  publicDeriver: PublicDeriver<>,
+  networkId: number,
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
 ): (
   string /* payload - not presentational */
 ) => (void | $PropertyType<Addressing, 'addressing'>) {
-  const addressStoreLookup = genAddressStoreLookup(publicDeriver, addressSubgroupMap);
+  const addressStoreLookup = genAddressStoreLookup(networkId, addressSubgroupMap);
   return (address) => {
     const lookupResult = addressStoreLookup(address);
     if (lookupResult == null) return undefined;
@@ -385,7 +314,7 @@ export function genAddressingLookup(
  * a given address belongs to the wallet with some extra information about the store
  */
 export function genAddressLookup(
-  publicDeriver: PublicDeriver<>,
+  networkId: number,
   intl: $npm$ReactIntl$IntlFormat,
   goToRoute: void | (string => void),
   addressSubgroupMap: $ReadOnlyMap<Class<IAddressTypeStore>, IAddressTypeUiSubset>,
@@ -397,7 +326,7 @@ export function genAddressLookup(
     address: $ReadOnly<StandardAddress>,
   |}
 )) {
-  const addressStoreLookup = genAddressStoreLookup(publicDeriver, addressSubgroupMap);
+  const addressStoreLookup = genAddressStoreLookup(networkId, addressSubgroupMap);
   return (address) => {
     const lookupResult = addressStoreLookup(address);
     if (lookupResult == null) return undefined;
@@ -416,6 +345,7 @@ export function genAddressLookup(
 
 export const mangledStores = [BASE_MANGLED];
 
+// fixme: this function shouldn't be here
 export async function getReceiveAddress(
   publicDeriver: IPublicDeriver<>,
 ): Promise<void | BaseSingleAddressPath> {

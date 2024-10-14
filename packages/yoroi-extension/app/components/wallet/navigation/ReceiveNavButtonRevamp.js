@@ -37,8 +37,8 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
   renderButton: void => Node = () => {
     const isTopLvl = Boolean(this.props.isToplevel);
     const isActive = Boolean(this.props.isActive);
-    const locationId='wallet:receive:navigationPanel'
-    const simplifiedLabel = this.props.label.toLowerCase().replace(/[ \/]/gi, '')
+    const locationId = 'wallet:receive:navigationPanel';
+    const simplifiedLabel = this.props.label.toLowerCase().replace(/[ \/]/gi, '');
     return (
       <Box
         onClick={this.props.onClick}
@@ -79,6 +79,7 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
           justifyContent: 'space-between',
           ...paddings,
           ...this.props.sx,
+          background: 'ds.bg_color_max',
         }}
         className={this.props.className}
       >

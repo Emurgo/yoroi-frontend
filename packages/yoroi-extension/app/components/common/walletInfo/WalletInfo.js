@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { ConceptualWallet } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
@@ -19,7 +18,7 @@ import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
-import WalletAccountIcon from './WalletAccountIcon';
+import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -29,10 +28,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isRefreshing: boolean,
   +plate: null | WalletChecksum,
-  +wallet: {|
-    conceptualWallet: ConceptualWallet,
-    conceptualWalletName: string,
-  |},
+  +conceptualWalletName: string,
 |};
 
 function constructPlate(
@@ -59,7 +55,7 @@ export default class WalletInfo extends Component<Props> {
   };
 
   render(): Node {
-    const { shouldHideBalance, onUpdateHideBalance, walletAmount } = this.props;
+    const { shouldHideBalance, onUpdateHideBalance, walletAmount, conceptualWalletName } = this.props;
 
     const [accountPlateId, iconComponent] = this.props.plate
       ? constructPlate(this.props.plate, 0, styles.icon)
@@ -71,7 +67,7 @@ export default class WalletInfo extends Component<Props> {
           {iconComponent}
           <div className={styles.content}>
             <div className={styles.name} id='walletInfo-walletName-text'>
-              {this.generateNameElem(this.props.wallet.conceptualWalletName)}
+              {this.generateNameElem(conceptualWalletName)}
             </div>
             <div className={styles.type}>
               <div className={styles.plate} id='walletInfo-walletPlate-text'>{accountPlateId}</div>

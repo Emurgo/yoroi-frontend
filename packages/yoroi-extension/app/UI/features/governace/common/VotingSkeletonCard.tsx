@@ -10,17 +10,26 @@ const StyledCard = styled(Stack)(({ theme }: any) => ({
   width: '294px',
   borderRadius: '8px',
   padding: '16px',
-  backgroundImage: theme.palette.ds?.bg_gradient_1,
-  backgroundOrigin: 'border-box',
-  boxShadow: 'inset 0 100vw white',
-  border: '2px solid transparent',
+  border: `2px solid ${theme.palette.ds?.primary_100}`,
 }));
 export const VotingSkeletonCard = () => {
   return (
     <StyledCard>
-      <Skeleton animation="wave" variant="rounded" width={157} height={180} sx={{ marginBottom: '22px' }} />
-      <Skeleton animation="wave" variant="rounded" width={185} height={22} sx={{ marginBottom: '12px' }} />
-      <Skeleton animation="wave" variant="rounded" width={262} height={88} />
+      <Skeleton
+        animation="wave"
+        variant="rounded"
+        width={157}
+        height={180}
+        sx={{ marginBottom: '22px', backgroundColor: 'ds.gray_100' }}
+      />
+      <Skeleton
+        animation="wave"
+        variant="rounded"
+        width={185}
+        height={22}
+        sx={{ marginBottom: '12px', backgroundColor: 'ds.gray_100' }}
+      />
+      <Skeleton animation="wave" variant="rounded" width={262} height={88} sx={{ backgroundColor: 'ds.gray_100' }} />
     </StyledCard>
   );
 };

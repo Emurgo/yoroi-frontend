@@ -137,9 +137,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
     const isDeletion = isForwardDelete || isBackwardDelete;
     const isInsert = inputType === 'insertText';
     const deleteCaretCorrection = isBackwardDelete ? 0 : 1;
-    const validInputSignsRegExp = new RegExp(
-      `^([-])?([0-9${decimalSeparator}${groupSeparator}]+)?$`
-    );
+    const validInputSignsRegExp = new RegExp(`^([-])?([0-9${decimalSeparator}${groupSeparator}]+)?$`);
     const validInputNoSignsRegExp = new RegExp(`^([0-9${decimalSeparator}${groupSeparator}]+)?$`);
     const validInputOnlyIntegersRegExp = new RegExp(`^([0-9]+)?$`);
     // $FlowFixMe[sketchy-null-bool]
@@ -219,12 +217,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
     }
 
     // Case: Decimal separator was replaced with a number
-    if (
-      value != null &&
-      hadDecimalSeparatorBefore &&
-      newNumberOfDecimalSeparators === 0 &&
-      isInsert
-    ) {
+    if (value != null && hadDecimalSeparatorBefore && newNumberOfDecimalSeparators === 0 && isInsert) {
       return {
         caretPosition: changedCaretPosition - 1,
         fallbackInputValue,
@@ -241,8 +234,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       return {
         value: '0',
         caretPosition: 2,
-        fallbackInputValue:
-          decimalPlaces != null && decimalPlaces > 0 ? null : `0${decimalSeparator}`,
+        fallbackInputValue: decimalPlaces != null && decimalPlaces > 0 ? null : `0${decimalSeparator}`,
       };
     }
 
@@ -277,8 +269,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       return {
         value: this.bigNumberToFixed(newNumber),
         caretPosition: changedCaretPosition,
-        fallbackInputValue:
-          decimalPlaces != null && decimalPlaces > 0 ? null : formattedNewNumber + decimalSeparator,
+        fallbackInputValue: decimalPlaces != null && decimalPlaces > 0 ? null : formattedNewNumber + decimalSeparator,
         minimumFractionDigits: 0,
       };
     }
@@ -296,16 +287,12 @@ class NumericInputRP extends Component<NumericInputProps, State> {
 
     // Case: Valid change has been made
     const hasNumberChanged = !this.isSameValue(currentNumber, newNumber);
-    const groupSeparatorsDiff =
-      this.getNumberOfGroupSeparators(formattedNewNumber) -
-      this.getNumberOfGroupSeparators(newValue);
+    const groupSeparatorsDiff = this.getNumberOfGroupSeparators(formattedNewNumber) - this.getNumberOfGroupSeparators(newValue);
     const hasNumberOfGroupSeparatorsChanged = groupSeparatorsDiff > 0;
-    const onlyNumberOfGroupSeparatorsChanged =
-      !hasNumberChanged && hasNumberOfGroupSeparatorsChanged;
+    const onlyNumberOfGroupSeparatorsChanged = !hasNumberChanged && hasNumberOfGroupSeparatorsChanged;
     const leadingZeroCorrection = valueHasLeadingZero ? -1 : 0;
     const caretCorrection =
-      (onlyNumberOfGroupSeparatorsChanged ? deleteCaretCorrection : groupSeparatorsDiff) +
-      leadingZeroCorrection;
+      (onlyNumberOfGroupSeparatorsChanged ? deleteCaretCorrection : groupSeparatorsDiff) + leadingZeroCorrection;
     return {
       caretPosition: Math.max(newCaretPosition + caretCorrection, 0),
       fallbackInputValue: null,
@@ -374,9 +361,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
     // $FlowFixMe[prop-missing]
     const { decimalSeparator, groupSeparator } = this.getBigNumberFormat();
     return new BigNumber(
-      value
-        .replace(escapedGlobalRegExp(groupSeparator), '')
-        .replace(escapedGlobalRegExp(decimalSeparator), '.')
+      value.replace(escapedGlobalRegExp(groupSeparator), '').replace(escapedGlobalRegExp(decimalSeparator), '.')
     );
   }
 
@@ -415,10 +400,7 @@ class NumericInputRP extends Component<NumericInputProps, State> {
       ...rest
     } = this.props;
 
-    const inputValue =
-      this.state.fallbackInputValue != null
-        ? this.state.fallbackInputValue
-        : this.valueToFormattedString(value);
+    const inputValue = this.state.fallbackInputValue != null ? this.state.fallbackInputValue : this.valueToFormattedString(value);
 
     return (
       <TextField
@@ -482,7 +464,8 @@ class AmountInput extends Component<AmountInputProps> {
         <NumericInputRP {...this.props} />
         {/* Do not show fee in case of some error is showing */}
         {error == null || error === '' ? (
-          <Typography component="div"
+          <Typography
+            component="div"
             sx={{
               position: 'absolute',
               bottom: '86px',
@@ -496,11 +479,12 @@ class AmountInput extends Component<AmountInputProps> {
           </Typography>
         ) : null}
 
-        <Typography component="div"
+        <Typography
+          component="div"
           variant="body3"
           sx={{
             position: 'absolute',
-            bottom: '45px',
+            bottom: '72px',
             right: error != null && error !== '' ? '45px' : '10px',
             color: 'grayscale.900',
             textTransform: 'uppercase',
@@ -534,6 +518,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
           '& > div': {
             padding: '0px',
             margin: '0px',
+            height: '32px',
           },
           '& input': {
             border: 'none',
@@ -541,6 +526,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
             width: '100%',
             fontSize: '24px',
             lineHeight: '32px',
+            marginTop: '-16px',
           },
           '& input::placeholder': { color: 'grayscale.600' },
         }}

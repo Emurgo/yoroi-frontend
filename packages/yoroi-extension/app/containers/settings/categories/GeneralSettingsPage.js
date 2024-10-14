@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
@@ -14,7 +13,6 @@ import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
-import { THEMES } from '../../../styles/themes';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -70,9 +68,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting ||
-      coinPriceStore.refreshCurrentUnit.isExecuting;
-    const { currentTheme } = profileStore;
+      profileStore.setUnitOfAccountRequest.isExecuting;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = intl.formatMessage(currencyLabels[c.symbol]);
@@ -118,25 +114,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           error={profileStore.setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
-        <ThemeSettingsBlock
-          currentTheme={currentTheme}
-          onSubmit={(theme: string) => {
-            if (theme === THEMES.YOROI_BASE) {
-              const { wallets } = this.props.stores;
-              const publicDeriver = wallets.selected;
-              const publicDerivers = wallets.publicDerivers;
-
-              if (publicDeriver == null && publicDerivers.length !== 0) {
-                const lastSelectedWallet = wallets.getLastSelectedWallet();
-                this.props.actions.wallets.setActiveWallet.trigger({
-                  wallet: lastSelectedWallet ?? publicDerivers[0],
-                });
-              }
-            }
-            this.props.actions.profile.updateTheme.trigger({ theme });
-          }}
-          onExternalLinkClick={handleExternalLinkClick}
-        />
+        <ThemeSettingsBlock />
         <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
       </Box>
     );

@@ -45,6 +45,7 @@ import {
 import {
   createStandardBip44Wallet,
 } from '../bridge/walletBuilder/byron';
+import { bytesToHex } from '../../../../../coreUtils';
 
 jest.mock('../../../../../utils/passwordCipher');
 jest.mock('../database/initialSeed');
@@ -52,7 +53,7 @@ jest.mock('../database/initialSeed');
 const mnemonic = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
 
 const privateDeriverPassword = 'greatest_password_ever';
-const passwordHash = Buffer.from(privateDeriverPassword).toString('hex');
+const passwordHash = bytesToHex(privateDeriverPassword);
 
 beforeAll(async () => {
   await RustModule.load();

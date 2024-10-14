@@ -63,7 +63,7 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
     <Container>
       <Card>
         <Box sx={{ padding: theme.spacing(3) }}>
-          <Typography fontWeight="500" color="ds.gray_cmax">
+          <Typography fontWeight="500" color="ds.gray_max">
             {strings.transactionHistory}
           </Typography>
           <Table
@@ -76,7 +76,7 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
               <TableRow>
                 {headCells.map(({ id, align, label }, index) => (
                   <TableCell key={id} align={align} sx={{ paddingX: index ? theme.spacing(2) : '0' }}>
-                    <Typography variant="body2" color="ds.gray_c600">
+                    <Typography variant="body2" color="ds.gray_600">
                       {label}
                     </Typography>
                   </TableCell>
@@ -95,7 +95,7 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
                       marginTop: theme.spacing(3),
                     }}
                   >
-                    <Typography key={item.title} component="th" variant="body2" color="ds.gray_c600">
+                    <Typography key={item.title} component="th" variant="body2" color="ds.gray_600">
                       {item.title}
                     </Typography>
                   </Box>
@@ -134,32 +134,32 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
               height: '48px',
               backgroundColor:
                 row.type === HistoryItemType.SENT || row.type === HistoryItemType.DELEGATE
-                  ? theme.palette.ds.primary_c100
+                  ? theme.palette.ds.primary_100
                   : row.type === HistoryItemType.RECEIVED || row.type === HistoryItemType.WITHDRAW
-                  ? theme.palette.ds.secondary_c100
-                  : theme.palette.ds.sys_magenta_c100,
+                  ? theme.palette.ds.secondary_100
+                  : theme.palette.ds.sys_magenta_100,
               '&:hover': {
                 backgroundColor:
                   row.type === HistoryItemType.SENT || row.type === HistoryItemType.DELEGATE
-                    ? theme.palette.ds.primary_c100
+                    ? theme.palette.ds.primary_100
                     : row.type === HistoryItemType.RECEIVED || row.type === HistoryItemType.WITHDRAW
-                    ? theme.palette.ds.secondary_c100
-                    : theme.palette.ds.sys_magenta_c100,
+                    ? theme.palette.ds.secondary_100
+                    : theme.palette.ds.sys_magenta_100,
               },
             }}
           >
-            {row.type === HistoryItemType.SENT && <Icon.Send stroke={theme.palette.ds.primary_c500} />}
+            {row.type === HistoryItemType.SENT && <Icon.Send stroke={theme.palette.ds.primary_500} />}
             {row.type === HistoryItemType.RECEIVED && (
-              <Icon.Send stroke={theme.palette.ds.secondary_c600} style={{ transform: 'rotate(180deg)' }} />
+              <Icon.Send stroke={theme.palette.ds.secondary_600} style={{ transform: 'rotate(180deg)' }} />
             )}
-            {row.type === HistoryItemType.ERROR && <Icon.Cancel fill={theme.palette.ds.sys_magenta_c500} />}
-            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_c600} />}
-            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_c500} />}
+            {row.type === HistoryItemType.ERROR && <Icon.Cancel fill={theme.palette.ds.sys_magenta_500} />}
+            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_600} />}
+            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_500} />}
           </IconButton>
           <Stack direction="column">
-            <Typography color="ds.gray_c900">{row.label}</Typography>
+            <Typography color="ds.gray_900">{row.label}</Typography>
             {isExpanded && (
-              <Typography sx={{ fontSize: '0.75rem' }} color="ds.gray_c600">
+              <Typography sx={{ fontSize: '0.75rem' }} color="ds.gray_600">
                 {moment.utc(row.time).local().format('h:mm A')}
               </Typography>
             )}
@@ -167,18 +167,18 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
         </Stack>
       </TableCell>
       <TableCell key={`${row.label} ${headCells[1].id}`}>
-        <Typography color={row.status === HistoryItemStatus.FAILED ? 'ds.sys_magenta_c500' : 'ds.gray_c900'}>
+        <Typography color={row.status === HistoryItemStatus.FAILED ? 'ds.sys_magenta_500' : 'ds.gray_900'}>
           {row.status}
         </Typography>
       </TableCell>
       <TableCell key={`${row.label} ${headCells[2].id}`} align="center">
         <Stack direction="column">
-          <Typography fontWeight="500" color="ds.text_gray_normal">
+          <Typography fontWeight="500" color="ds.text_gray_medium">
             {row.feeValue ? `${row.feeValue.toFixed(2)} ADA` : '-'}
           </Typography>
           {isExpanded &&
             (unitOfAccount === 'ADA' ? null : (
-              <Typography variant="body2" color="ds.text_gray_medium">
+              <Typography variant="body2" color="ds.text_gray_low">
                 {row.feeValueUsd ? `${row.feeValueUsd.toFixed(2)} ${unitOfAccount}` : '-'}
               </Typography>
             ))}
@@ -195,7 +195,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
           onClick={() => setIsExpanded(!isExpanded)}
         >
           <Stack direction="column">
-            <Typography fontWeight="500" color="ds.gray_c900" sx={{ textAlign: 'right' }}>
+            <Typography fontWeight="500" color="ds.gray_900" sx={{ textAlign: 'right' }}>
               {(row.type === HistoryItemType.RECEIVED ||
                 row.type === HistoryItemType.WITHDRAW ||
                 row.type === HistoryItemType.DELEGATE) &&
@@ -205,7 +205,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
                 {unitOfAccount === 'ADA' ? null : (
-                  <Typography variant="body2" color="ds.gray_c600" sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2" color="ds.gray_600" sx={{ textAlign: 'right' }}>
                     {(row.type === HistoryItemType.RECEIVED ||
                       row.type === HistoryItemType.WITHDRAW ||
                       row.type === HistoryItemType.DELEGATE) &&
@@ -214,12 +214,12 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
                   </Typography>
                 )}
                 {row.type === HistoryItemType.RECEIVED && (
-                  <Typography variant="body2" fontWeight="500" color="ds.gray_cmax" sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2" fontWeight="500" color="ds.gray_max" sx={{ textAlign: 'right' }}>
                     + {row.amountAsset} {strings.assets}
                   </Typography>
                 )}
                 {row.type === HistoryItemType.SENT && (
-                  <Typography variant="body2" fontWeight="500" color="ds.gray_cmax" sx={{ textAlign: 'right' }}>
+                  <Typography variant="body2" fontWeight="500" color="ds.gray_max" sx={{ textAlign: 'right' }}>
                     {row.amountAsset}
                   </Typography>
                 )}

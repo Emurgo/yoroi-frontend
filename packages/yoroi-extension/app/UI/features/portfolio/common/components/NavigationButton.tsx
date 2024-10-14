@@ -22,10 +22,10 @@ const NavigationButton = ({ label, onClick, variant, sx, width, ...props }: Prop
 
         '&.MuiButton-contained': {
           backgroundColor: theme.palette.ds.el_primary_medium,
-          color: theme.palette.ds.el_static_white,
+          color: theme.palette.ds.white_static,
 
           '&:hover': {
-            backgroundColor: theme.palette.ds.el_primary_high,
+            backgroundColor: theme.palette.ds.el_primary_max,
           },
         },
 

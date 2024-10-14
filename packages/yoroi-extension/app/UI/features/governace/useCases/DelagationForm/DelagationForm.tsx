@@ -88,7 +88,7 @@ export const DelagationForm = () => {
       setFormLoading(true);
       await signDelegationTransaction({
         password,
-        publicDeriver: selectedWallet,
+        wallet: selectedWallet,
         dialog: null,
       });
       setFormLoading(false);
@@ -114,26 +114,26 @@ export const DelagationForm = () => {
   return (
     <Container>
       <Stack>
-        <Typography variant="body2" color="ds.gray_c600" mb="4px">
+        <Typography variant="body2" color="ds.text_gray_low" mb="4px">
           {mapStatus[governanceVote.kind || '']}
         </Typography>
-        <Typography variant="body1" mb="24px">
+        <Typography variant="body1" mb="24px" color="ds.text_gray_medium">
           {mapStatusDescription[governanceVote.kind || '']}
         </Typography>
         <TotalBox>
-          <Typography variant="h4" color="ds.gray_cmin">
+          <Typography variant="h4" color="ds.white_static">
             {strings.total}
           </Typography>
           <Box textAlign="right">
-            <Typography variant="h4" fontWeight="500" color="ds.gray_cmin">
+            <Typography variant="h4" fontWeight="500" color="ds.white_static">
               {txFee} ADA
             </Typography>
-            <Typography variant="body2" color="ds.gray_c300">
+            <Typography variant="body2" color="ds.white_static" sx={{ opacity: '0.5' }}>
               {String(getFormattedPairingAmount(String(Number(txFee) * 1000000)))}
             </Typography>
           </Box>
         </TotalBox>
-        <Typography variant="body2" color="ds.gray_c600" mb="24px">
+        <Typography variant="body2" color="ds.text_gray_low" mb="24px">
           {strings.transactionDetails}
         </Typography>
         <Box mb="40px">
@@ -193,14 +193,14 @@ type OperationInfoProps = {
 const OperationInfo = ({ label, fee }: OperationInfoProps) => {
   return (
     <>
-      <Typography variant="body1" color="ds.text_gray_normal">
+      <Typography variant="body1" color="ds.text_gray_medium">
         {label}
       </Typography>
       <Stack direction="row" justifyContent="space-between">
-        <Typography variant="body1" fontWeight="500">
+        <Typography variant="body1" fontWeight="500" color="ds.text_gray_normal">
           Transaction fee
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_normal">
+        <Typography variant="body1" color="ds.text_gray_max">
           {fee} ADA
         </Typography>
       </Stack>

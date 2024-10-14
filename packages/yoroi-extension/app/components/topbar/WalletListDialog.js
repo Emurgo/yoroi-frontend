@@ -9,18 +9,20 @@ import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_open.inline.svg';
-import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed.inline.svg';
+import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
+import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { Box } from '@mui/system';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import styles from './WalletListDialog.scss';
 import WalletCard from './WalletCard';
 import globalMessages from '../../i18n/global-messages';
-import AmountDisplay, { FiatDisplay } from '../common/AmountDisplay';
+import AmountDisplay from '../common/AmountDisplay';
+import type { WalletType } from '../../../chrome/extension/background/types';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import { Typography, styled } from '@mui/material';
 
 const messages = defineMessages({
   addWallet: {
@@ -35,11 +37,25 @@ const messages = defineMessages({
     id: 'wallet.topbar.dialog.totalBalance',
     defaultMessage: '!!!Total Balance',
   },
-  cardano: {
-    id: 'wallet.topbar.dialog.cardano',
-    defaultMessage: '!!!Cardano, ADA',
-  },
 });
+
+export type WalletInfo = {|
+  +plate: null | WalletChecksum,
+  +type: WalletType,
+  +name: string,
+  +rewards: null | void | MultiToken,
+  +amount: null | MultiToken,
+  +walletId: number,
+|};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  marginTop: '32px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +close: void => void,
@@ -50,15 +66,15 @@ type Props = {|
   +onAddWallet: void => void,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +cardanoWallets: Array<Object>,
+  +cardanoWallets: Array<WalletInfo>,
   +walletsNavigation: WalletsNavigation,
   +updateSortedWalletList: WalletsNavigation => Promise<void>,
-  +onSelect: (PublicDeriver<>) => void,
-  +selectedWallet: null | PublicDeriver<>,
+  +onSelect: (number) => void,
+  +selectedWalletId: ?number,
 |};
 type State = {|
   cardanoWalletsIdx: number[],
-  selectedWallet: PublicDeriver<> | null,
+  selectedWalletId: number | null,
 |};
 
 const reorder = (list, startIndex, endIndex) => {
@@ -92,7 +108,7 @@ export default class WalletListDialog extends Component<Props, State> {
   };
   state: State = {
     cardanoWalletsIdx: [],
-    selectedWallet: null,
+    selectedWalletId: null,
   };
 
   async componentDidMount(): Promise<void> {
@@ -104,7 +120,7 @@ export default class WalletListDialog extends Component<Props, State> {
     this.setState(
       {
         cardanoWalletsIdx: cardanoWalletsId,
-        selectedWallet: this.props.selectedWallet,
+        selectedWalletId: this.props.selectedWalletId,
       },
       async () => {
         await this.props.updateSortedWalletList({
@@ -122,11 +138,7 @@ export default class WalletListDialog extends Component<Props, State> {
 
     this.setState(
       prev => {
-        const walletListIdx = reorder(
-          prev.cardanoWalletsIdx,
-          result.source.index,
-          result.destination.index
-        );
+        const walletListIdx = reorder(prev.cardanoWalletsIdx, result.source.index, result.destination.index);
         return {
           cardanoWalletsIdx: walletListIdx,
         };
@@ -140,16 +152,16 @@ export default class WalletListDialog extends Component<Props, State> {
   };
 
   onSelect: void => void = () => {
-    const { selectedWallet } = this.state;
-    if (selectedWallet === null) return;
-    this.props.onSelect(selectedWallet);
+    const { selectedWalletId } = this.state;
+    if (selectedWalletId === null) return;
+    this.props.onSelect(selectedWalletId);
     this.props.close();
   };
 
-  isCurrentWallet(wallet: PublicDeriver<>, compareWith: 'local' | 'global'): boolean {
-    const selectedWallet =
-      compareWith === 'local' ? this.state.selectedWallet : this.props.selectedWallet;
-    return wallet.getPublicDeriverId() === selectedWallet?.getPublicDeriverId();
+  isCurrentWallet(walletId: number, compareWith: 'local' | 'global'): boolean {
+    const selectedWalletId =
+      compareWith === 'local' ? this.state.selectedWalletId : this.props.selectedWalletId;
+    return walletId === selectedWalletId;
   }
 
   render(): Node {
@@ -186,8 +198,8 @@ export default class WalletListDialog extends Component<Props, State> {
             onClick: this.onSelect,
             size: 'large',
             disabled:
-              this.state.selectedWallet === null ||
-              this.isCurrentWallet(this.state.selectedWallet, 'global'),
+              this.state.selectedWalletId === null ||
+              this.isCurrentWallet(this.state.selectedWalletId, 'global'),
             primary: true,
             label: intl.formatMessage(messages.applyWallet),
           },
@@ -200,12 +212,24 @@ export default class WalletListDialog extends Component<Props, State> {
             <div className={styles.totalInfo}>
               {walletsTotal !== undefined && (
                 <div className={styles.amount}>
-                  <div className={styles.label}>{intl.formatMessage(messages.totalBalance)}</div>
-                  <div className={styles.value}>{walletsTotal}</div>
+                  <Typography variant="body2" mb="4px" color="ds.text_gray_medium">
+                    {intl.formatMessage(messages.totalBalance)}
+                  </Typography>
+                  <Typography variant="body1" mt="10px" fontWeight="500" color="ds.text_gray_medium">
+                    {walletsTotal}
+                  </Typography>
                 </div>
               )}
               <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-                {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+                {shouldHideBalance ? (
+                  <IconWrapper>
+                    <IconEyeClosed />
+                  </IconWrapper>
+                ) : (
+                  <IconWrapper>
+                    <IconEyeOpen />
+                  </IconWrapper>
+                )}
               </button>
             </div>
           </div>
@@ -214,11 +238,6 @@ export default class WalletListDialog extends Component<Props, State> {
             sx={{ overflow: 'auto', overflowY: 'auto', height: '400px' }}
             id="changeWalletDialog-walletList-box"
           >
-            {cardanoWalletsIdx.length > 0 && (
-              <div className={styles.sectionHeader}>
-                <h1>{intl.formatMessage(messages.cardano)}</h1>
-              </div>
-            )}
             <DragDropContext onDragEnd={result => this.onDragEnd('cardano', result)}>
               <Droppable droppableId="cardano-list-droppable">
                 {provided => (
@@ -235,9 +254,16 @@ export default class WalletListDialog extends Component<Props, State> {
                             <WalletCard
                               key={walletId}
                               idx={idx}
-                              onSelect={() => this.setState({ selectedWallet: wallet.wallet })}
-                              isCurrentWallet={this.isCurrentWallet(wallet.wallet, 'local')}
-                              {...wallet}
+                              onSelect={() => this.setState({ selectedWalletId: wallet.walletId })}
+                              isCurrentWallet={this.isCurrentWallet(wallet.walletId, 'local')}
+                              plate={wallet.plate}
+                              type={wallet.type}
+                              name={wallet.name}
+                              rewards={wallet.rewards}
+                              shouldHideBalance={this.props.shouldHideBalance}
+                              walletAmount={wallet.amount}
+                              walletId={walletId}
+                              getTokenInfo={this.props.getTokenInfo}
                               unitOfAccountSetting={unitOfAccountSetting}
                               getCurrentPrice={getCurrentPrice}
                               id="changeWalletDialog:walletsList"
@@ -257,45 +283,23 @@ export default class WalletListDialog extends Component<Props, State> {
   }
 
   renderWalletsTotal(): ?Node {
-    const {
-      unitOfAccountSetting,
-      cardanoWallets,
-      shouldHideBalance,
-      getCurrentPrice,
-    } = this.props;
-    if (unitOfAccountSetting.enabled) {
-      const adaFiat = this.sumWallets(cardanoWallets).fiat;
-      if (adaFiat != null) {
-        const totalFiat = adaFiat;
-        const { currency } = unitOfAccountSetting;
-        return (
-          <FiatDisplay
-            shouldHideBalance={shouldHideBalance}
-            amount={totalFiat}
-            currency={currency}
-          />
-        );
-      }
-    }
-    // either unit of account is not enabled, or fails to convert to fiat
-    const amount = this.sumWallets(cardanoWallets).sum;
-    const totalAmountId = `changeWalletDialog:total`;
+    const { unitOfAccountSetting, cardanoWallets, shouldHideBalance, getCurrentPrice } = this.props;
     return (
       <AmountDisplay
         shouldHideBalance={shouldHideBalance}
-        amount={amount}
+        amount={this.sumWallets(cardanoWallets).sum}
         getTokenInfo={this.props.getTokenInfo}
         showFiat={false}
         showAmount
         unitOfAccountSetting={unitOfAccountSetting}
         getCurrentPrice={getCurrentPrice}
-        id={totalAmountId}
+        id="changeWalletDialog:total"
       />
     );
   }
 
   sumWallets(
-    wallets: Array<Object>
+    wallets: Array<WalletInfo>
   ): {|
     sum: MultiToken | null,
     fiat: BigNumber | null,
@@ -305,8 +309,8 @@ export default class WalletListDialog extends Component<Props, State> {
       return { sum: null, fiat: new BigNumber('0') };
     }
     let sum;
-    if (wallets[0].walletAmount) {
-      sum = new MultiToken(wallets[0].walletAmount.values, wallets[0].walletAmount.defaults);
+    if (wallets[0].amount) {
+      sum = new MultiToken(wallets[0].amount.values, wallets[0].amount.defaults);
     } else {
       return { sum: null, fiat: null };
     }
@@ -316,11 +320,11 @@ export default class WalletListDialog extends Component<Props, State> {
     }
 
     for (let i = 1; i < wallets.length; i++) {
-      if (wallets[i].walletAmount) {
+      if (wallets[i].amount) {
         sum.joinAddMutable(
           new MultiToken(
             // treat TADA as ADA or vice versa
-            wallets[i].walletAmount.values.map(v => ({
+            wallets[i].amount.values.map(v => ({
               ...v,
               networkId: sum.getDefaults().defaultNetworkId,
             })),

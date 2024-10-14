@@ -8,6 +8,9 @@ import globalMessages from '../../../../../i18n/global-messages';
 import React from 'react';
 import { genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
 import WalletInfo from '../../../../common/walletInfo/WalletInfo';
+import type { WalletChecksum } from '@emurgo/cip4-js';
+import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
+import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 
 const messages: Object = defineMessages({
   dialogTitle: {
@@ -28,7 +31,14 @@ const messages: Object = defineMessages({
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
 type Props = {|
-  duplicatedWalletData: any,
+  duplicatedWalletData: {|
+    plate: WalletChecksum,
+    conceptualWalletName: string,
+    balance: MultiToken,
+    updateHideBalance: () => Promise<void>,
+    shouldHideBalance: boolean,
+    tokenInfo: TokenInfoMap,
+  |},
   open: boolean,
   onClose(): void,
   onNext(): void,
@@ -84,12 +94,12 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
           <Box component="ul" sx={{ listStyle: 'outside', mt: '16px' }}>
             <Box sx={{ display: 'flex', flexFlow: 'row', gap: '8px' }}>
               <WalletInfo
-                plate={duplicatedWalletData?.plate}
-                wallet={duplicatedWalletData?.settingsCache}
-                walletAmount={duplicatedWalletData?.balance}
-                onUpdateHideBalance={duplicatedWalletData?.updateHideBalance}
-                shouldHideBalance={duplicatedWalletData?.shouldHideBalance}
-                getTokenInfo={genLookupOrFail(duplicatedWalletData?.tokenInfo)}
+                plate={duplicatedWalletData.plate}
+                conceptualWalletName={duplicatedWalletData.conceptualWalletName}
+                walletAmount={duplicatedWalletData.balance}
+                onUpdateHideBalance={duplicatedWalletData.updateHideBalance}
+                shouldHideBalance={duplicatedWalletData.shouldHideBalance}
+                getTokenInfo={genLookupOrFail(duplicatedWalletData.tokenInfo)}
                 isRefreshing={false}
               />
             </Box>
@@ -102,7 +112,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             color="primary"
             disableRipple={false}
             onClick={onClose}
-            style={{ width: '100%', height: '48px', fontSize: '16px' }}
+            style={{ width: '100%', height: '48px', fontSize: '16px' , borderWidth: 2}}
             id='duplicatedWalletDialog-cancel-button'
           >
             {intl.formatMessage(globalMessages.cancel)}

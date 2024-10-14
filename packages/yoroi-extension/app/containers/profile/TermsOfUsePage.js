@@ -10,7 +10,6 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { isTestnet } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import environment from '../../environment';
 
@@ -23,9 +22,7 @@ export default class TermsOfUsePage extends Component<StoresAndActionsProps> {
   render(): Node {
     const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
     const { selected } = this.props.stores.wallets;
-    const isWalletTestnet = selected == null
-      ? false
-      : isTestnet(selected.getParent().getNetworkInfo());
+    const isWalletTestnet = Boolean(selected && selected.isTestnet);
 
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />

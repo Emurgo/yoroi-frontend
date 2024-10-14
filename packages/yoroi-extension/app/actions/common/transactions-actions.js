@@ -1,7 +1,7 @@
 // @flow
 import { AsyncAction, Action } from '../lib/Action';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
 import { Moment } from 'moment';
+import type { WalletState } from '../../../chrome/extension/background/types';
 
 // ======= TRANSACTIONS ACTIONS =======
 
@@ -11,9 +11,9 @@ export type TransactionRowsToExportRequest = {|
 |};
 
 export default class TransactionsActions {
-  loadMoreTransactions: AsyncAction<PublicDeriver<>> = new AsyncAction();
+  loadMoreTransactions: AsyncAction<WalletState> = new AsyncAction();
   exportTransactionsToFile: AsyncAction<{|
-    publicDeriver: PublicDeriver<>,
+    publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}> = new AsyncAction();
   closeExportTransactionDialog: Action<void> = new Action();

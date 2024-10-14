@@ -26,6 +26,6 @@ const SInput = styled(TextField)(({ theme, error }: any) => ({
     left: -10,
   },
   '& .MuiInputLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_c500,
+    color: error && theme.palette.ds.sys_magenta_500,
   },
 }));

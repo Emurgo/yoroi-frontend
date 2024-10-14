@@ -32,23 +32,24 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
     <Box>
       <Box
         sx={{
-          background: theme => theme.palette.background.gradients.walletEmptyCard,
+          background: theme => theme.palette.ds.bg_gradient_2,
           marginBottom: '40px',
           borderRadius: '8px',
           overflowY: 'hidden',
           position: 'relative',
-          padding: '24px',
+          padding: '16px',
+          height: '156px',
         }}
-        id='walletEmptyBanner'
+        id="wallet|staking-emptyWalletBanner-box"
       >
-        <Box sx={{ position: 'absolute', right: '10%', top: '-10%' }}>
+        <Box sx={{ position: 'absolute', right: '1%', top: '0%' }}>
           <CoverBg />
         </Box>
         <Box>
-          <Typography component="div" variant="h3" color="common.black" fontWeight={500} mb="8px">
+          <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
             {intl.formatMessage(messages.welcomeMessage)}
           </Typography>
-          <Typography component="div" variant="body1" color="common.black" maxWidth="500px" mb="40px">
+          <Typography component="div" variant="body1" color="ds.gray_max" maxWidth="600px" mb="24px">
             {intl.formatMessage(messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>
@@ -59,13 +60,14 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
             size="medium"
             sx={{
               '&.MuiButton-sizeMedium': {
-                padding: '9px 25px',
+                padding: '9px 20px',
                 height: 'unset',
               },
             }}
             onClick={onBuySellClick}
           >
-            <Typography component="div"
+            <Typography
+              component="div"
               variant="button2"
               fontWeight={500}
               sx={{

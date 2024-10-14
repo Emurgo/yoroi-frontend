@@ -4,11 +4,12 @@ import * as React from 'react';
 
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
-import { asGetSigningKey, asGetStakingKey } from '../../../../api/ada/lib/storage/models/PublicDeriver/traits';
+import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
+import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
 
@@ -30,7 +31,7 @@ const initialGovernanceProvider = {
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
-  submitedTransactions: [{ isDrepDelegation: false }],
+  submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -60,7 +61,6 @@ export const GovernanceContextProvider = ({
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
     ...defaultGovernanceState,
   });
-  const [stakingKeyHash, setStakingKeyHash] = React.useState(null);
   const [stakingKeyHex, setStakingKeyHex] = React.useState(null);
   const [governanceStatus, setGovernanceStatus] = React.useState<drepDelegation>({ status: null, drep: null });
   const {
@@ -77,47 +77,25 @@ export const GovernanceContextProvider = ({
     backendServiceZero,
     recentTransactions,
     submitedTransactions,
+    stakingAddress,
   } = currentWallet;
   const governanceManager = useGovernanceManagerMaker(walletId, networkId);
 
-  // TODO to me moved in rootStore and use this globbaly whenever we need just a wallet password check
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
-      // check the password
-      const withSigningKey = asGetSigningKey(selectedWallet);
-      if (!withSigningKey) {
-        throw new Error(`[sign tx] no signing key`);
-      }
-      const signingKeyFromStorage = await withSigningKey.getSigningKey();
-      // will throw a WrongPasswordError
-      await withSigningKey.normalizeKey({
-        ...signingKeyFromStorage,
-        password,
-      });
+      await getPrivateStakingKey({ publicDeriverId: walletId, password });
     } catch (error) {
       return error;
     }
   };
 
   React.useEffect(() => {
-    const withStakingKey = asGetStakingKey(selectedWallet);
-    if (withStakingKey == null) {
+    const skey = unwrapStakingKey(stakingAddress).to_keyhash()?.to_hex();
+    if (skey == null) {
       throw new Error(`missing staking key functionality`);
     }
-    withStakingKey
-      .getStakingKey()
-      .then(async stakingKeyResp => {
-        setStakingKeyHash(stakingKeyResp.addr.Hash);
-        const skey = unwrapStakingKey(stakingKeyResp.addr.Hash).to_keyhash()?.to_hex();
-        if (skey == null) {
-          throw new Error('Cannot get staking key from the wallet!');
-        }
-        setStakingKeyHex(skey);
-      })
-      .catch(err => {
-        console.error(`unexpected erorr: failed to get wallet staking key: ${err}`);
-      });
-  }, []);
+    setStakingKeyHex(skey);
+  }, [selectedWallet]);
 
   React.useEffect(() => {
     if (stakingKeyHex) {
@@ -142,7 +120,7 @@ export const GovernanceContextProvider = ({
     } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
       setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
     } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
-      const words = bech32.toWords(Buffer.from(governanceStatusState.drepDelegation?.drep, 'hex'));
+      const words = bech32.toWords(hexToBytes(governanceStatusState.drepDelegation?.drep));
       const encoded = bech32.encode('drep', words, 64);
       setGovernanceStatus({ status: 'delegate', drep: encoded || null });
     } else {
@@ -168,7 +146,6 @@ export const GovernanceContextProvider = ({
     governanceManager: governanceManager,
     stakePoolKeyHash: currentPool?.hash ?? '',
     walletId: currentWallet.walletId,
-    stakingKeyHash,
     stakingKeyHex,
     checkUserPassword,
     createDrepDelegationTransaction,

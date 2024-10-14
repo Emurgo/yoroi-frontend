@@ -2,17 +2,22 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage, FormattedMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './InternalHeader.scss';
+import { Box, Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
+  internalAddressesTitle: {
+    id: 'wallet.receive.page.internalAddressesTitle',
+    defaultMessage: '!!!Internal addresses',
+  },
   warning1: {
     id: 'wallet.receive.page.internalWarning1',
-    defaultMessage: '!!!Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain'
+    defaultMessage:
+      '!!!Internal addresses (or "change" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain.',
   },
   blogLinkUrl: {
     id: 'wallet.receive.page.internal.learnMore',
@@ -26,7 +31,7 @@ type Props = {|
 
 @observer
 export default class InternalHeader extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -34,27 +39,50 @@ export default class InternalHeader extends Component<Props> {
     const { intl } = this.context;
 
     const blogLink = (
-      <a
-        className={styles.link}
+      <Link
         href={intl.formatMessage(messages.blogLinkUrl)}
         onClick={event => this.props.onExternalLinkClick(event)}
+        underline="none"
+        color="ds.primary_500"
       >
         {intl.formatMessage(globalMessages.blogLinkWrapper)}
-      </a>
+      </Link>
     );
     return (
-      <WarningHeader
-        message={(
-          <div className={styles.component}>
-            <div>{intl.formatMessage(messages.warning1)}</div><br />
-            <div><FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} /></div>
-            <div>
-              {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
-              <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
-            </div>
-          </div>
-        )}
-      />
+      <Box>
+        <Typography
+          variant="body1"
+          sx={{
+            fontWeight: 500,
+            paddingBottom: '24px',
+          }}
+        >
+          {intl.formatMessage(messages.internalAddressesTitle)}
+        </Typography>
+        <WarningHeader
+          message={
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.warning1)}
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
+              </Typography>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(addressSubgroupName.internal)}&nbsp;
+                {intl.formatMessage(globalMessages.auditAddressWarning)}
+              </Typography>
+            </Box>
+          }
+        />
+      </Box>
     );
   }
 }

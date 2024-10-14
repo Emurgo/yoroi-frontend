@@ -16,9 +16,9 @@ import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import AdaApi from '../../api/ada';
-import { asGetPublicKey } from '../../api/ada/lib/storage/models/PublicDeriver/traits';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { bytesToHex } from '../../coreUtils';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -56,33 +56,32 @@ export type PlateWithMeta = {|
 |};
 
 export async function isWalletExist(
-  publicDerivers: Array<PublicDeriver<>>,
+  wallets: Array<WalletState>,
   recoveryPhrase: string,
   accountIndex: number,
   selectedNetwork: $ReadOnly<NetworkRow>
-): Promise<PublicDeriver<> | void> {
+): Promise<WalletState | void> {
   const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
   const accountPublicKey = rootPk
     .derive(WalletTypePurpose.CIP1852)
     .derive(CoinTypes.CARDANO)
     .derive(accountIndex)
     .to_public();
-  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex');
+  const publicKey = bytesToHex(accountPublicKey.as_bytes());
 
-  for (const deriver of publicDerivers) {
-    const withPubKey = asGetPublicKey(deriver);
-    if (withPubKey == null) return;
-    const existedPublicKey = await withPubKey.getPublicKey();
-    const walletNetwork = deriver.getParent().getNetworkInfo();
+  for (const wallet of wallets) {
+    const existedPublicKey = wallet.publicKey;
+    const walletNetworkId = wallet.networkId
     /**
      * We will still allow to restore the wallet on a different networks even they are
      * sharing the same recovery phrase but we are treating them differently
      */
     if (
-      publicKey === existedPublicKey.Hash &&
-      walletNetwork.NetworkId === selectedNetwork.NetworkId
-    )
-      return deriver;
+      publicKey === existedPublicKey &&
+      walletNetworkId === selectedNetwork.NetworkId
+    ) {
+      return wallet;
+    }
   }
 }
 
@@ -99,7 +98,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     plates: Array<PlateWithMeta>,
   |};
 
-  @observable duplicatedWallet: null | void | PublicDeriver<>;
+  @observable duplicatedWallet: null | void | WalletState;
 
   setup(): void {
     super.setup();
@@ -144,7 +143,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     });
 
     // Check for wallet duplication.
-    const wallets = this.stores.wallets.publicDerivers;
+    const wallets = this.stores.wallets.wallets;
     const accountIndex = this.stores.walletRestore.selectedAccount;
     const duplicatedWallet = await isWalletExist(
       wallets,

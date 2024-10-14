@@ -21,22 +21,22 @@ const TextField = {
       '.MuiFormHelperText-root': {
         fontSize: '0.75rem',
         '&.Mui-error': {
-          color: theme.palette.ds.sys_magenta_c500,
+          color: theme.palette.ds.sys_magenta_500,
         },
       },
       '.MuiOutlinedInput-input.Mui-disabled': {
-        color: asImportant(theme.palette.ds.gray_cmax),
-        WebkitTextFillColor: asImportant(theme.palette.ds.gray_cmax),
+        color: asImportant(theme.palette.ds.gray_max),
+        WebkitTextFillColor: asImportant(theme.palette.ds.gray_max),
       },
       '.MuiOutlinedInput-root.Mui-disabled': {
-        backgroundColor: theme.palette.ds.gray_c50,
+        backgroundColor: theme.palette.ds.gray_50,
       },
       '.MuiInputLabel-root.Mui-disabled': {
-        color: theme.palette.ds.gray_cmax,
-        backgroundColor: theme.palette.ds.gray_cmin,
+        color: theme.palette.ds.gray_max,
+        backgroundColor: theme.palette.ds.gray_min,
       },
       '& .MuiInputLabel-root': {
-        color: theme.palette.ds.gray_c600,
+        color: theme.palette.ds.gray_600,
       },
     }),
   },

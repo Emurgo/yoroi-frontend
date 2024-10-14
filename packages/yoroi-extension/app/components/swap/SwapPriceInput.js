@@ -8,12 +8,7 @@ import { useSwap } from '@yoroi/swap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
 import { observer } from 'mobx-react';
-import {
-  FormattedActualPrice,
-  PriceImpactColored,
-  PriceImpactPercent,
-  PriceImpactTitle,
-} from './PriceImpact';
+import { FormattedActualPrice, PriceImpactColored, PriceImpactPercent, PriceImpactTitle } from './PriceImpact';
 
 type Props = {|
   priceImpactState: ?PriceImpact,
@@ -23,22 +18,14 @@ const NO_PRICE_VALUE_PLACEHOLDER = ' ';
 
 function SwapPriceInput({ priceImpactState }: Props): Node {
   const { orderData } = useSwap();
-  const {
-    sellTokenInfo,
-    buyTokenInfo,
-    limitPriceFocusState,
-    onChangeLimitPrice,
-    limitPrice,
-  } = useSwapForm();
+  const { sellTokenInfo, buyTokenInfo, limitPriceFocusState, onChangeLimitPrice, limitPrice } = useSwapForm();
   const [endsWithDot, setEndsWithDot] = useState(false);
 
   const isMarketOrder = orderData.type === 'market';
   const pricePlaceholder = isMarketOrder ? NO_PRICE_VALUE_PLACEHOLDER : '0';
   const marketPrice = orderData.selectedPoolCalculation?.prices.market;
 
-  const format = s =>
-    Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) +
-    (s.endsWith('.') ? '.' : '');
+  const format = s => Quantities.format(s, orderData.tokens.priceDenomination, PRICE_PRECISION) + (s.endsWith('.') ? '.' : '');
 
   const formattedPrice = marketPrice ? format(marketPrice) : pricePlaceholder;
 
@@ -60,7 +47,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           gridTemplateColumns: '1fr auto',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: isReadonly ? 'grayscale.50' : 'common.white',
+          bgcolor: isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
           ...(!isReadonly && {
@@ -79,7 +66,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
+            bgcolor: 'ds.bg_color_max',
             borderRadius: '10px',
           }}
         >
@@ -96,9 +83,9 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           component="input"
           type="text"
           variant="body1"
-          color="#000"
+          color="ds.text_gray_medium"
           placeholder="0"
-          bgcolor={isReadonly ? 'grayscale.50' : 'common.white'}
+          bgcolor={isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max'}
           readOnly={isReadonly}
           value={isValidTickers ? valueToDisplay : NO_PRICE_VALUE_PLACEHOLDER}
           onChange={event => {

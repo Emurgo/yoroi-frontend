@@ -7,12 +7,14 @@ import type {
   ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
-  RemoveWalletFromWhitelistData,
 } from '../../../chrome/extension/connector/types';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import { getConnectedSites } from '../../connector/stores/ConnectorStore';
 import { noop } from '../../coreUtils';
+import {
+  getConnectedSites,
+  removeWalletFromWhiteList,
+} from '../../api/thunk';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
 type SetWhitelistFunc = {|
@@ -70,19 +72,16 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     await this.getConnectorWhitelist.execute();
   };
   _removeWalletFromWhitelist: (
-    request: {| url: string, protocol: string |}
+    request: {| url: string |}
   ) => Promise<void> = async request => {
     const filter = this.currentConnectorWhitelist.filter(
-      e => !(e.url === request.url && e.protocol === request.protocol)
+      e => e.url !== request.url
     );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
     await this.getConnectorWhitelist.execute();
-    window.chrome.runtime.sendMessage(({
-      type: 'remove_wallet_from_whitelist',
-      url: request.url,
-    }: RemoveWalletFromWhitelistData));
+    await removeWalletFromWhiteList({ url: request.url });
   };
 
   _refreshActiveSites: void => Promise<void> = async () => {

@@ -8,7 +8,6 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
-import { WalletTypeOption } from '../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import { CATALYST_MIN_AMOUNT } from '../../../config/numbersConfig';
@@ -16,7 +15,6 @@ import InsufficientFundsPage from './InsufficientFundsPage';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import environment from '../../../environment';
 import RegistrationOver from './RegistrationOver';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../../api/ada/lib/storage/models/ConceptualWallet/index';
 
 const messages: * = defineMessages({
   mainTitle: {
@@ -121,8 +119,8 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
     if (!environment.isTest() && balance.getDefaultEntry().amount.lt(CATALYST_MIN_AMOUNT)) {
       const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
       const tokenInfo = getTokenInfo({
-        identifier: selected.getParent().getDefaultToken().defaultIdentifier,
-        networkId: selected.getParent().getDefaultToken().defaultNetworkId,
+        identifier: selected.defaultTokenId,
+        networkId: selected.networkId,
       });
       return (
         <InsufficientFundsPage
@@ -137,16 +135,12 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
       );
     }
 
-    let walletType;
-    if (selected.getParent().getWalletType() !== WalletTypeOption.HARDWARE_WALLET) {
-      walletType = 'mnemonic';
-    } else if (isTrezorTWallet(selected.getParent())) {
-      walletType = 'trezorT';
-    } else if (isLedgerNanoWallet(selected.getParent())) {
-      walletType = 'ledgerNano';
-    } else {
-      throw new Error(`${nameof(VotingPageContent)} unexpected wallet type`);
-    }
+    // todo: unify type tags
+    const walletType = ({
+      'mnemonic': 'mnemonic',
+      'ledger': 'ledgerNano',
+      'trezor': 'trezorT',
+    })[selected.type];
 
     // <TODO:display fund info to user>
     // const { currentFund, nextFund } = catalystRoundInfo;
@@ -173,7 +167,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
       throw new Error(`${nameof(this.render)} no public deriver. Should never happen`);
     }
     const delegationStore = this.props.stores.delegation;
-    const isDelegating = delegationStore.isCurrentlyDelegating(publicDeriver);
+    const isDelegating = delegationStore.isCurrentlyDelegating(publicDeriver.publicDeriverId);
 
     /*
     At this point we are sure that we have current funds

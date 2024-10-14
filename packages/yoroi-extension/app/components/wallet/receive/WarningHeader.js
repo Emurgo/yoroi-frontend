@@ -4,10 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import styles from './WarningHeader.scss';
-import { ReactComponent as InvalidURIImg }  from '../../../assets/images/uri/invalid-uri.inline.svg';
-import VerticallyCenteredLayout from '../../layout/VerticallyCenteredLayout';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, Typography } from '@mui/material';
+import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 
 type Props = {|
   +message: Node,
@@ -16,35 +16,50 @@ type Props = {|
 
 @observer
 export default class WarningHeader extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps: {|children: void|} = {
-    children: undefined
+  static defaultProps: {| children: void |} = {
+    children: undefined,
   };
 
   render(): Node {
     const { intl } = this.context;
     return (
-      <div className={styles.component}>
+      <Box className={styles.component}>
         <div className={styles.header}>
-          <div className={styles.warningSection}>
-            <div className={styles.attentionLabel}>
-              <div>{intl.formatMessage(globalMessages.attentionHeaderText)}</div>
-            </div>
-            <div className={styles.text}>
+          <Box
+            sx={{
+              backgroundColor: 'ds.sys_magenta_100',
+            }}
+            className={styles.warningSection}
+          >
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <AttentionIcon />
+              <Typography
+                variant="body1"
+                color="ds.sys_magenta_500"
+                sx={{
+                  fontWeight: 500,
+                  paddingLeft: '8px',
+                }}>
+                {intl.formatMessage(globalMessages.attentionHeaderText)}
+              </Typography>
+            </Box>
+            <Box sx={{ paddingTop: '8px' }}>
               {this.props.message}
-            </div>
-          </div>
-          <div className={styles.invalidURIImg}>
-            <VerticallyCenteredLayout>
-              <InvalidURIImg />
-            </VerticallyCenteredLayout>
-          </div>
+            </Box>
+          </Box>
         </div>
         {this.props.children}
-      </div>
+      </Box>
     );
   }
 }

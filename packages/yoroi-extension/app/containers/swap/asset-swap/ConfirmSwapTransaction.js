@@ -1,5 +1,5 @@
 //@flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
@@ -22,17 +22,24 @@ import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
+import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
+
+const GradientBox = styled(Box)(({ theme }: any) => ({
+  backgroundImage: theme.palette.ds.bg_gradient_3,
+}));
 
 type Props = {|
   slippageValue: string,
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
-  userPasswordState: State<string>,
+  userPasswordState: ?State<string>,
   txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
+  onError: () => void,
 |};
 
 const priceStrings = {
@@ -58,6 +65,7 @@ export default function ConfirmSwapTransaction({
   defaultTokenInfo,
   getTokenInfo,
   getFormattedPairingValue,
+  onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
   const {
@@ -65,7 +73,7 @@ export default function ConfirmSwapTransaction({
     bestPoolCalculation: { pool: bestPool },
   } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
-  const { ptAmount, formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
+  const { ptAmount, formattedPtAmount, formattedNonPtAmount, formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
@@ -76,15 +84,27 @@ export default function ConfirmSwapTransaction({
     onSuccess: data => {
       onRemoteOrderDataResolved(data).catch(e => {
         console.error('Failed to handle remote order resolution', e);
-        alert('Failed to prepare order transaction');
+        onError();
       });
     },
     onError: error => {
       console.error('useSwapCreateOrder fail', error);
-      alert('Failed to receive remote data for the order');
+      onError();
     },
   });
   useEffect(() => {
+    // MOUNT
+
+    ampli.swapOrderSelected({
+      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+      from_amount: sellQuantity.displayValue,
+      to_amount: buyQuantity.displayValue,
+      order_type: orderData.type,
+      pool_source: pool?.provider,
+      slippage_tolerance: orderData.slippage,
+      swap_fees: Number(formattedFeeQuantity),
+    });
+
     if (walletAddress == null) {
       alert('Wallet address is not available');
       return;
@@ -103,14 +123,14 @@ export default function ConfirmSwapTransaction({
   return (
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
-        <Typography component="div" variant="h4" fontWeight={500}>
+        <Typography component="div" variant="h4" fontWeight={500} color="ds.text_gray_medium">
           Confirm swap transaction
         </Typography>
       </Box>
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.text_gray_low">
               Swap from
             </Typography>
           </Box>
@@ -126,7 +146,7 @@ export default function ConfirmSwapTransaction({
         </Box>
         <Box>
           <Box>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography component="div" variant="body1" color="ds.text_gray_low">
               Swap to
             </Typography>
           </Box>
@@ -153,11 +173,7 @@ export default function ConfirmSwapTransaction({
         </SummaryRow>
         <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
-        <SummaryRow
-          col1={priceStrings[orderData.type].label}
-          withInfo
-          infoText={priceStrings[orderData.type].info}
-        >
+        <SummaryRow col1={priceStrings[orderData.type].label} withInfo infoText={priceStrings[orderData.type].info}>
           {orderData.type === 'market' ? <FormattedMarketPrice /> : <FormattedLimitPrice />}
         </SummaryRow>
         <SummaryRow
@@ -178,11 +194,11 @@ export default function ConfirmSwapTransaction({
           </SummaryRow>
         )}
       </Box>
-      <Box p="16px" bgcolor="#244ABF" borderRadius="8px" color="common.white">
+      <GradientBox p="16px" borderRadius="8px" color="common.white">
         <Box display="flex" justifyContent="space-between">
-          <Box>Total</Box>
+          <Typography color="ds.white_static">Total</Typography>
           <Box>
-            <Typography component="div" fontSize="20px" fontWeight="500">
+            <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
               {formattedNonPtAmount ?? formattedPtAmount}
             </Typography>
           </Box>
@@ -190,31 +206,33 @@ export default function ConfirmSwapTransaction({
         {formattedNonPtAmount && (
           <Box display="flex" justifyContent="right">
             <Box>
-              <Typography component="div" fontSize="20px" fontWeight="500">
+              <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
                 {formattedPtAmount}
               </Typography>
             </Box>
           </Box>
         )}
         <Box display="flex" justifyContent="right">
-          <Typography component="div" variant="body1">
+          <Typography component="div" variant="body1" color="ds.white_static" sx={{ opacity: '0.5' }}>
             {getFormattedPairingValue(ptAmount)}
           </Typography>
         </Box>
-      </Box>
-      <Box>
-        <TextField
-          className="walletPassword"
-          value={userPasswordState.value}
-          label="Password"
-          type="password"
-          onChange={e => {
-            txSubmitErrorState.update(null);
-            userPasswordState.update(e.target.value);
-          }}
-          error={isIncorrectPassword && 'Incorrect password!'}
-        />
-      </Box>
+      </GradientBox>
+      {userPasswordState != null && (
+        <Box>
+          <TextField
+            className="walletPassword"
+            value={userPasswordState.value}
+            label="Password"
+            type="password"
+            onChange={e => {
+              txSubmitErrorState.update(null);
+              userPasswordState.update(e.target.value);
+            }}
+            error={isIncorrectPassword && 'Incorrect password!'}
+          />
+        </Box>
+      )}
     </Box>
   );
 }
@@ -222,7 +240,7 @@ export default function ConfirmSwapTransaction({
 const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="grayscale.600">
+      <Typography variant="body1" color="ds.text_gray_low">
         {col1}
       </Typography>
       {withInfo ? (
@@ -232,7 +250,7 @@ const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">
+      <Typography component="div" variant="body1" color="ds.text_gray_medium">
         {children}
       </Typography>
     </Box>

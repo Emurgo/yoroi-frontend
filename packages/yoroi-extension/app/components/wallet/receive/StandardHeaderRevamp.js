@@ -7,13 +7,17 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './StandardHeader.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import RawHash from '../../widgets/hashWrappers/RawHash';
+
+const QrCodeBackground = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_1,
+}));
 
 const messages = defineMessages({
   walletAddressLabel: {
@@ -58,17 +62,10 @@ export default class StandardHeaderRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const {
-      walletAddress,
-      isSubmitting,
-      error,
-      isWalletAddressUsed,
-      onCopyAddressTooltip,
-      notification,
-    } = this.props;
+    const { walletAddress, isSubmitting, error, isWalletAddressUsed, onCopyAddressTooltip, notification } = this.props;
     const { intl } = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
-    const locationId = 'wallet:receive:infoPanel:header'
+    const locationId = 'wallet:receive:infoPanel:header';
 
     const generateAddressForm = (
       <LoadingButton
@@ -95,24 +92,9 @@ export default class StandardHeaderRevamp extends Component<Props> {
           {intl.formatMessage(messages.walletAddressLabel)}
         </Typography>
 
-        <Box
-          display="flex"
-          alignItems="start"
-          justifyContent="center"
-          mb="30px"
-          pb="30px"
-          gap="24px"
-          position="relative"
-        >
+        <Box display="flex" alignItems="start" justifyContent="center" mb="30px" pb="30px" gap="24px" position="relative">
           <Box display="flex" justifyContent="center" alignItems="center">
-            <Box
-              p="16px"
-              borderRadius="16px"
-              height="min-content"
-              sx={{
-                background: theme => theme.palette.gradients['blue-green-bg'],
-              }}
-            >
+            <QrCodeBackground p="16px" borderRadius="16px" height="min-content">
               <Box
                 alignItems="flex-start"
                 display="flex"
@@ -129,7 +111,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
               >
                 <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
               </Box>
-            </Box>
+            </QrCodeBackground>
           </Box>
           <Box width="100%">
             <Box mb="8px">
@@ -164,12 +146,16 @@ export default class StandardHeaderRevamp extends Component<Props> {
               </CopyableAddress>
             </Box>
 
-            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="grayscale.600">
+            <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
               <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
             </Typography>
 
             {generateAddressForm}
-            {error && <div className={styles.error} id={locationId + '-addressError-text'}>{intl.formatMessage(error)}</div>}
+            {error && (
+              <div className={styles.error} id={locationId + '-addressError-text'}>
+                {intl.formatMessage(error)}
+              </div>
+            )}
           </Box>
         </Box>
       </Box>

@@ -1,12 +1,12 @@
-//@flow
+// @flow
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { FormattedTokenValue, OrderAsset } from './util';
 import { useSwap, } from '@yoroi/swap';
 import { useQuery } from 'react-query';
 import { useMemo } from 'react';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
 import { maybe} from '../../../coreUtils';
-import type { FormattedTokenValue, OrderAsset } from './util';
 import { createFormattedTokenValues } from './util';
 import { useAsyncMemo } from '../../../reactUtils';
 
@@ -68,17 +68,20 @@ export function useRichOrders(
   openOrders: Array<MappedOrder>,
   completedOrders: Array<MappedOrder>,
   transactionTimestamps: { [string]: Date },
+  openOrdersLoading: boolean,
+  completedOrdersLoading: boolean
 |} {
-  const {order, tokens, stakingKey} = useSwap()
+  const { order, tokens, stakingKey } = useSwap()
 
   /**
    * Fetch verified tokens list converted to map
    */
   const { data: tokensMap } = useQuery({
     suspense: true,
-    queryKey: ['useSwapTokensOnlyVerified'],
+    queryKey: ['useSwapTokensOnlyVerifiedMap'],
+    useErrorBoundary: false,
     queryFn: () => tokens.list.onlyVerified()
-      .then(tokensArray => tokensArray.reduce((map, t) => ({ ...map, [t.id]: t }), {}))
+      .then(tokensArray => tokensArray.reduce((map, t) => (t ? { ...map, [t.id]: t } : map), {}))
       .catch(e => {
         console.error('Failed to load verified tokens!', e);
         throw e;
@@ -88,8 +91,9 @@ export function useRichOrders(
   /**
    * Fetch open orders
    */
-  const { data: openOrdersData } = useQuery({
+  const { data: openOrdersData, isLoading: openOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusOpen', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusOpen().catch(e => {
       console.error('Failed to load open orders!', e);
       throw e;
@@ -99,8 +103,9 @@ export function useRichOrders(
   /**
    * Fetch completed orders
    */
-  const { data: completedOrdersData } = useQuery({
+  const { data: completedOrdersData, isLoading: completedOrdersLoading } = useQuery({
     queryKey: ['useSwapOrdersByStatusCompleted', stakingKey],
+    useErrorBoundary: false,
     queryFn: () => order.list.byStatusCompleted().catch(e => {
       console.error('Failed to load completed orders!', e);
       throw e;
@@ -161,5 +166,5 @@ export function useRichOrders(
     return useAsyncMemo.void;
   }, [openOrders, completedOrders], {});
 
-  return { openOrders, completedOrders, transactionTimestamps };
+  return { openOrders, completedOrders, transactionTimestamps, openOrdersLoading, completedOrdersLoading };
 }

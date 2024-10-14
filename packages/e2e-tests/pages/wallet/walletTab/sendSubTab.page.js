@@ -1,13 +1,30 @@
 import WalletTab from './walletTab.page.js';
-import { twoSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
+import { quarterSecond, fiveSeconds } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
+  // ------
   // step 1
   // ------
   receiverAddressInputLocator = {
     locator: '//input[starts-with(@id, "receiver--")]',
     method: 'xpath',
+  };
+  receiverHelperTextLocator = {
+    locator: '//p[starts-with(@id, "receiver--") and contains(@id, "-helper-text")]',
+    method: 'xpath',
+  };
+  receiverDoneIcon = {
+    locator: 'input-done-icon',
+    method: 'id',
+  };
+  receiverErrorIcon = {
+    locator: 'input-error-icon',
+    method: 'id',
+  };
+  domainResolverAddressTextLocator = {
+    locator: 'wallet:send:enterAddressStep-domainResolverAddress-text',
+    method: 'id',
   };
   memoInputLocator = {
     locator: 'wallet:send:enterAddressStep-enterMemo-input',
@@ -23,6 +40,10 @@ class SendSubTab extends WalletTab {
   amountToSendInputLocator = {
     locator: '//input[starts-with(@id, "amount--")]', // unfortunately, I didn't find a way to make a proper ID
     method: 'xpath',
+  };
+  amountToSendHelperTextLocator = {
+    locator: 'wallet:send:addAssetsStep-amountError-text',
+    method: 'id',
   };
   addTokenButtonLocator = {
     locator: 'wallet:send:addAssetsStep-addTokens-button',
@@ -45,6 +66,14 @@ class SendSubTab extends WalletTab {
   // ------
   // step 3
   // ------
+  receiverHandleBoxLocator = {
+    locator: 'wallet:send:confrimTransactionStep-receiverHandle-box',
+    method: 'id',
+  };
+  receiverHandleInfoTextLocator = {
+    locator: 'wallet:send:confrimTransactionStep-receiverHandleInfo-text',
+    method: 'id',
+  };
   receiverAddressTextLocator = {
     locator: 'wallet:send:confrimTransactionStep-receiverAddress-text',
     method: 'id',
@@ -77,37 +106,68 @@ class SendSubTab extends WalletTab {
     locator: 'wallet:send:confrimTransactionStep-confirmTransaction-button',
     method: 'id',
   };
-  // ------
   // functions
-  async buttonIsEnabled(locator) {
-    const buttonIsEnabled = await this.customWaiter(
-      async () => {
-        const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
-        return buttonlIsEnabled === null;
-      },
-      twoSeconds,
+  async stepOneIsDisplayed() {
+    this.logger.info(`SendSubTab::stepOneIsDisplayed is called.`);
+    const receiverState = await this.customWaitIsPresented(
+      this.receiverAddressInputLocator,
+      fiveSeconds,
       quarterSecond
     );
-
-    return buttonIsEnabled;
+    const memoState = await this.customWaitIsPresented(
+      this.memoInputLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    return receiverState && memoState;
+  }
+  async enterReceiver(receiver) {
+    this.logger.info(`SendSubTab::enterReceiver is called. Receiver: ${receiver}`);
+    await this.click(this.receiverAddressInputLocator);
+    await this.clearInputAll(this.receiverAddressInputLocator);
+    await this.input(this.receiverAddressInputLocator, receiver);
+  }
+  async receiverIsGood() {
+    this.logger.info(`SendSubTab::receiverIsGood is called.`);
+    return await this.customWaitIsPresented(this.receiverDoneIcon, fiveSeconds, quarterSecond);
+  }
+  async receiverIsIncorrect() {
+    this.logger.info(`SendSubTab::receiverIsIncorrect is called.`);
+    return await this.customWaitIsPresented(this.receiverErrorIcon, fiveSeconds, quarterSecond);
+  }
+  async getReceiverHelperText() {
+    this.logger.info(`SendSubTab::getReceiverHelperText is called.`);
+    return await this.getText(this.receiverHelperTextLocator);
+  }
+  async getReceiverHandlerAddress() {
+    this.logger.info(`SendSubTab::getReceiverHandlerAddress is called.`);
+    return await this.getText(this.domainResolverAddressTextLocator);
+  }
+  async enterMemo(memo) {
+    this.logger.info(`SendSubTab::enterMemo is called. Memo: ${memo}`);
+    await this.click(this.memoInputLocator);
+    await this.clearInputAll(this.memoInputLocator);
+    await this.input(this.memoInputLocator, memo);
+  }
+  async clickNextToStep2() {
+    this.logger.info(`SendSubTab::clickNextToStep2 is called.`);
+    const nextButtonIsEnabled = await this.buttonIsEnabled(this.nextToStep2ButtonLocator);
+    if (nextButtonIsEnabled) {
+      await this.click(this.nextToStep2ButtonLocator);
+    } else {
+      throw new Error('The Next button is disabled');
+    }
   }
   async enterReceiverAndMemo(receiver, memo = '', confirm = true) {
     this.logger.info(
-      `SendSubTab::enterReceiver is called. ` + `Receiver: ${receiver}, memo: ${memo}`
+      `SendSubTab::enterReceiverAndMemo is called. ` + `Receiver: ${receiver}, memo: ${memo}`
     );
-    await this.click(this.receiverAddressInputLocator);
-    await this.input(this.receiverAddressInputLocator, receiver);
+    await this.enterReceiver(receiver);
     if (memo) {
-      await this.click(this.memoInputLocator);
-      await this.input(this.memoInputLocator, memo);
+      await this.enterMemo(memo);
     }
     if (confirm) {
-      const nextButtonIsEnabled = await this.buttonIsEnabled(this.nextToStep2ButtonLocator);
-      if (nextButtonIsEnabled) {
-        await this.click(this.nextToStep2ButtonLocator);
-      } else {
-        throw new Error('The Next button is disabled');
-      }
+      await this.clickNextToStep2();
     }
   }
   // It will require passing an object { <asset1Name>: <asset1Amount>, <asset2Name>: <asset2Amount> }
@@ -127,9 +187,26 @@ class SendSubTab extends WalletTab {
       }
     }
   }
+  async getAmountHelperText() {
+    this.logger.info(`SendSubTab::getAmountHelperText is called.`);
+    const fieldIsNotEmpty = await this.customWaiter(async () => {
+      const fieldElem = await this.findElement(this.amountToSendHelperTextLocator);
+      const fieldText = await fieldElem.getText();
+      return fieldText !== '' && fieldText !== null && fieldText !== undefined;
+    });
+    if (fieldIsNotEmpty) {
+      return await this.getText(this.amountToSendHelperTextLocator);
+    } else {
+      throw new Error('There is no an error message');
+    }
+  }
   async getInfoFromConfirmTxPage() {
     this.logger.info(`SendSubTab::getInfoFromConfirmTxPage is called.`);
     throw new Error('The function is in development');
+  }
+  async getHandlerInfoConfirmTxPage() {
+    this.logger.info(`SendSubTab::getHandlerInfoConfirmTxPage is called.`);
+    return await this.getText(this.receiverHandleInfoTextLocator);
   }
   async confirmTransaction(password, isHW = false) {
     this.logger.info(`SendSubTab::confirmTransaction is called. ` + `Password: ${password}`);

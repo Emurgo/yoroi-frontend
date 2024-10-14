@@ -12,7 +12,6 @@ import Stepper from '../../common/stepper/Stepper';
 import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
 import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import { asGetPublicKey } from '../../../api/ada/lib/storage/models/PublicDeriver/traits';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
@@ -22,6 +21,9 @@ import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
 import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
+import type { StoresMap } from '../../../stores';
+import type { ActionsMap } from '../../../actions';
+import { forceNonNull } from '../../../coreUtils';
 
 const messages: * = defineMessages({
   title: {
@@ -47,8 +49,8 @@ type Intl = {|
 |};
 
 type Props = {|
-  stores: any,
-  actions: any,
+  stores: StoresMap,
+  actions: ActionsMap,
   restoreWallet: ({|
     walletName: string,
     walletPassword: string,
@@ -66,8 +68,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
     walletRestore,
     profile: profileData,
     wallets,
-    walletSettings,
-    transactions,
     tokenInfoStore,
   } = stores;
 
@@ -81,27 +81,15 @@ function RestoreWalletPage(props: Props & Intl): Node {
   } = useRestoreWallet();
 
   const getDuplicatedWalletData = () => {
-    const publicDeriver = duplicatedWallet;
-
-    if (!publicDeriver) return {};
-
-    const parent = publicDeriver.getParent();
-    const settingsCache = walletSettings.getConceptualWalletSettingsCache(parent);
-    const withPubKey = asGetPublicKey(publicDeriver);
-    const plate = withPubKey == null ? null : wallets.getPublicKeyCache(withPubKey).plate;
-    const balance = transactions.getBalance(publicDeriver);
-
-    const shouldHideBalance = profileData.shouldHideBalance;
-    const updateHideBalance = () => profile.updateHideBalance.trigger();
-    const tokenInfo = tokenInfoStore.tokenInfo;
+    if (!duplicatedWallet) return null;
 
     return {
-      plate,
-      settingsCache,
-      balance,
-      shouldHideBalance,
-      tokenInfo,
-      updateHideBalance,
+      plate: duplicatedWallet.plate,
+      conceptualWalletName: duplicatedWallet.name,
+      balance: duplicatedWallet.balance,
+      shouldHideBalance: profileData.shouldHideBalance,
+      tokenInfo: tokenInfoStore.tokenInfo,
+      updateHideBalance: () => profile.updateHideBalance.trigger(),
     };
   };
 
@@ -178,6 +166,9 @@ function RestoreWalletPage(props: Props & Intl): Node {
             ampli.restoreWalletDetailsStepViewed();
           }}
           checkValidPhrase={phrase => {
+            if (!selectedRestoreMode) {
+              throw new Error('unexpected nullish restore mode');
+            }
             const isValid = walletRestore.isValidMnemonic(
               { mnemonic: phrase, mode: selectedRestoreMode }
             );
@@ -186,20 +177,23 @@ function RestoreWalletPage(props: Props & Intl): Node {
             );
             return isValid;
           }}
-          openDuplicatedWallet={lastDuplicatedWallet => {
+          openDuplicatedWallet={lastDuplicatedWalletId => {
             resetRestoreWalletData();
-            walletsActions.setActiveWallet.trigger({ wallet: lastDuplicatedWallet });
+            walletsActions.setActiveWallet.trigger({ publicDeriverId: lastDuplicatedWalletId });
             handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
           }}
           onSubmit={async enteredRecoveryPhrase => {
-            const importedWallets = wallets.publicDerivers;
+            const importedWallets = wallets.wallets;
             const accountIndex = walletRestore.selectedAccount;
-
+            const { selectedNetwork } = profileData;
+            if (!selectedNetwork) {
+              throw new Error('unexpectedly missing selected network');
+            }
             const existingWallet = await isWalletExist(
               importedWallets,
               enteredRecoveryPhrase,
               accountIndex,
-              profileData.selectedNetwork
+              selectedNetwork
             );
 
             setRestoreWalletData({
@@ -207,7 +201,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
               recoveryPhrase: enteredRecoveryPhrase,
             });
 
-            return existingWallet;
+            return existingWallet?.publicDeriverId;
           }}
         />
       ),
@@ -220,14 +214,14 @@ function RestoreWalletPage(props: Props & Intl): Node {
           isRecovery
           prevStep={() => setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE)}
           recoveryPhrase={recoveryPhrase.split(' ')}
-          selectedNetwork={profileData.selectedNetwork}
+          selectedNetwork={forceNonNull(profileData.selectedNetwork)}
           onSubmit={(walletName: string, walletPassword: string) => {
             if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
             if (!profileData.selectedNetwork)
               throw new Error('Network must be selected to create a wallet. Should never happen');
 
             restoreWallet({ walletName, walletPassword, recoveryPhrase });
-            ampli.restoreWalletDetailsSubmitted();
+            ampli.restoreWalletDetailsSettled();
           }}
           {...manageDialogsProps}
         />

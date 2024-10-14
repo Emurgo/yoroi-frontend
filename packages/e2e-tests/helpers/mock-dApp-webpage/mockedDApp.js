@@ -6,7 +6,7 @@ import {
   getCSLPubKeyHash,
   getCslValue,
   getDRepIDHexAndBechFromHex,
-  mapCborUtxos,
+  mapCborUtxos, bytesToHex,
 } from './dAppTxHelper.js';
 
 class MockDAppWebpageError extends Error {}
@@ -307,7 +307,8 @@ export class MockDAppWebpage {
       `MockDApp::requestSigningTx Requesting signing the transaction: amount="${amount}", toAddress="${toAddress}"`
     );
 
-    const UTXOsreposne = await this.getUTXOs(amount, false);
+    const utxoAmount = Number(amount) + 1000000;
+    const UTXOsreposne = await this.getUTXOs(String(utxoAmount), false);
     this.logger.info(
       `MockDApp::requestSigningTx The UTXOsreposne: ${JSON.stringify(UTXOsreposne, null, 2)}`
     );
@@ -384,9 +385,9 @@ export class MockDAppWebpage {
 
     let payloadHex;
     if (payload.startsWith('0x')) {
-      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+      payloadHex = payload.replace('^0x', '');
     } else {
-      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+      payloadHex = bytesToHex(Buffer.from(payload, 'utf8'));
     }
     this.logger.info(`MockDApp::requestSigningData Payload HEX: ${payloadHex}`);
 
@@ -505,7 +506,7 @@ export class MockDAppWebpage {
         });
     }, signedTxHex);
     this.logger.info(
-      `MockDApp::getBalance The response is ${JSON.stringify(submitResponse, null, 2)}`
+      `MockDApp::submitTx The response is ${JSON.stringify(submitResponse, null, 2)}`
     );
     return submitResponse;
   }
@@ -624,9 +625,9 @@ export class MockDAppWebpage {
 
     let payloadHex;
     if (payload.startsWith('0x')) {
-      payloadHex = Buffer.from(payload.replace('^0x', ''), 'hex').toString('hex');
+      payloadHex = payload.replace('^0x', '');
     } else {
-      payloadHex = Buffer.from(payload, 'utf8').toString('hex');
+      payloadHex = bytesToHex(Buffer.from(payload, 'utf8'));
     }
     this.logger.info(`MockDApp::requestSigningDataCIP95 Payload HEX: ${payloadHex}`);
 

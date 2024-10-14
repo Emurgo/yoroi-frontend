@@ -7,7 +7,6 @@
   justify-content: center;
   padding: 16px 0 16px 0;
   border-radius: 8px;
-  background-color: rgba(255, 19, 81, 0.06);
   box-shadow: var(--yoroi-warning-box-bg-shadow);
 
   .header {
@@ -25,7 +24,6 @@
 
     .headerText {
       font-weight: 500;
-      color: var(--yoroi-palette-error-200);
       font-size: 16px;
       font-weight: 500;
       margin-left: 6px;
@@ -41,12 +39,10 @@
     & {
       line-height: 22px;
       font-weight: 400;
-      color: var(--yoroi-palette-error-200);
       font-size: 12px;
     }
     a,
     button {
-      @include underline(var(--yoroi-palette-error-200));
       line-height: initial;
     }
   }

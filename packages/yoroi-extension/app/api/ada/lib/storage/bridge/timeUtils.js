@@ -11,7 +11,7 @@ export type RelativeSlot = {| epoch: number, slot: number |};
  */
 function createEraBoundaries(config: $ReadOnlyArray<CardanoHaskellConfig>): Array<[number, number, CardanoHaskellConfig]> {
   const res: Array<[number, number, CardanoHaskellConfig]> = [];
-  for (let i = 0; i < config.length - 1; i++) {
+  for (let i = 0; i < config.length - 2; i++) {
     res.push([
       config[i].StartAt ?? fail(`${nameof(createEraBoundaries)} missing start`),
       config[i + 1].StartAt ?? fail(`${nameof(createEraBoundaries)} missing end`),
@@ -85,7 +85,7 @@ export default class TimeUtils {
     config: $ReadOnlyArray<CardanoHaskellConfig>,
     time: Date,
   ): number {
-    let GenesisDate = config[0].GenesisDate ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing genesis date`);
+    const GenesisDate = config[0].GenesisDate ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing genesis date`);
     let SlotDuration = config[0].SlotDuration ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing slot duration`);
     let SlotsPerEpoch = config[0].SlotsPerEpoch ?? fail(`${nameof(TimeUtils.timeToAbsoluteSlot)} missing slots per epoch`);
     let timeLeftToTip = (time.getTime() - new Date(Number.parseInt(GenesisDate, 10)).getTime());

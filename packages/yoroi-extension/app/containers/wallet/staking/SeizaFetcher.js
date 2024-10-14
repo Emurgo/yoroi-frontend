@@ -11,6 +11,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
 import { withLayout } from '../../../styles/context/layout';
 import type { Layouts } from '../../../styles/context/layout';
+import { Box, useTheme } from '@mui/material';
 
 export type SocialLinks = {|
   tw?: string,
@@ -78,8 +79,7 @@ class SeizaFetcher extends Component<AllProps> {
     if (
       !(
         (
-          event.origin ===
-            'null' /* message from a different origin implies event.origin is "null" */ &&
+          event.origin === 'null' /* message from a different origin implies event.origin is "null" */ &&
           event.source === this.iframe.contentWindow
         ) /* check it belongs to our iframe */
       )
@@ -89,12 +89,7 @@ class SeizaFetcher extends Component<AllProps> {
     const response = JSON.parse(decodeURI(event.data));
 
     // if it's the pool info object
-    if (
-      typeof response === 'object' &&
-      !Array.isArray(response) &&
-      response !== null &&
-      response.id
-    ) {
+    if (typeof response === 'object' && !Array.isArray(response) && response !== null && response.id) {
       // $FlowFixMe[not-a-function] only added for banner
       this.props.setFirstPool(response);
       return;
@@ -109,11 +104,7 @@ class SeizaFetcher extends Component<AllProps> {
     }
     const poolId: string = pool;
     if (poolId.length !== 56) {
-      throw new Error(
-        `${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${
-          poolId.length
-        }`
-      );
+      throw new Error(`${nameof(SeizaFetcher)} Server response has incorrect pool length. Expected 56, got ${poolId.length}`);
     }
 
     await this.props.stakepoolSelectedAction(pool);
@@ -160,6 +151,62 @@ class SeizaFetcher extends Component<AllProps> {
 
     // TODO: look into iframe's CSP policy once our backend implement a CSP
     return (
+      <SeizaFetcherComp setFrame={this.setFrame} stakingUrl={stakingUrl} iframe={this.iframe} frameHeight={this.frameHeight} />
+    );
+  }
+
+  _getBrowserReplacement(): string {
+    // 1) handle Yoroi running as an extension
+    if (environment.userAgentInfo.isExtension()) {
+      if (environment.userAgentInfo.isFirefox()) {
+        return 'firefox&mozId=' + location.hostname;
+      }
+      // otherwise assume Chrome
+      // $FlowFixMe[cannot-resolve-name]
+      return 'chrome&chromeId=' + chrome.runtime.id;
+    }
+
+    // 2) Handle Yoroi running as a website
+    if (environment.userAgentInfo.isFirefox()) {
+      return 'firefox&host' + location.host;
+    }
+    // otherwise assume Chrome
+    return 'chrome&chromeId=' + location.host;
+  }
+
+  _prepareStakingURL(urlTemplate: string, locale: string, bias: string, totalAda: ?number): null | string {
+    let finalURL = urlTemplate.replace('$$BROWSER$$', this._getBrowserReplacement());
+
+    // TODO: adds locale when adapools supports it
+    const lang = locale == null ? 'en' : locale.slice(0, 2);
+    finalURL += `&lang=${lang}`;
+
+    finalURL += `&delegated=${encodeURIComponent(JSON.stringify(this.props.poolList))}`;
+
+    finalURL += totalAda == null ? '' : `&totalAda=${totalAda}`;
+    // adds selected layout to customize revamp design
+    finalURL += `&layout=${this.props.selectedLayout}`;
+    finalURL += `&bias=${bias}`;
+
+    return finalURL;
+  }
+
+  @action
+  resize: void => void = () => {
+    if (this.iframe == null) {
+      this.frameHeight = 0;
+      return;
+    }
+    this.frameHeight = Math.max(window.innerHeight - this.iframe.getBoundingClientRect().top - 30, 0);
+  };
+}
+export default (withLayout(SeizaFetcher): ComponentType<Props>);
+
+const SeizaFetcherComp = ({ setFrame, stakingUrl, iframe, frameHeight }) => {
+  const { name } = useTheme();
+  stakingUrl += `&theme=${name === 'dark-theme' ? 'dark' : 'light'}`;
+  return (
+    <Box>
       <iframe
         /**
          * Rationale for allowing the following:
@@ -189,66 +236,13 @@ class SeizaFetcher extends Component<AllProps> {
          */
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"
         referrerPolicy="no-referrer"
-        ref={this.setFrame}
+        ref={setFrame}
         title="Staking"
         src={`${stakingUrl}`}
         frameBorder="0"
         width="100%"
-        height={this.iframe != null && this.frameHeight != null ? this.frameHeight + 'px' : null}
+        height={iframe != null && frameHeight != null ? frameHeight + 'px' : null}
       />
-    );
-  }
-
-  _getBrowserReplacement(): string {
-    // 1) handle Yoroi running as an extension
-    if (environment.userAgentInfo.isExtension()) {
-      if (environment.userAgentInfo.isFirefox()) {
-        return 'firefox&mozId=' + location.hostname;
-      }
-      // otherwise assume Chrome
-      // $FlowFixMe[cannot-resolve-name]
-      return 'chrome&chromeId=' + chrome.runtime.id;
-    }
-
-    // 2) Handle Yoroi running as a website
-    if (environment.userAgentInfo.isFirefox()) {
-      return 'firefox&host' + location.host;
-    }
-    // otherwise assume Chrome
-    return 'chrome&chromeId=' + location.host;
-  }
-
-  _prepareStakingURL(
-    urlTemplate: string,
-    locale: string,
-    bias: string,
-    totalAda: ?number
-  ): null | string {
-    let finalURL = urlTemplate.replace('$$BROWSER$$', this._getBrowserReplacement());
-
-    // TODO: adds locale when adapools supports it
-    const lang = locale == null ? 'en' : locale.slice(0, 2);
-    finalURL += `&lang=${lang}`;
-
-    finalURL += `&delegated=${encodeURIComponent(JSON.stringify(this.props.poolList))}`;
-
-    finalURL += totalAda == null ? '' : `&totalAda=${totalAda}`;
-    // adds selected layout to customize revamp design
-    finalURL += `&layout=${this.props.selectedLayout}`;
-    finalURL += `&bias=${bias}`;
-    return finalURL;
-  }
-
-  @action
-  resize: void => void = () => {
-    if (this.iframe == null) {
-      this.frameHeight = 0;
-      return;
-    }
-    this.frameHeight = Math.max(
-      window.innerHeight - this.iframe.getBoundingClientRect().top - 30,
-      0
-    );
-  };
-}
-export default (withLayout(SeizaFetcher): ComponentType<Props>);
+    </Box>
+  );
+};

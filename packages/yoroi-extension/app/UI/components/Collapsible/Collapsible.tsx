@@ -1,4 +1,3 @@
-import { IconButton } from '@mui/material';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
@@ -6,8 +5,9 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 import { Icon } from '../icons/index';
+import { IconButtonWrapper } from '../wrappers/IconButtonWrapper';
 
-const Accordion: any = styled(MuiAccordion)(() => ({
+const Accordion: any = styled(MuiAccordion)(({ theme }: any) => ({
   '&:not(:last-child)': {
     borderBottom: 0,
   },
@@ -17,7 +17,7 @@ const Accordion: any = styled(MuiAccordion)(() => ({
   '& .MuiAccordionSummary-root': {
     margin: '0px',
     padding: '0px',
-    backgroundColor: 'transparent',
+    backgroundColor: theme.palette.ds.bg_color_max,
     minHeight: '24px',
     height: '24px',
   },
@@ -29,9 +29,10 @@ const AccordionSummary = styled(MuiAccordionSummary)(() => ({
   },
 }));
 
-const AccordionDetails = styled(MuiAccordionDetails)(() => ({
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }: any) => ({
   padding: 0,
   paddingTop: '16px',
+  backgroundColor: theme.palette.ds.bg_color_max,
 }));
 
 type Props = {
@@ -52,9 +53,9 @@ export const Collapsible = ({ title, content }: Props) => {
         aria-controls="panel1d-content"
         id="panel1d-header"
         expandIcon={
-          <IconButton>
+          <IconButtonWrapper>
             <Icon.ChevronDown />
-          </IconButton>
+          </IconButtonWrapper>
         }
       >
         <Typography variant="body1" fontWeight="500">

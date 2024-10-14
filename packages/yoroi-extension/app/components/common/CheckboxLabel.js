@@ -54,10 +54,11 @@ function CheckboxLabel({
             strong: { fontWeight: 500 },
           }}
         >
-          <Typography component="div"
+          <Typography
+            component="div"
             marginBottom={description !== null ? '8px' : 0}
             sx={{
-              color: 'var(--yoroi-comp-checkbox-text)',
+              color: 'ds.text_gray_medium',
               fontWeight: 300,
               ...(labelSx !== null && labelSx),
             }}

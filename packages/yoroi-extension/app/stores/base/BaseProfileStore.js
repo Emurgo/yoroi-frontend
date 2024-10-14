@@ -5,10 +5,8 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { getCSSCustomPropObject} from '../../styles/utils';
 import { LANGUAGES } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
-import type { SetCustomUserThemeRequest } from '../../api/localStorage/index';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
@@ -21,10 +19,6 @@ import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
 
-interface CoinPriceStore {
-  refreshCurrentUnit: Request<(void) => Promise<void>>;
-}
-
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
 }
@@ -32,7 +26,6 @@ interface LoadingStore {
 export default class BaseProfileStore
   <
     TStores: {
-      +coinPriceStore: CoinPriceStore,
       +loading: LoadingStore,
       ...
     },
@@ -90,14 +83,6 @@ export default class BaseProfileStore
     (void) => Promise<void>
   >(this.api.localStorage.unsetUserLocale);
 
-  @observable getThemeRequest: Request<(void) => Promise<?string>> = new Request<
-    (void) => Promise<?string>
-  >(this.api.localStorage.getUserTheme);
-
-  @observable setThemeRequest: Request<(string) => Promise<void>> = new Request<
-    (string) => Promise<void>
-  >(this.api.localStorage.setUserTheme);
-
   @observable getUserRevampMigrationStatusRequest: Request<
     (void) => Promise<boolean>
   > = new Request<(void) => Promise<boolean>>(this.api.localStorage.getUserRevampMigrationStatus);
@@ -117,20 +102,6 @@ export default class BaseProfileStore
   > = new Request<(boolean) => Promise<void>>(
     this.api.localStorage.setUserRevampAnnouncementStatus
   );
-
-  @observable getCustomThemeRequest: Request<(void) => Promise<?string>> = new Request<
-    (void) => Promise<?string>
-  >(this.api.localStorage.getCustomUserTheme);
-
-  @observable setCustomThemeRequest: Request<
-    (SetCustomUserThemeRequest) => Promise<void>
-  > = new Request<(SetCustomUserThemeRequest) => Promise<void>>(
-    this.api.localStorage.setCustomUserTheme
-  );
-
-  @observable unsetCustomThemeRequest: Request<(void) => Promise<void>> = new Request<
-    (void) => Promise<void>
-  >(this.api.localStorage.unsetCustomUserTheme);
 
   @observable getComplexityLevelRequest: Request<
     (void) => Promise<?ComplexityLevelType>
@@ -182,8 +153,6 @@ export default class BaseProfileStore
     this.actions.profile.resetLocale.listen(this._resetLocale);
     this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
     this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
-    this.actions.profile.updateTheme.listen(this._updateTheme);
-    this.actions.profile.exportTheme.listen(this._exportTheme);
     this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
     this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
     this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
@@ -195,7 +164,6 @@ export default class BaseProfileStore
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
-    noop(this.currentTheme); // eagerly cache (note: don't remove -- getter is stateful)
     noop(this.isRevampAnnounced);
     noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
@@ -349,95 +317,56 @@ export default class BaseProfileStore
   // ========== Current/Custom Theme ========== //
 
   @computed get currentTheme(): Theme {
-    let { result } = this.getThemeRequest;
-    if (result == null) {
-      result = this.getThemeRequest.execute().result;
-    }
-    if (result != null) {
-      if (!this.didUserMigratedToRevampTheme) {
-        this.setUserRevampMigrationStatusRequest.execute(true);
-        noop(this._updateTheme({ theme: THEMES.YOROI_BASE }));
-        return THEMES.YOROI_BASE;
-      }
-
-      // verify content is an actual theme
-      if (Object.values(THEMES).find(theme => theme === result)) {
-        // $FlowExpectedError[incompatible-return]: can safely cast
-        return result;
-      }
-    }
-
     return THEMES.YOROI_BASE;
   }
 
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get isRevampTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_BASE;
+    return true;
   }
 
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get isModernTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_MODERN;
+    return false;
   }
 
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get isClassicTheme(): boolean {
-    return this.currentTheme === THEMES.YOROI_CLASSIC;
+    return false;
   }
 
-  /* @Returns Merged Pre-Built Theme and Custom Theme */
-  @computed get currentThemeVars(): { [key: string]: string, ... } {
-    let { result } = this.getCustomThemeRequest;
-    if (result == null) {
-      result = this.getCustomThemeRequest.execute().result;
-    }
-    let customThemeVars = {};
-    if (result != null) {
-      customThemeVars = JSON.parse(result);
-    }
-    // Merge Custom Theme
-    return customThemeVars;
-  }
-
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get isCurrentThemeSet(): boolean {
-    return this.getThemeRequest.result != null;
+    return true;
   }
 
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get didUserMigratedToRevampTheme(): boolean {
-    let { result } = this.getUserRevampMigrationStatusRequest;
-
-    if (result == null) {
-      result = this.getUserRevampMigrationStatusRequest.execute().result;
-    }
-
-    return result === true;
+    return true;
   }
 
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   @computed get hasLoadedCurrentTheme(): boolean {
-    return this.getThemeRequest.wasExecuted && this.getThemeRequest.result !== null;
+    return true;
   }
 
-  _updateTheme: ({| theme: string |}) => Promise<void> = async ({ theme }) => {
-    // Unset / Clear the Customized Theme from LocalStorage
-    document.documentElement?.removeAttribute('style'); // remove css prop
-    await this.unsetCustomThemeRequest.execute();
-    await this.getCustomThemeRequest.execute(); // eagerly cache
-    await this.setThemeRequest.execute(theme);
-    await this.getThemeRequest.execute(); // eagerly cache
-  };
-
-  _exportTheme: void => Promise<void> = async () => {
-    const cssCustomPropObject = getCSSCustomPropObject();
-    await this.unsetCustomThemeRequest.execute();
-    await this.setCustomThemeRequest.execute({
-      cssCustomPropObject,
-    });
-    await this.getCustomThemeRequest.execute(); // eagerly cache
-  };
-
+  /**
+   * <TODO:PENDING_REMOVAL>
+   */
   hasCustomTheme: void => boolean = (): boolean => {
-    let { result } = this.getCustomThemeRequest;
-    if (result == null) {
-      result = this.getCustomThemeRequest.execute().result;
-    }
-    return result !== undefined;
+    return false;
   };
 
   // ========== Terms of Use ========== //
@@ -561,8 +490,6 @@ export default class BaseProfileStore
   _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await this.setUnitOfAccountRequest.execute(currency);
     await this.getUnitOfAccountRequest.execute(); // eagerly cache
-
-    await this.stores.coinPriceStore.refreshCurrentUnit.execute().promise;
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {

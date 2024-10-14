@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
-import { WalletTypeOption } from '../../../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
+import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 
@@ -45,35 +45,31 @@ export const createCurrrentWalletInfo = (stores: any) => {
   const { wallets } = stores;
   const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
-  const selectedWallet = wallets.selected;
-  if (selectedWallet == null) {
-    throw new Error(`no selected Wallet. Should never happen`);
-  }
+  const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
+  const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
 
-  const walletAdaBalance = getWalletTotalAdaBalance(stores, selectedWallet);
-
-  const isHardware = selectedWallet.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET;
-  const currentWalletId = selectedWallet.getPublicDeriverId();
-  const networkInfo = selectedWallet.getParent().getNetworkInfo();
-  const networkId = networkInfo.NetworkId;
-  const backendService = selectedWallet.getParent().getNetworkInfo().Backend.BackendService;
-  const backendServiceZero = selectedWallet.getParent().getNetworkInfo().Backend.BackendServiceZero;
+  const isHardware: boolean = selectedWallet.isHardware;
+  const walletId: number = selectedWallet.publicDeriverId;
+  const networkId = selectedWallet.networkId;
+  const networkInfo /*: $ReadOnly<NetworkRow> */ = getNetworkById(selectedWallet.networkId);
+  const { BackendService, BackendServiceZero } = networkInfo.Backend;
 
   const groupedTx = groupTransactionsByDay(stores.transactions.recent);
   return {
     currentPool: walletCurrentPoolInfo,
     networkId,
-    walletId: currentWalletId,
-    selectedWallet: selectedWallet,
+    walletId,
+    selectedWallet,
     walletAdaBalance: walletAdaBalance.toNumber(),
     unitOfAccount: stores.profile.unitOfAccount,
     defaultTokenInfo: stores.tokenInfoStore.getDefaultTokenInfoSummary(networkId),
     getCurrentPrice: stores.coinPriceStore.getCurrentPrice,
     recentTransactions: groupedTx ? groupedTx : [],
-    submitedTransactions: stores.transactions.submitted,
+    submitedTransactions: selectedWallet.submittedTransactions,
     isHardwareWallet: isHardware,
-    backendService,
-    backendServiceZero,
+    backendService: BackendService,
+    backendServiceZero: BackendServiceZero,
+    stakingAddress: selectedWallet.stakingAddress,
   };
 };
 
@@ -87,17 +83,15 @@ export const getFormattedPairingValue = (getCurrentPrice, defaultTokenInfo, unit
   return `${val} ${currency}`;
 };
 
-const getTotalAmount = (walletAmount, rewards) => {
-  return walletAmount && rewards
-    ? walletAmount.joinAddCopy(rewards)
-    : (walletAmount ?? rewards);
+const combinedMultiToken = (walletAmount /*: MultiToken */, rewards /*: MultiToken */) /*: MultiToken */ => {
+  return walletAmount && rewards ? walletAmount.joinAddCopy(rewards) : walletAmount ?? rewards;
 };
 
-const getWalletTotalAdaBalance = (stores, selectedWallet) => {
-  const totalAmount = stores.transactions.getBalance(selectedWallet);
-  const rewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
-  const amount = getTotalAmount(totalAmount, rewards);
-  const defaultEntry = amount?.getDefaultEntry();
+const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*: MultiToken */ => {
+  const balance = selectedWallet.balance;
+  const rewardBalance /*: MultiToken */ = stores.delegation.getRewardBalanceOrZero(selectedWallet);
+  const totalBalance /*: MultiToken */ = combinedMultiToken(balance, rewardBalance);
+  const defaultEntry = totalBalance?.getDefaultEntry();
   if (defaultEntry == null) return new BigNumber(0);
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   const tokenInfo = getTokenInfo(defaultEntry);

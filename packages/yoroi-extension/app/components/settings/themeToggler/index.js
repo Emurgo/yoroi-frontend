@@ -1,25 +1,69 @@
 //@flow
 
-import { Box, Button } from '@mui/material';
-import { useState } from 'react';
+import { Box, FormControlLabel, Radio, RadioGroup, useTheme } from '@mui/material';
+import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
-import { ReactComponent as IconSun } from '../../../assets/images/top-bar/sun.inline.svg';
-import { ReactComponent as IconMoon } from '../../../assets/images/top-bar/moon.inline.svg';
+import LocalStorageApi from '../../../api/localStorage';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages } from 'react-intl';
 
-export default function ThemeToggler(): any {
-  const [mode, setMode] = useState(false);
+const messages = defineMessages({
+  lightTheme: {
+    id: 'settings.general.theme.light',
+    defaultMessage: '!!!Light Theme',
+  },
+  darkTheme: {
+    id: 'settings.general.theme.dark',
+    defaultMessage: '!!!Dark Theme',
+  },
+});
+
+const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => {
   const { toggleColorMode } = useThemeMode();
-
-  const toggle = () => {
-    setMode(md => !md);
-    toggleColorMode();
-  };
+  const localStorageApi = new LocalStorageApi();
+  const { name } = useTheme();
 
   return (
     <Box>
-      <Button startIcon={mode ? <IconSun /> : <IconMoon />} onClick={toggle}>
-        {mode ? 'Use Light Theme' : 'Use Dark Theme'}
-      </Button>
+      <Box>
+        <RadioGroup
+          aria-labelledby="theme-switch-buttons"
+          value={name === 'light-theme' ? 'light' : 'dark'}
+          onChange={async e => {
+            toggleColorMode(e.target.value);
+            await localStorageApi.setUserThemeMode(e.target.value);
+          }}
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <FormControlLabel
+            value={'light'}
+            control={
+              <Radio
+                sx={{
+                  color: 'primary.500',
+                }}
+                size="small"
+              />
+            }
+            label={intl.formatMessage(messages.lightTheme)}
+            id="switchToNewVersionButton"
+          />
+          <FormControlLabel
+            value={'dark'}
+            control={<Radio sx={{ color: 'primary.500' }} size="small" />}
+            label={intl.formatMessage(messages.darkTheme)}
+            id="switchToOldVersionButton"
+            sx={{
+              marginRight: '20px',
+            }}
+          />
+        </RadioGroup>
+      </Box>
     </Box>
   );
-}
+};
+
+export default ThemeToggler;

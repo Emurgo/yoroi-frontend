@@ -10,10 +10,7 @@ import type {
 } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type {
-  PublicDeriverCache,
-  WhitelistEntry,
-} from '../../../../chrome/extension/connector/types';
+import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import type {
   CardanoConnectorSignRequest,
   SignSubmissionErrorType,
@@ -47,6 +44,8 @@ import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
+import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
+import { hexToUtf } from '../../../coreUtils';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -89,11 +88,11 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +shouldHideBalance: boolean,
-  +selectedWallet: PublicDeriverCache,
+  +selectedWallet: WalletState,
   +connectedWebsite: ?WhitelistEntry,
   +submissionError: ?SignSubmissionErrorType,
   +signData: ?{| address: string, payload: string |},
-  +walletType: 'ledger' | 'trezor' | 'web',
+  +walletType: WalletType,
   +hwWalletError: ?LocalizableError,
   +isHwWalletErrorRecoverable: ?boolean,
   +tx: ?string,
@@ -154,7 +153,7 @@ class SignTxPage extends Component<Props, State> {
   );
 
   submit(): void {
-    if (this.props.walletType === 'web') {
+    if (this.props.walletType === 'mnemonic') {
       this.form.submit({
         onSuccess: form => {
           const { walletPassword } = form.values();
@@ -335,7 +334,7 @@ class SignTxPage extends Component<Props, State> {
   };
 
   renderPayload(payloadHex: string): string {
-    const utf8 = Buffer.from(payloadHex, 'hex').toString('utf8');
+    const utf8 = hexToUtf(payloadHex);
     if (utf8.match(/^[\P{C}\t\r\n]+$/u)) {
       return utf8;
     }
@@ -430,14 +429,18 @@ class SignTxPage extends Component<Props, State> {
             <pre>{this.renderPayload(signData.payload)}</pre>
           </Box>
 
-          <Box mt="16px">
-            <TextField
-              type="password"
-              {...walletPasswordField.bind()}
-              error={walletPasswordField.error}
-              id="walletPassword"
-            />
-          </Box>
+          <ErrorBlock error={hwWalletError} />
+
+          {walletType === 'mnemonic' && (
+            <Box mt="16px">
+              <TextField
+                type="password"
+                {...walletPasswordField.bind()}
+                error={walletPasswordField.error}
+                id="walletPassword"
+              />
+            </Box>
+          )}
         </Box>
       );
       utxosContent = null;
@@ -491,7 +494,7 @@ class SignTxPage extends Component<Props, State> {
               variant="contained"
               color="primary"
               fullWidth
-              disabled={(walletType === 'web' && !walletPasswordField.isValid) || isSubmitting}
+              disabled={(walletType === 'mnemonic' && !walletPasswordField.isValid) || isSubmitting}
               onClick={this.submit.bind(this)}
               sx={{ minWidth: 0 }}
               id="confirmButton"

@@ -9,13 +9,10 @@ import type {
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
-import BigNumber from 'bignumber.js';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
-
-type RustModuleLoadFlags = 'dontLoadMessagesSigning';
 
 function isWasmPointer(o: ?any): boolean {
   return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
@@ -152,7 +149,7 @@ class Module {
   _messageSigning: WasmMessageSigning;
   _crossCsl: CrossCsl;
 
-  async load(flags: Array<RustModuleLoadFlags> = []): Promise<void> {
+  async load(): Promise<void> {
     if (
       this._wasmv2 != null
         || this._wasmv4 != null
@@ -161,11 +158,7 @@ class Module {
     ) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
-    if (flags.includes('dontLoadMessagesSigning')) {
-      this._messageSigning = ((null: any): WasmMessageSigning);
-    } else {
-      this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
-    }
+    this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
     this._crossCsl = await import('@emurgo/cross-csl-browser');
   }
 
@@ -260,7 +253,7 @@ class Module {
       +coefficient: string,
       +constant: string,
     |};
-    +CoinsPerUtxoWord: string,
+    +CoinsPerUtxoByte: string,
     +PoolDeposit: string,
     +KeyDeposit: string,
     ...
@@ -270,7 +263,7 @@ class Module {
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
       ),
-      coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+      coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
       keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
     });
@@ -278,7 +271,7 @@ class Module {
   // Need to expose through a getter to get Flow to detect the type correctly
   WalletV4TxBuilder(params: {
     linearFee: LinearFee,
-    coinsPerUtxoWord: BigNum,
+    coinsPerUtxoByte: BigNum,
     poolDeposit: BigNum,
     keyDeposit: BigNum,
     maxValueBytes: ?number,
@@ -286,14 +279,14 @@ class Module {
     ...
   } | {
     linearFee: LinearFee,
-    coinsPerUtxoWord: BigNum,
+    coinsPerUtxoByte: BigNum,
     poolDeposit: BigNum,
     keyDeposit: BigNum,
     ...
   }): TransactionBuilder {
     const {
       linearFee,
-      coinsPerUtxoWord,
+      coinsPerUtxoByte,
       poolDeposit,
       keyDeposit,
       // $FlowFixMe[prop-missing]
@@ -302,15 +295,6 @@ class Module {
       maxTxBytes,
     } = params;
     const w4 = this.WalletV4;
-
-    // Inlined to avoid dependency cycles
-    // <TODO:PENDING_REMOVAL> LEGACY
-    const coinsPerUtxoByte = w4.BigNum.from_str(
-      new BigNumber(coinsPerUtxoWord.to_str())
-        .div(8)
-        .integerValue(BigNumber.ROUND_FLOOR)
-        .toString(),
-    );
 
     return w4.TransactionBuilder.new(
       w4.TransactionBuilderConfigBuilder.new()

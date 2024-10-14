@@ -5,7 +5,7 @@ import type { WalletType } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, styled } from '@mui/material';
 import { ReactComponent as AppStoreBadge } from '../../../assets/images/app-store-badge.inline.svg';
 import { ReactComponent as PlayStoreBadge } from '../../../assets/images/google-play-badge.inline.svg';
 import { ReactComponent as ExclamationIcon } from '../../../assets/images/revamp/icons/exclamation-circle.inline.svg';
@@ -36,8 +36,7 @@ const messages = defineMessages({
   },
   line4: {
     id: 'wallet.voting.line4',
-    defaultMessage:
-      '!!!Open the Catalyst Voting App and click on the Complete registration button.',
+    defaultMessage: '!!!Open the Catalyst Voting App and click on the Complete registration button.',
   },
   notDelegated: {
     id: 'wallet.voting.notDelegated',
@@ -77,6 +76,19 @@ type InjectedProps = {|
 type State = {|
   +showDisclamer: boolean,
 |};
+
+const SvgWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+const WarningWrapper = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.bg_gradient_1,
+  borderRadius: '8px',
+  padding: '16px 12px',
+}));
 
 @observer
 class Voting extends Component<Props & InjectedProps, State> {
@@ -144,36 +156,24 @@ class Voting extends Component<Props & InjectedProps, State> {
           </Typography>
 
           {showDisclamer && (
-            <Box
-              sx={{
-                background: 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)',
-                borderRadius: '8px',
-                px: '16px',
-                py: '12px',
-              }}
-            >
+            <WarningWrapper>
               <Box mb="8px" sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div>
+                <SvgWrapper>
                   <ExclamationIcon />
-                </div>
+                </SvgWrapper>
                 <Box sx={{ flexGrow: '1' }}>
                   <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
                     Disclamer
                   </Typography>
                 </Box>
-                <Box
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => this.setState({ showDisclamer: false })}
-                >
+                <SvgWrapper sx={{ cursor: 'pointer' }} onClick={() => this.setState({ showDisclamer: false })}>
                   <CrossIcon />
-                </Box>
+                </SvgWrapper>
               </Box>
               <Typography component="div" variant="body1" color="grayscale.900">
-                {intl.formatMessage(
-                  this.props.isDelegated ? messages.keepDelegated : messages.notDelegated
-                )}
+                {intl.formatMessage(this.props.isDelegated ? messages.keepDelegated : messages.notDelegated)}
               </Typography>
-            </Box>
+            </WarningWrapper>
           )}
 
           <div className={styles.cardContainer}>
@@ -211,9 +211,7 @@ class Voting extends Component<Props & InjectedProps, State> {
                 imageSrc={walletType === 'ledgerNano' ? LedgerStepImage : TrezorStepImage}
                 description={
                   <FormattedHTMLMessage
-                    {...(walletType === 'ledgerNano'
-                      ? messages.ledgerNanoRequirement
-                      : messages.trezorTRequirement)}
+                    {...(walletType === 'ledgerNano' ? messages.ledgerNanoRequirement : messages.trezorTRequirement)}
                   />
                 }
               />
@@ -269,9 +267,7 @@ class Voting extends Component<Props & InjectedProps, State> {
                 <span>1</span>
               </div>
               <div>
-                <div className={classnames([styles.lineText])}>
-                  {intl.formatMessage(messages.line3)}
-                </div>
+                <div className={classnames([styles.lineText])}>{intl.formatMessage(messages.line3)}</div>
                 <div className={styles.appBadges}>
                   <a
                     href="https://apps.apple.com/kg/app/catalyst-voting/id1517473397"
@@ -292,19 +288,12 @@ class Voting extends Component<Props & InjectedProps, State> {
               <div className={styles.number}>
                 <span>2</span>
               </div>
-              <div className={classnames([styles.lineText, styles.step2Text])}>
-                {intl.formatMessage(messages.line4)}
-              </div>
+              <div className={classnames([styles.lineText, styles.step2Text])}>{intl.formatMessage(messages.line4)}</div>
             </div>
             {this.renderStep3()}
           </div>
           <div className={styles.registerButton}>
-            <Button
-              variant="primary"
-              onClick={this.props.start}
-              disabled={this.props.hasAnyPending}
-              sx={{ width: '400px' }}
-            >
+            <Button variant="primary" onClick={this.props.start} disabled={this.props.hasAnyPending} sx={{ width: '400px' }}>
               {intl.formatMessage(globalMessages.registerLabel)}
             </Button>
           </div>

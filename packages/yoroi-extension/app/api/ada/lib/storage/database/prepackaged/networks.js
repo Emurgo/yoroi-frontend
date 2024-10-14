@@ -45,40 +45,8 @@ export const networks = Object.freeze({
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
       }),
-    ]: CardanoHaskellBaseConfig),
-    CoinType: CoinTypes.CARDANO,
-    Fork: CardanoForks.Haskell,
-  }: NetworkRow),
-  // <TODO:PENDING_REMOVAL> Legacy Testnet
-  CardanoTestnet: ({
-    NetworkId: 3_00,
-    NetworkName: 'Cardano Legacy Testnet',
-    Backend: {
-      BackendService: environment.isTest() ? 'http://localhost:21000' : 'https://testnet-backend.yoroiwallet.com',
-      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
-    },
-    BaseConfig: ([
       Object.freeze({
-        StartAt: 0,
-        ChainNetworkId: '0',
-        ByronNetworkId: 1097911063,
-        GenesisDate: '1563999616000',
-        SlotsPerEpoch: 21600,
-        SlotDuration: 20,
-      }),
-      Object.freeze({
-        StartAt: 74,
-        SlotsPerEpoch: 432000,
-        SlotDuration: 1,
-        PerEpochPercentageReward: 69344,
-        LinearFee: {
-          coefficient: '44',
-          constant: '155381',
-        },
-        CoinsPerUtxoWord: '34482',
-        MinimumUtxoVal: '1000000',
-        PoolDeposit: '500000000',
-        KeyDeposit: '2000000',
+        CoinsPerUtxoByte: '4310',
       }),
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
@@ -119,6 +87,9 @@ export const networks = Object.freeze({
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
       }),
+      Object.freeze({
+        CoinsPerUtxoByte: '4310',
+      }),
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
@@ -156,6 +127,9 @@ export const networks = Object.freeze({
         MinimumUtxoVal: '1000000',
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
+      }),
+      Object.freeze({
+        CoinsPerUtxoByte: '4310',
       }),
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
@@ -196,6 +170,9 @@ export const networks = Object.freeze({
         PoolDeposit: '500000000',
         KeyDeposit: '2000000',
       }),
+      Object.freeze({
+        CoinsPerUtxoByte: '4310',
+      }),
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
@@ -213,16 +190,19 @@ export function isCardanoHaskell(network: $ReadOnly<NetworkRow>): boolean {
   return network.CoinType === CoinTypes.CARDANO && network.Fork === CardanoForks.Haskell;
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfig(network: $ReadOnly<NetworkRow>): CardanoHaskellBaseConfig {
   if (!isCardanoHaskell(network)) throw new Error(`Incorrect network type ${JSON.stringify(network)}`);
   return (network.BaseConfig: any); // cast to return type
 }
 
+// <TODO:WALLET_API>
 export function cardanoHaskellConfigCombine(config: $ReadOnlyArray<CardanoHaskellConfig>): CardanoHaskellConfig {
   // $FlowIgnore[incompatible-exact]
   return (config.reduce((acc, next) => Object.assign(acc, next), {}): CardanoHaskellConfig);
 }
 
+// <TODO:WALLET_API>
 export function getCardanoHaskellBaseConfigCombined(network: $ReadOnly<NetworkRow>): CardanoHaskellConfig {
   return cardanoHaskellConfigCombine(getCardanoHaskellBaseConfig(network));
 }
@@ -242,7 +222,6 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
             policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
             assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
             ticker:
-              network === networks.CardanoTestnet ||
               network === networks.CardanoPreprodTestnet ||
               network === networks.CardanoPreviewTestnet ||
               network === networks.CardanoSanchoTestnet
@@ -257,3 +236,11 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
     }
     throw new Error(`Missing default asset for network type ${JSON.stringify(network)}`);
   });
+
+export function getNetworkById(id: number): $ReadOnly<NetworkRow> {
+  const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === id);
+  if (!networkKey) {
+    throw new Error('network not found');
+  }
+  return networks[networkKey];
+}

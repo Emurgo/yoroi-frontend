@@ -42,10 +42,11 @@ export async function buildYoroiTransferTx(payload: {|
   protocolParams: {|
     keyDeposit: RustModule.WalletV4.BigNum,
     linearFee: RustModule.WalletV4.LinearFee,
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum,
     poolDeposit: RustModule.WalletV4.BigNum,
     networkId: number,
   |},
+  networkId: number,
 |}): Promise<TransferTx> {
   try {
     const { senderUtxos, } = payload;
@@ -71,6 +72,8 @@ export async function buildYoroiTransferTx(payload: {|
       senderUtxos,
       payload.absSlotNumber,
       payload.protocolParams,
+      undefined,
+      payload.networkId,
     );
 
     const fee = new MultiToken(
@@ -98,9 +101,7 @@ export async function buildYoroiTransferTx(payload: {|
     return {
       recoveredBalance: totalBalance,
       fee,
-      id: Buffer.from(
-        RustModule.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-      ).toString('hex'),
+      id: RustModule.WalletV4.hash_transaction(signedTx.body()).to_hex(),
       encodedTx: signedTx.to_bytes(),
       // only display unique addresses
       senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),

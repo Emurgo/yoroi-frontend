@@ -24,6 +24,7 @@ import {
 import type { DeviceOwnedAddress, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
 import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
+import { hexToBytes } from '../../../../coreUtils';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -33,7 +34,7 @@ const network = networks.CardanoMainnet;
 
 function getProtocolParams(): {|
   linearFee: RustModule.WalletV4.LinearFee,
-  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  coinsPerUtxoByte: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   keyDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
@@ -43,7 +44,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str('2'),
       RustModule.WalletV4.BigNum.from_str('500'),
     ),
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str('1'),
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str('1'),
     poolDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     keyDeposit: RustModule.WalletV4.BigNum.from_str('500'),
     networkId: network.NetworkId,
@@ -258,7 +259,7 @@ test('Create Ledger transaction', async () => {
       txBuilder.add_bootstrap_input(
         RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver),
         RustModule.WalletV4.TransactionInput.new(
-          RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
+          RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
           1
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
@@ -267,7 +268,7 @@ test('Create Ledger transaction', async () => {
       txBuilder.add_key_input(
         keyHash,
         RustModule.WalletV4.TransactionInput.new(
-          RustModule.WalletV4.TransactionHash.from_bytes(Buffer.from(utxo.tx_hash, 'hex')),
+          RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
           1
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
@@ -276,7 +277,7 @@ test('Create Ledger transaction', async () => {
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
-      RustModule.WalletV4.Address.from_bytes(Buffer.from(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe'), 'hex')),
+      RustModule.WalletV4.Address.from_hex(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe')),
       RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
     )
   );
@@ -284,10 +285,7 @@ test('Create Ledger transaction', async () => {
 
   // note: key doesn't belong to the account signing. Just used to test witness generation
   const accountKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-    Buffer.from(
-      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-      'hex',
-    ),
+    hexToBytes('408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247'),
   );
   const stakingKey = accountKey.derive(ChainDerivations.CHIMERIC_ACCOUNT).derive(0);
 
@@ -330,17 +328,15 @@ test('Create Ledger transaction', async () => {
       NetworkId: network.NetworkId,
     },
     neededStakingKeyHashes: {
-      neededHashes: new Set([Buffer.from(stakeCredential.to_bytes()).toString('hex')]),
+      neededHashes: new Set([stakeCredential.to_hex()]),
       wits: new Set() // not needed for this test, but something should be here
     },
   });
 
-  const rewardAddressString = Buffer.from(
-    RustModule.WalletV4.RewardAddress.new(
-      Number.parseInt(baseConfig.ChainNetworkId, 10),
-      stakeCredential
-    ).to_address().to_bytes()
-  ).toString('hex');
+  const rewardAddressString = RustModule.WalletV4.RewardAddress.new(
+    Number.parseInt(baseConfig.ChainNetworkId, 10),
+    stakeCredential
+  ).to_address().to_hex();
   const response = await createLedgerSignTxPayload({
     signRequest,
     byronNetworkMagic: ByronNetworkId,
@@ -355,10 +351,14 @@ test('Create Ledger transaction', async () => {
   });
 
   expect(response).toStrictEqual(({
+    options: {
+      tagCborSets: false,
+    },
     signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
     tx: {
       fee: '1000',
       ttl: '500',
+      scriptDataHashHex: null,
       network: {
         networkId: 1,
         protocolMagic: 764824073,
@@ -412,6 +412,7 @@ test('Create Ledger transaction', async () => {
           type: TxOutputDestinationType.THIRD_PARTY,
         },
         amount: `5326134`,
+        datumHashHex: null,
         tokenBundle: null,
       }],
       withdrawals: null,
@@ -431,13 +432,13 @@ test('Create Ledger transaction', async () => {
         type: CertificateType.STAKE_REGISTRATION,
       }],
       auxiliaryData: undefined,
-      validityIntervalStart: undefined,
+      validityIntervalStart: null,
     },
     additionalWitnessPaths: [],
   }: SignTransactionRequest));
 
   buildSignedTransaction(
-    txBuilder.build(),
+    txBuilder.build_tx(),
     signRequest.senderUtxos,
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation

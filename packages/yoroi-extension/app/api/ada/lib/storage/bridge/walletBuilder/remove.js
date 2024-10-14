@@ -128,7 +128,7 @@ export async function removePublicDeriver(request: {|
         );
         const walletAddressIds = Object.keys(addresses)
           .flatMap(key => addresses[key])
-          .map(row => row.AddressId);
+          .map(row => row.address.AddressId);
 
         await deps.ModifyAddress.remove(
           db, dbTx,

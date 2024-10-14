@@ -1,9 +1,7 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
-import { observer } from 'mobx-react';
 import QRCode from 'qrcode.react';
-import { readCssVar } from '../../styles/utils';
+import { useTheme } from '@mui/material';
 
 type Props = {|
   +value: string,
@@ -11,37 +9,25 @@ type Props = {|
   +id?: string,
   +includeMargin?: boolean,
   +addBg?: boolean,
-  +fgColor?: string
+  +fgColor?: string,
 |};
 
-@observer
-export default class QrCodeWrapper extends Component<Props> {
+const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false, addBg = true }: Props): Node => {
+  const theme = useTheme();
+  // Get QRCode color value from active theme's CSS variable
+  const qrCodeBackgroundColor = addBg ? theme.palette.ds.el_gray_max : theme.palette.ds.white_static;
+  const qrCodeForegroundColor = theme.palette.ds.gray_min;
 
-  static defaultProps: {|
-    id: string,
-    includeMargin: boolean,
-    addBg: boolean,
-  |} = {
-    id: 'qr-code',
-    includeMargin: false,
-    addBg: true,
-  }
+  return (
+    <QRCode
+      value={value}
+      bgColor={qrCodeBackgroundColor}
+      fgColor={qrCodeForegroundColor}
+      size={size}
+      includeMargin={includeMargin}
+      id={id}
+    />
+  );
+};
 
-  render(): Node {
-    // Get QRCode color value from active theme's CSS variable
-    const { id, includeMargin, addBg, fgColor } = this.props;
-    const qrCodeBackgroundColor = addBg === true ? readCssVar('--yoroi-qr-code-background') : '#ffffff';
-    const qrCodeForegroundColor = fgColor ?? readCssVar('--yoroi-qr-code-foreground');
-
-    return (
-      <QRCode
-        value={this.props.value}
-        bgColor={qrCodeBackgroundColor}
-        fgColor={qrCodeForegroundColor}
-        size={this.props.size}
-        includeMargin={includeMargin === true}
-        id={id}
-      />
-    );
-  }
-}
+export default QrCodeWrapper;

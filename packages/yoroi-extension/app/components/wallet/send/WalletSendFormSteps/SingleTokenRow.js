@@ -17,7 +17,18 @@ import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.gray_max,
+    },
+    '& rect': {
+      fill: theme.palette.ds.bg_color_max,
+    },
+  },
+}));
 
 type Props = {|
   +token: FormattedTokenDisplay,
@@ -39,11 +50,10 @@ const messages = defineMessages({
     defaultMessage: '!!!Not enough balance',
   },
 });
-export default class SingleTokenRow extends Component<Props,State> {
+export default class SingleTokenRow extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
-
 
   constructor(props: Props) {
     super(props);
@@ -59,9 +69,7 @@ export default class SingleTokenRow extends Component<Props,State> {
 
   onAmountUpdate(value: string | null): void {
     const formattedAmount =
-      value !== null && value !== ''
-        ? new BigNumber(formattedAmountToNaturalUnits(value, this.getNumDecimals()))
-        : null;
+      value !== null && value !== '' ? new BigNumber(formattedAmountToNaturalUnits(value, this.getNumDecimals())) : null;
     if (formattedAmount && formattedAmount.isNegative()) return;
     this.props.updateAmount(this.props.token.info, formattedAmount);
   }
@@ -77,83 +85,64 @@ export default class SingleTokenRow extends Component<Props,State> {
       amount = amount.shiftedBy(-numberOfDecimals).toString();
     }
 
-    const displayAmount = token.amount
-      ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('')
-      : '0';
+    const displayAmount = token.amount ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('') : '0';
 
     return (
       <div className={styles.component}>
-        {!this.props.isTokenIncluded(token.info) ? (
-          <button
-            type="button"
-            className={styles.token}
-            onClick={() => this.props.onAddToken(token.info)}
-          >
-            <div className={styles.name}>
-              <div className={styles.logo}>
-                <NoAssetLogo />
-              </div>
-              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
-                {token.label.startsWith('asset')
-                  ? truncateAddressShort(token.label, 14)
-                  : token.label}
-              </Typography>
+        <Box
+          type="button"
+          className={classnames(styles.token, {
+            [styles.amountWrapper]: true,
+            [styles.amountError]: !isValid && this.props.isTokenIncluded(token.info),
+            [styles.inputFocused]: this.state.isInputFocused && this.props.isTokenIncluded(token.info),
+          })}
+          onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
+          border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
+          borderColor={this.props.isTokenIncluded(token.info) ? 'grayscale.400' : 'transparent'}
+        >
+          <div className={styles.amountTokenName}>
+            <div className={styles.logo}>
+              <NoAssetLogo />
             </div>
-            <Typography component="div" variant="body1" color="grayscale.900">
-              {truncateAddressShort(token.id, 14)}
+            <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
+              {token.label.startsWith('asset') ? truncateAddressShort(token.label, 14) : token.label}
             </Typography>
-            <div className={styles.amount}>{displayAmount}</div>
-          </button>
-        ) : (
-          <Box
-            border="2px solid"
-            borderColor="grayscale.400"
-            className={
-              classnames([styles.amountWrapper,
-                !isValid && styles.amountError,this.state.isInputFocused && styles.inputFocused])
-            }
-          >
-            <div className={styles.amountTokenName}>
-              <div className={styles.logo}>
-                <NoAssetLogo />
-              </div>
-              <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
-                {token.label}
-              </Typography>
-            </div>
-            <div>
-              <Typography component="div" variant="body1" color="grayscale.900">
-                {truncateAddressShort(token.id, 14)}
-              </Typography>
-            </div>
-            <div className={styles.amountInput}>
-              <AmountInputRevamp
-                value={!amount ? null : formattedAmountToBigNumber(amount)}
-                onChange={this.onAmountUpdate.bind(this)}
-                decimalPlaces={this.getNumDecimals()}
-                amountFieldRevamp
-                placeholder={displayAmount}
-                onFocus={() => {
-                  this.setState({ isInputFocused: true })
-                }}
-                onBlur={() => {
-                  this.setState({ isInputFocused: false })
-                }}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => this.props.onRemoveToken(token.info)}
-              className={styles.close}
-            >
-              {' '}
-              <CloseIcon />{' '}
-            </button>
-            <div className={styles.error}>
-              {!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
-            </div>
-          </Box>
-        )}
+          </div>
+          <Typography component="div" variant="body1" color="grayscale.900">
+            {truncateAddressShort(token.id, 14)}
+          </Typography>
+
+          {this.props.isTokenIncluded(token.info) ? (
+            <>
+              <Box className={styles.amountInput}>
+                <AmountInputRevamp
+                  value={!amount ? null : formattedAmountToBigNumber(amount)}
+                  onChange={this.onAmountUpdate.bind(this)}
+                  decimalPlaces={this.getNumDecimals()}
+                  amountFieldRevamp
+                  placeholder={displayAmount}
+                  onFocus={() => {
+                    this.setState({ isInputFocused: true });
+                  }}
+                  onBlur={() => {
+                    this.setState({ isInputFocused: false });
+                  }}
+                  autoFocus
+                />
+              </Box>
+              <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
+                <IconWrapper>
+                  <CloseIcon />
+                </IconWrapper>
+              </button>
+              <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
+            </>
+          ) : (
+            <Typography variant="body1" color="grayscale.900" className={styles.amount} sx={{ paddingRight: '10px' }}>
+              {displayAmount}
+            </Typography>
+          )}
+        </Box>
       </div>
     );
   }

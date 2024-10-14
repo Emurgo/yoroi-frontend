@@ -7,25 +7,12 @@ import { Logger } from '../../utils/logging';
 import { encryptWithPassword } from '../../utils/catalystCipher';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateVotingRegTxFunc } from '../../api/ada';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver/index';
-import {
-  asGetAllAccounting,
-  asGetAllUtxos,
-  asGetPublicKey,
-  asGetSigningKey,
-  asGetStakingKey,
-  asHasLevels,
-  asHasUtxoChains,
-} from '../../api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   getCardanoHaskellBaseConfig,
-  isCardanoHaskell,
+  getNetworkById,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { genOwnStakingKey } from '../../api/ada/index';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
@@ -36,10 +23,13 @@ import cryptoRandomString from 'crypto-random-string';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import type { ConceptualWallet } from '../../api/ada/lib/storage/models/ConceptualWallet'
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
 import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localStorage';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
+import { bytesToHex } from '../../coreUtils';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -135,7 +125,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       })
       return;
     }
-    const network = publicDeriver.getParent().getNetworkInfo()
+    const network = getNetworkById(publicDeriver.networkId);
     const res = await this.stores.substores.ada.stateFetchStore.fetcher
                 .getCatalystRoundInfo({ network })
     runInAction(() => {
@@ -171,7 +161,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     }
     let nextStep;
     if (
-      selected.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
+      selected.type !== 'mnemonic'
     ) {
       await this.actions.ada.voting.createTransaction.trigger(null);
       nextStep = ProgressStep.TRANSACTION;
@@ -227,27 +217,8 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     if (!publicDeriver) {
       return;
     }
-
-    const withUtxos = asGetAllUtxos(publicDeriver);
-    if (withUtxos == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing utxo functionality`);
-    }
-
-    const network = withUtxos.getParent().getNetworkInfo();
-    if (!isCardanoHaskell(network)) {
-      throw new Error(
-        `${nameof(VotingStore)}::${nameof(this._createTransaction)} network not supported`
-      );
-    }
-
-    const withHasUtxoChains = asHasUtxoChains(withUtxos);
-    if (withHasUtxoChains == null) {
-      throw new Error(`${nameof(this._createTransaction)} missing chains functionality`);
-    }
-
-    const fullConfig = getCardanoHaskellBaseConfig(
-      publicDeriver.getParent().getNetworkInfo()
-    );
+    const network = getNetworkById(publicDeriver.networkId);
+    const fullConfig = getCardanoHaskellBaseConfig(network);
 
     // use server time for TTL if connected to server
     const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
@@ -259,109 +230,83 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`${nameof(this._createTransaction)} should never happen`);
     }
 
-    const firstAddress = await this.stores.addresses.getFirstExternalAddress(publicDeriver);
+    const firstAddress = publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+
+    const protocolParameters = await getProtocolParameters(publicDeriver);
 
     let votingRegTxPromise;
 
-    if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.HARDWARE_WALLET
-    ) {
-      const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
+    if (publicDeriver.type !== 'mnemonic') {
+      const votingPublicKey = `0x${bytesToHex(catalystPrivateKey.to_public().as_bytes())}`;
 
-      const withStakingKey = asGetStakingKey(publicDeriver);
-      if (!withStakingKey) {
-        throw new Error(`${nameof(this._createTransaction)} can't get staking key`);
-      }
-      const stakingKeyResp = await withStakingKey.getStakingKey();
-
-      const withPublicKey = asGetPublicKey(publicDeriver);
-      if (!withPublicKey) {
-        throw new Error(`${nameof(this._createTransaction)} can't get public key`);
-      }
-      const publicKeyResp = await withPublicKey.getPublicKey();
-      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicKeyResp.Hash, 'hex')
-      );
-
-      const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-      if (!withLevels) {
-        throw new Error(`${nameof(this._createTransaction)} can't get level`);
-      }
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey);
 
       const stakingKey = derivePublicByAddressing({
-        addressing: stakingKeyResp.addressing,
+        addressing: publicDeriver.stakingAddressing.addressing,
         startingFrom: {
-          level: withLevels.getParent().getPublicDeriverLevel(),
+          level: publicDeriver.publicDeriverLevel,
           key: publicKey,
         },
       }).to_raw_key();
 
 
-      if (isTrezorTWallet(publicDeriver.getParent())) {
+      if (publicDeriver.type === 'trezor') {
         votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
+          wallet: publicDeriver,
           absSlotNumber,
           trezorTWallet: {
             votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
-      } else if (isLedgerNanoWallet(publicDeriver.getParent())) {
+      } else if (publicDeriver.type === 'ledger') {
         votingRegTxPromise = this.createVotingRegTx.execute({
-          publicDeriver: withHasUtxoChains,
+          wallet: publicDeriver,
           absSlotNumber,
           ledgerNanoWallet: {
             votingPublicKey,
-            stakingKeyPath: stakingKeyResp.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
       } else {
         throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
       }
 
-    } else if (
-      publicDeriver.getParent().getWalletType() === WalletTypeOption.WEB_WALLET
-    ) {
-      const withSigning = asGetSigningKey(publicDeriver);
-      if (withSigning == null) {
-        throw new Error(
-          `${nameof(this._createTransaction)} public deriver missing signing functionality.`
-        );
-      }
-      const withStakingKey = asGetAllAccounting(withSigning);
-      if (withStakingKey == null) {
-        throw new Error(`${nameof(this._createTransaction)} missing staking key functionality`);
-      }
+    } else {
       if (spendingPassword === null) {
         throw new Error(`${nameof(this._createTransaction)} expect a password`);
       }
-      const stakingKey = await genOwnStakingKey({
-        publicDeriver: withStakingKey,
+      // todo: optimize this away, use one round-trip
+      const stakingKey = await getPrivateStakingKey({
+        publicDeriverId: publicDeriver.publicDeriverId,
         password: spendingPassword,
       });
-
+      if (!stakingKey) {
+        throw new Error('expect mnemonic wallet to have private staking key');
+      }
       const trxMeta = generateRegistration({
-        stakePrivateKey: stakingKey,
+        stakePrivateKey: RustModule.WalletV4.PrivateKey.from_hex(stakingKey),
         catalystPrivateKey,
         receiverAddress: firstAddress.address,
         slotNumber: currentAbsoluteSlot,
       });
 
       votingRegTxPromise = this.createVotingRegTx.execute({
-        publicDeriver: withHasUtxoChains,
+        wallet: publicDeriver,
         absSlotNumber,
         normalWallet: { metadata: trxMeta },
+        protocolParameters,
       }).promise;
-    } else {
-      throw new Error(`${nameof(this._createTransaction)} unexpected wallet type`);
     }
 
     if (votingRegTxPromise == null) {
@@ -374,33 +319,33 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
   @action
   _signTransaction: ({|
     password?: string,
-    publicDeriver: PublicDeriver<>,
+    wallet: WalletState,
   |}) => Promise<void> = async request => {
     const result = this.createVotingRegTx.result;
     if (result == null) {
       throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
     }
-    if (isLedgerNanoWallet(request.publicDeriver.getParent())) {
+    if (request.wallet.type === 'ledger') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest: result,
-            publicDeriver: request.publicDeriver,
+            wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
       return;
     }
-    if (isTrezorTWallet(request.publicDeriver.getParent())) {
+    if (request.wallet.type === 'trezor') {
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
             signRequest: result,
-            publicDeriver: request.publicDeriver,
+            wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
       return;
     }
@@ -412,12 +357,12 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
-          publicDeriver: request.publicDeriver,
+          wallet: request.wallet,
           password: request.password,
           signRequest: result,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.publicDeriver),
+      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
   };
 

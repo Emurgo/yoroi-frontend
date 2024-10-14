@@ -1,11 +1,13 @@
 //@flow
-import { useMemo, type Node } from 'react';
-import { useSwap, useSwapTokensOnlyVerified } from '@yoroi/swap';
+import { type Node } from 'react';
+import { useSwap } from '@yoroi/swap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
-import { comparatorByGetter } from '../../../../coreUtils';
+import { useSellVerifiedSwapTokens } from '../hooks';
+import { ampli } from '../../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAsset } from '../../swapAnalytics';
 
 type Props = {|
   store: SwapStore,
@@ -16,15 +18,8 @@ type Props = {|
 |};
 
 export default function SelectSellTokenFromList({ store, onClose, onTokenInfoChanged, defaultTokenInfo, getTokenInfoBatch }: Props): Node {
-  const { onlyVerifiedTokens } = useSwapTokensOnlyVerified();
-  const assets = store.assets;
-  const walletVerifiedAssets = useMemo(() => {
-    return assets.map(a => {
-      const vft = onlyVerifiedTokens.find(ovt => ovt.fingerprint === a.fingerprint);
-      return a.id === '' || vft ? { ...a, ...vft } : undefined;
-    }).filter(Boolean).sort(comparatorByGetter(a => a.name?.toLowerCase()));
-  }, [onlyVerifiedTokens, assets]);
-
+  const { walletVerifiedAssets, isLoading } = useSellVerifiedSwapTokens(store.assets)
+  
   const { orderData, resetQuantities } = useSwap();
   const {
     buyQuantity: { isTouched: isBuyTouched },
@@ -50,6 +45,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
     if (shouldUpdateToken) {
       sellTouched(token);
       onTokenInfoChanged({ id, decimals: decimals ?? 0 });
+      ampli.swapAssetFromChanged(tokenInfoToAnalyticsFromAsset(token));
     }
 
     onClose();
@@ -58,6 +54,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
   return (
     <SelectAssetDialog
       assets={walletVerifiedAssets}
+      assetsStillLoading={isLoading}
       type="from"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}

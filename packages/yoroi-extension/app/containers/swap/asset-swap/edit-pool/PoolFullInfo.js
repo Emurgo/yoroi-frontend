@@ -14,11 +14,7 @@ type Props = {|
   showMinAda?: boolean,
 |};
 
-export default function SwapPoolFullInfo({
-  defaultTokenInfo,
-  withInfo,
-  showMinAda,
-}: Props): React$Node {
+export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAda }: Props): React$Node {
   const { orderData } = useSwap();
   const { buyTokenInfo, sellTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
@@ -34,10 +30,7 @@ export default function SwapPoolFullInfo({
   const ptTicker = defaultTokenInfo.ticker ?? '';
   const buyTicker = buyTokenInfo?.ticker ?? '';
 
-  const minReceived = Quantities.format(
-    calculation.buyAmountWithSlippage.quantity,
-    buyToken.decimals
-  );
+  const minReceived = Quantities.format(calculation.buyAmountWithSlippage.quantity, buyToken.decimals);
 
   const deposit = Quantities.format(cost.deposit.quantity, ptDecimals);
   const liqFeeQuantity = Quantities.format(cost.liquidityFee.quantity, ptDecimals ?? 0);
@@ -47,13 +40,9 @@ export default function SwapPoolFullInfo({
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-            <Typography>Min ADA</Typography>
+            <Typography color="ds.text_gray_low">Min ADA</Typography>
             {withInfo && (
-              <InfoTooltip
-                content={
-                  'A small ADA deposit that will be returned when your order is processed or canceled'
-                }
-              />
+              <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
             )}
           </Box>
           <Box>
@@ -63,7 +52,7 @@ export default function SwapPoolFullInfo({
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography>Fees</Typography>
+          <Typography color="ds.text_gray_low">Fees</Typography>
           {withInfo && (
             <InfoTooltip
               content={
@@ -80,12 +69,8 @@ export default function SwapPoolFullInfo({
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography>Minimum assets received</Typography>
-          {withInfo && (
-            <InfoTooltip
-              content={'The minimum amount you are guaranteed to receive in case of price slippage'}
-            />
-          )}
+          <Typography color="ds.text_gray_low">Minimum assets received</Typography>
+          {withInfo && <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />}
         </Box>
         <Box>
           {minReceived} {buyTicker}
@@ -93,7 +78,7 @@ export default function SwapPoolFullInfo({
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography>Liquidity provider fee</Typography>
+          <Typography color="ds.text_gray_low">Liquidity provider fee</Typography>
           {withInfo && (
             <InfoTooltip
               content={

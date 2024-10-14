@@ -27,15 +27,16 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
   width: '294px',
   height: '362px',
   borderRadius: '8px',
-  ...(!selected && {
-    backgroundImage: !pending && theme.palette.ds?.bg_gradient_1,
-    backgroundOrigin: 'border-box',
-    boxShadow: 'inset 0 100vw white',
-    border: '2px solid transparent',
-  }),
+  border: `2px solid ${theme.palette.ds?.primary_100}`,
+
+  ...(!selected &&
+    {
+      // backgroundColor: !pending && theme.palette.ds?.primary_100,
+    }),
   ...(selected && {
-    background: !pending && theme.palette.ds.bg_gradient_2,
-    border: 'none',
+    backgroundImage: !pending && theme.palette.ds.bg_gradient_2,
+    border: '2px solid transparent',
+    backgroundOrigin: 'border-box',
     pointerEvents: !isDrepSelected && 'none',
   }),
   cursor: 'pointer',
@@ -44,10 +45,11 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: !pending && theme.palette.ds.bg_gradient_1,
-    backgroundOrigin: 'content-box',
-    boxShadow: 'none',
-    transition: 'all 250ms ease-in-out',
+    backgroundImage: theme.palette.ds.bg_gradient_1,
+    border: '2px solid transparent',
+    backgroundOrigin: 'border-box',
+    // background: !pending && theme.palette.ds.bg_gradient_2,
+    transition: 'opacity 1s ease-in-out',
   },
 }));
 
@@ -97,7 +99,7 @@ export const GovernanceVoteingCard = ({
           <Typography variant="h3" fontWeight="500" mt="16px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color={'ds.gray_c800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
+          <Description variant="body2" color={'ds.gray_800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </CardContent>

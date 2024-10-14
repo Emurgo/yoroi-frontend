@@ -3,11 +3,11 @@ import React from 'react';
 
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
-import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import { Icon } from '../icons/index';
+import { IconButtonWrapper } from '../wrappers/IconButtonWrapper';
 
 type StyledInputProps = {
   id: string;
@@ -43,14 +43,14 @@ export const PasswordInput = ({ id, label, onChange, value, error, disabled, hel
         disabled={disabled}
         endAdornment={
           <InputAdornment position="end">
-            <IconButton
+            <IconButtonWrapper
               aria-label="toggle password visibility"
               onClick={handleClickShowPassword}
               onMouseDown={handleMouseDownPassword}
               edge="end"
             >
               {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
-            </IconButton>
+            </IconButtonWrapper>
           </InputAdornment>
         }
         label={label}
@@ -71,7 +71,7 @@ const SOutlinedInput = styled(OutlinedInput)(({ theme, error }: any) => ({
   },
 
   '& .MuiFormLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_c500,
+    color: error && theme.palette.ds.sys_magenta_500,
   },
 }));
 const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
@@ -80,6 +80,6 @@ const SFormControl = styled(FormControl)(({ theme, error }: any) => ({
   },
 
   '& .MuiFormLabel-root': {
-    color: error && theme.palette.ds.sys_magenta_c500,
+    color: error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.text_gray_low,
   },
 }));

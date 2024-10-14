@@ -94,10 +94,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           ]}
         />
       </Stack>
-      <SaveRecoveryPhraseTipsDialog
-        open={isActiveDialog}
-        onClose={() => closeDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)}
-      />
+      <SaveRecoveryPhraseTipsDialog open={isActiveDialog} onClose={() => closeDialog(TIPS_DIALOGS.LEARN_ABOUT_RECOVERY_PHRASE)} />
     </Stack>
   );
 }
@@ -105,8 +102,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
 const text: * = defineMessages({
   shortDescription: {
     id: 'wallet.create.firstStep.shortDescription',
-    defaultMessage:
-      '!!!<strong>Read this information carefully</strong> before saving your recovery phrase:',
+    defaultMessage: '!!!<strong>Read this information carefully</strong> before saving your recovery phrase:',
   },
   firstTip: {
     id: 'wallet.create.firstStep.firstTip',
@@ -118,13 +114,11 @@ const text: * = defineMessages({
   },
   thirdTip: {
     id: 'wallet.create.firstStep.thirdTip',
-    defaultMessage:
-      '!!!If you lose your <strong>recovery phrase</strong>, it will not be possible to recover your wallet',
+    defaultMessage: '!!!If you lose your <strong>recovery phrase</strong>, it will not be possible to recover your wallet',
   },
   fourthTip: {
     id: 'wallet.create.firstStep.fourthTip',
-    defaultMessage:
-      '!!!You are the only person who knows and stores your <strong>recovery phrase</strong>',
+    defaultMessage: '!!!You are the only person who knows and stores your <strong>recovery phrase</strong>',
   },
   fifthTip: {
     id: 'wallet.create.firstStep.fifthTip',
@@ -146,11 +140,11 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
 
         <Stack
           sx={{
-            background: theme => theme.palette.background.gradients.primary,
+            background: theme => theme.palette.ds.bg_gradient_1,
             borderRadius: theme => theme.shape.borderRadius + 'px',
             padding: '16px',
             paddingLeft: '40px',
-            color: 'primary.600',
+            color: 'ds.gray_max',
           }}
         >
           <Box
@@ -161,7 +155,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           >
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
-                <Typography component="div" variant="body1" color="primary.600" mb="4px">
+                <Typography component="div" variant="body1" color="ds.gray_max" mb="4px">
                   <FormattedHTMLMessage {...tip} />
                 </Typography>
               </Box>

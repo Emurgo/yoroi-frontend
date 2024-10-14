@@ -1,10 +1,11 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import type { Node } from 'react';
 import { useEffect, useState } from 'react';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import { ReactComponent as ChevronDownIcon } from '../../assets/images/revamp/icons/chevron-down.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/token-default.inline.svg';
+import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark.inline.svg';
 import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
@@ -38,6 +39,7 @@ export default function SwapInput({
 }: Props): Node {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
+  const { name } = useTheme();
 
   const handleChange = e => {
     if (!disabled) {
@@ -62,8 +64,8 @@ export default function SwapInput({
     }
   }, [id]);
 
-  const imgSrc =
-    ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
+  const defaultImage = name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
 
   return (
     <Box>
@@ -73,16 +75,15 @@ export default function SwapInput({
         sx={{
           borderStyle: 'solid',
           borderWidth: (tokenInfo.id?.length > 0 && error) || focusState.value ? '2px' : '1px',
-          borderColor: error ? 'magenta.500' : isFocusedColor,
+          borderColor: error ? 'ds.sys_magenta_500' : isFocusedColor,
           borderRadius: '8px',
           p: '16px',
-          pr: '8px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           gridTemplateRows: '1fr 1fr',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: 'common.white',
+          bgcolor: 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
           maxHeight: '95px',
@@ -98,8 +99,8 @@ export default function SwapInput({
             left: '16px',
             position: 'absolute',
             px: '4px',
-            bgcolor: 'common.white',
-            color: error ? 'magenta.500' : 'black',
+            bgcolor: 'ds.bg_color_max',
+            color: error ? 'magenta.500' : 'ds.text_gray_medium',
           }}
         >
           {label}
@@ -111,6 +112,7 @@ export default function SwapInput({
             border: '0',
             outline: 'none',
             '::placeholder': { color: 'grayscale.600' },
+            bgcolor: 'ds.bg_color_max',
           }}
           component="input"
           type="text"
@@ -138,7 +140,7 @@ export default function SwapInput({
                 src={imgSrc}
                 alt=""
                 onError={e => {
-                  e.target.src = defaultTokenImage;
+                  e.target.src = defaultImage;
                 }}
               />
             </Box>
@@ -161,6 +163,7 @@ export default function SwapInput({
                 ':disabled': {
                   cursor: 'not-allowed',
                 },
+                color: 'ds.text_gray_medium',
               }}
               onClick={() => {
                 handleAmountChange(quantity);
@@ -180,7 +183,7 @@ export default function SwapInput({
         </Box>
       </Box>
       {error && (
-        <Typography component="div" pt="4px" variant="caption" color="magenta.500">
+        <Typography component="div" pt="4px" variant="caption" color="ds.sys_magenta_500">
           {error}
         </Typography>
       )}

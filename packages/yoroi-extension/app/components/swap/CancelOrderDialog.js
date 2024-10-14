@@ -32,7 +32,7 @@ type Props = {|
   getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
   selectedExplorer: SelectedExplorer,
   submissionError: ?SignSubmissionErrorType,
-  walletType: 'ledger' | 'trezor' | 'web',
+  walletType: 'ledger' | 'trezor' | 'mnemonic',
   hwWalletError: ?LocalizableError,
 |};
 
@@ -70,25 +70,23 @@ export default function CancelSwapOrderDialog({
       </Dialog>
     );
   }
+  const isPasswordWallet = walletType === 'mnemonic';
+  const dialogHeight = isPasswordWallet ? '496px' : '388px';
   return (
     <Dialog
       title="Cancel order"
       onClose={onDialogClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
+      styleOverride={{ maxWidth: '612px', height: dialogHeight, minWidth: '612px' }}
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
-          <Typography component="div" variant="body1">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             Are you sure you want to cancel this order?
           </Typography>
         </Box>
-        <AssetPair
-          from={order.from.token}
-          to={order.to.token}
-          defaultTokenInfo={defaultTokenInfo}
-        />
+        <AssetPair from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
         <Box display="flex" flexDirection="column" gap="8px">
           <SummaryRow col1="Asset price">
             {order.price} {order.from.token.ticker}
@@ -96,10 +94,7 @@ export default function CancelSwapOrderDialog({
           <SummaryRow col1="Asset amount">
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow
-            col1="Total returned"
-            info="The amount returned to your wallet after cancelling the order"
-          >
+          <SummaryRow col1="Total returned" info="The amount returned to your wallet after cancelling the order">
             {transactionParams ? (
               transactionParams.returnValues.map((v, index) => (
                 <Box key={v.ticker}>
@@ -114,20 +109,22 @@ export default function CancelSwapOrderDialog({
             {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
-        <Box>
-          <TextField
-            className="walletPassword"
-            value={password}
-            label="Password"
-            type="password"
-            onChange={e => {
-              setIncorrectPassword(false);
-              setPassword(e.target.value);
-            }}
-            error={isIncorrectPassword && 'Incorrect password!'}
-            disabled={isLoading}
-          />
-        </Box>
+        {isPasswordWallet ? (
+          <Box>
+            <TextField
+              className="walletPassword"
+              value={password}
+              label="Password"
+              type="password"
+              onChange={e => {
+                setIncorrectPassword(false);
+                setPassword(e.target.value);
+              }}
+              error={isIncorrectPassword && 'Incorrect password!'}
+              disabled={isLoading}
+            />
+          </Box>
+        ) : <Box paddingTop="12px" />}
       </Box>
       <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
@@ -148,7 +145,7 @@ export default function CancelSwapOrderDialog({
               alert('Failed to process order cancel! ' + stringifyError(e));
             }
           }}
-          disabled={isLoading || password.length === 0}
+          disabled={isLoading || (isPasswordWallet && password.length === 0)}
         >
           {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
         </Button>
@@ -170,7 +167,7 @@ const SummaryRow = ({ col1, children, info = '' }) => (
       ) : null}
     </Box>
     <Box>
-      <Typography component="div" variant="body1">
+      <Typography component="div" variant="body1" color="ds.text_gray_medium">
         {children}
       </Typography>
     </Box>

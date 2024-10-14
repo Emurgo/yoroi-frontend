@@ -45,25 +45,35 @@ export type CardanoHaskellShelleyBaseConfig = {|
   +PoolDeposit: string,
   +KeyDeposit: string,
 |};
-export type CardanoHaskellBaseConfig = [$ReadOnly<CardanoHaskellByronBaseConfig>, $ReadOnly<CardanoHaskellShelleyBaseConfig>];
+
+export type CardanoHaskellConwayBaseConfig = {|
+  +CoinsPerUtxoByte: string,
+|};
+
+export type CardanoHaskellBaseConfig = [
+  $ReadOnly<CardanoHaskellByronBaseConfig>,
+  $ReadOnly<CardanoHaskellShelleyBaseConfig>,
+  $ReadOnly<CardanoHaskellConwayBaseConfig>,
+];
 
 // unfortunate hack to get around the fact tuple spreading is broken in Flow
 export type CardanoHaskellConfig = $ReadOnly<
   InexactSubset<{|
     ...$ElementType<CardanoHaskellBaseConfig, 0>,
     ...$ElementType<CardanoHaskellBaseConfig, 1>,
+    ...$ElementType<CardanoHaskellBaseConfig, 2>,
   |}>
 >;
 
-export type NetworkInsert = {|
+export type NetworkRow = {|
   NetworkId: number,
   NetworkName: string,
   NetworkFeatureName?: string,
   CoinType: CoinTypesT,
   Backend: {|
-    BackendService?: string,
-    TokenInfoService?: string,
-    BackendServiceZero?: string,
+    BackendService: string,
+    TokenInfoService: string,
+    BackendServiceZero: string,
   |},
   /**
    * Starting configuration for the wallet.
@@ -81,9 +91,6 @@ export type NetworkInsert = {|
    * To differentiate these, we need some identifier of the fork
    */
   Fork: number,
-|};
-export type NetworkRow = {|
-  ...NetworkInsert,
 |};
 export const NetworkSchema: {|
   +name: 'Network',

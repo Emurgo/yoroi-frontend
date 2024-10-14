@@ -15,10 +15,8 @@ import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRev
 import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
 import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
-import { WalletTypeOption } from '../../api/ada/lib/storage/models/ConceptualWallet/interfaces';
-import { isLedgerNanoWallet, isTrezorTWallet, } from '../../api/ada/lib/storage/models/ConceptualWallet/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { getMinimumValue, validateAmount } from '../../utils/validations';
+import { validateAmount } from '../../utils/validations';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
@@ -33,6 +31,7 @@ import globalMessages from '../../i18n/global-messages';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -95,6 +94,9 @@ class WalletSendPage extends Component<AllProps> {
       this.showSupportedAddressDomainBanner =
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
+    const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
+    loadProtocolParametersRequest.reset();
+    loadProtocolParametersRequest.execute();
     ampli.sendInitiated();
   }
 
@@ -118,10 +120,10 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   _getNumDecimals(): number {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
+    const { selected } = this.props.stores.wallets;
+    if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
     const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
+      selected.networkId
     );
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
     const info = getTokenInfo({
@@ -132,13 +134,20 @@ class WalletSendPage extends Component<AllProps> {
   }
 
   render(): Node {
-    const publicDeriver = this.props.stores.wallets.selected;
-    // Guard against potential null values
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
+    const { selected } = this.props.stores.wallets;
+    if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
-    const { transactionBuilderStore } = this.props.stores;
+    const {
+      uiDialogs,
+      profile,
+      transactionBuilderStore,
+      protocolParameters,
+    } = this.props.stores;
 
-    const { uiDialogs, profile } = this.props.stores;
+    if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
+      return null;
+    }
+
     const { actions } = this.props;
     const { hasAnyPending } = this.props.stores.transactions;
     const { txBuilderActions } = this.props.actions;
@@ -152,11 +161,9 @@ class WalletSendPage extends Component<AllProps> {
       actions.dialogs.closeActiveDialog.trigger();
     }
 
-    const walletType = publicDeriver.getParent().getWalletType();
-    const targetDialog =
-      walletType === WalletTypeOption.HARDWARE_WALLET
-        ? HWSendConfirmationDialog
-        : WalletSendConfirmationDialog;
+    const targetDialog = selected.type === 'mnemonic'
+      ? WalletSendConfirmationDialog
+      : HWSendConfirmationDialog;
 
     const onSubmit = () => {
       actions.dialogs.push.trigger({
@@ -166,8 +173,9 @@ class WalletSendPage extends Component<AllProps> {
     };
 
     const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-      publicDeriver.getParent().getNetworkInfo().NetworkId
+      selected.networkId
     );
+    const network  = getNetworkById(selected.networkId);
 
     if (this.props.selectedLayout === 'REVAMP') {
       const addressStore = this.props.stores.substores.ada.addresses;
@@ -182,8 +190,8 @@ class WalletSendPage extends Component<AllProps> {
               isDisplayed: this.showSupportedAddressDomainBanner,
               onClose: this.onSupportedAddressDomainBannerClose,
             }}
-            selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
-            selectedWallet={publicDeriver}
+            selectedNetwork={network}
+            selectedWallet={selected}
             selectedExplorer={this.props.stores.explorers.selectedExplorer}
             selectedToken={transactionBuilderStore.selectedToken}
             defaultToken={defaultToken}
@@ -242,15 +250,12 @@ class WalletSendPage extends Component<AllProps> {
     return (
       <>
         <WalletSendFormClassic
-          selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+          selectedNetwork={network}
           validateAmount={amount =>
             validateAmount(
               amount,
               transactionBuilderStore.selectedToken ?? defaultToken,
-              getMinimumValue(
-                publicDeriver.getParent().getNetworkInfo(),
-                transactionBuilderStore.selectedToken?.IsDefault ?? true
-              ),
+              transactionBuilderStore.minAda.getDefault(),
               this.context.intl
             )
           }
@@ -324,8 +329,8 @@ class WalletSendPage extends Component<AllProps> {
    * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation: () => Node = () => {
     const { actions, stores } = this.props;
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (!publicDeriver)
+    const { selected } = this.props.stores.wallets;
+    if (!selected)
       throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
@@ -350,12 +355,10 @@ class WalletSendPage extends Component<AllProps> {
    * Callback that creates a component to avoid the component knowing about actions/stores
    * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation: () => Node = () => {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (!publicDeriver)
+    const { selected } = this.props.stores.wallets;
+    if (!selected)
       throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
     const { transactionBuilderStore } = this.props.stores;
-    // Guard against potential null values
-    if (!publicDeriver) throw new Error('Active wallet required for hardwareWalletDoConfirmation.');
 
     if (!transactionBuilderStore.tentativeTx) {
       throw new Error(`${nameof(this.hardwareWalletDoConfirmation)}::should never happen`);
@@ -366,7 +369,6 @@ class WalletSendPage extends Component<AllProps> {
     const fee = signRequest.fee();
     const receivers = signRequest.receivers(false);
 
-    const conceptualWallet = publicDeriver.getParent();
     let hwSendConfirmationDialog: Node = null;
 
     if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
@@ -376,13 +378,13 @@ class WalletSendPage extends Component<AllProps> {
     }
     const selectedExplorerForNetwork =
       this.props.stores.explorers.selectedExplorer.get(
-        publicDeriver.getParent().getNetworkInfo().NetworkId
+        selected.networkId
       ) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();
 
-    if (isLedgerNanoWallet(conceptualWallet)) {
+    if (selected.type === 'ledger') {
       const messagesLedgerNano = {
         infoLine1: messages.txConfirmationLedgerNanoLine1,
         infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
@@ -407,18 +409,18 @@ class WalletSendPage extends Component<AllProps> {
           onSubmit={
             () => ledgerSendAction.sendUsingLedgerWallet.trigger({
               params: { signRequest },
-              publicDeriver,
               onSuccess: this.openTransactionSuccessDialog,
+              wallet: selected,
             })
           }
           onCancel={ledgerSendAction.cancel.trigger}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>
-            addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+            addressToDisplayString(addr, getNetworkById(selected.networkId))
           }
         />
       );
-    } else if (isTrezorTWallet(conceptualWallet)) {
+    } else if (selected.type === 'trezor') {
       const messagesTrezor = {
         infoLine1: messages.txConfirmationTrezorTLine1,
         infoLine2: globalMessages.txConfirmationTrezorTLine2,
@@ -442,14 +444,14 @@ class WalletSendPage extends Component<AllProps> {
           onSubmit={
             () => trezorSendAction.sendUsingTrezor.trigger({
               params: { signRequest },
-              publicDeriver,
               onSuccess: this.openTransactionSuccessDialog,
+              wallet: selected,
             })
           }
           onCancel={trezorSendAction.cancel.trigger}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           addressToDisplayString={addr =>
-            addressToDisplayString(addr, publicDeriver.getParent().getNetworkInfo())
+            addressToDisplayString(addr, getNetworkById(selected.networkId))
           }
         />
       );
@@ -543,8 +545,8 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   renderNFTDialog: void => Node = () => {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
+    const { selected } = this.props.stores.wallets;
+    if (!selected) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
     const { txBuilderActions } = this.props.actions;
@@ -558,7 +560,7 @@ class WalletSendPage extends Component<AllProps> {
         updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
         onAddToken={txBuilderActions.addToken.trigger}
         onRemoveTokens={txBuilderActions.removeTokens.trigger}
-        selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+        selectedNetwork={getNetworkById(selected.networkId)}
         calculateMinAda={this.calculateMinAda}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         shouldAddMoreTokens={this.shouldAddMoreTokens}
@@ -567,8 +569,8 @@ class WalletSendPage extends Component<AllProps> {
   };
 
   renderAddTokenDialog: void => Node = () => {
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
+    const { selected } = this.props.stores.wallets;
+    if (!selected) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
     const { txBuilderActions } = this.props.actions;
@@ -587,7 +589,7 @@ class WalletSendPage extends Component<AllProps> {
         onRemoveTokens={txBuilderActions.removeTokens.trigger}
         shouldAddMoreTokens={this.shouldAddMoreTokens}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
-        selectedNetwork={publicDeriver.getParent().getNetworkInfo()}
+        selectedNetwork={getNetworkById(selected.networkId)}
       />
     );
   };
