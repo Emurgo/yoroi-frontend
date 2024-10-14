@@ -27,12 +27,6 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     this.api.ada.generateWalletRecoveryPhrase
   );
 
-  setup(): void {
-    super.setup();
-    const { walletBackup } = this.actions;
-    walletBackup.finishWalletBackup.listen(this._createInDb);
-  }
-
   // =================== SEND MONEY ==================== //
 
   adaSendAndRefresh: ({|
@@ -231,7 +225,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     if (recoveryPhrase == null) {
       throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
     }
-    this.actions.walletBackup.initiateWalletBackup.trigger({
+    this.stores.walletBackup.initiateWalletBackup({
       recoveryPhrase,
       name: params.name,
       password: params.password,
@@ -249,7 +243,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
   };
 
   /** Create the wallet and go to wallet summary screen */
-  _createInDb: void => Promise<void> = async () => {
+  finishWalletBackup: void => Promise<void> = async () => {
     await this.createWallet({
       recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
       walletPassword: this.stores.walletBackup.password,
@@ -263,7 +257,7 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     walletName: string,
   |} => Promise<void> = async (request) => {
     const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
+    if (selectedNetwork == null) throw new Error(`${nameof(this.finishWalletBackup)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await createWallet({
         walletName: request.walletName,

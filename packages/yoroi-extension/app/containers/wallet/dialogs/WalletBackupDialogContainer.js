@@ -6,20 +6,19 @@ import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
 @observer
-export default class WalletBackupDialogContainer extends Component<Props> {
+export default class WalletBackupDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
 
   onCancelBackup: (() => void) = () => {
     this.props.onClose();
-    this.props.actions.walletBackup.cancelWalletBackup.trigger();
+    this.props.stores.walletBackup.cancelWalletBackup();
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const {
       recoveryPhraseWords,
       enteredPhrase,
@@ -31,19 +30,6 @@ export default class WalletBackupDialogContainer extends Component<Props> {
       isPrivacyNoticeAccepted,
       currentStep
     } = stores.walletBackup;
-    const {
-      startWalletBackup,
-      addWordToWalletBackupVerification,
-      clearEnteredRecoveryPhrase,
-      acceptWalletBackupTermDevice,
-      acceptWalletBackupTermRecovery,
-      restartWalletBackup,
-      finishWalletBackup,
-      removeOneMnemonicWord,
-      continueToPrivacyWarning,
-      togglePrivacyNoticeForWalletBackup,
-      continueToRecoveryPhraseForWalletBackup
-    } = actions.walletBackup;
     const { createWalletRequest } = stores.wallets;
     const hasWord = (enteredPhrase.length > 0);
     return (
@@ -55,12 +41,12 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         canPhraseBeShown={isPrivacyNoticeAccepted && countdownRemaining === 0}
         isPrivacyNoticeAccepted={isPrivacyNoticeAccepted}
         countdownRemaining={countdownRemaining}
-        togglePrivacyNotice={togglePrivacyNoticeForWalletBackup.trigger}
-        onBack={continueToPrivacyWarning.trigger}
-        onContinue={continueToRecoveryPhraseForWalletBackup.trigger}
+        togglePrivacyNotice={stores.walletBackup.togglePrivacyNoticeForWalletBackup}
+        onBack={stores.walletBackup.continueToPrivacyWarning}
+        onContinue={stores.walletBackup.continueToRecoveryPhraseForWalletBackup}
         // Props for WalletRecoveryPhraseDisplayDialog
         recoveryPhrase={recoveryPhraseWords.reduce((phrase, { word }) => `${phrase} ${word}`, '')}
-        onStartWalletBackup={startWalletBackup.trigger}
+        onStartWalletBackup={stores.walletBackup.startWalletBackup}
         // Props for WalletRecoveryPhraseEntryDialog
         isTermDeviceAccepted={isTermDeviceAccepted}
         enteredPhrase={enteredPhrase}
@@ -68,15 +54,15 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         isTermRecoveryAccepted={isTermRecoveryAccepted}
         isValid={isRecoveryPhraseValid}
         isSubmitting={createWalletRequest.isExecuting}
-        onAcceptTermDevice={acceptWalletBackupTermDevice.trigger}
-        onAcceptTermRecovery={acceptWalletBackupTermRecovery.trigger}
-        onAddWord={addWordToWalletBackupVerification.trigger}
-        onClear={clearEnteredRecoveryPhrase.trigger}
-        onFinishBackup={finishWalletBackup.trigger}
+        onAcceptTermDevice={stores.walletBackup.acceptWalletBackupTermDevice}
+        onAcceptTermRecovery={stores.walletBackup.acceptWalletBackupTermRecovery}
+        onAddWord={stores.walletBackup.addWordToWalletBackupVerification}
+        onClear={stores.walletBackup.clearEnteredRecoveryPhrase}
+        onFinishBackup={stores.substores.ada.wallets.finishWalletBackup}
         removeWord={() => {
-          removeOneMnemonicWord.trigger();
+          stores.walletBackup.removeOneMnemonicWord();
         }}
-        onRestartBackup={restartWalletBackup.trigger}
+        onRestartBackup={stores.walletBackup.restartWalletBackup}
         recoveryPhraseSorted={recoveryPhraseSorted}
       />
     );
