@@ -8,34 +8,19 @@ import WalletAccountIcon from './WalletAccountIcon';
 import { ReactComponent as ConceptualIcon }  from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
 import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
 import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
-import { Typography, Tooltip } from '@mui/material';
+import { Box, Typography, Tooltip } from '@mui/material';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { WalletType } from '../../../chrome/extension/background/types';
+import { constructPlate } from './WalletCard';
 
 type Props = {|
   +plate: null | WalletChecksum,
   +walletType: WalletType,
   +name: string,
 |};
-
-export function constructPlate(
-  plate: WalletChecksum,
-  saturationFactor: number,
-  divClass: string,
-): [string, React$Element<'div'>] {
-  return [plate.TextPart, (
-    <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
-    </div>
-  )];
-}
 
 @observer
 export default class NavPlate extends Component<Props> {
@@ -68,7 +53,7 @@ export default class NavPlate extends Component<Props> {
     const { intl } = this.context;
 
     const [accountPlateId, iconComponent] = (this.props.plate) ?
-      constructPlate(this.props.plate, 0, styles.icon)
+      constructPlate(this.props.plate, 0, 8, 5, 40, 4)
       : [];
 
     const TypeIcon = this.getIcon(this.props.walletType);
