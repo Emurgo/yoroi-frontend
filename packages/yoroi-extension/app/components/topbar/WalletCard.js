@@ -49,14 +49,32 @@ type State = {| +isActionsShow: boolean |};
 export function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
-  divClass: string
+  size: number,
+  scalePx: number,
+  iconSize: number,
+  borderRadius: number,
 ): [string, React$Element<'div'>] {
-  return [
-    plate.TextPart,
-    <div className={divClass}>
-      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
-    </div>,
-  ];
+  return [plate.TextPart, (
+    <Box
+      sx={{
+        width: `${iconSize}px`,
+        height: `${iconSize}px`,
+        borderRadius: `${borderRadius}px`,
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& .identicon': {
+          borderRadius: `${borderRadius}px`,
+        },
+      }}
+    >
+      <WalletAccountIcon
+        iconSeed={plate.ImagePart}
+        saturationFactor={saturationFactor}
+        size={size}
+        scalePx={scalePx}
+      />
+    </Box>
+  )];
 }
 
 @observer
@@ -98,7 +116,7 @@ export default class WalletCard extends Component<Props, State> {
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
     const { isActionsShow } = this.state;
 
-    const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
+    const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, 8, 5, 40, 4) : [];
 
     const typeText = [this.getType(this.props.type)]
       .filter(text => text != null)
@@ -147,7 +165,7 @@ export default class WalletCard extends Component<Props, State> {
                   </Typography>
                 </div>
                 <div className={styles.body}>
-                  <div>{iconComponent}</div>
+                  {iconComponent}
                   <div className={styles.content}>
                     <AmountDisplay
                       shouldHideBalance={shouldHideBalance}
