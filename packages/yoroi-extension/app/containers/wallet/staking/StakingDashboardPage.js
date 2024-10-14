@@ -190,7 +190,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                this.props.actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,

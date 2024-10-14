@@ -1,7 +1,6 @@
 // @flow
 import WalletBackupActions from './wallet-backup-actions';
 import DialogsActions from './dialogs-actions';
-import NotificationsActions from './notifications-actions';
 import MemosActions from './memos-actions';
 import WalletRestoreActions from './common/wallet-restore-actions';
 import YoroiTransferActions from './common/yoroi-transfer-actions';
@@ -14,7 +13,6 @@ export type ActionsMap = {|
   walletSettings: WalletSettingsActions,
   walletBackup: WalletBackupActions,
   dialogs: DialogsActions,
-  notifications: NotificationsActions,
   yoroiTransfer: YoroiTransferActions,
   memos: MemosActions,
   walletRestore: WalletRestoreActions,
@@ -26,7 +24,6 @@ const actionsMap: ActionsMap = Object.freeze({
   walletSettings: new WalletSettingsActions(),
   walletBackup: new WalletBackupActions(),
   dialogs: new DialogsActions(),
-  notifications: new NotificationsActions(),
   yoroiTransfer: new YoroiTransferActions(),
   memos: new MemosActions(),
   walletRestore: new WalletRestoreActions(),

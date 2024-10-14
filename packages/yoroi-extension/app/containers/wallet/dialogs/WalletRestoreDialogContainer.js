@@ -193,7 +193,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,

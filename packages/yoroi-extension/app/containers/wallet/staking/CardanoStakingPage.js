@@ -236,11 +236,12 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         hash={selectedPoolInfo.poolId}
         moreInfo={moreInfo}
         onCopyAddressTooltip={(address, elementId) => {
-          if (!this.props.stores.uiNotifications.isOpen(elementId)) {
+          const { uiNotifications } = this.props.stores;
+          if (!uiNotifications.isOpen(elementId)) {
             runInAction(() => {
               this.notificationElementId = elementId;
             });
-            this.props.actions.notifications.open.trigger({
+            uiNotifications.open({
               id: elementId,
               duration: tooltipNotification.duration,
               message: tooltipNotification.message,

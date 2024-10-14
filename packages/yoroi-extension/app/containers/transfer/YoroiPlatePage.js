@@ -47,7 +47,6 @@ export default class YoroiPlatePage extends Component<Props> {
 
   render(): null | Node {
     if (this.plates == null) return null;
-    const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
 
     const tooltipNotification = {
@@ -65,7 +64,7 @@ export default class YoroiPlatePage extends Component<Props> {
             runInAction(() => {
               this.notificationElementId = elementId;
             });
-            actions.notifications.open.trigger({
+            uiNotifications.open({
               id: elementId,
               duration: tooltipNotification.duration,
               message: tooltipNotification.message,

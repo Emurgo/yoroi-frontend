@@ -306,19 +306,19 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.LedgerNotification);
   };
 
   showTrezorTWalletIntegratedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.TrezorTNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.TrezorTNotification);
   };
 
   showWalletCreatedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletCreatedNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.WalletCreatedNotification);
   };
 
   showWalletRestoredNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletRestoredNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.WalletRestoredNotification);
   };
 
   @action

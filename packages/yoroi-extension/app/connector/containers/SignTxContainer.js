@@ -82,7 +82,6 @@ export default class SignTxContainer extends Component<
   }
 
   render(): Node {
-    const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
 
     const { signingMessage, unrecoverableError } = this.props.stores.connector;
@@ -110,7 +109,7 @@ export default class SignTxContainer extends Component<
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,

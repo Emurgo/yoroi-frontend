@@ -72,7 +72,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,

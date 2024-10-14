@@ -31,7 +31,7 @@ export type StoresMap = {|
   stateFetchStore: StateFetchStore<StoresMap, ActionsMap>,
   profile: ProfileStore,
   uiDialogs: UiDialogsStore<{||}, ActionsMap>,
-  uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
+  uiNotifications: UiNotificationsStore<{||}>,
   explorers: ExplorerStore,
   coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,

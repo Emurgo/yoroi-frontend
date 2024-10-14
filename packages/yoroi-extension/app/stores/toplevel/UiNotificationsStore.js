@@ -2,13 +2,11 @@
 import { observable, action, computed } from 'mobx';
 import Store from '../base/Store';
 import type { Notification } from '../../types/notification.types';
-import NotificationsActions from '../../actions/notifications-actions';
 
 /** Manage a list on ongoing notifications and closes them when they expire */
 export default class UiNotificationsStore<
   TStores,
-  TActions: { notifications: NotificationsActions, ... },
-> extends Store<TStores, TActions>
+> extends Store<TStores, any>
 {
 
   @observable activeNotifications: Array<Notification> = [];
@@ -17,12 +15,6 @@ export default class UiNotificationsStore<
     return this.activeNotifications.length > 0 ?
       this.activeNotifications[this.activeNotifications.length - 1] :
       null;
-  }
-
-  setup(): void {
-    super.setup();
-    this.actions.notifications.open.listen(this._onOpen);
-    this.actions.notifications.closeActiveNotification.listen(this._onClose);
   }
 
   isOpen: string => boolean = (
@@ -46,7 +38,7 @@ export default class UiNotificationsStore<
     this.activeNotifications.find(notification => notification.id === id)
   );
 
-  @action _onOpen: Notification => void = (newNotification) => {
+  @action open: Notification => void = (newNotification) => {
     const notification: Notification = {
       ...newNotification,
       secondsTimerInterval: newNotification.duration != null
@@ -56,7 +48,7 @@ export default class UiNotificationsStore<
 
     if (this.isOpen(notification.id)) {
       // if notification is currently active close and reopen it
-      this._onClose({ id: notification.id });
+      this.closeActiveNotification({ id: notification.id });
       setTimeout(() => this._set(notification), 200);
     } else {
       this._set(notification);
@@ -67,7 +59,7 @@ export default class UiNotificationsStore<
     this.activeNotifications.push(notification);
   };
 
-  @action _onClose: {| id: string |} => void = ({ id }) => {
+  @action closeActiveNotification: {| id: string |} => void = ({ id }) => {
     const notification = this._findNotificationById(id);
     if (notification) {
       if (notification.secondsTimerInterval) clearInterval(notification.secondsTimerInterval);
@@ -80,7 +72,7 @@ export default class UiNotificationsStore<
     const notification = this._findNotificationById(id);
     if (notification && notification.duration != null) {
       notification.duration -= 1;
-      if (notification.duration === 0) this._onClose({ id });
+      if (notification.duration === 0) this.closeActiveNotification({ id });
     }
   };
 }

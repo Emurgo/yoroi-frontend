@@ -76,7 +76,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.publicDeriverId}-copyNotification`;
-      this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
+      this.props.stores.uiNotifications.closeActiveNotification({ id: notificationId });
     }
   };
 
@@ -115,7 +115,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,
@@ -300,7 +300,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -330,7 +330,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
