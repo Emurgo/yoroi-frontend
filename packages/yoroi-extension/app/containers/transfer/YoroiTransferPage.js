@@ -40,7 +40,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
     paperPassword: string,
     recoveryPhrase: string,
   |}) => void) = (payload) => {
-    this.props.actions.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger({
+    this.props.stores.yoroiTransfer.setupTransferFundsWithPaperMnemonic({
       ...payload,
     });
   };
@@ -52,7 +52,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
     }
-    await this.props.actions.yoroiTransfer.checkAddresses.trigger({
+    await this.props.stores.yoroiTransfer.checkAddresses({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
     });
   };
@@ -63,7 +63,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
     const { stores } = this.props;
     const { wallets: walletsStore, yoroiTransfer } = stores;
     const wallet = stores.wallets.selectedOrFail;
-    await this.props.actions.yoroiTransfer.transferFunds.trigger({
+    await this.props.stores.yoroiTransfer.transferFunds({
       network: getNetworkById(wallet.networkId),
       next: async () => {
         const preRefreshTime = new Date().getTime();
@@ -90,11 +90,11 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
   }
 
   backToUninitialized: (() => void) = () => {
-    this.props.actions.yoroiTransfer.backToUninitialized.trigger();
+    this.props.stores.yoroiTransfer.backToUninitialized();
   };
 
   cancelTransferFunds: (() => void) = () => {
-    this.props.actions.yoroiTransfer.cancelTransferFunds.trigger();
+    this.props.stores.yoroiTransfer.reset();
   };
 
   render(): null | Node {

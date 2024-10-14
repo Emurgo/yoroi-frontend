@@ -14,12 +14,11 @@ import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelp
 import { truncateToken } from '../../utils/formatters';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriver: PublicDeriver<>,
 |};
 
 @observer
-export default class WalletTransferPage extends Component<Props> {
+export default class WalletTransferPage extends Component<{| ...Props, ...StoresAndActionsProps |}> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -30,7 +29,7 @@ export default class WalletTransferPage extends Component<Props> {
 
   // <TODO:PENDING_REMOVAL> paper
   startTransferYoroiPaperFunds: void => void = () => {
-    this.props.actions.yoroiTransfer.startTransferFunds.trigger();
+    this.props.stores.yoroiTransfer.startTransferFunds();
   }
 
   render(): Node {

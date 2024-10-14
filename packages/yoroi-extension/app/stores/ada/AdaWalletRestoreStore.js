@@ -34,7 +34,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     if (network == null) {
       throw new Error(`${nameof(this._transferFromLegacy)} no network selected`);
     }
-    await this.actions.yoroiTransfer.transferFunds.trigger({
+    await this.stores.yoroiTransfer.transferFunds({
       next: async () => {
         await this._restoreToDb();
       },
