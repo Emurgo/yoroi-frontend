@@ -26,16 +26,10 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
   };
 
   render(): Node {
-    const { walletSettings } = this.props.stores;
     const { intl } = this.context;
-    const { actions } = this.props;
+    const { actions, stores } = this.props;
+    const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
-    const {
-      startEditingWalletField,
-      stopEditingWalletField,
-      cancelEditingWalletField,
-      renameConceptualWallet,
-    } = actions.walletSettings;
 
     const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
     if (selectedWallet == null) {
@@ -64,15 +58,15 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
           lastUpdatedField={lastUpdatedWalletField}
           onFieldValueChange={async (field, value) => {
             if (field === 'name') {
-              await renameConceptualWallet.trigger({
+              await stores.walletSettings.renameConceptualWallet({
                 conceptualWalletId: selectedWallet.conceptualWalletId,
                 newName: value,
               });
             }
           }}
-          onStartEditing={field => startEditingWalletField.trigger({ field })}
-          onStopEditing={() => stopEditingWalletField.trigger()}
-          onCancelEditing={() => cancelEditingWalletField.trigger()}
+          onStartEditing={field => stores.walletSettings.startEditingWalletField({ field })}
+          onStopEditing={() => stores.walletSettings.stopEditingWalletField()}
+          onCancelEditing={() => stores.walletSettings.cancelEditingWalletField()}
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />

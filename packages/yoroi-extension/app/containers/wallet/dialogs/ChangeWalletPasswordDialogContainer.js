@@ -6,17 +6,15 @@ import ChangeWalletPasswordDialog from '../../../components/wallet/settings/Chan
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriverId: number,
 |};
 
 @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
+export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
 
   render(): Node {
-    const { actions } = this.props;
-    const { uiDialogs } = this.props.stores;
-    const { walletSettings } = this.props.stores;
+    const { actions, stores } = this.props;
+    const { uiDialogs, walletSettings } = stores;
     const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
 
@@ -29,7 +27,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         }}
         onSave={async (values) => {
           const { oldPassword, newPassword } = values;
-          await actions.walletSettings.updateSigningPassword.trigger({
+          await stores.walletSettings.updateSigningPassword({
             publicDeriverId: this.props.publicDeriverId,
             oldPassword,
             newPassword

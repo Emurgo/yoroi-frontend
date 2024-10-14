@@ -11,7 +11,6 @@ import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriverId: number,
 |};
 
@@ -24,7 +23,7 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-export default class ResyncWalletDialogContainer extends Component<Props> {
+export default class ResyncWalletDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -57,7 +56,7 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
           label: intl.formatMessage(globalMessages.resyncButtonLabel),
           danger: false,
           onClick: async () => {
-            await this.props.actions.walletSettings.resyncHistory.trigger({
+            await this.props.stores.walletSettings.resyncHistory({
               publicDeriverId: this.props.publicDeriverId,
             });
             this.props.actions.dialogs.closeActiveDialog.trigger();

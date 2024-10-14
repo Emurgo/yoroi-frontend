@@ -50,7 +50,6 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
 
   removeWalletRevamp: void => Promise<void> = async () => {
     const { stores } = this.props;
-    const settingsActions = this.props.actions.walletSettings;
     const selectedWalletId = this.props.publicDeriverId;
     const walletsNavigation = stores.profile.walletsNavigation;
 
@@ -63,7 +62,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
     };
     await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
-    settingsActions.removeWallet.trigger({
+    stores.walletSettings.removeWallet({
       publicDeriverId: this.props.publicDeriverId,
     });
   };
