@@ -144,7 +144,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
     this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
     this._getConnectorWhitelist();
     this._getConnectingMsg();
@@ -963,7 +962,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   _getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelist.execute();
   };
-  _updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({
+  updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({
     whitelist,
   }) => {
     await this.setConnectorWhitelist.execute({ whitelist });

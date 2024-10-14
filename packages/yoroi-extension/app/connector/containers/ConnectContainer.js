@@ -76,7 +76,6 @@ export default class ConnectContainer extends Component<
         `${nameof(chromeMessage)} connecting to a wallet but no connect message found`
       );
     }
-    const connector = this.props.actions.connector;
 
     const url = chromeMessage.url;
     const appAuthID = chromeMessage.appAuthID;
@@ -107,7 +106,7 @@ export default class ConnectContainer extends Component<
       auth: authEntry,
       image: chromeMessage.imgBase64Url,
     });
-    await connector.updateConnectorWhitelist.trigger({ whitelist });
+    await stores.connector.updateConnectorWhitelist({ whitelist });
 
     await ampli.dappPopupConnectWalletPasswordPageViewed();
 
