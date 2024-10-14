@@ -58,7 +58,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      actions.dialogs.push.trigger({
+      stores.uiDialogs.push({
         dialog: WalletTrezorConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
@@ -68,7 +68,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      actions.dialogs.push.trigger({
+      stores.uiDialogs.push({
         dialog: WalletLedgerConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
@@ -116,13 +116,13 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
           onRestore15={() => {
-            return actions.dialogs.push.trigger({
+            return stores.uiDialogs.push({
               dialog: WalletRestoreDialogContainer,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 } },
             });
           }}
           onRestore24={() => {
-            actions.dialogs.push.trigger({
+            stores.uiDialogs.push({
               dialog: WalletRestoreDialogContainer,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
@@ -138,7 +138,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
           mode={mode}
         />
       );
@@ -156,7 +156,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
@@ -165,7 +165,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
           actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
         />
       );
     }

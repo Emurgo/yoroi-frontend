@@ -38,11 +38,7 @@ export default class UiDialogsStore<
   setup(): void {
     super.setup();
     this.actions.dialogs.open.listen(this._onOpen);
-    this.actions.dialogs.push.listen(this._onPush);
-    this.actions.dialogs.pop.listen(this._onPop);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
-    this.actions.dialogs.resetActiveDialog.listen(this._reset);
-    this.actions.dialogs.updateDataForActiveDialog.listen(this._onUpdateDataForActiveDialog);
   }
 
   @computed
@@ -70,7 +66,7 @@ export default class UiDialogsStore<
     this.dialogList[this.dialogList.length - 1]?.dataForActiveDialog.get(key)
   );
 
-  @action _onPush: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
+  @action push: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
     const prevEntry = this.dialogList[this.dialogList.length - 1];
 
     const newMap = observable.map();
@@ -82,28 +78,28 @@ export default class UiDialogsStore<
       dataForActiveDialog: observable.map(),
     });
   };
-  @action _onPop: void => void = () => {
+  @action pop: void => void = () => {
     this.dialogList.pop();
   }
   @action _onOpen: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
-    this._reset();
-    this._onPush({
+    this.reset();
+    this.push({
       dialog,
       params,
     });
   };
 
   @action _onClose: void => void = () => {
-    this._reset();
+    this.reset();
   };
 
-  @action _onUpdateDataForActiveDialog: {| [key: string]: any, |} => void = (data) => {
+  @action updateDataForActiveDialog: {| [key: string]: any, |} => void = (data) => {
     if (this.dialogList.length === 0) return;
     // $FlowExpectedError[prop-missing] this is a mobx property -- not part of es6
     this.dialogList[this.dialogList.length - 1].dataForActiveDialog.merge(data);
   };
 
-  @action _reset: void => void = () => {
+  @action reset: void => void = () => {
     this.dialogList.splice(0); // remove all elements. Need this to trigger mobx reaction
   };
 

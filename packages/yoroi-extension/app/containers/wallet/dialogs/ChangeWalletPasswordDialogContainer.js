@@ -15,7 +15,6 @@ export default class ChangeWalletPasswordDialogContainer extends Component<{| ..
   render(): Node {
     const { actions, stores } = this.props;
     const { uiDialogs, walletSettings } = stores;
-    const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
 
     return (
@@ -41,7 +40,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<{| ..
           changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
-          updateDataForActiveDialog.trigger(data);
+          stores.uiDialogs.updateDataForActiveDialog(data);
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}

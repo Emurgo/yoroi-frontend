@@ -38,7 +38,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const {
       hasAny,
       hasMoreToLoad,
@@ -106,7 +106,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
                   stores.memos.selectTransaction({ tx: transaction });
-                  actions.dialogs.push.trigger({ dialog: AddMemoDialog });
+                  stores.uiDialogs.push({ dialog: AddMemoDialog });
                 },
               })
             }
@@ -115,7 +115,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
                   stores.memos.selectTransaction({ tx: transaction });
-                  actions.dialogs.push.trigger({ dialog: EditMemoDialog });
+                  stores.uiDialogs.push({ dialog: EditMemoDialog });
                 },
               })
             }
@@ -269,8 +269,8 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
   }
 
   openExportTransactionDialog: void => void = () => {
-    const { actions } = this.props;
-    actions.dialogs.push.trigger({ dialog: ExportTransactionDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.push({ dialog: ExportTransactionDialog });
   };
 
   showMemoDialog: ({|
@@ -281,7 +281,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
       return request.continuation();
     }
 
-    this.props.actions.dialogs.push.trigger({
+    this.props.stores.uiDialogs.push({
       dialog: request.dialog,
       params: {
         continuation: request.continuation,
@@ -290,8 +290,8 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
   };
 
   openDeleteMemoDialog: void => void = () => {
-    const { actions } = this.props;
-    actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.push({ dialog: DeleteMemoDialog });
   };
 
   readyToExportHistory: (number) => boolean = publicDeriverId => {

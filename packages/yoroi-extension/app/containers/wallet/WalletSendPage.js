@@ -71,7 +71,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   };
 
   openTransactionSuccessDialog: void => void = () => {
-    this.props.actions.dialogs.push.trigger({
+    this.props.stores.uiDialogs.push({
       dialog: TransactionSuccessDialog,
     });
   };
@@ -96,7 +96,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
 
   openDialog: any => void = dialog => {
     this.props.actions.dialogs.closeActiveDialog.trigger();
-    this.props.actions.dialogs.push.trigger({
+    this.props.stores.uiDialogs.push({
       dialog,
     });
   };
@@ -397,7 +397,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
       return request.continuation();
     }
 
-    this.props.actions.dialogs.push.trigger({
+    this.props.stores.uiDialogs.push({
       dialog: request.dialog,
       params: {
         continuation: request.continuation,
