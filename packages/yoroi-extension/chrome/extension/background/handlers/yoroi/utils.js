@@ -12,3 +12,17 @@ export async function getPublicDeriverById(publicDeriverId: number): Promise<Pub
   }
   throw new Error(`missing public deriver ${publicDeriverId}`);
 }
+
+export function notifyAllTabsActiveWalletOpen(activeWalletId: number) {
+  chrome.tabs.query({}, (tabs) => {
+    for (const tab of tabs) {
+      chrome.tabs.sendMessage(
+        tab.id,
+        {
+          type: 'active-wallet-open',
+          activeWalletId,
+        }
+      );
+    }
+  });
+}

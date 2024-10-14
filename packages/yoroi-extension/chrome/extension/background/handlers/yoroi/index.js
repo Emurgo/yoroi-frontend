@@ -43,6 +43,7 @@ import {
 } from './connector';
 import { GetProtocolParameters } from './protocolParameters';
 import { subscribe } from '../../subscriptionManager';
+import { notifyAllTabsActiveWalletOpen } from './utils';
 
 const handlerMap = Object.freeze({
   [GetHistoricalCoinPrices.typeTag]: GetHistoricalCoinPrices.handle,
@@ -100,17 +101,7 @@ export function getHandler(typeTag: string): ?Handler {
       subscribe(sender.tab.id, request.request.activeWalletId);
       if (request.request.changed) {
         // notify content scripts in all tabs
-        chrome.tabs.query({}, (tabs) => {
-          for (const tab of tabs) {
-            chrome.tabs.sendMessage(
-              tab.id,
-              {
-                type: 'active-wallet-open',
-                activeWalletId: request.request.activeWalletId
-              }
-            );
-          }
-        });
+        notifyAllTabsActiveWalletOpen(request.request.activeWalletId);
       }
       sendResponse(undefined);
     };
