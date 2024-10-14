@@ -2,7 +2,6 @@
 import WalletBackupActions from './wallet-backup-actions';
 import DialogsActions from './dialogs-actions';
 import MemosActions from './memos-actions';
-import WalletRestoreActions from './common/wallet-restore-actions';
 import TxBuilderActions from './common/tx-builder-actions';
 import WalletSettingsActions from './common/wallet-settings-actions';
 import  ConnectorActionsMap from '../connector/actions/connector-actions';
@@ -13,7 +12,6 @@ export type ActionsMap = {|
   walletBackup: WalletBackupActions,
   dialogs: DialogsActions,
   memos: MemosActions,
-  walletRestore: WalletRestoreActions,
   connector: ConnectorActionsMap,
 |};
 
@@ -23,7 +21,6 @@ const actionsMap: ActionsMap = Object.freeze({
   walletBackup: new WalletBackupActions(),
   dialogs: new DialogsActions(),
   memos: new MemosActions(),
-  walletRestore: new WalletRestoreActions(),
   connector: new ConnectorActionsMap(),
 });
 

@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -25,6 +24,7 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
+import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 
 @observer
 export default class AddWalletPage extends Component<StoresAndActionsProps> {

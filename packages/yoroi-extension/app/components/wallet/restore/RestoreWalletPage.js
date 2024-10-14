@@ -19,11 +19,11 @@ import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
-import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresMap } from '../../../stores';
 import type { ActionsMap } from '../../../actions';
 import { forceNonNull } from '../../../coreUtils';
+import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
 
 const messages: * = defineMessages({
   title: {

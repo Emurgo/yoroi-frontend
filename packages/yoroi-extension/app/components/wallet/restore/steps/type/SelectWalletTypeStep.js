@@ -1,7 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Stack, Box } from '@mui/material';
@@ -11,6 +10,7 @@ import twentyfourImg from '../../../../../assets/images/add-wallet/restore/24-wo
 import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
 import styles from './SelectWalletTypeStep.scss';
 import globalMessages from '../../../../../i18n/global-messages';
+import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
 
 const messages: * = defineMessages({
   fifteenWords: {
