@@ -78,7 +78,7 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
         clearInterval(this.countdownTimerInterval);
       }
     }, 1000);
-    this.actions.dialogs.open.trigger({
+    this.stores.uiDialogs.open({
       dialog: WalletBackupDialog,
     });
   };

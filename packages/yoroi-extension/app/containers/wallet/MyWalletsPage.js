@@ -36,7 +36,7 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
   };
 
   openDialogWrapper: any => void = dialog => {
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   updateHideBalance: void => Promise<void> = async () => {

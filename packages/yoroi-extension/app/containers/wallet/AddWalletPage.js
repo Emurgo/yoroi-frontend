@@ -46,7 +46,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     // so instead, the API gets reset before we start any dialog flow
     this.props.stores.profile.setSelectedNetwork(undefined);
 
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   render(): Node {

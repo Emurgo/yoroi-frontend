@@ -89,7 +89,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
             ampli.allWalletsPageViewed();
-            this.props.actions.dialogs.open.trigger({ dialog: WalletListDialog });
+            this.props.stores.uiDialogs.open({ dialog: WalletListDialog });
           }}
         />
       );
@@ -103,7 +103,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
           menu={this.props.menu}
           walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
+            <BuySellAdaButton onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })} />
           }
           pageBanner={pageBanner}
         />

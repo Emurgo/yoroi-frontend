@@ -68,11 +68,11 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
   };
 
   createWithdrawalTx: (shouldDeregister: boolean) => void = shouldDeregister => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const wallet = stores.wallets.selectedOrFail;
     stores.substores.ada.delegationTransaction.setShouldDeregister(shouldDeregister);
     noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-    actions.dialogs.open.trigger({
+    stores.uiDialogs.open({
       dialog: WithdrawRewardsDialog,
     });
   };
@@ -204,21 +204,21 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
     return (
       <Box>
         {isWalletWithNoFunds ? (
-          <WalletEmptyBanner onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
+          <WalletEmptyBanner onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })} />
         ) : null}
 
         {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
               onOverviewClick={() =>
-                actions.dialogs.open.trigger({
+                stores.uiDialogs.open({
                   dialog: OverviewModal,
                 })
               }
               withdrawRewards={
                 isParticipatingToGovernance === false
                   ? async () => {
-                      this.props.actions.dialogs.open.trigger({
+                      this.props.stores.uiDialogs.open({
                         dialog: GovernanceParticipateDialog,
                       });
                     }
@@ -246,7 +246,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
                 defaultTokenId: wallet.defaultTokenId,
               })}
               onOpenRewardList={() =>
-                actions.dialogs.open.trigger({
+                stores.uiDialogs.open({
                   dialog: RewardHistoryDialog,
                 })
               }
@@ -275,13 +275,13 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
             withdrawRewards={
               isParticipatingToGovernance === false
                 ? () => {
-                    this.props.actions.dialogs.open.trigger({
+                    this.props.stores.uiDialogs.open({
                       dialog: GovernanceParticipateDialog,
                     });
                   }
                 : isStakeRegistered
                 ? () => {
-                    this.props.actions.dialogs.open.trigger({
+                    this.props.stores.uiDialogs.open({
                       dialog: GovernanceParticipateDialog,
                     });
                   }
@@ -297,7 +297,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
             onNext={() => {
               // note: purposely don't await since the next dialog will properly render the spinner
               noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-              this.props.actions.dialogs.open.trigger({
+              this.props.stores.uiDialogs.open({
                 // dialog: WithdrawalTxDialogContainer,
                 dialog: WithdrawRewardsDialog,
               });

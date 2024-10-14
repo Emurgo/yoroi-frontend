@@ -240,7 +240,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
             noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-            this.props.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
+            this.props.stores.uiDialogs.open({ dialog: WithdrawalTxDialogContainer });
           }}
         />
       );
@@ -300,20 +300,20 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         )}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
-          this.props.actions.dialogs.open.trigger({
+          this.props.stores.uiDialogs.open({
             dialog: UnmangleTxDialogContainer,
           })
         }
         totalSum={balance == null ? undefined : balance.joinAddCopy(rewardBalance)}
         totalRewards={showRewardAmount ? rewardBalance : undefined}
         openLearnMore={() =>
-          this.props.actions.dialogs.open.trigger({
+          this.props.stores.uiDialogs.open({
             dialog: LessThanExpectedDialog,
           })
         }
         withdrawRewards={
           stakeRegistered ? () => {
-            this.props.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+            this.props.stores.uiDialogs.open({ dialog: DeregisterDialogContainer });
           } : undefined
         }
         unitOfAccount={_entry => {

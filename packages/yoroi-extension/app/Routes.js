@@ -538,7 +538,7 @@ export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node)
 
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
-  const { stores, actions } = governanceProps;
+  const { stores } = governanceProps;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
@@ -551,7 +551,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
       txDelegationResult={delegationTxResult}
       txDelegationError={delegationTxError}
       tokenInfo={stores.tokenInfoStore.tokenInfo}
-      triggerBuySellAdaDialog={() => actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+      triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>

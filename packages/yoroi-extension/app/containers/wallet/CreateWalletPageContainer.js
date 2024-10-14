@@ -25,7 +25,7 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
           createWallet={request => stores.substores.ada.wallets.createWallet(request)}
           setSelectedNetwork={stores.profile.setSelectedNetwork}
           selectedNetwork={stores.profile.selectedNetwork}
-          openDialog={dialog => this.props.actions.dialogs.open.trigger({ dialog })}
+          openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
           closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
           goToRoute={route => stores.app.goToRoute({ route })}

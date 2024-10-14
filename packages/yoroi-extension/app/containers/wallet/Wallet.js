@@ -33,7 +33,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
 
   componentDidMount() {
     if (!this.props.stores.profile.isRevampAnnounced)
-      this.props.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
+      this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
   }
 
   checkRoute(): void | string {

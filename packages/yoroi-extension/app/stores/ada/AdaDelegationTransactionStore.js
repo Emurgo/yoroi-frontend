@@ -179,7 +179,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       },
       refreshWallet,
     });
-    if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
+    if (request.dialog) this.stores.uiDialogs.open({ dialog: request.dialog });
   };
 
   complete: void => void = () => {

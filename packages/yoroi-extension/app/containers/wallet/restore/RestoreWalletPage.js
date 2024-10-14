@@ -24,7 +24,7 @@ export default class RestoreWalletPage extends Component<StoresAndActionsProps> 
           restoreWallet={stores.substores.ada.walletRestore.restoreWallet}
           stores={stores}
           actions={actions}
-          openDialog={dialog => this.props.actions.dialogs.open.trigger({ dialog })}
+          openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
           closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
           isDialogOpen={stores.uiDialogs.isOpen}
         />

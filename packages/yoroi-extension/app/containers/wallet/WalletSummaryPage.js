@@ -187,7 +187,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
           shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
             <WalletEmptyBanner
-              onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })}/>
+              onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })}/>
           }
         />
 

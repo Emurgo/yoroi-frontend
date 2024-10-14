@@ -35,7 +35,7 @@ export default class SupportSettingsPage extends Component<StoresAndActionsProps
     }
     // TODO: don't show if not in "Advanced"
     // has public key -> prompt if they want to include it in the logs
-    this.props.actions.dialogs.open.trigger({ dialog: IncludePublicKeyDialog });
+    this.props.stores.uiDialogs.open({ dialog: IncludePublicKeyDialog });
   };
 
   getDialog: void => Node = () => {

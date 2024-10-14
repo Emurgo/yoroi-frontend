@@ -27,7 +27,7 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
 
@@ -73,7 +73,7 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
             openDialog={() =>
-              actions.dialogs.open.trigger({
+              stores.uiDialogs.open({
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
@@ -81,20 +81,20 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
         )}
         <ResyncBlock
           openDialog={() =>
-            actions.dialogs.open.trigger({
+            stores.uiDialogs.open({
               dialog: ResyncWalletDialogContainer,
             })
           }
         />
         <ExportWallet
-          openDialog={() => actions.dialogs.open.trigger({
+          openDialog={() => stores.uiDialogs.open({
             dialog: ExportWalletDialogContainer,
           })}
         />
         <RemoveWallet
           walletName={selectedWalletName}
           openDialog={() =>
-            actions.dialogs.open.trigger({
+            stores.uiDialogs.open({
               dialog: RemoveWalletDialogContainer,
             })
           }

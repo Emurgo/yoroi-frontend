@@ -41,7 +41,7 @@ export default class NavBarContainer extends Component<{| ...StoresAndActionsPro
 
   openDialogWrapper: any => void = dialog => {
     this.props.stores.app.goToRoute({ route: ROUTES.MY_WALLETS });
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   render(): Node {

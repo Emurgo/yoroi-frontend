@@ -37,7 +37,6 @@ export default class UiDialogsStore<
 
   setup(): void {
     super.setup();
-    this.actions.dialogs.open.listen(this._onOpen);
     this.actions.dialogs.closeActiveDialog.listen(this._onClose);
   }
 
@@ -81,7 +80,7 @@ export default class UiDialogsStore<
   @action pop: void => void = () => {
     this.dialogList.pop();
   }
-  @action _onOpen: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
+  @action open: {| dialog : any, params?: {...} |} => void = ({ dialog, params }) => {
     this.reset();
     this.push({
       dialog,

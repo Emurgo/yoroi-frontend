@@ -65,7 +65,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
   };
 
   start: void => void = () => {
-    this.props.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
+    this.props.stores.uiDialogs.open({ dialog: VotingRegistrationDialogContainer });
   };
 
   render(): Node {

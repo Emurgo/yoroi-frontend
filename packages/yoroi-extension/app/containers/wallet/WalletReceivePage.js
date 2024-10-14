@@ -60,7 +60,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver != null) {
       // <TODO:IMPROVE> there's gotta be a better way to render loading while waiting for a request result
-      this.props.actions.dialogs.open.trigger({
+      this.props.stores.uiDialogs.open({
         dialog: LoadingSpinner,
       });
       await stores.addresses.createAddress(publicDeriver);
@@ -174,7 +174,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           <MangledHeader
             hasMangledUtxo={canUnmangle}
             onClick={() =>
-              this.props.actions.dialogs.open.trigger({
+              this.props.stores.uiDialogs.open({
                 dialog: UnmangleTxDialogContainer,
               })
             }
@@ -371,21 +371,21 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
   };
 
   openVerifyAddressDialog: void => void = (): void => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.open({ dialog: VerifyAddressDialog });
   };
 
   openURIGenerateDialog: (address: string, amount?: string) => void = (address, amount) => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({
+    const { stores } = this.props;
+    stores.uiDialogs.open({
       dialog: URIGenerateDialog,
       params: { address, amount },
     });
   };
 
   generateURI: (string, BigNumber) => void = (address, amount) => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({
+    const { stores } = this.props;
+    stores.uiDialogs.open({
       dialog: URIDisplayDialog,
       params: { address, amount: amount.toString() },
     });
