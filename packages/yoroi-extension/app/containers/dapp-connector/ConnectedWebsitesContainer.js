@@ -33,8 +33,8 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresAndA
         route: ROUTES.MY_WALLETS,
       });
     }
-    await this.props.actions.connector.refreshActiveSites.trigger();
-    await this.props.actions.connector.getConnectorWhitelist.trigger();
+    await this.props.stores.connector.refreshActiveSites();
+    await this.props.stores.connector.getConnectorWhitelist();
   }
 
   onRemoveWallet: ({| url: ?string |}) => void = ({ url }) => {

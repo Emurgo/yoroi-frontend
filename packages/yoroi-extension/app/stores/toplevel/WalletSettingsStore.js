@@ -122,7 +122,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
     // ==================== Disconnect related dApps ====================
-    await this.actions.connector.getConnectorWhitelist.trigger();
+    await this.stores.connector.getConnectorWhitelist();
     const connectorWhitelist = stores.connector.currentConnectorWhitelist;
     const connectedDapps = connectorWhitelist.filter(
       dapp => dapp.publicDeriverId === request.publicDeriverId

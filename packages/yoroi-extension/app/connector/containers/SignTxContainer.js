@@ -26,11 +26,12 @@ export default class SignTxContainer extends Component<
 
   onUnload: (SyntheticEvent<>) => void = ev => {
     ev.preventDefault();
-    this.props.actions.connector.cancelSignInTx.trigger();
+    this.props.stores.connector.cancelSignInTx();
   };
 
   componentDidMount() {
-    this.props.actions.connector.refreshWallets.trigger();
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.connector.refreshWallets();
     window.addEventListener('beforeunload', this.onUnload);
     window.addEventListener('unload', this.onUnload);
   }
@@ -54,12 +55,13 @@ export default class SignTxContainer extends Component<
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
 
-    await this.props.actions.connector.confirmSignInTx.trigger(password);
+    await this.props.stores.connector.confirmSignInTx(password);
   };
+
   onCancel: () => void = () => {
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
-    this.props.actions.connector.cancelSignInTx.trigger();
+    this.props.stores.connector.cancelSignInTx();
     setTimeout(() => { window.close(); }, 100);
   };
 
