@@ -15,7 +15,7 @@ export default class ExternalStorageSettingsPage extends Component<StoresAndActi
   };
 
   onDisconnect: void => Promise<void> = async () => {
-    await this.props.actions.memos.unsetExternalStorageProvider.trigger();
+    await this.props.stores.memos.unsetExternalStorageProvider();
   };
 
   render(): Node {

@@ -379,7 +379,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined && request.plateTextPart) {
           try {
-            await this.actions.memos.saveTxMemo.trigger({
+            await this.stores.memos.saveTxMemo({
               publicDeriverId: request.publicDeriverId,
               plateTextPart: request.plateTextPart,
               memo: {

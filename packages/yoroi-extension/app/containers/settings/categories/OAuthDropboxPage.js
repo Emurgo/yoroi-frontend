@@ -7,7 +7,6 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
 
 type Props = {|
-  ...StoresAndActionsProps,
   match: {|
     params: {|
       token: string,
@@ -19,10 +18,10 @@ type Props = {|
 |};
 
 @observer
-export default class OAuthDropboxPage extends Component<Props> {
+export default class OAuthDropboxPage extends Component<{| ...Props, ...StoresAndActionsProps |}> {
 
   onLoad: string => Promise<void> = async (token) => {
-    await this.props.actions.memos.updateExternalStorageProvider.trigger({
+    await this.props.stores.memos.setExternalStorageProvider({
       provider: ExternalStorageList.DROPBOX,
       token,
     });

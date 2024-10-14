@@ -91,7 +91,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   @action
   toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
-    this.props.actions.memos.closeMemoDialog.trigger();
+    this.props.stores.memos.closeMemoDialog();
   };
 
   openDialog: any => void = dialog => {
@@ -407,12 +407,12 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   };
 
   noCloudWarningDialog: void => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     return (
       <MemoNoExternalStorageDialog
-        onCancel={actions.memos.closeMemoDialog.trigger}
+        onCancel={stores.memos.closeMemoDialog}
         addExternal={() => {
-          actions.memos.closeMemoDialog.trigger();
+          stores.memos.closeMemoDialog();
           stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
         }}
         onAcknowledge={() => {

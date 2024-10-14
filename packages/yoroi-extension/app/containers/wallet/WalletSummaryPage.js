@@ -105,7 +105,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               this.showMemoDialog({
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
-                  actions.memos.selectTransaction.trigger({ tx: transaction });
+                  stores.memos.selectTransaction({ tx: transaction });
                   actions.dialogs.push.trigger({ dialog: AddMemoDialog });
                 },
               })
@@ -114,7 +114,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               this.showMemoDialog({
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
-                  actions.memos.selectTransaction.trigger({ tx: transaction });
+                  stores.memos.selectTransaction({ tx: transaction });
                   actions.dialogs.push.trigger({ dialog: EditMemoDialog });
                 },
               })
@@ -203,9 +203,9 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               return memos.selectedTransaction;
             })()}
             error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             onSubmit={values => {
-              return actions.memos.saveTxMemo.trigger(values);
+              return stores.memos.saveTxMemo(values);
             }}
             plateTextPart={selected.plate.TextPart}
           />
@@ -213,9 +213,9 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
 
         {uiDialogs.isOpen(MemoNoExternalStorageDialog) ? (
           <MemoNoExternalStorageDialog
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             addExternal={() => {
-              actions.memos.closeMemoDialog.trigger();
+              stores.memos.closeMemoDialog();
               stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
@@ -235,10 +235,10 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               return memo;
             })()}
             error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             onClickDelete={this.openDeleteMemoDialog}
             onSubmit={values => {
-              return actions.memos.updateTxMemo.trigger(values);
+              return stores.memos.updateTxMemo(values);
             }}
             plateTextPart={selected.plate.TextPart}
           />
@@ -252,11 +252,11 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
             })()}
             error={memos.error}
             onCancel={() => {
-              actions.memos.closeMemoDialog.trigger();
+              stores.memos.closeMemoDialog();
             }}
-            onClose={actions.memos.closeMemoDialog.trigger}
+            onClose={stores.memos.closeMemoDialog}
             onDelete={txHash => {
-              return actions.memos.deleteTxMemo.trigger({
+              return stores.memos.deleteTxMemo({
                 publicDeriverId: selected.publicDeriverId,
                 plateTextPart: selected.plate.TextPart,
                 txHash,
