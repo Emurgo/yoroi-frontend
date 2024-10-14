@@ -16,12 +16,11 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 declare var CONFIG: ConfigType;
 
 type Props = {|
-  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
 @observer
-export default class UnmangleTxDialogContainer extends Component<Props> {
+export default class UnmangleTxDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -47,7 +46,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       selected.networkId,
     );
     // note: don't await
-    this.props.actions.txBuilderActions.initialize.trigger({
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.transactionBuilderStore.initializeTx({
       publicDeriver: selected,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -76,7 +76,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         transactionRequest={{
           error: txBuilder.setupSelfTx.error,
           result: txBuilder.tentativeTx,
-          reset: this.props.actions.txBuilderActions.reset.trigger,
+          reset: this.props.stores.transactionBuilderStore.reset,
         }}
         toTransferTx={tentativeTx => ({
           recoveredBalance: tentativeTx.totalInput(),

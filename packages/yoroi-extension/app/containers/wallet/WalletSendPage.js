@@ -137,7 +137,6 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
     }
 
     const { hasAnyPending } = stores.transactions;
-    const { txBuilderActions } = this.props.actions;
 
     // disallow sending when pending tx exists
     if (
@@ -171,16 +170,16 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           selectedToken={transactionBuilderStore.selectedToken}
           defaultToken={defaultToken}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          onSubmit={txBuilderActions.updateTentativeTx.trigger}
+          onSubmit={transactionBuilderStore.updateTentativeTx}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
-          updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
-          updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-          updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
+          updateReceiver={(addr: void | string) => transactionBuilderStore.updateReceiver(addr)}
+          updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
+          updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
           fee={transactionBuilderStore.fee}
           isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
-          reset={txBuilderActions.reset.trigger}
+          reset={transactionBuilderStore.reset}
           error={transactionBuilderStore.createUnsignedTx.error}
           // Min ADA for all tokens that is already included in the tx
           minAda={transactionBuilderStore.minAda}
@@ -188,15 +187,15 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           resetUriParams={stores.loading.resetUriParams}
           memo={transactionBuilderStore.memo}
           showMemo={this.showMemo}
-          updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
+          updateMemo={(content: void | string) => transactionBuilderStore.updateMemo(content)}
           onAddMemo={() =>
             this.showMemoDialog({
               dialog: MemoNoExternalStorageDialog,
               continuation: this.toggleShowMemo,
             })}
           spendableBalance={stores.transactions.balance}
-          onAddToken={txBuilderActions.addToken.trigger}
-          onRemoveTokens={txBuilderActions.removeTokens.trigger}
+          onAddToken={transactionBuilderStore.addToken}
+          onRemoveTokens={transactionBuilderStore.removeTokens}
           plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
           isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
           openDialog={this.openDialog}
@@ -205,7 +204,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
           unitOfAccountSetting={stores.profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-          calculateMaxAmount={txBuilderActions.calculateMaxAmount.trigger}
+          calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
           maxSendableAmount={transactionBuilderStore.maxSendableAmount}
           signRequest={transactionBuilderStore.tentativeTx}
           staleTx={transactionBuilderStore.txMismatch}
@@ -477,16 +476,15 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
     if (!selected) throw new Error(`Active wallet required for ${nameof(AddNFTDialog)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
-    const { txBuilderActions } = this.props.actions;
 
     return (
       <AddNFTDialog
         onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
-        onAddToken={txBuilderActions.addToken.trigger}
-        onRemoveTokens={txBuilderActions.removeTokens.trigger}
+        updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
+        onAddToken={transactionBuilderStore.addToken}
+        onRemoveTokens={transactionBuilderStore.removeTokens}
         selectedNetwork={getNetworkById(selected.networkId)}
         calculateMinAda={this.calculateMinAda}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
@@ -500,20 +498,19 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
     if (!selected) throw new Error(`Active wallet required for ${nameof(AddTokenDialog)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
-    const { txBuilderActions } = this.props.actions;
 
     return (
       <AddTokenDialog
         onClose={() => {
-          txBuilderActions.deselectToken.trigger();
+          transactionBuilderStore.deselectToken();
           this.props.actions.dialogs.closeActiveDialog.trigger();
         }}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
+        updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
         calculateMinAda={this.calculateMinAda}
-        onAddToken={txBuilderActions.addToken.trigger}
-        onRemoveTokens={txBuilderActions.removeTokens.trigger}
+        onAddToken={transactionBuilderStore.addToken}
+        onRemoveTokens={transactionBuilderStore.removeTokens}
         shouldAddMoreTokens={this.shouldAddMoreTokens}
         plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
         selectedNetwork={getNetworkById(selected.networkId)}

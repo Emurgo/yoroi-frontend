@@ -53,6 +53,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable tentativeTx: null | ISignRequest<any>;
 
   @observable filter: ElementOf<IGetAllUtxosResponse> => boolean;
+
+  /**
+   * note: unused for now, as we don't provide an option to send custom meta
+   */
   @observable metadata: Array<TransactionMetadata> | void;
 
   /** tracks mismatch between `plannedTx` and `tentativeTx` */
@@ -74,21 +78,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   setup(): void {
     super.setup();
-    this._reset();
-    const actions = this.actions.txBuilderActions;
-    actions.updateReceiver.listen(this._updateReceiver);
-    actions.setFilter.listen(this._setFilter);
-    actions.updateAmount.listen(this._updateAmount);
-    actions.updateMemo.listen(this._updateMemo);
-    actions.addToken.listen(this._addToken);
-    actions.calculateMaxAmount.listen(this._maxSendableAmount)
-    actions.deselectToken.listen(this._deselectToken)
-    actions.removeTokens.listen(this._removeTokens);
-    actions.updateTentativeTx.listen(this._updateTentativeTx);
-    actions.updateSendAllStatus.listen(this._updateSendAllStatus);
-    actions.initialize.listen(this._initialize);
-    actions.reset.listen(this._reset);
-    actions.updateMetadata.listen(this._updateMetadata);
+    this.reset();
   }
 
   // =============
@@ -190,7 +180,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       this._updateTxBuilder()
 
       if (this.plannedTxInfoMap.length !== 0 && this.shouldSendMax === true) {
-        this._maxSendableAmount()
+        this.calculateMaxAmount()
       }
     },
   )
@@ -343,9 +333,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _maxSendableAmount: void => Promise<void> = async () =>  {
+  calculateMaxAmount: void => Promise<void> = async () =>  {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this._maxSendableAmount)} requires wallet to be selected.`);
+    if (!publicDeriver) throw new Error(`${nameof(this.calculateMaxAmount)} requires wallet to be selected.`);
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(publicDeriver).requests;
 
@@ -367,29 +357,29 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   // ===========
 
   @action
-  _updateSendAllStatus: (void | boolean) => void = (status) => {
-    this._updateAmount(undefined, status || false);
+  updateSendAllStatus: (void | boolean) => void = (status) => {
+    this.updateAmount(undefined, status || false);
   }
 
   /** Should only set to valid address or undefined */
   @action
-  _updateReceiver: (void | string) => void = (receiver) => {
+  updateReceiver: (void | string) => void = (receiver) => {
     this.receiver = receiver ?? null;
   }
 
   @action
-  _setFilter: (ElementOf<IGetAllUtxosResponse> => boolean) => void = (filter) => {
+  setFilter: (ElementOf<IGetAllUtxosResponse> => boolean) => void = (filter) => {
     this.filter = filter;
   }
 
   /** Should only set to valid amount or undefined */
   @action
-  _updateAmount: (
+  updateAmount: (
     value: ?BigNumber,
     shouldSendAll?: boolean,
   ) => void = (value, shouldSendAll) => {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this._updateAmount)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this.updateAmount)} requires wallet to be selected`);
     const selectedToken = (
       this.selectedToken ?? this.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
     );
@@ -410,23 +400,18 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _updateMetadata: (Array<TransactionMetadata> | void) => void = (metadata) => {
-    this.metadata = metadata;
-  }
-
-  @action
-  _updateMemo: (void | string) => void = (content) => {
+  updateMemo: (void | string) => void = (content) => {
     this.memo = content;
   }
 
   @action
-  _addToken: ({|
+  addToken: ({|
     token: void | $ReadOnly<TokenRow>,
     shouldSendAll: void | boolean,
     shouldReset?: boolean,
   |}) => void = ({ token, shouldReset, shouldSendAll }) => {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this._addToken)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this.addToken)} requires wallet to be selected`);
 
     const selectedToken = (
       token ?? this.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
@@ -452,10 +437,10 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _removeTokens: (tokens: Array<$ReadOnly<TokenRow>>) => void = (tokens) => {
+  removeTokens: (tokens: Array<$ReadOnly<TokenRow>>) => void = (tokens) => {
     // Todo: Fix removing the default asset
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this._removeTokens)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this.removeTokens)} requires wallet to be selected`);
 
     const tokenIds = new Set();
     tokens.forEach(token => tokenIds.add(token.Identifier))
@@ -465,16 +450,16 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     );
 
     // Deselect the token
-    this._deselectToken()
+    this.deselectToken()
   }
 
   @action
-  _deselectToken: void => void = () => {
+  deselectToken: void => void = () => {
     this.selectedToken = undefined;
   }
 
   @action
-  _updateTentativeTx: void => void = () => {
+  updateTentativeTx: void => void = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
       return;
@@ -483,12 +468,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @action
-  _initialize: SetupSelfTxRequest => Promise<void> = async (request) => {
+  initializeTx: SetupSelfTxRequest => Promise<void> = async (request) => {
     await this.setupSelfTx.execute(request);
   }
 
   @action
-  _reset: void => void = () => {
+  reset: void => void = () => {
     this.plannedTxInfoMap = [];
     this.memo = undefined;
     this.selectedToken = undefined;
@@ -541,16 +526,16 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
-    this._setFilter(request.filter);
+    this.setFilter(request.filter);
     const nextUnusedInternal = request.publicDeriver.receiveAddress;
-    this._updateReceiver(nextUnusedInternal.addr.Hash);
+    this.updateReceiver(nextUnusedInternal.addr.Hash);
     // Todo: update shouldSendAll
     if (this.shouldSendAll === false) {
-      this._updateSendAllStatus(true);
+      this.updateSendAllStatus(true);
     }
 
     await this._updateTxBuilder();
     this._updatePlannedTx();
-    this._updateTentativeTx();
+    this.updateTentativeTx();
   }
 }
