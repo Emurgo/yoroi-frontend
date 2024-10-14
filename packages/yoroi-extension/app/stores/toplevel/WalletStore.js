@@ -180,11 +180,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
     runInAction(() => {
       this.wallets.push(newWallet);
+      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this._setActiveWallet({
         publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   };
@@ -284,7 +284,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.actions.profile.setSelectedNetwork.trigger(
       getNetworkById(this.wallets[walletIndex].networkId)
     );
-    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex);
+    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex)
+      // This flag is used to determine whether to send the active-wallet-open event to Bring's content script.
+      // Don't send it here when we are creating a new wallet because the wallet hasn't been synced.
+      && !this.isInitialSyncing(publicDeriverId);
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
     // Cache select wallet

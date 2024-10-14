@@ -13,7 +13,7 @@ import { getCardanoStateFetcher } from '../../utils';
 import LocalStorageApi, {
   loadSubmittedTransactions, persistSubmittedTransactions
 } from '../../../../../app/api/localStorage';
-import { getPublicDeriverById } from './utils';
+import { getPublicDeriverById, notifyAllTabsActiveWalletOpen } from './utils';
 import { removePublicDeriver } from '../../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import {
@@ -56,15 +56,18 @@ export const CreateWallet: HandlerType<CreateWalletRequest, CreateWalletResponse
       walletPassword: request.walletPassword,
       accountIndex: request.accountIndex,
     });
+    const publicDeriverId = publicDerivers[0].getPublicDeriverId();
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
       params: {
         eventType: 'new',
-        publicDeriverId: publicDerivers[0].getPublicDeriverId(),
+        publicDeriverId,
       }
     });
-    syncWallet(publicDerivers[0], 'new wallet', 1);
+    syncWallet(publicDerivers[0], 'new wallet', 1).then(() => {
+      notifyAllTabsActiveWalletOpen(publicDeriverId);
+    });
     return await getPlaceHolderWalletState(publicDerivers[0]);
   },
 });
@@ -100,15 +103,18 @@ export const CreateHardwareWallet: HandlerType<
       checkAddressesInUse: stateFetcher.checkAddressesInUse,
       addressing: request.addressing,
     });
+    const publicDeriverId = publicDeriver.getPublicDeriverId();
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
       params: {
         eventType: 'new',
-        publicDeriverId: publicDeriver.getPublicDeriverId(),
+        publicDeriverId,
       }
     });
-    syncWallet(publicDeriver, 'new wallet', 1);
+    syncWallet(publicDeriver, 'new wallet', 1).then(() => {
+      notifyAllTabsActiveWalletOpen(publicDeriverId);
+    });;
 
     return await getPlaceHolderWalletState(publicDeriver);
   },
