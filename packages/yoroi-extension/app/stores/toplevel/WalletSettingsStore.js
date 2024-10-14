@@ -129,7 +129,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     );
 
     for (const dapp of connectedDapps) {
-      await this.actions.connector.removeWalletFromWhitelist.trigger({
+      await this.stores.connector.removeWalletFromWhitelist1({
         url: dapp.url,
       });
     }

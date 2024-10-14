@@ -41,7 +41,8 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresAndA
     if (url == null) {
       throw new Error(`Removing a wallet from whitelist but there's no url or protocol`);
     }
-    this.props.actions.connector.removeWalletFromWhitelist.trigger({
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.connector.removeWalletFromWhitelist1({
       url,
     });
   };

@@ -42,8 +42,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.getConnectorWhitelist();
+    noop(this.getConnectorWhitelist());
     noop(this.currentConnectorWhitelist);
   }
 
@@ -62,7 +61,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelistRequest.execute();
   };
-  _removeWalletFromWhitelist: (
+  removeWalletFromWhitelist1: (
     request: {| url: string |}
   ) => Promise<void> = async request => {
     const filter = this.currentConnectorWhitelist.filter(
