@@ -1,5 +1,6 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
+import globalMessages from '../../../../../i18n/global-messages';
 import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
@@ -79,6 +80,10 @@ export const messages = Object.freeze(
     send: {
       id: 'portfolio.button.send',
       defaultMessage: '!!!Send',
+    },
+    buyAda: {
+      id: 'button.buyAda',
+      defaultMessage: '!!!button.buyAda',
     },
     receive: {
       id: 'portfolio.button.receive',
@@ -310,12 +315,11 @@ export const messages = Object.freeze(
     },
     welcomeBannerTitle: {
       id: 'portfolio.welcomeBanner.title',
-      defaultMessage: '!!!Welcome to Yoroi',
+      defaultMessage: '!!!Start your crypto journey',
     },
     welcomeBannerDesc: {
       id: 'portfolio.welcomeBanner.description',
-      defaultMessage:
-        '!!!With new features and upgraded performance, transactions can be done faster and more securely than ever before.',
+      defaultMessage: '!!!Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities',
     },
   })
 );
@@ -341,6 +345,7 @@ export const useStrings = () => {
     swap: intl.formatMessage(messages.swap),
     send: intl.formatMessage(messages.send),
     receive: intl.formatMessage(messages.receive),
+    buyAda: intl.formatMessage(globalMessages.buyAda),
     liquidityPool: intl.formatMessage(messages.liquidityPool),
     openOrders: intl.formatMessage(messages.openOrders),
     lendAndBorrow: intl.formatMessage(messages.lendAndBorrow),

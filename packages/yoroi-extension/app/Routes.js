@@ -28,10 +28,14 @@ import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
+// GOLABL Context
+// $FlowIgnore: suppressing this error
+import { CurrencyProvider } from './UI/context/CurrencyContext';
+
 import PagePreparation from './components/page-preparation/PagePreparation';
 // New UI pages
 // $FlowIgnore: suppressing this error
-import { createCurrrentWalletInfo } from './UI/features/governace/common/helpers';
+import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
@@ -197,7 +201,6 @@ declare var CONFIG: ConfigType;
 
 export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
   const queryClient = new QueryClient();
-
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
@@ -501,6 +504,7 @@ const GovernanceSubpages = (stores, actions) => (
 
 export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
   // const queryClient = new QueryClient();
+
   const loader = (
     <FullscreenLayout bottomPadding={0}>
       <Stack alignItems="center" justifyContent="center" height="50vh">
@@ -572,15 +576,30 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
       txDelegationError={delegationTxError}
       tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
       triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+      getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>
   );
 }
 export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
+
+  const openDialogWrapper = (dialog): void => {
+    portfolioProps.actions.dialogs.open.trigger({ dialog });
+  };
+
   return (
-    <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </PortfolioContextProvider>
+    <CurrencyProvider currency={portfolioProps.stores.profile.unitOfAccount.currency || 'USD'}>
+      <PortfolioContextProvider
+        settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}
+        currentWallet={currentWalletInfo}
+        openDialogWrapper={openDialogWrapper}
+      >
+        <Suspense fallback={null} settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
+          {children}
+        </Suspense>
+      </PortfolioContextProvider>
+    </CurrencyProvider>
   );
 }

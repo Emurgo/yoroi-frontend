@@ -1,5 +1,5 @@
-import { useHistory } from 'react-router-dom';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import { ROUTES } from '../../../../../routes-config';
 
 export const useNavigateTo = () => {
@@ -9,7 +9,7 @@ export const useNavigateTo = () => {
     portfolio: () => history.push(ROUTES.PORTFOLIO.ROOT),
     portfolioDapps: () => history.push(ROUTES.PORTFOLIO.DAPPS),
     portfolioDetail: (tokenId: string) => history.push(`${ROUTES.PORTFOLIO.ROOT}/details/${tokenId}`),
-    swapPage: () => history.push(ROUTES.SWAP.ROOT),
+    swapPage: (tokenId?: string) => history.push(`${ROUTES.SWAP.ROOT}?tokenId=${tokenId}`),
     sendPage: () => history.push(ROUTES.WALLETS.SEND),
     receivePage: () => history.push(ROUTES.WALLETS.RECEIVE.ROOT),
   }).current;
