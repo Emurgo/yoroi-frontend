@@ -85,7 +85,7 @@ export default class AmountDisplay extends Component<Props> {
           </Typography>
         )}
         {showFiat === true && (
-          <Typography mb="5px" color="ds.text_gray_medium" fontSize="12px" id={id + '-availableFiatBalance-text'}>
+          <Typography mb="5px" color="ds.text_gray_low" fontSize="12px" lineHeight="16px" id={id + '-availableFiatBalance-text'}>
             {fiatDisplay || '-'}&nbsp;{currency || 'USD'}
           </Typography>
         )}
