@@ -16,6 +16,7 @@ import AmountDisplay from '../common/AmountDisplay';
 import { maybe } from '../../coreUtils';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import { Box, Typography, styled } from '@mui/material';
+import { truncateLongName } from '../../utils/formatters';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -154,14 +155,14 @@ export default class WalletCard extends Component<Props> {
                   {/* Wallet icon, wallet name, wallet plate */}
                   <Box display="flex" gap="8px">
                     {iconComponent}
-                    <Box>
+                    <Box maxWidth="112px" width="112px">
                       <Typography
                         id={walletNameId}
                         variant="body2"
                         color="ds.text_gray_medium"
                         fontWeight={500}
                       >
-                        {this.props.name}
+                        {truncateLongName(this.props.name)}
                       </Typography>
                       <Typography variant="caption1" color="ds.text_gray_low">
                         {walletPlate}
