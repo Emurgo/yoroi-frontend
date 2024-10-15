@@ -31,17 +31,16 @@ const initializeYoroi: void => Promise<void> = async () => {
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = await createStores(api, actions, router);
+  const stores = await createStores(api, router);
 
   Logger.debug(`[yoroi] stores created`);
 
   window.yoroi = {
     api,
-    actions,
     translations,
     stores,
     reset: action(async () => {
-      await createStores(api, actions, router);
+      await createStores(api, router);
     })
   };
 
