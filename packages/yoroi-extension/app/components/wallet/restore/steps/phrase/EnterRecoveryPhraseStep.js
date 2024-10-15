@@ -116,7 +116,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box mt="10px">
           <StepController
-            actions={[
+            stepActions={[
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,
