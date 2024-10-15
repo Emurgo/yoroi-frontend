@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -24,49 +23,50 @@ import globalMessages from '../../i18n/global-messages';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class MyWalletsPage extends Component<StoresAndActionsProps> {
+export default class MyWalletsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   openDialogWrapper: any => void = dialog => {
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   handleWalletNavItemClick: number => void = (
     publicDeriverId
   ) => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.WALLETS.ROOT,
       publicDeriverId,
     });
   };
 
   openToSettings: (number) => void = publicDeriverId => {
-    this.props.actions.wallets.setActiveWallet.trigger({
+    this.props.stores.wallets.setActiveWallet({
       publicDeriverId
     });
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.SETTINGS.WALLET,
     });
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
 
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const { wallets } = this.props.stores.wallets;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
+    const { wallets } = stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
 
     const navbarElementRevamp = (
@@ -85,7 +85,7 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={navbarElementRevamp}
         showInContainer

@@ -43,7 +43,7 @@ export default class SuccessPage extends Component<Props> {
     return (
       <Dialog
         title=""
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={this.props.closeInfo ? this.props.closeInfo.onClose : undefined}
         className={styles.dialog}

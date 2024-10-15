@@ -4,7 +4,6 @@ import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -15,6 +14,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
+import type { StoresProps } from '../../stores';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
@@ -23,7 +23,7 @@ type Props = {|
   +children?: Node,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class Transfer extends Component<AllProps> {
@@ -36,11 +36,10 @@ export default class Transfer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const navbar = (
       <NavBarContainer
-        actions={actions}
         stores={stores}
         title={
           <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
@@ -49,7 +48,7 @@ export default class Transfer extends Component<AllProps> {
     );
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         navbar={navbar}
         sidebar={sidebarContainer}
         showInContainer
@@ -60,7 +59,7 @@ export default class Transfer extends Component<AllProps> {
   }
 
   getContent: void => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const wallet = this.props.stores.wallets.selected;
     if (wallet == null) {
       return <NoWalletMessage />;
@@ -75,7 +74,6 @@ export default class Transfer extends Component<AllProps> {
         <BackgroundColoredLayout>
           <Suspense fallback={null}>
             <WalletTransferPage
-              actions={actions}
               stores={stores}
               publicDeriver={wallet}
             />

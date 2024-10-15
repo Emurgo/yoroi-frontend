@@ -17,7 +17,6 @@ import { StepState } from '../../components/widgets/ProgressSteps';
 import { Logger, stringifyError } from '../../utils/logging';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
@@ -30,7 +29,7 @@ type TrezorConnectionResponse = {|
 
 
 export default class TrezorConnectStore
-  extends Store<StoresMap, ActionsMap>
+  extends Store<StoresMap>
   implements HWConnectStoreTypes<TrezorConnectionResponse> {
 
   // =================== VIEW RELATED =================== //
@@ -72,14 +71,6 @@ export default class TrezorConnectStore
   setup(): void {
     super.setup();
     this._reset();
-    const trezorConnectAction = this.actions.ada.trezorConnect;
-    trezorConnectAction.init.listen(this._init);
-    trezorConnectAction.cancel.listen(this._cancel);
-    trezorConnectAction.submitCheck.listen(this._submitCheck);
-    trezorConnectAction.goBackToCheck.listen(this._goBackToCheck);
-    trezorConnectAction.submitConnect.listen(this._submitConnect);
-    trezorConnectAction.submitSave.listen(this._submitSave);
-
     try {
       const trezorManifest = getTrezorManifest();
       wrapWithoutFrame(trezor => trezor.manifest(trezorManifest));
@@ -90,8 +81,8 @@ export default class TrezorConnectStore
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
-  _init: void => void = () => {
-    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._init)} called`);
+  init: void => void = () => {
+    Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this.init)} called`);
   }
 
   teardown(): void {
@@ -109,13 +100,13 @@ export default class TrezorConnectStore
     this.trezorEventDevice = undefined;
   };
 
-  @action _cancel: void => void = () => {
+  @action cancel: void => void = () => {
     this.teardown();
   };
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck: void => void = () => {
+  @action submitCheck: void => void = () => {
     this.error = undefined;
     this.trezorEventDevice = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
@@ -125,14 +116,14 @@ export default class TrezorConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck: void => void = () => {
+  @action goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect: void => Promise<void> = async () => {
+  @action submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
@@ -268,7 +259,7 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave: string => Promise<void> = async (
+  @action submitSave: string => Promise<void> = async (
     walletName,
   ) => {
     this.error = null;
@@ -358,14 +349,15 @@ export default class TrezorConnectStore
   _onSaveSuccess: (WalletState) => Promise<void> = async (wallet) => {
     // close the active dialog
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
 
-    await this.stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    const { stores } = this;
+    await stores.wallets.addHwWallet(wallet);
+    stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
+    stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
-    this.stores.wallets.showTrezorTWalletIntegratedNotification();
+    stores.wallets.showTrezorTWalletIntegratedNotification();
 
     this.teardown();
     Logger.info('SUCCESS: Trezor Connected Wallet created and loaded');

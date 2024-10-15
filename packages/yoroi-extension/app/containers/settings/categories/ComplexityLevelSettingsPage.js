@@ -4,12 +4,12 @@ import { observer } from 'mobx-react';
 import ComplexityLevel from '../../../components/profile/complexity-level/ComplexityLevelForm';
 import { useTheme } from '@mui/material';
 
-const ComplexityLevelSettingsPage: any = observer(({ stores, actions }) => {
+const ComplexityLevelSettingsPage: any = observer(({ stores }) => {
   const { name } = useTheme();
   return (
     <ComplexityLevel
       complexityLevel={stores.profile.selectedComplexityLevel}
-      onSubmit={actions.profile.selectComplexityLevel.trigger}
+      onSubmit={stores.profile.selectComplexityLevel}
       error={stores.profile.setComplexityLevelRequest.error}
       baseTheme={name}
     />

@@ -28,6 +28,7 @@ export const environment = ((
     branch: process.env.BRANCH || '',
     isDev: () => (process.env.NODE_ENV === 'development'),
     isNightly: () => (process.env.NIGHTLY == null ? false : JSON.parse(process.env.NIGHTLY)),
+    // <TODO:CHECK> light mode legacy
     isLight: Boolean(process.env.IS_LIGHT),
     isTest: () => {
       if (typeof CONFIG === 'undefined') {

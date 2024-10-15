@@ -11,7 +11,6 @@ import { defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/ne
 import type {
   DefaultTokenEntry,
 } from '../../api/common/lib/MultiToken';
-import type WalletsActions from '../../actions/wallet-actions';
 import type TransactionsStore from './TransactionsStore';
 import type { IFetcher as IFetcherCardano } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import { getCardanoAssets } from '../../api/thunk';
@@ -40,9 +39,8 @@ export default class TokenInfoStore<
       ...
     },
     ...
-  },
-  ActionsMapType: { +wallets?: WalletsActions, ... },
-> extends Store<StoresMapType, ActionsMapType> {
+  }
+> extends Store<StoresMapType> {
   @observable tokenInfo: TokenInfoMap;
 
   setup(): void {

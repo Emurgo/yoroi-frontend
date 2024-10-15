@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
@@ -17,20 +16,22 @@ import AddCollateralPage from '../components/signin/AddCollateralPage';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ConnectorStoresProps } from '../stores';
 
 @observer
 export default class SignTxContainer extends Component<
-  ConnectorStoresAndActionsProps
+  ConnectorStoresProps
 > {
   @observable notificationElementId: string = '';
 
   onUnload: (SyntheticEvent<>) => void = ev => {
     ev.preventDefault();
-    this.props.actions.connector.cancelSignInTx.trigger();
+    this.props.stores.connector.cancelSignInTx();
   };
 
   componentDidMount() {
-    this.props.actions.connector.refreshWallets.trigger();
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.connector.refreshWallets();
     window.addEventListener('beforeunload', this.onUnload);
     window.addEventListener('unload', this.onUnload);
   }
@@ -54,12 +55,13 @@ export default class SignTxContainer extends Component<
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
 
-    await this.props.actions.connector.confirmSignInTx.trigger(password);
+    await this.props.stores.connector.confirmSignInTx(password);
   };
+
   onCancel: () => void = () => {
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
-    this.props.actions.connector.cancelSignInTx.trigger();
+    this.props.stores.connector.cancelSignInTx();
     setTimeout(() => { window.close(); }, 100);
   };
 
@@ -82,7 +84,6 @@ export default class SignTxContainer extends Component<
   }
 
   render(): Node {
-    const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
 
     const { signingMessage, unrecoverableError } = this.props.stores.connector;
@@ -110,7 +111,7 @@ export default class SignTxContainer extends Component<
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,

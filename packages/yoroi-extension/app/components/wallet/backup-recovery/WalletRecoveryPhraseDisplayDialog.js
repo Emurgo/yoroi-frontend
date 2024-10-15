@@ -60,7 +60,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
       <Dialog
         className="WalletRecoveryPhraseDisplayDialog"
         title={intl.formatMessage(globalMessages.recoveryPhraseDialogTitle)}
-        actions={actions}
+        dialogActions={actions}
         onClose={onCancelBackup}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}

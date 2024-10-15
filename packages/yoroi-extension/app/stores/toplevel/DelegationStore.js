@@ -9,7 +9,6 @@ import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
 import { PoolMissingApiError } from '../../api/common/errors';
 import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
@@ -60,7 +59,7 @@ export type PoolTransition = {|
 
 export type PoolTransitionModal = {| show: 'open' | 'closed' | 'idle', shouldUpdatePool?: boolean |};
 
-export default class DelegationStore extends Store<StoresMap, ActionsMap> {
+export default class DelegationStore extends Store<StoresMap> {
   @observable delegationRequests: Array<DelegationRequests> = [];
 
   @observable governanceStatus: any = null;
@@ -124,13 +123,11 @@ export default class DelegationStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const { delegation } = this.actions;
     this.registerReactions([this._changeWallets]);
-    delegation.setSelectedPage.listen(this._setSelectedPage);
   }
 
   @action
-  _setSelectedPage: number => void = newPage => {
+  setSelectedPage: number => void = newPage => {
     this.selectedPage = newPage;
   };
 

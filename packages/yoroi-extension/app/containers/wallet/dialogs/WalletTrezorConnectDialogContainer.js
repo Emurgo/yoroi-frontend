@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { Logger } from '../../../utils/logging';
 import { handleExternalLinkClick } from '../../../utils/routing';
 
@@ -13,15 +12,15 @@ import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { StoresProps } from '../../../stores';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: (void) => void,
   +onBack: void => void,
 |};
 
 @observer
-export default class WalletTrezorConnectDialogContainer extends Component<Props> {
+export default class WalletTrezorConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;
@@ -33,12 +32,11 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
 
   cancel: void => void = () => {
     this.props.onClose();
-    this.props.actions.ada.trezorConnect.cancel.trigger();
+    this.props.stores.substores.ada.trezorConnect.cancel();
   };
 
   render(): null | Node {
     const trezorConnectStore = this.props.stores.substores.ada.trezorConnect;
-    const hwConnectActions = this.props.actions.ada.trezorConnect;
 
     let component = null;
 
@@ -50,7 +48,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={hwConnectActions.submitCheck.trigger}
+            submit={trezorConnectStore.submitCheck}
             cancel={this.cancel}
             onBack={this.props.onBack}
           />);
@@ -62,8 +60,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={hwConnectActions.goBackToCheck.trigger}
-            submit={hwConnectActions.submitConnect.trigger}
+            goBack={trezorConnectStore.goBackToCheck}
+            submit={trezorConnectStore.submitConnect}
             cancel={this.cancel}
           />);
         break;
@@ -75,7 +73,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<Props>
             error={trezorConnectStore.error}
             defaultWalletName={trezorConnectStore.defaultWalletName}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={hwConnectActions.submitSave.trigger}
+            submit={trezorConnectStore.submitSave}
             cancel={this.cancel}
           />);
         break;

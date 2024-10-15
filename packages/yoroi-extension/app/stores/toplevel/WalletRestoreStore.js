@@ -3,7 +3,6 @@
 import { action, observable, runInAction } from 'mobx';
 import Store from '../base/Store';
 
-import type { RestoreModeType, WalletRestoreMeta, } from '../../actions/common/wallet-restore-actions';
 import type { PlateResponse } from '../../api/ada/lib/cardanoCrypto/plate';
 import { generateShelleyPlate } from '../../api/ada/lib/cardanoCrypto/plate';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
@@ -14,11 +13,11 @@ import {
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import AdaApi from '../../api/ada';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { bytesToHex } from '../../coreUtils';
+import config from '../../config';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -45,7 +44,6 @@ export const RestoreSteps = Object.freeze({
   START: 0,
   WALLET_EXIST: 1,
   VERIFY_MNEMONIC: 2,
-  LEGACY_EXPLANATION: 3,
   TRANSFER_TX_GEN: 4,
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
@@ -85,7 +83,41 @@ export async function isWalletExist(
   }
 }
 
-export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
+// <TODO:PENDING_REMOVAL> BIP44 , PAPER
+export type RestoreModeType =
+  | {|
+  type: 'bip44',
+  extra: void,
+  length: typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+|}
+  | {|
+  type: 'cip1852',
+  extra: void,
+  chain?: number,
+  length:
+    | typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+    | typeof config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT,
+|}
+  | {|
+  // note: we didn't allow paper wallet creation during the ITN
+  // but we did allow paper wallet restoration
+  type: 'bip44' | 'cip1852',
+  extra: 'paper',
+  length: typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+  chain?: number,
+|}
+  | {|
+  type: 'bip44' | 'cip1852',
+  extra: 'ledger' | 'trezor',
+|};
+
+export type WalletRestoreMeta = {|
+  recoveryPhrase: string,
+  walletName: string,
+  walletPassword: string,
+|};
+
+export default class AdaWalletRestoreStore extends Store<StoresMap> {
   @observable selectedAccount: number = 0 + HARD_DERIVATION_START;
 
   @observable step: RestoreStepsType;
@@ -103,31 +135,26 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   setup(): void {
     super.setup();
     this.reset();
-    const actions = this.actions.walletRestore;
-    actions.submitFields.listen(this._processRestoreMeta);
-    actions.verifyMnemonic.listen(this._verifyMnemonic);
-    actions.reset.listen(this.reset);
-    actions.back.listen(this._back);
   }
 
   @action
-  _verifyMnemonic: void => Promise<void> = async () => {
+  verifyMnemonic: void => Promise<void> = async () => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
-      throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
+      throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
 
-    await this.actions.walletRestore.startRestore.trigger();
+    await this.stores.substores.ada.walletRestore.startWalletRestore();
   };
 
   @action
-  _processRestoreMeta: WalletRestoreMeta => Promise<void> = async restoreMeta => {
+  submitWalletRestoringFields: WalletRestoreMeta => Promise<void> = async restoreMeta => {
     this.walletRestoreMeta = restoreMeta;
 
     const resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
-      throw new Error(`${nameof(this._processRestoreMeta)} no network selected`);
+      throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
 
     const plates = generatePlates(
       resolvedRecoveryPhrase,
@@ -164,14 +191,10 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
   }
 
   @action
-  _back: void => void = () => {
+  back: void => void = () => {
     if (this.step === RestoreSteps.VERIFY_MNEMONIC || this.step === RestoreSteps.WALLET_EXIST) {
       this.recoveryResult = undefined;
       this.step = RestoreSteps.START;
-      return;
-    }
-    if (this.step === RestoreSteps.LEGACY_EXPLANATION) {
-      this.step = RestoreSteps.VERIFY_MNEMONIC;
     }
   };
 

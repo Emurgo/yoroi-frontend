@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { Button, Stack } from '@mui/material';
 
 type Props = {|
-  actions: Array<{|
+  stepActions: Array<{|
     type: 'primary' | 'secondary',
     label: string,
     disabled: boolean,
@@ -13,7 +13,7 @@ type Props = {|
 |};
 
 function StepController(props: Props): Node {
-  const { actions } = props;
+  const { stepActions } = props;
 
   return (
     <Stack
@@ -24,7 +24,7 @@ function StepController(props: Props): Node {
       py="24px"
       gap="24px"
     >
-      {actions.map(({ type, label, disabled, onClick }, idx) => {
+      {stepActions.map(({ type, label, disabled, onClick }, idx) => {
         const isPrimary = type === 'primary';
         return (
           <Button

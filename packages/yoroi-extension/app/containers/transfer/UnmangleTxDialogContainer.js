@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
 import type { ConfigType } from '../../../config/config-types';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
@@ -11,17 +10,17 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 type Props = {|
-  ...StoresAndActionsProps,
   +onClose: void => void,
 |};
 
 @observer
-export default class UnmangleTxDialogContainer extends Component<Props> {
+export default class UnmangleTxDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -47,7 +46,8 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
       selected.networkId,
     );
     // note: don't await
-    this.props.actions.txBuilderActions.initialize.trigger({
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.transactionBuilderStore.initializeTx({
       publicDeriver: selected,
       /**
        * We filter to only UTXOs of mangled addresses
@@ -58,12 +58,11 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
     const txBuilder = this.props.stores.transactionBuilderStore;
     return (
       <TransferSendPage
-        actions={actions}
         stores={stores}
         onClose={{
           trigger: this.props.onClose,
@@ -76,7 +75,7 @@ export default class UnmangleTxDialogContainer extends Component<Props> {
         transactionRequest={{
           error: txBuilder.setupSelfTx.error,
           result: txBuilder.tentativeTx,
-          reset: this.props.actions.txBuilderActions.reset.trigger,
+          reset: this.props.stores.transactionBuilderStore.reset,
         }}
         toTransferTx={tentativeTx => ({
           recoveredBalance: tentativeTx.totalInput(),

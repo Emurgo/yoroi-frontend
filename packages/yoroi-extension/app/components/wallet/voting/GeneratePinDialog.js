@@ -85,7 +85,7 @@ export default class GeneratePinDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.dialog])}
         title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}

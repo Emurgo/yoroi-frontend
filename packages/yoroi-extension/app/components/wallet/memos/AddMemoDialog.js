@@ -129,7 +129,7 @@ export default class AddMemoDialog extends Component<Props, State> {
       <Dialog
         className={classnames([styles.component])}
         title={intl.formatMessage(memoMessages.addMemo)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}

@@ -76,7 +76,7 @@ export default class ConfirmPinDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.dialog])}
         title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={goBack} />}

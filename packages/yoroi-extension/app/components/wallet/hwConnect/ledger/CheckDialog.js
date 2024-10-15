@@ -136,7 +136,7 @@ export default class CheckDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'CheckDialog', styles.ledger])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}

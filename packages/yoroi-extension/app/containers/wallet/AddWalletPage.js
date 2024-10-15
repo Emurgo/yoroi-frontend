@@ -1,8 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { RestoreModeType } from '../../actions/common/wallet-restore-actions';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -25,18 +23,20 @@ import WalletTrezorConnectDialogContainer from './dialogs/WalletTrezorConnectDia
 import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDialogContainer';
 import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
+import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class AddWalletPage extends Component<StoresAndActionsProps> {
+export default class AddWalletPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+      this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
     }
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   openDialogWrapper: any => void = dialog => {
@@ -44,35 +44,35 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     // this is because on close, asynchronous unmount actions get triggered
     // so there is no safe time at which we can un-select the API
     // so instead, the API gets reset before we start any dialog flow
-    this.props.actions.profile.setSelectedNetwork.trigger(undefined);
+    this.props.stores.profile.setSelectedNetwork(undefined);
 
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   render(): Node {
-    const { selectedNetwork } = this.props.stores.profile;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
+    const { selectedNetwork } = stores.profile;
     const { uiDialogs } = stores;
 
     const openTrezorConnectDialog = () => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      actions.dialogs.push.trigger({
+      stores.uiDialogs.push({
         dialog: WalletTrezorConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
-      this.props.actions.ada.trezorConnect.init.trigger();
+      stores.substores.ada.trezorConnect.init();
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
       }
-      actions.dialogs.push.trigger({
+      stores.uiDialogs.push({
         dialog: WalletLedgerConnectDialogContainer,
       });
       // <TODO:HW_REFACTOR>
-      this.props.actions.ada.ledgerConnect.init.trigger();
+      stores.substores.ada.ledgerConnect.init();
     };
 
     let activeDialog = null;
@@ -80,22 +80,21 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       activeDialog = (
         <PickCurrencyDialogContainer
           onClose={this.onClose}
-          onCardano={() => actions.profile.setSelectedNetwork.trigger(networks.CardanoMainnet)}
+          onCardano={() => stores.profile.setSelectedNetwork(networks.CardanoMainnet)}
           onCardanoPreprodTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoPreprodTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoPreprodTestnet)
           }
           onCardanoPreviewTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoPreviewTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoPreviewTestnet)
           }
           onCardanoSanchoTestnet={() =>
-            actions.profile.setSelectedNetwork.trigger(networks.CardanoSanchoTestnet)
+            stores.profile.setSelectedNetwork(networks.CardanoSanchoTestnet)
           }
         />
       );
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
         />
@@ -103,7 +102,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       activeDialog = (
         <WalletBackupDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
         />
@@ -116,13 +114,13 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
         <WalletRestoreOptionDialogContainer
           onClose={this.onClose}
           onRestore15={() => {
-            return actions.dialogs.push.trigger({
+            return stores.uiDialogs.push({
               dialog: WalletRestoreDialogContainer,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 15 } },
             });
           }}
           onRestore24={() => {
-            actions.dialogs.push.trigger({
+            stores.uiDialogs.push({
               dialog: WalletRestoreDialogContainer,
               params: { restoreType: { type: 'cip1852', extra: undefined, length: 24 } },
             });
@@ -135,10 +133,9 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
           mode={mode}
         />
       );
@@ -153,32 +150,30 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       activeDialog = (
         <WalletTrezorConnectDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
         />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
       activeDialog = (
         <WalletLedgerConnectDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
-          onBack={() => actions.dialogs.pop.trigger()}
+          onBack={() => stores.uiDialogs.pop()}
         />
       );
     }
 
     const { hasAnyWallets } = this.props.stores.wallets;
-    const goToRoute = this.props.actions.router.goToRoute;
+    const goToRoute = stores.app.goToRoute;
     const addWalletPageComponent = (
       <>
         <AddWalletPageRevamp
           onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
-          onCreate={() => goToRoute.trigger({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
-          onRestore={() => goToRoute.trigger({ route: ROUTES.WALLETS.RESTORE_WALLET })}
-          goToCurrentWallet={() => goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
+          onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}
+          goToCurrentWallet={() => goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
           hasAnyWallets={hasAnyWallets === true}
         />
         {activeDialog}
@@ -191,8 +186,8 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       </Box>
     ) : (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
-        sidebar={<SidebarContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
       >
         {addWalletPageComponent}
       </TopBarLayout>
@@ -200,7 +195,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
   }
 
   _goToSettingsRoot: () => void = () => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.SETTINGS.ROOT,
     });
   };

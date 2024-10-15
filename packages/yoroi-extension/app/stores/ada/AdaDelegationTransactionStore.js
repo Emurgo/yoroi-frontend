@@ -7,12 +7,11 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getProtocolParameters } from '../../api/thunk';
 
-export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
+export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
     DeferredCall<CreateWithdrawalTxResponse>
   >(request => request());
@@ -49,16 +48,10 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   setup(): void {
     super.setup();
     this.reset({ justTransaction: false });
-    const { ada } = this.actions;
-    ada.delegationTransaction.signTransaction.listen(this._signTransaction);
-    ada.delegationTransaction.complete.listen(this._complete);
-    ada.delegationTransaction.setShouldDeregister.listen(this._setShouldDeregister);
-    ada.delegationTransaction.createWithdrawalTxForWallet.listen(this._createWithdrawalTxForWallet);
-    ada.delegationTransaction.reset.listen(this.reset);
   }
 
   @action
-  _setShouldDeregister: boolean => void = shouldDeregister => {
+  setShouldDeregister: boolean => void = shouldDeregister => {
     this.shouldDeregister = shouldDeregister;
   };
 
@@ -97,7 +90,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   @action
-  _createWithdrawalTxForWallet: ({|
+  createWithdrawalTxForWallet: ({|
     wallet: WalletState,
   |}) => Promise<void> = async request => {
     this.createWithdrawalTx.reset();
@@ -133,14 +126,14 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   @action
-  _signTransaction: ({|
+  signTransaction: ({|
     wallet: WalletState,
     password?: string,
     dialog?: any,
   |}) => Promise<void> = async request => {
     const result = this.createDelegationTx.result;
     if (result == null) {
-      throw new Error(`${nameof(this._signTransaction)} no tx to broadcast`);
+      throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
     const refreshWallet = () => {
       this.stores.delegation.disablePoolTransitionState(request.wallet);
@@ -173,7 +166,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
     }
     // normal password-based wallet
     if (request.password == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+      throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
     }
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
@@ -185,17 +178,17 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       },
       refreshWallet,
     });
-    if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
+    if (request.dialog) this.stores.uiDialogs.open({ dialog: request.dialog });
   };
 
-  _complete: void => void = () => {
-    this.actions.dialogs.closeActiveDialog.trigger();
+  complete: void => void = () => {
+    this.stores.uiDialogs.closeActiveDialog();
     this.goToDashboardRoute();
   };
 
   goToDashboardRoute(): void {
     const route = buildRoute(ROUTES.STAKING);
-    this.actions.router.goToRoute.trigger({ route });
+    this.stores.app.goToRoute({ route });
   }
 
   @action.bound

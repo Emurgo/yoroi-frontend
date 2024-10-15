@@ -11,31 +11,25 @@ import ExportWallet from '../../../components/wallet/settings/ExportWallet';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
 import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class WalletSettingsPage extends Component <StoresAndActionsProps> {
+export default class WalletSettingsPage extends Component <StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { walletSettings } = this.props.stores;
     const { intl } = this.context;
-    const { actions } = this.props;
+    const { stores } = this.props;
+    const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
-    const {
-      startEditingWalletField,
-      stopEditingWalletField,
-      cancelEditingWalletField,
-      renameConceptualWallet,
-    } = actions.walletSettings;
 
     const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
     if (selectedWallet == null) {
@@ -64,22 +58,22 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
           lastUpdatedField={lastUpdatedWalletField}
           onFieldValueChange={async (field, value) => {
             if (field === 'name') {
-              await renameConceptualWallet.trigger({
+              await stores.walletSettings.renameConceptualWallet({
                 conceptualWalletId: selectedWallet.conceptualWalletId,
                 newName: value,
               });
             }
           }}
-          onStartEditing={field => startEditingWalletField.trigger({ field })}
-          onStopEditing={() => stopEditingWalletField.trigger()}
-          onCancelEditing={() => cancelEditingWalletField.trigger()}
+          onStartEditing={field => stores.walletSettings.startEditingWalletField({ field })}
+          onStopEditing={() => stores.walletSettings.stopEditingWalletField()}
+          onCancelEditing={() => stores.walletSettings.cancelEditingWalletField()}
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
             openDialog={() =>
-              actions.dialogs.open.trigger({
+              stores.uiDialogs.open({
                 dialog: ChangeWalletPasswordDialogContainer,
               })
             }
@@ -87,20 +81,20 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
         )}
         <ResyncBlock
           openDialog={() =>
-            actions.dialogs.open.trigger({
+            stores.uiDialogs.open({
               dialog: ResyncWalletDialogContainer,
             })
           }
         />
         <ExportWallet
-          openDialog={() => actions.dialogs.open.trigger({
+          openDialog={() => stores.uiDialogs.open({
             dialog: ExportWalletDialogContainer,
           })}
         />
         <RemoveWallet
           walletName={selectedWalletName}
           openDialog={() =>
-            actions.dialogs.open.trigger({
+            stores.uiDialogs.open({
               dialog: RemoveWalletDialogContainer,
             })
           }
@@ -110,12 +104,11 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
   }
 
   getDialog: (void | number) => Node = publicDeriverId => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { isOpen } = this.props.stores.uiDialogs;
     if (publicDeriverId != null && isOpen(ChangeWalletPasswordDialogContainer)) {
       return (
         <ChangeWalletPasswordDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />
@@ -124,7 +117,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
     if (publicDeriverId != null && isOpen(ExportWalletDialogContainer)) {
       return (
         <ExportWalletDialogContainer
-          actions={actions}
           stores={stores}
         />
       );
@@ -136,7 +128,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
       }
       return (
         <RemoveWalletDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />
@@ -145,7 +136,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
     if (publicDeriverId != null && isOpen(ResyncWalletDialogContainer)) {
       return (
         <ResyncWalletDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />

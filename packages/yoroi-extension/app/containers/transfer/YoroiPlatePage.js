@@ -5,14 +5,14 @@ import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import globalMessages from '../../i18n/global-messages';
 import WalletRestoreVerifyDialog from '../../components/wallet/WalletRestoreVerifyDialog';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import config from '../../config';
 import { generatePlates } from '../../stores/toplevel/WalletRestoreStore';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
   +accountIndex: number,
   +onNext: void => PossiblyAsync<void>,
   +onCancel: void => void,
@@ -47,7 +47,6 @@ export default class YoroiPlatePage extends Component<Props> {
 
   render(): null | Node {
     if (this.plates == null) return null;
-    const actions = this.props.actions;
     const { uiNotifications } = this.props.stores;
 
     const tooltipNotification = {
@@ -65,7 +64,7 @@ export default class YoroiPlatePage extends Component<Props> {
             runInAction(() => {
               this.notificationElementId = elementId;
             });
-            actions.notifications.open.trigger({
+            uiNotifications.open({
               id: elementId,
               duration: tooltipNotification.duration,
               message: tooltipNotification.message,

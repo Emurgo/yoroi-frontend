@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
@@ -21,26 +20,27 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 @observer
-export default class YoroiTransferPage extends Component<StoresAndActionsProps> {
+export default class YoroiTransferPage extends Component<StoresProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   goToCreateWallet: void => void = () => {
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
   }
 
   setupTransferFundsWithPaperMnemonic: ((payload: {|
     paperPassword: string,
     recoveryPhrase: string,
   |}) => void) = (payload) => {
-    this.props.actions.yoroiTransfer.setupTransferFundsWithPaperMnemonic.trigger({
+    this.props.stores.yoroiTransfer.setupTransferFundsWithPaperMnemonic({
       ...payload,
     });
   };
@@ -52,7 +52,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
     if (publicDeriver == null) {
       throw new Error(`${nameof(this.checkAddresses)} no wallet selected`);
     }
-    await this.props.actions.yoroiTransfer.checkAddresses.trigger({
+    await this.props.stores.yoroiTransfer.checkAddresses({
       getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
     });
   };
@@ -60,18 +60,15 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
   /** Broadcast the transfer transaction if one exists and return to wallet page */
   transferFunds: void => Promise<void> = async () => {
     // broadcast transfer transaction then call continuation
-    const walletsStore = this.props.stores.wallets;
-    const yoroiTransfer = this.props.stores.yoroiTransfer;
-    const publicDeriver = this.props.stores.wallets.selected;
-    if (publicDeriver == null) {
-      throw new Error(`${nameof(this.transferFunds)} no wallet selected`);
-    }
-    await this.props.actions.yoroiTransfer.transferFunds.trigger({
-      network: getNetworkById(publicDeriver.networkId),
+    const { stores } = this.props;
+    const { wallets: walletsStore, yoroiTransfer } = stores;
+    const wallet = stores.wallets.selectedOrFail;
+    await this.props.stores.yoroiTransfer.transferFunds({
+      network: getNetworkById(wallet.networkId),
       next: async () => {
         const preRefreshTime = new Date().getTime();
         try {
-          await walletsStore.refreshWalletFromRemote(publicDeriver.publicDeriverId);
+          await walletsStore.refreshWalletFromRemote(wallet.publicDeriverId);
         } catch (_e) {
           // still need to re-route even if refresh failed
         }
@@ -79,7 +76,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
         await new Promise(resolve => {
           setTimeout(() => {
             if (walletsStore.selected != null) {
-              this.props.actions.router.goToRoute.trigger({
+              stores.app.goToRoute({
                 route: ROUTES.WALLETS.TRANSACTIONS
               });
             }
@@ -87,21 +84,21 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
           }, Math.max(SUCCESS_PAGE_STAY_TIME - timeToRefresh, 0));
         });
       },
-      getDestinationAddress: yoroiTransfer.nextInternalAddress(publicDeriver),
+      getDestinationAddress: yoroiTransfer.nextInternalAddress(wallet),
       rebuildTx: true,
     });
   }
 
   backToUninitialized: (() => void) = () => {
-    this.props.actions.yoroiTransfer.backToUninitialized.trigger();
+    this.props.stores.yoroiTransfer.backToUninitialized();
   };
 
   cancelTransferFunds: (() => void) = () => {
-    this.props.actions.yoroiTransfer.cancelTransferFunds.trigger();
+    this.props.stores.yoroiTransfer.reset();
   };
 
   render(): null | Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const yoroiTransfer = this.props.stores.yoroiTransfer;
 
     const publicDeriver = this.props.stores.wallets.selected;
@@ -128,7 +125,6 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
       case TransferStatus.DISPLAY_CHECKSUM:
         return (
           <YoroiPlatePage
-            actions={actions}
             stores={stores}
             onNext={this.checkAddresses}
             onCancel={this.backToUninitialized}

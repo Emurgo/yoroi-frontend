@@ -7,11 +7,11 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import { defineMessages, intlShape } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
+import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({
   title: {
@@ -21,16 +21,16 @@ const messages = defineMessages({
 });
 
 @observer
-export default class ComplexityLevelPage extends Component<StoresAndActionsProps> {
+export default class ComplexityLevelPage extends Component<StoresProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
+    const { stores } = this.props;
+    const { checkAdaServerStatus } = stores.serverConnectionStore;
 
-    const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
-
-    const { selected } = this.props.stores.wallets;
+    const { selected } = stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
     const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
@@ -50,9 +50,9 @@ export default class ComplexityLevelPage extends Component<StoresAndActionsProps
         banner={displayedBanner}
       >
         <ComplexityLevel
-          complexityLevel={this.props.stores.profile.selectedComplexityLevel}
-          onSubmit={this.props.actions.profile.selectComplexityLevel.trigger}
-          error={this.props.stores.profile.setComplexityLevelRequest.error}
+          complexityLevel={stores.profile.selectedComplexityLevel}
+          onSubmit={stores.profile.selectComplexityLevel}
+          error={stores.profile.setComplexityLevelRequest.error}
         />
       </TopBarLayout>
     );

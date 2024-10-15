@@ -227,7 +227,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
           />
 
           <StepController
-            actions={[
+            stepActions={[
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,

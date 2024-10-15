@@ -4,10 +4,10 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalClick } from '../../../utils/routing';
 import ExternalStorageSettings from '../../../components/settings/categories/ExternalStorageSettings';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class ExternalStorageSettingsPage extends Component<StoresAndActionsProps> {
+export default class ExternalStorageSettingsPage extends Component<StoresProps> {
 
   onConnect: string => void = (authorizeUrl) => {
     // Open authorize url
@@ -15,7 +15,7 @@ export default class ExternalStorageSettingsPage extends Component<StoresAndActi
   };
 
   onDisconnect: void => Promise<void> = async () => {
-    await this.props.actions.memos.unsetExternalStorageProvider.trigger();
+    await this.props.stores.memos.unsetExternalStorageProvider();
   };
 
   render(): Node {

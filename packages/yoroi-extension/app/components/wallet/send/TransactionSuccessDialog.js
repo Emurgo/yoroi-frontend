@@ -47,7 +47,7 @@ export default class TransactionSuccessDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(messages.title)}
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange),
             onClick: this.props.onClose,

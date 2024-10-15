@@ -159,7 +159,7 @@ export default class DelegationTxDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.delegateLabel)}
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(globalMessages.delegateLabel),
             onClick: this.submit.bind(this),

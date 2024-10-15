@@ -1,42 +1,42 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import React, { Component, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { Box } from '@mui/material';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
+import type { StoresProps } from '../../stores';
 
 export const CreateWalletPagePromise: void => Promise<any> = () =>
   import('../../components/wallet/create-wallet/CreateWalletPage');
 const CreateWalletPage = React.lazy(CreateWalletPagePromise);
 
 @observer
-export default class CreateWalletPageContainer extends Component<StoresAndActionsProps> {
+export default class CreateWalletPageContainer extends Component<StoresProps> {
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { hasAnyWallets } = stores.wallets;
 
     const createWalletPageComponent = (
       <Suspense fallback={null}>
         <CreateWalletPage
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
-          createWallet={actions.ada.wallets.createWallet.trigger}
-          setSelectedNetwork={actions.profile.setSelectedNetwork.trigger}
+          createWallet={request => stores.substores.ada.wallets.createWallet(request)}
+          setSelectedNetwork={stores.profile.setSelectedNetwork}
           selectedNetwork={stores.profile.selectedNetwork}
-          openDialog={dialog => this.props.actions.dialogs.open.trigger({ dialog })}
-          closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
+          openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
+          closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
           isDialogOpen={stores.uiDialogs.isOpen}
-          goToRoute={route => actions.router.goToRoute.trigger({ route })}
+          goToRoute={route => stores.app.goToRoute({ route })}
         />
       </Suspense>
     );
 
     return hasAnyWallets ? (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={<SidebarContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
+        sidebar={<SidebarContainer stores={stores} />}
         bgcolor="common.white"
       >
         {createWalletPageComponent}

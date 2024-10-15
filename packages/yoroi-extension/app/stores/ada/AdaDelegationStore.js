@@ -13,7 +13,6 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap, forceNonNull } from '../../coreUtils';
@@ -25,7 +24,7 @@ import type {
   RewardHistoryFunc,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 
-export default class AdaDelegationStore extends Store<StoresMap, ActionsMap> {
+export default class AdaDelegationStore extends Store<StoresMap> {
   _recalculateDelegationInfoDisposer: Array<(void) => void> = [];
 
   @action addObservedWallet: ({

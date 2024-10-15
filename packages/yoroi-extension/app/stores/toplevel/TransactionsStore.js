@@ -12,17 +12,12 @@ import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
-import type { TransactionRowsToExportRequest } from '../../actions/common/transactions-actions';
 import globalMessages from '../../i18n/global-messages';
-import {
-  isCardanoHaskell,
-  getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import type { TransactionExportRow } from '../../api/export';
 import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
@@ -47,7 +42,12 @@ type TxHistoryState = {|
 
 const EXPORT_START_DELAY = 800; // in milliseconds [1000 = 1sec]
 
-export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
+export type TransactionRowsToExportRequest = {|
+  startDate: typeof Moment,
+  endDate: typeof Moment,
+|};
+
+export default class TransactionsStore extends Store<StoresMap> {
   /** Track transactions for a set of wallets */
   @observable txHistoryStates: Array<TxHistoryState> = [];
 
@@ -72,15 +72,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
   @observable isExporting: boolean = false;
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
-
-  setup(): void {
-    super.setup();
-    const actions = this.actions.transactions;
-    actions.loadMoreTransactions.listen(this._loadMore);
-    actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
-    actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
-    actions.closeDelegationBanner.listen(this._closeDelegationBanner);
-  }
 
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
@@ -195,7 +186,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     ]);
   }
 
-  @action _loadMore: (WalletState) => Promise<void> = async (publicDeriver) => {
+  @action loadMoreTransactions: (WalletState) => Promise<void> = async (publicDeriver) => {
     const { publicDeriverId } = publicDeriver;
     const state = this.getTxHistoryState(publicDeriverId);
     const { tailRequest } = state.requests;
@@ -262,7 +253,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     return foundState;
   };
 
-  @action _exportTransactionsToFile: ({|
+  @action exportTransactionsToFile: ({|
     publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}) => Promise<void> = async (request) => {
@@ -272,13 +263,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this.getTransactionRowsToExportRequest.reset();
       this.exportTransactions.reset();
 
-      const continuation = await this.exportTransactionsToFile(request);
+      const continuation = await this._exportTransactionsToFileInternal(request);
 
       /** Intentionally added delay to feel smooth flow */
       setTimeout(async () => {
         await continuation();
         this._setExporting(false);
-        this.actions.dialogs.closeActiveDialog.trigger();
+        this.stores.uiDialogs.closeActiveDialog();
         runInAction(() => {
           this.shouldIncludeTxIds = false;
         });
@@ -292,7 +283,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       this._setExportError(localizableError);
       this._setExporting(false);
       Logger.error(
-        `${nameof(TransactionsStore)}::${nameof(this._exportTransactionsToFile)} ${stringifyError(
+        `${nameof(TransactionsStore)}::${nameof(this.exportTransactionsToFile)} ${stringifyError(
           error
         )}`
       );
@@ -310,19 +301,15 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     this.exportError = error;
   };
 
-  @action _closeExportTransactionDialog: void => void = () => {
+  @action closeExportTransactionDialog: void => void = () => {
     if (!this.isExporting) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.uiDialogs.closeActiveDialog();
       this._setExporting(false);
       this._setExportError(null);
     }
   };
 
-  @action _closeDelegationBanner: void => void = () => {
-    this.showDelegationBanner = false;
-  };
-
-  exportTransactionsToFile: ({|
+  _exportTransactionsToFileInternal: ({|
     +publicDeriver: WalletState,
     exportRequest: TransactionRowsToExportRequest,
   |}) => Promise<(void) => Promise<void>> = async request => {

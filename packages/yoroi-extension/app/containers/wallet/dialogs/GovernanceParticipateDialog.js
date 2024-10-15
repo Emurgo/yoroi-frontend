@@ -7,12 +7,7 @@ import { defineMessages } from 'react-intl';
 
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ROUTES } from '../../../routes-config';
-
-type Props = {|
-  onClose: () => void,
-  actions: any,
-  intl: $npm$ReactIntl$IntlFormat,
-|};
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   title: {
@@ -30,7 +25,14 @@ const messages = defineMessages({
   },
 });
 
-export const GovernanceParticipateDialog = ({ onClose, actions, intl }: Props): React$Node => {
+type Props = {|
+  onClose: () => void,
+  intl: $npm$ReactIntl$IntlFormat,
+|};
+
+type AllProps = {| ...StoresProps, ...Props |};
+
+export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps): React$Node => {
   return (
     <Dialog
       onClose={onClose}
@@ -50,7 +52,7 @@ export const GovernanceParticipateDialog = ({ onClose, actions, intl }: Props): 
         width="100%"
         onClick={() => {
           onClose();
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: ROUTES.Governance.ROOT,
           });
         }}

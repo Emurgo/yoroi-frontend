@@ -64,7 +64,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         )}
 
         <StepController
-          actions={[
+          stepActions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
               disabled: false,

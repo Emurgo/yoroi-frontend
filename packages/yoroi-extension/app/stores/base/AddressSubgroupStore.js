@@ -4,7 +4,6 @@ import { observable, computed, action } from 'mobx';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import { find } from 'lodash';
 import type { StoresMap } from '../index';
-import type { ActionsMap } from '../../actions';
 import type { StandardAddress, } from '../../types/AddressFilterTypes';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -23,15 +22,12 @@ export class AddressTypeStore {
   |}> = [];
 
   stores: StoresMap;
-  actions: ActionsMap;
   request: SubRequestType;
   constructor(data: {|
     stores: StoresMap,
-    actions: ActionsMap,
     request: SubRequestType,
   |}) {
     this.stores = data.stores;
-    this.actions = data.actions;
     this.request = data.request;
   }
 
@@ -88,7 +84,6 @@ export class AddressBookSubgroup extends AddressTypeStore implements IAddressTyp
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._wrapForeign({
         ...request,
         storeName: data.name,
@@ -101,7 +96,6 @@ export class ByronAllAddressesSubgroup extends AddressTypeStore implements IAddr
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
         ...request,
         storeName: data.name,
@@ -115,7 +109,6 @@ export class ByronExternalAddressesSubgroup extends AddressTypeStore implements 
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
@@ -133,7 +126,6 @@ export class ByronInternalAddressesSubgroup extends AddressTypeStore implements 
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._wrapForChainAddresses({
         ...request,
         storeName: data.name,
@@ -148,7 +140,6 @@ export class BaseExternalAddressesSubgroup extends AddressTypeStore implements I
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
@@ -166,7 +157,6 @@ export class BaseInternalAddressesSubgroup extends AddressTypeStore implements I
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
@@ -184,7 +174,6 @@ export class BaseMangledAddressesSubgroup extends AddressTypeStore implements IA
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
         publicDeriver: request.publicDeriver,
         ...request,
@@ -200,7 +189,6 @@ export class EnterpriseExternalAddressesSubgroup
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
@@ -219,7 +207,6 @@ export class EnterpriseInternalAddressesSubgroup
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._createAddressIfNeeded({
         publicDeriver: request.publicDeriver,
         genAddresses: () => data.stores.addresses._wrapForChainAddresses({
@@ -237,7 +224,6 @@ export class RewardAddressesSubgroup extends AddressTypeStore implements IAddres
   constructor(data: SubgroupCtorData): IAddressTypeStore {
     super({
       stores: data.stores,
-      actions: data.actions,
       request: (request) => data.stores.addresses._wrapForAllAddresses({
         publicDeriver: request.publicDeriver,
         ...request,

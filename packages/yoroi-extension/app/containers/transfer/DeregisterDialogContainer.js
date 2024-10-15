@@ -6,17 +6,11 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import WarningBox from '../../components/widgets/WarningBox';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
-
-type Props = {|
-  ...StoresAndActionsProps,
-  +onNext: void => void,
-  +alwaysShowDeregister: boolean,
-|};
+import type { StoresProps } from '../../stores';
 
 const dialogMessages = defineMessages({
   title: {
@@ -60,17 +54,23 @@ const dialogMessages = defineMessages({
   },
 });
 
+type LocalProps = {|
+  +onNext: void => void,
+  +alwaysShowDeregister: boolean,
+|};
+
 @observer
-export default class DeregisterDialogContainer extends Component<Props> {
+export default class DeregisterDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   componentDidMount() {
-    this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+    const { stores } = this.props;
+    stores.substores.ada.delegationTransaction.setShouldDeregister(false);
     if (
       this.props.alwaysShowDeregister === false &&
-      this.props.stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
+      stores.profile.selectedComplexityLevel !== ComplexityLevels.Advanced
     ) {
       this.props.onNext();
     }
@@ -85,7 +85,7 @@ export default class DeregisterDialogContainer extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-
+    const { stores } = this.props;
     return (
       <DangerousActionDialog
         title={intl.formatMessage(dialogMessages.title)}
@@ -95,16 +95,16 @@ export default class DeregisterDialogContainer extends Component<Props> {
         secondaryButton={{
           label: intl.formatMessage(dialogMessages.keep),
           onClick: () => {
-            this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(false);
+            stores.substores.ada.delegationTransaction.setShouldDeregister(false);
             this.props.onNext();
           },
           primary: true,
         }}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(dialogMessages.deregisterOption),
           onClick: () => {
-            this.props.actions.ada.delegationTransaction.setShouldDeregister.trigger(true);
+            stores.substores.ada.delegationTransaction.setShouldDeregister(true);
             this.props.onNext();
           },
         }}

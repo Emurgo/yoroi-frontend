@@ -8,20 +8,13 @@ import {
 } from '../../../utils/logging';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import { signAndBroadcastTransaction } from '../../../api/thunk';
 
-export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
-
-  setup(): void {
-    super.setup();
-    const { wallets, } = this.actions;
-    wallets.sendMoney.listen(this._sendMoney);
-  }
+export default class AdaMnemonicSendStore extends Store<StoresMap> {
 
   /** Send money and then return to transaction screen */
-  _sendMoney:  {|
+  sendMoney:  {|
     signRequest: ISignRequest<any>,
     password: string,
     +wallet: {
@@ -32,10 +25,11 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
     onSuccess?: void => void,
   |} => Promise<void> = async (request) => {
     if (!(request.signRequest instanceof HaskellShelleyTxSignRequest)) {
-      throw new Error(`${nameof(this._sendMoney)} wrong tx sign request`);
+      throw new Error(`${nameof(this.sendMoney)} wrong tx sign request`);
     }
 
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+    const { stores } = this;
+    await stores.substores.ada.wallets.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
           wallet: request.wallet,
@@ -43,15 +37,15 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
           signRequest: request.signRequest,
         },
       },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+      refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
 
-    this.actions.dialogs.closeActiveDialog.trigger();
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.uiDialogs.closeActiveDialog();
+    stores.wallets.sendMoneyRequest.reset();
     if (request.onSuccess) {
       request.onSuccess();
     } else {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 

@@ -12,14 +12,13 @@ import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../stateless/addressStores';
 import { allAddressSubgroups } from '../stateless/addressStores';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { popAddress } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export default class AddressesStore extends Store<StoresMap, ActionsMap> {
+export default class AddressesStore extends Store<StoresMap> {
 
   // note: no need for this to be observable
   _addressSubgroupMap: Map<Class<IAddressTypeStore>, IAddressTypeStore> = new Map();
@@ -36,17 +35,9 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-
-    const actions = this.actions.addresses;
-    actions.createAddress.listen(this._createAddress);
-    actions.resetErrors.listen(this._resetErrors);
-    actions.setFilter.listen(this._setFilter);
-    actions.resetFilter.listen(this._resetFilter);
-
     for (const store of allAddressSubgroups) {
       this._addressSubgroupMap.set(store.class, new store.class({
         stores: this.stores,
-        actions: this.actions,
         name: store.name,
       }));
     }
@@ -56,7 +47,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return this._addressSubgroupMap;
   }
 
-  _createAddress: WalletState => Promise<void> = async (
+  createAddress: WalletState => Promise<void> = async (
     publicDeriver
   ) => {
     try {
@@ -76,7 +67,7 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return address;
   };
 
-  @action _resetErrors: void => void = () => {
+  @action resetErrors: void => void = () => {
     this.error = null;
   };
 
@@ -191,11 +182,11 @@ export default class AddressesStore extends Store<StoresMap, ActionsMap> {
     return addresses;
   }
 
-  @action _setFilter: AddressFilterKind => void = (filter) => {
+  @action setFilter: AddressFilterKind => void = (filter) => {
     this.addressFilter = filter;
   }
 
-  @action _resetFilter: void => void = () => {
+  @action resetFilter: void => void = () => {
     this.addressFilter = AddressFilter.None;
   }
 }

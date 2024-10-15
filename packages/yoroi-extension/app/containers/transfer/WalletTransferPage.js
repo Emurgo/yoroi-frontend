@@ -5,36 +5,34 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriver: PublicDeriver<>,
 |};
 
 @observer
-export default class WalletTransferPage extends Component<Props> {
+export default class WalletTransferPage extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   // <TODO:PENDING_REMOVAL> paper
   startTransferYoroiPaperFunds: void => void = () => {
-    this.props.actions.yoroiTransfer.startTransferFunds.trigger();
+    this.props.stores.yoroiTransfer.startTransferFunds();
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const defaultToken = this.props.publicDeriver.getParent().getDefaultToken();
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
@@ -46,7 +44,7 @@ export default class WalletTransferPage extends Component<Props> {
           onByron={this.startTransferYoroiPaperFunds}
           ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
-        <YoroiTransferPage actions={actions} stores={stores} />
+        <YoroiTransferPage stores={stores} />
       </>
     );
   }

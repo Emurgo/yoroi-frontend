@@ -5,7 +5,6 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { createWallet, signTransaction } from '../../api/thunk';
@@ -19,21 +18,13 @@ import type{ WalletState } from '../../../chrome/extension/background/types';
 
 const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
-export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
+export default class AdaWalletsStore extends Store<StoresMap> {
   // REQUESTS
 
   @observable
   generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc> = new Request<GenerateWalletRecoveryPhraseFunc>(
     this.api.ada.generateWalletRecoveryPhrase
   );
-
-  setup(): void {
-    super.setup();
-    const { ada, walletBackup } = this.actions;
-    walletBackup.finishWalletBackup.listen(this._createInDb);
-    ada.wallets.startWalletCreation.listen(this._startWalletCreation);
-    ada.wallets.createWallet.listen(this._createWallet)
-  }
 
   // =================== SEND MONEY ==================== //
 
@@ -225,15 +216,15 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
 
   // =================== WALLET RESTORATION ==================== //
 
-  _startWalletCreation: ({|
+  startWalletCreation: ({|
     name: string,
     password: string,
   |}) => Promise<void> = async params => {
     const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
     if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
     }
-    this.actions.walletBackup.initiateWalletBackup.trigger({
+    this.stores.walletBackup.initiateWalletBackup({
       recoveryPhrase,
       name: params.name,
       password: params.password,
@@ -244,28 +235,28 @@ export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
     const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
 
     if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this._startWalletCreation)} failed to generate recovery phrase`);
+      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
     }
 
     return recoveryPhrase;
   };
 
   /** Create the wallet and go to wallet summary screen */
-  _createInDb: void => Promise<void> = async () => {
-    await this._createWallet({
+  finishWalletBackup: void => Promise<void> = async () => {
+    await this.createWallet({
       recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
       walletPassword: this.stores.walletBackup.password,
       walletName: this.stores.walletBackup.name,
     });
   };
 
-  _createWallet: {|
+  createWallet: {|
     recoveryPhrase: Array<string>,
     walletPassword: string,
     walletName: string,
   |} => Promise<void> = async (request) => {
     const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this._createInDb)} no network selected`);
+    if (selectedNetwork == null) throw new Error(`${nameof(this.finishWalletBackup)} no network selected`);
     await this.stores.wallets.createWalletRequest.execute(async () => {
       const wallet = await createWallet({
         walletName: request.walletName,

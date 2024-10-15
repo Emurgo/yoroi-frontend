@@ -1,7 +1,6 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -13,6 +12,7 @@ import NavBarContainerRevamp from '../../NavBarContainerRevamp';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { PoolTransitionBanner } from './PoolTransitionBanner';
+import type { StoresProps } from '../../../stores';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
@@ -21,22 +21,21 @@ const StakingPageContent = lazy(StakingPageContentPromise);
 declare var CONFIG: ConfigType;
 
 @observer
-class StakingPage extends Component<StoresAndActionsProps> {
+class StakingPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const selectedWallet = stores.wallets.selected;
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={
               <NavBarTitle
@@ -54,7 +53,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
         showInContainer
       >
         <Suspense fallback={null}>
-          <StakingPageContent stores={this.props.stores} actions={this.props.actions} />
+          <StakingPageContent stores={this.props.stores} />
         </Suspense>
       </TopBarLayout>
     );

@@ -78,7 +78,7 @@ export default class QrCodeDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.dialog])}
         title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}

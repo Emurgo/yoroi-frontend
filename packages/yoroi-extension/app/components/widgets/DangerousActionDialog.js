@@ -68,7 +68,7 @@ export default class DangerousActionDialog extends Component<Props> {
     return (
       <Dialog
         title={this.props.title}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={this.props.onCancel}
         className={dialogClasses}

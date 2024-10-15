@@ -1,9 +1,8 @@
 // @flow
 import BaseProfileStore from '../../../stores/base/BaseProfileStore';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
-export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
+export default class ProfileStore extends BaseProfileStore<StoresMap> {
 
   setup(): void {
     super.setup();
