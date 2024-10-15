@@ -11,7 +11,6 @@ import createStores from '../../../app/connector/stores/index';
 import { translations } from '../../../app/i18n/translations';
 import actions from '../../../app/connector/actions/index';
 // eslint-disable-next-line no-unused-vars
-import { Action } from '../../../app/actions/lib/Action';
 import App from '../../../app/connector/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
@@ -39,7 +38,6 @@ const initializeDappConnector: void => Promise<void> = async () => {
     translations,
     stores,
     reset: action(() => {
-      Action.resetAllActions();
       createStores(api, actions);
     }),
   };
