@@ -5,7 +5,6 @@ import { find, } from 'lodash';
 import Store from '../base/Store';
 import type { RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
   removeWalletFromDb,
@@ -20,7 +19,7 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
-export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
+export default class WalletSettingsStore extends Store<StoresMap> {
 
   @observable renameModelRequest: Request<(() => Promise<void>) => Promise<void>>
     = new Request(async (func) => { await func(); });

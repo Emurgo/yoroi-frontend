@@ -5,7 +5,6 @@ import type {
   SigningMessage,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
-import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
 import type {
   Anchor,
@@ -106,7 +105,7 @@ type SetWhitelistFunc = ({|
   whitelist: Array<WhitelistEntry> | void,
 |}) => Promise<void>;
 
-export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+export default class ConnectorStore extends Store<StoresMap> {
   @observable unrecoverableError: string | null = null;
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];

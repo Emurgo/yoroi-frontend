@@ -56,7 +56,7 @@ const storeClasses = Object.freeze({
 });
 
 export type StoresMap = {|
-  stateFetchStore: StateFetchStore<StoresMap, ActionsMap>,
+  stateFetchStore: StateFetchStore<StoresMap>,
   coinPriceStore: CoinPriceStore,
   tokenInfoStore: TokenInfoStore<StoresMap>,
   profile: ProfileStore,

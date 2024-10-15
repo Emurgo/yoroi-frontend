@@ -54,7 +54,7 @@ export type AdaStoresMap = {|
   ledgerConnect: LedgerConnectStore,
   ledgerSend: LedgerSendStore,
   hwVerifyAddress: HWVerifyAddressStore,
-  stateFetchStore: AdaStateFetchStore<StoresMap, ActionsMap>,
+  stateFetchStore: AdaStateFetchStore<StoresMap>,
   delegationTransaction: AdaDelegationTransactionStore,
   walletRestore: AdaWalletRestoreStore,
   delegation: AdaDelegationStore,

@@ -12,7 +12,6 @@ import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metad
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -41,7 +40,7 @@ export type MaxSendableAmountRequest =
  *
  * These can be loosened later to create a manual UTXO selection feature
  */
-export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap> {
+export default class TransactionBuilderStore extends Store<StoresMap> {
 
   /** Stores the tx information as the user is building it */
   @observable plannedTxInfoMap: PlannedTxInfoMap= [];

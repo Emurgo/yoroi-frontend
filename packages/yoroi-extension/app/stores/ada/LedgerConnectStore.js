@@ -25,7 +25,6 @@ import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walle
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
@@ -33,7 +32,7 @@ import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class LedgerConnectStore
-  extends Store<StoresMap, ActionsMap>
+  extends Store<StoresMap>
   implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
 
   // =================== VIEW RELATED =================== //

@@ -5,7 +5,6 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { HARD_DERIVATION_START } from '../../config/numbersConfig';
 import { createWallet, signTransaction } from '../../api/thunk';
@@ -19,7 +18,7 @@ import type{ WalletState } from '../../../chrome/extension/background/types';
 
 const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
-export default class AdaWalletsStore extends Store<StoresMap, ActionsMap> {
+export default class AdaWalletsStore extends Store<StoresMap> {
   // REQUESTS
 
   @observable

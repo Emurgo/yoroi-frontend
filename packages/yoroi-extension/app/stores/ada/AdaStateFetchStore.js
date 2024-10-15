@@ -10,10 +10,8 @@ import environment from '../../environment';
 
 export default class AdaStateFetchStore<
   TStores: RequiredStores,
-  TActions
 > extends BaseStateFetchStore<
   TStores,
-  TActions,
   IFetcher
 > {
 

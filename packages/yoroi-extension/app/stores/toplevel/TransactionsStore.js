@@ -16,7 +16,6 @@ import globalMessages from '../../i18n/global-messages';
 import { getNetworkById, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import moment, { Moment } from 'moment';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
@@ -48,7 +47,7 @@ export type TransactionRowsToExportRequest = {|
   endDate: typeof Moment,
 |};
 
-export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
+export default class TransactionsStore extends Store<StoresMap> {
   /** Track transactions for a set of wallets */
   @observable txHistoryStates: Array<TxHistoryState> = [];
 

@@ -18,7 +18,6 @@ import type {
   CreateFolderExternalTxMemoFunc
 } from '../../api/externalStorage/providers/IProvider.types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
   getAllTxMemos,
@@ -28,7 +27,7 @@ import {
 
 export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
-export default class MemosStore extends Store<StoresMap, ActionsMap> {
+export default class MemosStore extends Store<StoresMap> {
 
   @computed get providers(): { [key: string]: ProvidersType, ... } {
     return this.api.externalStorage.getProviders();

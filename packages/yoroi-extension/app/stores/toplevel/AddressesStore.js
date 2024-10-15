@@ -12,14 +12,13 @@ import { AddressTypeStore } from '../base/AddressSubgroupStore';
 import type { CoreAddressT } from '../../api/ada/lib/storage/database/primitives/enums';
 import type { IAddressTypeStore, IAddressTypeUiSubset } from '../stateless/addressStores';
 import { allAddressSubgroups } from '../stateless/addressStores';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ChainDerivations } from '../../config/numbersConfig';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { popAddress } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export default class AddressesStore extends Store<StoresMap, ActionsMap> {
+export default class AddressesStore extends Store<StoresMap> {
 
   // note: no need for this to be observable
   _addressSubgroupMap: Map<Class<IAddressTypeStore>, IAddressTypeStore> = new Map();

@@ -7,12 +7,11 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getProtocolParameters } from '../../api/thunk';
 
-export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
+export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
     DeferredCall<CreateWithdrawalTxResponse>
   >(request => request());

@@ -23,7 +23,6 @@ import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { Addressing, } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { genAddressingLookup } from '../../stateless/addressStores';
-import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import {
   generateCip15RegistrationMetadata,
@@ -40,7 +39,7 @@ export type SendUsingLedgerParams = {|
 |};
 
 /** Note: Handles Ledger Signing */
-export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
+export default class LedgerSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;

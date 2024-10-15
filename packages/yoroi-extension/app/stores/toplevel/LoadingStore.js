@@ -10,7 +10,6 @@ import type { UriParams } from '../../utils/URIHandling';
 import { isWithinSupply } from '../../utils/validations';
 import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
   TabIdKeys,
@@ -22,7 +21,7 @@ type SellAdaParamsType = {|
   amount: string,
 |};
 
-export default class LoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
+export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   /**
    * null if app not opened from URI Scheme OR URI scheme was invalid
    */

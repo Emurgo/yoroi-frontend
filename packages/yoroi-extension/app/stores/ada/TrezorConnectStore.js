@@ -17,7 +17,6 @@ import { StepState } from '../../components/widgets/ProgressSteps';
 import { Logger, stringifyError } from '../../utils/logging';
 import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
@@ -30,7 +29,7 @@ type TrezorConnectionResponse = {|
 
 
 export default class TrezorConnectStore
-  extends Store<StoresMap, ActionsMap>
+  extends Store<StoresMap>
   implements HWConnectStoreTypes<TrezorConnectionResponse> {
 
   // =================== VIEW RELATED =================== //

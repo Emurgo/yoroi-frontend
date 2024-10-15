@@ -16,7 +16,7 @@ export default class BaseExplorerStore
     TStores: {
       ...,
     }
-  > extends Store<TStores, any> {
+  > extends Store<TStores> {
 
   @observable getSelectedExplorerRequest: Request<typeof getSelectedExplorer>
     = new Request(getSelectedExplorer);

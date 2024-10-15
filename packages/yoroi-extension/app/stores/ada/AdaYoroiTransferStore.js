@@ -17,10 +17,9 @@ import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walle
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
-export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> {
+export default class AdaYoroiTransferStore extends Store<StoresMap> {
 
   @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
     = new Request(this.api.ada.restoreWalletForTransfer);

@@ -12,7 +12,6 @@ import { Logger, stringifyError } from '../../utils/logging';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -36,7 +35,7 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
  */
-export default class WalletStore extends Store<StoresMap, ActionsMap> {
+export default class WalletStore extends Store<StoresMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable initialSyncingWalletIds: Set<number> = observable.set();

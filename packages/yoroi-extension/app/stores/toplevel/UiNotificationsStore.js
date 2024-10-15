@@ -6,7 +6,7 @@ import type { Notification } from '../../types/notification.types';
 /** Manage a list on ongoing notifications and closes them when they expire */
 export default class UiNotificationsStore<
   TStores,
-> extends Store<TStores, any>
+> extends Store<TStores>
 {
 
   @observable activeNotifications: Array<Notification> = [];

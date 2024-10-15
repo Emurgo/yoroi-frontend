@@ -40,7 +40,7 @@ export default class TokenInfoStore<
     },
     ...
   }
-> extends Store<StoresMapType, any> {
+> extends Store<StoresMapType> {
   @observable tokenInfo: TokenInfoMap;
 
   setup(): void {

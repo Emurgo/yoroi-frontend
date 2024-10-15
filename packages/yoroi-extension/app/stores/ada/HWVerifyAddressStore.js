@@ -31,11 +31,10 @@ import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/tr
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import { genAddressingLookup } from '../stateless/addressStores';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
+export default class HWVerifyAddressStore extends Store<StoresMap> {
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError = null;
   @observable selectedAddress: ?$ReadOnly<StandardAddress> = null;

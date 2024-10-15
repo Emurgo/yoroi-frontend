@@ -3,10 +3,9 @@ import { computed } from 'mobx';
 import Store from '../base/Store';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
-export default class AppStore extends Store<StoresMap, ActionsMap> {
+export default class AppStore extends Store<StoresMap> {
 
   @computed get currentRoute(): string {
     return this.stores.router.location.pathname;

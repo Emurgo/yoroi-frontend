@@ -1,12 +1,11 @@
 // @flow
 import BaseLoadingStore from '../../../stores/base/BaseLoadingStore';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
   TabIdKeys,
 } from '../../../utils/tabManager';
 
-export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap, ActionsMap> {
+export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap> {
 
   async preLoadingScreenEnd(): Promise<void> {
     await super.preLoadingScreenEnd();

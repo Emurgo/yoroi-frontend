@@ -20,7 +20,6 @@ import { ROUTES } from '../../routes-config';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
@@ -44,7 +43,7 @@ export interface ProgressInfo {
   stepState: StepStateEnum,
 }
 
-export default class VotingStore extends Store<StoresMap, ActionsMap> {
+export default class VotingStore extends Store<StoresMap> {
   @observable progressInfo: ProgressInfo
   @observable encryptedKey: string | null = null;
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;

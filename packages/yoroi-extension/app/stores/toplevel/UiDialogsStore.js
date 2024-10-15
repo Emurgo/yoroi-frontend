@@ -28,7 +28,7 @@ type DialogEntry = {|
  */
 export default class UiDialogsStore<
   TStores,
-> extends Store<TStores, any>
+> extends Store<TStores>
 {
 
   @observable dialogList: Array<DialogEntry> = [];

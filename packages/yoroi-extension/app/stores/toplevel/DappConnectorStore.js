@@ -8,7 +8,6 @@ import type {
   WhitelistEntry,
   ConnectedSites,
 } from '../../../chrome/extension/connector/types';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { noop } from '../../coreUtils';
 import {
@@ -21,7 +20,7 @@ type SetWhitelistFunc = {|
   whitelist: Array<WhitelistEntry> | void,
 |} => Promise<void>;
 
-export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+export default class ConnectorStore extends Store<StoresMap> {
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
   @observable getConnectorWhitelistRequest: Request<

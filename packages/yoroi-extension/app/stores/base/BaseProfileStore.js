@@ -29,7 +29,7 @@ export default class BaseProfileStore
       ...
     }
   >
-  extends Store<TStores, any>
+  extends Store<TStores>
 {
 
   LANGUAGE_OPTIONS: Array<LanguageType> = [

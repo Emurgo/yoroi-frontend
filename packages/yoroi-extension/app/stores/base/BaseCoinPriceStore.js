@@ -26,7 +26,7 @@ export default class BaseCoinPriceStore
       ...,
     }
   >
-  extends Store<TStores, any>
+  extends Store<TStores>
 {
   @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number|null = null;

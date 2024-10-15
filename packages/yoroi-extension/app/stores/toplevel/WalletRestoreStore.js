@@ -13,7 +13,6 @@ import {
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import AdaApi from '../../api/ada';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -118,7 +117,7 @@ export type WalletRestoreMeta = {|
   walletPassword: string,
 |};
 
-export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
+export default class AdaWalletRestoreStore extends Store<StoresMap> {
   @observable selectedAccount: number = 0 + HARD_DERIVATION_START;
 
   @observable step: RestoreStepsType;

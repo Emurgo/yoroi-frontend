@@ -8,11 +8,10 @@ import {
 } from '../../../utils/logging';
 import { ROUTES } from '../../../routes-config';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import { signAndBroadcastTransaction } from '../../../api/thunk';
 
-export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
+export default class AdaMnemonicSendStore extends Store<StoresMap> {
 
   /** Send money and then return to transaction screen */
   sendMoney:  {|

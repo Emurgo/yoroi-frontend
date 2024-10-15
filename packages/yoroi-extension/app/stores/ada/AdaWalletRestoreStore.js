@@ -8,11 +8,10 @@ import type {
   Address,
   Addressing,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createWallet } from '../../api/thunk';
 
-export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
+export default class AdaWalletRestoreStore extends Store<StoresMap> {
   setup(): void {
     super.setup();
     this.reset();

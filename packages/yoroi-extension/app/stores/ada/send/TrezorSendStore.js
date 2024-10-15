@@ -9,7 +9,6 @@ import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError'
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ROUTES } from '../../../routes-config';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import {
   buildConnectorSignedTransaction,
@@ -31,7 +30,7 @@ export type SendUsingTrezorParams = {|
 |};
 
 /** Note: Handles Trezor Signing */
-export default class TrezorSendStore extends Store<StoresMap, ActionsMap> {
+export default class TrezorSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;
