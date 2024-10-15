@@ -14,7 +14,6 @@ import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/ic
 import { maybe } from '../../coreUtils';
 import AmountDisplay from '../common/AmountDisplay';
 import styles from './NavWalletDetailsRevamp.scss';
-import WalletAccountIcon from './WalletAccountIcon';
 import { constructPlate } from './WalletCard';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';

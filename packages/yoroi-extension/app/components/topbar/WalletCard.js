@@ -2,14 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import WalletAccountIcon from './WalletAccountIcon';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
@@ -42,8 +40,6 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?string,
   id: string,
 |};
-
-type State = {| +isActionsShow: boolean |};
 
 export function constructPlate(
   plate: WalletChecksum,
@@ -83,7 +79,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 @observer
-export default class WalletCard extends Component<Props, State> {
+export default class WalletCard extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -92,10 +88,6 @@ export default class WalletCard extends Component<Props, State> {
     isCurrentWallet: boolean,
   |} = {
     isCurrentWallet: false,
-  };
-
-  state: State = {
-    isActionsShow: false,
   };
 
   render(): Node {
@@ -217,9 +209,9 @@ export default class WalletCard extends Component<Props, State> {
               </Box>
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   transition: 'opacity 0.3s',
                   opacity: snapshot.isDragging ? 1 : 0,
                 }}
