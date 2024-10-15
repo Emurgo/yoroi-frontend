@@ -104,12 +104,11 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
   }
 
   getDialog: (void | number) => Node = publicDeriverId => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { isOpen } = this.props.stores.uiDialogs;
     if (publicDeriverId != null && isOpen(ChangeWalletPasswordDialogContainer)) {
       return (
         <ChangeWalletPasswordDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />
@@ -118,7 +117,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
     if (publicDeriverId != null && isOpen(ExportWalletDialogContainer)) {
       return (
         <ExportWalletDialogContainer
-          actions={actions}
           stores={stores}
         />
       );
@@ -130,7 +128,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
       }
       return (
         <RemoveWalletDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />
@@ -139,7 +136,6 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
     if (publicDeriverId != null && isOpen(ResyncWalletDialogContainer)) {
       return (
         <ResyncWalletDialogContainer
-          actions={actions}
           stores={stores}
           publicDeriverId={publicDeriverId}
         />

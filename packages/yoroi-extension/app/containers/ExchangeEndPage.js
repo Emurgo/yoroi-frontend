@@ -18,12 +18,12 @@ export default class ExchangeEndPage extends Component<StoresAndActionsProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
-        sidebar={<SidebarContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
         showInContainer
       >
         <ExchangeEndPageContent

@@ -70,7 +70,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const {
       uiDialogs,
       wallets: { selected },
@@ -154,7 +154,6 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           walletType={walletType}

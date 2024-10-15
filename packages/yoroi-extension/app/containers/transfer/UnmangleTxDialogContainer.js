@@ -58,12 +58,11 @@ export default class UnmangleTxDialogContainer extends Component<{| ...Props, ..
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
     const txBuilder = this.props.stores.transactionBuilderStore;
     return (
       <TransferSendPage
-        actions={actions}
         stores={stores}
         onClose={{
           trigger: this.props.onClose,

@@ -37,7 +37,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
   };
 
   render(): null | Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const ledgerConnectStore = this.props.stores.substores.ada.ledgerConnect;
 
     let component = null;
@@ -70,7 +70,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
       case ProgressStep.TRANSFER:
         component = (
           <UpgradeTxDialogContainer
-            actions={actions}
             stores={stores}
             onClose={ledgerConnectStore.finishTransfer}
             onSubmit={ledgerConnectStore.finishTransfer}

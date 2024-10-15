@@ -82,7 +82,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const { hwVerifyAddress } = this.props.stores.substores.ada;
     const publicDeriver = this.props.stores.wallets.selected;
@@ -313,7 +313,6 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
 
         {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
           <UnmangleTxDialogContainer
-            actions={actions}
             stores={stores}
             onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
           />

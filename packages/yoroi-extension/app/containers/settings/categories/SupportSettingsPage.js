@@ -39,13 +39,12 @@ export default class SupportSettingsPage extends Component<StoresAndActionsProps
   };
 
   getDialog: void => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     if (this.props.stores.uiDialogs.isOpen(IncludePublicKeyDialog)) {
       return (
         <IncludePublicKeyDialog
           downloadIncludingKey={() => downloadLogs(this.getPublicKey())}
           downloadExcludingKey={downloadLogs}
-          actions={actions}
           stores={stores}
         />
       );

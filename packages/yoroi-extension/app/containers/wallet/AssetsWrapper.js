@@ -26,20 +26,19 @@ export default class AssetsWrapper extends Component<Props> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AssetsWrapper)}.`);
 
     const { intl } = this.context;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarAssets)} />}
           />

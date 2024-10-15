@@ -39,9 +39,9 @@ export default class Settings extends Component<AllProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { children } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
 
     const menu = (
       <SettingsMenu
@@ -52,11 +52,10 @@ export default class Settings extends Component<AllProps> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={
               <NavBarTitle

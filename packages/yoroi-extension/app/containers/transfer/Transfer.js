@@ -36,11 +36,10 @@ export default class Transfer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const navbar = (
       <NavBarContainer
-        actions={actions}
         stores={stores}
         title={
           <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
@@ -49,7 +48,7 @@ export default class Transfer extends Component<AllProps> {
     );
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         navbar={navbar}
         sidebar={sidebarContainer}
         showInContainer
@@ -60,7 +59,7 @@ export default class Transfer extends Component<AllProps> {
   }
 
   getContent: void => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const wallet = this.props.stores.wallets.selected;
     if (wallet == null) {
       return <NoWalletMessage />;
@@ -75,7 +74,6 @@ export default class Transfer extends Component<AllProps> {
         <BackgroundColoredLayout>
           <Suspense fallback={null}>
             <WalletTransferPage
-              actions={actions}
               stores={stores}
               publicDeriver={wallet}
             />

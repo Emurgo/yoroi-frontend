@@ -41,8 +41,8 @@ export default class SwapPageContainer extends Component<AllProps> {
 
   render(): Node {
     const { children } = this.props;
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
 
     const menu = (
       <SwapMenu
@@ -53,11 +53,10 @@ export default class SwapPageContainer extends Component<AllProps> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={
               <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />

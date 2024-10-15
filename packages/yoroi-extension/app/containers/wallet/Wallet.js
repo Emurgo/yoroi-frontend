@@ -79,7 +79,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     // abort rendering if the page isn't valid for this wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
@@ -91,8 +91,8 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
     if (!selectedWallet) {
       return (
         <TopBarLayout
-          banner={<BannerContainer actions={actions} stores={stores} />}
-          navbar={<NavBarContainer title="" actions={actions} stores={stores} />}
+          banner={<BannerContainer stores={stores} />}
+          navbar={<NavBarContainer title="" stores={stores} />}
           showInContainer
         >
           <VerticallyCenteredLayout>
@@ -134,15 +134,14 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
       />
     );
 
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)}/>}
             menu={isInitialSyncing ? null : menu}

@@ -15,7 +15,7 @@ const RestoreWalletPageComponent = React.lazy(RestoreWalletPagePromise);
 @observer
 export default class RestoreWalletPage extends Component<StoresAndActionsProps> {
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { hasAnyWallets } = stores.wallets;
 
     const restoreWalletPageComponent = (
@@ -23,7 +23,6 @@ export default class RestoreWalletPage extends Component<StoresAndActionsProps> 
         <RestoreWalletPageComponent
           restoreWallet={stores.substores.ada.walletRestore.restoreWallet}
           stores={stores}
-          actions={actions}
           openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
           closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
           isDialogOpen={stores.uiDialogs.isOpen}
@@ -33,8 +32,8 @@ export default class RestoreWalletPage extends Component<StoresAndActionsProps> 
 
     return hasAnyWallets ? (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={<SidebarContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
+        sidebar={<SidebarContainer stores={stores} />}
         bgcolor="common.white"
       >
         {restoreWalletPageComponent}

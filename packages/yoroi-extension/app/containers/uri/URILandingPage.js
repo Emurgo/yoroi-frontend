@@ -28,7 +28,6 @@ export default class URILandingPage extends Component<StoresAndActionsProps> {
   render(): Node {
     return (
       <URILandingDialogContainer
-        actions={this.props.actions}
         stores={this.props.stores}
         onConfirm={this.onConfirm}
         onClose={this.onClose}

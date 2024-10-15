@@ -15,7 +15,7 @@ const CreateWalletPage = React.lazy(CreateWalletPagePromise);
 @observer
 export default class CreateWalletPageContainer extends Component<StoresAndActionsProps> {
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const { hasAnyWallets } = stores.wallets;
 
     const createWalletPageComponent = (
@@ -35,8 +35,8 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
 
     return hasAnyWallets ? (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={<SidebarContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
+        sidebar={<SidebarContainer stores={stores} />}
         bgcolor="common.white"
       >
         {createWalletPageComponent}

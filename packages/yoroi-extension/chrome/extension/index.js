@@ -7,7 +7,6 @@ import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import { translations } from '../../app/i18n/translations';
-import actions from '../../app/actions/index';
 import App from '../../app/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
@@ -61,7 +60,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   }
 
   render(
-    <App stores={stores} actions={actions} history={history} />,
+    <App stores={stores} history={history} />,
     root
   );
 

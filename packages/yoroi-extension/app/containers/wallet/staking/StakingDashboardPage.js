@@ -210,7 +210,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   getDialog: (WalletState) => Node = wallet => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const uiDialogs = this.props.stores.uiDialogs;
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
@@ -224,7 +224,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(UnmangleTxDialogContainer)) {
       return (
         <UnmangleTxDialogContainer
-          actions={actions}
           stores={stores}
           onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
         />
@@ -234,7 +233,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(DeregisterDialogContainer)) {
       return (
         <DeregisterDialogContainer
-          actions={actions}
           stores={stores}
           alwaysShowDeregister
           onNext={() => {
@@ -248,7 +246,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(WithdrawalTxDialogContainer)) {
       return (
         <WithdrawalTxDialogContainer
-          actions={actions}
           stores={stores}
           onClose={() => {
             stores.substores.ada.delegationTransaction.reset({ justTransaction: false });

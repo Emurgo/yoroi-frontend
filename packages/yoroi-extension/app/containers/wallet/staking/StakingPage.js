@@ -27,16 +27,15 @@ class StakingPage extends Component<StoresAndActionsProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const selectedWallet = stores.wallets.selected;
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={
               <NavBarTitle
@@ -54,7 +53,7 @@ class StakingPage extends Component<StoresAndActionsProps> {
         showInContainer
       >
         <Suspense fallback={null}>
-          <StakingPageContent stores={this.props.stores} actions={this.props.actions} />
+          <StakingPageContent stores={this.props.stores} />
         </Suspense>
       </TopBarLayout>
     );

@@ -33,7 +33,7 @@ export default class WalletTransferPage extends Component<{| ...Props, ...Stores
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const defaultToken = this.props.publicDeriver.getParent().getDefaultToken();
     const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
@@ -45,7 +45,7 @@ export default class WalletTransferPage extends Component<{| ...Props, ...Stores
           onByron={this.startTransferYoroiPaperFunds}
           ticker={truncateToken(getTokenName(defaultTokenInfo))}
         />
-        <YoroiTransferPage actions={actions} stores={stores} />
+        <YoroiTransferPage stores={stores} />
       </>
     );
   }

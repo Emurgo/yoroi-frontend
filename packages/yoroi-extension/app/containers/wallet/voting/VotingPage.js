@@ -21,22 +21,21 @@ export default class VotingPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
 
     const content = (
       <Suspense fallback={null}>
-        <VotingPageContent actions={actions} stores={stores} />
+        <VotingPageContent stores={stores} />
       </Suspense>
     );
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
-        sidebar={<SidebarContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarVoting)}/>}
           />

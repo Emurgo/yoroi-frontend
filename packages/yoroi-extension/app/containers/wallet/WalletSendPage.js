@@ -257,7 +257,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   /** Web Wallet Send Confirmation dialog
    * Callback that creates a container to avoid the component knowing about actions/stores */
   webWalletDoConfirmation: () => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { selected } = this.props.stores.wallets;
     if (!selected)
       throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
@@ -270,7 +270,6 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
 
     return (
       <WalletSendConfirmationDialogContainer
-        actions={actions}
         stores={stores}
         signRequest={signRequest}
         staleTx={transactionBuilderStore.txMismatch}

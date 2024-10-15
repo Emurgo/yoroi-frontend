@@ -48,18 +48,17 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresAndA
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const wallets = this.props.stores.wallets.wallets;
     const { intl } = this.context;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={<NavBarTitle title={intl.formatMessage(connectorMessages.dappConnector)} />}
           />

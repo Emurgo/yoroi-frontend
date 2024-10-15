@@ -98,7 +98,7 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
   };
 
   render(): null | Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const yoroiTransfer = this.props.stores.yoroiTransfer;
 
     const publicDeriver = this.props.stores.wallets.selected;
@@ -125,7 +125,6 @@ export default class YoroiTransferPage extends Component<StoresAndActionsProps> 
       case TransferStatus.DISPLAY_CHECKSUM:
         return (
           <YoroiPlatePage
-            actions={actions}
             stores={stores}
             onNext={this.checkAddresses}
             onCancel={this.backToUninitialized}

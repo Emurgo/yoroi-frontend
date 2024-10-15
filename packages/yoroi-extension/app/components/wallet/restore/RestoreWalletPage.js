@@ -21,7 +21,6 @@ import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
 import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresMap } from '../../../stores';
-import type { ActionsMap } from '../../../actions';
 import { forceNonNull } from '../../../coreUtils';
 import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
 
@@ -50,7 +49,6 @@ type Intl = {|
 
 type Props = {|
   stores: StoresMap,
-  actions: ActionsMap,
   restoreWallet: ({|
     walletName: string,
     walletPassword: string,

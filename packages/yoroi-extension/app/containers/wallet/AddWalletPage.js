@@ -50,7 +50,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { selectedNetwork } = stores.profile;
     const { uiDialogs } = stores;
 
@@ -95,7 +95,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
         />
@@ -103,7 +102,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
       activeDialog = (
         <WalletBackupDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
         />
@@ -135,7 +133,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
         throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
         <WalletRestoreDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           onBack={() => stores.uiDialogs.pop()}
@@ -153,7 +150,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       activeDialog = (
         <WalletTrezorConnectDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           onBack={() => stores.uiDialogs.pop()}
@@ -162,7 +158,6 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
       activeDialog = (
         <WalletLedgerConnectDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           onBack={() => stores.uiDialogs.pop()}
@@ -191,8 +186,8 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
       </Box>
     ) : (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
-        sidebar={<SidebarContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
       >
         {addWalletPageComponent}
       </TopBarLayout>

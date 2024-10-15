@@ -63,9 +63,9 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
 
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const { wallets } = stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
 
@@ -85,7 +85,7 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={navbarElementRevamp}
         showInContainer

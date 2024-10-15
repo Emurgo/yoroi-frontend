@@ -21,15 +21,15 @@ export default class WalletSwitch extends Component<StoresAndActionsProps> {
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const { stores } = this.props;
+    const sidebarContainer = (<SidebarContainer stores={stores} />);
 
     const navbarElement = (
       <NavBar title={undefined} />
     );
     return (
       <TopBarLayout
-        banner={(<BannerContainer actions={actions} stores={stores} />)}
+        banner={(<BannerContainer stores={stores} />)}
         sidebar={sidebarContainer}
         navbar={navbarElement}
         showInContainer

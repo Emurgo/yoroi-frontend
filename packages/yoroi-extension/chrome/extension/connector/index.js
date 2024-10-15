@@ -9,7 +9,6 @@ import { setupApi } from '../../../app/api/index';
 import createStores from '../../../app/connector/stores/index';
 // eslint-disable-next-line no-unused-vars
 import { translations } from '../../../app/i18n/translations';
-import actions from '../../../app/connector/actions/index';
 // eslint-disable-next-line no-unused-vars
 import App from '../../../app/connector/App';
 import BigNumber from 'bignumber.js';
@@ -61,7 +60,7 @@ const initializeDappConnector: void => Promise<void> = async () => {
     },
   }: LoadOptionsWithEnvironment)).promise;
 
-  render(<App stores={stores} actions={actions} history={history} />, root);
+  render(<App stores={stores} history={history} />, root);
 };
 
 addCloseListener(TabIdKeys.YoroiConnector);

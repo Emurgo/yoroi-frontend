@@ -180,7 +180,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
 
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { uiDialogs, delegation: delegationStore } = stores;
     const delegationRequests = delegationStore.getDelegationRequests(wallet.publicDeriverId);
     if (delegationRequests == null) {
@@ -260,7 +260,6 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
 
         <CardanoStakingPage
           stores={this.props.stores}
-          actions={this.props.actions}
           urlTemplate={CONFIG.poolExplorer.simpleTemplate}
           poolTransition={delegationStore.getPoolTransitionInfo(wallet)}
         />
@@ -291,7 +290,6 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
         ) : null}
         {uiDialogs.isOpen(DeregisterDialogContainer) ? (
           <DeregisterDialogContainer
-            actions={actions}
             stores={stores}
             alwaysShowDeregister
             onNext={() => {
@@ -305,14 +303,13 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog actions={actions} stores={stores} onClose={this.onClose} intl={this.context.intl} />
+          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context.intl} />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
-          <UnmangleTxDialogContainer actions={actions} stores={stores} onClose={this.onClose} />
+          <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
           <WithdrawalTxDialogContainer
-            actions={actions}
             stores={stores}
             onClose={() => {
               stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
@@ -322,7 +319,6 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
         ) : null}
         {uiDialogs.isOpen(WithdrawRewardsDialog) ? (
           <WithdrawRewardsDialog
-            actions={actions}
             stores={stores}
             onClose={() => {
               stores.substores.ada.delegationTransaction.reset({ justTransaction: false });

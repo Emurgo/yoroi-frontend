@@ -39,7 +39,7 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
   }
 
   render(): null | Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const votingStore = stores.substores.ada.votingStore;
     if (votingStore.createVotingRegTx.isExecuting) {
       return <CreateTxExecutingDialog />;
@@ -91,7 +91,6 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
       case ProgressStep.REGISTER:
         component = (
           <RegisterDialogContainer
-            actions={actions}
             stores={stores}
             stepsList={stepsList}
             submit={votingStore.submitRegister}
@@ -104,7 +103,6 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
       case ProgressStep.TRANSACTION:
         component = (
           <TransactionDialogContainer
-            actions={actions}
             stores={stores}
             stepsList={stepsList}
             cancel={this.cancel}

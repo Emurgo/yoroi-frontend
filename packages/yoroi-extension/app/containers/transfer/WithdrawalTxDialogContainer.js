@@ -26,7 +26,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
 
     if (this.props.stores.profile.selectedNetwork == null) {
@@ -39,7 +39,6 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
     const { createWithdrawalTx } = this.props.stores.substores.ada.delegationTransaction;
     return (
       <TransferSendPage
-        actions={actions}
         stores={stores}
         onClose={{
           trigger: this.props.onClose,
