@@ -2,15 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import styles from './WalletCard.scss';
 import WalletAccountIcon from './WalletAccountIcon';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import classnames from 'classnames';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import globalMessages from '../../i18n/global-messages';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { ReactComponent as DragIcon } from '../../assets/images/add-wallet/wallet-list/drag.inline.svg';
 import { Draggable } from 'react-beautiful-dnd';
@@ -18,7 +15,8 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import AmountDisplay from '../common/AmountDisplay';
 import { maybe } from '../../coreUtils';
 import type { WalletType } from '../../../chrome/extension/background/types';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
+import { truncateLongName } from '../../utils/formatters';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -44,23 +42,45 @@ type Props = {|
   id: string,
 |};
 
-type State = {| +isActionsShow: boolean |};
-
 export function constructPlate(
   plate: WalletChecksum,
   saturationFactor: number,
-  divClass: string
+  size: number,
+  scalePx: number,
+  iconSize: number,
+  borderRadius: number,
 ): [string, React$Element<'div'>] {
-  return [
-    plate.TextPart,
-    <div className={divClass}>
-      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
-    </div>,
-  ];
+  return [plate.TextPart, (
+    <Box
+      sx={{
+        width: `${iconSize}px`,
+        height: `${iconSize}px`,
+        borderRadius: `${borderRadius}px`,
+        alignItems: 'center',
+        justifyContent: 'center',
+        '& .identicon': {
+          borderRadius: `${borderRadius}px`,
+        },
+      }}
+    >
+      <WalletAccountIcon
+        iconSeed={plate.ImagePart}
+        saturationFactor={saturationFactor}
+        size={size}
+        scalePx={scalePx}
+      />
+    </Box>
+  )];
 }
 
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg path': {
+    fill: theme.palette.ds.el_gray_medium,
+  },
+}));
+
 @observer
-export default class WalletCard extends Component<Props, State> {
+export default class WalletCard extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -71,39 +91,12 @@ export default class WalletCard extends Component<Props, State> {
     isCurrentWallet: false,
   };
 
-  state: State = {
-    isActionsShow: false,
-  };
-
-  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = type => {
-    if (type === 'ledger') {
-      return globalMessages.ledgerWallet;
-    }
-    if (type === 'trezor') {
-      return globalMessages.trezorWallet;
-    }
-    return globalMessages.standardWallet;
-  };
-
-  showActions: void => void = () => {
-    this.setState({ isActionsShow: true });
-  };
-
-  hideActions: void => void = () => {
-    this.setState({ isActionsShow: false });
-  };
-
   render(): Node {
     const { intl } = this.context;
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
-    const { isActionsShow } = this.state;
 
-    const [, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
+    const [walletPlate, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, 8, 5, 40, 4) : [];
 
-    const typeText = [this.getType(this.props.type)]
-      .filter(text => text != null)
-      .map(text => intl.formatMessage(text))
-      .join(' - ');
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
     const buttonId = `${id}-selectWallet_${idx}-button`;
@@ -112,43 +105,77 @@ export default class WalletCard extends Component<Props, State> {
     const walletTokensAmountId = `${id}:walletCard_${idx}-walletTokensAmount-text`;
     const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
 
+    const draggableBoxBorderColor = (isDragging) => {
+      if (isDragging) {
+        return 'ds.gray_200';
+      }
+      if (this.props.isCurrentWallet === true) {
+        return 'ds.primary_600';
+      }
+      return 'transparent';
+    }
+
     return (
       <Box sx={{ background: 'ds.bg_color_max' }} mb="16px">
         <Draggable draggableId={walletId.toString()} index={idx}>
-          {(provided, snapshot) => (
-            <div
+          {(provided, snapshot) => {
+            return (
+            <Box
               tabIndex="0"
               role="button"
-              className={classnames(
-                styles.cardWrapper,
-                this.props.isCurrentWallet === true && styles.currentCardWrapper,
-                snapshot.isDragging === true && styles.isDragging
-              )}
-              onMouseEnter={this.showActions}
-              onMouseLeave={this.hideActions}
               {...provided.draggableProps}
               ref={provided.innerRef}
+              sx={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderRadius: '8px',
+                border: `1px solid`,
+                borderColor: draggableBoxBorderColor(snapshot.isDragging),
+                '&:hover': {
+                  borderColor: this.props.isCurrentWallet !== true && 'ds.gray_300',
+                  '& .dragIcon': {
+                    opacity: 1,
+                  },
+                },
+                cursor: 'pointer',
+                backgroundColor: snapshot.isDragging ? 'ds.bg_color_min' : 'transparent',
+                opacity: snapshot.isDragging ? '0.4' : '1',
+              }}
             >
-              <div
-                className={styles.main}
+              <Box
                 role="button"
                 tabIndex="0"
                 onClick={this.props.onSelect}
                 onKeyDown={this.props.onSelect}
                 id={buttonId}
               >
-                <div className={styles.header}>
-                  <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" mr="5px">
-                    {this.props.name}
-                  </Typography>
-                  {' ·  '}
-                  <Typography variant="body2" color="ds.text_gray_medium" ml="5px">
-                    {typeText}
-                  </Typography>
-                </div>
-                <div className={styles.body}>
-                  <div>{iconComponent}</div>
-                  <div className={styles.content}>
+                <Box display="flex" gap="24px">
+                  {/* Wallet icon, wallet name, wallet plate */}
+                  <Box display="flex" gap="8px">
+                    {iconComponent}
+                    <Box maxWidth="112px" width="112px">
+                      <Typography
+                        id={walletNameId}
+                        variant="body2"
+                        color="ds.text_gray_medium"
+                        fontWeight={500}
+                      >
+                        {truncateLongName(this.props.name)}
+                      </Typography>
+                      <Typography variant="caption1" color="ds.text_gray_low">
+                        {walletPlate}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* Wallet balance */}
+                  <Box sx={{
+                    '& .MuiTypography-root': {
+                      mt: '0px',
+                      mb: '0px',
+                    }
+                  }}>
                     <AmountDisplay
                       shouldHideBalance={shouldHideBalance}
                       amount={totalAmount}
@@ -159,35 +186,45 @@ export default class WalletCard extends Component<Props, State> {
                       getCurrentPrice={getCurrentPrice}
                       id={walletBalanceId}
                     />
-                  </div>
-                  <div className={styles.extraInfo}>
-                    <div className={styles.label}>
-                      {intl.formatMessage(messages.tokenTypes)}{' '}
-                      <span className={styles.value} id={walletTokensAmountId}>
+                  </Box>
+                  {/* Tokens amount info */}
+                  <Box color='ds.text_gray_medium'>
+                    <Box display="flex" alignItems="center">
+                      <Typography variant="body2" marginRight="4px" lineHeight="16px">
+                        {intl.formatMessage(messages.tokenTypes)}{':'}
+                      </Typography>
+                      <Typography variant="caption1" fontWeight={500} lineHeight="16px" id={walletTokensAmountId}>
                         {tokenTypes}
-                      </span>
-                    </div>
-                    <div className={styles.label}>
-                      NFTs{' '}
-                      <span className={styles.value} id={walletNFTsAmountId}>
+                      </Typography>
+                    </Box>
+                    <Box display="flex" alignItems="center" mt="8px">
+                      <Typography variant="body2" marginRight="4px" lineHeight="16px">
+                        NFTs{':'}
+                      </Typography>
+                      <Typography variant="caption1" fontWeight={500} lineHeight="16px" id={walletNFTsAmountId}>
                         {nfts}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                className={classnames(
-                  styles.actions,
-                  (isActionsShow === true || snapshot.isDragging === true) && styles.showActions
-                )}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'opacity 0.3s',
+                  opacity: snapshot.isDragging ? 1 : 0,
+                }}
+                className='dragIcon'
+                {...provided.dragHandleProps}
               >
-                <div {...provided.dragHandleProps}>
+                <IconWrapper>
                   <DragIcon />
-                </div>
-              </div>
-            </div>
-          )}
+                </IconWrapper>
+              </Box>
+            </Box>
+          )}}
         </Draggable>
       </Box>
     );

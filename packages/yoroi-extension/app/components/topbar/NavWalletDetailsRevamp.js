@@ -14,7 +14,7 @@ import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/ic
 import { maybe } from '../../coreUtils';
 import AmountDisplay from '../common/AmountDisplay';
 import styles from './NavWalletDetailsRevamp.scss';
-import WalletAccountIcon from './WalletAccountIcon';
+import { constructPlate } from './WalletCard';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -47,15 +47,6 @@ type Props = {|
   +openWalletInfoDialog: () => void,
 |};
 
-function constructPlate(plate: WalletChecksum, saturationFactor: number, divClass: string): [string, React$Element<'div'>] {
-  return [
-    plate.TextPart,
-    <div className={divClass}>
-      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
-    </div>,
-  ];
-}
-
 @observer
 export default class NavWalletDetailsRevamp extends Component<Props> {
   static defaultProps: {|
@@ -87,7 +78,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
     const totalAmount = this.getTotalAmount();
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
-    const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, styles.icon) : [];
+    const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, 8, 4, 32, 4) : [];
     const amountDisplayId = `topBar:selectedWallet`;
 
     return (
@@ -109,7 +100,9 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       >
         <div className={styles.outerWrapper}>
           <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
-            <div className={classnames([styles.plate])}>{iconComponent}</div>
+            <Box marginRight="8px">
+              {iconComponent}
+            </Box>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
                 <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
@@ -121,7 +114,14 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               </div>
               <div className={styles.balance}>
                 <Box
-                  sx={{ color: 'grayscale.max', height: '100%' }}
+                  sx={{
+                    color: 'grayscale.max',
+                    height: '100%',
+                    '& .MuiTypography-root': {
+                      mt: '0px',
+                      mb: '0px',
+                    }
+                  }}
                   className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
                 >
                   <AmountDisplay
