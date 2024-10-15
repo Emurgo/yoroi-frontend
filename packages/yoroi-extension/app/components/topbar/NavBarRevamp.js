@@ -23,6 +23,7 @@ class NavBarRevamp extends Component<Props> {
     buyButton: void,
     menu: void,
     pageBanner: boolean,
+    isErrorPage: boolean
   |} = {
     children: undefined,
     goToNotifications: undefined,
@@ -30,15 +31,16 @@ class NavBarRevamp extends Component<Props> {
     buyButton: undefined,
     menu: undefined,
     pageBanner: false,
+    pageBanner: false,
   };
 
   render(): Node {
-    const { title, children, walletDetails, menu, buyButton, pageBanner } = this.props;
+    const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = this.props;
     return (
       <Box
         sx={{
           backgroundColor: 'ds.bg_color_max',
-          borderBottom: pageBanner ? 'none' : '1px solid',
+          borderBottom: pageBanner || isErrorPage ? 'none' : '1px solid',
           borderBottomColor: 'grayscale.200',
         }}
       >
@@ -73,7 +75,7 @@ class NavBarRevamp extends Component<Props> {
                 )}
               </Box>
             </Box>
-            {menu != null ? <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box> : null}
+            {menu != null && !isErrorPage ? <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box> : null}
           </Box>
         </Box>
       </Box>
