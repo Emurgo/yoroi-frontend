@@ -18,7 +18,6 @@ import DelegationStore from './toplevel/DelegationStore';
 import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
 import { RouterStore } from 'mobx-react-router';
-import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
@@ -131,7 +130,6 @@ function initializeSubstore<T: {...}>(
 export default (action(
   async (
     api: Api,
-    actions: ActionsMap,
     // $FlowFixMe[value-as-type]
     router: RouterStore
   ): Promise<StoresMap> => {
@@ -153,7 +151,7 @@ export default (action(
     storeNames.forEach(name => {
       // Careful: we pass incomplete `store` down to child components
       // Any toplevel store that accesses `store` in its constructor may crash
-      stores[name] = ((new storeClasses[name](stores, api, actions)): any);
+      stores[name] = ((new storeClasses[name](stores, api)): any);
     });
     storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
@@ -162,7 +160,7 @@ export default (action(
      * Because to make sure all substores are non-null we have to create the object
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
-      ada: setupAdaStores((stores: any), api, actions),
+      ada: setupAdaStores((stores: any), api),
     };
 
     const loadedStores: StoresMap = (stores: any);
@@ -176,4 +174,4 @@ export default (action(
     return loadedStores;
   }
   // $FlowFixMe[value-as-type]
-): (Api, ActionsMap, RouterStore) => StoresMap);
+): (Api, RouterStore) => StoresMap);

@@ -38,7 +38,6 @@ export default class AddressesStore extends Store<StoresMap> {
     for (const store of allAddressSubgroups) {
       this._addressSubgroupMap.set(store.class, new store.class({
         stores: this.stores,
-        actions: this.actions,
         name: store.name,
       }));
     }

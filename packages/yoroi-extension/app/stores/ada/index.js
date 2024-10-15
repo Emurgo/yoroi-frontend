@@ -19,7 +19,6 @@ import AdaDelegationStore from './AdaDelegationStore';
 import AdaMnemonicSendStore from './send/AdaMnemonicSendStore';
 import VotingStore from './VotingStore';
 import SwapStore from './SwapStore';
-import type { ActionsMap } from '../../actions/index';
 import type { Api } from '../../api/index';
 import type { StoresMap } from '../index';
 import BaseCardanoTimeStore from '../base/BaseCardanoTimeStore';
@@ -91,13 +90,12 @@ export default (action(
   (
     stores: StoresMap,
     api: Api,
-    actions: ActionsMap,
   ): AdaStoresMap => {
     const storeNames: Array<$Keys<typeof adaStoreClasses>> = Object.keys(adaStoreClasses);
     storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
     storeNames.forEach(name => {
-      adaStores[name] = ((new adaStoreClasses[name](stores, api, actions)): any);
+      adaStores[name] = ((new adaStoreClasses[name](stores, api)): any);
     });
     return (adaStores: any);
   }
-): (StoresMap, Api, ActionsMap) => AdaStoresMap);
+): (StoresMap, Api) => AdaStoresMap);
