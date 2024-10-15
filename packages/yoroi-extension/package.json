@@ -6,7 +6,7 @@
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
     "dev:main": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev main --env mainnet",
     "dev:background": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev background  --env mainnet",
-    "dev:stable": "rimraf dev/ && concurrently  -n  extension,background \"npm run dev:main\"  \"npm run dev:background\"",
+    "dev:stable": "rimraf dev/ && concurrently -c auto  -n  extension,background \"npm run dev:main\"  \"npm run dev:background\"",
     "dev:nightly": "rimraf dev/ && concurrently   -n  extension,background \"npm run dev:main --nightly\"  \"npm run dev:background --nightly\" ",
     "prod:build-mv2": "rimraf build/ && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production babel-node scripts-mv2/build --type=prod",
     "prod:build": "rimraf build/ && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production babel-node scripts/build",

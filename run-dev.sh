@@ -1,1 +1,1 @@
-nvm i && . install-all.sh && npm run dev-mv2 --prefix packages/yoroi-extension
+nvm i && . install-all.sh && npm run dev:stable --prefix packages/yoroi-extension
