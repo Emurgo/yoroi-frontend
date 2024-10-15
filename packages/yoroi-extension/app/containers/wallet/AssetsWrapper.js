@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -11,9 +10,10 @@ import globalMessages from '../../i18n/global-messages';
 import SidebarContainer from '../SidebarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
   +children?: Node,
 |};
 @observer

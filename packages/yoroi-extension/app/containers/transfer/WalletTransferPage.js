@@ -5,20 +5,19 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   publicDeriver: PublicDeriver<>,
 |};
 
 @observer
-export default class WalletTransferPage extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class WalletTransferPage extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };

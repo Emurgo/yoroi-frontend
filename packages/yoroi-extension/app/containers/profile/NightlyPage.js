@@ -6,9 +6,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import NightlyForm from '../../components/profile/nightly/NightlyForm';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({
   title: {
@@ -18,7 +18,7 @@ const messages = defineMessages({
 });
 
 @observer
-export default class NightlyPage extends Component<StoresAndActionsProps> {
+export default class NightlyPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

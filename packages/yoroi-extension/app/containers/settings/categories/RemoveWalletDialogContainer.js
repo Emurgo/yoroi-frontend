@@ -8,14 +8,13 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   publicDeriverId: number,
 |};
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 const dialogMessages = defineMessages({
   warning2: {

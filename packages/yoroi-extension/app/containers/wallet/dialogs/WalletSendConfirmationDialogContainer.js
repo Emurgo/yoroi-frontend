@@ -2,13 +2,13 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../../stores';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -21,7 +21,7 @@ type LocalProps = {|
   +openTransactionSuccessDialog: () => void,
 |};
 
-type Props = {| ...StoresAndActionsProps, ...LocalProps |};
+type Props = {| ...StoresProps, ...LocalProps |};
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {

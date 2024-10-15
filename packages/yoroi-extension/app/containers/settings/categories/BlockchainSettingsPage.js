@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
 import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
@@ -12,9 +11,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class BlockchainSettingsPage extends Component<StoresAndActionsProps> {
+export default class BlockchainSettingsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

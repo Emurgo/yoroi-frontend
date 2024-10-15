@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -25,9 +24,10 @@ import WalletLedgerConnectDialogContainer from './dialogs/WalletLedgerConnectDia
 import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class AddWalletPage extends Component<StoresAndActionsProps> {
+export default class AddWalletPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
@@ -15,8 +15,8 @@ import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
-import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
+import setupAdaStores from './ada/index';
 import { RouterStore } from 'mobx-react-router';
 import type { Api } from '../api/index';
 import StateFetchStore from './toplevel/StateFetchStore';
@@ -175,3 +175,7 @@ export default (action(
   }
   // $FlowFixMe[value-as-type]
 ): (Api, RouterStore) => StoresMap);
+
+export type StoresProps = {|
+  +stores: StoresMap,
+|};

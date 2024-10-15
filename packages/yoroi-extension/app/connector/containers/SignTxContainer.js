@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
@@ -17,10 +16,11 @@ import AddCollateralPage from '../components/signin/AddCollateralPage';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { ConnectorStoresProps } from '../stores';
 
 @observer
 export default class SignTxContainer extends Component<
-  ConnectorStoresAndActionsProps
+  ConnectorStoresProps
 > {
   @observable notificationElementId: string = '';
 

@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,
@@ -42,9 +41,10 @@ import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
 import { maybe } from '../../coreUtils';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletReceivePage extends Component<StoresAndActionsProps> {
+export default class WalletReceivePage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   @observable notificationElementId: string = '';

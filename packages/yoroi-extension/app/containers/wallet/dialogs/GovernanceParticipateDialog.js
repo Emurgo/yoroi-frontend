@@ -7,7 +7,7 @@ import { defineMessages } from 'react-intl';
 
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ROUTES } from '../../../routes-config';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   title: {
@@ -30,7 +30,7 @@ type Props = {|
   intl: $npm$ReactIntl$IntlFormat,
 |};
 
-type AllProps = {| ...StoresAndActionsProps, ...Props |};
+type AllProps = {| ...StoresProps, ...Props |};
 
 export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps): React$Node => {
   return (

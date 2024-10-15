@@ -1,13 +1,13 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType, StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
+import type { StoresProps } from '../../../../stores';
 
 type Props = {|
   +stepsList: StepsList,
@@ -18,7 +18,7 @@ type Props = {|
   +walletType: WalletType,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class TransactionDialogContainer extends Component<AllProps> {

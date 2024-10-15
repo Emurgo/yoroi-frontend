@@ -2,19 +2,19 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import type { SidebarCategoryRevamp } from '../stores/stateless/sidebarCategories';
 import { allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { ROUTES } from '../routes-config';
 import { runInAction } from 'mobx';
+import type { StoresProps } from '../stores';
 
 type State = {|
   featureFlags: { [string]: boolean },
 |};
 
 @observer
-export default class SidebarContainer extends Component<StoresAndActionsProps, State> {
+export default class SidebarContainer extends Component<StoresProps, State> {
 
   state: State = {
     featureFlags: {},

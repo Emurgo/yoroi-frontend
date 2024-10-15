@@ -5,7 +5,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
@@ -23,9 +22,10 @@ import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { maybe, noop } from '../../../coreUtils';
 import type { WalletState } from '../../../../chrome/extension/background/types';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
+export default class StakingDashboardPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

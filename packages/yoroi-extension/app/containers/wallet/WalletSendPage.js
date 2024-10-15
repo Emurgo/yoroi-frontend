@@ -6,7 +6,6 @@ import { action, observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
 
@@ -28,6 +27,7 @@ import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNF
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -51,7 +51,7 @@ const messages = defineMessages({
 });
 
 @observer
-export default class WalletSendPage extends Component<StoresAndActionsProps> {
+export default class WalletSendPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

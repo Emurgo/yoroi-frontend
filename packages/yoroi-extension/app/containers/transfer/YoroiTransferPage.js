@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
 import YoroiPlatePage from './YoroiPlatePage';
@@ -21,12 +20,13 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 // Stay this long on the success page, then jump to the wallet transactions page
 const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 @observer
-export default class YoroiTransferPage extends Component<StoresAndActionsProps> {
+export default class YoroiTransferPage extends Component<StoresProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,

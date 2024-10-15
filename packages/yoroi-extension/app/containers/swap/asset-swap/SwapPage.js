@@ -6,7 +6,6 @@ import { CreateSwapOrder } from './CreateSwapOrder';
 import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
@@ -33,6 +32,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -56,7 +56,7 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-function SwapPage(props: StoresAndActionsProps & Intl): Node {
+function SwapPage(props: StoresProps & Intl): Node {
   const { stores } = props;
   const [openedDialog, setOpenedDialog] = useState('');
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
@@ -463,4 +463,4 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresAndActionsProps>);
+export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresProps>);

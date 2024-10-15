@@ -4,7 +4,6 @@ import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -15,13 +14,14 @@ import { ROUTES } from '../../routes-config';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { connectorMessages } from '../../i18n/global-messages';
+import type { StoresProps } from '../../stores';
 
 export const ConnectedWebsitesPagePromise: void => Promise<any> = () =>
   import('../../components/dapp-connector/ConnectedWebsites/ConnectedWebsitesPage');
 const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
 @observer
-export default class ConnectedWebsitesPageContainer extends Component<StoresAndActionsProps> {
+export default class ConnectedWebsitesPageContainer extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

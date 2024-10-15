@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -14,12 +13,13 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   +children?: Node,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class SwapPageContainer extends Component<AllProps> {

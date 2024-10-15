@@ -2,7 +2,6 @@
 
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -28,6 +27,7 @@ import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
 import Dialog from '../../../components/widgets/Dialog';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -58,7 +58,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class WithdrawRewardsDialog extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

@@ -11,7 +11,6 @@ import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
@@ -21,12 +20,13 @@ import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimati
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   +children: Node,
 |};
 @observer
-export default class Wallet extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

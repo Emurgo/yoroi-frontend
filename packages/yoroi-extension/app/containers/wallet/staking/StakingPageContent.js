@@ -28,13 +28,13 @@ import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
 @observer
-export default class StakingPageContent extends Component<StoresAndActionsProps> {
+export default class StakingPageContent extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

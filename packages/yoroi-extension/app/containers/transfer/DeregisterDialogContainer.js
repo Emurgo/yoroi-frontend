@@ -6,11 +6,11 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import WarningBox from '../../components/widgets/WarningBox';
 
 import DangerousActionDialog from '../../components/widgets/DangerousActionDialog';
+import type { StoresProps } from '../../stores';
 
 const dialogMessages = defineMessages({
   title: {
@@ -60,7 +60,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class DeregisterDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class DeregisterDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

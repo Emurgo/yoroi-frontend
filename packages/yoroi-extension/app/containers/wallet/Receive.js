@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -10,13 +9,14 @@ import { buildRoute } from '../../utils/routing';
 import { routeForStore, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import { Box } from '@mui/material';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
+import type { StoresProps } from '../../stores';
 
 type LocalProps = {|
   +children?: Node,
 |};
 
 @observer
-export default class Receive extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class Receive extends Component<{| ...StoresProps, ...LocalProps |}> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };

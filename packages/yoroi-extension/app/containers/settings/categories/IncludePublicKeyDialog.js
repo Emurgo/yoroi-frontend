@@ -7,9 +7,8 @@ import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   +downloadIncludingKey: void => void,
@@ -32,7 +31,7 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };

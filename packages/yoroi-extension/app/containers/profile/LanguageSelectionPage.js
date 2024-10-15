@@ -7,14 +7,14 @@ import { intlShape } from 'react-intl';
 import environment from '../../environment';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class LanguageSelectionPage extends Component<StoresAndActionsProps> {
+export default class LanguageSelectionPage extends Component<StoresProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -44,7 +44,7 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
     await stores.profile.acceptLocale();
   };
 
-  renderByron(props: StoresAndActionsProps): Node {
+  renderByron(props: StoresProps): Node {
     const { selected } = this.props.stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
     const displayedBanner = props.stores

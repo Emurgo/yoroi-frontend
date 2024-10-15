@@ -8,7 +8,6 @@ import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
@@ -26,6 +25,7 @@ import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
 import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -42,7 +42,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class WalletRestoreDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -12,9 +11,10 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, defineMessages } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { matchPath } from 'react-router';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
   +children?: Node,
 |};
 

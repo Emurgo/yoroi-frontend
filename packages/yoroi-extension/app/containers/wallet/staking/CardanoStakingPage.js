@@ -6,7 +6,6 @@ import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import Dialog from '../../../components/widgets/Dialog';
@@ -30,13 +29,14 @@ import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
 import { Box } from '@mui/system';
 import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   urlTemplate: ?string,
   poolTransition: ?PoolTransition,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 type State = {|
   firstPool: PoolData | void,

@@ -3,14 +3,14 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletBackupDialog from '../../../components/wallet/WalletBackupDialog';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   +onClose: void => void,
 |};
 
 @observer
-export default class WalletBackupDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class WalletBackupDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
   onCancelBackup: (() => void) = () => {
     this.props.onClose();

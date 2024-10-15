@@ -10,8 +10,7 @@ import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
-import type { StoresMap } from './stores/index';
-import type { StoresAndActionsProps } from './types/injectedProps.types';
+import type { StoresMap, StoresProps } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -479,7 +478,7 @@ const GovernanceSubpages = (stores) => (
   </Switch>
 );
 
-export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node {
+export function wrapSwap(swapProps: StoresProps, children: Node): Node {
   // const queryClient = new QueryClient();
   const loader = (
     <FullscreenLayout bottomPadding={0}>
@@ -499,7 +498,7 @@ export function wrapSwap(swapProps: StoresAndActionsProps, children: Node): Node
   );
 }
 
-export function wrapSettings(settingsProps: StoresAndActionsProps, children: Node): Node {
+export function wrapSettings(settingsProps: StoresProps, children: Node): Node {
   return (
     <Settings {...settingsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -507,7 +506,7 @@ export function wrapSettings(settingsProps: StoresAndActionsProps, children: Nod
   );
 }
 
-export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): Node {
+export function wrapAssets(assetsProps: StoresProps, children: Node): Node {
   return (
     <AssetsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -515,7 +514,7 @@ export function wrapAssets(assetsProps: StoresAndActionsProps, children: Node): 
   );
 }
 
-export function wrapNFTs(assetsProps: StoresAndActionsProps, children: Node): Node {
+export function wrapNFTs(assetsProps: StoresProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -523,7 +522,7 @@ export function wrapNFTs(assetsProps: StoresAndActionsProps, children: Node): No
   );
 }
 
-export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): Node {
+export function wrapWallet(walletProps: StoresProps, children: Node): Node {
   return (
     <Wallet {...walletProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -531,12 +530,12 @@ export function wrapWallet(walletProps: StoresAndActionsProps, children: Node): 
   );
 }
 
-export function wrapReceive(receiveProps: StoresAndActionsProps, children: Node): Node {
+export function wrapReceive(receiveProps: StoresProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
 }
 
 // NEW UI - TODO: to be refactred
-export function wrapGovernance(governanceProps: StoresAndActionsProps, children: Node): Node {
+export function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
   const { stores } = governanceProps;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
@@ -556,7 +555,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
     </GovernanceContextProvider>
   );
 }
-export function wrapPortfolio(portfolioProps: StoresAndActionsProps, children: Node): Node {
+export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   return (
     <PortfolioContextProvider settingFiatPairUnit={portfolioProps.stores.profile.unitOfAccount}>
       <Suspense fallback={null}>{children}</Suspense>

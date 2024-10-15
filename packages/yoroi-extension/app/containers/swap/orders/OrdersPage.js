@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
@@ -32,6 +31,7 @@ import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
+import type { StoresProps } from '../../../stores';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -89,7 +89,7 @@ const orderColumns: Array<Column> = [
   },
 ];
 
-export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
+export default function SwapOrdersPage(props: StoresProps): Node {
   const { order: orderApi } = useSwap();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);

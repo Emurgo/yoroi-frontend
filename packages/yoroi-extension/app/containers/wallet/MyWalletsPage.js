@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -24,9 +23,10 @@ import globalMessages from '../../i18n/global-messages';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class MyWalletsPage extends Component<StoresAndActionsProps> {
+export default class MyWalletsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

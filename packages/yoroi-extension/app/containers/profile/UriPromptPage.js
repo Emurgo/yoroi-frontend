@@ -11,7 +11,6 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import UriPromptForm from '../../components/profile/uri-prompt/UriPromptForm';
 import UriAccept from '../../components/profile/uri-prompt/UriAccept';
 
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
@@ -19,9 +18,10 @@ import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { noop } from '../../coreUtils';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class UriPromptPage extends Component<StoresAndActionsProps> {
+export default class UriPromptPage extends Component<StoresProps> {
 
   @observable
   isAccepted: boolean = false;

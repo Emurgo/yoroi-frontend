@@ -1,19 +1,19 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import React, { Component, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { Box } from '@mui/material';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
+import type { StoresProps } from '../../../stores';
 
 export const RestoreWalletPagePromise: void => Promise<any> = () =>
   import('../../../components/wallet/restore/RestoreWalletPage');
 const RestoreWalletPageComponent = React.lazy(RestoreWalletPagePromise);
 
 @observer
-export default class RestoreWalletPage extends Component<StoresAndActionsProps> {
+export default class RestoreWalletPage extends Component<StoresProps> {
   render(): Node {
     const { stores } = this.props;
     const { hasAnyWallets } = stores.wallets;

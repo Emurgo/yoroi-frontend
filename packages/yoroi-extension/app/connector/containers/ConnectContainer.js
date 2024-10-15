@@ -4,13 +4,13 @@ import { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
 import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { ConnectorStoresProps } from '../stores';
 
 declare var chrome;
 
@@ -25,7 +25,7 @@ type State = {|
 
 @observer
 export default class ConnectContainer extends Component<
-  ConnectorStoresAndActionsProps,
+  ConnectorStoresProps,
   State
 > {
   state: State = {

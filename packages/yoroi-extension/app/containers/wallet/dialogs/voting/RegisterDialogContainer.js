@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -12,6 +11,7 @@ import Dialog from '../../../../components/widgets/Dialog';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
+import type { StoresProps } from '../../../../stores';
 
 type Props = {|
   +stepsList: StepsList,
@@ -21,7 +21,7 @@ type Props = {|
   +onError: Error => void,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class RegisterDialogContainer extends Component<AllProps> {

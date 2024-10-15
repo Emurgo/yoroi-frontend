@@ -1,7 +1,6 @@
 // @flow
 import { observer } from 'mobx-react';
 import { Component } from 'react';
-import type {  StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { ComponentType, Node } from 'react';
 import {
   genLookupOrFail,
@@ -15,9 +14,10 @@ import { Box } from '@mui/system';
 import TokenDetails from '../../components/wallet/assets/TokenDetails';
 import { getDescriptionFromTokenMetadata } from '../../utils/nftMetadata';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
 |};
 type MatchProps = {|
   match: Match,

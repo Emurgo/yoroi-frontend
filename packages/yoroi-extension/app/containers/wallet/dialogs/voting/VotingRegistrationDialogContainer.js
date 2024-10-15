@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { WalletType } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -15,13 +14,14 @@ import RegisterDialogContainer from './RegisterDialogContainer';
 import globalMessages from '../../../../i18n/global-messages';
 import CreateTxExecutingDialog from '../../../../components/wallet/voting/CreateTxExecutingDialog';
 import { noop } from '../../../../coreUtils';
+import type { StoresProps } from '../../../../stores';
 
 type Props = {|
   +onClose: void => void,
   +walletType: WalletType,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class VotingRegistrationDialogContainer extends Component<AllProps> {

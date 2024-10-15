@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { Logger } from '../../../utils/logging';
 import { handleExternalLinkClick } from '../../../utils/routing';
 
@@ -13,6 +12,7 @@ import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { StoresProps } from '../../../stores';
 
 type LocalProps = {|
   +onClose: (void) => void,
@@ -20,7 +20,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class WalletTrezorConnectDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class WalletTrezorConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;

@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -25,6 +24,7 @@ import type {
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -48,7 +48,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class TransferSendPage extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,

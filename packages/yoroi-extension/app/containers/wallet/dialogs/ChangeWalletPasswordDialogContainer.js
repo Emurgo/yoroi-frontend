@@ -3,14 +3,14 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   publicDeriverId: number,
 |};
 
 @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
   render(): Node {
     const { stores } = this.props;

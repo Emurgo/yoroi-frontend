@@ -3,8 +3,8 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   match: {|
@@ -18,7 +18,7 @@ type Props = {|
 |};
 
 @observer
-export default class OAuthDropboxPage extends Component<{| ...Props, ...StoresAndActionsProps |}> {
+export default class OAuthDropboxPage extends Component<{| ...Props, ...StoresProps |}> {
 
   onLoad: string => Promise<void> = async (token) => {
     await this.props.stores.memos.setExternalStorageProvider({

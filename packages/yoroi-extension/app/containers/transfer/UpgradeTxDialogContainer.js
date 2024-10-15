@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -24,6 +23,7 @@ import type {
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 type LocalProps = {|
   +onClose: void => void,
@@ -39,7 +39,7 @@ const messages = defineMessages({
 
 // TODO: probably a lot of this can be de-duplicated with TransferSendPage
 @observer
-export default class UpgradeTxDialogContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,

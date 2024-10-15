@@ -11,16 +11,16 @@ import ExportWallet from '../../../components/wallet/settings/ExportWallet';
 import RemoveWalletDialogContainer from './RemoveWalletDialogContainer';
 import ExportWalletDialogContainer from './ExportWalletDialogContainer';
 import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class WalletSettingsPage extends Component <StoresAndActionsProps> {
+export default class WalletSettingsPage extends Component <StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

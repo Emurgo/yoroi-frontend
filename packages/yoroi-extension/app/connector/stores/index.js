@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 import ProfileStore from './toplevel/ProfileStore';
 import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
@@ -101,3 +101,7 @@ export default (action(
     return loadedStores;
   }
 ): (Api) => StoresMap);
+
+export type ConnectorStoresProps = {|
+  +stores: StoresMap,
+|};

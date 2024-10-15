@@ -8,18 +8,18 @@ import globalMessages from '../../i18n/global-messages';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import BannerContainer from '../banners/BannerContainer';
 import { buildRoute } from '../../utils/routing';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   +children?: Node,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 @observer
 export default class Settings extends Component<AllProps> {
   static defaultProps: {| children: void |} = {

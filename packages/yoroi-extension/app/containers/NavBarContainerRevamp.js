@@ -1,7 +1,6 @@
 // @flow
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -16,6 +15,7 @@ import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
+import type { StoresProps } from '../stores';
 
 type LocalProps = {|
   title: Node,
@@ -24,7 +24,7 @@ type LocalProps = {|
 |};
 
 @observer
-export default class NavBarContainerRevamp extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

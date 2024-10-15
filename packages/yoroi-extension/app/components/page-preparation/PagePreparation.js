@@ -3,9 +3,9 @@ import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { ROUTES } from '../../routes-config';
 import { ReactComponent as UnexpectedError } from '../../assets/images/revamp/page-unexpected-error.inline.svg';
+import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({
   preparation: {
@@ -26,7 +26,7 @@ const messages = defineMessages({
   },
 });
 
-export default class PagePreparation extends Component<StoresAndActionsProps> {
+export default class PagePreparation extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

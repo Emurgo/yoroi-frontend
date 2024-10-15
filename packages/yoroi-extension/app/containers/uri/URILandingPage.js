@@ -3,13 +3,13 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import URILandingDialogContainer from './URILandingDialogContainer';
 import { isValidReceiveAddress } from '../../api/ada/lib/storage/bridge/utils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class URILandingPage extends Component<StoresAndActionsProps> {
+export default class URILandingPage extends Component<StoresProps> {
   onClose: void => void = () => {
     const { stores } = this.props;
     this.props.stores.uiDialogs.closeActiveDialog();

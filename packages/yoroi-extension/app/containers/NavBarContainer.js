@@ -3,7 +3,6 @@ import moment from 'moment';
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { intlShape } from 'react-intl';
 import NavBar from '../components/topbar/NavBar';
 import NavPlate from '../components/topbar/NavPlate';
@@ -17,13 +16,14 @@ import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import globalMessages from '../i18n/global-messages';
 import { MultiToken } from '../api/common/lib/MultiToken';
+import type { StoresProps } from '../stores';
 
 type LocalProps = {|
   title: Node,
 |};
 
 @observer
-export default class NavBarContainer extends Component<{| ...StoresAndActionsProps, ...LocalProps |}> {
+export default class NavBarContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };

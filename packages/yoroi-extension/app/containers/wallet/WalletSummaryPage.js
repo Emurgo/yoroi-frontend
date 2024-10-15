@@ -9,7 +9,6 @@ import { ROUTES } from '../../routes-config';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
@@ -28,9 +27,10 @@ import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { noop } from '../../coreUtils';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletSummaryPage extends Component<StoresAndActionsProps> {
+export default class WalletSummaryPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
