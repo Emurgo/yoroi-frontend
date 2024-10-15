@@ -115,7 +115,14 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               </div>
               <div className={styles.balance}>
                 <Box
-                  sx={{ color: 'grayscale.max', height: '100%' }}
+                  sx={{
+                    color: 'grayscale.max',
+                    height: '100%',
+                    '& .MuiTypography-root': {
+                      mt: '0px',
+                      mb: '0px',
+                    }
+                  }}
                   className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
                 >
                   <AmountDisplay
