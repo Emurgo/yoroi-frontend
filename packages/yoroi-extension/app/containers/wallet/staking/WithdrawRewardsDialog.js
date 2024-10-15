@@ -207,7 +207,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresAndActi
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(globalMessages.cancel),
             onClick: this.props.onClose,

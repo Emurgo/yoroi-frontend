@@ -99,7 +99,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       <Dialog
         className="ExportTransactionDialog"
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}

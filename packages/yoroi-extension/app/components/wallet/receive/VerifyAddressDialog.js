@@ -87,7 +87,7 @@ export default class VerifyAddressDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'VerifyAddressDialog'])}
         title={intl.formatMessage(messages.addressDetailsTitleLabel)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.cancel}

@@ -284,7 +284,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         closeOnOverlayClick={false}
         onClose={this.cancel}
         closeButton={<DialogCloseButton onClose={this.cancel} />}
-        actions={dialogBackButton}
+        dialogActions={dialogBackButton}
       >
         <>
           <center>

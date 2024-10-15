@@ -170,7 +170,7 @@ export default class SaveDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'SaveDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         closeButton={<DialogCloseButton />}

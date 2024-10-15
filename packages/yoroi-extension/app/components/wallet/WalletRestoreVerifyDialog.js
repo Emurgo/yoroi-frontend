@@ -185,7 +185,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}

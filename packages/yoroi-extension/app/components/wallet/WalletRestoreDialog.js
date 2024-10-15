@@ -281,7 +281,7 @@ export default class WalletRestoreDialog extends Component<Props> {
       <Dialog
         className={dialogClasses}
         title={intl.formatMessage(dialogTitle)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
         backButton={onBack && <DialogBackButton onBack={onBack} />}

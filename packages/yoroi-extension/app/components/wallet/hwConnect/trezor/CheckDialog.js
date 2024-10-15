@@ -120,7 +120,7 @@ export default class CheckDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'CheckDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}

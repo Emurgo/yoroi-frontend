@@ -185,7 +185,7 @@ export default class AddNFTDialog extends Component<Props, State> {
         onClose={onClose}
         withCloseButton
         scrollableContentClass={styles.nftsGrid}
-        actions={[
+        dialogActions={[
           {
             disabled: hasSelectedTokensIncluded.length === 0 || !shouldAddMore || currentNftsList.length === 0,
             onClick: this.onAddAll,
