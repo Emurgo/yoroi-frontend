@@ -98,26 +98,12 @@ export default class WalletCard extends Component<Props, State> {
     isActionsShow: false,
   };
 
-  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = type => {
-    if (type === 'ledger') {
-      return globalMessages.ledgerWallet;
-    }
-    if (type === 'trezor') {
-      return globalMessages.trezorWallet;
-    }
-    return globalMessages.standardWallet;
-  };
-
   render(): Node {
     const { intl } = this.context;
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
 
     const [walletPlate, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, 8, 5, 40, 4) : [];
 
-    const typeText = [this.getType(this.props.type)]
-      .filter(text => text != null)
-      .map(text => intl.formatMessage(text))
-      .join(' - ');
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
     const buttonId = `${id}-selectWallet_${idx}-button`;
