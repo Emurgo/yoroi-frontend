@@ -181,7 +181,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.setActiveWallet({
         publicDeriverId: newWallet.publicDeriverId,
       });
-      this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.uiDialogs.closeActiveDialog();
       this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
     });

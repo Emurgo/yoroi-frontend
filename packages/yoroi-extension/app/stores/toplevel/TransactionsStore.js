@@ -270,7 +270,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       setTimeout(async () => {
         await continuation();
         this._setExporting(false);
-        this.actions.dialogs.closeActiveDialog.trigger();
+        this.stores.uiDialogs.closeActiveDialog();
         runInAction(() => {
           this.shouldIncludeTxIds = false;
         });
@@ -304,7 +304,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
 
   @action closeExportTransactionDialog: void => void = () => {
     if (!this.isExporting) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.uiDialogs.closeActiveDialog();
       this._setExporting(false);
       this._setExportError(null);
     }

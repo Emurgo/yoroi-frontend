@@ -36,7 +36,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       unitOfAccountSetting,
       openTransactionSuccessDialog,
     } = this.props;
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;
 
     if (publicDeriver == null)
@@ -79,7 +79,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
         onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
+          stores.uiDialogs.closeActiveDialog();
           sendMoneyRequest.reset();
         }}
         error={sendMoneyRequest.error}

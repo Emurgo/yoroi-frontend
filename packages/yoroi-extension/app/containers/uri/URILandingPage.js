@@ -12,7 +12,7 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 export default class URILandingPage extends Component<StoresAndActionsProps> {
   onClose: void => void = () => {
     const { stores } = this.props;
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
     stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
     stores.loading.resetUriParams();
   };

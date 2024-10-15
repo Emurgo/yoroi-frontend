@@ -176,6 +176,6 @@ export default class HWVerifyAddressStore extends Store<StoresMap, ActionsMap> {
     this.selectedAddress = null;
     this._setError(null);
     this._setActionProcessing(false);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
   }
 }

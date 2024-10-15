@@ -73,7 +73,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await this.changeSigningKeyRequest.execute(async () => {
       await changeSigningKeyPassword(request);
     });
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
     this.changeSigningKeyRequest.reset();
   };
 

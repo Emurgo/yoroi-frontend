@@ -85,7 +85,7 @@ export default class DeregisterDialogContainer extends Component<{| ...StoresAnd
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     return (
       <DangerousActionDialog
         title={intl.formatMessage(dialogMessages.title)}
@@ -100,7 +100,7 @@ export default class DeregisterDialogContainer extends Component<{| ...StoresAnd
           },
           primary: true,
         }}
-        onCancel={actions.dialogs.closeActiveDialog.trigger}
+        onCancel={stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(dialogMessages.deregisterOption),
           onClick: () => {

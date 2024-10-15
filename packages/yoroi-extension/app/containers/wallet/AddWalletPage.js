@@ -36,7 +36,7 @@ export default class AddWalletPage extends Component<StoresAndActionsProps> {
     if (!this.props.stores.wallets.hasAnyWallets) {
       this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
     }
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   openDialogWrapper: any => void = dialog => {

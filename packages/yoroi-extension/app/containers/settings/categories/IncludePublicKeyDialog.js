@@ -12,7 +12,6 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +downloadIncludingKey: void => void,
   +downloadExcludingKey: void => void,
 |};
@@ -33,7 +32,7 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-export default class IncludePublicKeyDialog extends Component<Props> {
+export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresAndActionsProps |}> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -56,19 +55,19 @@ export default class IncludePublicKeyDialog extends Component<Props> {
         toggleCheck={this.toggleCheck}
         isSubmitting={false}
         error={undefined}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(dialogMessages.withKey),
           onClick: () => {
             this.props.downloadIncludingKey();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }
         }}
         secondaryButton={{
           label: intl.formatMessage(dialogMessages.withoutKey),
           onClick: () => {
             this.props.downloadExcludingKey();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }
         }}
         id="includePublicKeyDialog"

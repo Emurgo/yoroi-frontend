@@ -64,7 +64,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
         dialog: LoadingSpinner,
       });
       await stores.addresses.createAddress(publicDeriver);
-      this.props.actions.dialogs.closeActiveDialog.trigger();
+      this.props.stores.uiDialogs.closeActiveDialog();
     }
   };
 
@@ -271,7 +271,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
               if (val == null) return null;
               return new BigNumber(val);
             })()}
-            onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onClose={() => stores.uiDialogs.closeActiveDialog()}
             onGenerate={(address, amount) => {
               this.generateURI(address, amount);
             }}
@@ -293,7 +293,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           <URIDisplayDialog
             address={paramAddress}
             amount={new BigNumber(paramAmount)}
-            onClose={actions.dialogs.closeActiveDialog.trigger}
+            onClose={stores.uiDialogs.closeActiveDialog}
             onBack={() => this.openURIGenerateDialog(paramAddress, paramAmount)}
             onCopyAddressTooltip={elementId => {
               if (!uiNotifications.isOpen(elementId)) {
@@ -315,7 +315,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           <UnmangleTxDialogContainer
             actions={actions}
             stores={stores}
-            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+            onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
           />
         )}
 

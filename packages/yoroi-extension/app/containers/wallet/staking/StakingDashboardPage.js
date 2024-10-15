@@ -216,7 +216,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
         <LessThanExpectedDialog
-          close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          close={() => this.props.stores.uiDialogs.closeActiveDialog()}
         />
       );
     }
@@ -226,7 +226,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         <UnmangleTxDialogContainer
           actions={actions}
           stores={stores}
-          onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
         />
       );
     }
@@ -252,7 +252,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           stores={stores}
           onClose={() => {
             stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
       );

@@ -26,7 +26,7 @@ export default class ExportWalletDialogContainer extends Component<Props> {
     }
     return (
       <ExportPublicKeyDialog
-        onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onClose={this.props.stores.uiDialogs.closeActiveDialog}
         publicKeyHex={selected.publicKey}
         pathToPublic={selected.pathToPublic}
       />

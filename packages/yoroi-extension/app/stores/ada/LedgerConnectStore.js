@@ -395,7 +395,7 @@ export default class LedgerConnectStore
     const { stores } = this;
     Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
     if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.uiDialogs.closeActiveDialog();
     }
 
     await stores.wallets.addHwWallet(wallet);
@@ -414,7 +414,7 @@ export default class LedgerConnectStore
   }
 
   finishTransfer: void => void = () => {
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
     this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification

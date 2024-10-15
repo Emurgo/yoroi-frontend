@@ -147,14 +147,14 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
           selectedWalletId={selected?.publicDeriverId}
           close={() => {
             this.checkAndResetGovRoutes();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
           shouldHideBalance={stores.profile.shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
           onAddWallet={() => {
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
             stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
           }}
           updateSortedWalletList={stores.profile.updateSortedWalletList}
@@ -179,7 +179,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresAndActi
 
       return (
         <BuySellDialog
-          onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+          onCancel={this.props.stores.uiDialogs.closeActiveDialog}
           onExchangeCallback={() =>
             stores.app.goToRoute({ route: ROUTES.EXCHANGE_END })
           }

@@ -183,7 +183,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   complete: void => void = () => {
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
     this.goToDashboardRoute();
   };
 

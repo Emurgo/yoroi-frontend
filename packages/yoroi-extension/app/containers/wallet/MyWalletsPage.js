@@ -32,7 +32,7 @@ export default class MyWalletsPage extends Component<StoresAndActionsProps> {
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   openDialogWrapper: any => void = dialog => {

@@ -13,7 +13,7 @@ type Props = {|
 export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresAndActionsProps |}> {
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { uiDialogs, walletSettings } = stores;
     const { changeSigningKeyRequest } = walletSettings;
 
@@ -33,7 +33,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<{| ..
           });
         }}
         onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
+          stores.uiDialogs.closeActiveDialog();
           changeSigningKeyRequest.reset();
         }}
         onPasswordSwitchToggle={() => {

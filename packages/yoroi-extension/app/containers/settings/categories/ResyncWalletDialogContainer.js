@@ -59,12 +59,12 @@ export default class ResyncWalletDialogContainer extends Component<{| ...Props, 
             await this.props.stores.walletSettings.resyncHistory({
               publicDeriverId: this.props.publicDeriverId,
             });
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           },
         }}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.stores.uiDialogs.closeActiveDialog,
         }}
         id="resyncWalletDialog"
       >

@@ -65,7 +65,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
     if (redirect) {
       window.document.location = redirect;
     } else {
-      this.props.actions.dialogs.closeActiveDialog.trigger();
+      this.props.stores.uiDialogs.closeActiveDialog();
       stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
@@ -95,7 +95,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   };
 
   openDialog: any => void = dialog => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
     this.props.stores.uiDialogs.push({
       dialog,
     });
@@ -122,7 +122,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { selected } = stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
@@ -144,7 +144,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
         uiDialogs.isOpen(WalletSendConfirmationDialog)) &&
       hasAnyPending
     ) {
-      actions.dialogs.closeActiveDialog.trigger();
+      stores.uiDialogs.closeActiveDialog();
     }
 
     const defaultToken = stores.tokenInfoStore.getDefaultTokenInfo(
@@ -199,7 +199,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
           plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
           isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
           openDialog={this.openDialog}
-          closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
+          closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
           isOpen={uiDialogs.isOpen}
           openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
           unitOfAccountSetting={stores.profile.unitOfAccount}
@@ -479,7 +479,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
 
     return (
       <AddNFTDialog
-        onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onClose={this.props.stores.uiDialogs.closeActiveDialog}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
@@ -503,7 +503,7 @@ export default class WalletSendPage extends Component<StoresAndActionsProps> {
       <AddTokenDialog
         onClose={() => {
           transactionBuilderStore.deselectToken();
-          this.props.actions.dialogs.closeActiveDialog.trigger();
+          this.props.stores.uiDialogs.closeActiveDialog();
         }}
         spendableBalance={this.props.stores.transactions.balance}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}

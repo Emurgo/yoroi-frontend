@@ -350,7 +350,7 @@ export default class TrezorConnectStore
   _onSaveSuccess: (WalletState) => Promise<void> = async (wallet) => {
     // close the active dialog
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
 
     const { stores } = this;
     await stores.wallets.addHwWallet(wallet);

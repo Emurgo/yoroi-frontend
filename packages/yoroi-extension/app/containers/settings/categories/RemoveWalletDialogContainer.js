@@ -78,13 +78,13 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
         error={settingsStore.removeWalletRequest.error}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
           onClick: this.removeWalletRevamp,
         }}
         secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.stores.uiDialogs.closeActiveDialog,
         }}
         id="removeWalletDialog"
       >

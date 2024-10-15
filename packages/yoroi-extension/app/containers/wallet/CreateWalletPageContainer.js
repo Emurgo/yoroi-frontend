@@ -26,7 +26,7 @@ export default class CreateWalletPageContainer extends Component<StoresAndAction
           setSelectedNetwork={stores.profile.setSelectedNetwork}
           selectedNetwork={stores.profile.selectedNetwork}
           openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
-          closeDialog={this.props.actions.dialogs.closeActiveDialog.trigger}
+          closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
           isDialogOpen={stores.uiDialogs.isOpen}
           goToRoute={route => stores.app.goToRoute({ route })}
         />

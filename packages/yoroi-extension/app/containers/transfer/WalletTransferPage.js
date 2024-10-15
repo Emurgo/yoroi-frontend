@@ -24,7 +24,7 @@ export default class WalletTransferPage extends Component<{| ...Props, ...Stores
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   // <TODO:PENDING_REMOVAL> paper

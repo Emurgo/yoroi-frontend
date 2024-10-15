@@ -209,7 +209,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresAndActionsPr
         <RevampAnnouncementDialog
           onClose={() => {
             stores.profile.markRevampAsAnnounced();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
       );

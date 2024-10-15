@@ -1,7 +1,6 @@
 // @flow
 import { computed, observable, action, } from 'mobx';
 import Store from '../base/Store';
-import DialogsActions from '../../actions/dialogs-actions';
 
 type DialogEntry = {|
   dialog: any,
@@ -29,16 +28,10 @@ type DialogEntry = {|
  */
 export default class UiDialogsStore<
   TStores,
-  TActions: { dialogs: DialogsActions, ... },
-> extends Store<TStores, TActions>
+> extends Store<TStores, any>
 {
 
   @observable dialogList: Array<DialogEntry> = [];
-
-  setup(): void {
-    super.setup();
-    this.actions.dialogs.closeActiveDialog.listen(this._onClose);
-  }
 
   @computed
   get hasOpen(): boolean {
@@ -88,7 +81,7 @@ export default class UiDialogsStore<
     });
   };
 
-  @action _onClose: void => void = () => {
+  @action closeActiveDialog: void => void = () => {
     this.reset();
   };
 

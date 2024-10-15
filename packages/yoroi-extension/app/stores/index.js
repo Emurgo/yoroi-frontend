@@ -64,7 +64,7 @@ export type StoresMap = {|
   app: AppStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
-  uiDialogs: UiDialogsStore<{||}, ActionsMap>,
+  uiDialogs: UiDialogsStore<{||}>,
   uiNotifications: UiNotificationsStore<{||}>,
   loading: LoadingStore,
   wallets: WalletStore,

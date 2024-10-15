@@ -41,7 +41,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap, ActionsMap> {
       refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
 
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
     stores.wallets.sendMoneyRequest.reset();
     if (request.onSuccess) {
       request.onSuccess();

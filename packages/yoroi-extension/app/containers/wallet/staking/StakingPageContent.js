@@ -40,7 +40,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   async componentDidMount() {
@@ -316,7 +316,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
             stores={stores}
             onClose={() => {
               stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-              this.props.actions.dialogs.closeActiveDialog.trigger();
+              this.props.stores.uiDialogs.closeActiveDialog();
             }}
           />
         ) : null}
@@ -326,7 +326,7 @@ export default class StakingPageContent extends Component<StoresAndActionsProps>
             stores={stores}
             onClose={() => {
               stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-              this.props.actions.dialogs.closeActiveDialog.trigger();
+              this.props.stores.uiDialogs.closeActiveDialog();
             }}
           />
         ) : null}

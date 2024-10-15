@@ -161,7 +161,7 @@ export default class MemosStore extends Store<StoresMap, ActionsMap> {
 
   @action closeMemoDialog: void => void = () => {
     this._setError(null);
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
   }
 
   @action selectTransaction: {| tx: WalletTransaction |} => void = (params) => {

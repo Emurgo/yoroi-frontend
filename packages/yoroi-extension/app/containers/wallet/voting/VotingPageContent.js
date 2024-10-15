@@ -61,7 +61,7 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   start: void => void = () => {

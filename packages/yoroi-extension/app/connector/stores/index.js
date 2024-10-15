@@ -30,7 +30,7 @@ const storeClasses = Object.freeze({
 export type StoresMap = {|
   stateFetchStore: StateFetchStore<StoresMap, ActionsMap>,
   profile: ProfileStore,
-  uiDialogs: UiDialogsStore<{||}, ActionsMap>,
+  uiDialogs: UiDialogsStore<{||}>,
   uiNotifications: UiNotificationsStore<{||}>,
   explorers: ExplorerStore,
   coinPriceStore: ConnectorCoinPriceStore,
