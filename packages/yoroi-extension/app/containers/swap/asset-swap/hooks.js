@@ -1,17 +1,17 @@
+import type { AssetAmount } from '../../../components/swap/types';
 import { useSwapTokensOnlyVerified } from '@yoroi/swap';
 import { useMemo } from 'react';
 import { comparatorByGetter } from '../../../coreUtils';
-import type { AssetAmount } from '../../../components/swap/types';
 
 export function useSellVerifiedSwapTokens(
-  assets: Array<AssetAmount>,
-): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
-
+  assets: Array<AssetAmount>
+): {| walletVerifiedAssets: Array<any>, isLoading: boolean, error: boolean |} {
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
   const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
     useErrorBoundary: false,
+    retry: true,
+    retryDelay: 1000
   });
-
-  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
 
   const swapFromVerifiedAssets = useMemo(() => {
     return assets
@@ -23,19 +23,19 @@ export function useSellVerifiedSwapTokens(
       .sort(comparatorByGetter(a => a.name?.toLowerCase()));
   }, [onlyVerifiedTokens, assets]);
 
-  return { walletVerifiedAssets: swapFromVerifiedAssets, isLoading };
+  return { walletVerifiedAssets: swapFromVerifiedAssets, isLoading, error: false };
 }
 
 export function useBuyVerifiedSwapTokens(
   assets: Array<AssetAmount>,
-  sellTokenInfo: { id: string, ... },
-): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
-
+  sellTokenInfo: { id: string, ... }
+): {| walletVerifiedAssets: Array<any>, isLoading: boolean, error: boolean |} {
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
   const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
     useErrorBoundary: false,
+    retry: true,
+    retryDelay: 1000
   });
-
-  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
 
   const swapToVerifiedAssets = useMemo(() => {
     const isSellingPt = sellTokenInfo.id === '';
@@ -51,5 +51,5 @@ export function useBuyVerifiedSwapTokens(
     return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, assets, sellTokenInfo]);
 
-  return { walletVerifiedAssets: swapToVerifiedAssets, isLoading };
+  return { walletVerifiedAssets: swapToVerifiedAssets, isLoading, error: false };
 }
