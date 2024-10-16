@@ -46,7 +46,7 @@ class SwapPageContainer extends Component<AllProps> {
     return false;
   };
 
-  isErrorPage: boolean = () => {
+  isErrorPage: void => boolean = () => {
     const { location } = this.props.stores.router;
     if (location) {
       return location.pathname.endsWith('page-error');

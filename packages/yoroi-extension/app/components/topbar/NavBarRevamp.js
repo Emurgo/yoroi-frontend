@@ -12,6 +12,7 @@ type Props = {|
   +buyButton?: Node,
   +menu?: ?Node,
   +pageBanner?: ?Node,
+  +isErrorPage?: boolean,
 |};
 
 @observer
@@ -31,7 +32,7 @@ class NavBarRevamp extends Component<Props> {
     buyButton: undefined,
     menu: undefined,
     pageBanner: false,
-    pageBanner: false,
+    isErrorPage: false,
   };
 
   render(): Node {
