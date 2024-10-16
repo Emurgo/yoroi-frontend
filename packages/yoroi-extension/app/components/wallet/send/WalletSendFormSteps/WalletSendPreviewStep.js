@@ -36,7 +36,7 @@ import { ReactComponent as AttentionIcon } from '../../../../assets/images/atten
 
 const SBox = styled(Box)(({ theme }) => ({
   backgroundImage: theme.palette.ds.bg_gradient_3,
-  color: 'grayscale.min',
+  color: 'ds.gray_min',
 }));
 
 type Props = {|

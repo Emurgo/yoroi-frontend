@@ -15,6 +15,7 @@ type Props = {|
   +showInContainer?: boolean,
   +withPadding?: boolean, // default: true
   +bgcolor?: string,
+  +isErrorPage?: boolean,
 |};
 
 /** Adds a top bar above the wrapped node */
@@ -29,6 +30,7 @@ function TopBarLayout({
   showInContainer,
   withPadding,
   bgcolor,
+  isErrorPage,
 }: Props) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -61,37 +63,35 @@ function TopBarLayout({
             overflow: 'auto',
           }}
         >
-          {(
+          <Box
+            sx={{
+              bgcolor: bgcolor || 'ds.bg_color_max',
+              height: !isErrorPage ? '100%' : 'auto',
+              width: '100%',
+              maxWidth: '1872px',
+              mx: 'auto',
+            }}
+          >
             <Box
               sx={{
-                bgcolor: bgcolor || 'ds.bg_color_max',
                 height: '100%',
                 width: '100%',
-                maxWidth: '1872px',
-                mx: 'auto',
+                margin: 'auto',
               }}
             >
               <Box
                 sx={{
                   height: '100%',
-                  width: '100%',
-                  margin: 'auto',
+                  minHeight: '200px',
+                  padding: typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
+                  pb: 0,
+                  bgcolor: 'ds.bg_color_max',
                 }}
               >
-                <Box
-                  sx={{
-                    height: '100%',
-                    minHeight: '200px',
-                    padding: typeof withPadding === 'undefined' || withPadding === true ? '24px' : '0px',
-                    pb: 0,
-                    bgcolor: 'ds.bg_color_max',
-                  }}
-                >
-                  {children}
-                </Box>
+                {children}
               </Box>
             </Box>
-          )}
+          </Box>
         </Box>
       </>
     );
