@@ -17,7 +17,7 @@ const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false}: Pr
     <QRCode
       value={value}
       bgColor={theme.palette.ds.white_static}
-      fgColor={theme.palette.ds.static_dark}
+      fgColor={theme.palette.ds.black_static}
       size={size}
       includeMargin={includeMargin}
       id={id}
