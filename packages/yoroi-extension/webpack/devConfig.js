@@ -32,6 +32,7 @@ const baseDevConfig = (
     ],
   },
   devServer: {
+    port: 8080,
     devMiddleware: {
       publicPath: `js`,
       stats: {
@@ -103,6 +104,7 @@ const backgroundServiceWorkerConfig = (
     ],
   },
   devServer: {
+    port: 8081,
     devMiddleware: {
       writeToDisk: true,
     },
