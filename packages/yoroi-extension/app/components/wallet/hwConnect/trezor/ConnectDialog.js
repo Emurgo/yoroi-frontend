@@ -118,7 +118,7 @@ export default class ConnectDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'ConnectDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         backButton={backButton}

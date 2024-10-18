@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import SupportSettings from '../../../components/settings/categories/SupportSettings';
 import { downloadLogs } from '../../../utils/logging';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class SupportSettingsPage extends Component<StoresAndActionsProps> {
+export default class SupportSettingsPage extends Component<StoresProps> {
   getPublicKey: void => void | string = () => {
     const { selected } = this.props.stores.wallets;
     if (selected == null) {
@@ -35,17 +35,16 @@ export default class SupportSettingsPage extends Component<StoresAndActionsProps
     }
     // TODO: don't show if not in "Advanced"
     // has public key -> prompt if they want to include it in the logs
-    this.props.actions.dialogs.open.trigger({ dialog: IncludePublicKeyDialog });
+    this.props.stores.uiDialogs.open({ dialog: IncludePublicKeyDialog });
   };
 
   getDialog: void => Node = () => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     if (this.props.stores.uiDialogs.isOpen(IncludePublicKeyDialog)) {
       return (
         <IncludePublicKeyDialog
           downloadIncludingKey={() => downloadLogs(this.getPublicKey())}
           downloadExcludingKey={downloadLogs}
-          actions={actions}
           stores={stores}
         />
       );

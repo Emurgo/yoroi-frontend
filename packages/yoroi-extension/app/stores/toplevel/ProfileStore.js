@@ -6,14 +6,14 @@ import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
 import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
+import { noop } from '../../coreUtils';
 
-export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
+export default class ProfileStore extends BaseProfileStore<StoresMap> {
   @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
 
   /**
@@ -32,7 +32,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
         ampli.createWalletLanguagePageViewed();
       },
     },
@@ -43,7 +43,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
         ampli.createWalletTermsPageViewed();
       },
     },
@@ -54,7 +54,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
@@ -64,7 +64,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.profile.selectComplexityLevel.trigger(ComplexityLevels.Simple);
+        noop(this.stores.profile.selectComplexityLevel(ComplexityLevels.Simple));
       },
     },
     {
@@ -74,7 +74,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
@@ -84,39 +84,40 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         if (this.stores.app.currentRoute === route) {
           return;
         }
-        this.actions.router.goToRoute.trigger({ route });
+        this.stores.app.goToRoute({ route });
       },
     },
     {
       isDone: () => this.hasRedirected,
       action: async () => {
-        const { wallets } = this.stores;
+        const { stores } = this;
+        const { wallets } = stores;
 
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
-        await this.stores.memos.loadFromStorage();
-        await this.stores.tokenInfoStore.refreshTokenInfo();
-        await this.stores.coinPriceStore.loadFromStorage();
+        await stores.memos.loadFromStorage();
+        await stores.tokenInfoStore.refreshTokenInfo();
+        await stores.coinPriceStore.loadFromStorage();
 
         await wallets.restoreWalletsFromStorage();
         subscribe();
-        if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
-          this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
+        if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
+          stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
           const firstWallet =
             wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
           if (firstWallet == null) {
-            this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
             return;
           }
           const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
-          this.actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: ROUTES.WALLETS.ROOT,
             publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
           });
         }
-        if (this.stores.loading.shouldRedirect) {
-          this.actions.loading.redirect.trigger();
+        if (stores.loading.shouldRedirect) {
+          stores.loading.redirect();
         }
         runInAction(() => {
           this.hasRedirected = true;
@@ -154,16 +155,11 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
 
   setup(): void {
     super.setup();
-    this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
-    this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
-    this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
-    this.actions.profile.setSelectedNetwork.listen(this._setSelectedNetwork);
     this.registerReactions([
       this._checkSetupSteps,
     ]);
-    this.actions.profile.updateSortedWalletList.listen(this._updateSortedWalletList);
     this._getUriSchemeAcceptance(); // eagerly cache
-    this._getSortedWalletList()
+    noop(this._getSortedWalletList());
   }
 
   teardown(): void {
@@ -183,7 +179,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     return this.__selectedNetwork;
   }
 
-  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
+  @action setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
     this.__selectedNetwork = type;
   };
 
@@ -206,7 +202,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     return this.getUriSchemeAcceptanceRequest.result === true;
   }
 
-  _acceptUriScheme: void => Promise<void> = async () => {
+  acceptUriScheme: void => Promise<void> = async () => {
     await this.setUriSchemeAcceptanceRequest.execute();
     await this.getUriSchemeAcceptanceRequest.execute(); // eagerly cache
   };
@@ -225,7 +221,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     return result === true;
   }
 
-  _toggleSidebar: void => Promise<void> = async () => {
+  toggleSidebar: void => Promise<void> = async () => {
     const isSidebarExpanded = this.isSidebarExpanded;
     await this.setToggleSidebarRequest.execute(isSidebarExpanded);
     await this.getToggleSidebarRequest.execute();
@@ -258,7 +254,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     await this.getWalletsNavigationRequest.execute();
   };
 
-  _updateSortedWalletList: WalletsNavigation => Promise<void>
+  updateSortedWalletList: WalletsNavigation => Promise<void>
     = async (walletsNavigation) => {
     await this.setWalletsNavigationRequest.execute(walletsNavigation);
     await this.getWalletsNavigationRequest.execute();

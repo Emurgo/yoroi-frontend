@@ -25,7 +25,6 @@ import {
   addressGroupName,
 } from '../../types/AddressFilterTypes';
 import type { StoresMap } from '../index';
-import type { ActionsMap } from '../../actions';
 import { ROUTES } from '../../routes-config';
 import { buildRoute } from '../../utils/routing';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -39,7 +38,6 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type SubgroupCtorData = {|
   stores: StoresMap,
-  actions: ActionsMap,
   name: AddressTypeName,
 |}
 export interface IAddressTypeUiSubset {

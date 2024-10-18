@@ -9,7 +9,6 @@ import {
 import {
   filterAddressesByStakingKey,
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
 import { Api, Resolver } from '@yoroi/types';
@@ -58,7 +57,7 @@ export function resolveAddressDomainNameServerName(nameServerTag: string): strin
   }
 }
 
-export default class AdaAddressesStore extends Store<StoresMap, ActionsMap> {
+export default class AdaAddressesStore extends Store<StoresMap> {
 
   _domainResolverApi: ?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |} = null;
 

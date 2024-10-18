@@ -314,7 +314,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     return (
       <Dialog
         title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
-        actions={[
+        dialogActions={[
           {
             disabled:
               fullTokensList.length === 0 || hasSelectedTokensIncluded.length === 0 || !this.isValidAmounts() || !shouldAddMore,

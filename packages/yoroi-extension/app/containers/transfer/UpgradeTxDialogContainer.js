@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -24,9 +23,9 @@ import type {
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
   +onSubmit: void => void,
 |};
@@ -40,7 +39,7 @@ const messages = defineMessages({
 
 // TODO: probably a lot of this can be de-duplicated with TransferSendPage
 @observer
-export default class UpgradeTxDialogContainer extends Component<Props> {
+export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -57,7 +56,7 @@ export default class UpgradeTxDialogContainer extends Component<Props> {
     expectedSerial: string | void,
     networkId: number,
   |} => Promise<void> = async (request) => {
-    await this.props.actions.ada.ledgerSend.sendUsingLedgerKey.trigger({
+    await this.props.stores.substores.ada.ledgerSend.sendUsingLedgerKey({
       ...request,
     });
     this.props.onSubmit();

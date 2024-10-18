@@ -4,13 +4,13 @@ import { Component } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
 import { autorun } from 'mobx';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
 import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import type { ConnectorStoresProps } from '../stores';
 
 declare var chrome;
 
@@ -25,7 +25,7 @@ type State = {|
 
 @observer
 export default class ConnectContainer extends Component<
-  ConnectorStoresAndActionsProps,
+  ConnectorStoresProps,
   State
 > {
   state: State = {
@@ -58,7 +58,8 @@ export default class ConnectContainer extends Component<
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    this.props.actions.connector.refreshWallets.trigger();
+    // noinspection JSIgnoredPromiseFromCall
+    this.props.stores.connector.refreshWallets();
     window.addEventListener('beforeunload', this.onUnload);
     window.addEventListener('unload', this.onUnload);
   }
@@ -68,13 +69,13 @@ export default class ConnectContainer extends Component<
     checksum: ?WalletChecksum,
     password: ?string
   ) => Promise<void> = async (deriver, _checksum, password) => {
-    const chromeMessage = this.props.stores.connector.connectingMessage;
+    const { stores } = this.props;
+    const chromeMessage = stores.connector.connectingMessage;
     if (chromeMessage == null) {
       throw new Error(
         `${nameof(chromeMessage)} connecting to a wallet but no connect message found`
       );
     }
-    const connector = this.props.actions.connector;
 
     const url = chromeMessage.url;
     const appAuthID = chromeMessage.appAuthID;
@@ -91,7 +92,7 @@ export default class ConnectContainer extends Component<
     }
 
     const { publicDeriverId } = deriver;
-    const result = this.props.stores.connector.currentConnectorWhitelist;
+    const result = stores.connector.currentConnectorWhitelist;
 
     // Removing any previous whitelisted connections for the same url
     const whitelist = (result.length ? [...result] : []).filter(
@@ -105,7 +106,7 @@ export default class ConnectContainer extends Component<
       auth: authEntry,
       image: chromeMessage.imgBase64Url,
     });
-    await connector.updateConnectorWhitelist.trigger({ whitelist });
+    await stores.connector.updateConnectorWhitelist({ whitelist });
 
     await ampli.dappPopupConnectWalletPasswordPageViewed();
 
@@ -118,7 +119,7 @@ export default class ConnectContainer extends Component<
 
     // if we close the window immediately, the previous message may not be able to
     // to reach the service worker
-    setTimeout(() => { connector.closeWindow.trigger(); }, 100);
+    setTimeout(() => { stores.connector.closeWindow(); }, 100);
   };
 
   onSelectWallet: (deriver: WalletState, checksum: ?WalletChecksum) => void = (
@@ -153,7 +154,7 @@ export default class ConnectContainer extends Component<
       tabId: chromeMessage?.tabId,
     });
 
-    this.props.actions.connector.closeWindow.trigger();
+    this.props.stores.connector.closeWindow();
   };
 
   hidePasswordForm: void => void = () => {
@@ -161,7 +162,7 @@ export default class ConnectContainer extends Component<
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   render(): Node {

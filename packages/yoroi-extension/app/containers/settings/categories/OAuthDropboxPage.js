@@ -3,11 +3,10 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { ExternalStorageList } from '../../../domain/ExternalStorage';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   match: {|
     params: {|
       token: string,
@@ -19,10 +18,10 @@ type Props = {|
 |};
 
 @observer
-export default class OAuthDropboxPage extends Component<Props> {
+export default class OAuthDropboxPage extends Component<{| ...Props, ...StoresProps |}> {
 
   onLoad: string => Promise<void> = async (token) => {
-    await this.props.actions.memos.updateExternalStorageProvider.trigger({
+    await this.props.stores.memos.setExternalStorageProvider({
       provider: ExternalStorageList.DROPBOX,
       token,
     });

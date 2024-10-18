@@ -104,7 +104,7 @@ export default class URIVerifyDialog extends Component<Props> {
     // TODO: in the future, we will need to confirm which wallet/account to use for this transaction
     return (
       <Dialog
-        actions={actions}
+        dialogActions={actions}
         className={dialogClasses}
         title={intl.formatMessage(messages.uriVerifyTitle)}
         closeOnOverlayClick={false}

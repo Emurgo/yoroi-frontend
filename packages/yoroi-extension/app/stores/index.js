@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
@@ -15,10 +15,9 @@ import WalletRestoreStore from './toplevel/WalletRestoreStore';
 import YoroiTransferStore from './toplevel/YoroiTransferStore';
 import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
-import setupAdaStores from './ada/index';
 import type { AdaStoresMap } from './ada/index';
+import setupAdaStores from './ada/index';
 import { RouterStore } from 'mobx-react-router';
-import type { ActionsMap } from '../actions/index';
 import type { Api } from '../api/index';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
@@ -56,16 +55,16 @@ const storeClasses = Object.freeze({
 });
 
 export type StoresMap = {|
-  stateFetchStore: StateFetchStore<StoresMap, ActionsMap>,
+  stateFetchStore: StateFetchStore<StoresMap>,
   coinPriceStore: CoinPriceStore,
-  tokenInfoStore: TokenInfoStore<StoresMap, ActionsMap>,
+  tokenInfoStore: TokenInfoStore<StoresMap>,
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
   app: AppStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
-  uiDialogs: UiDialogsStore<{||}, ActionsMap>,
-  uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
+  uiDialogs: UiDialogsStore<{||}>,
+  uiNotifications: UiNotificationsStore<{||}>,
   loading: LoadingStore,
   wallets: WalletStore,
   addresses: AddressesStore,
@@ -131,7 +130,6 @@ function initializeSubstore<T: {...}>(
 export default (action(
   async (
     api: Api,
-    actions: ActionsMap,
     // $FlowFixMe[value-as-type]
     router: RouterStore
   ): Promise<StoresMap> => {
@@ -153,7 +151,7 @@ export default (action(
     storeNames.forEach(name => {
       // Careful: we pass incomplete `store` down to child components
       // Any toplevel store that accesses `store` in its constructor may crash
-      stores[name] = ((new storeClasses[name](stores, api, actions)): any);
+      stores[name] = ((new storeClasses[name](stores, api)): any);
     });
     storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
@@ -162,7 +160,7 @@ export default (action(
      * Because to make sure all substores are non-null we have to create the object
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
-      ada: setupAdaStores((stores: any), api, actions),
+      ada: setupAdaStores((stores: any), api),
     };
 
     const loadedStores: StoresMap = (stores: any);
@@ -176,4 +174,8 @@ export default (action(
     return loadedStores;
   }
   // $FlowFixMe[value-as-type]
-): (Api, ActionsMap, RouterStore) => StoresMap);
+): (Api, RouterStore) => StoresMap);
+
+export type StoresProps = {|
+  +stores: StoresMap,
+|};

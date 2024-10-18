@@ -5,7 +5,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import StakingDashboard from '../../../components/wallet/staking/dashboard/StakingDashboard';
 import UserSummary from '../../../components/wallet/staking/dashboard/UserSummary';
 import StakePool from '../../../components/wallet/staking/dashboard/StakePool';
@@ -21,11 +20,12 @@ import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContai
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
-import { maybe } from '../../../coreUtils';
+import { maybe, noop } from '../../../coreUtils';
 import type { WalletState } from '../../../../chrome/extension/background/types';
+import type { StoresProps } from '../../../stores';
 
 @observer
-export default class StakingDashboardPage extends Component<StoresAndActionsProps> {
+export default class StakingDashboardPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -33,15 +33,16 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   @observable notificationElementId: string = '';
 
   componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
+    this.props.stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
   }
 
   render(): Node {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(StakingDashboardPage)} no public deriver. Should never happen`);
     }
-    const delegationStore = this.props.stores.delegation;
+    const delegationStore = stores.delegation;
     const delegationRequests = delegationStore.getDelegationRequests(publicDeriver.publicDeriverId);
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
@@ -54,7 +55,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     );
 
     const showRewardAmount = errorIfPresent == null
-      && this.props.stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
+      && stores.delegation.isExecutedDelegatedBalance(publicDeriver.publicDeriverId);
 
     const dashboard = (
       <StakingDashboard
@@ -62,12 +63,12 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           stakePools.pools == null
             ? undefined
             : {
-                currentPage: this.props.stores.delegation.selectedPage,
+                currentPage: stores.delegation.selectedPage,
                 numPages: stakePools.pools.length,
-                goToPage: page => this.props.actions.delegation.setSelectedPage.trigger(page),
+                goToPage: page => stores.delegation.setSelectedPage(page),
               }
         }
-        hasAnyPending={this.props.stores.transactions.hasAnyPending}
+        hasAnyPending={stores.transactions.hasAnyPending}
         stakePools={stakePools}
         userSummary={this._generateUserSummary({
           wallet: publicDeriver,
@@ -77,18 +78,18 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           delegationRequests,
           networkId: publicDeriver.networkId,
           defaultTokenId: publicDeriver.defaultTokenId,
-          currentEpoch: this.props.stores.substores.ada.time.getCurrentTimeRequests(
+          currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(
             publicDeriver
           ).currentEpoch,
-          shouldHideBalance: this.props.stores.profile.shouldHideBalance,
-          getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
-          tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
+          shouldHideBalance: stores.profile.shouldHideBalance,
+          getLocalPoolInfo: stores.delegation.getLocalPoolInfo,
+          tokenInfo: stores.tokenInfoStore.tokenInfo,
         })}
-        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
+        isUnregistered={!stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
-            this.props.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
+            stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId)
           )
         )}
       />
@@ -189,7 +190,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                this.props.actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -209,13 +210,13 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
   };
 
   getDialog: (WalletState) => Node = wallet => {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const uiDialogs = this.props.stores.uiDialogs;
 
     if (uiDialogs.isOpen(LessThanExpectedDialog)) {
       return (
         <LessThanExpectedDialog
-          close={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          close={() => this.props.stores.uiDialogs.closeActiveDialog()}
         />
       );
     }
@@ -223,9 +224,8 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(UnmangleTxDialogContainer)) {
       return (
         <UnmangleTxDialogContainer
-          actions={actions}
           stores={stores}
-          onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+          onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
         />
       );
     }
@@ -233,15 +233,12 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(DeregisterDialogContainer)) {
       return (
         <DeregisterDialogContainer
-          actions={actions}
           stores={stores}
           alwaysShowDeregister
           onNext={() => {
             // note: purposely don't await since the next dialog will properly render the spinner
-            this.props.actions.ada.delegationTransaction.createWithdrawalTxForWallet.trigger({
-              wallet,
-            });
-            this.props.actions.dialogs.open.trigger({ dialog: WithdrawalTxDialogContainer });
+            noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
+            this.props.stores.uiDialogs.open({ dialog: WithdrawalTxDialogContainer });
           }}
         />
       );
@@ -249,13 +246,10 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (uiDialogs.isOpen(WithdrawalTxDialogContainer)) {
       return (
         <WithdrawalTxDialogContainer
-          actions={actions}
           stores={stores}
           onClose={() => {
-            this.props.actions.ada.delegationTransaction.reset.trigger({
-              justTransaction: false,
-            });
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
       );
@@ -303,20 +297,20 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
         )}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onUnmangle={() =>
-          this.props.actions.dialogs.open.trigger({
+          this.props.stores.uiDialogs.open({
             dialog: UnmangleTxDialogContainer,
           })
         }
         totalSum={balance == null ? undefined : balance.joinAddCopy(rewardBalance)}
         totalRewards={showRewardAmount ? rewardBalance : undefined}
         openLearnMore={() =>
-          this.props.actions.dialogs.open.trigger({
+          this.props.stores.uiDialogs.open({
             dialog: LessThanExpectedDialog,
           })
         }
         withdrawRewards={
           stakeRegistered ? () => {
-            this.props.actions.dialogs.open.trigger({ dialog: DeregisterDialogContainer });
+            this.props.stores.uiDialogs.open({ dialog: DeregisterDialogContainer });
           } : undefined
         }
         unitOfAccount={_entry => {

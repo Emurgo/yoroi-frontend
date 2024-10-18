@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -15,6 +14,7 @@ import InsufficientFundsPage from './InsufficientFundsPage';
 import { genLookupOrFail, getTokenName } from '../../../stores/stateless/tokenHelpers';
 import environment from '../../../environment';
 import RegistrationOver from './RegistrationOver';
+import type { StoresProps } from '../../../stores';
 
 const messages: * = defineMessages({
   mainTitle: {
@@ -57,20 +57,20 @@ const messages: * = defineMessages({
 });
 
 @observer
-class VotingPageContent extends Component<StoresAndActionsProps> {
+class VotingPageContent extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   start: void => void = () => {
-    this.props.actions.dialogs.open.trigger({ dialog: VotingRegistrationDialogContainer });
+    this.props.stores.uiDialogs.open({ dialog: VotingRegistrationDialogContainer });
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const {
       uiDialogs,
       wallets: { selected },
@@ -154,7 +154,6 @@ class VotingPageContent extends Component<StoresAndActionsProps> {
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
       activeDialog = (
         <VotingRegistrationDialogContainer
-          actions={actions}
           stores={stores}
           onClose={this.onClose}
           walletType={walletType}

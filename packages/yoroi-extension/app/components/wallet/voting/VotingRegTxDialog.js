@@ -170,7 +170,7 @@ export default class VotingRegTxDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.votingRegistrationTitle)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={!this.props.isSubmitting ? this.props.onCancel : null}
         className={styles.dialog}

@@ -1,12 +1,10 @@
 /* eslint-disable promise/always-return */
 // @flow
 import type {
-  ConnectedSites,
   ConnectingMessage,
   SigningMessage,
   WhitelistEntry,
 } from '../../../chrome/extension/connector/types';
-import type { ActionsMap } from '../actions/index';
 import type { StoresMap } from './index';
 import type {
   Anchor,
@@ -65,10 +63,8 @@ import { iterateLenGet, hexToBytes, noop, purify } from '../../coreUtils';
 import {
   broadcastTransaction,
   connectWindowRetrieveData,
-  getConnectedSites,
   getProtocolParameters,
   getWallets,
-  removeWalletFromWhiteList,
   signAndBroadcastTransaction,
   signFail,
   signWindowRetrieveData,
@@ -109,7 +105,7 @@ type SetWhitelistFunc = ({|
   whitelist: Array<WhitelistEntry> | void,
 |}) => Promise<void>;
 
-export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
+export default class ConnectorStore extends Store<StoresMap> {
   @observable unrecoverableError: string | null = null;
   @observable connectingMessage: ?ConnectingMessage = null;
   @observable whiteList: Array<WhitelistEntry> = [];
@@ -124,10 +120,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<SetWhitelistFunc>(
     ({ whitelist }) => this.api.localStorage.setWhitelist(whitelist)
   );
-
-  @observable getConnectedSites: Request<typeof getConnectedSites> = new Request<
-    typeof getConnectedSites
-  >(getConnectedSites);
 
   @observable signingMessage: ?SigningMessage = null;
 
@@ -146,19 +138,15 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   // the tx is not supported.
   @observable isHwWalletErrorRecoverable: ?boolean = null;
 
+  isSignInExecuted: boolean = false;
+
   setup(): void {
     super.setup();
-    this.actions.connector.updateConnectorWhitelist.listen(this._updateConnectorWhitelist);
-    this.actions.connector.removeWalletFromWhitelist.listen(this._removeWalletFromWhitelist);
-    this.actions.connector.confirmSignInTx.listen(async (password) => {
-      await this._confirmSignInTx(password);
-    });
-    this.actions.connector.cancelSignInTx.listen(this._cancelSignInTx);
-    this.actions.connector.refreshActiveSites.listen(this._refreshActiveSites);
-    this.actions.connector.refreshWallets.listen(this._getWallets);
-    this.actions.connector.closeWindow.listen(this._closeWindow);
+    // noinspection JSIgnoredPromiseFromCall
     this._getConnectorWhitelist();
+    // noinspection JSIgnoredPromiseFromCall
     this._getConnectingMsg();
+    // noinspection JSIgnoredPromiseFromCall
     this._getSigningMsg();
     noop(this.currentConnectorWhitelist);
   }
@@ -169,7 +157,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   // ========== general ========== //
   @action
-  _closeWindow() {
+  closeWindow() {
     window.close();
   }
 
@@ -212,7 +200,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   };
 
   @action
-  _confirmSignInTx: string => Promise<void> = async password => {
+  confirmSignInTx: string => Promise<void> = async password => {
     runInAction(() => {
       this.submissionError = null;
     });
@@ -221,7 +209,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     if (signingMessage == null) {
       throw new Error(
-        `${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`
+        `${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`
       );
     }
 
@@ -359,15 +347,24 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       throw new Error(`unkown sign data type ${signingMessage.sign.type}`);
     }
 
-    this.actions.connector.cancelSignInTx.remove(this._cancelSignInTx);
+    runInAction(() => {
+      this.isSignInExecuted = true;
+    });
+
     await ampli.dappPopupSignTransactionSubmitted();
-    this._closeWindow();
+    this.closeWindow();
   };
+
   @action
-  _cancelSignInTx: void => void = () => {
+  cancelSignInTx: void => void = () => {
+    if (this.isSignInExecuted) {
+      // Ignore call to cancel in case sign was already executed
+      // This is needed to handle page unload after signing
+      return;
+    }
     if (this.signingMessage == null) {
       throw new Error(
-        `${nameof(this._confirmSignInTx)} confirming a tx but no signing message set`
+        `${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`
       );
     }
     const { signingMessage } = this;
@@ -379,7 +376,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
   // ========== wallets info ========== //
   @action
-  _getWallets: void => Promise<void> = async () => {
+  refreshWallets: void => Promise<void> = async () => {
     runInAction(() => {
       this.loadingWallets = LoadingWalletStates.PENDING;
       this.errorWallets = '';
@@ -476,7 +473,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
           uid: signingMessage.sign.uid,
           tabId: signingMessage.tabId,
         });
-        this._closeWindow();
+        this.closeWindow();
         return;
       }
 
@@ -546,7 +543,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             uid: signingMessage.sign.uid,
             tabId: signingMessage.tabId,
           });
-          this._closeWindow();
+          this.closeWindow();
           return;
         }
         if (foreignUtxo.spendingTxHash != null) {
@@ -556,7 +553,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
             uid: signingMessage.sign.uid,
             tabId: signingMessage.tabId,
           });
-          this._closeWindow();
+          this.closeWindow();
           return;
         }
         const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
@@ -965,37 +962,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
   _getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelist.execute();
   };
-  _updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({
+  updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({
     whitelist,
   }) => {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
-  _removeWalletFromWhitelist: (request: {|
-    url: string,
-  |}) => Promise<void> = async request => {
-    const filter = this.currentConnectorWhitelist.filter(
-      e => e.url !== request.url
-    );
-    await this.setConnectorWhitelist.execute({
-      whitelist: filter,
-    });
-    await this.getConnectorWhitelist.execute();
-    await removeWalletFromWhiteList({ url: request.url });
-  };
-
-  _refreshActiveSites: void => Promise<void> = async () => {
-    await this.getConnectedSites.execute();
-  };
-
-  // ========== active websites ========== //
-  @computed get activeSites(): ConnectedSites {
-    let { result } = this.getConnectedSites;
-    if (result == null) {
-      result = this.getConnectedSites.execute().result;
-    }
-    return result ?? { sites: [] };
-  }
 
   @computed get connectedWallet(): ?WalletState {
     const { signingMessage } = this;

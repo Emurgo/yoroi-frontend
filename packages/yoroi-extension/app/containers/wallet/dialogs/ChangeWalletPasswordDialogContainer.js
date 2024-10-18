@@ -3,21 +3,18 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import ChangeWalletPasswordDialog from '../../../components/wallet/settings/ChangeWalletPasswordDialog';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriverId: number,
 |};
 
 @observer
-export default class ChangeWalletPasswordDialogContainer extends Component<Props> {
+export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
   render(): Node {
-    const { actions } = this.props;
-    const { uiDialogs } = this.props.stores;
-    const { walletSettings } = this.props.stores;
-    const { updateDataForActiveDialog } = actions.dialogs;
+    const { stores } = this.props;
+    const { uiDialogs, walletSettings } = stores;
     const { changeSigningKeyRequest } = walletSettings;
 
     return (
@@ -29,21 +26,21 @@ export default class ChangeWalletPasswordDialogContainer extends Component<Props
         }}
         onSave={async (values) => {
           const { oldPassword, newPassword } = values;
-          await actions.walletSettings.updateSigningPassword.trigger({
+          await stores.walletSettings.updateSigningPassword({
             publicDeriverId: this.props.publicDeriverId,
             oldPassword,
             newPassword
           });
         }}
         onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
+          stores.uiDialogs.closeActiveDialog();
           changeSigningKeyRequest.reset();
         }}
         onPasswordSwitchToggle={() => {
           changeSigningKeyRequest.reset();
         }}
         onDataChange={data => {
-          updateDataForActiveDialog.trigger(data);
+          stores.uiDialogs.updateDataForActiveDialog(data);
         }}
         isSubmitting={changeSigningKeyRequest.isExecuting}
         error={changeSigningKeyRequest.error}

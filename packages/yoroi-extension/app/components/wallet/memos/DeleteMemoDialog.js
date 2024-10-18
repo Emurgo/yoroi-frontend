@@ -79,7 +79,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
       <Dialog
         className={classnames([styles.component])}
         title={intl.formatMessage(memoMessages.deleteMemo)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onClose}

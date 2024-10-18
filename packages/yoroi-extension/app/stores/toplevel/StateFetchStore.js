@@ -14,9 +14,8 @@ export default class StateFetchStore<
       ...
     },
     ...
-  },
-  ActionsMapType
-> extends Store<StoresMapType, ActionsMapType> {
+  }
+> extends Store<StoresMapType> {
 
   @observable fetcher: IFetcher;
 

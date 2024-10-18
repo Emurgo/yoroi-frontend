@@ -2,14 +2,14 @@
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import AssetsPage from '../../components/wallet/assets/AssetsPage';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletAssetsPage extends Component<StoresAndActionsProps> {
+export default class WalletAssetsPage extends Component<StoresProps> {
 
   render(): Node {
     const publicDeriver = this.props.stores.wallets.selected;

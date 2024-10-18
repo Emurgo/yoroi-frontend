@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -12,6 +11,7 @@ import Dialog from '../../../../components/widgets/Dialog';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
+import type { StoresProps } from '../../../../stores';
 
 type Props = {|
   +stepsList: StepsList,
@@ -21,7 +21,7 @@ type Props = {|
   +onError: Error => void,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class RegisterDialogContainer extends Component<AllProps> {
@@ -30,7 +30,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { submit, cancel, onError, stepsList } = this.props;
+    const { submit, cancel, onError, stepsList, stores } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
@@ -45,9 +45,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {
-            await this.props.actions.ada.voting.createTransaction.trigger(
-              walletPassword
-            );
+            await stores.substores.ada.votingStore.createTransaction(walletPassword);
             await submit();
           } catch (error) {
             onError(error);
@@ -74,7 +72,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
         closeOnOverlayClick={false}
         onClose={this.props.cancel}
         closeButton={<DialogCloseButton onClose={this.props.cancel} />}
-        actions={dialogBackButton}
+        dialogActions={dialogBackButton}
       >
         <>
           <ErrorBlock error={error} />

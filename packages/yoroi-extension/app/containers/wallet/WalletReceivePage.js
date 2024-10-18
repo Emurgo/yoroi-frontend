@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
 import {
   AddressFilter,
@@ -42,9 +41,10 @@ import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
 import { maybe } from '../../coreUtils';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletReceivePage extends Component<StoresAndActionsProps> {
+export default class WalletReceivePage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
 
   @observable notificationElementId: string = '';
@@ -52,35 +52,37 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();
-    this.props.actions.addresses.resetFilter.trigger();
+    this.props.stores.addresses.resetFilter();
   }
 
   handleGenerateAddress: void => Promise<void> = async () => {
-    const publicDeriver = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver != null) {
-      this.props.actions.dialogs.open.trigger({
+      // <TODO:IMPROVE> there's gotta be a better way to render loading while waiting for a request result
+      this.props.stores.uiDialogs.open({
         dialog: LoadingSpinner,
       });
-      await this.props.actions.addresses.createAddress.trigger(publicDeriver);
-      this.props.actions.dialogs.closeActiveDialog.trigger();
+      await stores.addresses.createAddress(publicDeriver);
+      this.props.stores.uiDialogs.closeActiveDialog();
     }
   };
 
   resetErrors: void => void = () => {
-    this.props.actions.addresses.resetErrors.trigger();
+    this.props.stores.addresses.resetErrors();
   };
 
   closeNotification: void => void = () => {
     const publicDeriver = this.props.stores.wallets.selected;
     if (publicDeriver) {
       const notificationId = `${publicDeriver.publicDeriverId}-copyNotification`;
-      this.props.actions.notifications.closeActiveNotification.trigger({ id: notificationId });
+      this.props.stores.uiNotifications.closeActiveNotification({ id: notificationId });
     }
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const { hwVerifyAddress } = this.props.stores.substores.ada;
     const publicDeriver = this.props.stores.wallets.selected;
@@ -113,7 +115,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,
@@ -124,7 +126,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
     const notification = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     const selectedExplorerForNetwork =
-      this.props.stores.explorers.selectedExplorer.get(
+      stores.explorers.selectedExplorer.get(
         publicDeriver.networkId
       ) ??
       (() => {
@@ -135,7 +137,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
       defaultNetworkId: publicDeriver.networkId,
       defaultIdentifier: publicDeriver.defaultTokenId,
     };
-    const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
+    const defaultTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo)({
       identifier: defaultToken.defaultIdentifier,
       networkId: defaultToken.defaultNetworkId,
     });
@@ -151,9 +153,9 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
-            error={this.props.stores.addresses.error}
-            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={stores.addresses.createAddressRequest.isExecuting}
+            error={stores.addresses.error}
+            isFilterActive={stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -172,7 +174,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           <MangledHeader
             hasMangledUtxo={canUnmangle}
             onClick={() =>
-              this.props.actions.dialogs.open.trigger({
+              this.props.stores.uiDialogs.open({
                 dialog: UnmangleTxDialogContainer,
               })
             }
@@ -192,9 +194,9 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
             onGenerateAddress={this.handleGenerateAddress}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notification}
-            isSubmitting={this.props.stores.addresses.createAddressRequest.isExecuting}
-            error={this.props.stores.addresses.error}
-            isFilterActive={this.props.stores.addresses.addressFilter !== AddressFilter.None}
+            isSubmitting={stores.addresses.createAddressRequest.isExecuting}
+            error={stores.addresses.error}
+            isFilterActive={stores.addresses.addressFilter !== AddressFilter.None}
           />
         );
       }
@@ -220,13 +222,13 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
         <WalletReceiveRevamp
           hierarchy={{
             path: getSelectedHierarchyPath(),
-            filter: this.props.stores.addresses.addressFilter,
+            filter: stores.addresses.addressFilter,
           }}
           header={header}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           selectedExplorer={selectedExplorerForNetwork}
           walletAddresses={applyAddressFilter({
-            addressFilter: this.props.stores.addresses.addressFilter,
+            addressFilter: stores.addresses.addressFilter,
             addresses: addressTypeStore.request.all,
           })
             .slice()
@@ -234,7 +236,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           onCopyAddressTooltip={onCopyAddressTooltip}
           notification={notification}
           onVerifyAddress={async (request: $ReadOnly<StandardAddress>) => {
-            await actions.ada.hwVerifyAddress.selectAddress.trigger(request);
+            await stores.substores.ada.hwVerifyAddress.selectAddress(request);
             this.openVerifyAddressDialog();
           }}
           onGeneratePaymentURI={
@@ -269,7 +271,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
               if (val == null) return null;
               return new BigNumber(val);
             })()}
-            onClose={() => actions.dialogs.closeActiveDialog.trigger()}
+            onClose={() => stores.uiDialogs.closeActiveDialog()}
             onGenerate={(address, amount) => {
               this.generateURI(address, amount);
             }}
@@ -291,14 +293,14 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
           <URIDisplayDialog
             address={paramAddress}
             amount={new BigNumber(paramAmount)}
-            onClose={actions.dialogs.closeActiveDialog.trigger}
+            onClose={stores.uiDialogs.closeActiveDialog}
             onBack={() => this.openURIGenerateDialog(paramAddress, paramAmount)}
             onCopyAddressTooltip={elementId => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -311,9 +313,8 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
 
         {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
           <UnmangleTxDialogContainer
-            actions={actions}
             stores={stores}
-            onClose={() => this.props.actions.dialogs.closeActiveDialog.trigger()}
+            onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
           />
         )}
 
@@ -328,7 +329,7 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -337,8 +338,8 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
             }}
             notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
             isHardware={isHwWallet}
-            verify={() => actions.ada.hwVerifyAddress.verifyAddress.trigger(publicDeriver)}
-            cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
+            verify={() => stores.substores.ada.hwVerifyAddress.verifyAddress(publicDeriver)}
+            cancel={stores.substores.ada.hwVerifyAddress.closeAddressDetailDialog}
             complexityLevel={profile.selectedComplexityLevel}
           />
         ) : null}
@@ -369,21 +370,21 @@ export default class WalletReceivePage extends Component<StoresAndActionsProps> 
   };
 
   openVerifyAddressDialog: void => void = (): void => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({ dialog: VerifyAddressDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.open({ dialog: VerifyAddressDialog });
   };
 
   openURIGenerateDialog: (address: string, amount?: string) => void = (address, amount) => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({
+    const { stores } = this.props;
+    stores.uiDialogs.open({
       dialog: URIGenerateDialog,
       params: { address, amount },
     });
   };
 
   generateURI: (string, BigNumber) => void = (address, amount) => {
-    const { actions } = this.props;
-    actions.dialogs.open.trigger({
+    const { stores } = this.props;
+    stores.uiDialogs.open({
       dialog: URIDisplayDialog,
       params: { address, amount: amount.toString() },
     });
