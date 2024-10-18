@@ -12,17 +12,17 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request && github.event.pull_request.draft == false) || (github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check')))
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Read .nvmrc
         run: echo ::set-output name=NVMRC::$(cat .nvmrc)
         id: nvm
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: '${{ steps.nvm.outputs.NVMRC }}'
       - name: Cache node modules
         # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         env:
           cache-name: cache-yoroi-extension-node-modules
         with:
