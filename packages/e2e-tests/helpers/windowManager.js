@@ -260,4 +260,10 @@ export class WindowManager {
 
     return this._getHandleByTitle(titleSwitchTo)[0];
   }
+
+  async reopenExtensionTab() {
+    this.logger.info(`WindowManager::reopenExtensionTab Reopening the extension tab`);
+    const extURL = '';
+    await openNewTab(extensionTabName, extURL);
+  }
 }

@@ -8,7 +8,8 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { walletNameShortener } from '../utils/utils.js';
+import { getTestLogger, walletNameShortener } from '../utils/utils.js';
+import { WindowManager } from './windowManager.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -102,7 +103,11 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   const state = await addWalletPage.isDisplayed();
   expect(state).to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
-  await addWalletPage.refreshPage();
+  // open a new tab
+  const wmLogger = getTestLogger(`windowManager_${Date.now}`, `preloadDBAndStorage`);
+  const windowManager = new WindowManager(webdriver, wmLogger);
+  windowManager.init();
+  // open the extension url again
 };
 
 export const waitTxPage = async (webdriver, logger) => {
