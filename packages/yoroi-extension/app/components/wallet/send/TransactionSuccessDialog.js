@@ -32,7 +32,6 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
   +process: 'for-sell' | 'normal',
 |};
 

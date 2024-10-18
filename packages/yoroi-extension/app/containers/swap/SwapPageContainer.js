@@ -1,13 +1,11 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
-import { withLayout } from '../../styles/context/layout';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -18,18 +16,13 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children?: Node,
 |};
 
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
-
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
 
 @observer
-class SwapPageContainer extends Component<AllProps> {
+export default class SwapPageContainer extends Component<AllProps> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -73,7 +66,6 @@ class SwapPageContainer extends Component<AllProps> {
           />
         }
         showInContainer
-        showAsCard
         withPadding={false}
       >
         <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
@@ -83,4 +75,3 @@ class SwapPageContainer extends Component<AllProps> {
     );
   }
 }
-export default (withLayout(SwapPageContainer): ComponentType<Props>);

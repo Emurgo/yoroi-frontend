@@ -7,7 +7,7 @@ import type { ConfigType } from '../config/config-types';
 import type { ActionsMap } from './actions/index';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
-import AddWalletPage, { AddAnotherWalletPromise } from './containers/wallet/AddWalletPage';
+import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
@@ -133,12 +133,6 @@ const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
 const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
 const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
 
-const YoroiPalettePagePromise = () => import('./containers/experimental/YoroiPalette');
-const YoroiPalettePage = React.lazy(YoroiPalettePagePromise);
-
-const YoroiThemesPagePromise = () => import('./containers/experimental/yoroiThemes');
-const YoroiThemesPage = React.lazy(YoroiThemesPagePromise);
-
 // SWAP
 const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
 const SwapPage = React.lazy(SwapPagePromise);
@@ -149,7 +143,6 @@ const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
 
 export const LazyLoadPromises: Array<() => any> = [
-  AddAnotherWalletPromise,
   StakingPageContentPromise,
   CreateWalletPagePromise,
   RestoreWalletPagePromise,
@@ -183,8 +176,6 @@ export const LazyLoadPromises: Array<() => any> = [
   NFTsPageRevampPromise,
   NFTDetailPageRevampPromise,
   ConnectedWebsitesPagePromise,
-  YoroiPalettePagePromise,
-  YoroiThemesPagePromise,
   SwapPagePromise,
   SwapOrdersPagePromise,
   OptForAnalyticsPagePromise,
@@ -266,16 +257,6 @@ export const Routes = (stores: StoresMap, actions: ActionsMap): Node => {
             exact
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
             component={props => <ConnectedWebsitesPage {...props} stores={stores} actions={actions} />}
-          />
-          <Route
-            exact
-            path={ROUTES.EXPERIMENTAL.YOROI_PALETTE}
-            component={props => <YoroiPalettePage {...props} stores={stores} actions={actions} />}
-          />
-          <Route
-            exact
-            path={ROUTES.EXPERIMENTAL.THEMES}
-            component={props => <YoroiThemesPage {...props} stores={stores} actions={actions} />}
           />
           <Route
             path={ROUTES.WALLETS.ROOT}

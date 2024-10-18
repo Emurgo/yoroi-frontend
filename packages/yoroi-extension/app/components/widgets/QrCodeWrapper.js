@@ -8,21 +8,16 @@ type Props = {|
   +size: number,
   +id?: string,
   +includeMargin?: boolean,
-  +addBg?: boolean,
-  +fgColor?: string,
 |};
 
-const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false, addBg = true }: Props): Node => {
+const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false}: Props): Node => {
   const theme = useTheme();
-  // Get QRCode color value from active theme's CSS variable
-  const qrCodeBackgroundColor = addBg ? theme.palette.ds.el_gray_max : theme.palette.ds.white_static;
-  const qrCodeForegroundColor = theme.palette.ds.gray_min;
 
   return (
     <QRCode
       value={value}
-      bgColor={qrCodeBackgroundColor}
-      fgColor={qrCodeForegroundColor}
+      bgColor={theme.palette.ds.white_static}
+      fgColor={theme.palette.ds.black_static}
       size={size}
       includeMargin={includeMargin}
       id={id}

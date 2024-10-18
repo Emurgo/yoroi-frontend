@@ -78,7 +78,6 @@ export default class WalletBackupDialogContainer extends Component<Props> {
         }}
         onRestartBackup={restartWalletBackup.trigger}
         recoveryPhraseSorted={recoveryPhraseSorted}
-        classicTheme={stores.profile.isClassicTheme}
       />
     );
   }

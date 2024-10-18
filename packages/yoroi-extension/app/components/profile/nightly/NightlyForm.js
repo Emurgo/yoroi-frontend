@@ -1,17 +1,13 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { ComponentType, Node } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import styles from './NightlyForm.scss';
-import globalMessages from '../../../i18n/global-messages';
-import { ReactComponent as NightlyIcon } from '../../../assets/images/yoroi-nightly-icon.inline.svg';
-import { ReactComponent as NightlyIconRevamp } from '../../../assets/images/yoroi-nightly-icon-dark.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
+import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import globalMessages from '../../../i18n/global-messages';
+import { ReactComponent as NightlyIconRevamp } from '../../../assets/images/yoroi-nightly-icon-dark.inline.svg';
 
 const messages = defineMessages({
   nightlySlogan: {
@@ -63,7 +59,7 @@ type State = {|
 |};
 
 @observer
-class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
+export default class NightlyForm extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -78,50 +74,9 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onSubmit, isRevampLayout, renderLayoutComponent } = this.props;
+    const { onSubmit } = this.props;
 
-    const classicLayout = (
-      <div className={styles.component}>
-        <div className={styles.centeredBox}>
-          <div className={styles.logo}>
-            <NightlyIcon />
-          </div>
-          <div className={styles.content}>
-            <FormattedHTMLMessage {...messages.header} />
-            <br />
-            <br />
-            <div className={styles.header}>{intl.formatMessage(messages.warningHeader)}</div>
-            <ul>
-              <li>{intl.formatMessage(messages.warning1)}</li>
-              <li>{intl.formatMessage(messages.warning2)}</li>
-            </ul>
-            <br />
-            <div className={styles.header}>{intl.formatMessage(messages.recommendationHeader)}</div>
-            <ul>
-              <li>{intl.formatMessage(messages.recommendation1)}</li>
-              <li>{intl.formatMessage(messages.recommendation2)}</li>
-            </ul>
-          </div>
-          <div className={styles.checkbox}>
-            <CheckboxLabel
-              label={intl.formatMessage(messages.acknowledgedRisks)}
-              onChange={this.toggleAcceptance.bind(this)}
-              checked={this.state.acknowledgedRisks}
-            />
-          </div>
-          <Button
-            variant={isRevampLayout ? 'contained' : 'primary'}
-            onClick={onSubmit}
-            disabled={!this.state.acknowledgedRisks}
-            sx={{ width: '480px' }}
-          >
-            {intl.formatMessage(globalMessages.continue)}
-          </Button>
-        </div>
-      </div>
-    );
-
-    const revampLayout = (
+    return (
       <Box>
         <Box maxWidth="424px" mx="auto">
           <Box
@@ -133,7 +88,7 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
               mb: '24px',
             }}
           >
-            <NightlyIconRevamp />
+            <NightlyIconRevamp/>
             <Typography component="div" variant="h1" fontWeight={500} mb="8px" mt="24px" lineHeight="24px">
               {intl.formatMessage(globalMessages.yoroiNightly)}
             </Typography>
@@ -226,12 +181,5 @@ class NightlyForm extends Component<Props & InjectedLayoutProps, State> {
         </Box>
       </Box>
     );
-
-    return renderLayoutComponent({
-      CLASSIC: classicLayout,
-      REVAMP: revampLayout,
-    });
   }
 }
-
-export default (withLayout(NightlyForm): ComponentType<Props>);

@@ -1,7 +1,6 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
@@ -11,79 +10,10 @@ import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revam
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import { ReactComponent as transferIcon } from '../../assets/images/sidebar/transfer_wallets.inline.svg';
-import { ReactComponent as settingsIcon } from '../../assets/images/sidebar/wallet-settings-2-ic.inline.svg';
-import { ReactComponent as goBackIcon } from '../../assets/images/top-bar/back-arrow-white.inline.svg';
 import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
-
-export type SidebarCategory = {|
-  +className: string,
-  +route: string,
-  +icon: string,
-  +label?: MessageDescriptor,
-  +isVisible: ({|
-    hasAnyWallets: boolean,
-    selected: ?{ publicDeriverId: number, ... },
-    currentRoute: string,
-  |}) => boolean,
-|};
-
-export const allCategories: Array<SidebarCategory> = [];
-function registerCategory(category: SidebarCategory): SidebarCategory {
-  allCategories.push(category);
-  return category;
-}
-
-export const MY_WALLETS: SidebarCategory = registerCategory({
-  className: 'wallets',
-  route: ROUTES.MY_WALLETS,
-  icon: walletsIcon,
-  label: globalMessages.sidebarWallets,
-  isVisible: request => request.hasAnyWallets && request.selected == null,
-});
-
-export const WALLETS_ROOT: SidebarCategory = registerCategory({
-  className: 'wallets',
-  route: ROUTES.WALLETS.ROOT,
-  icon: walletsIcon,
-  label: globalMessages.sidebarWallets,
-  isVisible: request => request.hasAnyWallets && request.selected != null,
-});
-
-export const BACK_TO_ADD: SidebarCategory = registerCategory({
-  className: 'go-back',
-  route: ROUTES.WALLETS.ADD,
-  icon: goBackIcon,
-  label: globalMessages.goBack,
-  isVisible: request => !request.hasAnyWallets,
-});
-
-export const SETTINGS: SidebarCategory = registerCategory({
-  className: 'settings',
-  route: ROUTES.SETTINGS.ROOT,
-  icon: settingsIcon,
-  label: globalMessages.sidebarSettings,
-  isVisible: r => r.selected != null,
-});
-
-export const TRANSFER_PAGE: SidebarCategory = registerCategory({
-  className: 'wallet-transfer',
-  route: ROUTES.TRANSFER.ROOT,
-  icon: transferIcon,
-  label: globalMessages.sidebarTransfer,
-  isVisible: r => r.selected != null,
-});
-
-export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
-  className: 'dapp-connector',
-  route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
-  icon: dappConnectorIcon,
-  label: connectorMessages.dappConnector,
-  isVisible: _request => !environment.isLight,
-});
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
@@ -129,7 +59,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !selected?.isTestnet,
+    isVisible: ({ selected }) => !selected?.isTestnet,
   },
   {
     className: 'assets',

@@ -1,7 +1,7 @@
 // @flow
 
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { action, observable } from 'mobx';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -9,8 +9,6 @@ import environment from '../../../environment';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
-import { withLayout } from '../../../styles/context/layout';
-import type { Layouts } from '../../../styles/context/layout';
 import { Box, useTheme } from '@mui/material';
 
 export type SocialLinks = {|
@@ -47,14 +45,8 @@ type Props = {|
   setFirstPool?: PoolData => void,
 |};
 
-type InjectedProps = {|
-  +selectedLayout: Layouts,
-|};
-
-type AllProps = {| ...Props, ...InjectedProps |};
-
 @observer
-class SeizaFetcher extends Component<AllProps> {
+export default class SeizaFetcher extends Component<Props> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -114,7 +106,7 @@ class SeizaFetcher extends Component<AllProps> {
     this.iframe = frame;
   };
 
-  constructor(props: AllProps) {
+  constructor(props: Props) {
     super(props);
     window.addEventListener('message', this.messageHandler, false);
   }
@@ -185,7 +177,7 @@ class SeizaFetcher extends Component<AllProps> {
 
     finalURL += totalAda == null ? '' : `&totalAda=${totalAda}`;
     // adds selected layout to customize revamp design
-    finalURL += `&layout=${this.props.selectedLayout}`;
+    finalURL += `&layout=REVAMP`;
     finalURL += `&bias=${bias}`;
 
     return finalURL;
@@ -200,7 +192,6 @@ class SeizaFetcher extends Component<AllProps> {
     this.frameHeight = Math.max(window.innerHeight - this.iframe.getBoundingClientRect().top - 30, 0);
   };
 }
-export default (withLayout(SeizaFetcher): ComponentType<Props>);
 
 const SeizaFetcherComp = ({ setFrame, stakingUrl, iframe, frameHeight }) => {
   const { name } = useTheme();

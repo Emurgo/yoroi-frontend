@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletType } from './types';
 import { Component } from 'react';
@@ -10,7 +10,6 @@ import { ReactComponent as AppStoreBadge } from '../../../assets/images/app-stor
 import { ReactComponent as PlayStoreBadge } from '../../../assets/images/google-play-badge.inline.svg';
 import { ReactComponent as ExclamationIcon } from '../../../assets/images/revamp/icons/exclamation-circle.inline.svg';
 import { ReactComponent as CrossIcon } from '../../../assets/images/revamp/icons/cross.inline.svg';
-import { withLayout } from '../../../styles/context/layout';
 import Step1Image from '../../../assets/images/revamp/catalyst-step1.inline.svg';
 import Step2Image from '../../../assets/images/revamp/catalyst-step2.inline.svg';
 import TrezorStepImage from '../../../assets/images/pic-catalyst-step3-trezor.inline.svg';
@@ -69,10 +68,6 @@ type Props = {|
   +walletType: WalletType,
 |};
 
-type InjectedProps = {|
-  +isRevampLayout: boolean,
-|};
-
 type State = {|
   +showDisclamer: boolean,
 |};
@@ -91,12 +86,12 @@ const WarningWrapper = styled(Box)(({ theme }) => ({
 }));
 
 @observer
-class Voting extends Component<Props & InjectedProps, State> {
+export default class Voting extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  state = {
+  state: State = {
     showDisclamer: true,
   };
 
@@ -133,7 +128,7 @@ class Voting extends Component<Props & InjectedProps, State> {
     throw new Error(`${nameof(Voting)} impossible wallet type`);
   }
 
-  renderRevampLayout() {
+  render(): Node {
     const { intl } = this.context;
     const { walletType } = this.props;
     const { showDisclamer } = this.state;
@@ -231,80 +226,4 @@ class Voting extends Component<Props & InjectedProps, State> {
       </>
     );
   }
-
-  renderLayout() {
-    const { intl } = this.context;
-    const fundName = this.props.name;
-    const pendingTxWarningComponent = this.props.hasAnyPending ? (
-      <div className={styles.warningBox}>
-        <WarningBox>{this.context.intl.formatMessage(globalMessages.sendingIsDisabled)}</WarningBox>
-      </div>
-    ) : null;
-    return (
-      <>
-        {pendingTxWarningComponent}
-
-        <div className={styles.voting}>
-          <div className={styles.delegationStatus}>
-            {this.props.isDelegated ? (
-              <div className={styles.lineText}>{intl.formatMessage(messages.keepDelegated)}</div>
-            ) : (
-              <div className={styles.warningBox}>
-                <WarningBox>{intl.formatMessage(messages.notDelegated)}</WarningBox>
-              </div>
-            )}
-          </div>
-
-          <div className={classnames([styles.lineTitle, styles.firstItem])}>
-            {intl.formatMessage(messages.lineTitle, { fundName })}
-          </div>
-
-          <div className={styles.lineText}>{intl.formatMessage(messages.line2)}</div>
-
-          <div className={styles.cardContainer}>
-            <div className={classnames([styles.card, styles.bgStep1])}>
-              <div className={styles.number}>
-                <span>1</span>
-              </div>
-              <div>
-                <div className={classnames([styles.lineText])}>{intl.formatMessage(messages.line3)}</div>
-                <div className={styles.appBadges}>
-                  <a
-                    href="https://apps.apple.com/kg/app/catalyst-voting/id1517473397"
-                    onClick={event => this.props.onExternalLinkClick(event)}
-                  >
-                    <AppStoreBadge />
-                  </a>
-                  <a
-                    href="https://play.google.com/store/apps/details?id=io.iohk.vitvoting"
-                    onClick={event => this.props.onExternalLinkClick(event)}
-                  >
-                    <PlayStoreBadge />
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className={classnames([styles.card, styles.bgStep2])}>
-              <div className={styles.number}>
-                <span>2</span>
-              </div>
-              <div className={classnames([styles.lineText, styles.step2Text])}>{intl.formatMessage(messages.line4)}</div>
-            </div>
-            {this.renderStep3()}
-          </div>
-          <div className={styles.registerButton}>
-            <Button variant="primary" onClick={this.props.start} disabled={this.props.hasAnyPending} sx={{ width: '400px' }}>
-              {intl.formatMessage(globalMessages.registerLabel)}
-            </Button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
-  render(): Node {
-    return this.props.isRevampLayout ? this.renderRevampLayout() : this.renderLayout();
-  }
 }
-
-export default (withLayout(Voting): ComponentType<Props>);
