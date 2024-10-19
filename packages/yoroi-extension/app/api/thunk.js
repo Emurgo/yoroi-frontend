@@ -111,7 +111,7 @@ export function callBackground<T, R>(message: T): Promise<R> {
     window.chrome.runtime.sendMessage(message, response => {
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
-        reject(`Error when calling the background with: ${JSON.stringify(message) ?? 'undefined'}`);
+        reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(message) ?? 'undefined'}`);
         return;
       }
       resolve(response);
@@ -262,8 +262,8 @@ export const getAllTxMemos: GetEntryFuncType<typeof  GetAllTxMemos> = async () =
   return result.map(GetAllTxMemos.fixMemoDate);
 }
 
-const _removeAllTransactions: GetEntryFuncType<typeof RemoveAllTransactions> = async (request) => {
-  await callBackground({ type: RemoveAllTransactions.typeTag, request });
+const _removeAllTransactions: GetEntryFuncType<typeof RemoveAllTransactions> = async ({ publicDeriverId }) => {
+  await callBackground({ type: RemoveAllTransactions.typeTag, request: { publicDeriverId } });
 }
 
 export async function removeAllTransactions(
@@ -286,13 +286,15 @@ export async function removeAllTransactions(
   }
 }
 
-export const popAddress: GetEntryFuncType<typeof PopAddress> = async (request) => {
-  await callBackground({ type: PopAddress.typeTag, request });
+export const popAddress: GetEntryFuncType<typeof PopAddress> = async ({ publicDeriverId }) => {
+  await callBackground({ type: PopAddress.typeTag, request: { publicDeriverId } });
 }
 
-function deserializeTx(tx: any): WalletTransaction {
-  // we know that there are only two types and only the Shelley one has the 'certificates'
-  // field
+function deserializeTx(tx: any): ?WalletTransaction {
+  if (tx?.txid == null) {
+    return null;
+  }
+  // we know that there are only two types and only the Shelley one has the 'certificates' field
   if (Object.prototype.hasOwnProperty.call(tx, 'certificates')) {
     return CardanoShelleyTransaction.fromData(deserializeShelleyTransactionCtorData(tx));
   }
@@ -301,7 +303,18 @@ function deserializeTx(tx: any): WalletTransaction {
 
 export const refreshTransactions: GetEntryFuncType<typeof RefreshTransactions> = async (request) => {
   const txs = await callBackground({ type: 'refresh-transactions', request });
-  return txs.map(deserializeTx);
+  if (txs.error) {
+    console.error('Failed to refresh transactions!', txs.error);
+    return [];
+  }
+  return txs.map(tx => {
+    try {
+      return deserializeTx(tx);
+    } catch (e) {
+      console.error('Failed to deserialize a tx from: ' + JSON.stringify(tx), e);
+      return null;
+    }
+  }).filter(Boolean);
 }
 
 export const resyncWallet: GetEntryFuncType<typeof ResyncWallet> = async (request) => {
@@ -397,7 +410,14 @@ chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => 
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {
-      message.params.newTxs = message.params.newTxs.map(deserializeTx);
+      message.params.newTxs = message.params.newTxs.map(tx => {
+        try {
+          return deserializeTx(tx);
+        } catch (e) {
+          console.error('Failed to deserialize a transaction from: ' + JSON.stringify(tx), e);
+          return null;
+        }
+      }).filter(Boolean);
     }
     if (message.params.walletState) {
       patchWalletState(message.params.walletState);
