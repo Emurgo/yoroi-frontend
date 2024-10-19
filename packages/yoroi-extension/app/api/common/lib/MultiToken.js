@@ -35,6 +35,7 @@ export class MultiToken {
         multiTokenData.values.map(({ identifier, networkId, amount }) => ({
           identifier,
           networkId,
+          // $FlowIgnore
           amount: new BigNumber({ ...amount, _isBigNumber: true }),
         })),
         multiTokenData.defaults
