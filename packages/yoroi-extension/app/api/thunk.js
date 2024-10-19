@@ -150,12 +150,18 @@ function patchWalletState(walletState: Object): WalletState {
 }
 
 export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
-  const wallets = await callBackground({ type: GetWallets.typeTag, request: { walletId } });
-
-  for (const wallet of wallets) {
+  const resp = await callBackground({ type: GetWallets.typeTag, request: { walletId } });
+  if (resp.error) {
+    console.error('error when loading wallets:', resp.error);
+    throw new Error(`error when loading wallets: ${resp.error}`);
+  }
+  if (!Array.isArray(resp)) {
+    throw new Error(`loading wallets not array: ${JSON.stringify(resp)}`);
+  }
+  for (const wallet of resp) {
     patchWalletState(wallet);
   }
-  return wallets;
+  return resp;
 }
 
 export async function subscribe(activeWalletId: ?number): Promise<void> {
