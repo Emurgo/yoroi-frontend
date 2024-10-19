@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { walletNameShortener } from '../utils/utils.js';
+import { walletNameShortener, getByLocator } from '../utils/utils.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -102,7 +102,21 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   const state = await addWalletPage.isDisplayed();
   expect(state).to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
-  await addWalletPage.refreshPage();
+  // based on https://courtneyzhan.medium.com/reloading-a-chrome-extension-using-selenium-webdriver-85ac0e0faa97
+  await webdriver.navigate().to('chrome://extensions');  
+  // first shadow root, call from driver
+  const elem1 = await webdriver.findElement(getByLocator({ locator: "extensions-manager", method: 'css' }));
+  const shadowRoot1 = await elem1.getShadowRoot(); //webdriver.executeScript("return arguments[0].shadowRoot", elem1);
+  // second shadow_root, call from shadow_root1
+  const elem2 = await shadowRoot1.findElement(getByLocator({ locator: "extensions-item-list", method: 'css' }));
+  const shadowRoot2 = await webdriver.executeScript("return arguments[0].shadowRoot", elem2);
+  // third shadow_root, call from shadow_root2
+  const elem3 = await shadowRoot2.findElement(getByLocator({ locator: "extensions-item", method: 'css' }));
+  const shadowRoot3 = await webdriver.executeScript("return arguments[0].shadowRoot", elem3);
+  const reloadButton = await shadowRoot3.findElement(getByLocator({ locator: "cr-icon-button", method: 'css' }));
+  await reloadButton.click();
+  await new Promise(resolve => setTimeout(resolve, 1500000));
+  await webdriver.navigate().back();
 };
 
 export const waitTxPage = async (webdriver, logger) => {
