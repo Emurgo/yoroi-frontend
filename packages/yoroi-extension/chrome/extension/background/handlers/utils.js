@@ -4,12 +4,12 @@ import type { PublicDeriver } from '../../../../app/api/ada/lib/storage/models/P
 import type { WalletState } from '../types';
 import {
   asGetAllUtxos,
-  asHasLevels,
+  asGetBalance,
   asGetPublicKey,
   asGetSigningKey,
   asGetStakingKey,
+  asHasLevels,
   asHasUtxoChains,
-  asGetBalance,
 } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits'
 import { getWalletChecksum } from '../../../../app/api/export/utils';
 import { getReceiveAddress } from '../../../../app/stores/stateless/addressStores';
@@ -18,24 +18,15 @@ import { getChainAddressesForDisplay, } from '../../../../app/api/ada/lib/storag
 import { CoreAddressTypes } from '../../../../app/api/ada/lib/storage/database/primitives/enums';
 import { ChainDerivations } from '../../../../app/config/numbersConfig';
 import {
-  getAllAddressesForWallet,
   getAllAddressesForDisplay,
+  getAllAddressesForWallet,
 } from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
-import {
-  isLedgerNanoWallet,
-  isTrezorTWallet
-} from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import {
-  isTestnet,
-  isCardanoHaskell,
-} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, isTestnet, } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
-import {
-  asAddressedUtxo,
-  cardanoValueFromRemoteFormat,
-} from '../../../../app/api/ada/transactions/utils';
+import { asAddressedUtxo, cardanoValueFromRemoteFormat, } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
@@ -48,18 +39,29 @@ import { getProtocolParameters } from './yoroi/protocolParameters';
 export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
   const db = await getDb();
   let publicDerivers = await loadWalletsFromStorage(db);
-  if (typeof publicDeriverId === 'number') {
-    const publicDeriver = publicDerivers.find(pd =>
-      pd.getPublicDeriverId() === publicDeriverId
-    );
-    if (publicDeriver) {
-      publicDerivers = [publicDeriver];
-    } else {
-      publicDerivers = [];
+  if (publicDeriverId != null) {
+    if (typeof publicDeriverId !== 'number') {
+      throw new Error(`Invalid public deriver ID type in request: ${publicDeriverId} (${typeof publicDeriverId})`);
     }
+    const publicDeriver = publicDerivers.find(pd => pd.getPublicDeriverId() === publicDeriverId);
+    publicDerivers = publicDeriver ? [publicDeriver] : [];
   }
-  const walletStates = await Promise.all(publicDerivers.map(getWalletState));
-  await batchLoadSubmittedTransactions(walletStates);
+
+  const maybeWalletStates = await Promise.all(publicDerivers.map(async publicDeriver => {
+    try {
+      return await getWalletState(publicDeriver);
+    } catch (err) {
+      console.error('failed to load wallet state for public deriver id ' + publicDeriver.publicDeriverId, err);
+      return null;
+    }
+  }));
+  // $FlowIgnore
+  const walletStates: Array<WalletState> = maybeWalletStates.filter(x => x != null);
+  try {
+    await batchLoadSubmittedTransactions(walletStates);
+  } catch (e) {
+    console.error('getWalletsState:batchLoadSubmittedTransactions error:', e);
+  }
   return walletStates;
 }
 
