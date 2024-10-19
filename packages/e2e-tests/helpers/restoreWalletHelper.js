@@ -1,4 +1,5 @@
 import AddNewWallet from '../pages/addNewWallet.page.js';
+import BasePage from '../pages/basepage.js';
 import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
 import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
@@ -8,8 +9,8 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { getTestLogger, walletNameShortener } from '../utils/utils.js';
-import { WindowManager } from './windowManager.js';
+import { walletNameShortener } from '../utils/utils.js';
+import { extensionTabName, serviceWorkersTabName, WindowManager } from './windowManager.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -99,15 +100,14 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
 };
 
 export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
+  logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
   expect(state).to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
-  // open a new tab
-  const wmLogger = getTestLogger(`windowManager_${Date.now}`, `preloadDBAndStorage`);
-  const windowManager = new WindowManager(webdriver, wmLogger);
-  windowManager.init();
-  // open the extension url again
+  // It is necessary to re-run the service worker after loading info into the indexedDB
+  await restartServiceWorker(webdriver, logger);
+  logger.info(`--------------------- preloadDBAndStorage END ---------------------`);
 };
 
 export const waitTxPage = async (webdriver, logger) => {
@@ -116,3 +116,48 @@ export const waitTxPage = async (webdriver, logger) => {
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
 };
+
+export const restartServiceWorker = async (webdriver, logger) => {
+  logger.info(`--------------------- restartServiceWorker START ---------------------`);
+  const windowManager = new WindowManager(webdriver, logger);
+  windowManager.init();
+  await windowManager.openNewTab(serviceWorkersTabName, serviceWorkersTabName);
+
+  const basepage = new BasePage(webdriver, logger);
+
+  const stopBtnLocator = {
+    locator: '//button[text()="Stop"]',
+    method: 'xpath',
+  };
+  const btnLocator = {
+    locator: '//button',
+    method: 'xpath',
+  };
+
+  const stopBtnElems = await basepage.findElements(stopBtnLocator);
+  const stopBtnElem = stopBtnElems[1];
+  await stopBtnElem.click();
+
+  await basepage.sleep(500);
+
+  const allBtns = await basepage.findElements(btnLocator);
+  const startBtn = allBtns[7];
+  await startBtn.click();
+
+  await basepage.sleep(500);
+
+  await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);
+  await basepage.refreshPage();
+  await basepage.sleep(500);
+  logger.info(`--------------------- restartServiceWorker END ---------------------`);
+};
+
+export const collectInfo = async (mochaContext, webdriver, logger) => {
+  logger.info(`--------------------- collectInfo START ---------------------`);
+  const basepage = new BasePage(webdriver, logger);
+  basepage.takeScreenshot(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.takeSnapshot(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.getBrowserLogs(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.getDriverLogs(mochaContext.test.parent.title, 'preparationSteps');
+  logger.info(`--------------------- collectInfo END ---------------------`);
+}
