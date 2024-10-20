@@ -32,12 +32,19 @@ export class MultiToken {
   |}): MultiToken {
     try {
       return new MultiToken(
-        multiTokenData.values.map(({ identifier, networkId, amount }) => ({
-          identifier,
-          networkId,
-          // $FlowIgnore
-          amount: new BigNumber({ ...amount, _isBigNumber: true }),
-        })),
+        multiTokenData.values.map(({ identifier, networkId, amount }) => {
+          const fixedAmount = new BigNumber(
+            typeof amount === 'object'
+              ? { ...amount, _isBigNumber: true }
+              : amount
+          );
+          return ({
+            identifier,
+            networkId,
+            // $FlowIgnore
+            amount: fixedAmount,
+          });
+        }),
         multiTokenData.defaults
       );
     } catch (e) {
