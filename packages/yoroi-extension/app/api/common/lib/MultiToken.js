@@ -30,14 +30,27 @@ export class MultiToken {
     values: Array<{| identifier: string, networkId: number, amount: string |}>,
     defaults: DefaultTokenEntry,
   |}): MultiToken {
-    return new MultiToken(
-      multiTokenData.values.map(({ identifier, networkId, amount }) => ({
-        identifier,
-        networkId,
-        amount: new BigNumber(amount),
-      })),
-      multiTokenData.defaults
-    );
+    try {
+      return new MultiToken(
+        multiTokenData.values.map(({ identifier, networkId, amount }) => {
+          const fixedAmount = new BigNumber(
+            typeof amount === 'object'
+              ? { ...amount, _isBigNumber: true }
+              : amount
+          );
+          return ({
+            identifier,
+            networkId,
+            // $FlowIgnore
+            amount: fixedAmount,
+          });
+        }),
+        multiTokenData.defaults
+      );
+    } catch (e) {
+      console.error('Failed to parse MultiToken from: ' + JSON.stringify(multiTokenData), e);
+      throw e;
+    }
   }
 
   constructor(values: Array<TokenEntry>, defaults: DefaultTokenEntry) {
