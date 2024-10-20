@@ -109,6 +109,8 @@ declare var chrome;
 export function callBackground<T, R>(message: T): Promise<R> {
   return new Promise((resolve, reject) => {
     window.chrome.runtime.sendMessage(message, response => {
+      // $FlowIgnore
+      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(response));
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(message) ?? 'undefined'}`);
@@ -302,11 +304,12 @@ function deserializeTx(tx: any): ?WalletTransaction {
 }
 
 export const refreshTransactions: GetEntryFuncType<typeof RefreshTransactions> = async (request) => {
-  const txs = await callBackground({ type: 'refresh-transactions', request });
-  if (txs.error) {
-    console.error('Failed to refresh transactions!', txs.error);
+  const resp = await callBackground({ type: RefreshTransactions.typeTag, request });
+  if (resp.error) {
+    console.error('Failed to refresh transactions!', resp.error);
     return [];
   }
+  const txs = JSON.parse(resp);
   return txs.map(tx => {
     try {
       return deserializeTx(tx);
