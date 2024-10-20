@@ -107,6 +107,7 @@ export function getHandler(typeTag: string): ?Handler {
     return async (request, send, sendResponse) => {
       try {
         const result = await handler(request.request);
+        console.debug(`BACKGROUND [${typeTag}] sending result: `, JSON.stringify(result));
         sendResponse(result);
       } catch (error) {
         sendResponse({ error: error.message });

@@ -354,6 +354,7 @@ export const RefreshTransactions: HandlerType<
       // initial transaction list loading
       txs = await adaApi.refreshTransactions(refreshTxRequest);
     }
-    return txs;
+    // $FlowIgnore
+    return JSON.stringify(txs);
   },
 });
