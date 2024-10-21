@@ -103,7 +103,7 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
-  expect(state).to.be.true;
+  expect(state, 'The Add new wallet page is not displayed').to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
   // It is necessary to re-run the service worker after loading info into the indexedDB
   if (isChrome()){
