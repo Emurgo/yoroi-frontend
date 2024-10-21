@@ -125,7 +125,16 @@ module.exports = {
     camelcase: 0,
     'react/jsx-curly-brace-presence': 0,
   },
-  plugins: ['import', 'promise', 'react', 'flowtype', 'no-floating-promise', 'prettier', 'eslint-plugin-simple-import-sort'],
+  plugins: [
+    'import',
+    'promise',
+    'react',
+    'flowtype',
+    'no-floating-promise',
+    'prettier',
+    'eslint-plugin-simple-import-sort',
+    '@typescript-eslint',
+  ],
   globals: {
     chrome: true,
     API: true,

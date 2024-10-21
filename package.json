@@ -10,6 +10,8 @@
     "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
     "concurrently": "^7.0.0",
     "husky": "4.3.8",
     "lerna": "^4.0.0",

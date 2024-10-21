@@ -1,17 +1,17 @@
-import React, { Fragment, useMemo, useState } from 'react';
-import { Box, Stack, Typography, IconButton, Table, TableCell, TableHead, TableBody, TableRow, styled } from '@mui/material';
+import { Box, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Card } from '../../../../components';
-import moment from 'moment';
-import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Icon } from '../../../../components/icons';
-import { HistoryItemStatus, HistoryItemType, TransactionItemType } from '../../common/types/transaction';
-import { mapStrings } from '../../common/helpers/transactionHelper';
-import { IHeadCell } from '../../common/types/table';
 import _ from 'lodash';
-import mockData from '../../common/mockData';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import moment from 'moment';
+import React, { Fragment, useMemo, useState } from 'react';
+import { Card } from '../../../../../components';
+import { Icon } from '../../../../../components/icons';
+import { formatNumber } from '../../../common/helpers/formatHelper';
+import { mapStrings } from '../../../common/helpers/transactionHelper';
+import { useStrings } from '../../../common/hooks/useStrings';
+import mockData from '../../../common/mockData';
+import { IHeadCell } from '../../../common/types/table';
+import { HistoryItemStatus, HistoryItemType, TransactionItemType } from '../../../common/types/transaction';
+import { usePortfolio } from '../../../module/PortfolioContextProvider';
 
 const Container = styled(Box)(() => ({
   width: '100%',
