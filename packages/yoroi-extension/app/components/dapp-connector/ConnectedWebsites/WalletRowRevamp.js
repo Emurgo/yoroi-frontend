@@ -13,7 +13,7 @@ import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-conne
 import { intlShape } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Box, Typography, styled } from '@mui/material';
-import { constructPlate } from '../../topbar/NavPlate';
+import { constructPlate } from '../../topbar/WalletCard';
 import styles from './WalletRow.scss';
 
 type Props = {|
@@ -95,7 +95,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
     } = this.props;
     const { showDeleteIcon } = this.state;
 
-    const [, plateIcon] = constructPlate(plate, 0, '');
+    const [, plateIcon] = constructPlate(plate, 0, 8, 5, 40, 4);
 
     return (
       <Box
@@ -121,9 +121,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
         id={id}
       >
         <Box width="100%" display="flex" alignItems="center" gap="8px">
-          <Box width="40px" height="40px" overflow="hidden" borderRadius="50%">
-            {plateIcon}
-          </Box>
+          {plateIcon}
           <div>
             <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
               {walletName}

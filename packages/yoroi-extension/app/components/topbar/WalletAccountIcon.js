@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import styles from './WalletAccountIcon.scss';
 import Blockies from 'react-blockies';
 import tinycolor from 'tinycolor2';
 import { hexToBytes } from '../../coreUtils';
@@ -59,7 +58,6 @@ export default class WalletAccountIcon extends Component<Props> {
       bgColor={saturation(color.primary, saturationFactor)}
       color={saturation(color.secondary, saturationFactor)}
       spotColor={saturation(color.spots, saturationFactor)}
-      className={styles.walletIcon}
     />);
   }
 }
