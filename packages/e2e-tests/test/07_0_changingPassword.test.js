@@ -60,8 +60,10 @@ describe('Changing wallet password. Positive', function () {
   // Checking that the old password doesn't work anymore
   it("Checking the old wallet doesn't work anymore", async function () {
     const sendSubTab = new SendSubTab(webdriver, logger);
+    const errIsShown = await sendSubTab.pwdErrMsgDisplayedAndNotEmpty();
+    expect(errIsShown, 'The error is not displayed').to.be.true;
     const realErrMsg = await sendSubTab.getPasswordErrorMsg();
-    expect(realErrMsg, 'The old password still works').to.equal(WRONG_PASSWORD);
+    expect(realErrMsg, 'The error message isn\'t correct').to.equal(WRONG_PASSWORD);
   });
 
   after(function (done) {

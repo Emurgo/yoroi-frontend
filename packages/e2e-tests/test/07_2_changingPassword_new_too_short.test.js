@@ -43,6 +43,8 @@ describe('Changing wallet password. Negative. New one is short', function () {
   });
   it('Checking the error message', async function () {
     const walletSubTabPage = new WalletSubTab(webdriver, logger);
+    const errIsShown = await walletSubTabPage.newPasswordErrDisplayedAndNotEmpty();
+    expect(errIsShown, 'The error is not displayed').to.be.true;
     const realErrMsg = await walletSubTabPage.getNewPasswordErrorMsg();
     expect(realErrMsg, 'Incorrect error is shown').to.equal(PASSWORD_TOO_SHORT);
   });

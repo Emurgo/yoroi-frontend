@@ -6,11 +6,11 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import { getPassword } from '../helpers/constants.js';
-import { PASSWORDS_DONT_MATCH, WRONG_PASSWORD } from '../helpers/messages.js';
+import { PASSWORDS_DONT_MATCH } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { collectInfo, preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
-describe('Changing wallet password', function () {
+describe('Changing wallet password. Negative. Wrong repeated password', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
@@ -45,6 +45,8 @@ describe('Changing wallet password', function () {
   });
   it('Checking the error message', async function () {
     const walletSubTabPage = new WalletSubTab(webdriver, logger);
+    const errIsShown = await walletSubTabPage.repeatNewPasswordErrDisplayedAndNotEmpty();
+    expect(errIsShown, 'The error is not displayed').to.be.true;
     const realErrMsg = await walletSubTabPage.getRepeatNewPasswordErrorMsg();
     expect(realErrMsg, 'Incorrect error is shown').to.equal(PASSWORDS_DONT_MATCH);
   });
