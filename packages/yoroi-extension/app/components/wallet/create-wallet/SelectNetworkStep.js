@@ -3,13 +3,17 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, styled } from '@mui/material';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import styles from './SelectNetworkStep.scss';
 import globalMessages from '../../../i18n/global-messages';
 import StepController from './StepController';
+
+const GradientBox = styled(Box)(({ theme }: any) => ({
+  backgroundImage: theme.palette.ds.bg_gradient_1,
+}));
 
 const messages: * = defineMessages({
   title: {
@@ -79,16 +83,11 @@ function SelectNetworkStep(props: Props & Intl): Node {
 
         <Stack alignItems="center" justifyContent="center" gap="16px">
           {networksList.map(({ name, networkInfo }) => (
-            <Box
-              component="button"
-              className={styles.networkCard}
-              key={name}
-              onClick={() => onSelect(networkInfo)}
-            >
-              <Typography component="div" variant="h3" fontWeight={500}>
+            <GradientBox component="button" className={styles.networkCard} key={name} onClick={() => onSelect(networkInfo)}>
+              <Typography color="ds.text_gray_max" variant="h3" fontWeight={500}>
                 {name}
               </Typography>
-            </Box>
+            </GradientBox>
           ))}
         </Stack>
       </Stack>
