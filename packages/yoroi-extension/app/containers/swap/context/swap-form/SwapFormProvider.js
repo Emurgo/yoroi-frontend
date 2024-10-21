@@ -197,22 +197,26 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       sellQuantityChanged(quantity);
     }
     actions.sellInputValueChanged(input);
-    const sellAvailableAmount = swapFormState.sellTokenInfo.amount ?? '0';
+    const sellTokenInfo = swapFormState.sellTokenInfo;
+    const sellAvailableAmount = sellTokenInfo.amount ?? '0';
     if (quantity !== '' && sellAvailableAmount !== '') {
-      const decimals = swapFormState.sellTokenInfo.decimals ?? 0;
+      const decimals = sellTokenInfo.decimals ?? 0;
       const calculation = orderData.selectedPoolCalculation;
 
       const [, availableQuantity] = Quantities.parseFromText(sellAvailableAmount, decimals, numberLocale);
-      const diff = Quantities.diff(availableQuantity, quantity);
+      const remainingQuantity = Quantities.diff(availableQuantity, quantity);
 
       if (Quantities.isGreaterThan(quantity, availableQuantity)) {
         actions.sellAmountErrorChanged('Not enough balance');
         return;
       }
       if (calculation?.cost) {
-        const totalFee = Quantities.sum([calculation.cost.batcherFee.quantity, calculation.cost.deposit.quantity]);
+        const { quantity: feeQuantity, tokenId: feeTokenId } = calculation.cost.batcherFee;
+        const totalFee = Quantities.sum([feeQuantity, calculation.cost.deposit.quantity]);
 
-        if (Number(diff) < Number(totalFee)) {
+        const isSellingFeeToken = sellTokenInfo.id === feeTokenId;
+
+        if (isSellingFeeToken && Quantities.isGreaterThan(totalFee, remainingQuantity)) {
           actions.sellAmountErrorChanged('Not enough balance, please consider the fees');
         }
       }
