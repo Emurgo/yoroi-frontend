@@ -1,6 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { isMacOS } from '../utils/utils.js';
+import * as fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -126,3 +127,9 @@ export const Colors = Object.freeze({
 });
 
 export const balanceReplacer = '******';
+
+export const getSnapshotedMemo = () => {
+  const dbSnapshotPath = path.resolve(dbSnapshotsDir, 'testWallet1MemoAdded.indexedDB.json');
+  const data = fs.readFileSync(dbSnapshotPath, 'utf8');
+  return JSON.parse(data).TxMemo[0].value.Content;
+};
