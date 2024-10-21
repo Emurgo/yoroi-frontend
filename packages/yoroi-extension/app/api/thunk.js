@@ -404,9 +404,19 @@ const callbacks = Object.freeze({
   serverStatusUpdate: [],
   coinPriceUpdate: [],
 });
-chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
+chrome.runtime.onMessage.addListener(async (serializedMessage, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
-  Logger.debug('get message from background:', JSON.stringify(message, null, 2));
+  Logger.debug('get message from background:', serializedMessage);
+
+  let message;
+  try {
+    message = JSON.parse(serializedMessage);
+  } catch {
+    return;
+  }
+  if (typeof message !== 'object') {
+    return;
+  }
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {
