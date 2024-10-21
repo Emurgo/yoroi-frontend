@@ -118,7 +118,7 @@ export default function SelectAssetDialog({
         </>
       }
     >
-      {(filteredAssets.length !== 0 && !assetsStillLoading) && (
+      {filteredAssets.length !== 0 && !assetsStillLoading && (
         <Table
           rowGap="0px"
           columnNames={type === 'from' ? fromColumns : toColumns}
@@ -145,12 +145,14 @@ export default function SelectAssetDialog({
               {assetsStillLoading ? (
                 <LoadingSpinner />
               ) : (
-                <NoAssetsFound />
+                <>
+                  <NoAssetsFound />
+                  <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
+                    {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
+                  </Typography>
+                </>
               )}
             </Box>
-            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
-              {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
-            </Typography>
           </Box>
         </Box>
       )}
