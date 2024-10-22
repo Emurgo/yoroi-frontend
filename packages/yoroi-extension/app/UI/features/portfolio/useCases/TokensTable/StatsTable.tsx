@@ -35,7 +35,6 @@ const StatsTable = ({ data }: Props): JSX.Element => {
   const {
     tokenActivity: { data24h, data7d, data30d },
     isLoading,
-    error,
   } = usePortfolioTokenActivity();
   const ptActivity = useCurrencyPairing().ptActivity;
 

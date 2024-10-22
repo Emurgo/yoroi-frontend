@@ -58,6 +58,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         label={strings.detailsOn}
         value={`${tokenInfo.info.policyId}${tokenInfo?.assetName}`}
         isNetworkUrl={true}
+        isPrimary={isPrimary}
       />
     </Stack>
   );
@@ -71,6 +72,7 @@ type TokenOverviewSectionTypes = {
   isExternalLink?: boolean;
   isNetworkUrl?: boolean;
   withCopy?: boolean;
+  isPrimary?: boolean;
 };
 
 const TokenOverviewSection = ({
@@ -79,8 +81,9 @@ const TokenOverviewSection = ({
   isExternalLink = false,
   isNetworkUrl = false,
   withCopy,
+  isPrimary,
 }: TokenOverviewSectionTypes) => {
-  if (!value) {
+  if (!value && !isPrimary) {
     return <></>;
   }
 
@@ -98,7 +101,7 @@ const TokenOverviewSection = ({
           <Stack direction="row" gap="16px">
             <LinkMui
               target="_blank"
-              href={isNetworkUrl != null ? `${networkUrl.cardanoScan}/${value}` : ''}
+              href={isNetworkUrl != null ? (isPrimary ? 'https://cardanoscan.io/' : `${networkUrl.cardanoScan}/${value}`) : ''}
               rel="noopener noreferrer"
               sx={{ textDecoration: 'none' }}
             >
@@ -106,7 +109,7 @@ const TokenOverviewSection = ({
             </LinkMui>
             <LinkMui
               target="_blank"
-              href={isNetworkUrl != null ? `${networkUrl.cexplorer}/${value}` : ''}
+              href={isNetworkUrl != null ? (isPrimary ? 'https://cardanoscan.io/' : `${networkUrl.cexplorer}/${value}`) : ''}
               rel="noopener noreferrer"
               sx={{ textDecoration: 'none' }}
             >
