@@ -171,6 +171,7 @@ const useChart = (data: IChartData) => {
     handleMouseDown,
     handleMouseUp,
     detailInfo,
+    isDragging,
   };
 };
 

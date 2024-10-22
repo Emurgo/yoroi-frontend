@@ -57,7 +57,10 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
       changePercent: point.changePercent,
       changeValue: point.changeValue,
     })) || [];
-  const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo } = useChart(chartData);
+
+  const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo, isDragging } = useChart(
+    chartData
+  );
 
   if (!isPrimaryToken) {
     return (
@@ -81,6 +84,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
         detailInfo={detailInfo}
         isLoading={isFetching || !data || chartData === undefined}
         tokenInfo={tokenInfo}
+        isDragging={isDragging}
       />
 
       <Box sx={{ userSelect: 'none', width: '100%' }}>

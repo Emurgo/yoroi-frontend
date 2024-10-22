@@ -15,9 +15,10 @@ interface Props {
   detailInfo: any;
   isLoading: boolean;
   tokenInfo: TokenInfoType;
+  isDragging?: boolean;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: Props): JSX.Element => {
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): JSX.Element => {
   const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const theme: any = useTheme();
   const strings = useStrings();
@@ -51,6 +52,8 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
             isPrimaryToken={isPrimaryToken}
             unitOfAccount={unitOfAccount}
             secondaryTokenActivity={data24h && data24h[tokenInfo?.info?.id]}
+            detailInfo={detailInfo}
+            isDragging={isDragging}
           />
 
           {chartData === undefined ? (
@@ -67,11 +70,13 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
   );
 };
 
-const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity }) => {
+const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity, detailInfo, isDragging }) => {
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
 
   const sPrice = secondaryTokenActivity && secondaryTokenActivity[1].price.close;
-  const ptPrice = ptActivity.close;
+
+  const ptPrice = isDragging ? detailInfo.value : ptActivity.close;
+
   const ptUnitPrice = sPrice * ptPrice;
 
   if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;

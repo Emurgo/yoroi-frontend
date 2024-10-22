@@ -4,6 +4,7 @@ import { useQuery, UseQueryOptions } from 'react-query';
 // import { useLanguage } from '../../../kernel/i18n';
 import { supportedCurrencies, time } from '../../../../utils/constants';
 import { fetchPtPriceActivity } from '../../../../utils/usePrimaryTokenActivity';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { TOKEN_CHART_INTERVAL } from '../helpers/constants';
 import { getTimestampsTokenInterval } from '../helpers/getTimestampsTokenInterval';
 import { priceChange } from '../helpers/priceChange';
@@ -84,7 +85,9 @@ export const useGetPortfolioTokenChart = (
   > = {}
 ) => {
   // const { currency } = useCurrencyPairing();
-  const currency = 'USD';
+  const { unitOfAccount } = usePortfolio();
+
+  const currency = unitOfAccount;
 
   const ptQuery = useQuery({
     staleTime: time.halfHour,
@@ -99,6 +102,7 @@ export const useGetPortfolioTokenChart = (
     queryKey: ['useGetPortfolioTokenChart', tokenInfo.info?.id ?? '', timeInterval, currency],
     queryFn: async () => {
       // @ts-ignore
+
       const response = await fetchPtPriceActivity(getTimestampsTokenInterval(timeInterval));
       if (isRight(response)) {
         if (response.value.data.error) throw new Error(response.value.data.error);

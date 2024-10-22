@@ -42,6 +42,8 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         <TokenOverviewSection label={strings.website} value={tokenInfo.info.metadata.website} isExternalLink />
       )}
 
+      {isPrimary && <TokenOverviewSection label={strings.website} value="https://cardano.org/" isExternalLink />}
+
       {isPrimary ? (
         <></>
       ) : (
