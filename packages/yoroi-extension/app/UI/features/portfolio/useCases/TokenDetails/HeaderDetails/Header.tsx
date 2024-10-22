@@ -2,13 +2,13 @@ import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
+import { isEmpty } from 'lodash';
 import React from 'react';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
 import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
-import { isEmpty } from 'lodash';
 
 interface Props {
   tokenInfo: TokenInfoType;
@@ -56,23 +56,23 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
       </Typography>
 
       <Stack direction="column" spacing={theme.spacing(0.5)}>
-        <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-end">
+        <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-start">
           <Typography variant="h2" fontWeight="500" color="ds.gray_max">
             {tokenTotalAmount}
           </Typography>
           <Typography
             variant="body2"
             fontWeight="500"
-            color="ds.text_gray_low"
+            color="ds.gray_max"
             sx={{
-              padding: `${theme.spacing(1)} 0`,
+              paddingTop: `${theme.spacing(1.3)}`,
             }}
           >
             {tokenInfo.info.name}
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600">
+        <Typography color="ds.static_darl">
           {isPrimaryToken ? tokenInfo.formatedAmount : totaPriceCalc}{' '}
           {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
         </Typography>

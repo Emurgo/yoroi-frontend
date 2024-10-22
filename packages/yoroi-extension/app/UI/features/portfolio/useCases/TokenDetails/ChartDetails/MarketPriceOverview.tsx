@@ -41,7 +41,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo }: P
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: !isPrimaryToken && theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_max">
-        {strings.marketPrice}
+        {tokenInfo.info.name} {strings.marketPrice}
       </Typography>
 
       <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
