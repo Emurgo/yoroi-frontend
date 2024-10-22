@@ -2,7 +2,7 @@ import { Box, Stack, Typography, useTheme, Skeleton } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import LocalStorageApi from '../../../../../api/localStorage/index';
-import { SearchInput, Skeleton, Tooltip } from '../../../../components';
+import { SearchInput, Tooltip } from '../../../../components';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { WalletBalance } from '../../../../types/currrentWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
