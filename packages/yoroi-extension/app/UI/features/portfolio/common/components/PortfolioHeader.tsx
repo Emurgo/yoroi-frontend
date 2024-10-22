@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Stack, Typography, useTheme, Skeleton } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import LocalStorageApi from '../../../../../api/localStorage/index';
@@ -87,7 +87,23 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
     };
 
     setFiatPair();
-  }, [walletBalance, unitOfAccount, totalTokenPrice]);
+  }, [walletBalance, unitOfAccount, totalTokenPrice, accountPair]);
+
+  if (accountPair === null) {
+    return (
+      <Stack direction="column">
+        <Stack direction="row" alignItems="flex-end" gap="2px">
+          <Skeleton width="62px" height="32px" />
+          <Skeleton width="48px" height="24px" />
+        </Stack>
+        <Stack direction="row" alignItems="flex-end">
+          <Skeleton width="69px" height="24px" sx={{ marginRight: '8px' }} />
+          <Skeleton width="35px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px', marginRight: '4px' }} />
+          <Skeleton width="65px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px' }} />
+        </Stack>
+      </Stack>
+    );
+  }
 
   return (
     <Stack direction="row" justifyContent="space-between">

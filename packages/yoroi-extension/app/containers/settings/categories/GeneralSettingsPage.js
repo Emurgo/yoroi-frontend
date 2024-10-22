@@ -13,6 +13,7 @@ import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
+import LocalStorageApi from '../../../api/localStorage/index';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -56,8 +57,10 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
   };
 
   onSelectUnitOfAccount: string => Promise<void> = async value => {
-    const unitOfAccount =
-      value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    const localStorageApi = new LocalStorageApi();
+
+    const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    localStorageApi.unsetPortfolioFiatPair();
     await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
@@ -67,8 +70,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     const coinPriceStore = this.props.stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
-    const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = intl.formatMessage(currencyLabels[c.symbol]);
@@ -88,9 +90,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
       svg: AdaCurrency,
     });
 
-    const unitOfAccountValue = profileStore.unitOfAccount.enabled
-      ? profileStore.unitOfAccount.currency
-      : 'ADA';
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
