@@ -6,12 +6,12 @@ import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { getSnapshotedMemo as getOldMemo } from '../helpers/constants.js';
 
 describe('Deleting a memo', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
-  const oldMemo = 'j1hKEo4Er4FDLFAtGBo07jIcXBSOqx9D16U0sUIl';
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
@@ -28,7 +28,7 @@ describe('Deleting a memo', function () {
   it('Delete memo', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
-    expect(memoMessage).to.equal(oldMemo);
+    expect(memoMessage).to.equal(getOldMemo());
 
     // click edit memo
     const memoWarningModal = await transactionsPage.clickEditMemo(0, 0);
