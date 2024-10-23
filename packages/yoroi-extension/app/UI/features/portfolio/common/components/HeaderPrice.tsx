@@ -10,7 +10,7 @@ export const HeaderPrice = ({ isLoading = false }) => {
   }
 
   return (
-    <Typography color="ds.text_gray_medium">
+    <Typography color="ds.text_gray_low" mr="12px">
       {accountPair?.to.value} {accountPair?.to.name}
     </Typography>
   );
