@@ -106,9 +106,10 @@ declare var chrome;
 
 // UI -> background queries:
 
-export function callBackground<T, R>(message: T): Promise<R> {
+export function callBackground<T, R>(message: {| type: string, request?: Object |}): Promise<R> {
   return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(message, response => {
+    const serializedMessage = { type: message.type, request: JSON.stringify(message.request || null) };
+    window.chrome.runtime.sendMessage(serializedMessage, response => {
       // $FlowIgnore
       console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(response));
       if (window.chrome.runtime.lastError) {
