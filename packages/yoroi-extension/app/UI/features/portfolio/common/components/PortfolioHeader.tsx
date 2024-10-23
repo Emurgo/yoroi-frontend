@@ -73,21 +73,25 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
       const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
       const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
-      if (portfolioStoragePairObj) {
+      if (portfolioStoragePairObj !== undefined) {
         changeUnitOfAccountPair({
           from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
-          to: { name: portfolioStoragePairObj.to.name, value: portfolioStoragePairObj.to.value },
+          to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
         });
       } else {
+        changeUnitOfAccountPair({
+          from: { name: 'ADA', value: walletBalance?.ada || '0' },
+          to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
+        });
         localStorageApi.setSetPortfolioFiatPair({
           from: { name: 'ADA', value: walletBalance?.ada || '0' },
-          to: { name: unitOfAccount || 'USD', value: totalTokenPrice || '0' },
+          to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
         });
       }
     };
 
     setFiatPair();
-  }, [walletBalance, unitOfAccount, totalTokenPrice, accountPair]);
+  }, [totalTokenPrice, walletBalance, showADA]);
 
   if (accountPair === null) {
     return (

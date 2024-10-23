@@ -15,18 +15,18 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h }) => {
 
     const tokenPrice =
       isPrimaryToken && secondaryToken24Activity === undefined
-        ? ptActivity.close
-        : secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+        ? ptActivity?.close
+        : secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
     const tokenPriceFiat = tokenPrice ? new BigNumber(tokenPrice) : 1;
     const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
     const decimals = isPrimaryToken ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
 
     const totalValue = atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPriceFiat)
-      .times(new BigNumber(ptActivity.close))
+      .times(new BigNumber(ptActivity?.close))
       .toNumber();
 
-    const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity.close)));
+    const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity?.close)));
 
     const totalTokenPrice = isPrimaryToken ? primaryTokenFiatTotalAmount : totalValue;
     const unitPrice = accountPair?.from.name === 'ADA' ? tokenPrice : Number(totalTokenPrice) / Number(token.shiftedAmount);

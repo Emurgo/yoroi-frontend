@@ -55,12 +55,12 @@ export const TokenPriceChangeChip = ({
   }
 
   const tokenPriceClose = isPrimaryToken
-    ? primaryTokenActivity.close
-    : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+    ? primaryTokenActivity?.close
+    : secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
 
   const tokenPriceOpen = isPrimaryToken
-    ? primaryTokenActivity.open
-    : secondaryTokenActivity && secondaryTokenActivity[1].price.open;
+    ? primaryTokenActivity?.open
+    : secondaryTokenActivity && secondaryTokenActivity[1].price?.open;
 
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
@@ -117,7 +117,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
     ptActivity: { close: ptPrice },
   } = useCurrencyPairing();
 
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
   const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
 
   const showingAda = accountPair?.from.name === 'ADA';
@@ -170,8 +170,8 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const { unitOfAccount } = usePortfolio();
   const isPrimaryToken = token.id === '-';
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price.close;
-  const ptPrice = ptActivity.close;
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
+  const ptPrice = ptActivity?.close;
   const ptUnitPrice = tokenPrice * ptPrice;
 
   return (
