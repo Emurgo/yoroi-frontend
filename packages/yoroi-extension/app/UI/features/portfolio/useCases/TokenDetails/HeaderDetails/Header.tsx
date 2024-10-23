@@ -72,7 +72,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
           </Typography>
         </Stack>
 
-        <Typography color="ds.static_darl">
+        <Typography color="ds.gray_600">
           {isPrimaryToken ? tokenInfo.formatedAmount : totaPriceCalc}{' '}
           {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
         </Typography>
