@@ -189,7 +189,10 @@ export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (
 };
 
 export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
-  await callBackground({ type: ChangeSigningPassword.typeTag, request, });
+  const resp = await callBackground({ type: ChangeSigningPassword.typeTag, request, });
+  if (resp?.error === 'Passphrase doesn\'t match') {
+    throw new IncorrectWalletPasswordError();
+  }
 }
 
 export const renamePublicDeriver: GetEntryFuncType<typeof RenamePublicDeriver> = async (request) => {
