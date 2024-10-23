@@ -35,7 +35,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   const handler = getHandler(message.type);
   if (handler) {
-    handler(message, sender, sendResponse);
+    const deserializedMessage = {
+      type: message.type,
+      request: JSON.parse(message.request),
+    };
+    handler(deserializedMessage, sender, sendResponse);
     // Returning `true` is required by Firefox, see:
     // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage
     return true;
