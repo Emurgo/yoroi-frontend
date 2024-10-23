@@ -4,6 +4,7 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+import { DEFAULT_FIAT_PAIR } from '../../../common/helpers/constants';
 import { formatNumber } from '../../../common/helpers/formatHelper';
 import { formatPriceChange, priceChange } from '../../../common/helpers/priceChange';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -61,7 +62,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
           ) : (
             <Stack direction="row" gap="4px">
               <PriceChangeChip value={Number(priceChangeProcent)} />
-              <PriceValueChip value={Number(priceChangeValue)} unitOfAccount={unitOfAccount || 'USD'} />
+              <PriceValueChip value={Number(priceChangeValue)} unitOfAccount={unitOfAccount || DEFAULT_FIAT_PAIR} />
             </Stack>
           )}
         </Stack>

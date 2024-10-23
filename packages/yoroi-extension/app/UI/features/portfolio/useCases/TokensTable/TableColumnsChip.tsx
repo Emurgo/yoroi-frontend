@@ -6,6 +6,7 @@ import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
+import { DEFAULT_FIAT_PAIR } from '../../common/helpers/constants';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
@@ -94,7 +95,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
           ) : (
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-              {0} {accountPair?.to.name || 'USD'}
+              {0} {accountPair?.to.name || DEFAULT_FIAT_PAIR}
             </Typography>
           )}
         </Stack>
@@ -147,7 +148,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   //   console.log('totaPrice', totaPrice);
   // }
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
-  const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || 'USD'}`;
+  const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || DEFAULT_FIAT_PAIR}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>

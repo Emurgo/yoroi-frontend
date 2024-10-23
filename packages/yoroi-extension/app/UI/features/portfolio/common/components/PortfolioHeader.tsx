@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, useTheme, Skeleton } from '@mui/material';
+import { Box, Skeleton, Stack, Typography, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import LocalStorageApi from '../../../../../api/localStorage/index';
@@ -7,6 +7,7 @@ import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { WalletBalance } from '../../../../types/currrentWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
+import { DEFAULT_FIAT_PAIR } from '../helpers/constants';
 import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
 import { HeaderPrice } from './HeaderPrice';
@@ -30,6 +31,7 @@ interface Props {
 }
 
 const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }: Props): JSX.Element => {
+  const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
   const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
@@ -58,8 +60,11 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
   const handleCurrencyChange = async () => {
     const pair = {
-      from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
-      to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
+      from: {
+        name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : 'ADA',
+        value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
+      },
+      to: { name: showADA ? 'ADA' : unitOfAccount ?? DEFAULT_FIAT_PAIR, value: showADA ? walletBalance.ada : totalTokenPrice },
     };
     localStorageApi.setSetPortfolioFiatPair(pair);
     changeUnitOfAccountPair(pair);
@@ -67,12 +72,13 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
   React.useEffect(() => {
     const setFiatPair = async () => {
+      setLoading(true);
       const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
       const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
       const pair = {
         from: { name: 'ADA', value: walletBalance?.ada || '0' },
-        to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
+        to: { name: unitOfAccount || DEFAULT_FIAT_PAIR, value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
       };
 
       if (portfolioStoragePairObj !== undefined) {
@@ -84,6 +90,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
         changeUnitOfAccountPair(pair);
         localStorageApi.setSetPortfolioFiatPair(pair);
       }
+      setLoading(false);
     };
 
     setFiatPair();
@@ -112,8 +119,8 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
-          <HeaderPrice isLoading={tokenActivity === null} />
-          {isLoading ? (
+          {loading || isLoading ? <Skeleton width="64px" height="13px" /> : <HeaderPrice isLoading={tokenActivity === null} />}
+          {isLoading || loading ? (
             <Skeletons theme={theme} />
           ) : (
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">

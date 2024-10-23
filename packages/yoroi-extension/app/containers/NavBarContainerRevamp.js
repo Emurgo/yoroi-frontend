@@ -41,6 +41,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
     await this.props.actions.profile.updateHideBalance.trigger();
   };
 
+  addNewWallet: void => Promise<void> = async () => {
+    await localStorage.unsetPortfolioFiatPair();
+    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+  };
+
   onSelectWallet: number => Promise<void> = async newWalletId => {
     const { delegation, app } = this.props.stores;
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
@@ -148,10 +154,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
-          onAddWallet={() => {
-            this.props.actions.dialogs.closeActiveDialog.trigger();
-            this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
-          }}
+          onAddWallet={this.addNewWallet}
           updateSortedWalletList={this.props.actions.profile.updateSortedWalletList.trigger}
           walletsNavigation={this.props.stores.profile.walletsNavigation}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}

@@ -11,6 +11,7 @@ import {
 } from './state';
 
 import BuySellDialog from '../../../../components/buySell/BuySellDialog';
+import { DEFAULT_FIAT_PAIR } from '../common/helpers/constants';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
@@ -36,7 +37,7 @@ export const PortfolioContextProvider = ({
   children,
   settingFiatPairUnit,
   initialState = {
-    unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
+    unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : DEFAULT_FIAT_PAIR,
     accountPair: null,
   },
   currentWallet,

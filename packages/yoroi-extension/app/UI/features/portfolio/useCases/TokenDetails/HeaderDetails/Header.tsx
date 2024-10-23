@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import { isEmpty } from 'lodash';
 import React from 'react';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+import { DEFAULT_FIAT_PAIR } from '../../../common/helpers/constants';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
@@ -17,10 +18,10 @@ interface Props {
 const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const { unitOfAccount, walletBalance } = usePortfolio();
+  const { unitOfAccount, walletBalance, accountPair } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
-
+  console.log('unitOfAccount', { unitOfAccount, accountPair, walletBalance });
   if (tokenInfo.quantity === null) {
     return <></>;
   }
@@ -31,7 +32,6 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
 
   const {
     tokenActivity: { data24h },
-    // isLoading: isActivityLoading,
   } = usePortfolioTokenActivity();
 
   const totaPriceCalc = React.useMemo(() => {
@@ -73,8 +73,8 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
         </Stack>
 
         <Typography color="ds.gray_600">
-          {isPrimaryToken ? tokenInfo.formatedAmount : totaPriceCalc}{' '}
-          {isPrimaryToken && unitOfAccount === 'ADA' ? 'USD' : unitOfAccount}
+          {isPrimaryToken ? (accountPair?.from.name === 'ADA' ? accountPair?.to.value : accountPair?.from.value) : totaPriceCalc}{' '}
+          {isPrimaryToken && unitOfAccount === 'ADA' ? DEFAULT_FIAT_PAIR : unitOfAccount}
         </Typography>
       </Stack>
     </Stack>
