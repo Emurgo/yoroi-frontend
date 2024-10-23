@@ -250,7 +250,7 @@ export const GetPrivateStakingKey: HandlerType<
 });
 
 export const RemoveAllTransactions: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'remove-all-transactions',
@@ -275,7 +275,7 @@ export const RemoveAllTransactions: HandlerType<
 });
 
 export const PopAddress: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'pop-address',
