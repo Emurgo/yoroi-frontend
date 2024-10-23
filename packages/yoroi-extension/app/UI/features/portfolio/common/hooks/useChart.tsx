@@ -37,7 +37,7 @@ const useChart = (data: IChartData) => {
         sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
         stroke={theme.palette.ds.gray_700}
       >
-        {payload.value.toFixed(2)}
+        {Math.floor(payload.value * 10) / 10}
       </Box>
     );
   };
