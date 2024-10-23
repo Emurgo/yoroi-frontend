@@ -21,7 +21,6 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const { unitOfAccount, walletBalance, accountPair } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
-  console.log('unitOfAccount', { unitOfAccount, accountPair, walletBalance });
   if (tokenInfo.quantity === null) {
     return <></>;
   }
