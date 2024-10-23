@@ -292,7 +292,8 @@ export async function removeAllTransactions(
   }
 }
 
-export const popAddress: GetEntryFuncType<typeof PopAddress> = async ({ publicDeriverId }) => {
+type PopAddressType = ({ publicDeriverId: number, ...}) => ReturnType<GetEntryFuncType<typeof PopAddress>>;
+export const popAddress:  PopAddressType = async ({ publicDeriverId }) => {
   await callBackground({ type: PopAddress.typeTag, request: { publicDeriverId } });
 }
 
@@ -401,8 +402,11 @@ export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = asy
   return await callBackground({ type: GetConnectedSites.typeTag });
 }
 
-export const getProtocolParameters: GetEntryFuncType<typeof GetProtocolParameters> = async (request) => {
-  return await callBackground({ type: GetProtocolParameters.typeTag, request });
+type GetProtocolParametersType = ({ networkId: number, ... }) => ReturnType<GetEntryFuncType<typeof GetProtocolParameters>>;
+export const getProtocolParameters: GetProtocolParametersType = async (
+  { networkId }
+) => {
+  return await callBackground({ type: GetProtocolParameters.typeTag, request: { networkId } });
 }
   
 // Background -> UI notifications:
