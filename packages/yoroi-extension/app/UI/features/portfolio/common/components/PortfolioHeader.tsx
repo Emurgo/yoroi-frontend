@@ -57,15 +57,12 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   }, [tokenActivity, config.decimals, ptPrice]);
 
   const handleCurrencyChange = async () => {
-    localStorageApi.setSetPortfolioFiatPair({
+    const pair = {
       from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
       to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
-    });
-
-    changeUnitOfAccountPair({
-      from: { name: showADA ? unitOfAccount ?? 'USD' : 'ADA', value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada },
-      to: { name: showADA ? 'ADA' : unitOfAccount ?? 'USD', value: showADA ? walletBalance.ada : totalTokenPrice },
-    });
+    };
+    localStorageApi.setSetPortfolioFiatPair(pair);
+    changeUnitOfAccountPair(pair);
   };
 
   React.useEffect(() => {
@@ -73,40 +70,27 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
       const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
       const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
+      const pair = {
+        from: { name: 'ADA', value: walletBalance?.ada || '0' },
+        to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
+      };
+
       if (portfolioStoragePairObj !== undefined) {
         changeUnitOfAccountPair({
           from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
           to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
         });
       } else {
-        changeUnitOfAccountPair({
-          from: { name: 'ADA', value: walletBalance?.ada || '0' },
-          to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
-        });
-        localStorageApi.setSetPortfolioFiatPair({
-          from: { name: 'ADA', value: walletBalance?.ada || '0' },
-          to: { name: unitOfAccount || 'USD', value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
-        });
+        changeUnitOfAccountPair(pair);
+        localStorageApi.setSetPortfolioFiatPair(pair);
       }
     };
 
     setFiatPair();
   }, [totalTokenPrice, walletBalance, showADA]);
 
-  if (accountPair === null) {
-    return (
-      <Stack direction="column">
-        <Stack direction="row" alignItems="flex-end" gap="2px">
-          <Skeleton width="62px" height="32px" />
-          <Skeleton width="48px" height="24px" />
-        </Stack>
-        <Stack direction="row" alignItems="flex-end">
-          <Skeleton width="69px" height="24px" sx={{ marginRight: '8px' }} />
-          <Skeleton width="35px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px', marginRight: '4px' }} />
-          <Skeleton width="65px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px' }} />
-        </Stack>
-      </Stack>
-    );
+  if (!accountPair) {
+    return <LoadingSkeleton />;
   }
 
   return (
@@ -120,39 +104,25 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
               {String(accountPair?.from.value)}
             </Typography>
           )}
-          <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
-            <Typography component="span" variant="body2" fontWeight="500" color="ds.text_gray_medium">
-              {accountPair?.from?.name}
-            </Typography>
-            <Typography
-              component="span"
-              variant="body2"
-              fontWeight="500"
-              color="ds.text_gray_low"
-              onClick={handleCurrencyChange}
-              sx={{
-                cursor: 'pointer',
-                display: 'inline',
-              }}
-            >
-              /{accountPair?.to?.name}
-            </Typography>
-          </Typography>
+          <CurrencyDisplay
+            from={accountPair?.from?.name}
+            to={accountPair?.to?.name}
+            handleCurrencyChange={handleCurrencyChange}
+          />
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
           <HeaderPrice isLoading={tokenActivity === null} />
           {isLoading ? (
-            <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
-              <Skeleton width="47px" height="20px" />
-              <Skeleton width="65px" height="20px" />
-            </Stack>
+            <Skeletons theme={theme} />
           ) : (
             <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
-              <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
-                <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
-                <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
-              </Stack>
+              <PriceChangeDisplay
+                variantPnl={variantPnl}
+                changePercent={changePercent}
+                changeValue={changeValue}
+                config={config}
+              />
             </Tooltip>
           )}
         </Stack>
@@ -162,6 +132,52 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
     </Stack>
   );
 };
+
+const LoadingSkeleton = () => (
+  <Stack direction="column">
+    <Stack direction="row" alignItems="flex-end" gap="2px">
+      <Skeleton width="62px" height="32px" />
+      <Skeleton width="48px" height="24px" />
+    </Stack>
+    <Stack direction="row" alignItems="flex-end">
+      <Skeleton width="69px" height="24px" sx={{ marginRight: '8px' }} />
+      <Skeleton width="35px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px', marginRight: '4px' }} />
+      <Skeleton width="65px" height="16px" sx={{ backgroundColor: 'ds.gray_100', borderRadius: '8px' }} />
+    </Stack>
+  </Stack>
+);
+
+const CurrencyDisplay = ({ from, to, handleCurrencyChange }) => (
+  <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
+    <Typography component="span" variant="body2" fontWeight="500" color="ds.text_gray_medium">
+      {from}
+    </Typography>
+    <Typography
+      component="span"
+      variant="body2"
+      fontWeight="500"
+      color="ds.text_gray_low"
+      onClick={handleCurrencyChange}
+      sx={{ cursor: 'pointer', display: 'inline' }}
+    >
+      /{to}
+    </Typography>
+  </Typography>
+);
+
+const Skeletons = ({ theme }) => (
+  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
+    <Skeleton width="47px" height="20px" />
+    <Skeleton width="65px" height="20px" />
+  </Stack>
+);
+
+const PriceChangeDisplay = ({ variantPnl, changePercent, changeValue, config }) => (
+  <Stack direction="row" alignItems="center" spacing={1}>
+    <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
+    <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
+  </Stack>
+);
 
 type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; changePercent: string };
 export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
