@@ -472,7 +472,7 @@ function handleWrongPassword<
   result: T,
   passwordErrorClass: typeof Error
 ): T {
-  if (result.error === 'IncorrectWalletPasswordError') {
+  if (typeof result.error === 'string' && result.error.includes('api.errors.IncorrectPasswordError')) {
     throw new passwordErrorClass();
   }
   if (result.error) {
