@@ -93,7 +93,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
             component="div"
             sx={{
               width: '100%',
-              height: `${160}px`,
+              height: '160px',
             }}
           >
             {!data ? null : (
