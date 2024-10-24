@@ -1,4 +1,4 @@
-import { createChartData, getRandomTime, start1WeekAgo, start24HoursAgo } from './helpers/mockHelper';
+import { getRandomTime, start1WeekAgo, start24HoursAgo } from './helpers/mockHelper';
 import { BalanceType, LiquidityItemType, OrderItemType, TokenType } from './types';
 import { HistoryItemStatus, HistoryItemType, TransactionItemType } from './types/transaction';
 
@@ -30,7 +30,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: 0.0,
-        totalAmountUsd: 0.0,
+        totalAmountFiat: 0.0,
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -52,14 +52,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'DOGE',
@@ -70,7 +62,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -92,14 +84,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'AGIX',
@@ -110,7 +94,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -132,14 +116,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'Shiba',
@@ -150,7 +126,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -172,14 +148,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'ALT',
@@ -190,7 +158,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -212,14 +180,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN1',
@@ -230,7 +190,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -252,14 +212,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN2',
@@ -270,7 +222,7 @@ const mockData = {
         '1W': -(10 * Math.random()),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -292,14 +244,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN3',
@@ -310,7 +254,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -332,14 +276,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN6',
@@ -350,7 +286,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': 10 * Math.random(),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -372,14 +308,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
       {
         name: 'TKN8',
@@ -390,7 +318,7 @@ const mockData = {
         '1W': 10 * Math.random(),
         '1M': -(10 * Math.random()),
         totalAmount: Math.round(100000 * Math.random()),
-        totalAmountUsd: Math.round(100000 * Math.random()),
+        totalAmountFiat: Math.round(100000 * Math.random()),
         overview: {
           description:
             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, ",
@@ -412,14 +340,6 @@ const mockData = {
           { value: 10 * Math.random() },
           { value: Math.random() / 100 },
         ],
-        chartData: {
-          start24HoursAgo: createChartData('24H'),
-          start1WeekAgo: createChartData('1W'),
-          start1MonthAgo: createChartData('1M'),
-          start6MonthAgo: createChartData('6M'),
-          start1YearAgo: createChartData('1Y'),
-          ALL: createChartData('1Y'),
-        },
       },
     ] as TokenType[],
   },

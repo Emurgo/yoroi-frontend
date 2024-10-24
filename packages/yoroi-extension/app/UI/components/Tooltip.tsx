@@ -1,6 +1,6 @@
-import React from 'react';
-import { default as MuiTooltip, TooltipProps } from '@mui/material/Tooltip';
 import { useTheme } from '@mui/material';
+import { default as MuiTooltip, TooltipProps } from '@mui/material/Tooltip';
+import React from 'react';
 
 interface Props extends TooltipProps {
   children: JSX.Element;
@@ -17,8 +17,8 @@ export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {
       componentsProps={{
         tooltip: {
           sx: {
-            color: theme.palette.ds.text_primary_on,
-            bgcolor: theme.palette.ds.gray_900,
+            color: theme.palette.ds.text_gray_medium,
+            bgcolor: theme.palette.ds.bg_color_min,
             borderRadius: `${theme.shape.borderRadius / 2}px`,
             padding: '5px 12px',
           },

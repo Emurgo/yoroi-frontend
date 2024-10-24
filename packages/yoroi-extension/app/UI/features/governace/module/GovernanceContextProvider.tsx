@@ -12,6 +12,7 @@ import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defa
 import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
+type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -45,6 +46,7 @@ type GovernanceProviderProps = {
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
+  getCurrentPrice: GetCurrentPrice;
 };
 
 export const GovernanceContextProvider = ({
@@ -56,6 +58,7 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
+  getCurrentPrice,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -71,7 +74,6 @@ export const GovernanceContextProvider = ({
     backendService,
     defaultTokenInfo,
     unitOfAccount,
-    getCurrentPrice,
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,

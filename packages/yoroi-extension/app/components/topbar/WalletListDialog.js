@@ -63,13 +63,13 @@ type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +walletAmount: ?MultiToken,
-  +onAddWallet: void => void,
+  +onAddWallet: void => Promise<void>,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +cardanoWallets: Array<WalletInfo>,
   +walletsNavigation: WalletsNavigation,
   +updateSortedWalletList: WalletsNavigation => Promise<void>,
-  +onSelect: (number) => void,
+  +onSelect: number => void,
   +selectedWalletId: ?number,
 |};
 type State = {|
@@ -159,8 +159,7 @@ export default class WalletListDialog extends Component<Props, State> {
   };
 
   isCurrentWallet(walletId: number, compareWith: 'local' | 'global'): boolean {
-    const selectedWalletId =
-      compareWith === 'local' ? this.state.selectedWalletId : this.props.selectedWalletId;
+    const selectedWalletId = compareWith === 'local' ? this.state.selectedWalletId : this.props.selectedWalletId;
     return walletId === selectedWalletId;
   }
 
@@ -197,9 +196,7 @@ export default class WalletListDialog extends Component<Props, State> {
             id: 'changeWalletDialog-applyWallet-button',
             onClick: this.onSelect,
             size: 'large',
-            disabled:
-              this.state.selectedWalletId === null ||
-              this.isCurrentWallet(this.state.selectedWalletId, 'global'),
+            disabled: this.state.selectedWalletId === null || this.isCurrentWallet(this.state.selectedWalletId, 'global'),
             primary: true,
             label: intl.formatMessage(messages.applyWallet),
           },

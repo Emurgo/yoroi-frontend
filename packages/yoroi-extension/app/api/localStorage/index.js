@@ -35,6 +35,7 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
+  PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -98,6 +99,14 @@ export default class LocalStorageApi {
   getUserThemeMode: void => Promise<?string> = () => getLocalItem(storageKeys.USER_THEME);
 
   setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
+
+  // ========== Portfolio FIAT Pair ========== //
+
+  getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+
+  setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+
+  unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
 
   // ========== Theme Migration ========== //
 
@@ -328,6 +337,7 @@ export default class LocalStorageApi {
     await this.unsetToggleSidebar();
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
+    await this.unsetPortfolioFiatPair();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);
@@ -443,8 +453,8 @@ export function createStorageFlag(key: string, defaultValue: boolean): StorageFi
 }
 
 export function createFlagStorage(): StorageAPI {
-    return {
-      get: async s => (await getLocalItem(s)) ?? null,
-      set: setLocalItem,
-    };
+  return {
+    get: async s => (await getLocalItem(s)) ?? null,
+    set: setLocalItem,
+  };
 }

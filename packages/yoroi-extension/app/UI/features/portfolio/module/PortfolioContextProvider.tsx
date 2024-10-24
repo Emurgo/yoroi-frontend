@@ -1,6 +1,17 @@
 import * as React from 'react';
 
-import { PortfolioActionType, PortfolioReducer, defaultPortfolioActions, defaultPortfolioState, CurrencyType } from './state';
+import { CurrentWalletType } from '../../../types/currrentWallet';
+import {
+  AccountPair,
+  CurrencyType,
+  PortfolioActionType,
+  PortfolioReducer,
+  defaultPortfolioActions,
+  defaultPortfolioState,
+} from './state';
+
+import BuySellDialog from '../../../../components/buySell/BuySellDialog';
+import { DEFAULT_FIAT_PAIR } from '../common/helpers/constants';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
@@ -16,16 +27,27 @@ type PortfolioProviderProps = {
   };
   initialState: {
     unitOfAccount: CurrencyType;
+    accountPair: AccountPair;
   };
+  currentWallet: CurrentWalletType;
+  openDialogWrapper: (dialog: React.ReactNode) => void;
 };
 
 export const PortfolioContextProvider = ({
   children,
   settingFiatPairUnit,
   initialState = {
-    unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : 'USD',
+    unitOfAccount: settingFiatPairUnit.enabled ? settingFiatPairUnit.currency : DEFAULT_FIAT_PAIR,
+    accountPair: null,
   },
+  currentWallet,
+  openDialogWrapper,
 }: PortfolioProviderProps) => {
+  const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo, backendServiceZero } = currentWallet;
+  if (selectedWallet === undefined) {
+    return <></>;
+  }
+
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
     ...initialState,
@@ -38,6 +60,15 @@ export const PortfolioContextProvider = ({
         unitOfAccount: currency,
       });
     },
+    changeUnitOfAccountPair: (payload: any) => {
+      dispatch({
+        type: PortfolioActionType.changeUnitOfAccountPair,
+        accountPair: {
+          from: { name: payload.from.name, value: payload.from.value },
+          to: { name: payload.to.name, value: payload.to.value },
+        },
+      });
+    },
   }).current;
 
   const context = React.useMemo(
@@ -45,8 +76,15 @@ export const PortfolioContextProvider = ({
       ...state,
       ...actions,
       settingFiatPairUnit,
+      walletBalance,
+      ftAssetList: ftAssetList || [],
+      networkId,
+      primaryTokenInfo,
+      openBuyDialog: () => openDialogWrapper(BuySellDialog),
+      showWelcomeBanner: ftAssetList.length === 1,
+      backendServiceZero: backendServiceZero,
     }),
-    [state, actions]
+    [state, actions, ftAssetList]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;

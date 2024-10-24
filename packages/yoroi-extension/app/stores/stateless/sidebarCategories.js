@@ -2,7 +2,6 @@
 import type { MessageDescriptor } from 'react-intl';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
 import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
@@ -131,19 +130,19 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarSwap,
     isVisible: ({ selected }) => !selected?.isTestnet,
   },
-  {
-    className: 'assets',
-    route: ROUTES.ASSETS.ROOT,
-    icon: assetsIcon,
-    label: globalMessages.sidebarAssets,
-    isVisible: _request => _request.selected !== null,
-  },
+  // {
+  //   className: 'assets',
+  //   route: ROUTES.ASSETS.ROOT,
+  //   icon: assetsIcon,
+  //   label: globalMessages.sidebarAssets,
+  //   isVisible: _request => _request.selected !== null,
+  // },
   {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 250,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'nfts',
@@ -167,13 +166,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: connectorMessages.connector,
     isVisible: _request => true,
   },
-  // {
-  //   className: 'swap',
-  //   route: '/swap',
-  //   icon: swapIcon,
-  //   label: globalMessages.sidebarSwap,
-  //   isVisible: _request => true,
-  // },
   {
     className: 'governance',
     route: '/governance',
