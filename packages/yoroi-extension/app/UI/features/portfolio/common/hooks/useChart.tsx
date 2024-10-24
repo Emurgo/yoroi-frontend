@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { IChartData } from '../types/chart';
@@ -28,18 +28,25 @@ const useChart = (data: IChartData) => {
     payload: { value: number };
   }): React.SVGProps<SVGTextElement> => {
     return (
-      <Box
+      <Typography
+        variant="caption"
         zIndex={2000}
         component="text"
-        x={x - 2}
+        x={x - 5}
         y={y === 8 ? y - 3 : y + 3}
         dy={1}
         textAnchor="end"
-        sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
+        sx={{
+          color: theme.palette.ds.gray_700,
+          fontSize: '12px',
+          lineHeight: '16px',
+          fontWeight: '200 !important',
+          letterSpacing: '0.2px',
+        }}
         stroke={theme.palette.ds.gray_700}
       >
         {payload.value.toFixed(2)}
-      </Box>
+      </Typography>
     );
   };
 
