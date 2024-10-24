@@ -29,15 +29,16 @@ const useChart = (data: IChartData) => {
   }): React.SVGProps<SVGTextElement> => {
     return (
       <Box
+        zIndex={2000}
         component="text"
         x={x - 2}
-        y={y}
+        y={y === 8 ? y - 3 : y + 3}
         dy={1}
         textAnchor="end"
         sx={{ color: theme.palette.ds.gray_700, fontSize: '0.75rem', lineHeight: '1rem', fontWeight: 400 }}
         stroke={theme.palette.ds.gray_700}
       >
-        {Math.floor(payload.value * 10) / 10}
+        {payload.value.toFixed(2)}
       </Box>
     );
   };

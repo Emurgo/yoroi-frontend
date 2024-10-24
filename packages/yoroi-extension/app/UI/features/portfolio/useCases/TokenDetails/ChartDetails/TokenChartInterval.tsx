@@ -57,7 +57,6 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
       changePercent: point.changePercent,
       changeValue: point.changeValue,
     })) || [];
-
   const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo, isDragging } = useChart(
     chartData
   );
@@ -77,7 +76,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
     <Stack
       direction="column"
       spacing={theme.spacing(4)}
-      sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3) }}
+      sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3), height: '317px' }}
     >
       <TokenMarketPriceOverview
         chartData={chartData}
@@ -93,13 +92,13 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
           src={chartSkeletonPng}
           sx={{
             width: '100%',
-            height: `${chartHeight}px`,
+            height: `${160}px`,
           }}
         >
           {isFetching || !data ? null : (
-            <ResponsiveContainer width={'100%'} height={chartHeight}>
+            <ResponsiveContainer width={'100%'} height="100%">
               <LineChart
-                margin={{ top: 0, left: -23, right: 0, bottom: 0 }}
+                margin={{ top: 10, left: -16, right: 0, bottom: 0 }}
                 data={chartData}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
@@ -113,7 +112,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                   tickLine={false}
                   type={'number'}
                   tick={CustomYAxisTick}
-                  tickCount={9}
+                  tickCount={6}
                 />
                 <RechartTooltip cursor={false} content={<></>} />
                 <Line
