@@ -39,7 +39,7 @@ describe('dApp, connection in extension', function () {
     await windowManager.openNewTab(mockDAppName, mockDAppUrl);
   });
 
-  it('Connect the wallet without auth to the dapp', async function () {
+  it('Connect the wallet to the dapp', async function () {
     await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet1);
   });
 

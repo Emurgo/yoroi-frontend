@@ -13,7 +13,7 @@ import { adaInLovelaces } from '../../helpers/constants.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
-describe('dApp, getCollateral, error, max limit, not auth,', function () {
+describe('dApp, getCollateral, error, max limit', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;

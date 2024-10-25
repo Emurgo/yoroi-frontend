@@ -12,7 +12,7 @@ import { adaInLovelaces, getTestWalletName } from '../../helpers/constants.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
-describe('dApp, getCollateral, error, empty wallet, not auth', function () {
+describe('dApp, getCollateral, error, empty wallet', function () {
   const testWalletName = getTestWalletName();
   let newTestWallet = {
     name: '',

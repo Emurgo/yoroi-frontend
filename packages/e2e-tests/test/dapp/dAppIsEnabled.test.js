@@ -11,7 +11,7 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
-describe('dApp, isEnabled, not auth', function () {
+describe('dApp, isEnabled', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
