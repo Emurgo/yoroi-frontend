@@ -9,7 +9,7 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { walletNameShortener } from '../utils/utils.js';
+import { isChrome, walletNameShortener } from '../utils/utils.js';
 import { extensionTabName, serviceWorkersTabName, WindowManager } from './windowManager.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
@@ -103,10 +103,14 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
-  expect(state).to.be.true;
+  expect(state, 'The Add new wallet page is not displayed').to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
   // It is necessary to re-run the service worker after loading info into the indexedDB
-  await restartServiceWorker(webdriver, logger);
+  if (isChrome()){
+    await restartServiceWorker(webdriver, logger);
+  } else {
+    await addWalletPage.refreshPage();
+  }
   logger.info(`--------------------- preloadDBAndStorage END ---------------------`);
 };
 
