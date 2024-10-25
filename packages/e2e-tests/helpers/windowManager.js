@@ -4,7 +4,7 @@ class WindowManagerError extends Error {}
 
 export const mockDAppName = 'MockDApp';
 export const popupConnectorName = 'popupConnectorWindow';
-export const popupConnectorWindowTitle = 'Yoroi dApp Connector';
+export const popupConnectorWindowTitle = 'Yoroi Dapp Connector';
 export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
