@@ -109,7 +109,7 @@ declare var chrome;
 
 export function callBackground<T, R>(message: {| type: string, request?: Object |}): Promise<R> {
   return new Promise((resolve, reject) => {
-    const serializedMessage = { type: message.type, request: JSON.stringify(message.request || null) };
+    const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
     window.chrome.runtime.sendMessage(serializedMessage, response => {
       // $FlowIgnore
       console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(response));
