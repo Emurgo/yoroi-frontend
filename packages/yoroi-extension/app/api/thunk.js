@@ -416,7 +416,7 @@ const callbacks = Object.freeze({
   serverStatusUpdate: [],
   coinPriceUpdate: [],
 });
-chrome.runtime.onMessage.addListener(async (serializedMessage, _sender, _sendResponse) => {
+chrome.runtime.onMessage.addListener((serializedMessage, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
   let message;
   try {
