@@ -36,7 +36,7 @@ describe('Generating a new address', function () {
     const receivePage = new ReceiveSubTab(webdriver, logger);
     await receivePage.generateNewAddress();
   });
-  it('Check amount after generateing an address', async function () {
+  it('Check amount after generating an address', async function () {
     const receivePage = new ReceiveSubTab(webdriver, logger);
     const addrsAmount = await receivePage.getAmountOfAddresses();
     expect(addrsAmount, 'The amount of addresses is different from expected').to.equal(2);
