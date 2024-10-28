@@ -99,7 +99,7 @@ export default class CheckDialog extends Component<Props> {
         {!classicTheme && <AboutLedgerSVG />}
 
         <div className={styles.prerequisiteBlock}>
-          <Stack direction="row">
+          <Stack direction="row" alignItems="center">
             <IconWrapper>
               <AboutPrerequisiteIconSVG />
             </IconWrapper>
