@@ -493,7 +493,15 @@ export default class BaseProfileStore
     if (setting.enabled) {
       refreshCurrentCoinPrice();
     }
-    await this.getUnitOfAccountRequest.execute(); // eagerly cache
+    // The amount display is not reactive to this:
+    // await this.getUnitOfAccountRequest.execute(); // eagerly cache
+    // so explicitly patch the result:
+    this.getUnitOfAccountRequest.patch(result => {
+      if (result) {
+        // $FlowFixMe[incompatible-type]
+        Object.assign(result, setting);
+      }
+    });
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {
