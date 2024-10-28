@@ -23,7 +23,7 @@ describe('Renaming the wallet', function () {
     await waitTxPage(webdriver, logger);
   });
 
-  it('Go to Wallet subtub in Settings', async function () {
+  it('Go to Wallet subtab in Settings', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToSettingsTab();
     const settingsPage = new SettingsTab(webdriver, logger);
