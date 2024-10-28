@@ -13,7 +13,8 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { WalletType } from '../../../chrome/extension/background/types';
-import { constructPlate } from './WalletCard';
+import { constructPlate40 } from './WalletCard';
+import { maybe } from '../../coreUtils';
 
 type Props = {|
   +plate: null | WalletChecksum,
@@ -51,9 +52,7 @@ export default class NavPlate extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
-    const [accountPlateId, iconComponent] = (this.props.plate) ?
-      constructPlate(this.props.plate, 0, 8, 5, 40, 4)
-      : [];
+    const [accountPlateId, iconComponent] = maybe(this.props.plate, constructPlate40) ?? [];
 
     const TypeIcon = this.getIcon(this.props.walletType);
 

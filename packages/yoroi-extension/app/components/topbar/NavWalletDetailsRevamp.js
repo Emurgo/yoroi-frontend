@@ -14,7 +14,7 @@ import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/ic
 import { maybe } from '../../coreUtils';
 import AmountDisplay from '../common/AmountDisplay';
 import styles from './NavWalletDetailsRevamp.scss';
-import { constructPlate } from './WalletCard';
+import { constructPlate32 } from './WalletCard';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
@@ -78,7 +78,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
 
     const totalAmount = this.getTotalAmount();
     const showEyeIconSafe = showEyeIcon != null && showEyeIcon;
-    const [accountPlateId, iconComponent] = plate ? constructPlate(plate, 0, 8, 4, 32, 4) : [];
+    const [accountPlateId, iconComponent] = maybe(plate, constructPlate32) ?? [];
     const amountDisplayId = `topBar:selectedWallet`;
 
     return (

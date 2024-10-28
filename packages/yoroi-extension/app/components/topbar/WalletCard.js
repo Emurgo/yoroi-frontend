@@ -42,32 +42,58 @@ type Props = {|
   id: string,
 |};
 
+export function constructPlate40(
+  plate: WalletChecksum,
+): [string, React$Element<'div'>] {
+  return constructPlate(plate, {
+    saturationFactor: 0,
+    size: 8,
+    scalePx: 5,
+    iconSize: 40,
+    borderRadius: 4,
+  });
+}
+
+export function constructPlate32(
+  plate: WalletChecksum,
+): [string, React$Element<'div'>] {
+  return constructPlate(plate, {
+    saturationFactor: 0,
+    size: 8,
+    scalePx: 4,
+    iconSize: 32,
+    borderRadius: 4,
+  });
+}
+
 export function constructPlate(
   plate: WalletChecksum,
-  saturationFactor: number,
-  size: number,
-  scalePx: number,
-  iconSize: number,
-  borderRadius: number,
+  params: {|
+    saturationFactor: number,
+    size: number,
+    scalePx: number,
+    iconSize: number,
+    borderRadius: number,
+  |}
 ): [string, React$Element<'div'>] {
   return [plate.TextPart, (
     <Box
       sx={{
-        width: `${iconSize}px`,
-        height: `${iconSize}px`,
-        borderRadius: `${borderRadius}px`,
+        width: `${params.iconSize}px`,
+        height: `${params.iconSize}px`,
+        borderRadius: `${params.borderRadius}px`,
         alignItems: 'center',
         justifyContent: 'center',
         '& .identicon': {
-          borderRadius: `${borderRadius}px`,
+          borderRadius: `${params.borderRadius}px`,
         },
       }}
     >
       <WalletAccountIcon
         iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        size={size}
-        scalePx={scalePx}
+        saturationFactor={params.saturationFactor}
+        size={params.size}
+        scalePx={params.scalePx}
       />
     </Box>
   )];
@@ -95,7 +121,7 @@ export default class WalletCard extends Component<Props> {
     const { intl } = this.context;
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
 
-    const [walletPlate, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, 8, 5, 40, 4) : [];
+    const [walletPlate, iconComponent] = maybe(this.props.plate, constructPlate40) ?? [];
 
     const totalAmount = this.getTotalAmount();
     const { tokenTypes, nfts } = this.countTokenTypes();
