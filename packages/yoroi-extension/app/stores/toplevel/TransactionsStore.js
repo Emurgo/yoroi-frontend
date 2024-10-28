@@ -193,7 +193,9 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     ]);
   }
 
-  async _updateTransactionPriceData(publicDeriver: { networkId: number, ... }, timestamps: Set<number>) {
+  async _updateTransactionPriceData(
+    publicDeriver: { networkId: number, ... }, timestamps: Set<number>
+  ): Promise<void> {
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.networkId,
     );
