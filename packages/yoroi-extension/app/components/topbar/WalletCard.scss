@@ -69,12 +69,9 @@
   flex: 1;
   text-align: left;
   .label {
-    color: var(--yoroi-palette-gray-600);
     line-height: 22px;
   }
-  .value {
-    color: var(--yoroi-palette-gray-900);
-  }
+
 }
 .actions {
   opacity: 0;

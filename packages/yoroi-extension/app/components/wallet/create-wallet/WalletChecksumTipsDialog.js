@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, styled } from '@mui/material';
 import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({
@@ -18,13 +18,11 @@ const messages: Object = defineMessages({
   },
   secondTip: {
     id: 'wallet.create.dialog.walletChecksum.secondTip',
-    defaultMessage:
-      '!!!Plate number <strong>{plateText}</strong> is a auto-generated sign of four letters and four digits.',
+    defaultMessage: '!!!Plate number <strong>{plateText}</strong> is a auto-generated sign of four letters and four digits.',
   },
   thirdTip: {
     id: 'wallet.create.dialog.walletChecksum.thirdTip',
-    defaultMessage:
-      '!!!Checksum and plate number are unique to your wallet and represent your public key.',
+    defaultMessage: '!!!Checksum and plate number are unique to your wallet and represent your public key.',
   },
 });
 
@@ -49,15 +47,13 @@ function WalletChecksumTipsDialog(props: Props & Intl): Node {
       </Typography>
       <Box component="ul" sx={{ listStyle: 'outside', px: '24px' }}>
         <Box component="li">
-          <Typography component="div" variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             <FormattedMessage
               {...messages.firstTip}
               values={{
                 plateImg: (
                   <Box component="span" display="inline-block" width="24px" position="relative">
-                    <Box sx={{ position: 'absolute', top: '-18px', left: '0px' }}>
-                      {plateImagePart}
-                    </Box>
+                    <Box sx={{ position: 'absolute', top: '-18px', left: '0px' }}>{plateImagePart}</Box>
                   </Box>
                 ),
               }}
@@ -65,12 +61,12 @@ function WalletChecksumTipsDialog(props: Props & Intl): Node {
           </Typography>
         </Box>
         <Box component="li">
-          <Typography component="div" variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             <FormattedHTMLMessage {...messages.secondTip} values={{ plateText: plateTextPart }} />
           </Typography>
         </Box>
         <Box component="li">
-          <Typography component="div" variant="body1" color="grey.800">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium">
             {intl.formatMessage(messages.thirdTip)}
           </Typography>
         </Box>

@@ -6,9 +6,17 @@ import { intlShape } from 'react-intl';
 import classnames from 'classnames';
 
 import globalMessages from '../../../i18n/global-messages';
-import { ReactComponent as ArrowDownSVG }  from '../../../assets/images/expand-arrow-grey.inline.svg';
+import { ReactComponent as ArrowDownSVG } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, styled } from '@mui/material';
+import { Typography } from '@mui/material';
+
+const GradientBox = styled(Box)(({ theme }: any) => ({
+  backgroundImage: theme.palette.ds.bg_gradient_1,
+  marginBottom: '16px',
+  borderRadius: '8px',
+}));
 
 type Props = {|
   +parentName: string,
@@ -25,13 +33,13 @@ type State = {|
 
 @observer
 export default class OptionBlock extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
-  static defaultProps: {|learnMoreText: void|} = {
-    learnMoreText: undefined
-  }
+  static defaultProps: {| learnMoreText: void |} = {
+    learnMoreText: undefined,
+  };
 
   state: State = {
     showLearnMore: false,
@@ -45,57 +53,40 @@ export default class OptionBlock extends Component<Props, State> {
     const { intl } = this.context;
     const { parentName, type, title, learnMoreText, onSubmit } = this.props;
 
-    const learnMoreTextBlockClasses = classnames([
-      styles.learnMoreTextBlock,
-      this.state.showLearnMore && styles.showlearnMore,
-    ]);
+    const learnMoreTextBlockClasses = classnames([styles.learnMoreTextBlock, this.state.showLearnMore && styles.showlearnMore]);
 
-    const learnMoreButtonClasses = classnames([
-      styles.learnMoreButton,
-      this.state.showLearnMore && styles.arrowUp,
-    ]);
+    const learnMoreButtonClasses = classnames([styles.learnMoreButton, this.state.showLearnMore && styles.arrowUp]);
 
     return (
-      <li className={styles.optionBlockListItem}>
-        <div className={styles.optionBlockWrapper}>
-          {/* Submit button block */}
-          <button
-            onClick={onSubmit}
-            type="button"
-            className={classnames([
-              styles.optionSubmitButton,
-              `${parentName}_${type}`
-            ])}
-          >
-            <div className={`${styles.optionImage} ${styles[type]}`} />
-            <div className={styles.optionTitle}>
-              {title}
-            </div>
-          </button>
-          {/* Learn more block */}
-          {(learnMoreText != null && learnMoreText !== '')
-            ? (
+      <GradientBox className={styles.optionBlockWrapper}>
+        <li className={styles.optionBlockListItem}>
+          <div className={styles.optionBlockWrapper}>
+            {/* Submit button block */}
+            <button onClick={onSubmit} type="button" className={classnames([styles.optionSubmitButton, `${parentName}_${type}`])}>
+              <div className={`${styles.optionImage} ${styles[type]}`} />
+              <Typography className={styles.optionTitle} color="ds.text_gray_medium">
+                {title}
+              </Typography>
+            </button>
+            {/* Learn more block */}
+            {learnMoreText != null && learnMoreText !== '' ? (
               <div>
                 <div className={learnMoreTextBlockClasses}>
                   <div className={styles.learnMoreTextWrapper}>
-                    <div className={styles.learnMoreText}>{learnMoreText}</div>
+                    <Typography color="ds.text_gray_low">{learnMoreText}</Typography>
                   </div>
                 </div>
-                <button
-                  className={learnMoreButtonClasses}
-                  type="button"
-                  onClick={this.toggleLearnMore.bind(this)}
-                >
+                <button className={learnMoreButtonClasses} type="button" onClick={this.toggleLearnMore.bind(this)}>
                   {intl.formatMessage(globalMessages.learnMore)}
                   <span className={styles.learnMoreButtonIcon}>
                     <ArrowDownSVG width="20px" height="20px" />
                   </span>
                 </button>
-              </div>)
-            : null
-          }
-        </div>
-      </li>
+              </div>
+            ) : null}
+          </div>
+        </li>
+      </GradientBox>
     );
   }
 }

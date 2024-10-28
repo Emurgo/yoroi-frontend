@@ -19,6 +19,7 @@ import AmountDisplay from '../common/AmountDisplay';
 import { maybe } from '../../coreUtils';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import { Box, Typography } from '@mui/material';
+import { fontWeight } from '../../styles/themes/tokens/tokens';
 
 const messages = defineMessages({
   tokenTypes: {
@@ -161,18 +162,18 @@ export default class WalletCard extends Component<Props, State> {
                     />
                   </div>
                   <div className={styles.extraInfo}>
-                    <div className={styles.label}>
-                      {intl.formatMessage(messages.tokenTypes)}{' '}
-                      <span className={styles.value} id={walletTokensAmountId}>
+                    <Typography className={styles.label} color="ds.text_gray_medium">
+                      {intl.formatMessage(messages.tokenTypes)}:{' '}
+                      <Typography component="span" id={walletTokensAmountId} fontWeight="500">
                         {tokenTypes}
-                      </span>
-                    </div>
-                    <div className={styles.label}>
-                      NFTs{' '}
-                      <span className={styles.value} id={walletNFTsAmountId}>
+                      </Typography>
+                    </Typography>
+                    <Typography className={styles.label} color="ds.text_gray_medium">
+                      NFTs:{' '}
+                      <Typography component="span" id={walletNFTsAmountId} fontWeight="500">
                         {nfts}
-                      </span>
-                    </div>
+                      </Typography>
+                    </Typography>
                   </div>
                 </div>
               </div>
