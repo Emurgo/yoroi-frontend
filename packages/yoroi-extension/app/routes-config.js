@@ -1,6 +1,7 @@
 // @flow
 export const ROUTES = {
   ROOT: '/',
+  PAGE_ERROR: '/page-error',
   NIGHTLY_INFO: '/nightly',
   MY_WALLETS: '/my-wallets',
   PROFILE: {

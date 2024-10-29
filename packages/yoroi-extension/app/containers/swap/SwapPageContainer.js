@@ -6,6 +6,8 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
+import { SwapFormProvider } from './context/swap-form';
+import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -13,7 +15,6 @@ import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
-import { SwapFormProvider } from './context/swap-form';
 
 type Props = {|
   +children?: Node,
@@ -42,7 +43,7 @@ export default class SwapPageContainer extends Component<AllProps> {
   isErrorPage: void => boolean = () => {
     const { location } = this.props.stores.router;
     if (location) {
-      return location.pathname.endsWith('page-error');
+      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
     }
     return false;
   };
