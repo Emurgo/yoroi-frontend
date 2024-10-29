@@ -19,7 +19,6 @@ import AmountDisplay from '../common/AmountDisplay';
 import { maybe } from '../../coreUtils';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import { Box, Typography } from '@mui/material';
-import { fontWeight } from '../../styles/themes/tokens/tokens';
 
 const messages = defineMessages({
   tokenTypes: {

@@ -9,8 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as ArrowDownSVG } from '../../../assets/images/expand-arrow-grey.inline.svg';
 import styles from './OptionBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, styled } from '@mui/material';
-import { Typography } from '@mui/material';
+import { Box, styled, Typography } from '@mui/material';
 
 const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_1,

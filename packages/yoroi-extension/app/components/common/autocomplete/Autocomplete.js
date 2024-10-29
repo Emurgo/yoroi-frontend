@@ -2,9 +2,7 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { useCombobox } from 'downshift';
-import { Input, Box, FormControl } from '@mui/material';
-import { styled } from '@mui/system';
-import { Typography } from '@mui/material';
+import { Input, Box, FormControl, Typography, styled } from '@mui/material';
 
 type Props = {|
   +options: Array<string>,
@@ -234,7 +232,7 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
 };
 
-const ULList = styled(Box)(({ theme }) => ({
+const ULList = styled(Box)(() => ({
   width: '100%',
   margin: 0,
   borderTop: 0,

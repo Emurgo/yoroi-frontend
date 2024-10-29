@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import InfoDialog from '../../widgets/infoDialog';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
-import { Typography, Box, styled } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { observer } from 'mobx-react';
 
 const messages: Object = defineMessages({

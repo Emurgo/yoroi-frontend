@@ -12,8 +12,7 @@ import OptionBlock from '../../../widgets/options/OptionBlock';
 import environment from '../../../../environment';
 
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
-import { Typography } from '@mui/material';
-import { Link } from '@mui/material';
+import { Typography, Link } from '@mui/material';
 
 const messages = defineMessages({
   dialogTitle: {
