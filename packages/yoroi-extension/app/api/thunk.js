@@ -190,7 +190,7 @@ export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (
 
 export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
   const resp = await callBackground({ type: ChangeSigningPassword.typeTag, request, });
-  if (resp?.error === (new WrongPassphraseError()).message) {
+  if (resp?.error === WrongPassphraseError.defaultMessage) {
     throw new IncorrectWalletPasswordError();
   }
 }
