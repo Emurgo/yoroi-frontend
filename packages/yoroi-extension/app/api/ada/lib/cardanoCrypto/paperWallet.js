@@ -11,6 +11,7 @@ import {
   isValidBip39Mnemonic
 } from './wallet';
 import config from '../../../../config';
+import { hexToBytes } from '../../../../coreUtils';
 
 // <TODO:PENDING_REMOVAL> paper
 /** Check validity of paper mnemonic (including checksum) */
@@ -50,7 +51,7 @@ export const unscramblePaperAdaMnemonic = (
         const entropy = mnemonicToEntropy(phrase);
         const mnemonics = RustModule.WasmScope(Scope => {
           const newEntropy = Scope.WalletV2.paper_wallet_unscramble(
-            Buffer.from(entropy, 'hex'),
+            hexToBytes(entropy),
             password || ''
           );
 

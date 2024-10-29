@@ -7,61 +7,63 @@ import type {
   AddressUtxoResponse,
   BestBlockRequest,
   BestBlockResponse,
+  CatalystRoundInfoRequest,
+  CatalystRoundInfoResponse,
+  FilterUsedRequest,
+  FilterUsedResponse,
+  GetLatestBlockBySlotFunc,
+  GetRecentTransactionHashesRequest,
+  GetRecentTransactionHashesResponse,
+  GetSwapFeeTiersFunc,
+  GetSwapFeeTiersRequest,
+  GetSwapFeeTiersResponse,
+  GetTransactionsByHashesRequest,
+  GetTransactionsByHashesResponse,
+  GetTransactionSlotsByHashesResponse,
+  GetUtxoDataRequest,
+  GetUtxoDataResponse,
   HistoryRequest,
   HistoryResponse,
+  MultiAssetMintMetadataResponse,
+  MultiAssetRequest,
+  MultiAssetSupplyResponse,
   PoolInfoRequest,
   PoolInfoResponse,
   RemoteTransaction,
   RewardHistoryRequest,
   RewardHistoryResponse,
+  SignedBatchRequest,
   SignedRequest,
   SignedRequestInternal,
   SignedResponse,
   TokenInfoRequest,
   TokenInfoResponse,
-  CatalystRoundInfoRequest,
-  CatalystRoundInfoResponse,
-  MultiAssetRequest,
-  MultiAssetMintMetadataResponse,
-  GetUtxoDataRequest,
-  GetUtxoDataResponse,
-  GetLatestBlockBySlotFunc,
-  GetRecentTransactionHashesRequest,
-  GetRecentTransactionHashesResponse,
-  GetTransactionsByHashesRequest,
-  GetTransactionsByHashesResponse,
-  MultiAssetSupplyResponse,
-  FilterUsedRequest,
-  FilterUsedResponse,
-  GetSwapFeeTiersFunc,
-  GetSwapFeeTiersRequest,
-  GetSwapFeeTiersResponse, GetTransactionSlotsByHashesResponse, SignedBatchRequest,
 } from './types';
 
 import type { IFetcher } from './IFetcher.types';
 
-import axios from 'axios';
 import type { $AxiosError } from 'axios';
+import axios from 'axios';
 import { Logger, stringifyError } from '../../../../utils/logging';
 import {
   CheckAddressesInUseApiError,
   GetAccountStateApiError,
   GetBestBlockError,
-  GetPoolInfoApiError,
   GetCatalystRoundInfoApiError,
+  GetPoolInfoApiError,
   GetRewardHistoryApiError,
   GetTxHistoryForAddressesApiError,
+  GetUtxoDataError,
   GetUtxosForAddressesApiError,
   InvalidWitnessError,
   RollbackApiError,
   SendTransactionApiError,
-  GetUtxoDataError,
 } from '../../../common/errors';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
 import { addressBech32ToHex } from '../cardanoCrypto/utils';
-import { bytesToBase64, forceNonNull, last } from '../../../../coreUtils';
+import { bytesToBase64, bytesToHex, forceNonNull, last } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -188,9 +190,8 @@ export class RemoteFetcher implements IFetcher {
             // $FlowExpectedError[cannot-write]
             input.assets = input.assets ?? [];
             try {
-              const payload = bech32.fromWords(bech32.decode(input.address, 1000).words);
               // $FlowExpectedError[cannot-write]
-              input.address = Buffer.from(payload).toString('hex');
+              input.address = bytesToHex(bech32.fromWords(bech32.decode(input.address, 1000).words));
             } catch (_e) { /* expected not to work for base58 addresses */ }
           }
           for (const output of resp.outputs) {
@@ -198,9 +199,8 @@ export class RemoteFetcher implements IFetcher {
             // $FlowExpectedError[cannot-write]
             output.assets = output.assets ?? [];
             try {
-              const payload = bech32.fromWords(bech32.decode(output.address, 1000).words);
               // $FlowExpectedError[cannot-write]
-              output.address = Buffer.from(payload).toString('hex');
+              output.address = bytesToHex(bech32.fromWords(bech32.decode(output.address, 1000).words));
             } catch (_e) { /* expected not to work for base58 addresses */ }
           }
         }
@@ -280,9 +280,8 @@ export class RemoteFetcher implements IFetcher {
               // $FlowExpectedError[cannot-write]
               input.assets = input.assets ?? [];
               try {
-                const payload = bech32.fromWords(bech32.decode(input.address, 1000).words);
                 // $FlowExpectedError[cannot-write]
-                input.address = Buffer.from(payload).toString('hex');
+                input.address = bytesToHex(bech32.fromWords(bech32.decode(input.address, 1000).words));
               } catch (_e) { /* expected not to work for base58 addresses */ }
             }
             for (const output of resp.outputs) {
@@ -290,9 +289,8 @@ export class RemoteFetcher implements IFetcher {
               // $FlowExpectedError[cannot-write]
               output.assets = output.assets ?? [];
               try {
-                const payload = bech32.fromWords(bech32.decode(output.address, 1000).words);
                 // $FlowExpectedError[cannot-write]
-                output.address = Buffer.from(payload).toString('hex');
+                output.address = bytesToHex(bech32.fromWords(bech32.decode(output.address, 1000).words));
               } catch (_e) { /* expected not to work for base58 addresses */ }
             }
           }

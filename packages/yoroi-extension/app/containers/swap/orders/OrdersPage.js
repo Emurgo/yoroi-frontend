@@ -8,7 +8,7 @@ import type { FormattedTokenValue } from './util';
 import { Box, Button } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import {
   getTransactionFeeFromCbor,
@@ -30,6 +30,8 @@ import { createFormattedTokenValues } from './util';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
+import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -98,6 +100,16 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
+
+  useEffect(() => {
+
+    // on change open/closed orders tab
+
+    ampli.swapConfirmedPageViewed({
+      swap_tab: showCompletedOrders ? 'Completed Orders' : 'Open Orders',
+    });
+
+  }, [showCompletedOrders]);
 
   const {
     wallets,
@@ -273,11 +285,26 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]
         : [signedCancelTx];
+
     await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
     });
+
     setCancellationState(null);
+
+    alert('Cancel submitted');
+
+    try {
+      ampli.swapCancelationSubmitted({
+        ...tokenInfoToAnalyticsFromAndToAssets(order.from.token, order.to.token),
+        from_amount: Number(Quantities.format(order.from.quantity, order.from.token.decimals || 0)),
+        to_amount: Number(Quantities.format(order.to.quantity, order.to.token.decimals || 0)),
+        pool_source: order.provider,
+      });
+    } catch (e) {
+      console.error('analytics fail', e);
+    }
   };
 
   const columnContext = { completedOrders: showCompletedOrders };

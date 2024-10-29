@@ -4,10 +4,8 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography, Button } from '@mui/material';
+import { Stack, Box, Typography, Button, styled } from '@mui/material';
 import StepController from './StepController';
-import styles from './VerifyRecoveryPhraseStep.scss';
-import classnames from 'classnames';
 import { ReactComponent as VerifiedIcon } from '../../../assets/images/verify-icon-green.inline.svg';
 import environment from '../../../environment';
 import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
@@ -40,6 +38,10 @@ type Props = {|
   prevStep: () => void,
   isRecoveryPhraseEntered: boolean,
 |};
+
+const SBox = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.primary_100,
+}));
 
 function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const { intl, recoveryPhrase, isRecoveryPhraseEntered, nextStep, prevStep } = props;
@@ -81,13 +83,20 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   const sortedRecoveryPhrase = useMemo(() => makeSortedPhrase(recoveryPhrase), [recoveryPhrase]);
 
   return (
-    <Stack alignItems="center" justifyContent="center" className={styles.component} id="verifyRecoveryPhraseStepComponent">
+    <Stack alignItems="center" justifyContent="center" id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
-        <Box className={styles.verifyRecoveryPhraseArea}>
+        <Box
+          sx={{
+            border: 'double 2px transparent',
+            borderRadius: '8px',
+            borderColor: 'ds.primary_200',
+            marginBottom: '16px',
+          }}
+        >
           <Stack
             gap="8px"
             flexDirection="row"
@@ -107,7 +116,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                 !isRecoveryPhraseEntered && (idx === enteredRecoveryPhrase.length - 1 || enteredRecoveryPhrase[idx + 1] === null);
 
               const Word = (
-                <Box
+                <SBox
                   sx={{
                     backgroundColor: 'ds.primary_100',
                     borderRadius: '8px',
@@ -131,7 +140,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                   >
                     {word}
                   </Typography>
-                </Box>
+                </SBox>
               );
               return (
                 <Stack
@@ -172,17 +181,24 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
         <Stack flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="center" gap="8px">
           {sortedRecoveryPhrase.map(({ word, internalWordId }, idx) => {
             const isAdded = addedWordsIndxes.has(idx);
+            const wrongWordBorderColor = (wrondWordId, currentId) =>
+              wrongWordIdx === currentId ? 'ds.sys_magenta_500' : 'transparent';
+            const wordBorderColor = (wrondWordId, currentId) =>
+              isAdded ? 'ds.primary_200' : wrongWordBorderColor(wrondWordId, currentId);
+            const isAddedOrIsWrong = isAdded || wrongWordIdx === idx;
             const button = (
               <Box
                 component="button"
                 key={internalWordId}
-                className={classnames(styles.wordChip, {
-                  [styles.wordAdded]: isAdded,
-                  [styles.wrongWord]: wrongWordIdx === idx,
-                })}
                 onClick={() => onAddWord(word, idx)}
+                disabled={isAdded}
                 sx={{
+                  height: '40px',
                   width: '123px',
+                  backgroundColor: isAddedOrIsWrong ? 'transparent' : 'ds.primary_100',
+                  border: isAddedOrIsWrong ? 2 : 0,
+                  borderRadius: '8px',
+                  borderColor: wordBorderColor(wrongWordIdx, idx),
                 }}
                 id={'verifyRecoveryPhraseWord' + idx}
               >

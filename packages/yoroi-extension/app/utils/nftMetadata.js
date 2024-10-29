@@ -5,6 +5,7 @@ import type {
   NFTMetadata,
   TokenMetadata,
 } from '../api/ada/lib/storage/database/primitives/tables';
+import { hexToBytes } from '../coreUtils';
 
 export function find721metadata(
   policyId: string,
@@ -19,7 +20,7 @@ export function find721metadata(
     return null;
   }
   const metadata = metadataWrapper['721'];
-  const assetName = Array.from(Buffer.from(assetNameHex, 'hex')).map(
+  const assetName = Array.from(hexToBytes(assetNameHex)).map(
     c => String.fromCharCode(c)
   ).join('');
   const asset: any = metadata[policyId]?.[assetName] || metadata[policyId]?.[assetNameHex];

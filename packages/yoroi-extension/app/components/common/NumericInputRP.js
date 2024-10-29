@@ -484,7 +484,7 @@ class AmountInput extends Component<AmountInputProps> {
           variant="body3"
           sx={{
             position: 'absolute',
-            bottom: '45px',
+            bottom: '72px',
             right: error != null && error !== '' ? '45px' : '10px',
             color: 'grayscale.900',
             textTransform: 'uppercase',

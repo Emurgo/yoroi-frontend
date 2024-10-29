@@ -39,6 +39,7 @@ import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/has
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addByronAddress } from '../../../../restoration/byron/scan';
 import { KeyKind } from '../../../cardanoCrypto/keys/types';
+import { hexToBytes } from '../../../../../../coreUtils';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -137,7 +138,7 @@ export async function createStandardBip44Wallet(request: {|
 
   const encryptedRoot = encryptWithPassword(
     request.password,
-    Buffer.from(request.rootPk.key().to_hex(), 'hex'),
+    hexToBytes(request.rootPk.key().to_hex()),
   );
 
   const accountPublicKey = request.rootPk.bip44_account(

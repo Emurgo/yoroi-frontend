@@ -1,45 +1,37 @@
 // // @flow
-import type {
-  CardanoAddressedUtxo,
-} from '../types';
-import { verifyFromDerivationRoot }  from '../../lib/storage/models/utils';
+import type { CardanoAddressedUtxo, } from '../types';
+import { verifyFromDerivationRoot } from '../../lib/storage/models/utils';
 import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
-  CardanoSignTransaction,
-  CardanoInput,
-  CardanoOutput,
-  CardanoWithdrawal,
-  CardanoCertificate,
   CardanoAddressParameters,
   CardanoAssetGroup,
-  CardanoToken,
+  CardanoCertificate,
+  CardanoInput,
+  CardanoOutput,
   CardanoSignedTxWitness,
+  CardanoSignTransaction,
+  CardanoToken,
+  CardanoWithdrawal,
 } from 'trezor-connect-flow/index';
 import {
-  CardanoCertificateType,
   CardanoAddressType,
-  CardanoTxSigningMode,
-  CardanoTxOutputSerializationFormat,
-  CardanoTxWitnessType,
+  CardanoCertificateType,
   CardanoGovernanceRegistrationFormat,
+  CardanoTxOutputSerializationFormat,
+  CardanoTxSigningMode,
+  CardanoTxWitnessType,
 } from 'trezor-connect-flow';
-import type {
-  Address, Value, Addressing,
-} from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import {
-  Bip44DerivationLevels,
-} from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import {
-  ChainDerivations,
-} from '../../../../config/numbersConfig';
+import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
+import { ChainDerivations, } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { maybe } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
@@ -157,41 +149,35 @@ export function createTrezorSignTxPayload(
 
 function formatTrezorWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
-  path: Array<Array<number>>,
+  paths: Array<Array<number>>,
 ): Array<CardanoWithdrawal> {
-  const result = [];
-
-  const withdrawalKeys = withdrawals.keys();
-  for (let i = 0; i < withdrawalKeys.len(); i++) {
-    const withdrawalAmount = withdrawals.get(withdrawalKeys.get(i));
-    if (withdrawalAmount == null) {
-      throw new Error(`${nameof(formatTrezorWithdrawals)} should never happen`);
-    }
-    result.push({
+  return iterateLenGetMap(withdrawals)
+    .values()
+    .nonNull()
+    .zip(paths)
+    .map(([withdrawalAmount, path]) => ({
       amount: withdrawalAmount.to_str(),
-      path: path[i],
-    });
-  }
-  return result;
+      path,
+    }))
+    .toArray();
 }
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  path: Array<Array<number>>,
+  paths: Array<Array<number>>,
 ): Array<CardanoCertificate> {
   const result = [];
-  for (let i = 0; i < certificates.len(); i++) {
-    const cert = certificates.get(i);
+  for (const [cert, path] of iterateLenGet(certificates).zip(paths)) {
     if (cert.as_stake_registration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_REGISTRATION,
-        path: path[i],
+        path,
       });
       continue;
     }
     if (cert.as_stake_deregistration() != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DEREGISTRATION,
-        path: path[i],
+        path,
       });
       continue;
     }
@@ -199,8 +185,8 @@ function formatTrezorCertificates(
     if (delegationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
-        path: path[i],
-        pool: Buffer.from(delegationCert.pool_keyhash().to_bytes()).toString('hex'),
+        pool: delegationCert.pool_keyhash().to_hex(),
+        path,
       });
       continue;
     }
@@ -239,31 +225,27 @@ function toTrezorTokenBundle(
 |} {
   if (assets == null) return Object.freeze({});
 
-  const assetGroup: Array<CardanoAssetGroup> = [];
-  const policyHashes = assets.keys();
-  for (let i = 0; i < policyHashes.len(); i++) {
-    const policyId = policyHashes.get(i);
-    const assetsForPolicy = assets.get(policyId);
-    if (assetsForPolicy == null) continue;
+  const tokenBundle: Array<CardanoAssetGroup> = iterateLenGetMap(assets)
+    .nonNullValue()
+    .map(([policyId, assetsForPolicy]) => {
 
-    const tokenAmounts: Array<CardanoToken> = [];
-    const assetNames = assetsForPolicy.keys();
-    for (let j = 0; j < assetNames.len(); j++) {
-      const assetName = assetNames.get(j);
-      const amount = assetsForPolicy.get(assetName);
-      if (amount == null) continue;
+      const tokenAmounts: Array<CardanoToken> = iterateLenGetMap(assetsForPolicy)
+        .nonNullValue()
+        .map(([assetName, amount]) => ({
+          assetNameBytes: bytesToHex(assetName.name()),
+          amount: amount.to_str(),
+        }))
+        .toArray();
 
-      tokenAmounts.push({
-        amount: amount.to_str(),
-        assetNameBytes: Buffer.from(assetName.name()).toString('hex'),
-      });
-    }
-    assetGroup.push({
-      policyId: Buffer.from(policyId.to_bytes()).toString('hex'),
-      tokenAmounts,
-    });
-  }
-  return { tokenBundle: assetGroup };
+      return {
+        policyId: policyId.to_hex(),
+        tokenAmounts,
+      };
+
+    })
+    .toArray();
+
+  return { tokenBundle };
 }
 function _generateTrezorOutputs(
   txOutputs: RustModule.WalletV4.TransactionOutputs,
@@ -271,8 +253,7 @@ function _generateTrezorOutputs(
   stakingKeyPath: Array<number>,
 ): Array<CardanoOutput> {
   const result = [];
-  for (let i = 0; i < txOutputs.len(); i++) {
-    const output = txOutputs.get(i);
+  for (const output of iterateLenGet(txOutputs)) {
     const address = output.address();
     const jsAddr = toHexOrBase58(output.address());
 
@@ -348,7 +329,7 @@ export function toTrezorAddressParameters(
         path: toDerivationPathString(path),
         // can't always know staking key path since address may not belong to the wallet
         // (mangled address)
-        stakingKeyHash: Buffer.from(hash.to_bytes()).toString('hex'),
+        stakingKeyHash: hash.to_hex(),
       };
     }
   }
@@ -427,7 +408,7 @@ export function buildSignedTransaction(
         key: publicKey.key,
       }
     });
-    const pubKey = Buffer.from(addressKey.to_raw_key().as_bytes()).toString('hex');
+    const pubKey = addressKey.to_raw_key().to_hex();
 
     const witness = findWitness(pubKey);
 
@@ -436,13 +417,11 @@ export function buildSignedTransaction(
       const byronAddr = RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver);
       const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
         RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
-        RustModule.WalletV4.Ed25519Signature.from_bytes(
-          Buffer.from(witness, 'hex')
-        ),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness),
         addressKey.chaincode(),
         byronAddr.attributes(),
       );
-      const asString = Buffer.from(bootstrapWit.to_bytes()).toString('hex');
+      const asString = bootstrapWit.to_hex();
       if (seenBootstrapWit.has(asString)) {
         continue;
       }
@@ -453,11 +432,9 @@ export function buildSignedTransaction(
 
     const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
       RustModule.WalletV4.Vkey.new(addressKey.to_raw_key()),
-      RustModule.WalletV4.Ed25519Signature.from_bytes(
-        Buffer.from(witness, 'hex')
-      ),
+      RustModule.WalletV4.Ed25519Signature.from_hex(witness),
     );
-    const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+    const asString = vkeyWit.to_hex();
     if (seenVKeyWit.has(asString)) {
       continue;
     }
@@ -467,7 +444,7 @@ export function buildSignedTransaction(
 
   // add any staking key needed
   const stakingPubKey = stakingKey
-    ? Buffer.from(stakingKey.to_raw_key().as_bytes()).toString('hex')
+    ? bytesToHex(stakingKey.to_raw_key().as_bytes())
     : null;
 
   for (const witness of witnesses) {
@@ -477,9 +454,9 @@ export function buildSignedTransaction(
       }
       const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
         RustModule.WalletV4.Vkey.new(stakingKey.to_raw_key()),
-        RustModule.WalletV4.Ed25519Signature.from_bytes(Buffer.from(witness.signature, 'hex')),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
       );
-      const asString = Buffer.from(vkeyWit.to_bytes()).toString('hex');
+      const asString = vkeyWit.to_hex();
       if (seenVKeyWit.has(asString)) {
         continue;
       }
@@ -532,8 +509,7 @@ export function toTrezorSignRequest(
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
     const formatted = [];
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
+    for (const input of iterateLenGet(inputs)) {
       const hash = input.transaction_id().to_hex();
       const index = input.index();
       const ownUtxo = senderUtxos.find(utxo =>
@@ -685,17 +661,13 @@ export function toTrezorSignRequest(
     return result;
   }
 
-  const outputs = [];
-  for (let i = 0; i < txBody.outputs().len(); i++) {
-    outputs.push(formatOutput(txBody.outputs().get(i)));
-  }
+  const outputs = iterateLenGet(txBody.outputs()).map(formatOutput).toArray();
 
   const formattedRequiredSigners = [];
   const additionalWitnessRequests = [];
   const requiredSigners = txBody.required_signers();
   if (requiredSigners) {
-    for (let i = 0; i < requiredSigners.len(); i++) {
-      const hash = requiredSigners.get(i);
+    for (const hash of iterateLenGet(requiredSigners)) {
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
         RustModule.WalletV4.Credential.from_keyhash(hash),
@@ -729,7 +701,7 @@ export function toTrezorSignRequest(
         networkId,
         stakeCredential
       );
-      const addressPayload = Buffer.from(rewardAddr.to_address().to_bytes()).toString('hex');
+      const addressPayload = rewardAddr.to_address().to_hex();
       const addressing = ownAddressMap(addressPayload);
       if (addressing == null) {
         throw new Error('not own address in certificate');
@@ -738,9 +710,7 @@ export function toTrezorSignRequest(
     };
 
     const result = [];
-    for (let i = 0; i < certificates.len(); i++) {
-      const cert = certificates.get(i);
-
+    for (const cert of iterateLenGet(certificates)) {
       const registrationCert = cert.as_stake_registration();
       if (registrationCert != null) {
         result.push({
@@ -776,14 +746,7 @@ export function toTrezorSignRequest(
   if (withdrawals) {
     const result = [];
 
-    const withdrawalKeys = withdrawals.keys();
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const rewardAddress = withdrawalKeys.get(i);
-      const withdrawalAmount = withdrawals.get(rewardAddress);
-      if (withdrawalAmount == null) {
-        throw new Error('missing withdraw amount should never happen');
-      }
-
+    for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
       const rewardAddressPayload = rewardAddress.to_address().to_hex();
       const path = ownAddressMap(rewardAddressPayload);
       if (path == null) {
@@ -875,8 +838,7 @@ export function toTrezorSignRequest(
   const referenceInputs = txBody.reference_inputs();
   if (referenceInputs) {
     const formattedReferenceInputs = [];
-    for (let i = 0; i < referenceInputs.len(); i++) {
-      const input = referenceInputs.get(i);
+    for (const input of iterateLenGet(referenceInputs)) {
       formattedReferenceInputs.push({
         prev_hash: input.transaction_id().to_hex(),
         prev_index: input.index(),

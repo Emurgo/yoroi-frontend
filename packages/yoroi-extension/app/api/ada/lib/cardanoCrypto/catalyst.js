@@ -2,6 +2,7 @@
 
 import { RustModule } from './rustLoader';
 import blake2b from 'blake2b';
+import { bytesToHex } from '../../../../coreUtils';
 
 export const CatalystLabels = Object.freeze({
   DATA: 61284,
@@ -95,8 +96,8 @@ export function generateRegistration(request: {|
   slotNumber: number,
 |}): RustModule.WalletV4.AuxiliaryData {
   return generateRegistrationMetadata(
-    Buffer.from(request.catalystPrivateKey.to_public().as_bytes()).toString('hex'),
-    Buffer.from(request.stakePrivateKey.to_public().as_bytes()).toString('hex'),
+    bytesToHex(request.catalystPrivateKey.to_public().as_bytes()),
+    bytesToHex(request.stakePrivateKey.to_public().as_bytes()),
     request.receiverAddress,
     request.slotNumber,
     (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),

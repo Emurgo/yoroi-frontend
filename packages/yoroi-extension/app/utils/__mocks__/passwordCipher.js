@@ -2,6 +2,7 @@
 /* eslint-disable  import/no-unused-modules */
 
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { bytesToHex, hexToBytes } from '../../coreUtils';
 
 /**
  * we need a constant password for tests.
@@ -12,8 +13,8 @@ export function encryptWithPassword(
   password: string,
   bytes: Uint8Array
 ): string {
-  const rawKeyHex = Buffer.from(bytes).toString('hex');
-  const passwordHex = Buffer.from(password).toString('hex');
+  const rawKeyHex = bytesToHex(bytes);
+  const passwordHex = bytesToHex(password);
   return rawKeyHex + passwordHex;
 }
 
@@ -21,10 +22,10 @@ export function decryptWithPassword(
   password: string,
   encryptedHex: string
 ): Uint8Array {
-  const expectedSuffix = Buffer.from(password).toString('hex');
+  const expectedSuffix = bytesToHex(password);
   if (!encryptedHex.endsWith(expectedSuffix)) {
     throw new WrongPassphraseError();
   }
   const rawKey = encryptedHex.slice(0, encryptedHex.length - expectedSuffix.length);
-  return Buffer.from(rawKey, 'hex');
+  return hexToBytes(rawKey);
 }

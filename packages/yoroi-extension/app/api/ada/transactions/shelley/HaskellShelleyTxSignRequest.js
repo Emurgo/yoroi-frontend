@@ -11,6 +11,7 @@ import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromCardanoValue, multiTokenFromRemote } from '../utils';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import { iterateLenGet, iterateLenGetMap } from '../../../../coreUtils';
 
 /**
  * We take a copy of these parameters instead of re-evaluating them from the network
@@ -88,9 +89,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   txId(): string {
-    return Buffer.from(RustModule.WalletV4.hash_transaction(
-      this.unsignedTx.build()
-    ).to_bytes()).toString('hex');
+    return RustModule.WalletV4.hash_transaction(this.unsignedTx.build()).to_hex();
   }
 
   size(): {| full: number, outputs: number[] |} {
@@ -105,15 +104,9 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     value: MultiToken,
   |}> {
     const body = this.unsignedTx.build();
-
-    const values = [];
-
-    const inputs = body.inputs();
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
-
+    return iterateLenGet(body.inputs()).map(input => {
       const key = {
-        hash: Buffer.from(input.transaction_id().to_bytes()).toString('hex'),
+        hash: input.transaction_id().to_hex(),
         index: input.index(),
       };
       const utxoEntry = this.senderUtxos.find(
@@ -122,17 +115,16 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       if (utxoEntry == null) {
         throw new Error(`${nameof(this.inputs)} missing ${nameof(this.senderUtxos)} input for ${JSON.stringify(key)}`);
       }
-      values.push({
+      return {
         value: multiTokenFromRemote(
           utxoEntry,
           this.networkSettingSnapshot.NetworkId,
         ),
         address: utxoEntry.receiver,
-      });
-    }
-
-    return values;
+      };
+    }).toArray();
   }
+
   totalInput(): MultiToken {
     const values = multiTokenFromCardanoValue(
       this.unsignedTx.get_implicit_input().checked_add(
@@ -150,28 +142,19 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
   outputs(): Array<TxDataOutput> {
     const body = this.unsignedTx.build();
-
-    const values = [];
-
-    const outputs = body.outputs();
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
-
-      values.push({
-        value: multiTokenFromCardanoValue(
-            output.amount(),
-            {
-              defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-              defaultNetworkId: this.networkSettingSnapshot.NetworkId,
-            },
-          ),
-        isForeign: false,
-        address: Buffer.from(output.address().to_bytes()).toString('hex'),
-      });
-    }
-
-    return values;
+    return iterateLenGet(body.outputs()).map(output => ({
+      value: multiTokenFromCardanoValue(
+        output.amount(),
+        {
+          defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+          defaultNetworkId: this.networkSettingSnapshot.NetworkId,
+        },
+      ),
+      isForeign: false,
+      address: output.address().to_hex(),
+    })).toArray();
   }
+
   totalOutput(): MultiToken {
     return multiTokenFromCardanoValue(
       this.unsignedTx.get_explicit_output(),
@@ -206,32 +189,20 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +amount: MultiToken,
   |}> {
     const withdrawals = this.unsignedTx.build().withdrawals();
-    if (withdrawals == null) return [];
-
-    const withdrawalKeys = withdrawals.keys();
-    const result = [];
-    for (let i = 0; i < withdrawalKeys.len(); i++) {
-      const rewardAddress = withdrawalKeys.get(i);
-      const withdrawalAmount = withdrawals.get(rewardAddress)?.to_str();
-      if (withdrawalAmount == null) continue;
-
-      const amount = new MultiToken(
+    return iterateLenGetMap(withdrawals).nonNullValue().map(([rewardAddress, withdrawalAmount]) => ({
+      address: rewardAddress.to_address().to_hex(),
+      amount: new MultiToken(
         [{
           identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-          amount: new BigNumber(withdrawalAmount),
+          amount: new BigNumber(withdrawalAmount.to_str()),
           networkId: this.networkSettingSnapshot.NetworkId,
         }],
         {
           defaultNetworkId: this.networkSettingSnapshot.NetworkId,
           defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
         }
-      );
-      result.push({
-        address: Buffer.from(rewardAddress.to_address().to_bytes()).toString('hex'),
-        amount,
-      });
-    }
-    return result;
+      ),
+    })).toArray();
   }
 
   keyDeregistrations(): Array<{|
@@ -239,21 +210,15 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     +refund: MultiToken,
   |}> {
     const certs = this.unsignedTx.build().certs();
-    if (certs == null) return [];
-
-    const result = [];
-    for (let i = 0; i < certs.len(); i++) {
-      const cert = certs.get(i).as_stake_deregistration();
-      if (cert == null) continue;
-
-      const address = RustModule.WalletV4.RewardAddress.new(
-        this.networkSettingSnapshot.ChainNetworkId,
-        cert.stake_credential(),
-      );
-      result.push({
-        rewardAddress: Buffer.from(address.to_address().to_bytes()).toString('hex'),
-        // recall: for now you get the full deposit back. May change in the future
-        refund: new MultiToken(
+    return iterateLenGet(certs)
+      .map(c => c.as_stake_deregistration())
+      .nonNull()
+      .map(cert => {
+        const rewardAddress = RustModule.WalletV4.RewardAddress.new(
+          this.networkSettingSnapshot.ChainNetworkId,
+          cert.stake_credential(),
+        ).to_address().to_hex();
+        const refund = new MultiToken(
           [{
             identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
             amount: this.networkSettingSnapshot.KeyDeposit,
@@ -263,34 +228,22 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
             defaultNetworkId: this.networkSettingSnapshot.NetworkId,
             defaultIdentifier: PRIMARY_ASSET_CONSTANTS.Cardano,
           }
-        ),
-      });
-    }
-    return result;
+        );
+        return ({ rewardAddress, refund });
+      })
+      .toArray();
   }
 
   certificates(): Array<{| kind: $Values<CertificateKind>, payloadHex: string |}> {
-    const res = [];
-    const certs = this.unsignedTx.build().certs();
-    if (certs != null) {
-      for (let i = 0; i < certs.len(); i++) {
-        const cert = certs.get(i);
-        res.push({
-          kind: cert.kind(),
-          payloadHex: cert.to_hex(),
-        });
-      }
-    }
-    return res;
+    return iterateLenGet(this.unsignedTx.build().certs()).map(cert => ({
+      kind: cert.kind(),
+      payloadHex: cert.to_hex(),
+    })).toArray();
   }
 
   receivers(includeChange: boolean): Array<string> {
-    const outputs = this.unsignedTx.build().outputs();
-
-    const outputStrings = [];
-    for (let i = 0; i < outputs.len(); i++) {
-      outputStrings.push(toHexOrBase58(outputs.get(i).address()));
-    }
+    const outputStrings = iterateLenGet(this.unsignedTx.build().outputs())
+      .map(o => toHexOrBase58(o.address())).toArray();
 
     if (!includeChange) {
       const changeAddrs = this.changeAddr.map(change => change.address);
@@ -323,5 +276,5 @@ export function shelleyTxEqual(
   req1: RustModule.WalletV4.TransactionBuilder,
   req2: RustModule.WalletV4.TransactionBuilder,
 ): boolean {
-  return Buffer.from(req1.build().to_bytes()).toString('hex') === Buffer.from(req2.build().to_bytes()).toString('hex');
+  return req1.build().to_hex() === req2.build().to_hex();
 }

@@ -18,6 +18,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import AdaApi from '../../api/ada';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { bytesToHex } from '../../coreUtils';
 
 const messages = defineMessages({
   walletRestoreVerifyAccountIdLabel: {
@@ -66,7 +67,7 @@ export async function isWalletExist(
     .derive(CoinTypes.CARDANO)
     .derive(accountIndex)
     .to_public();
-  const publicKey = Buffer.from(accountPublicKey.as_bytes()).toString('hex');
+  const publicKey = bytesToHex(accountPublicKey.as_bytes());
 
   for (const wallet of wallets) {
     const existedPublicKey = wallet.publicKey;

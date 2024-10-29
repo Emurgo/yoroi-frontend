@@ -6,7 +6,7 @@ import { bytesToHex, hexToBytes } from '../../../../coreUtils';
 export function v4PublicToV2(
   v4Key: RustModule.WalletV4.Bip32PublicKey
 ): RustModule.WalletV2.PublicKey {
-  return RustModule.WalletV2.PublicKey.from_hex(Buffer.from(v4Key.as_bytes()).toString('hex'));
+  return RustModule.WalletV2.PublicKey.from_hex(bytesToHex(v4Key.as_bytes()));
 }
 
 export function addressHexToBech32(hex: string): string {
@@ -40,7 +40,7 @@ export function transactionHexToBodyHex(txHex: string): string {
 
 export function transactionHexToHash(txHex: string): string {
   return RustModule.WasmScope(Module =>
-    Module.WalletV4.hash_transaction(Module.WalletV4.FixedTransaction.from_hex(txHex).body()).to_hex());
+    Module.WalletV4.FixedTransaction.from_hex(txHex).transaction_hash().to_hex());
 }
 
 export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: string): string {

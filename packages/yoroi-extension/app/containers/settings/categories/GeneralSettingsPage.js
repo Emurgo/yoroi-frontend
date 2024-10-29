@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { handleExternalLinkClick } from '../../../utils/routing';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
@@ -14,7 +13,7 @@ import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
-import { THEMES } from '../../../styles/themes';
+import LocalStorageApi from '../../../api/localStorage/index';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -58,8 +57,10 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
   };
 
   onSelectUnitOfAccount: string => Promise<void> = async value => {
-    const unitOfAccount =
-      value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    const localStorageApi = new LocalStorageApi();
+
+    const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    localStorageApi.unsetPortfolioFiatPair();
     await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
@@ -69,9 +70,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     const coinPriceStore = this.props.stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
-    const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting;
-    const { currentTheme } = profileStore;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = intl.formatMessage(currencyLabels[c.symbol]);
@@ -91,9 +90,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
       svg: AdaCurrency,
     });
 
-    const unitOfAccountValue = profileStore.unitOfAccount.enabled
-      ? profileStore.unitOfAccount.currency
-      : 'ADA';
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
@@ -117,22 +114,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           error={profileStore.setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
-        <ThemeSettingsBlock
-          currentTheme={currentTheme}
-          onSubmit={(theme: string) => {
-            if (theme === THEMES.YOROI_BASE) {
-              const { wallets, selected } = this.props.stores.wallets;
-              if (selected == null && wallets.length !== 0) {
-                const lastSelectedWallet = this.props.stores.wallets.getLastSelectedWallet();
-                this.props.actions.wallets.setActiveWallet.trigger({
-                  publicDeriverId: (lastSelectedWallet ?? wallets[0]).publicDeriverId,
-                });
-              }
-            }
-            this.props.actions.profile.updateTheme.trigger({ theme });
-          }}
-          onExternalLinkClick={handleExternalLinkClick}
-        />
+        <ThemeSettingsBlock />
         <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
       </Box>
     );

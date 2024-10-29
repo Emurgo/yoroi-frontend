@@ -61,7 +61,7 @@ import {
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { ampli } from '../../../ampli/index';
-import { hexToBytes, noop, purify } from '../../coreUtils';
+import { iterateLenGet, hexToBytes, noop, purify } from '../../coreUtils';
 import {
   broadcastTransaction,
   connectWindowRetrieveData,
@@ -466,9 +466,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
       )
     );
 
-    for (let i = 0; i < txBody.inputs().len(); i++) {
-      const input = txBody.inputs().get(i);
-      const txHash = Buffer.from(input.transaction_id().to_bytes()).toString('hex');
+    for (const input of iterateLenGet(txBody.inputs())) {
+      const txHash = input.transaction_id().to_hex();
       const txIndex = input.index();
       if (allUsedUtxoIdsSet.has(`${txHash}${txIndex}`)) {
         signFail({
@@ -503,9 +502,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     ].map(a => a.address.Hash));
 
     const outputs: Array<TxDataOutput> = [];
-    for (let i = 0; i < txBody.outputs().len(); i++) {
-      const output = txBody.outputs().get(i);
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
+    for (const output of iterateLenGet(txBody.outputs())) {
+      const address = output.address().to_hex();
       outputs.push({
         address,
         isForeign: !ownAddresses.has(address),
@@ -572,8 +570,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     const cip95Info = [];
     const certs = txBody.certs();
     if (certs) {
-      for (let i = 0; i < certs.len(); i++) {
-        const cert = certs.get(i);
+      for (const cert of iterateLenGet(certs)) {
         if (!cert) {
           throw new Error('unexpectedly missing certificate');
         }
@@ -704,17 +701,12 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const votingProcedures = txBody.voting_procedures();
     if (votingProcedures) {
-      const voters = votingProcedures.get_voters();
-      for (let i = 0; i < voters.len(); i++) {
-        const voter = voters.get(i);
+      for (const voter of iterateLenGet(votingProcedures.get_voters())) {
         if (!voter) {
           throw new Error('unexpectedly missing voter');
         }
-        const govActionIds = votingProcedures.get_governance_action_ids_by_voter(
-          voter
-        );
-        for (let j = 0; j < govActionIds.len(); j++) {
-          const govActionId = govActionIds.get(j);
+        const govActionIds = votingProcedures.get_governance_action_ids_by_voter(voter);
+        for (const govActionId of iterateLenGet(govActionIds)) {
           if (!govActionId) {
             throw new Error('unexpectedly missing governance action id');
           }
@@ -741,9 +733,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
     const votingProposals = txBody.voting_proposals();
     if (votingProposals) {
-      for (let i = 0; i < votingProposals.len(); i++) {
-        // eslint-disable-next-line no-unused-vars
-        const _votingProposal = votingProposals.get(i);
+      // eslint-disable-next-line no-unused-vars
+      for (const _votingProposal of iterateLenGet(votingProposals)) {
         //  wait for CSL update
       }
     }
@@ -1197,7 +1188,7 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
     }
 
     const publicKeyInfo = {
-      key: RustModule.WalletV4.Bip32PublicKey.from_bytes(Buffer.from(publicDeriver.publicKey, 'hex')),
+      key: RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey),
       addressing: {
         startLevel: 1,
         path: publicDeriver.pathToPublic,

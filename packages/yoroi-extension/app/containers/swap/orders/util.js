@@ -40,7 +40,7 @@ export function createFormattedTokenValues({
     },
   ];
   [from.token, to.token].forEach(t => {
-    if (t.id !== '' && t.id !== '.') {
+    if (t != null && t.id !== '' && t.id !== '.') {
       maybe(tokenAmountMap[t.id], v => {
         const formattedValue = Quantities.format(v, t.decimals, t.decimals);
         formattedTokenValues.push({

@@ -183,7 +183,7 @@ function Autocomplete({
         sx={{
           boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
           maxHeight: 44 * maxVisibleOptions + 'px',
-          color: 'black',
+          color: 'ds.gray_900',
           borderRadius: '8px',
           width: '120px',
           '&::-webkit-scrollbar': { display: 'none' },
@@ -234,7 +234,7 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
 };
 
-const ULList = styled(Box)({
+const ULList = styled(Box)(({ theme }) => ({
   width: '100%',
   margin: 0,
   borderTop: 0,
@@ -248,7 +248,7 @@ const ULList = styled(Box)({
   outline: '0',
   transition: 'opacity .1s ease',
   borderRadius: 0,
-});
+}));
 
 const InputWrapper = styled(Box)(
   ({ theme, error, isVerified }) => `
@@ -270,13 +270,13 @@ const InputWrapper = styled(Box)(
     padding: 8px;
     letter-spacing: 0;
     text-align: center;
-    border: 2px solid ${error ? '#FF1351' : theme.palette.primary[300]};
+    border: 2px solid ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.primary_300};
     border-radius: 8px;
     height: 40px;
     box-sizing: border-box;
 
     &:focus {
-      border-color: ${error ? '#FF1351' : theme.palette.primary[600]};
+      border-color: ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.el_primary_medium};
     }
 
     ${

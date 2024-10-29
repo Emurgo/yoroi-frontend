@@ -45,6 +45,7 @@ import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
+import { hexToUtf } from '../../../coreUtils';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -333,7 +334,7 @@ class SignTxPage extends Component<Props, State> {
   };
 
   renderPayload(payloadHex: string): string {
-    const utf8 = Buffer.from(payloadHex, 'hex').toString('utf8');
+    const utf8 = hexToUtf(payloadHex);
     if (utf8.match(/^[\P{C}\t\r\n]+$/u)) {
       return utf8;
     }

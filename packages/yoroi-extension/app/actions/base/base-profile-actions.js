@@ -10,8 +10,6 @@ export default class BaseProfileActions {
   updateTentativeLocale: Action<{| locale: string |}> = new Action();
   updateLocale: AsyncAction<{| locale: string |}> = new AsyncAction();
   resetLocale: AsyncAction<void> = new AsyncAction();
-  updateTheme: AsyncAction<{| theme: string |}> = new AsyncAction();
-  exportTheme: AsyncAction<void> = new AsyncAction();
   commitLocaleToStorage: AsyncAction<void> = new AsyncAction();
   updateHideBalance: AsyncAction<void> = new AsyncAction();
   acceptNightly: Action<void> = new Action();

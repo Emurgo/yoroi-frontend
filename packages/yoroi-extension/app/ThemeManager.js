@@ -4,7 +4,7 @@ import React from 'react';
 import { writeCssVar } from './styles/utils';
 
 type Props = {|
-  +cssVariables: { [key: string]: string, ... },
+  +cssVariables?: { [key: string]: string, ... },
   +children?: Node,
 |};
 

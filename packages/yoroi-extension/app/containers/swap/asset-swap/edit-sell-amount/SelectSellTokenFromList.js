@@ -6,6 +6,8 @@ import { useSwapForm } from '../../context/swap-form';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { useSellVerifiedSwapTokens } from '../hooks';
+import { ampli } from '../../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAsset } from '../../swapAnalytics';
 
 type Props = {|
   store: SwapStore,
@@ -43,6 +45,7 @@ export default function SelectSellTokenFromList({ store, onClose, onTokenInfoCha
     if (shouldUpdateToken) {
       sellTouched(token);
       onTokenInfoChanged({ id, decimals: decimals ?? 0 });
+      ampli.swapAssetFromChanged(tokenInfoToAnalyticsFromAsset(token));
     }
 
     onClose();

@@ -14,7 +14,6 @@ import config from '../../../../../config';
 import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import { Box, Button, Fade, Stack, Typography } from '@mui/material';
-import styles from './EnterRecoveryPhraseStep.scss';
 import environment from '../../../../../environment';
 
 const messages = defineMessages({
@@ -145,7 +144,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     if (isValidPhrase && !form.submitted) this.submit();
 
     return (
-      <Box className={styles.verifyRecoveryPhraseArea}>
+      <Box>
         <Stack gap="8px" p="16px 0px" flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="center">
           {recoveryPhrase?.map((word, idx) => {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
@@ -236,7 +235,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage">
+            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage" color="ds.gray_900">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

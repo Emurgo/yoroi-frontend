@@ -66,6 +66,7 @@ import {
 import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
 import { getProtocolParameters } from '../yoroi/protocolParameters';
+import { hexToBytes } from '../../../../../app/coreUtils';
 
 declare var chrome;
 
@@ -165,9 +166,7 @@ const signDataHandler = NewHandler.withSyncedWallet<
   }
   let address;
   try {
-    address = Buffer.from(
-      RustModule.WalletV4.Address.from_bech32(rawAddress).to_bytes()
-    ).toString('hex');
+    address = RustModule.WalletV4.Address.from_bech32(rawAddress).to_hex();
   } catch {
     address = rawAddress;
   }
@@ -275,7 +274,7 @@ const Handlers = Object.freeze({
         })
         value.set_multiasset(assetToRustMultiasset(mappedAssets));
       }
-      const result = Buffer.from(value.to_bytes()).toString('hex');
+      const result = value.to_hex();
       value.free();
       return { ok: result };
     }
@@ -389,7 +388,7 @@ const Handlers = Object.freeze({
     [ string /* tx hex */ ],
     string,
   >(async ({ wallet, message }) => {
-    const txBuffer = Buffer.from(message.params[0], 'hex');
+    const txBuffer = hexToBytes(message.params[0]);
     await connectorSendTxCardano(
       wallet,
       txBuffer,
@@ -398,9 +397,7 @@ const Handlers = Object.freeze({
     const tx = RustModule.WalletV4.Transaction.from_bytes(
       txBuffer
     );
-    const id = Buffer.from(
-      RustModule.WalletV4.hash_transaction(tx.body()).to_bytes()
-    ).toString('hex');
+    const id = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
     try {
       await connectorRecordSubmittedCardanoTransaction(
         wallet,
@@ -523,9 +520,9 @@ const Handlers = Object.freeze({
     }
     const [payloadHex, signatureHex] = message.params;
     const pk = RustModule.WalletV4.PublicKey
-          .from_bytes(Buffer.from(String(connection.status?.auth?.pubkey), 'hex'));
+          .from_hex(String(connection.status?.auth?.pubkey));
     const sig = RustModule.WalletV4.Ed25519Signature.from_hex(signatureHex);
-    const res = pk.verify(Buffer.from(payloadHex, 'hex'), sig);
+    const res = pk.verify(hexToBytes(payloadHex), sig);
     pk.free();
     return { ok: res };
   }),
@@ -539,9 +536,7 @@ const Handlers = Object.freeze({
     let requiredAmount: string = firstParam || String(MAX_COLLATERAL);
     if (!/^\d+$/.test(requiredAmount)) {
       try {
-        requiredAmount = RustModule.WalletV4.Value.from_bytes(
-          Buffer.from(requiredAmount, 'hex')
-        ).coin().to_str();
+        requiredAmount = RustModule.WalletV4.Value.from_hex(requiredAmount).coin().to_str();
       } catch {
         return {
           err: {
