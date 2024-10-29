@@ -16,6 +16,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { ROUTES } from '../../routes-config';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -49,7 +50,7 @@ class SwapPageContainer extends Component<AllProps> {
   isErrorPage: void => boolean = () => {
     const { location } = this.props.stores.router;
     if (location) {
-      return location.pathname.endsWith('page-error');
+      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
     }
     return false;
   };
