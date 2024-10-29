@@ -138,8 +138,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
-    const allWordsEntered =
-      recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
+    const allWordsEntered = recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
     const mnemonicError = intl.formatMessage(messages.incorrectRecoveryPhrase);
 
@@ -147,14 +146,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
 
     return (
       <Box className={styles.verifyRecoveryPhraseArea}>
-        <Stack
-          gap="8px"
-          p="16px 0px"
-          flexDirection="row"
-          flexWrap="wrap"
-          alignItems="center"
-          justifyContent="center"
-        >
+        <Stack gap="8px" p="16px 0px" flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="center">
           {recoveryPhrase?.map((word, idx) => {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
             const fieldBind = wordField.bind();
@@ -181,7 +173,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   }}
                   variant="body1"
                 >
-                  <Typography component="div" variant="body1" color="primary.400" width="24px">
+                  <Typography component="div" variant="body1" color="ds.text_primary_medium" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -234,7 +226,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
             </Fade>
 
             <Fade in={!isValidPhrase && allWordsEntered}>
-              <Typography component="div" variant="body2" color="#FF1351" id="mnemonicErrorText">
+              <Typography component="div" variant="body2" color="ds.sys_magenta_500" id="mnemonicErrorText">
                 {mnemonicError}
               </Typography>
             </Fade>
