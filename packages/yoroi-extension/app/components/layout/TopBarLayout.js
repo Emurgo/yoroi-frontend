@@ -74,7 +74,8 @@ function TopBarLayout({
           >
             <Box
               sx={{
-                height: '100%',
+                bgcolor: bgcolor || 'ds.bg_color_max',
+                height: !isErrorPage ? '100%' : 'auto',
                 width: '100%',
                 margin: 'auto',
               }}

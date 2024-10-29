@@ -142,7 +142,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     return (
       <>
         <div align="center">
-          <QrCodeWrapper fgColor="black" value={this.props.addressInfo.address} size={152} />
+          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
         </div>
         <br />
         <br />

@@ -109,7 +109,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   },
                 }}
               >
-                <QrCodeWrapper fgColor="#000" value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
+                <QrCodeWrapper value={walletAddress} size={153} id={locationId + '-addressQrCode-image'} />
               </Box>
             </QrCodeBackground>
           </Box>

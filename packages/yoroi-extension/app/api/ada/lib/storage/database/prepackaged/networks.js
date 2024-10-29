@@ -240,7 +240,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
 export function getNetworkById(id: number): $ReadOnly<NetworkRow> {
   const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === id);
   if (!networkKey) {
-    throw new Error('network not found');
+    throw new Error('network not found by id: ' + id);
   }
   return networks[networkKey];
 }
