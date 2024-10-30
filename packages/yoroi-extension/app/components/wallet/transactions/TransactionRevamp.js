@@ -18,8 +18,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { Button, Grid, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Button, Grid, Typography, useTheme, styled, Box } from '@mui/material';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
@@ -1057,7 +1056,40 @@ const icons = {
   stake: StakeIcon,
 };
 
+const getColors = (ds, type) => {
+  const colorsByType = {
+    send: { bg: ds.primary_100, icon: ds.primary_600 },
+    receive: { bg: ds.secondary_100, icon: ds.secondary_600 },
+    reward: { bg: ds.secondary_100, icon: ds.secondary_600 },
+    error: { bg: ds.magenta_100, icon: ds.magenta_500 },
+    stake: { bg: ds.secondary_100, icon: ds.secondary_600 },
+  };
+
+  return colorsByType[type] || { bg: ds.primary_100, icon: ds.primary_600 };
+};
+
+const IconWrapper = styled(Box)(({ isDark, colors, theme }) => ({
+  '& svg': {
+    '& rect': {
+      fill: isDark && colors.bg,
+    },
+    '& path': {
+      fill: isDark && colors.icon,
+    },
+  },
+}));
+
 const TypeIcon = ({ type }) => {
   const Icon = icons[type];
-  return <Box sx={{ width: 40, height: 40 }}>{Icon && <Icon />}</Box>;
+  const theme = useTheme();
+  const colors = getColors(theme.palette.ds, type);
+  const isDark = theme.name === 'dark-theme';
+
+  return (
+    <Box sx={{ width: 40, height: 40 }}>
+      <IconWrapper isDark={isDark} colors={colors}>
+        {Icon && <Icon />}
+      </IconWrapper>
+    </Box>
+  );
 };
