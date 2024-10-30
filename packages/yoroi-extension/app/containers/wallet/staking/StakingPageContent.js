@@ -31,6 +31,7 @@ import type { LayoutComponentMap } from '../../../styles/context/layout';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
+import type { WalletType } from '../../../../chrome/extension/background/types';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -210,7 +211,10 @@ class StakingPageContent extends Component<AllProps> {
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(publicDeriver.publicDeriverId);
     const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(publicDeriver.publicDeriverId);
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(publicDeriver);
-    const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
+
+    // <TODO:PENDING_REMOVAL> remove special check after governance for trezor is added
+    const isTrezor = (publicDeriver.type: WalletType) === 'trezor';
+    const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation != null || isTrezor;
 
     return (
       <Box>
