@@ -79,7 +79,15 @@ export default class ExportTransactionDialog extends Component<Props> {
             }}
             className={componentId}
             renderInput={params => {
-              return <TextField {...params} sx={{ mb: '24px' }} />;
+              return (
+                <TextField
+                  {...params}
+                  sx={{ mb: '24px' }}
+                  sx={{
+                    svg: { color: 'ds.gray_max' },
+                  }}
+                />
+              );
             }}
           />
         ))}
