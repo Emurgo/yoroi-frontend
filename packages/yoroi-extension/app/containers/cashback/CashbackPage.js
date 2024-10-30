@@ -23,7 +23,7 @@ import { getPublicDeriverById } from '../../../chrome/extension/background/handl
 import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import DialogTextBlock from '../../components/widgets/DialogTextBlock'
-import { Address } from '@emurgo/cardano-serialization-lib-browser'
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { Box, TextField, InputAdornment, IconButton, Tooltip, Typography, DialogContentText } from '@mui/material';
 
 type Props = StoresAndActionsProps;
@@ -59,7 +59,9 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     try {
       const publicDeriver = stores.wallets.selected;
       if (!publicDeriver) throw Error('no publicDeriver');
-      const walletAddress = Address.from_hex(publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address).to_bech32();
+      const walletAddress = RustModule.WalletV4.Address.from_hex(
+        publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address
+      ).to_bech32();
 
       const response = await fetch(`${environment.bringBaseUrl}check/portal`, {
         method: 'POST',
