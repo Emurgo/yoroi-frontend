@@ -61,12 +61,12 @@ export function addrContainsAccountKey(
   const wasmAddr = normalizeToAddress(address);
   if (wasmAddr == null) throw new Error(`${nameof(addrContainsAccountKey)} invalid address ${address}`);
 
-  const accountKeyString = typeof targetAccountKey === 'string' ? targetAccountKey : Buffer.from(targetAccountKey.to_bytes()).toString('hex');
+  const accountKeyString = typeof targetAccountKey === 'string' ? targetAccountKey : targetAccountKey.to_hex();
 
   const asBase = RustModule.WalletV4.BaseAddress.from_address(wasmAddr);
 
   if (asBase != null) {
-    const isAccountKey = Buffer.from(asBase.stake_cred().to_bytes()).toString('hex') === accountKeyString;
+    const isAccountKey = asBase.stake_cred().to_hex() === accountKeyString;
     // clean: de-allocate the pointer
     asBase.free();
     if (isAccountKey) return true;

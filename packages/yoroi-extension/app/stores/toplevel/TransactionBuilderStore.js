@@ -7,22 +7,17 @@ import LocalizedRequest from '../lib/LocalizedRequest';
 
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  isCardanoHaskell, getCardanoHaskellBaseConfig, getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { isCardanoHaskell, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { TransactionMetadata } from '../../api/ada/lib/storage/bridge/metadataUtils';
-import {
-  MultiToken,
-} from '../../api/common/lib/MultiToken';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getDefaultEntryToken } from './TokenInfoStore';
-import {
-  cardanoMinAdaRequiredFromAssets_coinsPerWord,
-} from '../../api/ada/transactions/utils';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { maxSendableADA } from '../../api/ada/transactions/shelley/transactions';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { cardanoMinAdaRequiredFromAssets } from '../../api/ada/transactions/utils';
+import { getProtocolParameters } from '../../api/thunk';
 
 export type SetupSelfTxRequest = {|
   publicDeriver: WalletState,
@@ -117,12 +112,11 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   }
 
   @computed get
-  minAda(): ?MultiToken {
+  minAda(): MultiToken {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
     const network = getNetworkById(publicDeriver.networkId);
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
-    if (!isCardanoHaskell(network)) return;
 
     let minAmount;
     if (this.isDefaultIncluded && this.plannedTxInfoMap.length === 1) {
@@ -268,14 +262,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   calculateMinAda: (tokens: Array<{| token: $ReadOnly<TokenRow> |}>) => string = (tokens) => {
     const publicDeriver = this.stores.wallets.selected;
-    if (!publicDeriver) throw new Error(`${nameof(this.minAda)} requires wallet to be selected`);
+    if (!publicDeriver) throw new Error(`${nameof(this.calculateMinAda)} requires wallet to be selected`);
     const network = getNetworkById(publicDeriver.networkId);
     const defaultToken = this.stores.tokenInfoStore.getDefaultTokenInfo(network.NetworkId)
     if (!isCardanoHaskell(network)) return '0';
     const filteredTokens = tokens.filter(({ token }) => !token.IsDefault);
     if (filteredTokens.length === 0) return String(1_000_000);
-    const fullConfig = getCardanoHaskellBaseConfig(network);
-    const squashedConfig = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
     const fakeAmount = new BigNumber('1000000');
     const fakeMultitoken = new MultiToken(
       [{
@@ -291,9 +283,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       getDefaultEntryToken(defaultToken)
     );
 
-    const minAmount = cardanoMinAdaRequiredFromAssets_coinsPerWord(
+    const protocolParameters = this.stores.protocolParameters.getProtocolParameters(
+      publicDeriver.networkId
+    );
+    const minAmount = cardanoMinAdaRequiredFromAssets(
       fakeMultitoken,
-      new BigNumber(squashedConfig.CoinsPerUtxoWord),
+      new BigNumber(protocolParameters.coinsPerUtxoByte),
     );
     return minAmount.toString();
   }
@@ -331,6 +326,8 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         time: this.stores.serverConnectionStore.serverTime ?? new Date(),
       }).slot);
 
+      const protocolParameters = await getProtocolParameters(publicDeriver);
+
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver,
         receiver,
@@ -338,6 +335,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
         filter: this.filter,
         absSlotNumber,
         metadata: this.metadata,
+        protocolParameters,
       }));
     } else {
       throw new Error(`${nameof(TransactionBuilderStore)}::${nameof(this._updateTxBuilder)} network not supported`);

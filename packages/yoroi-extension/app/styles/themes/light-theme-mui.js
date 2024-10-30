@@ -1,24 +1,25 @@
 // @flow
 import { createTheme } from '@mui/material/styles';
-import { commonTheme } from './common-theme';
 import { deepmerge } from '@mui/utils';
-import { lightThemeBase } from './light-theme-base';
 import {
-  LightButton,
   Checkbox,
-  TextField,
-  OutlinedInput,
-  FormHelperText,
+  Chip,
   FormControl,
+  FormHelperText,
+  InputLabel,
+  LightButton,
+  Link,
   Menu,
   MenuItem,
-  Tabs,
-  TabPanel,
-  Chip,
-  Tooltip,
-  InputLabel,
+  OutlinedInput,
   Select,
+  TabPanel,
+  Tabs,
+  TextField,
+  Tooltip
 } from '../overrides';
+import { commonTheme } from './common-theme';
+import { lightThemeBase } from './light-theme-base';
 
 const lightThemeComponents = {
   components: {
@@ -36,6 +37,7 @@ const lightThemeComponents = {
     MuiTabPanel: TabPanel,
     MuiChip: Chip,
     MuiTooltip: Tooltip,
+    MuiLink: Link,
   },
 };
 

@@ -9,6 +9,12 @@ export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
 export const backgroungTabName = 'background';
+export const serviceWorkersTabName = 'chrome://serviceworker-internals';
+export const serviceWorkersLink = 'chrome://serviceworker-internals';
+export const browserWindowType = Object.freeze({
+  tab: 'tab',
+  window: 'window',
+});
 
 export class WindowManager {
   constructor(driver, logger) {
@@ -130,11 +136,11 @@ export class WindowManager {
   }
 
   async openNewTab(tabTitle, url) {
-    return await this._openNewWithCheck('tab', tabTitle, url);
+    return await this._openNewWithCheck(browserWindowType.tab, tabTitle, url);
   }
 
   async openNewWindow(windowTitle, url) {
-    return await this._openNewWithCheck('window', windowTitle, url);
+    return await this._openNewWithCheck(browserWindowType.window, windowTitle, url);
   }
 
   async closeTabWindow(titleToClose, switchToTitle) {

@@ -14,14 +14,9 @@
   .txError {
     display: flex;
     flex-flow: column;
-    align-items: center;
     justify-content: center;
-    padding: 16px 0 16px 0;
+    padding: 12px 16px;
     border-radius: 8px;
-    background-color: rgba(255, 19, 81, 0.06);
-    box-shadow: var(--yoroi-warning-box-bg-shadow);
-    font-weight: 500;
-    color: var(--yoroi-palette-error-200);
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 20px;

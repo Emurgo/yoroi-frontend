@@ -14,6 +14,12 @@ import type { WalletState } from '../types';
 import WalletTransaction from '../../../../app/domain/WalletTransaction';
 // eslint-disable-next-line import/no-cycle
 import { getWalletsState } from '../handlers/utils';
+import TimeUtils from '../../../../app/api/ada/lib/storage/bridge/timeUtils';
+import { updateProtocolParametersCacheFromNetwork } from '../handlers/yoroi/protocolParameters';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 registerCallback(params => {
   if (params.type === 'subscriptionChange') {
@@ -66,7 +72,7 @@ export async function syncWallet(publicDeriver: PublicDeriver<>, logInfo: string
 }
 async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Promise<void> {
   const publicDeriverId = publicDeriver.getPublicDeriverId();
-  console.log(
+  console.debug(
     'Syncing wallet ID %s name "%s" for %s.',
     publicDeriverId,
     (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
@@ -75,7 +81,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
 
   const lastSyncInfo = await publicDeriver.getLastSyncInfo();
   if (Date.now() - (lastSyncInfo.Time?.valueOf() || 0) < environment.getWalletRefreshInterval()) {
-    console.log('last sync was %s, skip syncing', lastSyncInfo.Time);
+    console.debug('last sync was %s, skip syncing', lastSyncInfo.Time);
     return;
   }
 
@@ -148,8 +154,21 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     if (submittedTransactionsChanged) {
       persistSubmittedTransactions(submittedTransactions);
     }
-    console.log('Syncing wallet %s finished.', publicDeriverId);
-    emitUpdate(publicDeriverId, false, (await getWalletsState(publicDeriverId))[0], newTxs);
+    console.debug('Syncing wallet %s finished.', publicDeriverId);
+    emitUpdate(
+      publicDeriverId,
+      false,
+      (await getWalletsState(publicDeriverId))[0],
+      newTxs
+    );
+
+    const networkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
+    const baseConfig = getCardanoHaskellBaseConfig(getNetworkById(networkId));
+    const updatedLastSyncInfo = await publicDeriver.getLastSyncInfo();
+    if (updatedLastSyncInfo?.SlotNum != null) {
+      const { epoch } = TimeUtils.toRelativeSlotNumber(baseConfig, updatedLastSyncInfo.SlotNum);
+      await updateProtocolParametersCacheFromNetwork(networkId, epoch);
+    }
   } catch (error) {
     console.error('Syncing wallet %s failed:', publicDeriverId, error);
   } finally {

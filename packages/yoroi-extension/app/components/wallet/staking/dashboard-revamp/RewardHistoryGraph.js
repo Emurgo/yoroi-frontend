@@ -7,7 +7,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { getAvatarFromPoolId } from '../utils';
 import RewardGraphClean from './RewardGraphClean';
-import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';

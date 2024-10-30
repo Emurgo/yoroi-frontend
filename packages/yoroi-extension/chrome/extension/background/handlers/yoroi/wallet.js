@@ -28,6 +28,7 @@ import {
 import type { ReferenceTransaction, BaseGetTransactionsRequest } from '../../../../../app/api/common';
 import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
+import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -89,6 +90,8 @@ export const CreateHardwareWallet: HandlerType<
   typeTag: 'create-hardware-wallet',
 
   handle: async (request) => {
+    await RustModule.load();
+
     const db = await getDb();
 
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
@@ -192,6 +195,9 @@ export const ResyncWallet: HandlerType<
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
     await syncWallet(publicDeriver, 'UI resync');
+    await updateProtocolParametersCacheFromNetwork(
+      publicDeriver.getParent().getNetworkInfo().NetworkId
+    );
   },
 });
 

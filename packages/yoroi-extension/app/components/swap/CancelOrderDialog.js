@@ -70,13 +70,15 @@ export default function CancelSwapOrderDialog({
       </Dialog>
     );
   }
+  const isPasswordWallet = walletType === 'mnemonic';
+  const dialogHeight = isPasswordWallet ? '496px' : '388px';
   return (
     <Dialog
       title="Cancel order"
       onClose={onDialogClose}
       withCloseButton
       closeOnOverlayClick
-      styleOverride={{ maxWidth: '612px', height: '496px', minWidth: '612px' }}
+      styleOverride={{ maxWidth: '612px', height: dialogHeight, minWidth: '612px' }}
     >
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
@@ -107,20 +109,22 @@ export default function CancelSwapOrderDialog({
             {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
-        <Box>
-          <TextField
-            className="walletPassword"
-            value={password}
-            label="Password"
-            type="password"
-            onChange={e => {
-              setIncorrectPassword(false);
-              setPassword(e.target.value);
-            }}
-            error={isIncorrectPassword && 'Incorrect password!'}
-            disabled={isLoading}
-          />
-        </Box>
+        {isPasswordWallet ? (
+          <Box>
+            <TextField
+              className="walletPassword"
+              value={password}
+              label="Password"
+              type="password"
+              onChange={e => {
+                setIncorrectPassword(false);
+                setPassword(e.target.value);
+              }}
+              error={isIncorrectPassword && 'Incorrect password!'}
+              disabled={isLoading}
+            />
+          </Box>
+        ) : <Box paddingTop="12px" />}
       </Box>
       <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
@@ -141,7 +145,7 @@ export default function CancelSwapOrderDialog({
               alert('Failed to process order cancel! ' + stringifyError(e));
             }
           }}
-          disabled={isLoading || password.length === 0}
+          disabled={isLoading || (isPasswordWallet && password.length === 0)}
         >
           {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
         </Button>

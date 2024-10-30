@@ -10,7 +10,7 @@ import Dialog from '../../../widgets/Dialog';
 import { injectIntl, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { RewardHistoryItem } from './RewardHistoryTab';
-import InvalidURIImg from '../../../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';

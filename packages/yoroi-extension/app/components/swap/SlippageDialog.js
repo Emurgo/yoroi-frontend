@@ -1,8 +1,8 @@
 // @flow
-import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
+import { useState } from 'react';
 import Tabs from '../common/tabs/Tabs';
+import Dialog from '../widgets/Dialog';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -56,7 +56,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
           </Typography>
         </Box>
         <Box pb="16px" pt="8px">
-          <Typography component="div" variant="body2" color="grayscale.700">
+          <Typography component="div" variant="body2" color="ds.text_gray_low">
             Slippage tolerance is set as a percentage of the total swap value. Your transactions will not be executed if the price
             moves by more than this amount.
           </Typography>

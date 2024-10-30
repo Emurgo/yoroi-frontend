@@ -1,9 +1,10 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../assets/images/revamp/asset-default.inline.svg';
+import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark.inline.svg';
 import { ReactComponent as ArrowBottomIcon } from '../../assets/images/revamp/icons/arrow-bottom.inline.svg';
 import { ReactComponent as ArrowTopIcon } from '../../assets/images/revamp/icons/arrow-top.inline.svg';
 import { ReactComponent as SearchIcon } from '../../assets/images/revamp/icons/search.inline.svg';
@@ -15,6 +16,7 @@ import Dialog from '../widgets/Dialog';
 import { InfoTooltip } from '../widgets/InfoTooltip';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 import type { AssetAmount, PriceImpact } from './types';
+import LoadingSpinner from '../widgets/LoadingSpinner';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
@@ -23,6 +25,7 @@ const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
+  assetsStillLoading: boolean,
   type: 'from' | 'to',
   onAssetSelected: any => void,
   onClose: void => void,
@@ -32,6 +35,7 @@ type Props = {|
 
 export default function SelectAssetDialog({
   assets = [],
+  assetsStillLoading,
   type,
   onAssetSelected,
   onClose,
@@ -107,14 +111,14 @@ export default function SelectAssetDialog({
             />
           </Box>
           <Box sx={{ marginBottom: '16px' }}>
-            <Typography component="div" variant="body2" color="grayscale.700">
+            <Typography component="div" variant="body2" color="ds.text_gray_low">
               {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
             </Typography>
           </Box>
         </>
       }
     >
-      {filteredAssets.length !== 0 && (
+      {(filteredAssets.length !== 0 && !assetsStillLoading) && (
         <Table
           rowGap="0px"
           columnNames={type === 'from' ? fromColumns : toColumns}
@@ -134,11 +138,15 @@ export default function SelectAssetDialog({
           })}
         </Table>
       )}
-      {filteredAssets.length === 0 && (
+      {(filteredAssets.length === 0 || assetsStillLoading) && (
         <Box py="8px">
           <Box display="flex" flexDirection="column" gap="16px" alignItems="center" justifyContent="center">
             <Box mt="60px">
-              <NoAssetsFound />
+              {assetsStillLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <NoAssetsFound />
+              )}
             </Box>
             <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
               {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
@@ -176,6 +184,8 @@ export const AssetAndAmountRow = ({
   priceImpactState?: ?PriceImpact,
 |}): React$Node => {
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
+  const theme = useTheme();
+  const defaultImage = theme.name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
 
   const isFrom = type === 'from';
 
@@ -199,7 +209,7 @@ export const AssetAndAmountRow = ({
     }
   }, [id]);
 
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultTokenImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
 
   const amount = displayAmount ?? assetAmount;
 
@@ -245,7 +255,7 @@ export const AssetAndAmountRow = ({
             src={imgSrc}
             alt={name}
             onError={e => {
-              e.target.src = defaultTokenImage;
+              e.target.src = defaultImage;
             }}
           />
         </Box>

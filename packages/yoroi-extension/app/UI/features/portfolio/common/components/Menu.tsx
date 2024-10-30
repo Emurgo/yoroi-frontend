@@ -1,5 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material';
+import { Box, Stack, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { SubMenuOption } from '../types';
 
@@ -13,7 +12,7 @@ const Menu = ({ options, onItemClick, isActiveItem }: Props) => {
   const theme: any = useTheme();
 
   return (
-    <Stack direction="row" spacing={theme.spacing(3)} sx={{ height: '3rem', paddingX: theme.spacing(3) }}>
+    <Stack direction="row" spacing={theme.spacing(3)} sx={{ height: '3rem' }}>
       {options.map((option, index) => (
         <Box
           key={index}

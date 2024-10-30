@@ -25,6 +25,7 @@ import config from '../../../../config';
 import {
   networks,
 } from '../storage/database/prepackaged/networks';
+import { bytesToHex } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -43,9 +44,7 @@ function generateWallet(): RustModule.WalletV2.Bip44ChainPublic {
     .derive(HARD_DERIVATION_START + 0)
     .derive(ChainDerivations.EXTERNAL);
   return RustModule.WalletV2.Bip44ChainPublic.new(
-    RustModule.WalletV2.PublicKey.from_hex(
-      Buffer.from(v3Chain.to_public().as_bytes()).toString('hex')
-    ),
+    RustModule.WalletV2.PublicKey.from_hex(bytesToHex(v3Chain.to_public().as_bytes())),
     RustModule.WalletV2.DerivationScheme.v2()
   );
 }

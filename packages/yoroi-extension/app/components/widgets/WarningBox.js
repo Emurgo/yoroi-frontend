@@ -5,16 +5,17 @@ import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 
 import styles from './WarningBox.scss';
 
 type Props = {|
-  +children: ?Node
+  +children: ?Node,
 |};
 
 @observer
 export default class WarningBox extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -22,18 +23,17 @@ export default class WarningBox extends Component<Props> {
     const { intl } = this.context;
     const { children } = this.props;
     return (
-      <div className={styles.component}>
+      <Box sx={{ backgroundColor: 'ds.sys_magenta_100' }} className={styles.component}>
         {/* Warning header  */}
         <div className={styles.header}>
           <div className={styles.headerIcon} />
-          <span className={styles.headerText}>
+          <Typography color="ds.text_gray_max" className={styles.headerText}>
             {intl.formatMessage(globalMessages.attentionHeaderText)}
-          </span>
+          </Typography>
         </div>
         {/* Warning content  */}
         <div className={styles.warning}>{children}</div>
-
-      </div>
+      </Box>
     );
   }
 }

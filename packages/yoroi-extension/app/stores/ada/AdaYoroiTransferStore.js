@@ -108,7 +108,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap, ActionsMap> 
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
         ),
-        coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
+        coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
         networkId: selectedNetwork.NetworkId,
       },

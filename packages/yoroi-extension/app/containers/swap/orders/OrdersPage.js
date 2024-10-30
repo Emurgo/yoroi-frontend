@@ -8,7 +8,7 @@ import type { FormattedTokenValue } from './util';
 import { Box, Button } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import {
   getTransactionFeeFromCbor,
@@ -27,10 +27,11 @@ import { Quantities } from '../../../utils/quantities';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
-import { signTransaction } from '../../../api/thunk';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
+import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -99,6 +100,16 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
     tx: ?{| cbor: string, formattedFee: string, formattedReturn: Array<FormattedTokenValue> |},
     isSubmitting?: boolean,
   |}>(null);
+
+  useEffect(() => {
+
+    // on change open/closed orders tab
+
+    ampli.swapConfirmedPageViewed({
+      swap_tab: showCompletedOrders ? 'Completed Orders' : 'Open Orders',
+    });
+
+  }, [showCompletedOrders]);
 
   const {
     wallets,
@@ -245,11 +256,10 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
     }
-    const signedCollateralReorgTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: collateralReorgTx.cbor
-    });
+
+    const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: collateralReorgTx.cbor, password });
+
     setCancellationState({ order, signedCollateralReorgTx, tx });
   };
 
@@ -267,20 +277,34 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
       return;
     }
     setCancellationState({ order, signedCollateralReorgTx, tx, isSubmitting: true });
-    const signedCancelTx = await signTransaction({
-      publicDeriverId: wallet.publicDeriverId,
-      password,
-      transactionHex: tx.cbor
-    });
+
+    const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets
+      .adaSignTransactionHexFromWallet({ wallet, transactionHex: tx.cbor, password });
+
     const signedTransactionHexes =
       signedCollateralReorgTx != null
         ? [signedCollateralReorgTx, signedCancelTx]
         : [signedCancelTx];
+
     await swapStore.executeTransactionHexes({
       wallet,
       signedTransactionHexes,
     });
+
     setCancellationState(null);
+
+    alert('Cancel submitted');
+
+    try {
+      ampli.swapCancelationSubmitted({
+        ...tokenInfoToAnalyticsFromAndToAssets(order.from.token, order.to.token),
+        from_amount: Number(Quantities.format(order.from.quantity, order.from.token.decimals || 0)),
+        to_amount: Number(Quantities.format(order.to.quantity, order.to.token.decimals || 0)),
+        pool_source: order.provider,
+      });
+    } catch (e) {
+      console.error('analytics fail', e);
+    }
   };
 
   const columnContext = { completedOrders: showCompletedOrders };

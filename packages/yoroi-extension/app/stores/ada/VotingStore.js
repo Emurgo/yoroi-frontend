@@ -28,7 +28,8 @@ import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localSt
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { getPrivateStakingKey } from '../../api/thunk';
+import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
+import { bytesToHex } from '../../coreUtils';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -231,14 +232,14 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
 
     const firstAddress = publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
 
+    const protocolParameters = await getProtocolParameters(publicDeriver);
+
     let votingRegTxPromise;
 
     if (publicDeriver.type !== 'mnemonic') {
-      const votingPublicKey = `0x${Buffer.from(catalystPrivateKey.to_public().as_bytes()).toString('hex')}`;
+      const votingPublicKey = `0x${bytesToHex(catalystPrivateKey.to_public().as_bytes())}`;
 
-      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(publicDeriver.publicKey, 'hex')
-      );
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicDeriver.publicKey);
 
       const stakingKey = derivePublicByAddressing({
         addressing: publicDeriver.stakingAddressing.addressing,
@@ -256,11 +257,12 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           trezorTWallet: {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
       } else if (publicDeriver.type === 'ledger') {
         votingRegTxPromise = this.createVotingRegTx.execute({
@@ -269,11 +271,12 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
           ledgerNanoWallet: {
             votingPublicKey,
             stakingKeyPath: publicDeriver.stakingAddressing.addressing.path,
-            stakingKey: Buffer.from(stakingKey.as_bytes()).toString('hex'),
+            stakingKey: bytesToHex(stakingKey.as_bytes()),
             paymentKeyPath: firstAddress.addressing.path,
             paymentAddress: firstAddress.address,
             nonce: currentAbsoluteSlot,
           },
+          protocolParameters,
         }).promise;
       } else {
         throw new Error(`${nameof(this._createTransaction)} unexpected hardware wallet type`);
@@ -302,6 +305,7 @@ export default class VotingStore extends Store<StoresMap, ActionsMap> {
         wallet: publicDeriver,
         absSlotNumber,
         normalWallet: { metadata: trxMeta },
+        protocolParameters,
       }).promise;
     }
 

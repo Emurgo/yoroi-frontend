@@ -40,6 +40,7 @@ import type { AddByHashFunc } from '../../../../../common/lib/storage/bridge/has
 import { rawGenAddByHash } from '../../../../../common/lib/storage/bridge/hashMapper';
 import { addShelleyChimericAccountAddress, addShelleyUtxoAddress } from '../../../../restoration/shelley/scan';
 import { KeyKind } from '../../../cardanoCrypto/keys/types';
+import { bytesToHex } from '../../../../../../coreUtils';
 
 // TODO: maybe move this inside walletBuilder somehow so it's all done in the same transaction
 /**
@@ -367,7 +368,7 @@ export async function createHardwareCip1852Wallet(request: {|
                 KeyDerivationId: insertRequest.keyDerivationId,
               }),
               publicKey: {
-                Hash: Buffer.from(request.accountPublicKey.as_bytes()).toString('hex'),
+                Hash: bytesToHex(request.accountPublicKey.as_bytes()),
                 IsEncrypted: false,
                 PasswordLastUpdate: null,
                 Type: KeyKind.BIP32ED25519,

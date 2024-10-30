@@ -1,5 +1,5 @@
 import WalletTab from './walletTab.page.js';
-import { quarterSecond, fiveSeconds } from '../../../helpers/timeConstants.js';
+import { quarterSecond, fiveSeconds, halfSecond } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -225,6 +225,17 @@ class SendSubTab extends WalletTab {
     this.logger.info(`SendSubTab::getPasswordErrorMsg is called.`);
     await this.waitElementTextMatches(this.passwordHelpMessageTextLocator, /\w+/g);
     return await this.getText(this.passwordHelpMessageTextLocator);
+  }
+  async pwdErrMsgDisplayedAndNotEmpty() {
+    this.logger.info(`SendSubTab::pwdErrMsgDisplayedAndNotEmpty is called.`);
+    return await this.customWaiter(
+      async () => {
+        const errMsg = await this.getText(this.passwordHelpMessageTextLocator);
+        return errMsg !== '';
+      },
+      fiveSeconds,
+      halfSecond,
+    );
   }
 }
 

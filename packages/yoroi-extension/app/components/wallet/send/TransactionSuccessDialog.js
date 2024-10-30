@@ -50,9 +50,7 @@ export default class TransactionSuccessDialog extends Component<Props> {
         title={intl.formatMessage(messages.title)}
         actions={[
           {
-            label: intl.formatMessage(
-              this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange
-            ),
+            label: intl.formatMessage(this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange),
             onClick: this.props.onClose,
             primary: true,
           },
@@ -62,16 +60,8 @@ export default class TransactionSuccessDialog extends Component<Props> {
       >
         <Stack alignItems="center">
           <SuccessImg />
-          <Typography component="div"
-            color="gray.700"
-            fontWeight={500}
-            mt="16px"
-            textAlign="center"
-            maxWidth="400px"
-          >
-            {intl.formatMessage(
-              this.props.process === 'normal' ? messages.explanation: messages.sellSendDone
-            )}
+          <Typography component="div" color="ds.text_gray_medium" fontWeight={500} mt="16px" textAlign="center" maxWidth="400px">
+            {intl.formatMessage(this.props.process === 'normal' ? messages.explanation : messages.sellSendDone)}
           </Typography>
         </Stack>
       </Dialog>

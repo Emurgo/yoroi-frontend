@@ -11,6 +11,7 @@ import {
 import * as crypto from 'crypto';
 
 import { RustModule } from './rustLoader';
+import { hexToBytes, utfToBytes } from '../../../../coreUtils';
 
 /** Generate a random mnemonic based on 160-bits of entropy (15 words) */
 export const generateAdaMnemonic: void => Array<string> = () => generateMnemonic(160).split(' ');
@@ -21,7 +22,7 @@ export const hashRepeatedly = (seed: Buffer): [Buffer, Buffer] => {
   let IL;
   let IR;
   do {
-    I = crypto.createHmac('sha512', Buffer.from('ed25519 seed', 'utf8'))
+    I = crypto.createHmac('sha512', utfToBytes('ed25519 seed'))
       .update(currSeed)
       .digest();
     currSeed = I;
@@ -42,7 +43,7 @@ export const generateLedgerWalletRootKey = (
   const seed = mnemonicToSeedSync(mnemonic);
 
   // note: prefix 1 and sha256 (not 512)
-  const chainCode = crypto.createHmac('sha256', Buffer.from('ed25519 seed', 'utf8'))
+  const chainCode = crypto.createHmac('sha256', utfToBytes('ed25519 seed'))
     .update(Buffer.concat([Buffer.of(1), seed], 1 + seed.length))
     .digest();
 
@@ -75,7 +76,7 @@ export function generateWalletRootKey(
  */
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
+    hexToBytes(bip39entropy),
     EMPTY_PASSWORD
   );
   return rootKey;
@@ -90,7 +91,7 @@ export function generatePrivateKeyForCatalyst(): RustModule.WalletV4.Bip32Privat
   const bip39entropy = mnemonicToEntropy(mnemonic);
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    Buffer.from(bip39entropy, 'hex'),
+    hexToBytes(bip39entropy),
     EMPTY_PASSWORD
   );
   return rootKey;

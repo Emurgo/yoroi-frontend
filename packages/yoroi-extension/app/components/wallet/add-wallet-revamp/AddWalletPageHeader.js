@@ -6,9 +6,17 @@ import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Typography, Box, Button } from '@mui/material';
+import { Typography, Box, Button, styled } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 const messages: * = defineMessages({
   backButtonLabel: {
@@ -36,8 +44,12 @@ export default class AddWalletPageHeader extends Component<Props> {
       <Box>
         {hasAnyWallets && (
           <Button
-            sx={{ color: 'grayscale.900', lineHeight: '27px',fontSize: '14px' }}
-            startIcon={<BackIcon />}
+            sx={{ color: 'ds.gray_900', fontSize: '14px' }}
+            startIcon={
+              <IconWrapper>
+                <BackIcon />
+              </IconWrapper>
+            }
             onClick={goToCurrentWallet}
           >
             {intl.formatMessage(messages.backButtonLabel)}

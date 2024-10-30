@@ -8,7 +8,6 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import moment from 'moment';
 
 const messages = defineMessages({
   startDate: {
@@ -71,7 +70,6 @@ export default class ExportTransactionDialog extends Component<Props> {
             key={id}
             label={intl.formatMessage(label)}
             value={value}
-            maxDate={moment()} // Today
             minDate={minDate}
             onChange={setDateHandler}
             slotProps={{

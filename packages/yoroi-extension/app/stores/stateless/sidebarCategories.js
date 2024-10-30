@@ -2,7 +2,6 @@
 import type { MessageDescriptor } from 'react-intl';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
 import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
@@ -18,6 +17,7 @@ import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 
 export type SidebarCategory = {|
   +className: string,
@@ -129,21 +129,21 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => (environment.isDev() || environment.isNightly()) && !selected?.isTestnet,
+    isVisible: ({ selected }) => !selected?.isTestnet,
   },
   {
     className: 'assets',
     route: ROUTES.ASSETS.ROOT,
     icon: assetsIcon,
     label: globalMessages.sidebarAssets,
-    isVisible: _request => _request.selected !== null,
+    isVisible: () => environment.isProduction() || environment.isDev(),
   },
   {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: ({ selected }) => environment.isDev() && selected?.networkId === 250,
+    isVisible: () => environment.isDev() || environment.isNightly(),
   },
   {
     className: 'nfts',
@@ -167,13 +167,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: connectorMessages.connector,
     isVisible: _request => true,
   },
-  // {
-  //   className: 'swap',
-  //   route: '/swap',
-  //   icon: swapIcon,
-  //   label: globalMessages.sidebarSwap,
-  //   isVisible: _request => true,
-  // },
   {
     className: 'governance',
     route: '/governance',

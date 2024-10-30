@@ -29,7 +29,7 @@ import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
 import type { CardanoConnectorSignRequest } from '../../connector/types';
 import type { AddressDetails } from '../../api/ada';
 import type{ WalletState } from '../../../chrome/extension/background/types';
-import { broadcastTransaction } from '../../api/thunk';
+import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 
@@ -102,6 +102,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     const submittedTxs = wallet.submittedTransactions;
     const reorgTargetAmount = '2000000';
     const firstExternalAddress: AddressDetails = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+    const protocolParameters = await getProtocolParameters(wallet);
     const { unsignedTx, collateralOutputAddressSet } = await this.api.ada._createReorgTx(
       getNetworkById(wallet.networkId),
       wallet.balance.getDefaults(),
@@ -113,6 +114,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
       addressedUtxos,
       submittedTxs,
       firstExternalAddress.address,
+      protocolParameters,
     );
     const unsignedTxHex = unsignedTx.unsignedTx.build_tx().to_hex();
     const hash = transactionHexToHash(unsignedTxHex);
@@ -156,7 +158,7 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
     feFees: {| tokenId: string, quantity: string |},
     ptFees: {| deposit: string, batcher: string |},
     poolProvider: string,
-  |}) => Promise<HaskellShelleyTxSignRequest> = ({
+  |}) => Promise<HaskellShelleyTxSignRequest> = async ({
     wallet,
     contractAddress,
     datum,
@@ -196,10 +198,12 @@ export default class SwapStore extends Store<StoresMap, ActionsMap> {
         amount: createSwapFeFeeAmount({ wallet, feFees }),
       });
     }
+    const protocolParameters = await getProtocolParameters(wallet);
     return this.api.ada.createSimpleTx({
       publicDeriver: wallet,
       entries,
       metadata,
+      protocolParameters,
     });
   };
 

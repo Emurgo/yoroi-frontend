@@ -16,6 +16,10 @@ export function hexToUtf(hex: string): string {
   return hexToBytes(hex).toString('utf-8');
 }
 
+export function utfToBytes(utf: string): Buffer {
+  return Buffer.from(utf, 'utf-8');
+}
+
 export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
   try {
     return f();
@@ -100,6 +104,10 @@ export function first<T>(arr: T[]): ?T {
   return arr[0];
 }
 
+export function second<T>(arr: T[]): ?T {
+  return arr[1];
+}
+
 export function last<T>(arr: T[]): ?T {
   return arr[arr.length - 1];
 }
@@ -168,6 +176,13 @@ export function cast<T>(t: any): T {
 }
 
 /**
+ * Stringifies and then parses the passed argument, removing any functions or proxies
+ */
+export function purify<T>(t: any): T {
+  return JSON.parse(JSON.stringify(t));
+}
+
+/**
  * Async pause, does nothing except stops time and yields when awaited
  */
 export async function delay(time: number): Promise<void> {
@@ -200,5 +215,165 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
     const value = fun();
     cache[0] = { value, time };
     return value;
+  }
+}
+
+/**
+ * Makes sure the result is an array.
+ * Either returns the passed array or wraps the item into an array.
+ * Might be useful with flat-mapping.
+ */
+export function ensureArray<T>(t: T | Array<T>): Array<T> {
+  // $FlowIgnore
+  return Array.isArray(t) ? t : [t];
+}
+
+export type LenGet<T> = { +len: () => number, +get: number => T, ... };
+export type LenGetMap<K,V> = { +keys: () => LenGet<K>, +get: K => V, ... };
+
+export function iterateLenGet<T>(lenget: ?LenGet<T>): ExtendedIterable<T> {
+  return ExtendedIterable.from<T>((function*() {
+    if (lenget != null) {
+      const len = lenget.len();
+      for (let i = 0; i < len; i++) {
+        yield lenget.get(i);
+      }
+    }
+  })());
+}
+
+export function iterateLenGetMap<K, V>(map: ?LenGetMap<K,V>): ExtendedIterableMap<K, V> {
+  return ExtendedIterableMap.fromTuples<K,V>((function*() {
+    if (map) {
+      for (const k of iterateLenGet(map.keys())) {
+        yield [k, map.get(k)];
+      }
+    }
+  })());
+}
+
+export function zipGenerators<A,B>(iterA: Iterable<A>, iterB: Iterable<B>): ExtendedIterable<[A,B]> {
+  return ExtendedIterable.from<[A,B]>((function*() {
+    // $FlowIgnore
+    const as = iterA[Symbol.iterator]();
+    // $FlowIgnore
+    const bs = iterB[Symbol.iterator]();
+    while (true) {
+      const nextA = as.next();
+      const nextB = bs.next();
+      if (nextA.done || nextB.done) {
+        break;
+      }
+      yield [nextA.value, nextB.value];
+    }
+  })());
+}
+
+// $FlowIgnore
+export class ExtendedIterable<T> implements Iterable<T> {
+
+  __source: Iterable<T>;
+
+  constructor(source: Iterable<T>) {
+    this.__source = source;
+  }
+
+  static from<X>(col: Iterable<X>): ExtendedIterable<X> {
+    return new ExtendedIterable<X>(col);
+  }
+
+  // $FlowIgnore
+  [Symbol.iterator]()
+    : Iterator<T> {
+    return this.__source[Symbol.iterator]();
+  }
+
+  forEach(f: T => void): void {
+    for (const t of this.__source) {
+      f(t);
+    }
+  }
+
+  zip<B>(iterB: Iterable<B>): ExtendedIterable<[T,B]> {
+    return zipGenerators<T,B>(this.__source, iterB);
+  }
+
+  join(iterB: Iterable<T>): ExtendedIterable<T> {
+    const source = this.__source;
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) yield t;
+      for (const t of iterB) yield t;
+    })());
+  }
+
+  toArray(): Array<T> {
+    return Array.from(this.__source);
+  }
+
+  toSet(): Set<T> {
+    return new Set<T>(this.__source);
+  }
+
+  map<R>(f: T => R): ExtendedIterable<R> {
+    const source = this.__source;
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        yield f(t);
+      }
+    })());
+  }
+
+  flatMap<R>(f: T => Iterable<R>): ExtendedIterable<R> {
+    const source = this.__source;
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        for (const r of f(t)) {
+          yield r;
+        }
+      }
+    })());
+  }
+
+  filter(f: T => boolean): ExtendedIterable<T> {
+    const source = this.__source;
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) {
+        if (f(t)) {
+          yield t;
+        }
+      }
+    })());
+  }
+
+  unique(): ExtendedIterable<T> {
+    const set = new Set<T>();
+    return this.filter(t => {
+      if (set.has(t)) return false;
+      set.add(t);
+      return true;
+    });
+  }
+
+  nonNull(): ExtendedIterable<$NonMaybeType<T>> {
+    return this.filter(t => t != null);
+  }
+}
+
+export class ExtendedIterableMap<K,V> extends ExtendedIterable<[K,V]> {
+
+  static fromTuples<X,Y>(col: Iterable<[X,Y]>): ExtendedIterableMap<X,Y> {
+    return new ExtendedIterableMap<X, Y>(col);
+  }
+
+  keys(): ExtendedIterable<K> {
+    return this.map(([k]) => k);
+  }
+
+  values(): ExtendedIterable<V> {
+    return this.map(([,v]) => v);
+  }
+
+  nonNullValue(): ExtendedIterableMap<K,$NonMaybeType<V>> {
+    return ExtendedIterableMap.fromTuples(this.filter(([,v]) => v != null));
   }
 }

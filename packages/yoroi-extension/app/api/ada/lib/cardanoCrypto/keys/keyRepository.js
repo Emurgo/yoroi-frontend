@@ -17,6 +17,7 @@ import { RustModule } from '../rustLoader';
 import type { BIP32Interface } from 'bip32';
 import { fromBase58, fromPublicKey } from 'bip32';
 import { decode, encode } from 'bs58check';
+import { hexToBytes } from '../../../../../coreUtils';
 
 // ================
 //   BIP32ED25519
@@ -80,7 +81,7 @@ export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
   }
 
   sign(data: Buffer): Buffer {
-    return Buffer.from(this.key.to_raw_key().sign(data).to_hex(), 'hex');
+    return hexToBytes(this.key.to_raw_key().sign(data).to_hex());
   }
 
   toPublic(): BIP32ED25519PublicKey {

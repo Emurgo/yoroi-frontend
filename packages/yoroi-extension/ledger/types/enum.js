@@ -18,6 +18,7 @@ export const OPERATION_NAME = Object.freeze({
   SIGN_TX: 'ledger-sign-transaction',
   SHOW_ADDRESS: 'ledger-show-address',
   DERIVE_ADDRESS: 'ledger-derive-address',
+  SIGN_MESSAGE: 'sign-message',
   CLOSE_WINDOW: 'close-window',
 });
 export type OperationNameType = $Values<typeof OPERATION_NAME>;

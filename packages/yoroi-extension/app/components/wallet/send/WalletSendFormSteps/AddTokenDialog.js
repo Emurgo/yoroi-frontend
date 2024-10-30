@@ -5,20 +5,16 @@
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
-import type {
-  TokenRow,
-  NetworkRow,
-} from '../../../../api/ada/lib/storage/database/primitives/tables';
+import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import { Typography } from '@mui/material';
+import { Typography, Box, styled } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { compareNumbers, compareStrings } from '../../assets/AssetsList';
 import { getTokens } from '../../../../utils/wallet';
-import { Box } from '@mui/system';
 import { formattedAmountToNaturalUnits } from '../../../../utils/formatters';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
@@ -34,6 +30,14 @@ import MinAda from './MinAda';
 import globalMessages from '../../../../i18n/global-messages';
 import MaxAssetsError from '../MaxAssetsError';
 import OutlinedInput from '@mui/material/OutlinedInput';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +onClose: void => void,
@@ -139,18 +143,14 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onSelect: ($ReadOnly<TokenRow>) => void = token => {
     // Remove if it already in the list
-    const selectedTokens = this.state.selectedTokens.filter(
-      ({ token: t }) => t.Identifier !== token.Identifier
-    );
+    const selectedTokens = this.state.selectedTokens.filter(({ token: t }) => t.Identifier !== token.Identifier);
     this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: null }] });
   };
 
   onRemoveToken: ($ReadOnly<TokenRow>) => void = token => {
     const tokenEntry = this.getSelectedToken(token);
     if (!tokenEntry) return;
-    const selectedTokens = [...this.state.selectedTokens].filter(
-      ({ token: t }) => t.Identifier !== token.Identifier
-    );
+    const selectedTokens = [...this.state.selectedTokens].filter(({ token: t }) => t.Identifier !== token.Identifier);
 
     this.setState({
       selectedTokens: [...selectedTokens, { token, included: false, amount: null }],
@@ -158,14 +158,11 @@ export default class AddTokenDialog extends Component<Props, State> {
   };
 
   isTokenIncluded: ($ReadOnly<TokenRow>) => boolean = token => {
-    return !!this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier)
-      ?.included;
+    return !!this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier)?.included;
   };
 
   updateAmount: ($ReadOnly<TokenRow>, BigNumber | null) => void = (token, amount) => {
-    const filteredTokens = this.state.selectedTokens.filter(
-      ({ token: t }) => t.Identifier !== token.Identifier
-    );
+    const filteredTokens = this.state.selectedTokens.filter(({ token: t }) => t.Identifier !== token.Identifier);
 
     this.setState({ selectedTokens: [...filteredTokens, { token, amount, included: true }] });
   };
@@ -182,9 +179,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     amount: BigNumber | null,
     included: boolean,
   |} | null = token => {
-    return (
-      this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier) ?? null
-    );
+    return this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier) ?? null;
   };
 
   onAddAll: void => void = () => {
@@ -232,21 +227,15 @@ export default class AddTokenDialog extends Component<Props, State> {
   };
 
   getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {
-    const token = this.state.fullTokensList.find(
-      entry => entry.info.Identifier === tokenInfo.Identifier
-    );
+    const token = this.state.fullTokensList.find(entry => entry.info.Identifier === tokenInfo.Identifier);
 
     if (!token) throw new Error('Token not found.');
-    const amount = new BigNumber(
-      formattedAmountToNaturalUnits(token.amount ?? '0', token.info.Metadata.numberOfDecimals)
-    );
+    const amount = new BigNumber(formattedAmountToNaturalUnits(token.amount ?? '0', token.info.Metadata.numberOfDecimals));
     return amount;
   };
 
   isValidAmount: ($ReadOnly<TokenRow>) => boolean = token => {
-    const tokenEntry = this.state.selectedTokens.find(
-      ({ token: t }) => t.Identifier === token.Identifier
-    );
+    const tokenEntry = this.state.selectedTokens.find(({ token: t }) => t.Identifier === token.Identifier);
     if (tokenEntry && tokenEntry.included) {
       // Should not show any error if no amount entered
       // Will disable the `ADD` button only
@@ -262,28 +251,19 @@ export default class AddTokenDialog extends Component<Props, State> {
   isValidAmounts: void => boolean = () => {
     for (const tokenEntry of this.state.selectedTokens) {
       if (!tokenEntry.included) continue;
-      if (
-        !this.isValidAmount(tokenEntry.token) ||
-        !tokenEntry.amount ||
-        Number(tokenEntry.amount) === 0
-      )
-        return false;
+      if (!this.isValidAmount(tokenEntry.token) || !tokenEntry.amount || Number(tokenEntry.amount) === 0) return false;
     }
     return true;
   };
 
-  search: (e: SyntheticEvent<HTMLInputElement>) => void = (
-    event: SyntheticEvent<HTMLInputElement>
-  ) => {
+  search: (e: SyntheticEvent<HTMLInputElement>) => void = (event: SyntheticEvent<HTMLInputElement>) => {
     const keyword = event.currentTarget.value;
     this.setState(prev => ({ currentTokensList: prev.fullTokensList }));
     if (!keyword) return;
     const regExp = new RegExp(keyword, 'gi');
     const tokensListCopy = [...this.state.fullTokensList];
 
-    const filteredTokensList = tokensListCopy.filter(
-      a => a.label.match(regExp) || a.id.match(regExp)
-    );
+    const filteredTokensList = tokensListCopy.filter(a => a.label.match(regExp) || a.id.match(regExp));
     this.setState({ currentTokensList: filteredTokensList });
   };
 
@@ -328,25 +308,16 @@ export default class AddTokenDialog extends Component<Props, State> {
     const { intl } = this.context;
     const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
-    const shouldAddMore = shouldAddMoreTokens(
-      selectedTokens.map(({ token, included }) => ({ token, included }))
-    );
+    const shouldAddMore = shouldAddMoreTokens(selectedTokens.map(({ token, included }) => ({ token, included })));
     const hasSelectedTokensIncluded = selectedTokens.filter(t => t.included);
 
     return (
       <Dialog
-        title={
-          fullTokensList.length === 0
-            ? intl.formatMessage(globalMessages.tokens)
-            : intl.formatMessage(messages.nTokens, { number: fullTokensList.length })
-        }
+        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
         actions={[
           {
             disabled:
-              fullTokensList.length === 0 ||
-              hasSelectedTokensIncluded.length === 0 ||
-              !this.isValidAmounts() ||
-              !shouldAddMore,
+              fullTokensList.length === 0 || hasSelectedTokensIncluded.length === 0 || !this.isValidAmounts() || !shouldAddMore,
             onClick: this.onAddAll,
             primary: true,
             label: intl.formatMessage(globalMessages.confirm),
@@ -369,8 +340,9 @@ export default class AddTokenDialog extends Component<Props, State> {
                   transform: 'translateY(-50%)',
                 }}
               >
-                {' '}
-                <SearchIcon />{' '}
+                <IconWrapper>
+                  <SearchIcon />
+                </IconWrapper>
               </Box>
               <OutlinedInput
                 onChange={this.search}
@@ -387,11 +359,7 @@ export default class AddTokenDialog extends Component<Props, State> {
           </Box>
           {isCardanoHaskell(this.props.selectedNetwork) && (
             <Box textAlign="center" mt="24px">
-              <MinAda
-                minAda={calculateMinAda(
-                  selectedTokens.map(({ token, included }) => ({ token, included }))
-                )}
-              />
+              <MinAda minAda={calculateMinAda(selectedTokens.map(({ token, included }) => ({ token, included })))} />
             </Box>
           )}
           {!shouldAddMore && (
@@ -402,20 +370,13 @@ export default class AddTokenDialog extends Component<Props, State> {
           {currentTokensList.length === 0 ? (
             <div className={styles.noAssetFound}>
               <NoItemsFoundImg />
-              <h1 className={styles.text}>
-                {intl.formatMessage(
-                  fullTokensList.length === 0 ? messages.noTokensYet : messages.noTokensFound
-                )}
-              </h1>
+              <Typography color="ds.text_gray_medium" variant="body1" fontWeight="500">
+                {intl.formatMessage(fullTokensList.length === 0 ? messages.noTokensYet : messages.noTokensFound)}
+              </Typography>
             </div>
           ) : (
             <Box>
-              <Box
-                component="ul"
-                borderBottom="1px solid"
-                borderBottomColor="grayscale.200"
-                className={styles.columns}
-              >
+              <Box component="ul" borderBottom="1px solid" borderBottomColor="grayscale.200" className={styles.columns}>
                 <li>
                   <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
                     <Typography component="div" variant="body2" color="grayscale.600">

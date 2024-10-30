@@ -346,7 +346,8 @@ describe('app/api/ada/index', () => {
         NetworkName: 'Cardano Legacy Testnet',
         Backend: {
           BackendService: 'https://testnet-backend.yoroiwallet.com',
-          TokenInfoService: 'https://stage-cdn.yoroiwallet.com'
+          TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+          BackendServiceZero: 'placeholder',
         },
         BaseConfig: [
           {
@@ -370,6 +371,9 @@ describe('app/api/ada/index', () => {
             MinimumUtxoVal: '1000000',
             PoolDeposit: '500000000',
             KeyDeposit: '2000000'
+          },
+          {
+            CoinsPerUtxoByte: '4310',
           }
         ],
         CoinType: 2147485463,
@@ -430,6 +434,16 @@ describe('app/api/ada/index', () => {
         }
       ],
       metadata: undefined,
+      protocolParameters: {
+        linearFee: {
+          constant: '155381',
+          coefficient: '44',
+        },
+        coinsPerUtxoByte: '4310',
+        poolDeposit: '500000000',
+        keyDeposit: '2000000',
+        epoch: 0,
+      },
     }
     const response = await AdaApi.prototype.createUnsignedTxForUtxos(createTxRequest);
 

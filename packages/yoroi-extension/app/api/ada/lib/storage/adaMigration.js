@@ -62,6 +62,7 @@ export async function migrateToLatest(
      * We changed the place where Yoroi data is stored so  we must process this migration first
      * to ensure other migrations look at the right place for storage
      */
+    /* disable this since window.localStorage is not available to manifest v3 service worker
     ['<1.9.0', async () => {
       const applied = await moveStorage(localStorageApi);
       if (applied) {
@@ -70,6 +71,7 @@ export async function migrateToLatest(
       }
       return applied;
     }],
+    */
     ['<1.4.0', async () => await bip44Migration()],
     ['<1.10.0', async () => await storageV2Migration(persistentDb)],
     ['=1.10.0', async () => await cardanoTxHistoryReset(persistentDb)],
@@ -99,6 +101,7 @@ export async function migrateToLatest(
     ['<4.18', async () => {
       return await populateNewUtxodata(persistentDb);
     }],
+    ['<5.4', () => unsetLegacyThemeFlags(localStorageApi)],
   ];
 
   let appliedMigration = false;
@@ -134,6 +137,7 @@ async function testMigration(localStorageApi: LocalStorageApi): Promise<boolean>
  * since version 1.9 this storage needs to be moved to storage.local.
  * This function must go before other modifications because they will work over storage.local.
  */
+// eslint-disable-next-line no-unused-vars
 async function moveStorage(localStorageApi: LocalStorageApi): Promise<boolean> {
   // Note: this function assumes nobody is using Yoroi as a  website (at least before 1.9.0)
   const oldStorage = await localStorageApi.getOldStorage();
@@ -411,5 +415,14 @@ export async function populateNewUtxodata(
     }
   }
 
+  return true;
+}
+
+async function unsetLegacyThemeFlags(localStorageApi: LocalStorageApi): Promise<boolean> {
+  const hasLegacyFlags = await localStorageApi.hasAnyLegacyThemeFlags();
+  if (!hasLegacyFlags) {
+    return false;
+  }
+  await localStorageApi.unsetLegacyThemeFlags();
   return true;
 }

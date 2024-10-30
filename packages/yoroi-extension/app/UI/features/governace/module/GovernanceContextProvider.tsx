@@ -9,8 +9,10 @@ import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/consta
 import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
+import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
+type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -30,7 +32,7 @@ const initialGovernanceProvider = {
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
-  submitedTransactions: [{ isDrepDelegation: false }],
+  submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -44,6 +46,7 @@ type GovernanceProviderProps = {
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
+  getCurrentPrice: GetCurrentPrice;
 };
 
 export const GovernanceContextProvider = ({
@@ -55,6 +58,7 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
+  getCurrentPrice,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -70,7 +74,6 @@ export const GovernanceContextProvider = ({
     backendService,
     defaultTokenInfo,
     unitOfAccount,
-    getCurrentPrice,
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,
@@ -119,7 +122,7 @@ export const GovernanceContextProvider = ({
     } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
       setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
     } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
-      const words = bech32.toWords(Buffer.from(governanceStatusState.drepDelegation?.drep, 'hex'));
+      const words = bech32.toWords(hexToBytes(governanceStatusState.drepDelegation?.drep));
       const encoded = bech32.encode('drep', words, 64);
       setGovernanceStatus({ status: 'delegate', drep: encoded || null });
     } else {

@@ -23,8 +23,7 @@ function constructPlate(
       <WalletAccountIcon
         iconSeed={plate.ImagePart}
         saturationFactor={saturationFactor}
-        scalePx={9}
-        size={8}
+        scalePx={6}
       />
     </div>,
   ];

@@ -1009,7 +1009,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   getMetadata: WalletTransaction => ?Node = data => {
     const { intl } = this.context;
 
-    if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
+    if (data instanceof CardanoShelleyTransaction && data.metadata != null) {
       let metadata;
       if (typeof data.metadata === 'string') {
         let jsonData = null;

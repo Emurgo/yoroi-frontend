@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import { Box, Stack, Typography } from '@mui/material';
 import { RESTORE_WALLET_STEPS } from '../../steps';
 import StepController from '../../../create-wallet/StepController';
-import styles from './EnterRecoveryPhraseStep.scss';
 import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
 import DuplicatedWalletDialog from './DuplicatedWalletDialog';
@@ -97,7 +96,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
   const { length } = mode ?? fail('No mnemonic length is selected!');
 
   return (
-    <Stack alignItems="center" justifyContent="center" className={styles.component} id='enterRecoveryPhraseStepComponent'>
+    <Stack alignItems="center" justifyContent="center" id='enterRecoveryPhraseStepComponent'>
       <Stack
         direction="column"
         alignItems="left"

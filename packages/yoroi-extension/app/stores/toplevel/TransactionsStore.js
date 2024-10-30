@@ -248,11 +248,7 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       throw new Error('unexpected nullish headRequest.promise');
     }
     headRequest.promise.then(result => {
-      const { txs } = this.getTxHistoryState(publicDeriverId);
-      runInAction(() => {
-        txs.splice(0, 0, ...result);
-      });
-      return this._afterLoadingNewTxs(result, publicDeriver);
+      return this.updateNewTransactions(result, publicDeriver);
     }).catch(error => {
       console.error('error when loading transaction list head', error)
     });
@@ -550,9 +546,13 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     publicDeriver: WalletState,
   ): Promise<void> {
     const { txs } = this.getTxHistoryState(publicDeriver.publicDeriverId);
+    // newTxs is not supposed to have duplicate txs to existing ones but there were unknown cases
+    // reported
+    const existingTxHashes = new Set(txs.map(tx => tx.txid));
+    const unseenTxs = [...new Set(newTxs)].filter(tx => !existingTxHashes.has(tx.txid));
     runInAction(() => {
-      txs.splice(0, 0, ...newTxs);
+      txs.splice(0, 0, ...unseenTxs);
     });
-    await this._afterLoadingNewTxs(txs, publicDeriver);
+    await this._afterLoadingNewTxs(unseenTxs, publicDeriver);
   }
 }

@@ -801,16 +801,6 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://explorer.cardano-testnet.iohkdev.io/en/address?address=",
-        "transaction": "https://explorer.cardano-testnet.iohkdev.io/en/transaction?id=",
-      },
-      "ExplorerId": 400,
-      "IsBackup": true,
-      "Name": "CardanoExplorer",
-      "NetworkId": 300,
-    },
-    Object {
-      "Endpoints": Object {
         "address": "https://testnet.cardanoscan.io/address/",
         "pool": "https://testnet.cardanoscan.io/pool/",
         "stakeAddress": "https://testnet.cardanoscan.io/stakeKey/",
@@ -1264,46 +1254,15 @@ Object {
           "SlotsPerEpoch": 432000,
           "StartAt": 208,
         },
+        Object {
+          "CoinsPerUtxoByte": "4310",
+        },
       ],
       "CoinType": 2147485463,
       "Fork": 0,
       "NetworkFeatureName": "mainnet",
       "NetworkId": 0,
       "NetworkName": "Cardano Mainnet",
-    },
-    Object {
-      "Backend": Object {
-        "BackendService": "https://testnet-backend.yoroiwallet.com",
-        "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
-      },
-      "BaseConfig": Array [
-        Object {
-          "ByronNetworkId": 1097911063,
-          "ChainNetworkId": "0",
-          "GenesisDate": "1563999616000",
-          "SlotDuration": 20,
-          "SlotsPerEpoch": 21600,
-          "StartAt": 0,
-        },
-        Object {
-          "CoinsPerUtxoWord": "34482",
-          "KeyDeposit": "2000000",
-          "LinearFee": Object {
-            "coefficient": "44",
-            "constant": "155381",
-          },
-          "MinimumUtxoVal": "1000000",
-          "PerEpochPercentageReward": 69344,
-          "PoolDeposit": "500000000",
-          "SlotDuration": 1,
-          "SlotsPerEpoch": 432000,
-          "StartAt": 74,
-        },
-      ],
-      "CoinType": 2147485463,
-      "Fork": 0,
-      "NetworkId": 300,
-      "NetworkName": "Cardano Legacy Testnet",
     },
     Object {
       "Backend": Object {
@@ -1333,6 +1292,9 @@ Object {
           "SlotDuration": 1,
           "SlotsPerEpoch": 432000,
           "StartAt": 0,
+        },
+        Object {
+          "CoinsPerUtxoByte": "4310",
         },
       ],
       "CoinType": 2147485463,
@@ -1370,6 +1332,9 @@ Object {
           "SlotsPerEpoch": 86400,
           "StartAt": 0,
         },
+        Object {
+          "CoinsPerUtxoByte": "4310",
+        },
       ],
       "CoinType": 2147485463,
       "Fork": 0,
@@ -1405,6 +1370,9 @@ Object {
           "SlotDuration": 1,
           "SlotsPerEpoch": 86400,
           "StartAt": 0,
+        },
+        Object {
+          "CoinsPerUtxoByte": "4310",
         },
       ],
       "CoinType": 2147485463,
@@ -1478,7 +1446,7 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 300,
+      "NetworkId": 250,
       "TokenId": 2,
     },
     Object {
@@ -1495,7 +1463,7 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 250,
+      "NetworkId": 350,
       "TokenId": 3,
     },
     Object {
@@ -1512,25 +1480,8 @@ Object {
         "ticker": "TADA",
         "type": "Cardano",
       },
-      "NetworkId": 350,
-      "TokenId": 4,
-    },
-    Object {
-      "Digest": 6.262633522161549e-167,
-      "Identifier": "",
-      "IsDefault": true,
-      "IsNFT": false,
-      "Metadata": Object {
-        "assetName": "",
-        "logo": null,
-        "longName": null,
-        "numberOfDecimals": 6,
-        "policyId": "",
-        "ticker": "TADA",
-        "type": "Cardano",
-      },
       "NetworkId": 450,
-      "TokenId": 5,
+      "TokenId": 4,
     },
   ],
   "TokenList": Array [],

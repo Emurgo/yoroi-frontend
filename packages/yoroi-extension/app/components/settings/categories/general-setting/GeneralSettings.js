@@ -93,7 +93,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             onChange={this.selectLanguage}
             disabled={isSubmitting}
             renderValue={value => (
-              <Typography component="div" variant="body2">
+              <Typography component="div" variant="body1">
                 {languageOptions.filter(item => item.value === value)[0].label}
               </Typography>
             )}

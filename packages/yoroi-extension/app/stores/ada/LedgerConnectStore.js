@@ -28,7 +28,7 @@ import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import { createHardwareWallet } from '../../api/thunk';
+import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
@@ -197,12 +197,8 @@ export default class LedgerConnectStore
     bip44Key,
     cip1852Key,
   ) => {
-    const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(bip44Key, 'hex')
-    );
-    const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-      Buffer.from(cip1852Key, 'hex')
-    );
+    const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(bip44Key);
+    const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(cip1852Key);
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._checkAndStoreHWDeviceInfo)} no network selected`);
@@ -211,6 +207,7 @@ export default class LedgerConnectStore
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
+    const protocolParameters = await getProtocolParameters({ networkId: selectedNetwork.NetworkId });
     try {
       const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
       await this.stores.substores.ada.yoroiTransfer.transferRequest.execute({
@@ -223,6 +220,7 @@ export default class LedgerConnectStore
         absSlotNumber: new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, currentTime)),
         network: selectedNetwork,
         defaultToken: this.stores.tokenInfoStore.getDefaultTokenInfo(selectedNetwork.NetworkId),
+        protocolParameters,
       }).promise;
     } catch (_e) {
       // usually this means no internet connection or not enough ADA to upgrade

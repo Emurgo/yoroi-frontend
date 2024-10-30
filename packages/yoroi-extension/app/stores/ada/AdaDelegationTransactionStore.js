@@ -10,6 +10,7 @@ import { ROUTES } from '../../routes-config';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { getProtocolParameters } from '../../api/thunk';
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap, ActionsMap> {
   @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
@@ -76,6 +77,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       }).slot
     );
 
+    const protocolParameters = await getProtocolParameters(request.wallet);
+
     const delegationTxPromise = this.createDelegationTx.execute({
       wallet: request.wallet,
       poolRequest: request.poolRequest,
@@ -83,6 +86,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       valueInAccount: this.stores.delegation.getRewardBalanceOrZero(request.wallet),
       drepCredential: request.drepCredential,
       absSlotNumber,
+      protocolParameters,
     }).promise;
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
@@ -107,6 +111,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       }).slot
     );
 
+    const protocolParameters = await getProtocolParameters(request.wallet);
+
     const unsignedTx = await this.createWithdrawalTx.execute(async () => {
       return await this.api.ada.createWithdrawalTx({
         wallet: request.wallet,
@@ -119,6 +125,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
             shouldDeregister: this.shouldDeregister,
           },
         ],
+        protocolParameters,
       });
     }).promise;
 

@@ -128,7 +128,6 @@ export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
     const { networkId } = request;
     return (
       (environment.isTest() ||
-        networkId === networks.CardanoTestnet.NetworkId ||
         networkId === networks.CardanoPreprodTestnet.NetworkId ||
         networkId === networks.CardanoPreviewTestnet.NetworkId ||
         networkId === networks.CardanoSanchoTestnet.NetworkId)

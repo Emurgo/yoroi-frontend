@@ -25,6 +25,7 @@ import {
 import { networks, getCardanoHaskellBaseConfig } from '../../lib/storage/database/prepackaged/networks';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
+import { bytesToHex } from '../../../../coreUtils';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -37,7 +38,7 @@ const network = networks.CardanoMainnet;
 function getProtocolParams(): {|
   keyDeposit: RustModule.WalletV4.BigNum,
   linearFee: RustModule.WalletV4.LinearFee,
-  coinsPerUtxoWord: RustModule.WalletV4.BigNum,
+  coinsPerUtxoByte: RustModule.WalletV4.BigNum,
   poolDeposit: RustModule.WalletV4.BigNum,
   networkId: number,
   |} {
@@ -49,7 +50,7 @@ function getProtocolParams(): {|
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.coefficient),
       RustModule.WalletV4.BigNum.from_str(baseConfig.LinearFee.constant),
     ),
-    coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(baseConfig.CoinsPerUtxoWord),
+    coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(baseConfig.CoinsPerUtxoByte),
     poolDeposit: RustModule.WalletV4.BigNum.from_str(baseConfig.PoolDeposit),
     networkId: network.NetworkId,
   };
@@ -64,7 +65,7 @@ function getByronAddress(
     .derive(0)
     .to_public();
   const v2Key = RustModule.WalletV2.PublicKey.from_hex(
-    Buffer.from(v3Key.as_bytes()).toString('hex')
+    bytesToHex(v3Key.as_bytes())
   );
 
   const baseConfig = network.BaseConfig[0];
@@ -93,11 +94,8 @@ describe('Haskell Shelley era tx format tests', () => {
     const txIndex = 0;
     const outAddress = 'Ae2tdPwUPEZKX8N2TjzBXLy5qrecnQUniTd2yxE8mWyrh2djNpUkbAtXtP4';
 
-    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(
-        '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
-        'hex',
-      ),
+    const accountPrivateKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(
+      '408a1cb637d615c49e8696c30dd54883302a20a7b9b8a9d1c307d2ed3cd50758c9402acd000461a8fc0f25728666e6d3b86d031b8eea8d2f69b21e8aa6ba2b153e3ec212cc8a36ed9860579dfe1e3ef4d6de778c5dbdd981623b48727cd96247',
     );
 
     const addr1 = getByronAddress(accountPrivateKey, 0);
@@ -141,7 +139,7 @@ describe('Haskell Shelley era tx format tests', () => {
     const signedTx = RustModule.WalletV4.Transaction.from_bytes(transferInfo.encodedTx);
     const body = signedTx.body();
     expect(body.inputs().len()).toBe(1);
-    expect(Buffer.from(body.inputs().get(0).transaction_id().to_bytes()).toString('hex')).toBe(txId);
+    expect(body.inputs().get(0).transaction_id().to_hex()).toBe(txId);
     expect(body.inputs().get(0).index()).toBe(txIndex);
 
     expect(body.outputs().len()).toBe(1);
@@ -156,7 +154,7 @@ describe('Haskell Shelley era tx format tests', () => {
     const witnesses = signedTx.witness_set().bootstraps();
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
-    expect(Buffer.from(witnesses.get(0).to_bytes()).toString('hex'))
+    expect(witnesses.get(0).to_hex())
       .toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e584019d98b819060294910b7669d0e7e4b6c8843f9524626ff53b028ac9d38f415eb389141bad0589f858133423a07b13245af641f152bf4b06287171315676ae2045820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
   });
 });

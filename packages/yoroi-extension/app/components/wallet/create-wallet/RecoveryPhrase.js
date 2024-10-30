@@ -3,7 +3,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, Typography, Grid, Button } from '@mui/material';
+import { Box, Typography, Grid, Button, styled } from '@mui/material';
 import { ReactComponent as OpenedEyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
 import { ReactComponent as ClosedEyeIcon } from '../../../assets/images/close-eye-primary.inline.svg';
 
@@ -28,6 +28,10 @@ const messages: * = defineMessages({
   },
 });
 
+const SGrid = styled(Grid)(({ theme }) => ({
+  background: theme.palette.ds.primary_100,
+}));
+
 function RecoveryPhrase(props: Props & Intl): Node {
   const { recoveryPhrase, intl, shouldShowRecoveryPhrase, toggleRecoveryPhrase } = props;
 
@@ -36,12 +40,11 @@ function RecoveryPhrase(props: Props & Intl): Node {
       <Grid container gap="8px">
         {recoveryPhrase &&
           recoveryPhrase.map((word, idx) => (
-            <Grid
+            <SGrid
               item
               key={word}
               columns={7}
               sx={{
-                background: 'linear-gradient(269deg, #E4E8F7 0%, #C6F7ED 99%)',
                 textAlign: 'center',
                 borderRadius: '8px',
                 display: 'flex',
@@ -66,7 +69,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
               >
                 {idx + 1}. {word}
               </Typography>
-            </Grid>
+            </SGrid>
           ))}
       </Grid>
       <Button

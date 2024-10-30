@@ -79,11 +79,11 @@ import {
   signTransaction as shelleySignTransaction,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
-import { cip8Sign, v4PublicToV2, } from './lib/cardanoCrypto/utils';
+import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
-import { createTrezorSignTxPayload, } from './transactions/shelley/trezorTx';
-import { createLedgerSignTxPayload, } from './transactions/shelley/ledgerTx';
+import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
+import { createLedgerSignTxPayload, toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -121,8 +121,6 @@ import type {
   MultiAssetSupplyFunc,
   RemoteUnspentOutput,
   SendFunc,
-  SignedRequest,
-  SignedResponse,
   TokenInfoFunc,
   UtxoData,
 } from './lib/state-fetch/types';
@@ -131,7 +129,7 @@ import type { AddressRowWithPath, } from './lib/storage/bridge/traitUtils';
 import { getAllAddressesForDisplay, getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
-  cardanoMinAdaRequiredFromAssets_coinsPerWord,
+  cardanoMinAdaRequiredFromAssets,
   convertAdaTransactionsToExportRows,
   multiTokenFromCardanoValue,
   multiTokenFromRemote,
@@ -148,13 +146,17 @@ import type {
   RestoreWalletResponse,
   SendTokenList,
 } from '../common/types';
-import { getCardanoHaskellBaseConfig, getNetworkById, } from './lib/storage/database/prepackaged/networks';
-import { toSenderUtxos, } from './transactions/transfer/utils';
+import {
+  getCardanoHaskellBaseConfig,
+  getCardanoHaskellBaseConfigCombined,
+  getNetworkById,
+} from './lib/storage/database/prepackaged/networks';
+import { toSenderUtxos } from './transactions/transfer/utils';
 import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, hexToBytes, hexToUtf } from '../../coreUtils';
+import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -162,6 +164,7 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 import TimeUtils from './lib/storage/bridge/timeUtils';
 import type { IFetcher } from './lib/state-fetch/IFetcher.types';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
+import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 
 // ADA specific Request / Response params
 
@@ -176,9 +179,6 @@ export type GetAllAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
-export type GetAllAddressesForDisplayFunc = (
-  request: GetAllAddressesForDisplayRequest
-) => Promise<GetAllAddressesForDisplayResponse>;
 
 // getChainAddressesForDisplay
 
@@ -188,9 +188,6 @@ export type GetChainAddressesForDisplayRequest = {|
   type: CoreAddressT,
 |};
 export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
-export type GetChainAddressesForDisplayFunc = (
-  request: GetChainAddressesForDisplayRequest
-) => Promise<GetChainAddressesForDisplayResponse>;
 
 // refreshTransactions
 
@@ -234,28 +231,10 @@ export type SignAndBroadcastFunc = (
 
 // createTrezorSignTxData
 
-export type CreateTrezorSignTxDataRequest = {|
-  signRequest: HaskellShelleyTxSignRequest,
-  network: $ReadOnly<NetworkRow>,
-|};
 export type CreateTrezorSignTxDataResponse = {|
   // https://github.com/trezor/connect/blob/develop/docs/methods/cardanoSignTransaction.md
   trezorSignTxPayload: $Exact<CardanoSignTransaction>,
 |};
-export type CreateTrezorSignTxDataFunc = (
-  request: CreateTrezorSignTxDataRequest
-) => Promise<CreateTrezorSignTxDataResponse>;
-
-// broadcastTrezorSignedTx
-
-export type BroadcastTrezorSignedTxRequest = {|
-  signedTxRequest: SignedRequest,
-  sendTx: SendFunc,
-|};
-export type BroadcastTrezorSignedTxResponse = SignedResponse;
-export type BroadcastTrezorSignedTxFunc = (
-  request: BroadcastTrezorSignedTxRequest
-) => Promise<BroadcastTrezorSignedTxResponse>;
 
 // createLedgerSignTxData
 
@@ -268,20 +247,16 @@ export type CreateLedgerSignTxDataRequest = {|
 export type CreateLedgerSignTxDataResponse = {|
   ledgerSignTxPayload: SignTransactionRequest,
 |};
-export type CreateLedgerSignTxDataFunc = (
-  request: CreateLedgerSignTxDataRequest
-) => Promise<CreateLedgerSignTxDataResponse>;
 
-// broadcastLedgerSignedTx
+// createHwSignTxData
 
-export type BroadcastLedgerSignedTxRequest = {|
-  signedTxRequest: SignedRequest,
-  sendTx: SendFunc,
+export type CreateHWSignTxDataRequestFromRawTx = {|
+  txBodyHex: string,
+  network: $ReadOnly<NetworkRow>,
+  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  senderUtxos: Array<CardanoAddressedUtxo>,
+  additionalRequiredSigners?: Array<string>,
 |};
-export type BroadcastLedgerSignedTxResponse = SignedResponse;
-export type BroadcastLedgerSignedTxFunc = (
-  request: BroadcastLedgerSignedTxRequest
-) => Promise<BroadcastLedgerSignedTxResponse>;
 
 // createUnsignedTx
 
@@ -298,6 +273,7 @@ export type CreateUnsignedTxRequest = {|
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
   tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
+  protocolParameters: ProtocolParameters,
 |};
 export type CardanoTxRequestMintMetadata = {|
   tag: number | string, // the metadata tag, e.g. 721 for NFTs
@@ -342,6 +318,7 @@ export type CreateUnsignedTxForConnectorRequest = {|
   absSlotNumber: BigNumber,
   submittedTxs: Array<PersistedSubmittedTransaction>,
   utxos: Array<CardanoAddressedUtxo>,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateUnsignedTxResponse = HaskellShelleyTxSignRequest;
 export type CreateVotingRegTxResponse = HaskellShelleyTxSignRequest;
@@ -359,6 +336,7 @@ export type CreateUnsignedTxForUtxosRequest = {|
   tokens: SendTokenList,
   utxos: Array<CardanoAddressedUtxo>,
   metadata: Array<TransactionMetadata> | void,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateUnsignedTxForUtxosResponse = HaskellShelleyTxSignRequest;
 export type CreateUnsignedTxForUtxosFunc = (
@@ -374,11 +352,13 @@ export type CreateDelegationTxRequest = {|
   poolRequest?: string,
   drepCredential?: string,
   valueInAccount: MultiToken,
+  protocolParameters: ProtocolParameters,
 |};
 
 type CreateVotingRegTxRequestCommon = {|
   wallet: WalletState,
   absSlotNumber: BigNumber,
+  protocolParameters: ProtocolParameters,
 |};
 
 export type CreateVotingRegTxRequest = {|
@@ -403,6 +383,7 @@ export type CreateSimpleTxRequest = {|
   },
   entries: Array<TxOutput>,
   metadata: RustModule.WalletV4.AuxiliaryData,
+  protocolParameters: ProtocolParameters,
 |};
 
 export type CreateDelegationTxResponse = {|
@@ -435,6 +416,7 @@ export type CreateWithdrawalTxRequest = {|
      */
     shouldDeregister: boolean,
   |}>,
+  protocolParameters: ProtocolParameters,
 |};
 export type CreateWithdrawalTxResponse = HaskellShelleyTxSignRequest;
 
@@ -488,6 +470,7 @@ export type TransferToCip1852Request = {|
   getUTXOsForAddresses: AddressUtxoFunc,
   network: $ReadOnly<NetworkRow>,
   defaultToken: $ReadOnly<TokenRow>,
+  protocolParameters: ProtocolParameters,
 |};
 export type TransferToCip1852Response = {|
   signRequest: CreateUnsignedTxResponse,
@@ -726,17 +709,13 @@ export default class AdaApi {
           request.signRequest.senderUtxos,
           request.signRequest.unsignedTx,
           request.publicDeriver.getParent().getPublicDeriverLevel(),
-          Scope.WalletV4.Bip32PrivateKey.from_bytes(
-            Buffer.from(normalizedKey.prvKeyHex, 'hex')
-          ),
+          Scope.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
           request.signRequest.neededStakingKeyHashes.wits,
           request.signRequest.metadata,
         );
 
         return {
-          txHash: Buffer.from(
-            Scope.WalletV4.hash_transaction(signedTx.body()).to_bytes()
-          ).toString('hex'),
+          txHash: Scope.WalletV4.hash_transaction(signedTx.body()).to_hex(),
           encodedTx: signedTx.to_bytes(),
         }
       })
@@ -750,7 +729,7 @@ export default class AdaApi {
       Logger.debug(
         `${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} success: ` + stringifyData({ txId })
       );
-      return { txId, signedTxHex: Buffer.from(encodedTx).toString('hex') };
+      return { txId, signedTxHex: bytesToHex(encodedTx) };
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
@@ -765,9 +744,10 @@ export default class AdaApi {
     }
   }
 
-  async createTrezorSignTxData(
-    request: CreateTrezorSignTxDataRequest
-  ): Promise<CreateTrezorSignTxDataResponse> {
+  createTrezorSignTxData(request: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    network: $ReadOnly<NetworkRow>,
+  |}): CreateTrezorSignTxDataResponse {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
 
@@ -775,7 +755,7 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const trezorSignTxPayload = await createTrezorSignTxPayload(
+      const trezorSignTxPayload = createTrezorSignTxPayload(
         request.signRequest,
         config.ByronNetworkId,
         Number.parseInt(config.ChainNetworkId, 10),
@@ -791,9 +771,9 @@ export default class AdaApi {
     }
   }
 
-  async createLedgerSignTxData(
+  createLedgerSignTxData(
     request: CreateLedgerSignTxDataRequest
-  ): Promise<CreateLedgerSignTxDataResponse> {
+  ): CreateLedgerSignTxDataResponse {
     try {
       Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
 
@@ -801,7 +781,7 @@ export default class AdaApi {
         request.network
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
-      const ledgerSignTxPayload = await createLedgerSignTxPayload({
+      const ledgerSignTxPayload = createLedgerSignTxPayload({
         signRequest: request.signRequest,
         byronNetworkMagic: config.ByronNetworkId,
         networkId: Number.parseInt(config.ChainNetworkId, 10),
@@ -821,18 +801,67 @@ export default class AdaApi {
     }
   }
 
+  createHwSignTxDataFromRawTx(
+    hw: 'ledger' | 'trezor',
+    request: CreateHWSignTxDataRequestFromRawTx
+  ): (
+    {| hw: 'ledger', result: CreateLedgerSignTxDataResponse |}
+    | {| hw: 'trezor', result: CreateTrezorSignTxDataResponse |}
+  ) {
+    try {
+      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} called`);
+
+      const config = getCardanoHaskellBaseConfigCombined(request.network);
+      const protocolMagic = config.ByronNetworkId ?? fail('Missing ByronNetworkId in network config!');
+
+      const addressMap = s => request.addressingMap(s)?.path;
+
+      if (hw === 'ledger') {
+
+        const ledgerSignTxPayload = toLedgerSignRequest(
+          request.txBodyHex,
+          Number(config.ChainNetworkId),
+          protocolMagic,
+          addressMap,
+          request.senderUtxos,
+          request.additionalRequiredSigners ?? [],
+        );
+
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(ledgerSignTxPayload));
+        return { hw, result: { ledgerSignTxPayload } };
+      }
+      if (hw === 'trezor') {
+
+        const trezorSignTxPayload = toTrezorSignRequest(
+          request.txBodyHex,
+          Number(config.ChainNetworkId),
+          protocolMagic,
+          addressMap,
+          request.senderUtxos,
+        );
+        Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(trezorSignTxPayload));
+        return { hw, result: { trezorSignTxPayload } };
+      }
+
+      throw new Error('Now supported HW type: ' + hw);
+
+    } catch (error) {
+      Logger.error(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} error: ` + stringifyError(error));
+      if (error instanceof LocalizableError) throw error;
+      throw new GenericApiError();
+    }
+  }
+
   async createUnsignedTxForUtxos(
     request: CreateUnsignedTxForUtxosRequest
   ): Promise<CreateUnsignedTxForUtxosResponse> {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.createUnsignedTxForUtxos)} called`);
     try {
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
       let unsignedTxResponse;
       const trxMetadata =
         request.metadata !== undefined ? createMetadata(request.metadata): undefined;
+
+      const { protocolParameters } = request;
 
       if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
@@ -844,16 +873,17 @@ export default class AdaApi {
           request.utxos,
           request.absSlotNumber,
           {
-            keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
+            keyDeposit: RustModule.WalletV4.BigNum.from_str(protocolParameters.keyDeposit),
             linearFee: RustModule.WalletV4.LinearFee.new(
-              RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-              RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+              RustModule.WalletV4.BigNum.from_str(protocolParameters.linearFee.coefficient),
+              RustModule.WalletV4.BigNum.from_str(protocolParameters.linearFee.constant),
             ),
-            coinsPerUtxoWord: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord),
-            poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
-            networkId: request.network.NetworkId,
+            coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte),
+            poolDeposit: RustModule.WalletV4.BigNum.from_str(protocolParameters.poolDeposit),
+            networkId: Number(request.network.BaseConfig[0].ChainNetworkId),
           },
           trxMetadata,
+          request.network.NetworkId,
         );
       } else {
         const changeAddresses = request.receivers.reduce(
@@ -904,17 +934,18 @@ export default class AdaApi {
           request.utxos,
           request.absSlotNumber,
           {
-            keyDeposit: config.KeyDeposit,
-            linearFeeCoefficient: config.LinearFee.coefficient,
-            linearFeeConstant: config.LinearFee.constant,
-            coinsPerUtxoWord: config.CoinsPerUtxoWord,
-            poolDeposit: config.PoolDeposit,
-            networkId: request.network.NetworkId,
+            keyDeposit: protocolParameters.keyDeposit,
+            linearFeeCoefficient: protocolParameters.linearFee.coefficient,
+            linearFeeConstant: protocolParameters.linearFee.constant,
+            coinsPerUtxoByte: protocolParameters.coinsPerUtxoByte,
+            poolDeposit: protocolParameters.poolDeposit,
+            networkId: Number(request.network.BaseConfig[0].ChainNetworkId),
           },
           [],
           [],
           false,
           trxMetadata,
+          request.network.NetworkId,
         );
       }
       Logger.debug(
@@ -926,9 +957,9 @@ export default class AdaApi {
         changeAddr: unsignedTxResponse.changeAddr,
         metadata: trxMetadata,
         networkSettingSnapshot: {
-          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          ChainNetworkId: Number(getCardanoHaskellBaseConfig(request.network)[0].ChainNetworkId),
+          KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
           NetworkId: request.network.NetworkId,
         },
         neededStakingKeyHashes: {
@@ -975,6 +1006,7 @@ export default class AdaApi {
       utxos: addressedUtxo,
       tokens: request.tokens,
       metadata: request.metadata,
+      protocolParameters: request.protocolParameters,
     });
   }
 
@@ -1003,6 +1035,7 @@ export default class AdaApi {
       request.absSlotNumber,
       request.submittedTxs,
       request.utxos,
+      request.protocolParameters,
       foreignUtxoFetcher
     );
   }
@@ -1017,6 +1050,7 @@ export default class AdaApi {
     absSlotNumber: BigNumber,
     submittedTxs: Array<PersistedSubmittedTransaction>,
     committedUtxos: Array<CardanoAddressedUtxo>,
+    protocolParameters: ProtocolParameters,
     foreignUtxoFetcher: ?ForeignUtxoFetcher,
   ): Promise<CreateUnsignedTxResponse> {
     const {
@@ -1101,19 +1135,6 @@ export default class AdaApi {
       addressing: receiveAddress.addressing,
     };
 
-    const config = getCardanoHaskellBaseConfig(
-      network
-    ).reduce((acc, next) => Object.assign(acc, next), {});
-
-    const protocolParams = {
-      keyDeposit: config.KeyDeposit,
-      linearFeeCoefficient: config.LinearFee.coefficient,
-      linearFeeConstant: config.LinearFee.constant,
-      coinsPerUtxoWord: config.CoinsPerUtxoWord,
-      poolDeposit: config.PoolDeposit,
-      networkId: network.NetworkId,
-    };
-
     const outputs = [];
     const mint = [];
     const mintMetadata = {};
@@ -1173,7 +1194,7 @@ export default class AdaApi {
         const values = [
           {
             identifier: defaultToken.defaultIdentifier,
-            networkId: protocolParams.networkId,
+            networkId: network.NetworkId,
             amount: new BigNumber(adaValue),
           },
         ];
@@ -1182,7 +1203,7 @@ export default class AdaApi {
           if (assetValue != null) {
             values.push({
               identifier: assetId,
-              networkId: protocolParams.networkId,
+              networkId: network.NetworkId,
               amount: new BigNumber(assetValue),
             });
           }
@@ -1190,7 +1211,7 @@ export default class AdaApi {
         return new MultiToken(
           values,
           {
-            defaultNetworkId: protocolParams.networkId,
+            defaultNetworkId: network.NetworkId,
             defaultIdentifier: defaultToken.defaultIdentifier,
           },
         );
@@ -1233,9 +1254,10 @@ export default class AdaApi {
           throw new Error(`Value is required for a valid tx output, got: ${JSON.stringify(target)}`);
         }
       } else {
-
-        const minAmount =
-          cardanoMinAdaRequiredFromAssets_coinsPerWord(amount, new BigNumber(protocolParams.coinsPerUtxoWord));
+        const minAmount = cardanoMinAdaRequiredFromAssets(
+          amount,
+          new BigNumber(protocolParameters.coinsPerUtxoByte)
+        );
         if (minAmount.gt(target.value ?? '0')) {
           amount = makeMultiToken(minAmount.toString());
         }
@@ -1280,7 +1302,15 @@ export default class AdaApi {
       validityIntervalStart,
       ttl,
       requiredSigners,
-      protocolParams,
+      {
+        linearFeeCoefficient: protocolParameters.linearFee.coefficient,
+        linearFeeConstant: protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: protocolParameters.coinsPerUtxoByte,
+        poolDeposit: protocolParameters.poolDeposit,
+        keyDeposit: protocolParameters.keyDeposit,
+        networkId: network.NetworkId,
+      },
+      network.NetworkId,
     );
 
     return new HaskellShelleyTxSignRequest({
@@ -1289,10 +1319,10 @@ export default class AdaApi {
       changeAddr: unsignedTxResponse.changeAddr,
       metadata: undefined,
       networkSettingSnapshot: {
-        ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-        KeyDeposit: new BigNumber(config.KeyDeposit),
-        PoolDeposit: new BigNumber(config.PoolDeposit),
-        NetworkId: protocolParams.networkId,
+        ChainNetworkId: Number(getCardanoHaskellBaseConfig(network)[0].ChainNetworkId),
+        KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+        PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
+        NetworkId: network.NetworkId,
       },
       neededStakingKeyHashes: {
         neededHashes: new Set(),
@@ -1309,21 +1339,17 @@ export default class AdaApi {
     try {
       const { wallet } = request;
       const networkInfo = getNetworkById(wallet.networkId);
-      const config = getCardanoHaskellBaseConfig(networkInfo)
-        .reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: networkInfo.NetworkId,
       };
 
-      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_bytes(
-        Buffer.from(wallet.publicKey, 'hex')
-      );
+      const publicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(wallet.publicKey);
 
       const stakingKey = derivePublicByAddressing({
         addressing: wallet.stakingAddressing.addressing,
@@ -1356,6 +1382,8 @@ export default class AdaApi {
         delegationCerts,
         [],
         false,
+        undefined,
+        request.wallet.networkId,
       );
 
       const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
@@ -1393,13 +1421,8 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
-      const stakeCredentialHex = RustModule.WasmScope(Scope => {
-        return Buffer.from(
-            Scope.WalletV4.Credential
-              .from_keyhash(stakingKey.hash())
-              .to_bytes()
-          ).toString('hex')
-      });
+      const stakeCredentialHex = RustModule.WasmScope(Scope =>
+        Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex());
 
       const signTxRequest = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
@@ -1407,9 +1430,9 @@ export default class AdaApi {
         changeAddr: unsignedTx.changeAddr,
         metadata: undefined,
         networkSettingSnapshot: {
-          ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          ChainNetworkId: Number(getCardanoHaskellBaseConfig(networkInfo)[0].ChainNetworkId),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: networkInfo.NetworkId,
         },
         neededStakingKeyHashes: {
@@ -1439,11 +1462,11 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.wallet.networkId,
       };
 
@@ -1461,9 +1484,7 @@ export default class AdaApi {
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
         const wasmAddr = RustModule.WalletV4.RewardAddress.from_address(
-          RustModule.WalletV4.Address.from_bytes(
-            Buffer.from(withdrawal.rewardAddress, 'hex')
-          )
+          RustModule.WalletV4.Address.from_hex(withdrawal.rewardAddress)
         );
         if (wasmAddr == null) throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
         const paymentCred = wasmAddr.payment_cred();
@@ -1476,7 +1497,7 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
-          neededKeys.neededHashes.add(Buffer.from(paymentCred.to_bytes()).toString('hex'));
+          neededKeys.neededHashes.add(paymentCred.to_hex());
         }
       }
       const accountStates = await request.getAccountState({
@@ -1502,16 +1523,14 @@ export default class AdaApi {
           }
 
           const rewardAddress = RustModule.WalletV4.RewardAddress.from_address(
-            RustModule.WalletV4.Address.from_bytes(
-              Buffer.from(address, 'hex')
-            )
+            RustModule.WalletV4.Address.from_hex(address)
           );
           if (rewardAddress == null) {
             throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
           }
           {
             const stakeCredential = rewardAddress.payment_cred();
-            neededKeys.neededHashes.add(Buffer.from(stakeCredential.to_bytes()).toString('hex'));
+            neededKeys.neededHashes.add(stakeCredential.to_hex());
           }
           list.push({
             address: rewardAddress,
@@ -1540,6 +1559,8 @@ export default class AdaApi {
         certificates,
         finalWithdrawals,
         false,
+        undefined,
+        request.wallet.networkId,
       );
       // there wasn't enough in the withdrawal to send anything to us
       if (unsignedTxResponse.changeAddr.length === 0) {
@@ -1555,10 +1576,10 @@ export default class AdaApi {
           if (withdrawal.privateKey != null) {
             const { privateKey } = withdrawal;
             neededKeys.wits.add(
-              Buffer.from(RustModule.WalletV4.make_vkey_witness(
+              RustModule.WalletV4.make_vkey_witness(
                 RustModule.WalletV4.hash_transaction(body),
                 privateKey
-              ).to_bytes()).toString('hex')
+              ).to_hex()
             );
           }
         }
@@ -1570,8 +1591,8 @@ export default class AdaApi {
         metadata: undefined,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: neededKeys,
@@ -1596,11 +1617,11 @@ export default class AdaApi {
       const config = fullConfig.reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.publicDeriver.networkId,
       };
 
@@ -1621,6 +1642,7 @@ export default class AdaApi {
         [],
         false,
         request.metadata,
+        request.publicDeriver.networkId,
       );
 
       return new HaskellShelleyTxSignRequest({
@@ -1630,16 +1652,14 @@ export default class AdaApi {
         metadata: request.metadata,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.publicDeriver.networkId,
         },
         neededStakingKeyHashes: {
           neededHashes: new Set(),
           wits: new Set(),
         },
-        trezorTCatalystRegistrationTxSignData: undefined,
-        ledgerNanoCatalystRegistrationTxSignData: undefined,
       });
     } catch (error) {
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
@@ -1660,11 +1680,11 @@ export default class AdaApi {
       ).reduce((acc, next) => Object.assign(acc, next), {});
 
       const protocolParams = {
-        keyDeposit: config.KeyDeposit,
-        linearFeeCoefficient: config.LinearFee.coefficient,
-        linearFeeConstant: config.LinearFee.constant,
-        coinsPerUtxoWord: config.CoinsPerUtxoWord,
-        poolDeposit: config.PoolDeposit,
+        keyDeposit: request.protocolParameters.keyDeposit,
+        linearFeeCoefficient: request.protocolParameters.linearFee.coefficient,
+        linearFeeConstant: request.protocolParameters.linearFee.constant,
+        coinsPerUtxoByte: request.protocolParameters.coinsPerUtxoByte,
+        poolDeposit: request.protocolParameters.poolDeposit,
         networkId: request.wallet.networkId,
       };
 
@@ -1706,6 +1726,7 @@ export default class AdaApi {
         [],
         false,
         trxMetadata,
+        request.wallet.networkId,
       );
 
       return new HaskellShelleyTxSignRequest({
@@ -1715,8 +1736,8 @@ export default class AdaApi {
         metadata: trxMetadata,
         networkSettingSnapshot: {
           ChainNetworkId: Number.parseInt(config.ChainNetworkId, 10),
-          KeyDeposit: new BigNumber(config.KeyDeposit),
-          PoolDeposit: new BigNumber(config.PoolDeposit),
+          KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
+          PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
         neededStakingKeyHashes: {
@@ -1997,7 +2018,7 @@ export default class AdaApi {
         signRequest: await this.createUnsignedTxForUtxos({
           absSlotNumber: request.absSlotNumber,
           receivers: [{
-            address: Buffer.from(receiveAddress.to_address().to_bytes()).toString('hex'),
+            address: receiveAddress.to_address().to_hex(),
             addressing: {
               path: [
                 WalletTypePurpose.CIP1852,
@@ -2021,6 +2042,7 @@ export default class AdaApi {
           }],
           utxos,
           metadata: undefined,
+          protocolParameters: request.protocolParameters,
         })
       };
     } catch (error) {
@@ -2043,9 +2065,7 @@ export default class AdaApi {
       }
       const wallet = await createHardwareCip1852Wallet({
         db: request.db,
-        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_bytes(
-          Buffer.from(request.publicKey, 'hex')
-        ),
+        accountPublicKey: RustModule.WalletV4.Bip32PublicKey.from_hex(request.publicKey),
         accountIndex: request.addressing.path[
         Bip44DerivationLevels.ACCOUNT.level - request.addressing.startLevel
           ],
@@ -2171,7 +2191,7 @@ export default class AdaApi {
     );
   }
 
-  // fixme: refactor this tmp function
+  // <TODO:TMP>
   async _addressedUtxosWithSubmittedTxs(
     originalUtxos: Array<CardanoAddressedUtxo>,
     publicDeriverId: number,
@@ -2281,6 +2301,7 @@ export default class AdaApi {
     reorgTargetAmount: string,
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
+    protocolParameters: ProtocolParameters,
     reorgTargetAddress?: string,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
@@ -2320,6 +2341,7 @@ export default class AdaApi {
       utxos,
       submittedTxs,
       targetAddress,
+      protocolParameters,
     );
   }
 
@@ -2334,6 +2356,7 @@ export default class AdaApi {
     utxos: Array<CardanoAddressedUtxo>,
     submittedTxs: Array<PersistedSubmittedTransaction>,
     targetAddress: string,
+    protocolParameters: ProtocolParameters,
   ): Promise<{|
     unsignedTx: HaskellShelleyTxSignRequest,
     collateralOutputAddressSet: Set<string>,
@@ -2366,6 +2389,7 @@ export default class AdaApi {
         allUtxoAddresses,
         submittedTxs,
       )).filter(utxo => !dontUseUtxoIds.has(utxo.utxo_id)),
+      protocolParameters,
       null,
     );
 
@@ -2429,10 +2453,8 @@ function getDifferenceAfterTx(
   defaultToken: DefaultTokenEntry,
 ): MultiToken {
 
-  const accountKeyString = RustModule.WasmScope(Scope => {
-    const stakeCredential = Scope.WalletV4.Credential.from_keyhash(stakingKey.hash());
-    return Buffer.from(stakeCredential.to_bytes()).toString('hex')
-  })
+  const accountKeyString = RustModule.WasmScope(Scope =>
+    Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex())
 
   const sumInForKey = new MultiToken([], defaultToken);
   {
@@ -2464,11 +2486,8 @@ function getDifferenceAfterTx(
   const sumOutForKey = new MultiToken([], defaultToken);
   {
     const txBody = utxoResponse.txBuilder.build();
-    const outputs = txBody.outputs();
-    for (let i = 0; i < outputs.len(); i++) {
-      const output = outputs.get(i);
-      const address = Buffer.from(output.address().to_bytes()).toString('hex');
-      if (addrContainsAccountKey(address, accountKeyString, true)) {
+    for (const output of iterateLenGet(txBody.outputs())) {
+      if (addrContainsAccountKey(output.address().to_hex(), accountKeyString, true)) {
         sumOutForKey.joinAddMutable(multiTokenFromCardanoValue(output.amount(), defaultToken));
       }
     }
@@ -2488,9 +2507,7 @@ export async function genOwnStakingKey(request: {|
       ...signingKeyFromStorage,
       password: request.password,
     });
-    const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-      Buffer.from(normalizedKey.prvKeyHex, 'hex')
-    );
+    const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex);
     const normalizedStakingKey = derivePrivateByAddressing({
       addressing: stakingAddr.addressing,
       startingFrom: {
@@ -2645,44 +2662,56 @@ export async function walletSignData(
   const signingKey = derivePrivateByAddressing({
     addressing: addressing.addressing,
     startingFrom: {
-      key: RustModule.WalletV4.Bip32PrivateKey.from_bytes(
-        Buffer.from(normalizedKey.prvKeyHex, 'hex')
-      ),
+      key: RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
       level: withLevels.getParent().getPublicDeriverLevel(),
     },
   }).to_raw_key();
 
   const coseSign1 = await cip8Sign(
-    Buffer.from(address, 'hex'),
+    hexToBytes(address),
     signingKey,
-    Buffer.from(payload, 'hex'),
+    hexToBytes(payload),
   );
 
-  const key = RustModule.MessageSigning.COSEKey.new(
-    RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
-  );
-  key.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_int(
-      RustModule.MessageSigning.Int.new_i32(6)
-    )
-  );
-  key.set_header(
-    RustModule.MessageSigning.Label.new_int(
-      RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
-    ),
-    RustModule.MessageSigning.CBORValue.new_bytes(
-      signingKey.to_public().as_bytes()
-    )
-  );
+  const key = makeCip8Key(signingKey.to_public().as_bytes());
 
   return {
-    signature: Buffer.from(coseSign1.to_bytes()).toString('hex'),
-    key: Buffer.from(key.to_bytes()).toString('hex'),
+    signature: bytesToHex(coseSign1.to_bytes()),
+    key: bytesToHex(key.to_bytes()),
   };
+}
+
+export async function encodeHardwareWalletSignResult(
+  addressHex: string,
+  signatureHex: string,
+  payloadHex: string,
+  signingPublicKeyHex: string,
+): Promise<{| signature: string, key: string |}> {
+  const coseSign1 = await buildCoseSign1FromSignature (
+    hexToBytes(addressHex),
+    hexToBytes(signatureHex),
+    hexToBytes(payloadHex),
+  );
+
+  const key = makeCip8Key(hexToBytes(signingPublicKeyHex));
+
+  return {
+    signature: bytesToHex(coseSign1.to_bytes()),
+    key: bytesToHex(key.to_bytes()),
+  };
+}
+
+// todo: DRep key
+export function findPath(wallet: WalletState, inputAddress: string): ?Array<number> {
+  if (inputAddress === wallet.stakingAddress) {
+    return wallet.stakingAddressing.addressing.path;
+  }
+
+  for (const { address, path } of wallet.allAddresses.utxoAddresses) {
+    if (address.Hash === inputAddress) {
+      return  path;
+    }
+  }
+
+  return null;
 }

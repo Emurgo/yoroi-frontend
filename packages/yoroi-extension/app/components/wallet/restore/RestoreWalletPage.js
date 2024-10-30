@@ -221,7 +221,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
               throw new Error('Network must be selected to create a wallet. Should never happen');
 
             restoreWallet({ walletName, walletPassword, recoveryPhrase });
-            ampli.restoreWalletDetailsSubmitted();
+            ampli.restoreWalletDetailsSettled();
           }}
           {...manageDialogsProps}
         />

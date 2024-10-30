@@ -9,6 +9,7 @@ import AssetFingerprint from '@emurgo/cip14-js';
 import { AssetNameUtils } from '@emurgo/yoroi-lib/dist/internals/utils/assets';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
+import { hexToBytes } from '../../coreUtils';
 
 export function getTokenName(
   tokenRow: $ReadOnly<{
@@ -77,8 +78,8 @@ export function getTokenIdentifierIfExists(
   if (tokenRow.Metadata.type === 'Cardano') {
     const { policyId, assetName } = tokenRow.Metadata;
     const assetFingerprint = new AssetFingerprint(
-      Buffer.from(policyId, 'hex'),
-      Buffer.from(assetName, 'hex')
+      hexToBytes(policyId),
+      hexToBytes(assetName),
     );
     return assetFingerprint.fingerprint();
   }
