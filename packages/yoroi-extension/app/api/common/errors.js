@@ -199,9 +199,14 @@ export class GenericApiError extends LocalizableError {
 }
 
 export class IncorrectWalletPasswordError extends LocalizableError {
+
+  static get errorId(): string {
+    return messages.incorrectWalletPasswordError.id;
+  }
+
   constructor() {
     super({
-      id: messages.incorrectWalletPasswordError.id,
+      id: IncorrectWalletPasswordError.errorId,
       defaultMessage: messages.incorrectWalletPasswordError.defaultMessage || '',
     });
   }

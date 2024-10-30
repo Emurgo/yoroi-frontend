@@ -19,6 +19,7 @@ type Props = {|
   +asModern?: boolean,
   +withPadding?: boolean, // default: true
   +bgcolor?: string,
+  +isErrorPage?: boolean,
 |};
 
 type InjectedProps = {| isRevampLayout: boolean, currentTheme: string |};
@@ -40,6 +41,7 @@ function TopBarLayout({
   asModern,
   withPadding,
   bgcolor,
+  isErrorPage,
 }: AllProps) {
   const isModern = currentTheme === THEMES.YOROI_MODERN;
   const isRevamp = isRevampLayout && asModern !== true && !isModern;
@@ -79,7 +81,7 @@ function TopBarLayout({
             <Box
               sx={{
                 bgcolor: bgcolor || 'ds.bg_color_max',
-                height: '100%',
+                height: !isErrorPage ? '100%' : 'auto',
                 width: '100%',
                 maxWidth: '1872px',
                 mx: 'auto',

@@ -23,6 +23,7 @@ type Props = {|
   title: Node,
   menu?: Node,
   pageBanner?: Node,
+  isErrorPage?: boolean,
 |};
 
 const localStorage = new LocalStorageApi();
@@ -67,7 +68,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   render(): Node {
-    const { stores, pageBanner } = this.props;
+    const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
 
@@ -109,6 +110,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           buyButton={
             <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
           }
+          isErrorPage={isErrorPage}
           pageBanner={pageBanner}
         />
         {pageBanner && pageBanner}

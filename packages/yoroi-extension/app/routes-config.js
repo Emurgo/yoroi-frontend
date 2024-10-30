@@ -1,6 +1,10 @@
 // @flow
-export const ROUTES = {
+
+export const PAGE_ERROR_SUBROUTE: string = '/page-error';
+
+export const ROUTES: { [string]: any } = {
   ROOT: '/',
+  PAGE_ERROR: PAGE_ERROR_SUBROUTE,
   NIGHTLY_INFO: '/nightly',
   MY_WALLETS: '/my-wallets',
   PROFILE: {
@@ -74,7 +78,7 @@ export const ROUTES = {
   },
   SWAP: {
     ROOT: '/swap',
-    ERROR: '/swap/page-error',
+    ERROR: '/swap' + PAGE_ERROR_SUBROUTE,
     ORDERS: '/swap/orders',
   },
   EXCHANGE_END: '/exchange-end',

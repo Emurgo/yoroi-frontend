@@ -80,6 +80,16 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
     actions.exportTransactionsToFile.listen(this._exportTransactionsToFile);
     actions.closeExportTransactionDialog.listen(this._closeExportTransactionDialog);
     actions.closeDelegationBanner.listen(this._closeDelegationBanner);
+    this.actions.profile.updateUnitOfAccount.listen(async () => {
+      const publicDeriver = this.stores.wallets.selected;
+      if (!publicDeriver) {
+        return;
+      }
+      const timestamps = new Set(this.getTxHistoryState(publicDeriver.publicDeriverId).txs.map(
+        tx => tx.date.valueOf()
+      ));
+      await this._updateTransactionPriceData(publicDeriver, timestamps);
+    });
   }
 
   /** Calculate information about transactions that are still realistically reversible */
@@ -174,6 +184,18 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
         withdrawalIds.add(txid);
       }
     }
+    await this._updateTransactionPriceData(publicDeriver, timestamps);
+    await Promise.all([
+      // reload token info cache
+      // todo: use fetchMissingTokenInfo to fetch only missing tokens
+      this.stores.tokenInfoStore.refreshTokenInfo(),
+      this.stores.addresses.refreshAddressesFromDb(publicDeriver)
+    ]);
+  }
+
+  async _updateTransactionPriceData(
+    publicDeriver: { networkId: number, ... }, timestamps: Set<number>
+  ): Promise<void> {
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.networkId,
     );
@@ -186,13 +208,6 @@ export default class TransactionsStore extends Store<StoresMap, ActionsMap> {
       timestamps: Array.from(timestamps),
       defaultToken: ticker,
     });
-
-    await Promise.all([
-      // reload token info cache
-      // todo: use fetchMissingTokenInfo to fetch only missing tokens
-      this.stores.tokenInfoStore.refreshTokenInfo(),
-      this.stores.addresses.refreshAddressesFromDb(publicDeriver)
-    ]);
   }
 
   @action _loadMore: (WalletState) => Promise<void> = async (publicDeriver) => {
