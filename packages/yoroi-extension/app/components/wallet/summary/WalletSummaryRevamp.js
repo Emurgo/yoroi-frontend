@@ -224,21 +224,19 @@ export default class WalletSummaryRevamp extends Component<Props> {
             }}
           >
             <Grid item xs={4}>
-              <Typography component="div" variant="body2">
+              <Typography variant="body2" color="ds.text_gray_medium">
                 {intl.formatMessage({ id: 'wallet.summary.page.type' })}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'left' }}>
-              <Typography component="div" variant="body2">
+              <Typography variant="body2" color="ds.text_gray_medium">
                 {intl.formatMessage({ id: 'wallet.summary.page.status' })}
               </Typography>
             </Grid>
-            <Grid item xs={2} sx={{ textAlign: 'right' }}>
-              <Typography component="div" variant="body2">
-                {intl.formatMessage(globalMessages.feeLabel)}
-              </Typography>
+            <Grid item xs={2} sx={{ textAlign: 'right' }} color="ds.text_gray_medium">
+              <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
             </Grid>
-            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }}>
+            <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }} color="ds.text_gray_medium">
               <Typography component="div" variant="body2">
                 {intl.formatMessage(globalMessages.amountLabel)}
               </Typography>
