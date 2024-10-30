@@ -25,6 +25,8 @@ import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import DialogTextBlock from '../../components/widgets/DialogTextBlock'
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { Box, TextField, InputAdornment, IconButton, Tooltip, Typography, DialogContentText } from '@mui/material';
+import { LedgerConnect } from '../../utils/hwConnectHandler';
+import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 type Props = StoresAndActionsProps;
 
@@ -40,6 +42,9 @@ type IframeMessageData = {|
 
 const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllProps) => {
   const { actions, stores } = props;
+  const wallet = stores.wallets.selected;
+  if (!wallet) throw Error('no publicDeriver');
+
   const theme = useTheme();
   // const intl = useContext(IntlContext);
 
@@ -90,12 +95,33 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
   }
 
   const signMessage = useCallback(async (message: string, password: string) => {
-    const wallet = stores.wallets.selected;
-    if (!wallet) throw Error('no publicDeriver');
-    const address = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address;
-    const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId)
+    const { address, addressing } = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+
     try {
-      const res = await walletSignData(publicDeriver, password, address, stringToHex(message))
+      let res;
+      if (wallet.type === 'mnemonic') {
+        const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId)
+        res = await walletSignData(publicDeriver, password, address, stringToHex(message))
+      } else if (wallet.type === 'ledger') {
+        const ledgerConnect = new LedgerConnect({
+          locale: stores.profile.currentLocale,
+        });
+        const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
+          serial: null,
+          params: {
+            messageHex: stringToHex(message),
+            signingPath: addressing.path,
+            hashPayload: false,
+            addressFieldType: MessageAddressFieldType.KEY_HASH,
+          },
+        });
+        res = {
+          signature: signatureHex,
+          key: signingPublicKeyHex,
+        };
+      } else {
+        throw new Error('unsupported wallet type');
+      }
       iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'SIGNATURE', ...res, message, address }, '*');
       setSignaturePopup(false)
       setPassword('')
@@ -179,13 +205,16 @@ return (
             actions={[{
               label: 'CONFIRM',
               primary: true,
-              disabled: !password,
+              disabled: wallet.type === 'mnemonic' && !password,
               onClick: () => signMessage(message, password)
             }]}
           >
             <Box>
               <Typography sx={{ marginBottom: "16px", color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5' }}>
-                Enter your password to claim cashback rewards.
+                {wallet.type === 'mnemonic' ?
+                 'Enter your password to claim cashback rewards.' :
+                 'Confirm on your hardware wallet to claim cashback rewards.'
+                }
               </Typography>
               <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
                 Message
@@ -195,28 +224,30 @@ return (
               }}>
                 {message}
               </DialogContentText>
-              <TextField
-                className="walletPassword"
-                value={password}
-                label="Password"
-                type="password"
-                // endAdornment={
-                //   <InputAdornment position="end">
-                //     <IconButton
-                //       aria-label="toggle password visibility"
-                //       onClick={() => setShowPassword(!showPassword)}
-                //       edge="end"
-                //     >
-                //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
-                //     </IconButton>
-                //   </InputAdornment>
-                // }
-                onChange={e => {
-                  setPassword(e.target.value);
-                }}
-                error={!!errMsg}
-                disabled={false}
-              />
+              {wallet.type === 'mnemonic' && (
+                <TextField
+                  className="walletPassword"
+                  value={password}
+                  label="Password"
+                  type="password"
+                  // endAdornment={
+                  //   <InputAdornment position="end">
+                  //     <IconButton
+                  //       aria-label="toggle password visibility"
+                  //       onClick={() => setShowPassword(!showPassword)}
+                  //       edge="end"
+                  //     >
+                  //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
+                  //     </IconButton>
+                  //   </InputAdornment>
+                  // }
+                  onChange={e => {
+                    setPassword(e.target.value);
+                  }}
+                  error={!!errMsg}
+                  disabled={false}
+                />
+              )}
             </Box>
           </Dialog>
           : null}
