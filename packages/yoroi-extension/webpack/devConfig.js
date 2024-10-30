@@ -190,7 +190,7 @@ const bringContentScriptConfig = (
     hot: false,
     liveReload: false,
     // HTTP is not actually used because injected code must always be written to `dev` dir
-    port: 8003,
+    port: 8082,
   },
   output: {
     path: path.join(__dirname, '../dev/js'),
