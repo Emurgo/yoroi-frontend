@@ -801,7 +801,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                <Typography component="div" variant="button2" color="ds.text_gray_low" fontWeight={500} mr="12px">
                   ADA
                 </Typography>
 
