@@ -648,8 +648,11 @@ const Handlers = Object.freeze({
     'dark' | 'light'
   >(async () => {
     const localStorageApi = new LocalStorageApi();
-    const theme = await localStorageApi.getUserThemeMode();
-    return { ok: theme || 'light' };
+    let theme = await localStorageApi.getUserThemeMode();
+    if (theme !== 'light' && theme !== 'dark') {
+      theme = 'light';
+    }
+    return { ok: theme };
   }),
 
   'pop-up-wallet-creation': NewHandler.basic<

@@ -14,6 +14,7 @@ export async function getPublicDeriverById(publicDeriverId: number): Promise<Pub
 }
 
 export function notifyAllTabsActiveWalletOpen(activeWalletId: number) {
+  declare var chrome;
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
       chrome.tabs.sendMessage(
