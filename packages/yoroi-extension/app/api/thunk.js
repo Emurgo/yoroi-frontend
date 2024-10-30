@@ -164,8 +164,8 @@ export async function getWallets(walletId?: number): Promise<Array<WalletState>>
   return resp;
 }
 
-export async function subscribe(activeWalletId: ?number): Promise<void> {
-  await callBackground({ type: 'subscribe', request: { activeWalletId } });
+export async function subscribe(activeWalletId: ?number, changed?: boolean): Promise<void> {
+  await callBackground({ type: 'subscribe', request: { activeWalletId, changed: changed === true } });
 }
 
 export const createWallet: GetEntryFuncType<typeof CreateWallet> = async (request) => {

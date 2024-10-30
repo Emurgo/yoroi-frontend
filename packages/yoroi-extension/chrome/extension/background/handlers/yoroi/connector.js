@@ -448,7 +448,6 @@ export const RemoveWalletFromWhiteList: HandlerType<
       const site = connectedSites[tabId];
       if (site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
-        break;
       }
     }
   },

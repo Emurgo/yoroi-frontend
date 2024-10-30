@@ -8,4 +8,4 @@ export const IntlProvider = ({ children, intl }: { children: React.ReactNode; in
 };
 
 export const useIntl = () =>
-  React.useContext(IntlProviderContext) ?? console.warn('IntlProviderontext: needs to be wrapped in a IntlProvider');
+  React.useContext(IntlProviderContext) ?? console.warn('IntlProviderContext: needs to be wrapped in a IntlProvider');

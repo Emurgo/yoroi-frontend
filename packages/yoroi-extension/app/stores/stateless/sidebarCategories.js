@@ -1,6 +1,7 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import { ReactComponent as CashbackIcon } from '../../assets/images/sidebar/cashback.inline.svg';
 import { ReactComponent as walletsIcon } from '../../assets/images/sidebar/my_wallets.inline.svg';
 import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
@@ -22,12 +23,12 @@ import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp
 export type SidebarCategory = {|
   +className: string,
   +route: string,
-  +icon: string,
-  +label?: MessageDescriptor,
-  +isVisible: ({|
-    hasAnyWallets: boolean,
-    selected: ?{ publicDeriverId: number, ... },
-    currentRoute: string,
+    +icon: string,
+      +label ?: MessageDescriptor,
+      +isVisible: ({|
+        hasAnyWallets: boolean,
+          selected: ?{ publicDeriverId: number, ... },
+currentRoute: string,
   |}) => boolean,
 |};
 
@@ -87,9 +88,9 @@ export const CONNECTED_WEBSITES: SidebarCategory = registerCategory({
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: ?WalletState,
-  currentRoute: string,
-  isRewardWallet: isRewardWalletFunc,
+    selected: ?WalletState,
+      currentRoute: string,
+        isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
 type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
@@ -97,10 +98,10 @@ type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
-  +icon: string,
-  +label?: MessageDescriptor,
-  +isVisible: isVisibleFunc,
-  +featureFlagName?: string,
+    +icon: string,
+      +label ?: MessageDescriptor,
+      +isVisible: isVisibleFunc,
+        +featureFlagName ?: string,
 |};
 
 // TODO: Fix routes and isVisible prop
@@ -159,6 +160,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     label: globalMessages.sidebarVoting,
     // $FlowFixMe[prop-missing]
     isVisible: request => request.selected != null,
+  },
+  {
+    className: 'cashback',
+    route: ROUTES.CASHBACK.ROOT,
+    icon: CashbackIcon,
+    label: globalMessages.sidebarCashback,
+    isVisible: _request => true,
   },
   {
     className: 'connected-websites',

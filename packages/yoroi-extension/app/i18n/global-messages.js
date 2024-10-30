@@ -690,6 +690,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
   },
+  sidebarCashback: {
+    id: 'sidebar.cashback',
+    defaultMessage: '!!!Cashback',
+  },
   sidebarAssets: {
     id: 'sidebar.assets',
     defaultMessage: '!!!Assets',

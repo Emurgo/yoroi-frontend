@@ -55,6 +55,10 @@ export const ROUTES = {
     ROOT: '/assets',
     DETAILS: '/assets/tokens/:tokenId',
   },
+  // Bringweb3
+  CASHBACK: {
+    ROOT: '/cashback'
+  },
   NFTS: {
     ROOT: '/nfts',
     DETAILS: '/nfts/:nftId',
