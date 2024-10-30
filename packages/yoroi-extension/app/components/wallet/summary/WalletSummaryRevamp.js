@@ -194,6 +194,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 textTransform: 'uppercase',
                 margin: '2px',
                 lineHeight: '21px',
+                color: 'ds.text_primary_medium',
               }}
               onClick={openExportTxToFileDialog}
               onKeyPress={openExportTxToFileDialog}
