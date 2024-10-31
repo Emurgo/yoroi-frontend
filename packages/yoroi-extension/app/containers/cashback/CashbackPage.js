@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
 import styles from './styles.module.css'
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
@@ -27,11 +26,17 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { Box, TextField, InputAdornment, IconButton, Tooltip, Typography, DialogContentText } from '@mui/material';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { IncorrectWalletPasswordError } from '../../api/common/errors';
+import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
+import LocalizableError from '../../i18n/LocalizableError';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { injectIntl } from 'react-intl';
 
 type Props = StoresAndActionsProps;
 
 type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...InjectedLayoutProps, intl: $npm$ReactIntl$IntlShape, |};
 
 type IframeMessageData = {|
   action: string,
@@ -41,12 +46,11 @@ type IframeMessageData = {|
         |};
 
 const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllProps) => {
-  const { actions, stores } = props;
+  const { actions, stores, intl } = props;
   const wallet = stores.wallets.selected;
   if (!wallet) throw Error('no publicDeriver');
 
   const theme = useTheme();
-  // const intl = useContext(IntlContext);
 
   const iframeRef = useRef < HTMLIFrameElement | null > (null);
   const [iframeSrc, setIframeSrc] = useState('');
@@ -101,32 +105,51 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
       let res;
       if (wallet.type === 'mnemonic') {
         const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId)
-        res = await walletSignData(publicDeriver, password, address, stringToHex(message))
+        try {
+          res = await walletSignData(publicDeriver, password, address, stringToHex(message))
+        } catch (error) {
+          if (error instanceof WrongPassphraseError) {
+            throw new IncorrectWalletPasswordError();
+          }
+          throw error;
+        }
       } else if (wallet.type === 'ledger') {
         const ledgerConnect = new LedgerConnect({
           locale: stores.profile.currentLocale,
         });
-        const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
-          serial: null,
-          params: {
-            messageHex: stringToHex(message),
-            signingPath: addressing.path,
-            hashPayload: false,
-            addressFieldType: MessageAddressFieldType.KEY_HASH,
-          },
-        });
-        res = {
-          signature: signatureHex,
-          key: signingPublicKeyHex,
-        };
+        try {
+          const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
+            serial: null,
+            params: {
+              messageHex: stringToHex(message),
+              signingPath: addressing.path,
+              hashPayload: false,
+              addressFieldType: MessageAddressFieldType.KEY_HASH,
+            },
+          });
+          res = {
+            signature: signatureHex,
+            key: signingPublicKeyHex,
+          };
+        } catch (error) {
+          throw new convertToLocalizableError(error);
+        }
       } else {
         throw new Error('unsupported wallet type');
       }
-      iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'SIGNATURE', ...res, message, address }, '*');
-      setSignaturePopup(false)
-      setPassword('')
+      iframeRef.current?.contentWindow.postMessage(
+        {
+          to: 'bringweb3',
+          action: 'SIGNATURE',
+          ...res,
+          message, address
+        },
+        '*'
+      );
+      setSignaturePopup(false);
+      setPassword('');
     } catch (error) {
-      setErrMsg(error.message)
+      setErrMsg(error instanceof LocalizableError ? intl.formatMessage(error) : error.message)
       // console.warn(error);
     }
   }, []);
@@ -248,6 +271,7 @@ return (
                   disabled={false}
                 />
               )}
+              { errMsg }
             </Box>
           </Dialog>
           : null}
@@ -274,4 +298,4 @@ return (
 );
 });
 
-export default (withLayout(CashbackPageContainer): React$ComponentType < Props >);
+export default (injectIntl((withLayout(CashbackPageContainer))): React$ComponentType < Props >);
