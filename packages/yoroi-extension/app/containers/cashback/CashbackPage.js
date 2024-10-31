@@ -31,7 +31,26 @@ import { IncorrectWalletPasswordError } from '../../api/common/errors';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
+import { injectIntl, defineMessages, } from 'react-intl';
+
+const messages = defineMessages({
+  claim: {
+    id: 'cashback.claim.dialog.title',
+    defaultMessage: '!!!CLAIM CASHBACK',
+  },
+  passwordClaimInstruction: {
+    id: 'cashback.claim.dialog.instruction.password',
+    defaultMessage: '!!!Enter your password to claim cashback rewards.',
+  },
+  hardwardClaimInstruction: {
+    id: 'cashback.claim.dialog.instruction.hardware',
+    defaultMessage: '!!!Confirm on your hardware wallet to claim cashback rewards.',
+  },
+  message: {
+    id: 'cashback.claim.dialog.message.label',
+    defaultMessage: '!!!Message',
+  },
+});
 
 type Props = StoresAndActionsProps;
 
@@ -212,8 +231,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         <NavBarContainerRevamp
           actions={actions}
           stores={stores}
-          title={<NavBarTitle title={'Cashback'} />}
-          // title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
+          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
         />
       }
     >
@@ -221,12 +239,12 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         <Suspense fallback={null}>
           {signaturePopup ?
             <Dialog
-              title='CLAIM CASHBACK'
+              title={intl.formatMessage(messages.claim)}
               closeOnOverlayClick
               closeButton={<DialogCloseButton />}
               onClose={abortClaim}
               actions={[{
-                label: 'CONFIRM',
+                label: intl.formatMessage(globalMessages.confirm),
                 primary: true,
                 disabled: wallet.type === 'mnemonic' && !password,
                 onClick: () => signMessage(message, password)
@@ -234,13 +252,12 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
             >
               <Box>
                 <Typography sx={{ marginBottom: "16px", color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5' }}>
-                  {wallet.type === 'mnemonic' ?
-                   'Enter your password to claim cashback rewards.' :
-                   'Confirm on your hardware wallet to claim cashback rewards.'
-                  }
+                  {intl.formatMessage(wallet.type === 'mnemonic' ?
+                    messages.passwordClaimInstruction : messages. hardwardClaimInstruction
+                  )}
                 </Typography>
                 <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
-                  Message
+                  {intl.formatMessage(messages.message)}
                 </Typography>
                 <DialogContentText sx={{
                   whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
