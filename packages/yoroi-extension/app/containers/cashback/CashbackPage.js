@@ -40,10 +40,10 @@ type AllProps = {| ...Props, ...InjectedLayoutProps, intl: $npm$ReactIntl$IntlSh
 
 type IframeMessageData = {|
   action: string,
-    overlayBgColor ?: string,
-    messageToSign: string,
-      amount: number
-        |};
+  overlayBgColor ?: string,
+  messageToSign: string,
+  amount: number
+|};
 
 const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllProps) => {
   const { actions, stores, intl } = props;
@@ -163,139 +163,139 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
 
     const messageData: IframeMessageData = (event.data: any);
 
-  if (messageData.action === 'SIGN_MESSAGE') {
-    setClaimAmount(messageData.amount)
+    if (messageData.action === 'SIGN_MESSAGE') {
+      setClaimAmount(messageData.amount)
 
-    setMessage(messageData.messageToSign)
-    setSignaturePopup(true)
-  } else if (messageData.action === 'POPUP_OPENED') {
-    setPopup(true);
-    setOverlayBgColor(messageData.overlayBgColor || overlayBgColor);
-  } else if (messageData.action === 'POPUP_CLOSED') {
-    setPopup(false);
-  }
-}, [iframeSrc, overlayBgColor]);
-
-useEffect(() => {
-  if (environment.isLight) {
-    actions.router.goToRoute.trigger({
-      route: ROUTES.MY_WALLETS,
-    });
-  }
-  if (!iframeSrc) fetchIframeUrl();
-
-  window.addEventListener('message', handleMessage);
-
-  return () => {
-    window.removeEventListener('message', handleMessage);
-  };
-}, [iframeSrc, fetchIframeUrl, handleMessage]);
-
-const closePopup = useCallback(() => {
-  iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
-  setPopup(false);
-}, []);
-
-const abortClaim = useCallback(() => {
-  iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'ABORT_SIGN_MESSAGE' }, '*');
-  setSignaturePopup(false)
-  setPassword('')
-}, []);
-
-const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-
-return (
-  <TopBarLayout
-    banner={<BannerContainer actions={actions} stores={stores} />}
-    sidebar={sidebarContainer}
-    navbar={
-      <NavBarContainerRevamp
-        actions={actions}
-        stores={stores}
-        title={<NavBarTitle title={'Cashback'} />}
-      // title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
-      />
+      setMessage(messageData.messageToSign)
+      setSignaturePopup(true)
+    } else if (messageData.action === 'POPUP_OPENED') {
+      setPopup(true);
+      setOverlayBgColor(messageData.overlayBgColor || overlayBgColor);
+    } else if (messageData.action === 'POPUP_CLOSED') {
+      setPopup(false);
     }
-  >
-    <FullscreenLayout bottomPadding={0}>
-      <Suspense fallback={null}>
-        {signaturePopup ?
-          <Dialog
-            title='CLAIM CASHBACK'
-            closeOnOverlayClick
-            closeButton={<DialogCloseButton />}
-            onClose={abortClaim}
-            actions={[{
-              label: 'CONFIRM',
-              primary: true,
-              disabled: wallet.type === 'mnemonic' && !password,
-              onClick: () => signMessage(message, password)
-            }]}
-          >
-            <Box>
-              <Typography sx={{ marginBottom: "16px", color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5' }}>
-                {wallet.type === 'mnemonic' ?
-                 'Enter your password to claim cashback rewards.' :
-                 'Confirm on your hardware wallet to claim cashback rewards.'
-                }
-              </Typography>
-              <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
-                Message
-              </Typography>
-              <DialogContentText sx={{
-                whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
-              }}>
-                {message}
-              </DialogContentText>
-              {wallet.type === 'mnemonic' && (
-                <TextField
-                  className="walletPassword"
-                  value={password}
-                  label="Password"
-                  type="password"
-                  // endAdornment={
-                  //   <InputAdornment position="end">
-                  //     <IconButton
-                  //       aria-label="toggle password visibility"
-                  //       onClick={() => setShowPassword(!showPassword)}
-                  //       edge="end"
-                  //     >
-                  //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
-                  //     </IconButton>
-                  //   </InputAdornment>
-                  // }
-                  onChange={e => {
-                    setPassword(e.target.value);
-                  }}
-                  error={!!errMsg}
-                  disabled={false}
-                />
-              )}
-              { errMsg }
-            </Box>
-          </Dialog>
-          : null}
-        {popup ? (
-          <div
-            className={styles.iframe_overlay}
-            style={{ background: overlayBgColor }}
-            onClick={closePopup}
-          />
-        ) : null}
-        {iframeSrc && (
-          <iframe
-            ref={iframeRef}
-            id="bringweb3"
-            className={styles.iframe}
-            src={iframeSrc}
-            width="100%"
-            height="100%"
-          />
-        )}
-      </Suspense>
-    </FullscreenLayout>
-  </TopBarLayout >
-);
+  }, [iframeSrc, overlayBgColor]);
+
+  useEffect(() => {
+    if (environment.isLight) {
+      actions.router.goToRoute.trigger({
+        route: ROUTES.MY_WALLETS,
+      });
+    }
+    if (!iframeSrc) fetchIframeUrl();
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [iframeSrc, fetchIframeUrl, handleMessage]);
+
+  const closePopup = useCallback(() => {
+    iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
+    setPopup(false);
+  }, []);
+
+  const abortClaim = useCallback(() => {
+    iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'ABORT_SIGN_MESSAGE' }, '*');
+    setSignaturePopup(false)
+    setPassword('')
+  }, []);
+
+  const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+
+  return (
+    <TopBarLayout
+      banner={<BannerContainer actions={actions} stores={stores} />}
+      sidebar={sidebarContainer}
+      navbar={
+        <NavBarContainerRevamp
+          actions={actions}
+          stores={stores}
+          title={<NavBarTitle title={'Cashback'} />}
+          // title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
+        />
+      }
+    >
+      <FullscreenLayout bottomPadding={0}>
+        <Suspense fallback={null}>
+          {signaturePopup ?
+            <Dialog
+              title='CLAIM CASHBACK'
+              closeOnOverlayClick
+              closeButton={<DialogCloseButton />}
+              onClose={abortClaim}
+              actions={[{
+                label: 'CONFIRM',
+                primary: true,
+                disabled: wallet.type === 'mnemonic' && !password,
+                onClick: () => signMessage(message, password)
+              }]}
+            >
+              <Box>
+                <Typography sx={{ marginBottom: "16px", color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5' }}>
+                  {wallet.type === 'mnemonic' ?
+                   'Enter your password to claim cashback rewards.' :
+                   'Confirm on your hardware wallet to claim cashback rewards.'
+                  }
+                </Typography>
+                <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
+                  Message
+                </Typography>
+                <DialogContentText sx={{
+                  whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
+                }}>
+                  {message}
+                </DialogContentText>
+                {wallet.type === 'mnemonic' && (
+                  <TextField
+                    className="walletPassword"
+                    value={password}
+                    label="Password"
+                    type="password"
+                    // endAdornment={
+                    //   <InputAdornment position="end">
+                    //     <IconButton
+                    //       aria-label="toggle password visibility"
+                    //       onClick={() => setShowPassword(!showPassword)}
+                    //       edge="end"
+                    //     >
+                    //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
+                    //     </IconButton>
+                    //   </InputAdornment>
+                    // }
+                    onChange={e => {
+                      setPassword(e.target.value);
+                    }}
+                    error={!!errMsg}
+                    disabled={false}
+                  />
+                )}
+                { errMsg }
+              </Box>
+            </Dialog>
+            : null}
+          {popup ? (
+            <div
+              className={styles.iframe_overlay}
+              style={{ background: overlayBgColor }}
+              onClick={closePopup}
+            />
+          ) : null}
+          {iframeSrc && (
+            <iframe
+              ref={iframeRef}
+              id="bringweb3"
+              className={styles.iframe}
+              src={iframeSrc}
+              width="100%"
+              height="100%"
+            />
+          )}
+        </Suspense>
+      </FullscreenLayout>
+    </TopBarLayout >
+  );
 });
 
 export default (injectIntl((withLayout(CashbackPageContainer))): React$ComponentType < Props >);
