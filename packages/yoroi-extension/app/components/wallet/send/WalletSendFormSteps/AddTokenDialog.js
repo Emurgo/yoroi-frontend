@@ -313,7 +313,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
+        title={intl.formatMessage(messages.nTokens, { number: currentTokensList.length })}
         actions={[
           {
             disabled:
@@ -352,6 +352,9 @@ export default class AddTokenDialog extends Component<Props, State> {
                   width: '100%',
                   fontSize: '14px',
                   lineHeight: '22px',
+                  '& input::placeholder': {
+                    color: 'ds.text_gray_low',
+                  },
                 }}
                 placeholder={intl.formatMessage(messages.search)}
               />
