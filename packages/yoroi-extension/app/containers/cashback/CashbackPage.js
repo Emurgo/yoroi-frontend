@@ -288,7 +288,9 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
                     disabled={false}
                   />
                 )}
-                { errMsg }
+                <Typography color="ds.text_error">
+                  { errMsg }
+                </Typography>
               </Box>
             </Dialog>
             : null}
