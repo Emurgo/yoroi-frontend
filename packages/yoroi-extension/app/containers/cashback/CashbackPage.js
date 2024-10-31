@@ -25,13 +25,14 @@ import DialogTextBlock from '../../components/widgets/DialogTextBlock'
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { Box, TextField, InputAdornment, IconButton, Tooltip, Typography, DialogContentText } from '@mui/material';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
-import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { IncorrectWalletPasswordError } from '../../api/common/errors';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl, defineMessages, } from 'react-intl';
+import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   claim: {
@@ -137,13 +138,27 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
           locale: stores.profile.currentLocale,
         });
         try {
+          const network = getNetworkById(wallet.networkId);
+          const config = network.BaseConfig[0];
           const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
             serial: null,
             params: {
+              preferHexDisplay: false,
               messageHex: stringToHex(message),
               signingPath: addressing.path,
-              hashPayload: false,
-              addressFieldType: MessageAddressFieldType.KEY_HASH,
+              hashPayload: true,
+              addressFieldType: MessageAddressFieldType.ADDRESS,
+              address: {
+                type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+                params: {
+                  spendingPath: addressing.path,
+                  stakingPath: wallet.stakingAddressing.addressing.path,
+                },
+              },
+              network: {
+                protocolMagic: config.ByronNetworkId,
+                networkId: Number(config.ChainNetworkId),
+              },
             },
           });
           res = {
