@@ -6,7 +6,8 @@ import {
   getCSLPubKeyHash,
   getCslValue,
   getDRepIDHexAndBechFromHex,
-  mapCborUtxos, bytesToHex,
+  mapCborUtxos,
+  bytesToHex,
 } from './dAppTxHelper.js';
 
 class MockDAppWebpageError extends Error {}
@@ -22,13 +23,9 @@ export class MockDAppWebpage {
     this.logger = logger;
   }
 
-  async _requestAccess(auth = false) {
-    this.logger.info(
-      `MockDApp::_requestAccess Requesting the access ${auth ? 'with' : 'without'} authentication`
-    );
-    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable(${
-      auth ? '{requestIdentification: true}' : ''
-    })`;
+  async requestAccess() {
+    this.logger.info(`MockDApp::requestAccess Requesting the access without authentication`);
+    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable()`;
     await this.driver.executeScript(scriptString);
   }
 
@@ -163,14 +160,6 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp::getAddresses Result: ${JSON.stringify(addressesResult, null, 2)}`);
     return addressesResult;
-  }
-
-  async requestNonAuthAccess() {
-    await this._requestAccess();
-  }
-
-  async requestAuthAccess() {
-    await this._requestAccess(true);
   }
 
   async checkAccessRequest() {
