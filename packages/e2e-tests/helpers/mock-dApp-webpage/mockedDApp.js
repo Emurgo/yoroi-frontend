@@ -628,7 +628,7 @@ export class MockDAppWebpage {
   }
 
   async getSigningDataCIP95Result() {
-    this.logger.info(`MockDApp::getSigningDataResult Getting signing data result`);
+    this.logger.info(`MockDApp::getSigningDataCIP95Result Getting signing data result`);
     const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signDataCIP95Promise
@@ -645,7 +645,7 @@ export class MockDAppWebpage {
         });
     });
     this.logger.info(
-      `MockDApp::getSigningDataResult Signing data result: ${JSON.stringify(signingResult, null, 2)}`
+      `MockDApp::getSigningDataCIP95Result Signing data result: ${JSON.stringify(signingResult, null, 2)}`
     );
     return signingResult;
   }
