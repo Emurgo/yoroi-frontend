@@ -102,6 +102,9 @@ function TextField({
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: `0 0 0 30px ${appTheme.palette.ds.bg_color_max} inset !important`,
         },
+        '& .MuiInputBase-input.Mui-disabled': {
+          '-webkit-text-fill-color': theme => `${theme.palette.ds.text_gray_medium} !important`,
+        },
       }}
       /*
         In order to show placeholders for classic theme we dont' need to override
