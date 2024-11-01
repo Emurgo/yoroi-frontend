@@ -56,7 +56,7 @@ export const SignTransaction: HandlerType<
       );
       return transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex);
     } catch (error) {
-      return { error: error.name };
+      return { error: error.message };
     }
   },
 });
@@ -149,7 +149,7 @@ export const SignAndBroadcastTransaction: HandlerType<
         emitUpdateForTxSubmission(request.publicDeriverId);
         return { txId };
       } catch (error) {
-        return { error: error.name };
+        return { error: error.message };
       }
     });
   },

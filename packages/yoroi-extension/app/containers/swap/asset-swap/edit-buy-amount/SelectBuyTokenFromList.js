@@ -1,13 +1,13 @@
 //@flow
-import { type Node } from 'react';
-import { useSwap } from '@yoroi/swap';
-import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
-import { useSwapForm } from '../../context/swap-form';
+import type { Node } from 'react';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
-import SwapStore from '../../../../stores/ada/SwapStore';
+import { useSwap } from '@yoroi/swap';
+import { useSwapForm } from '../../context/swap-form';
 import { useBuyVerifiedSwapTokens } from '../hooks';
 import { ampli } from '../../../../../ampli/index';
 import { tokenInfoToAnalyticsToAsset } from '../../swapAnalytics';
+import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
+import SwapStore from '../../../../stores/ada/SwapStore';
 
 type Props = {|
   store: SwapStore,
@@ -33,7 +33,9 @@ export default function SelectBuyTokenFromList({
     switchTokens,
   } = useSwapForm();
 
-  const { walletVerifiedAssets, isLoading } = useBuyVerifiedSwapTokens(store.assets, sellTokenInfo);
+  const { walletVerifiedAssets, isLoading, errored } = useBuyVerifiedSwapTokens(store.assets, sellTokenInfo);
+
+  console.log('errored', errored);
 
   const { orderData, resetQuantities } = useSwap();
 
@@ -59,7 +61,7 @@ export default function SelectBuyTokenFromList({
   return (
     <SelectAssetDialog
       assets={walletVerifiedAssets}
-      assetsStillLoading={isLoading}
+      assetsStillLoading={isLoading || errored}
       type="to"
       onAssetSelected={handleAssetSelected}
       onClose={onClose}

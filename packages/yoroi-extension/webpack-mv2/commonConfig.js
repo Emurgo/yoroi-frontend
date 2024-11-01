@@ -86,6 +86,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
         '*.forTests.*',
         '**/__mocks__/*',
         '*.snap',
+        '*.d.ts',
         '*.dump.json',
         '*.md',
         '*.types.*',

@@ -1,43 +1,40 @@
-import React from 'react';
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { Skeleton } from '../../../../components/Skeleton';
-import { TokenType } from '../../common/types/index';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import React from 'react';
+import { useStrings } from '../../../common/hooks/useStrings';
 
-const PerformanceItemType = {
-  FIAT: 'fiat',
-  TOKEN: 'token',
-  RANK: 'rank',
-};
+// const PerformanceItemType = {
+//   FIAT: 'fiat',
+//   TOKEN: 'token',
+//   RANK: 'rank',
+// };
 
 interface Props {
-  tokenInfo: TokenType;
-  isLoading: boolean;
+  tokenInfo: TokenInfoType;
+  isLoading?: boolean;
 }
 
-const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+  console.log({ tokenInfo, isLoading });
   const theme = useTheme();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  // const { unitOfAccount } = usePortfolio();
 
-  const firstPerformanceItemList = [
-    { id: 'tokenPriceChange', type: PerformanceItemType.FIAT, label: strings.tokenPriceChange },
-    { id: 'tokenPrice', type: PerformanceItemType.FIAT, label: strings.tokenPrice },
-    { id: 'marketCap', type: PerformanceItemType.FIAT, label: strings.marketCap },
-    { id: 'volumn', type: PerformanceItemType.FIAT, label: strings['24hVolumn'] },
-    { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
-  ];
+  // const firstPerformanceItemList = [
+  //   { id: 'tokenPriceChange', type: PerformanceItemType.FIAT, label: strings.tokenPriceChange },
+  //   { id: 'tokenPrice', type: PerformanceItemType.FIAT, label: strings.tokenPrice },
+  //   { id: 'marketCap', type: PerformanceItemType.FIAT, label: strings.marketCap },
+  //   { id: 'volumn', type: PerformanceItemType.FIAT, label: strings['24hVolumn'] },
+  //   { id: 'rank', type: PerformanceItemType.RANK, label: strings.rank },
+  // ];
 
-  const secondPerformanceItemList = [
-    { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
-    { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
-    { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
-    { id: 'allTimeHigh', type: PerformanceItemType.FIAT, label: strings.allTimeHigh },
-    { id: 'allTimeLow', type: PerformanceItemType.FIAT, label: strings.allTimeLow },
-  ];
+  // const secondPerformanceItemList = [
+  //   { id: 'circulating', type: PerformanceItemType.TOKEN, label: strings.circulating },
+  //   { id: 'totalSupply', type: PerformanceItemType.TOKEN, label: strings.totalSupply },
+  //   { id: 'maxSupply', type: PerformanceItemType.TOKEN, label: strings.maxSupply },
+  //   { id: 'allTimeHigh', type: PerformanceItemType.FIAT, label: strings.allTimeHigh },
+  //   { id: 'allTimeLow', type: PerformanceItemType.FIAT, label: strings.allTimeLow },
+  // ];
 
   return (
     <Stack direction="column">
@@ -45,7 +42,7 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
-        {firstPerformanceItemList.map((item, index) => (
+        {/* {firstPerformanceItemList.map((item, index) => (
           <Stack
             key={item.id}
             direction="row"
@@ -71,10 +68,10 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
               </Typography>
             )}
           </Stack>
-        ))}
+        ))} */}
       </Stack>
       <Stack direction="column" spacing={'0.375rem'} sx={{ marginTop: theme.spacing(1) }}>
-        {secondPerformanceItemList.map((item, index) => (
+        {/* {secondPerformanceItemList.map((item, index) => (
           <Stack key={item.id} direction="row" justifyContent="space-between" alignItems="center">
             <Typography color="ds.gray_600">{item.label}</Typography>
             {isLoading ? (
@@ -94,10 +91,10 @@ const TokenDetailPerformance = ({ tokenInfo, isLoading }: Props): JSX.Element =>
               </Typography>
             )}
           </Stack>
-        ))}
+        ))} */}
       </Stack>
     </Stack>
   );
 };
 
-export default TokenDetailPerformance;
+export default Performance;
