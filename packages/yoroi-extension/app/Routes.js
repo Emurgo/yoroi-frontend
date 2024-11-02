@@ -51,6 +51,7 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
+import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 
 // PAGES
@@ -572,6 +573,7 @@ export function wrapGovernance(governanceProps: StoresAndActionsProps, children:
       txDelegationError={delegationTxError}
       tokenInfo={governanceProps.stores.tokenInfoStore.tokenInfo}
       triggerBuySellAdaDialog={() => governanceProps.actions.dialogs.open.trigger({ dialog: BuySellDialog })}
+      ampli={ampli}
     >
       <Suspense fallback={null}>{children}</Suspense>;
     </GovernanceContextProvider>

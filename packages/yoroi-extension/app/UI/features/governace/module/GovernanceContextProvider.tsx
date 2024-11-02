@@ -13,6 +13,12 @@ import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
 
+type GovernanceAnalytics = {
+  governanceChooseDrepPageViewed: () => void,
+  governanceConfirmTransactionPageViewed: () => void,
+  governanceTransactionSuccessPageViewed: () => void,
+};
+
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
   ...defaultGovernanceActions,
@@ -32,6 +38,7 @@ const initialGovernanceProvider = {
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
   submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
+  ampli: (null as GovernanceAnalytics | null),
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -45,6 +52,7 @@ type GovernanceProviderProps = {
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
+  ampli: GovernanceAnalytics;
 };
 
 export const GovernanceContextProvider = ({
@@ -56,6 +64,7 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
+  ampli,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -162,6 +171,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
+    ampli,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;
