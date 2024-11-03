@@ -2,7 +2,7 @@
 
 export const PAGE_ERROR_SUBROUTE: string = '/page-error';
 
-export const ROUTES: { [string]: any } = {
+export const ROUTES = {
   ROOT: '/',
   PAGE_ERROR: PAGE_ERROR_SUBROUTE,
   NIGHTLY_INFO: '/nightly',
@@ -78,6 +78,7 @@ export const ROUTES: { [string]: any } = {
   },
   SWAP: {
     ROOT: '/swap',
+    // $FlowIgnore
     ERROR: '/swap' + PAGE_ERROR_SUBROUTE,
     ORDERS: '/swap/orders',
   },

@@ -1,7 +1,8 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { bytesToHex, hexToBytes } from '../../../../coreUtils';
+import { bytesToHex, hexToBytes, maybe } from '../../../../coreUtils';
+import { base32ToHex } from '../storage/bridge/utils';
 
 export function v4PublicToV2(
   v4Key: RustModule.WalletV4.Bip32PublicKey
@@ -52,15 +53,27 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
 }
 
 export function dRepToMaybeCredentialHex(s: string): ?string {
+  const isPotentiallyValidHex = /^(22|23)[0-9a-fA-F]{56}$/.test(s);
   return RustModule.WasmScope(Module => {
     try {
       if (s.startsWith('drep1')) {
+        if (s.length === 58) {
+          return maybe(base32ToHex(s), dRepToMaybeCredentialHex);
+        }
         return Module.WalletV4.Credential
           .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
       }
       if (s.startsWith('drep_script1')) {
         return Module.WalletV4.Credential
           .from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
+      }
+      if (isPotentiallyValidHex && s.startsWith('22')) {
+        return Module.WalletV4.Credential
+          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_hex(s.substr(2))).to_hex();
+      }
+      if (isPotentiallyValidHex && s.startsWith('23')) {
+        return Module.WalletV4.Credential
+          .from_scripthash(Module.WalletV4.ScriptHash.from_hex(s.substr(2))).to_hex();
       }
     } catch {} // eslint-disable-line no-empty
     return null;
