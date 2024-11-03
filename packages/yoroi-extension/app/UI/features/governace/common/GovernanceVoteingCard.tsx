@@ -19,7 +19,7 @@ type Props = {
   loading: boolean;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelected }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -37,7 +37,7 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, isDrepSelecte
     backgroundImage: !pending && theme.palette.ds.bg_gradient_2,
     border: '2px solid transparent',
     backgroundOrigin: 'border-box',
-    pointerEvents: !isDrepSelected && 'none',
+    pointerEvents: is_drep_selected !== 'true' && 'none',
   }),
   cursor: 'pointer',
   ...(pending && {
@@ -85,9 +85,9 @@ export const GovernanceVoteingCard = ({
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard
         onClick={pending ? undefined : onClick}
-        pending={pending === true ? 'true' : undefined}
+        pending={pending ? 'true' : undefined}
         selected={selected}
-        isDrepSelected={governanceStatus.status === 'delegate'}
+        is_drep_selected={String(governanceStatus.status === 'delegate')}
       >
         {loading && (
           <SpinnerBox>
