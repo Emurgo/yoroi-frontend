@@ -141,13 +141,14 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
           const network = getNetworkById(wallet.networkId);
           const config = network.BaseConfig[0];
           const messageHex = stringToHex(message);
+          const hashPayload = true;
           const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
             serial: null,
             params: {
               preferHexDisplay: false,
               messageHex,
               signingPath: addressing.path,
-              hashPayload: true,
+              hashPayload,
               addressFieldType: MessageAddressFieldType.ADDRESS,
               address: {
                 type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
@@ -167,6 +168,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
             signatureHex,
             messageHex,
             signingPublicKeyHex,
+            hashPayload,
           );
         } catch (error) {
           throw new convertToLocalizableError(error);
