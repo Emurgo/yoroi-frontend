@@ -121,7 +121,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
   const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
 
-  const showingAda = accountPair?.from.name === 'ADA';
+  const showingAda = accountPair?.from.name === primaryTokenInfo.name;
   const currency = accountPair?.from.name;
   const decimals = isPrimary ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
 

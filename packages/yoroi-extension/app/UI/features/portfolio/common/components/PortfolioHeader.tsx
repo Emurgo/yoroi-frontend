@@ -45,10 +45,10 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
   const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
 
-  const showADA = accountPair?.from.name === 'ADA';
+  const showADA = accountPair?.from.name === primaryTokenInfo.name;
 
   const totalTokenPrice = React.useMemo(() => {
-    const showingAda = accountPair?.from.name !== 'ADA';
+    const showingAda = accountPair?.from.name !== primaryTokenInfo.name;
     const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
 
     if (ptPrice == null) return `... ${currency}`;
@@ -61,10 +61,13 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const handleCurrencyChange = async () => {
     const pair = {
       from: {
-        name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : 'ADA',
+        name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
         value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
       },
-      to: { name: showADA ? 'ADA' : unitOfAccount ?? DEFAULT_FIAT_PAIR, value: showADA ? walletBalance.ada : totalTokenPrice },
+      to: {
+        name: showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR,
+        value: showADA ? walletBalance.ada : totalTokenPrice,
+      },
     };
     localStorageApi.setSetPortfolioFiatPair(pair);
     changeUnitOfAccountPair(pair);
@@ -77,7 +80,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
       const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
       const pair = {
-        from: { name: 'ADA', value: walletBalance?.ada || '0' },
+        from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
         to: { name: unitOfAccount || DEFAULT_FIAT_PAIR, value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
       };
 

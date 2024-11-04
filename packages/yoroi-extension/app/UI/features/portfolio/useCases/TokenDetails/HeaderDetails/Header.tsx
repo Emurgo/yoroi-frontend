@@ -18,7 +18,7 @@ interface Props {
 const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const { unitOfAccount, walletBalance, accountPair } = usePortfolio();
+  const { unitOfAccount, walletBalance, accountPair, primaryTokenInfo } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
   if (tokenInfo.quantity === null) {
@@ -72,8 +72,12 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
         </Stack>
 
         <Typography color="ds.gray_600">
-          {isPrimaryToken ? (accountPair?.from.name === 'ADA' ? accountPair?.to.value : accountPair?.from.value) : totaPriceCalc}{' '}
-          {isPrimaryToken && unitOfAccount === 'ADA' ? DEFAULT_FIAT_PAIR : unitOfAccount}
+          {isPrimaryToken
+            ? accountPair?.from.name === primaryTokenInfo.name
+              ? accountPair?.to.value
+              : accountPair?.from.value
+            : totaPriceCalc}{' '}
+          {isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}
         </Typography>
       </Stack>
     </Stack>
