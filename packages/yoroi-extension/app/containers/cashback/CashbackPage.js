@@ -17,7 +17,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { useTheme } from '@mui/material';
-import { walletSignData } from '../../api/ada';
+import { walletSignData, encodeHardwareWalletSignResult } from '../../api/ada';
 import { getPublicDeriverById } from '../../../chrome/extension/background/handlers/yoroi/utils';
 import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
@@ -140,11 +140,12 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         try {
           const network = getNetworkById(wallet.networkId);
           const config = network.BaseConfig[0];
+          const messageHex = stringToHex(message);
           const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
             serial: null,
             params: {
               preferHexDisplay: false,
-              messageHex: stringToHex(message),
+              messageHex,
               signingPath: addressing.path,
               hashPayload: true,
               addressFieldType: MessageAddressFieldType.ADDRESS,
@@ -161,10 +162,12 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
               },
             },
           });
-          res = {
-            signature: signatureHex,
-            key: signingPublicKeyHex,
-          };
+          res = await encodeHardwareWalletSignResult(
+            addressFieldHex,
+            signatureHex,
+            messageHex,
+            signingPublicKeyHex,
+          );
         } catch (error) {
           throw new convertToLocalizableError(error);
         }
