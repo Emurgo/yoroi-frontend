@@ -81,6 +81,7 @@ import type {
 import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
+import { sanitizeForLog } from '../coreUtils';
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -111,7 +112,7 @@ export function callBackground<T, R>(message: T): Promise<R> {
     window.chrome.runtime.sendMessage(message, response => {
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
-        reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(message) ?? 'undefined'}`);
+        reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(sanitizeForLog(message)) ?? 'undefined'}`);
         return;
       }
       resolve(response);
@@ -189,7 +190,10 @@ export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (
 };
 
 export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
-  await callBackground({ type: ChangeSigningPassword.typeTag, request, });
+  const resp = await callBackground({ type: ChangeSigningPassword.typeTag, request, });
+  if (resp?.error === WrongPassphraseError.defaultMessage) {
+    throw new IncorrectWalletPasswordError();
+  }
 }
 
 export const renamePublicDeriver: GetEntryFuncType<typeof RenamePublicDeriver> = async (request) => {
@@ -406,7 +410,7 @@ const callbacks = Object.freeze({
 });
 chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
   //fixme: verify sender.id/origin
-  Logger.debug('get message from background:', JSON.stringify(message, null, 2));
+  Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {
@@ -472,7 +476,7 @@ function handleWrongPassword<
   result: T,
   passwordErrorClass: typeof Error
 ): T {
-  if (result.error === 'IncorrectWalletPasswordError') {
+  if (typeof result.error === 'string' && result.error.includes(IncorrectWalletPasswordError.errorId)) {
     throw new passwordErrorClass();
   }
   if (result.error) {

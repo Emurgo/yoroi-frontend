@@ -244,7 +244,7 @@ export const GetPrivateStakingKey: HandlerType<
       });
       return stakingKey.to_hex();
     } catch (error) {
-      return { error: error.name };
+      return { error: error.message };
     }
   },
 });

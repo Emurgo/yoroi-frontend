@@ -9,7 +9,7 @@ import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import { bech32 as bech32Module } from 'bech32';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
-import { bytesToHex, fail, hexToBytes } from '../../../../../coreUtils';
+import { bytesToHex, fail, hexToBytes, maybe } from '../../../../../coreUtils';
 
 export function tryAddressToKind(
   address: string,
@@ -156,9 +156,16 @@ export function normalizeToBase58(addr: string): void | string {
   return undefined;
 }
 
-// this implementation was copied from the convert function of the bech32 package.
-const convertBase32ToHex = (data: any[]) => {
+/**
+ * this implementation was copied from the convert function of the bech32 package.
+ */
+const convertBase32ToHex = (data: any[]): string => {
   return bytesToHex(bech32Module.fromWords(data));
+};
+
+export const base32ToHex = (base32: string): ?string => {
+  const base32Words = bech32Module.decodeUnsafe(base32, base32.length);
+  return maybe(base32Words?.words, convertBase32ToHex);
 };
 
 /* eslint-disable */
@@ -255,14 +262,7 @@ export function normalizeToAddress(addr: string): void | RustModule.WalletV4.Add
   }
 
   // 3) Try decoding bech32...
-  const bech32Decoded = bech32Module.decodeUnsafe(addr, addr.length);
-  if (bech32Decoded) {
-    // 3.1) if successfull, convert the decoded bech32 to base16 and try parsing the hex
-    const hex = convertBase32ToHex(bech32Decoded.words);
-    return parseHexAddress(hex);
-  }
-
-  return undefined;
+  return maybe(base32ToHex(addr), parseHexAddress) ?? undefined;
 }
 
 export function toEnterprise(address: string): void | RustModule.WalletV4.EnterpriseAddress {

@@ -8,6 +8,7 @@ import { startPoll } from './coinPrice';
 import { environment } from '../../../app/environment';
 import axios from 'axios';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
+import { sanitizeForLog } from '../../../app/coreUtils';
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -31,7 +32,7 @@ if (chrome.action) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   //fixme: verify sender.id === extension id
   if (environment.isDev()) {
-    console.debug(`get message ${JSON.stringify(message)} from ${sender.tab.id}`);
+    console.debug(`get message ${JSON.stringify(sanitizeForLog(message))} from ${sender.tab.id}`);
   }
   const handler = getHandler(message.type);
   if (handler) {
