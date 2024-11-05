@@ -421,12 +421,12 @@ chrome.runtime.onMessage.addListener((serializedMessage, _sender, _sendResponse)
   let message;
   try {
     message = JSON.parse(serializedMessage);
-  } catch {
-    Logger.error('underializable message');
+  } catch (error) {
+    Logger.error('unserializable message: ' + serializedMessage + ' | Error: ' + stringifyError(error));
     return;
   }
   if (typeof message !== 'object') {
-    Logger.error('unrecognizable message');
+    Logger.error('unrecognizable message type: ' + (typeof message) + ' (expected object); Original message: ' + serializedMessage);
     return;
   }
   Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
