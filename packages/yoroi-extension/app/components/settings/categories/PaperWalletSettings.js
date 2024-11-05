@@ -1,9 +1,7 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
 import { Button } from '@mui/material';
 
 type Props = {|
@@ -12,10 +10,6 @@ type Props = {|
 
 @observer
 class PaperWalletSettings extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
   render(): Node {
     const { onRedirect } = this.props;
     return (

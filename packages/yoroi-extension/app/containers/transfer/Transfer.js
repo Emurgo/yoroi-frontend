@@ -58,7 +58,7 @@ class Transfer extends Component<Props> {
 
     return (
       <Suspense fallback={null}>
-        <WalletTransferPage actions={actions} stores={stores} publicDeriver={wallet} />
+        <WalletTransferPage actions={actions} stores={stores} />
       </Suspense>
     );
   };
