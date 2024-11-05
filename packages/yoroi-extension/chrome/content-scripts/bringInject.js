@@ -13,6 +13,7 @@ const darkTheme = {
   // Popup
   popupBg: "#15171F",
   popupShadow: "0px 6px 20px 0px rgba(0, 0, 0, 0.10), 0px 1px 8px 0px rgba(0, 0, 0, 0.06)",
+  xBtnFC: "#E1E6F5",
   // Primary button
   primaryBtnBg: "#4B6DDE",
   primaryBtnFS: "16px",
@@ -32,7 +33,11 @@ const darkTheme = {
   // Markdown
   markdownBg: "#15171F",
   markdownFS: "14px",
+  markdownFW: "400",
   markdownFC: "#E1E6F5",
+  markdownTitleFS: "14px",
+  markdownTitleFW: "500",
+  markdownTitleFC: "#E1E6F5",
   markdownBorderW: "1px",
   markdownRadius: "8px",
   markdownBorderC: "#262A38",
@@ -59,6 +64,7 @@ const darkTheme = {
   detailsAmountFC: "#7892E8",
   detailsAmountFW: "500",
   // Overlay
+  overlayWaitingBg: "#15171F",
   overlayBg: "#1F232ECC",
   overlayFS: "16px",
   overlayFW: "400",
@@ -107,6 +113,7 @@ const lightTheme = {
   // Popup
   popupBg: "#FFFFFF",
   popupShadow: "0px 6px 20px 0px rgba(0, 0, 0, 0.10), 0px 1px 8px 0px rgba(0, 0, 0, 0.06)",
+  xBtnFC: "#242838",
   // Primary button
   primaryBtnBg: "#4B6DDE",
   primaryBtnFC: "#FFFFFF",
@@ -126,7 +133,11 @@ const lightTheme = {
   // Markdown
   markdownBg: "#FFFFFF",
   markdownFS: "14px",
+  markdownFW: "400",
   markdownFC: "#242838",
+  markdownTitleFS: "14px",
+  markdownTitleFW: "500",
+  markdownTitleFC: "#242838",
   markdownBorderW: "1px",
   markdownRadius: "8px",
   markdownBorderC: "#DCE0E9",
@@ -153,6 +164,7 @@ const lightTheme = {
   detailsAmountFC: "#4B6DDE",
   detailsAmountFW: "500",
   // Overlay
+  overlayWaitingBg: "#FFFFFF",
   overlayBg: "#0000007A",
   overlayFS: "16px",
   overlayFW: "400",
