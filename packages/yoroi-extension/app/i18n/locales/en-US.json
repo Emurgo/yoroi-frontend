@@ -295,6 +295,7 @@
   "settings.general.translation.contributors": "_",
   "settings.general.theme.light": "Light Theme",
   "settings.general.theme.dark": "Dark Theme",
+  "settings.menu.paperWallet.link.label": "Paper Wallet",
   "settings.menu.analytics.link.label": "Analytics",
   "settings.menu.assetDeposit.link.label": "Locked assets deposit",
   "settings.menu.blockchain.link.label": "Blockchain",
