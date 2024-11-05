@@ -18,6 +18,7 @@ import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
+import { refreshCurrentCoinPrice } from '../../api/thunk';
 
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
@@ -487,9 +488,20 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.result;
   };
 
-  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
-    await this.setUnitOfAccountRequest.execute(currency);
-    await this.getUnitOfAccountRequest.execute(); // eagerly cache
+  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (setting) => {
+    await this.setUnitOfAccountRequest.execute(setting);
+    if (setting.enabled) {
+      refreshCurrentCoinPrice();
+    }
+    // The amount display is not reactive to this:
+    // await this.getUnitOfAccountRequest.execute(); // eagerly cache
+    // so explicitly patch the result:
+    this.getUnitOfAccountRequest.patch(result => {
+      if (result) {
+        // $FlowFixMe[incompatible-type]
+        Object.assign(result, setting);
+      }
+    });
   };
 
   @computed get hasLoadedUnitOfAccount(): boolean {

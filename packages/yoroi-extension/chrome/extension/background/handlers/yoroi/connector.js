@@ -128,7 +128,7 @@ export const CreateAuthEntry: HandlerType<
       });
       return result;
     } catch (error) {
-      return { error: error.name };
+      return { error: error.message };
     }
   },
 });

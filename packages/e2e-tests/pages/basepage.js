@@ -242,27 +242,31 @@ class BasePage {
     );
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
-    const logsPaths = path.resolve(testRundDataDir, `console_${cleanName}-log.json`);
+    const logsPaths = path.resolve(testRundDataDir, `console_browser_${cleanName}.log`);
     if (isChrome()) {
       const logEntries = await this.driver
         .manage()
         .logs()
         .get(logging.Type.BROWSER, logging.Level.ALL);
-      const jsonLogs = logEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
-      await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
+      const jsonLogsStrings = logEntries.map(l => {
+        const splitMsg = l.message.split(' ');
+        const message = splitMsg.slice(2).join(' ');
+        return `[${l.level}] [${l.timestamp}] ${message}`
+      });
+      await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
     }
   }
   async getDriverLogs(testSuiteName, logFileName) {
     this.logger.info(`BasePage::getDriverLogs is called.`);
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
-    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}.log`);
     const driverLogEntries = await this.driver
       .manage()
       .logs()
       .get(logging.Type.DRIVER, logging.Level.INFO);
-    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
-    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
+      const driverLogsStrings = driverLogEntries.map(l =>`[${l.level}] [${l.timestamp}] ${l.message}`);
+    await writeFile(driverLogsPaths, driverLogsStrings.join(','));
   }
   async waitForElementLocated(locator) {
     this.logger.info(

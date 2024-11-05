@@ -1,17 +1,22 @@
+import type { AssetAmount } from '../../../components/swap/types';
 import { useSwapTokensOnlyVerified } from '@yoroi/swap';
 import { useMemo } from 'react';
 import { comparatorByGetter } from '../../../coreUtils';
-import type { AssetAmount } from '../../../components/swap/types';
+import { useQueryClient } from 'react-query';
 
 export function useSellVerifiedSwapTokens(
-  assets: Array<AssetAmount>,
-): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
+  assets: Array<AssetAmount>
+): {| walletVerifiedAssets: Array<any>, isLoading: boolean, errored: boolean |} {
+  const queryClient = useQueryClient();
 
-  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
+  const { onlyVerifiedTokens, isLoading, isError } = useSwapTokensOnlyVerified({
     useErrorBoundary: false,
   });
 
-  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
+  if (isError) {
+    queryClient.invalidateQueries({ queryKey: ['useSwapTokensOnlyVerified'] });
+  }
 
   const swapFromVerifiedAssets = useMemo(() => {
     return assets
@@ -23,19 +28,23 @@ export function useSellVerifiedSwapTokens(
       .sort(comparatorByGetter(a => a.name?.toLowerCase()));
   }, [onlyVerifiedTokens, assets]);
 
-  return { walletVerifiedAssets: swapFromVerifiedAssets, isLoading };
+  return { walletVerifiedAssets: swapFromVerifiedAssets, isLoading, errored: isError };
 }
 
 export function useBuyVerifiedSwapTokens(
   assets: Array<AssetAmount>,
-  sellTokenInfo: { id: string, ... },
-): {| walletVerifiedAssets: Array<any>, isLoading: boolean  |} {
+  sellTokenInfo: { id: string, ... }
+): {| walletVerifiedAssets: Array<any>, isLoading: boolean, errored: boolean |} {
+  const queryClient = useQueryClient();
 
-  const { onlyVerifiedTokens, isLoading } = useSwapTokensOnlyVerified({
+  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
+  const { onlyVerifiedTokens, isLoading, isError } = useSwapTokensOnlyVerified({
     useErrorBoundary: false,
   });
 
-  // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something
+  if (isError) {
+    queryClient.invalidateQueries({ queryKey: ['useSwapTokensOnlyVerified'] });
+  }
 
   const swapToVerifiedAssets = useMemo(() => {
     const isSellingPt = sellTokenInfo.id === '';
@@ -51,5 +60,5 @@ export function useBuyVerifiedSwapTokens(
     return [...(isSellingPt ? [] : [pt]), ...nonPtAssets];
   }, [onlyVerifiedTokens, assets, sellTokenInfo]);
 
-  return { walletVerifiedAssets: swapToVerifiedAssets, isLoading };
+  return { walletVerifiedAssets: swapToVerifiedAssets, isLoading, errored: isError };
 }

@@ -92,6 +92,8 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
       action: async () => {
         const { wallets } = this.stores;
 
+        await subscribe();
+
         // note: we want to load memos BEFORE we start syncing wallets
         // this is because syncing wallets will also try and sync memos with external storage
         await this.stores.memos.loadFromStorage();
@@ -99,7 +101,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         await this.stores.coinPriceStore.loadFromStorage();
 
         await wallets.restoreWalletsFromStorage();
-        subscribe();
         if (wallets.hasAnyWallets && this.stores.loading.fromUriScheme) {
           this.actions.router.goToRoute.trigger({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {

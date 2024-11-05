@@ -101,7 +101,7 @@ export default class BaseCoinPriceStore
     timestamps: Array<number>,
     defaultToken: string,
   |} => Promise<void> = async (request) => {
-    const { unitOfAccount } = this.stores.profile;
+    const unitOfAccount = await this.stores.profile.getUnitOfAccountBlock();
     if (!unitOfAccount.enabled) return;
 
     const { timestamps } = request;
