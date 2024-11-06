@@ -239,6 +239,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'ABORT_SIGN_MESSAGE' }, '*');
     setSignaturePopup(false)
     setPassword('')
+    setErrMsg('')
   }, []);
 
   const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
