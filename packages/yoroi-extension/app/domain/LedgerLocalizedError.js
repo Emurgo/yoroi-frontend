@@ -95,6 +95,16 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         ledgerErrors.cancelOnDeviceError101
       );
     }
+    if (
+      // Not running the Cardano app on Ledger
+      /General error 0x6e01/.test(error.message) ||
+        // Ledger is sleeping
+        /General error 0x5515/.test(error.message)
+    ) {
+      return new LocalizableError(
+        ledgerErrors.cardanoAppNotRunning
+      );
+    }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
       case 'TransportError: Failed to sign with Ledger device: U2F TIMEOUT':
@@ -123,11 +133,6 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       case 'catalyst registration not supported':
         localizableError = new LocalizableError(
           ledgerErrors.cip15NotSupportedError106
-        );
-        break;
-      case 'DeviceStatusError: General error 0x6e01. Please consult https://github.com/cardano-foundation/ledger-app-cardano/blob/master/src/errors.h':
-        localizableError = new LocalizableError(
-          ledgerErrors.cardanoAppNotRunning
         );
         break;
       case 'DeviceVersionUnsupported: CIP36 registration not supported by Ledger app version 5.0.0.':
