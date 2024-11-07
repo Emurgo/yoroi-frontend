@@ -33,10 +33,6 @@ export const settingsMenuMessages: Object = defineMessages({
     id: 'settings.menu.analytics.link.label',
     defaultMessage: '!!!Analytics',
   },
-  paperWallet: {
-    id: 'settings.menu.paperWallet.link.label',
-    defaultMessage: '!!!Paper Wallet',
-  },
 });
 
 type Props = {|
@@ -94,11 +90,6 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
-      },
-      {
-        label: intl.formatMessage(settingsMenuMessages.paperWallet),
-        route: ROUTES.SETTINGS.PAPER_WALLET,
-        className: 'paperWallet',
       },
     ];
 

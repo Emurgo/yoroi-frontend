@@ -37,11 +37,20 @@ const messages = defineMessages({
     id: 'settings.support.logs.title',
     defaultMessage: '!!!Logs',
   },
+  paperWallet: {
+    id: 'settings.support.paperWallet.title',
+    defaultMessage: '!!!Paper Wallet',
+  },
+  paperWalletTransfer: {
+    id: 'settings.support.paperWallet.button',
+    defaultMessage: '!!!Transfer from Paper Wallet',
+  },
 });
 
 type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +onDownloadLogs: void => void,
+  +onPaperWalletTransfer: void => void,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -150,6 +159,15 @@ class SupportSettings extends Component<Props & InjectedProps> {
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>
+
+        <Box mt="40px">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
+            {intl.formatMessage(messages.paperWallet)}
+          </Typography>
+          <Button variant="contained" onClick={this.props.onPaperWalletTransfer}>
+            {intl.formatMessage(messages.paperWalletTransfer)}
+          </Button>
+        </Box>
       </Box>
     );
   }

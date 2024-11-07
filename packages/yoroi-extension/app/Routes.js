@@ -79,8 +79,6 @@ const SupportSettingsPagePromise = () => import('./containers/settings/categorie
 const SupportSettingsPage = React.lazy(SupportSettingsPagePromise);
 const AnalyticsSettingsPagePromise = () => import('./containers/settings/categories/AnalyticsSettingsPage');
 const AnalyticsSettingsPage = React.lazy(AnalyticsSettingsPagePromise);
-const PaperWalletSettingsPagePromise = () => import('./containers/settings/categories/PaperWalletSettingsPage');
-const PaperWalletSettingsPage = React.lazy(PaperWalletSettingsPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
@@ -426,11 +424,6 @@ const SettingsSubpages = (stores, actions) => (
       exact
       path={ROUTES.SETTINGS.ANALYTICS}
       component={props => <AnalyticsSettingsPage {...props} stores={stores} actions={actions} />}
-    />
-    <Route
-      exact
-      path={ROUTES.SETTINGS.PAPER_WALLET}
-      component={props => <PaperWalletSettingsPage {...props} stores={stores} actions={actions} />}
     />
     <Redirect to={ROUTES.SETTINGS.GENERAL} />
   </Switch>
