@@ -47,3 +47,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 init().catch(console.error);
 startMonitorServerStatus();
 startPoll();
+
+if (environment.userAgentInfo.isFirefox()) {
+  browser.runtime.onInstalled.addListener(onYoroiIconClicked);
+}
