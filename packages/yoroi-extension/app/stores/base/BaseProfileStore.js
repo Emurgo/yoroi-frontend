@@ -573,10 +573,6 @@ export default class BaseProfileStore
     this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
     this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
     ampli.client.setOptOut(!isAnalyticsAllowed);
-    if (environment.userAgentInfo.isFirefox() && window.document.location.search === '?installed') {
-      // This is the mandatory data collection consent pop up of Firefox on installation.
-      window.close();
-    }
   }
 
   @computed get isAnalyticsOpted(): boolean {
