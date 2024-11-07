@@ -58,21 +58,24 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h });
+  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h, data7d, data30d });
 
+  // console.log('assetFormatedList', assetFormatedList);
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
+
+  const sortedData = useMemo(() => getSortedData(assetFormatedList), [getSortedData, assetFormatedList]);
   return (
     <Table
       name="stat"
       headCells={headCells}
-      data={getSortedData(assetFormatedList)}
+      data={sortedData}
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
       isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(assetFormatedList).map((row: any) => (
+      {sortedData.map((row: any) => (
         <TableRow
           key={row.id}
           onClick={() => navigateTo.portfolioDetail(row.id)}
@@ -86,15 +89,15 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             },
           }}
         >
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
             <TokenDisplay token={row} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', marginTop: '10px', width: '15%' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -102,7 +105,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red', width: '15%' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -111,7 +114,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -120,11 +123,11 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
             <TokenProcentage procentage={row.percentage} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
           </TableCell>
         </TableRow>

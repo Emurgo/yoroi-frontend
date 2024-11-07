@@ -134,32 +134,20 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
       .times(showingAda ? 1 : new BigNumber(ptPrice))
       .toFormat(decimals);
 
-  // if (token.info.name === 'SHIBA') {
-  //   console.log('Token CALC DETAILS', {
-  //     ptPrice,
-  //     tokenQuantityAsBigInt,
-  //     tokenPrice,
-  //     name: token.info.name,
-  //     decimals,
-  //     confff: config.decimals,
-  //     showingAda,
-  //   });
-
-  //   console.log('totaPrice', totaPrice);
-  // }
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
   const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || DEFAULT_FIAT_PAIR}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography color="ds.text_gray_normal">
-          {isPrimary ? walletBalance?.ada : token.formatedAmount} {token.info.name}
+        <Typography color="ds.text_gray_normal" sx={{ display: 'flex' }}>
+          <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+          <Typography>{token.info.name}</Typography>
         </Typography>
         {token.name === accountPair?.to.name ? (
-          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
-          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
             {totalTokenPrice}
           </Typography>
         )}
@@ -174,10 +162,11 @@ export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
   const ptPrice = ptActivity?.close;
   const ptUnitPrice = tokenPrice * ptPrice;
+  const priceDisplay = parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4);
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4)} {unitOfAccount}
+      {priceDisplay} {unitOfAccount}
     </Typography>
   );
 };
