@@ -13,6 +13,7 @@ import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
 import { Box, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   title: {
@@ -47,6 +48,10 @@ const messages = defineMessages({
   learnMore: {
     id: 'profile.analytics.learnMore',
     defaultMessage: '!!!Learn more about user insights',
+  },
+  collectedData: {
+    id: 'profile.analytics.collectedData',
+    defaultMessage: '!!!Collected data includes: visited pages, browser version, selected language, time of analytical events',
   },
   rejectionImpact: {
     id: 'profile.analytics.rejectionImpact',
@@ -92,16 +97,19 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
+    const isFirefox = environment.userAgentInfo.isFirefox();
+
     const analyticsDetails = [
       [YesIcon, messages.line1],
       [YesIcon, messages.line2],
-      [YesIcon, messages.rejectionImpact],
+      (isFirefox ? [YesIcon, messages.rejectionImpact] : null),
       [NoIcon, messages.line3],
       [NoIcon, messages.line4],
       [NoIcon, messages.line5],
-    ];
+    ].filter(Boolean);
 
     return (
+      <>
       <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
           {isSettingsScreen && (
@@ -141,6 +149,25 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             ))}
           </Box>
 
+        </div>
+      </Box>
+
+      {isFirefox ? (
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: isStartupScreen ? 'center' : 'flex-start',
+            marginTop: '15px',
+            fontSize: '0.8rem',
+          }}
+        >
+          {intl.formatMessage(messages.collectedData)}
+        </Box>
+      ) : null}
+
+      <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
+        <div className={variant === 'startup' ? styles.centeredBox : ''}>
           <Box
             sx={{
               display: 'flex',
@@ -192,6 +219,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
           )}
         </div>
       </Box>
+      </>
     );
   }
 }
