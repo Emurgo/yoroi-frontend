@@ -21,9 +21,22 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   @observable
   hasRedirected: boolean = false;
 
+  _analyticsStep = {
+    isDone: () => this.isAnalyticsOpted,
+    action: async () => {
+      const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
+      if (this.stores.app.currentRoute === route) {
+        return;
+      }
+      this.actions.router.goToRoute.trigger({ route });
+    },
+  };
+
   /** Linear list of steps that need to be completed before app start */
   @observable
   SETUP_STEPS: Array<{| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |}> = [
+    // Firefox policy requires this to be the first
+    ...(environment.userAgentInfo.isFirefox() ? [this._analyticsStep] : []),
     {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
@@ -46,16 +59,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         ampli.createWalletTermsPageViewed();
       },
     },
-    {
-      isDone: () => this.isAnalyticsOpted,
-      action: async () => {
-        const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
-        if (this.stores.app.currentRoute === route) {
-          return;
-        }
-        this.actions.router.goToRoute.trigger({ route });
-      },
-    },
+    ...(environment.userAgentInfo.isFirefox() ? [] : [this._analyticsStep]),
     {
       isDone: () => this.isComplexityLevelSelected,
       action: async () => {

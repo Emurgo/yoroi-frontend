@@ -1816,3 +1816,9 @@ function handleExchangeRedirectMessage(message, sender) {
     chrome.tabs.create({ url: extensionUrl });
   }
 }
+
+if (environment.userAgentInfo.isFirefox()) {
+  browser.runtime.onInstalled.addListener(() => {
+    chrome.tabs.create({ url: 'main_window.html?installed' });
+  });
+}
