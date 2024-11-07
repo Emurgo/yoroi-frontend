@@ -16,6 +16,8 @@ function getVersion(): string {
   return content.version;
 }
 
+const FIREFOX_PRIVACY_POLICY_URL = 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/privacy';
+
 export const environment = ((
   {
     ...process.env,
@@ -41,6 +43,12 @@ export const environment = ((
     getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
     getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
+    externalPrivacyPolicyURL: (): ?string => {
+        if (userAgentInfo.isFirefox()) {
+            return FIREFOX_PRIVACY_POLICY_URL;
+        }
+        return null;
+    }
   }
 ): {
     getNetworkName: void => Network,
