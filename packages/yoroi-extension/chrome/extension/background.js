@@ -1818,5 +1818,10 @@ function handleExchangeRedirectMessage(message, sender) {
 }
 
 if (environment.userAgentInfo.isFirefox()) {
-  browser.runtime.onInstalled.addListener(onYoroiIconClicked);
+  browser.runtime.onInstalled.addListener(async () => {
+    const analyticsFlag = await new LocalStorageApi().loadIsAnalyticsAllowed();
+    if (analyticsFlag == null) {
+      onYoroiIconClicked();
+    }
+  });
 }
