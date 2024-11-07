@@ -48,6 +48,10 @@ const messages = defineMessages({
     id: 'profile.analytics.learnMore',
     defaultMessage: '!!!Learn more about user insights',
   },
+  rejectionImpact: {
+    id: 'profile.analytics.rejectionImpact',
+    defaultMessage: '!!!Opting out won’t impact your experience',
+  },
   accept: {
     id: 'profile.analytics.accept',
     defaultMessage: '!!!Accept',
@@ -91,6 +95,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const analyticsDetails = [
       [YesIcon, messages.line1],
       [YesIcon, messages.line2],
+      [YesIcon, messages.rejectionImpact],
       [NoIcon, messages.line3],
       [NoIcon, messages.line4],
       [NoIcon, messages.line5],
