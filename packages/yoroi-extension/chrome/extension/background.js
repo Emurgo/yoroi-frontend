@@ -85,6 +85,7 @@ import { addressHexToBech32 } from '../../app/api/ada/lib/cardanoCrypto/utils';
 
 /*::
 declare var chrome;
+declare var browser;
 */
 
 const onYoroiIconClicked = () => {
