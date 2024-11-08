@@ -20,6 +20,7 @@ import {
   CardanoTxOutputSerializationFormat,
   CardanoTxSigningMode,
   CardanoTxWitnessType,
+  CardanoDRepType,
 } from 'trezor-connect-flow';
 import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
@@ -31,7 +32,7 @@ import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe, forceNonNull } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
@@ -186,6 +187,43 @@ function formatTrezorCertificates(
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
         pool: delegationCert.pool_keyhash().to_hex(),
+        path,
+      });
+      continue;
+    }
+    const voteDelegation = cert.as_vote_delegation();
+    if (voteDelegation != null) {
+      const wasmDrep = voteDelegation.drep();
+      let dRep;
+      switch (wasmDrep.kind()) {
+      case RustModule.WalletV4.DRepKind.KeyHash:
+        dRep = {
+          type: CardanoDRepType.KEY_HASH,
+          keyHash: forceNonNull(voteDelegation.drep().to_key_hash()).to_hex(),
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.ScriptHash:
+        dRep = {
+          type: CardanoDRepType.KEY_HASH,
+          scriptHash: forceNonNull(voteDelegation.drep().to_script_hash()).to_hex(),
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.AlwaysAbstain:
+        dRep = {
+          type: CardanoDRepType.ABSTAIN,
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.AlwaysNoConfidence:
+        dRep = {
+          type: CardanoDRepType.NO_CONFIDENCE,
+        };
+        break;
+      default:
+        throw new Error('Trezor: Unsupported dRep kind: ' + wasmDrep.kind());
+      }
+      result.push({
+        type: CardanoCertificateType.VOTE_DELEGATION,
+        dRep,
         path,
       });
       continue;
