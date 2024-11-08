@@ -112,7 +112,7 @@ export function callBackground<R>(message: {| type: string, request?: Object |})
     const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
     window.chrome.runtime.sendMessage(serializedMessage, response => {
       // $FlowIgnore
-      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(response));
+      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(sanitizeForLog(message)) ?? 'undefined'}`);
