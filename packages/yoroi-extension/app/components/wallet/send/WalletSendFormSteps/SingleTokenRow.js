@@ -95,6 +95,7 @@ export default class SingleTokenRow extends Component<Props, State> {
             [styles.amountWrapper]: true,
             [styles.amountError]: !isValid && this.props.isTokenIncluded(token.info),
             [styles.inputFocused]: this.state.isInputFocused && this.props.isTokenIncluded(token.info),
+            [styles.inputSelected]: this.props.isTokenIncluded(token.info),
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
           border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
@@ -105,7 +106,7 @@ export default class SingleTokenRow extends Component<Props, State> {
               <NoAssetLogo />
             </div>
             <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
-              {token.label.startsWith('asset') ? truncateAddressShort(token.label, 14) : token.label}
+              {truncateAddressShort(token.label, token.label.startsWith('asset') ? 14 : 12)}
             </Typography>
           </div>
           <Typography component="div" variant="body1" color="grayscale.900">
@@ -126,12 +127,15 @@ export default class SingleTokenRow extends Component<Props, State> {
                   }}
                   onBlur={() => {
                     this.setState({ isInputFocused: false });
+                    if (!amount) {
+                      this.props.onRemoveToken(token.info);
+                    }
                   }}
                   autoFocus
                 />
               </Box>
               <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
-                <IconWrapper>
+                <IconWrapper className={styles.closeIcon}>
                   <CloseIcon />
                 </IconWrapper>
               </button>

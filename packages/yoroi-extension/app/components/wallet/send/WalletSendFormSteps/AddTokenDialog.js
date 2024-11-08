@@ -87,6 +87,10 @@ export const messages: Object = defineMessages({
     id: 'wallet.send.form.dialog.nToken',
     defaultMessage: '!!!Token ({number})',
   },
+  title: {
+    id: 'wallet.send.form.dialog.title',
+    defaultMessage: '!!!Tokens',
+  },
   nameAndTicker: {
     id: 'wallet.assets.nameAndTicker',
     defaultMessage: '!!!Ticker and name',
@@ -144,7 +148,7 @@ export default class AddTokenDialog extends Component<Props, State> {
   onSelect: ($ReadOnly<TokenRow>) => void = token => {
     // Remove if it already in the list
     const selectedTokens = this.state.selectedTokens.filter(({ token: t }) => t.Identifier !== token.Identifier);
-    this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: null }] });
+    this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: this.getCurrentAmount(token) || null }] });
   };
 
   onRemoveToken: ($ReadOnly<TokenRow>) => void = token => {
@@ -313,7 +317,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
+        title={intl.formatMessage(messages.title)}
         actions={[
           {
             disabled:
@@ -326,11 +330,12 @@ export default class AddTokenDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         className={styles.dialog}
         onClose={onClose}
+        styleContentOverride={{ paddingBottom: '0' }}
         withCloseButton
         scrollableContentClass="CurrentTokensList"
       >
         <Box className={styles.component}>
-          <Box sx={{ width: '100%' }}>
+          <Box sx={{ width: '100%', mt: '1px' }}>
             <Box sx={{ position: 'relative' }}>
               <Box
                 sx={{
@@ -378,12 +383,9 @@ export default class AddTokenDialog extends Component<Props, State> {
             <Box>
               <Box component="ul" borderBottom="1px solid" borderBottomColor="grayscale.200" className={styles.columns}>
                 <li>
-                  <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.LABEL)}>
-                    <Typography component="div" variant="body2" color="grayscale.600">
-                      {intl.formatMessage(messages.nameAndTicker)}
-                    </Typography>
-                    {this.displayColumnLogo(SORTING_COLUMNS.LABEL)}
-                  </button>
+                  <Typography component="div" variant="body2" color="grayscale.600">
+                    {intl.formatMessage(messages.nameAndTicker)}
+                  </Typography>
                 </li>
                 <li>
                   <Typography component="div" variant="body2" color="grayscale.600">
@@ -391,19 +393,16 @@ export default class AddTokenDialog extends Component<Props, State> {
                   </Typography>
                 </li>
                 <li className={styles.quantity}>
-                  <button type="button" onClick={() => this.sortTokens(SORTING_COLUMNS.AMOUNT)}>
-                    <Typography component="div" variant="body2" color="grayscale.600">
-                      {intl.formatMessage(messages.quantity)}
-                    </Typography>
-                    {this.displayColumnLogo(SORTING_COLUMNS.AMOUNT)}
-                  </button>
+                  <Typography component="div" variant="body2" color="grayscale.600">
+                    {intl.formatMessage(messages.quantity)}
+                  </Typography>
                 </li>
               </Box>
               <Box
                 height="320px"
                 overflow="auto"
                 pr={currentTokensList.length > 4 ? '4px' : '24px'}
-                pt="10px"
+                py="10px"
                 className="CurrentTokensList"
               >
                 {currentTokensList.map(token => (
