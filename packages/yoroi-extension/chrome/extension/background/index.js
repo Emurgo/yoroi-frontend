@@ -49,7 +49,5 @@ startMonitorServerStatus();
 startPoll();
 
 if (environment.userAgentInfo.isFirefox()) {
-  browser.runtime.onInstalled.addListener(() => {
-    chrome.tabs.create({ url: 'main_window.html?installed' });
-  });
+  browser.runtime.onInstalled.addListener(onYoroiIconClicked);
 }
