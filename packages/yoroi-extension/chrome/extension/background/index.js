@@ -9,11 +9,13 @@ import { environment } from '../../../app/environment';
 import axios from 'axios';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import { sanitizeForLog } from '../../../app/coreUtils';
+import LocalStorageApi from '../../../app/api/localStorage/index';
 
 axios.defaults.adapter = fetchAdapter;
 
 /*::
 declare var chrome;
+declare var browser;
 */
 
 const onYoroiIconClicked = () => {

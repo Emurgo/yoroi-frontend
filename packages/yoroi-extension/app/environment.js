@@ -43,7 +43,7 @@ export const environment = ((
     getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
     getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
-    externalPrivacyPolicyURL: (): ?string => {
+    externalPrivacyPolicyURL: () => {
         if (userAgentInfo.isFirefox()) {
             return FIREFOX_PRIVACY_POLICY_URL;
         }
@@ -64,6 +64,7 @@ export const environment = ((
     isProduction: void => boolean,
     getWalletRefreshInterval: void => number,
     getServerStatusRefreshInterval: void => number,
+    externalPrivacyPolicyURL: void => ?string,
     userAgentInfo: UserAgentInfo,
     isLight: boolean,
     ...

@@ -22,7 +22,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   @observable
   hasRedirected: boolean = false;
 
-  _analyticsStep = {
+  _analyticsStep: {| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |} = {
     isDone: () => this.isAnalyticsOpted,
     action: async () => {
       const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
