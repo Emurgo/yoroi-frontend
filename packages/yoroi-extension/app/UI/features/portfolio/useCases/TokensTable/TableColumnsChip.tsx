@@ -69,9 +69,11 @@ export const TokenPriceChangeChip = ({
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={variantPnl} withIcon>
         <Typography fontSize="13px">
-          {formatPriceChange(
-            isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
-          )}
+          {Number.isNaN(changePercent)
+            ? '-'
+            : formatPriceChange(
+                isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
+              )}
           %
         </Typography>
       </PnlTag>

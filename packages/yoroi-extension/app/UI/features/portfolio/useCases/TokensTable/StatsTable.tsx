@@ -68,7 +68,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h });
+  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h, data30d, data7d });
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
   return (
