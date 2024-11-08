@@ -228,6 +228,7 @@ function formatTrezorCertificates(
       });
       continue;
     }
+    // TODO: @trezor/connect-web 9.4.2 haven't supported dRep (de)registration and update
     throw new Error(`${nameof(formatTrezorCertificates)} Trezor doesn't support this certificate type`);
   }
   return result;
