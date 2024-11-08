@@ -23,10 +23,11 @@ const PortfolioWallet = (): JSX.Element => {
     }
 
     const lowercaseKeyword = keyword.toLowerCase();
-
     const temp = ftAssetList.filter(item => {
       return (
-        item.info.name.toLowerCase().includes(lowercaseKeyword) || item.info.policyId.toLowerCase().includes(lowercaseKeyword)
+        item.info.name.toLowerCase().includes(lowercaseKeyword) ||
+        item.info.policyId.toLowerCase() === lowercaseKeyword ||
+        item.info.fingerprint.toLowerCase() === lowercaseKeyword
       );
     });
     if (temp && temp.length > 0) {
