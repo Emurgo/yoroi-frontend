@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from '@mui/material';
+import { TableCell, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -15,6 +15,16 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { TokenDisplay, TokenPrice, TokenPriceChangeChip, TokenPriceTotal, TokenProcentage } from './TableColumnsChip';
 import { useProcessedTokenData } from './useProcentage';
+
+const STableRow = styled(TableRow)(({ theme }: any) => ({
+  cursor: 'pointer',
+  transition: 'all 0.3s ease-in-out',
+  borderRadius: `${theme.shape.borderRadius}px`,
+  '& td': { border: 0 },
+  '&:hover': {
+    backgroundColor: theme.palette.ds.bg_color_min,
+  },
+}));
 
 interface Props {
   data: TokenType[];
@@ -58,46 +68,31 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h, data7d, data30d });
+  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h });
 
-  // console.log('assetFormatedList', assetFormatedList);
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
-
-  const sortedData = useMemo(() => getSortedData(assetFormatedList), [getSortedData, assetFormatedList]);
   return (
     <Table
       name="stat"
       headCells={headCells}
-      data={sortedData}
+      data={getSortedData(assetFormatedList)}
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
       isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {sortedData.map((row: any) => (
-        <TableRow
-          key={row.id}
-          onClick={() => navigateTo.portfolioDetail(row.id)}
-          sx={{
-            cursor: 'pointer',
-            transition: 'all 0.3s ease-in-out',
-            borderRadius: `${theme.shape.borderRadius}px`,
-            '& td': { border: 0 },
-            '&:hover': {
-              backgroundColor: theme.palette.ds.gray_c50,
-            },
-          }}
-        >
-          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
+      {getSortedData(assetFormatedList).map((row: any) => (
+        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)} sx={{}}>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenDisplay token={row} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', marginTop: '10px', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -105,7 +100,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -114,7 +109,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -123,14 +118,14 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
             <TokenProcentage procentage={row.percentage} />
           </TableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', width: '15%' }}>
+          <TableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
           </TableCell>
-        </TableRow>
+        </STableRow>
       ))}
     </Table>
   );
