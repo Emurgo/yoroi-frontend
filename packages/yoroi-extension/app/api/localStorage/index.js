@@ -303,17 +303,26 @@ export default class LocalStorageApi {
 
   unsetAcceptedTosVersion: void => Promise<void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
 
+  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
+  _getIsAnalyticsAllowedKey: () => string = () => {
+    let key = storageKeys.IS_ANALYTICS_ALLOWED;
+    if (environment.userAgentInfo.isFirefox()) {
+      key += '-firefox';
+    }
+    return key;
+  }
+
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
-    const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+    const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
     if (!json) {
       return undefined;
     }
     return JSON.parse(json);
   };
 
-  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
-    await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
-  };
+  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
+    await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
+  }
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
