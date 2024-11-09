@@ -416,13 +416,22 @@ const callbacks = Object.freeze({
   serverStatusUpdate: [],
   coinPriceUpdate: [],
 });
-chrome.runtime.onMessage.addListener((serializedMessage, _sender, _sendResponse) => {
-  //fixme: verify sender.id/origin
+const APP_ORIGIN = window.location.origin || null;
+chrome.runtime.onMessage.addListener((serializedMessage, { origin }, _sendResponse) => {
+  if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
+    Logger.debug('ignoring non-origin message (' + origin + '/' + APP_ORIGIN + '):' + JSON.stringify(sanitizeForLog(serializedMessage)));
+    return;
+  }
+  const messageType = typeof serializedMessage;
+  if (messageType !== 'string') {
+    Logger.error('unexpected message type (' + messageType + ') a JSON string is expected, but received: ' + JSON.stringify(sanitizeForLog(serializedMessage)));
+    return;
+  }
   let message;
   try {
     message = JSON.parse(serializedMessage);
   } catch (error) {
-    Logger.error('unserializable message: ' + serializedMessage + ' | Error: ' + stringifyError(error));
+    Logger.error('unparsable message: ' + serializedMessage + ' | Error: ' + stringifyError(error));
     return;
   }
   if (typeof message !== 'object') {
