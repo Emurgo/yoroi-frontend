@@ -417,14 +417,20 @@ const callbacks = Object.freeze({
   coinPriceUpdate: [],
 });
 const APP_ORIGIN = window.location.origin || null;
-chrome.runtime.onMessage.addListener((serializedMessage, { origin }, _sendResponse) => {
+const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
+chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
   if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
-    Logger.debug('ignoring non-origin message (' + origin + '/' + APP_ORIGIN + '):' + JSON.stringify(sanitizeForLog(serializedMessage)));
+    Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + '):' + JSON.stringify(sanitizeForLog(rawMessage)));
     return;
   }
+  if (rawMessage.type !== EXPECTED_MESSAGE_TYPE) {
+    Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + '):' + JSON.stringify(sanitizeForLog(rawMessage)));
+    return;
+  }
+  const serializedMessage = rawMessage.data;
   const messageType = typeof serializedMessage;
   if (messageType !== 'string') {
-    Logger.error('unexpected message type (' + messageType + ') a JSON string is expected, but received: ' + JSON.stringify(sanitizeForLog(serializedMessage)));
+    Logger.error('[client] unexpected message type (' + messageType + ') a JSON string is expected, but received: ' + JSON.stringify(sanitizeForLog(serializedMessage)));
     return;
   }
   let message;

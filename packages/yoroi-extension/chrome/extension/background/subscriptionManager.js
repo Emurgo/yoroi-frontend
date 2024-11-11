@@ -68,6 +68,6 @@ declare var chrome;
 */
 export function emitUpdateToSubscriptions(data: Object): void {
   for (const { tabId } of getSubscriptions()) {
-    chrome.tabs.sendMessage(tabId, JSON.stringify(data));
+    chrome.tabs.sendMessage(tabId, { type: 'yoroi-emit-update', data: JSON.stringify(data) });
   }
 }
