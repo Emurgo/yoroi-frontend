@@ -420,11 +420,11 @@ const APP_ORIGIN = window.location.origin || null;
 const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
 chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
   if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
-    Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + '):' + JSON.stringify(sanitizeForLog(rawMessage)));
+    Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + ')');
     return;
   }
   if (rawMessage.type !== EXPECTED_MESSAGE_TYPE) {
-    Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + '):' + JSON.stringify(sanitizeForLog(rawMessage)));
+    Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + ')');
     return;
   }
   const serializedMessage = rawMessage.data;
