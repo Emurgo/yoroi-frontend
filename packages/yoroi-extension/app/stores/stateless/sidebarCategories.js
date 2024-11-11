@@ -132,13 +132,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: ({ selected }) => !selected?.isTestnet,
   },
   {
-    className: 'assets',
-    route: ROUTES.ASSETS.ROOT,
-    icon: assetsIcon,
-    label: globalMessages.sidebarAssets,
-    isVisible: () => environment.isProduction() || environment.isDev(),
-  },
-  {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
