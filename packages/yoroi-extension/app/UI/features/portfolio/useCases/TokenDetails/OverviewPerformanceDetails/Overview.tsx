@@ -90,7 +90,7 @@ const TokenOverviewSection = ({
   const theme: any = useTheme();
 
   return (
-    <Stack direction="row" alignItems="flex-end" justifyContent="space-between">
+    <Stack direction="row" alignItems="flex-end" gap="8px">
       <Stack direction="column" spacing={theme.spacing(0.5)}>
         <Typography fontWeight="500" color="ds.gray_900">
           {label}

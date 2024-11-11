@@ -1,8 +1,7 @@
-import { Box, Divider } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import React, { useState } from 'react';
 import { Card } from '../../../../../components';
-import Menu from '../../../common/components/Menu';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { SubMenuOption } from '../../../common/types/index';
 import TokenDetailOverview from './Overview';
@@ -33,22 +32,25 @@ const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
     // },
   ];
 
-  const [selectedTab, setSelectedTab] = useState(subMenuOptions[0]?.route);
+  const [selectedTab, _] = useState(subMenuOptions[0]?.route);
 
-  const isActiveItem = (route: string) => {
-    if (route === selectedTab) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+  // const isActiveItem = (route: string) => {
+  //   if (route === selectedTab) {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // };
 
   return (
     <Card sx={{ backgroundColor: 'ds.gray_min' }}>
-      <Box sx={{ marginTop: `${theme.spacing(2)}`, backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>
+      <Typography p="24px" pb="0px" fontWeight={500} fontSize="18px">
+        {strings.overview}
+      </Typography>
+      {/* <Box sx={{ marginTop: `${theme.spacing(2)}`, backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>
         <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
         <Divider />
-      </Box>
+      </Box> */}
       <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
         {selectedTab === subMenuOptions[0]?.route ? (
           <TabContent>
