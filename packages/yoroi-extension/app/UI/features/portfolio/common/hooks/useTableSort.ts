@@ -37,7 +37,7 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
         const bValue = Number(b[orderBy]);
         return bValue === aValue ? 0 : bValue < aValue ? -1 : 1;
       case 'character':
-        return String(a.info[orderBy]).localeCompare(b.info[orderBy]);
+        return String(b.info[orderBy]).localeCompare(a.info[orderBy]);
       default:
         return b[orderBy] === a[orderBy] ? 0 : b[orderBy] < a[orderBy] ? -1 : 1;
     }
