@@ -186,9 +186,11 @@ export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const ptUnitPrice = tokenPrice * ptPrice;
   const priceDisplay = parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4);
 
+  const noDataToDisplay = priceDisplay === 'NaN';
+
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {priceDisplay} {unitOfAccount}
+      {noDataToDisplay ? '-' : `${priceDisplay} ${unitOfAccount}`}
     </Typography>
   );
 };
