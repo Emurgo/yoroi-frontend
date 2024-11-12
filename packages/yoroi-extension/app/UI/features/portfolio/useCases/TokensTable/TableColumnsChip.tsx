@@ -65,11 +65,31 @@ export const TokenPriceChangeChip = ({
 
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
+  const noDataToDisplay = Number.isNaN(changePercent);
+
+  if (noDataToDisplay) {
+    return (
+      <Stack
+        direction="row"
+        sx={{ backgroundColor: 'ds.gray_100', width: '42px', borderRadius: '20px' }}
+        justifyContent="center"
+        gap="4px"
+      >
+        <Typography variant="caption" color="ds.text_gray_low">
+          -
+        </Typography>
+        <Typography variant="caption" color="ds.text_gray_low">
+          %
+        </Typography>
+      </Stack>
+    );
+  }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={variantPnl} withIcon>
         <Typography fontSize="13px">
-          {Number.isNaN(changePercent)
+          {noDataToDisplay
             ? '-'
             : formatPriceChange(
                 isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
