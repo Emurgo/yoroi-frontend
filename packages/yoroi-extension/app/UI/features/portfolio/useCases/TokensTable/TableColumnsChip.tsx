@@ -13,6 +13,7 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   const theme = useTheme();
+
   return (
     <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
       <Box
@@ -22,7 +23,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
           borderRadius: `${theme.shape.borderRadius}px`,
         }}
         component="img"
-        src={token.info.image || tokenPng}
+        src={token.info.image ?? tokenPng}
       ></Box>
       <Stack direction="column">
         <Typography fontWeight="500" color="ds.text_gray_normal">

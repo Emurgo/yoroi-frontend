@@ -25,6 +25,9 @@ const STableRow = styled(TableRow)(({ theme }: any) => ({
     backgroundColor: theme.palette.ds.bg_color_min,
   },
 }));
+const STableCell = styled(TableCell)(() => ({
+  width: '15%',
+}));
 
 interface Props {
   data: TokenType[];
@@ -83,48 +86,48 @@ const StatsTable = ({ data }: Props): JSX.Element => {
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {getSortedData(assetFormatedList).map((row: any) => (
-        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)} sx={{}}>
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenDisplay token={row} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
+          <STableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
+          <STableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.WEEK}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.MONTH}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
+          <STableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
             <TokenProcentage procentage={row.percentage} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
-          </TableCell>
+          </STableCell>
         </STableRow>
       ))}
     </Table>
