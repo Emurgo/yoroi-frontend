@@ -28,7 +28,6 @@ import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/b
 import { ChainDerivations, } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
@@ -105,7 +104,7 @@ export function createTrezorSignTxPayload(
       ...request,
       certificates: formatTrezorCertificates(
         certificates,
-        range(0, certificates.len()).map(_i => stakingKeyPath),
+        (_) => stakingKeyPath,
       )
     };
 
@@ -162,23 +161,26 @@ function formatTrezorWithdrawals(
     }))
     .toArray();
 }
+
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  paths: Array<Array<number>>,
+  getPath: (stakeCredential: RustModule.WalletV4.Credential) => Array<number>,
 ): Array<CardanoCertificate> {
   const result = [];
-  for (const [cert, path] of iterateLenGet(certificates).zip(paths)) {
-    if (cert.as_stake_registration() != null) {
+  for (const cert of iterateLenGet(certificates)) {
+    const registrationCert = cert.as_stake_registration();
+    if (registrationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_REGISTRATION,
-        path,
+        path: getPath(registrationCert.stake_credential()),
       });
       continue;
     }
-    if (cert.as_stake_deregistration() != null) {
+    const deregistrationCert = cert.as_stake_deregistration();
+    if (deregistrationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DEREGISTRATION,
-        path,
+        path: getPath(deregistrationCert.stake_credential()),
       });
       continue;
     }
@@ -186,8 +188,8 @@ function formatTrezorCertificates(
     if (delegationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
+        path: getPath(delegationCert.stake_credential()),
         pool: delegationCert.pool_keyhash().to_hex(),
-        path,
       });
       continue;
     }
@@ -224,11 +226,11 @@ function formatTrezorCertificates(
       result.push({
         type: CardanoCertificateType.VOTE_DELEGATION,
         dRep,
-        path,
+        path: getPath(voteDelegation.stake_credential()),
       });
       continue;
     }
-    // TODO: @trezor/connect-web 9.4.2 haven't supported dRep (de)registration and update
+    // TODO: @trezor/connect-web 9.4.2 hasn't supported dRep (de)registration and update
     throw new Error(`${nameof(formatTrezorCertificates)} Trezor doesn't support this certificate type`);
   }
   return result;
@@ -747,37 +749,7 @@ export function toTrezorSignRequest(
       }
       return addressing;
     };
-
-    const result = [];
-    for (const cert of iterateLenGet(certificates)) {
-      const registrationCert = cert.as_stake_registration();
-      if (registrationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_REGISTRATION,
-          path: getPath(registrationCert.stake_credential()),
-        });
-        continue;
-      }
-      const deregistrationCert = cert.as_stake_deregistration();
-      if (deregistrationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_DEREGISTRATION,
-          path: getPath(deregistrationCert.stake_credential()),
-        });
-        continue;
-      }
-      const delegationCert = cert.as_stake_delegation();
-      if (delegationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_DELEGATION,
-          path: getPath(delegationCert.stake_credential()),
-          pool: delegationCert.pool_keyhash().to_hex(),
-        });
-        continue;
-      }
-      throw new Error(`unsupported certificate type`);
-    }
-    formattedCertificates = result;
+    formattedCertificates = formatTrezorCertificates(certificates, getPath);
   }
 
   let formattedWithdrawals = null;
