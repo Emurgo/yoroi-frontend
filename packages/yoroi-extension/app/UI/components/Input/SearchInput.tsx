@@ -1,17 +1,19 @@
-import React from 'react';
-import { Input, InputAdornment, InputProps, styled, useTheme } from '@mui/material';
-import { useRef } from 'react';
+import { InputAdornment, InputProps, OutlinedInput, styled, useTheme } from '@mui/material';
+import React, { useRef } from 'react';
 import { Icon } from './../icons/index';
 
-const StyledInput = styled(Input)(({ theme }: any) => ({
-  borderRadius: `${theme.shape.borderRadius}px`,
-  width: '320px',
+const StyledInput = styled(OutlinedInput)(({ theme }: any) => ({
+  width: '370px',
   height: '40px',
-  padding: `${theme.spacing(1)} ${theme.spacing(2)} ${theme.spacing(1)} ${theme.spacing(1)}`,
-  border: '1px solid',
-  borderColor: theme.palette.ds.gray_400,
-  'input::placeholder': {
-    color: theme.palette.ds.gray_600,
+  padding: '10px 12px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_low,
+    },
+  },
+  '& input::placeholder': {
+    color: theme.palette.ds.el_gray_low,
+    opacity: 1,
   },
 }));
 
