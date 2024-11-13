@@ -97,7 +97,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
-    const isFirefox = environment.userAgentInfo.isFirefox();
+    const isFirefox = environment.isFirefox();
 
     const analyticsDetails = [
       [YesIcon, messages.line1],

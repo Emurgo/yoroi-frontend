@@ -326,10 +326,10 @@ async function createFetcher(
     () => environment.getVersion(),
     () => locale,
     () => {
-      if (environment.userAgentInfo.isFirefox()) {
+      if (environment.isFirefox()) {
         return 'firefox';
       }
-      if (environment.userAgentInfo.isChrome()) {
+      if (environment.isChrome()) {
         return 'chrome';
       }
       return '-';
@@ -1818,7 +1818,7 @@ function handleExchangeRedirectMessage(message, sender) {
   }
 }
 
-if (environment.userAgentInfo.isFirefox()) {
+if (environment.isFirefox()) {
   browser.runtime.onInstalled.addListener(async () => {
     const analyticsFlag = await new LocalStorageApi().loadIsAnalyticsAllowed();
     if (analyticsFlag == null) {
