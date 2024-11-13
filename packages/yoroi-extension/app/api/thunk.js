@@ -17,6 +17,7 @@ import {
   SendTransactionApiError,
   GenericApiError,
   IncorrectWalletPasswordError,
+  InvalidWitnessError,
 } from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
 //import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
@@ -236,11 +237,13 @@ export async function signAndBroadcastTransaction(
     type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
   });
+  handleKnownSubmissionErrors(result);
   return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
   const result = await callBackground({ type: BroadcastTransaction.typeTag, request });
+  handleKnownSubmissionErrors(result);
   if (result?.error) {
     throw new Error(result.error);
   }
@@ -517,4 +520,14 @@ function handleWrongPassword<
     throw new SendTransactionApiError();
   }
   return result;
+}
+
+function handleKnownSubmissionErrors<
+  T: { error?: string, ... }
+>(
+  result: T,
+): void {
+  if (result.error?.includes('api.errors.invalidWitnessError')) {
+    throw new InvalidWitnessError()
+  }
 }
