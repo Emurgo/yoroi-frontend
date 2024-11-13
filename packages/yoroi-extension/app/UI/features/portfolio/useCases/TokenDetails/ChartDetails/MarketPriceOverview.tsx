@@ -33,13 +33,12 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
     tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
-  const priceChangeProcent = isPrimaryToken
-    ? detailInfo?.changePercent || changePercent
-    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.change;
+  const deltaPriceChange =
+    !isPrimaryToken && data24h[tokenInfo?.info?.id][1].price.close - data24h[tokenInfo?.info?.id][1].price.open;
+  const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : !isEmpty(data24h) && deltaPriceChange;
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
     : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.close;
-
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ p: !isPrimaryToken && theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_max">
