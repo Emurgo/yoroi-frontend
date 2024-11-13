@@ -3,9 +3,9 @@ import React, { useRef } from 'react';
 import { Icon } from './../icons/index';
 
 const StyledInput = styled(OutlinedInput)(({ theme }: any) => ({
-  width: '370px',
+  width: '320px',
   height: '40px',
-  padding: '10px 12px',
+  padding: '8px',
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_low,

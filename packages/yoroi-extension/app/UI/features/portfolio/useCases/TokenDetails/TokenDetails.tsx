@@ -1,8 +1,7 @@
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import React from 'react';
-import { ReactComponent as BackIcon } from '../../../../../assets/images/assets-page/back-arrow.inline.svg';
-import { Card } from '../../../../components';
+import { BackButton, Card } from '../../../../components';
 import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
@@ -23,7 +22,11 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const IconWrapper = styled(Box)(({ theme }: any) => ({
+const SButton = styled(Button)(({ theme }: any) => ({
+  color: theme.palette.ds.el_gray_medium,
+  '&.MuiButton-sizeMedium': {
+    padding: '13px 16px',
+  },
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
@@ -40,24 +43,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   return (
     <Box sx={{ width: '100%' }}>
       <Header>
-        <Box
-          height="40px"
-          onClick={() => navigateTo.portfolio()}
-          sx={{
-            color: theme.palette.ds.black_static,
-            display: 'flex',
-            gap: theme.spacing(2),
-            alignItems: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <IconWrapper>
-            <BackIcon />
-          </IconWrapper>
-          <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium" sx={{ textTransform: 'uppercase' }}>
-            {strings.backToPortfolio}
-          </Typography>
-        </Box>
+        <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
         <Stack direction="row" spacing={theme.spacing(2)}>
           <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
