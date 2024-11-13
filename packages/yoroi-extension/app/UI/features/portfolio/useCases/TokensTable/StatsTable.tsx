@@ -95,7 +95,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -121,7 +121,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
             />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenProcentage procentage={row.percentage} />
           </STableCell>
 

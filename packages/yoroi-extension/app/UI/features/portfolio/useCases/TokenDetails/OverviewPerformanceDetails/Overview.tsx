@@ -37,9 +37,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
 
       <TokenOverviewSection label={strings.description} value={tokenInfo.info.metadata.description} />
 
-      {tokenInfo.info.metadata.website && (
-        <TokenOverviewSection label={strings.website} value={tokenInfo.info.metadata.website} isExternalLink />
-      )}
+      {<TokenOverviewSection label={strings.website} value={tokenInfo.info.metadata.website} isExternalLink />}
 
       {isPrimary && <TokenOverviewSection label={strings.website} value="https://cardano.org/" isExternalLink />}
 
@@ -114,7 +112,7 @@ const TokenOverviewSection = ({
           </Stack>
         ) : isExternalLink ? (
           <LinkMui href={value} target="_blank" rel="noopener noreferrer" style={{ width: 'fit-content' }}>
-            {value}
+            {value || '-'}
           </LinkMui>
         ) : (
           <Typography color="ds.gray_600">{value}</Typography>

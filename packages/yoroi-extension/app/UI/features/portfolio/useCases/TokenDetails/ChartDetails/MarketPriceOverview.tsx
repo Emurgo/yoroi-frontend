@@ -34,7 +34,10 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
   } = usePortfolioTokenActivity();
 
   const deltaPriceChange =
-    !isPrimaryToken && data24h[tokenInfo?.info?.id][1].price.close - data24h[tokenInfo?.info?.id][1].price.open;
+    !isPrimaryToken &&
+    !isEmpty(data24h) &&
+    data24h[tokenInfo?.info?.id][1].price.close - data24h[tokenInfo?.info?.id][1].price.open;
+
   const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : !isEmpty(data24h) && deltaPriceChange;
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
