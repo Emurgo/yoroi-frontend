@@ -527,7 +527,7 @@ function handleKnownSubmissionErrors<
 >(
   result: T,
 ): void {
-  if (result.error?.includes('api.errors.invalidWitnessError')) {
+  if (result?.error?.includes('api.errors.invalidWitnessError')) {
     throw new InvalidWitnessError()
   }
 }
