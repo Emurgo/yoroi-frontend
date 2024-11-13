@@ -12,9 +12,12 @@ declare var browser;
 const IS_FIREFOX_BROWSER_INFO: [boolean | null] = [null];
 if (typeof browser !== 'undefined') {
     browser.runtime.getBrowserInfo().then(({ name }) => {
-        const isFirefox = name === 'Firefox';
-        console.debug(`isFirefox = ${String(isFirefox)} / defined by browser info API`)
-        IS_FIREFOX_BROWSER_INFO[0] = isFirefox;
+        const isff = name === 'Firefox';
+        console.debug(`isFirefox = ${String(isff)} / defined by browser info API`)
+        IS_FIREFOX_BROWSER_INFO[0] = isff;
+        return null;
+    }).catch(e => {
+        console.error('failed to call browser info API', e);
     });
 }
 
