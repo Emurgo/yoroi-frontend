@@ -37,7 +37,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
 
       <TokenOverviewSection label={strings.description} value={tokenInfo.info.metadata.description} />
 
-      {<TokenOverviewSection label={strings.website} value={tokenInfo.info.metadata.website} isExternalLink />}
+      <TokenOverviewSection label={strings.website} value={tokenInfo.info.metadata.website} isExternalLink />
 
       {isPrimary && <TokenOverviewSection label={strings.website} value="https://cardano.org/" isExternalLink />}
 
@@ -80,9 +80,9 @@ const TokenOverviewSection = ({
   withCopy,
   isPrimary,
 }: TokenOverviewSectionTypes) => {
-  if (!value && !isPrimary) {
-    return <></>;
-  }
+  // if (!value && !isPrimary) {
+  //   return <></>;
+  // }
 
   const { explorer } = usePortfolio();
   const theme: any = useTheme();
@@ -115,7 +115,7 @@ const TokenOverviewSection = ({
             {value || '-'}
           </LinkMui>
         ) : (
-          <Typography color="ds.gray_600">{value}</Typography>
+          <Typography color="ds.gray_600">{value || '-'}</Typography>
         )}
       </Stack>
       {withCopy && <CopyButton textToCopy={value} />}
