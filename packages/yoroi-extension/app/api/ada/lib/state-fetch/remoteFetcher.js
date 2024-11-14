@@ -568,7 +568,7 @@ export class RemoteFetcher implements IFetcher {
       }
     ).then(response => [ response.data ])
       .catch((error) => {
-        if (error.response.status === 404 && error.response.data === 'Transaction not found') {
+        if (error.response.status === 404 && error.response.data === 'No outputs found') {
           return [ null ];
         }
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUtxoData)} error: ` + stringifyError(error));
