@@ -92,7 +92,7 @@ export const useGetPortfolioTokenChart = (
     cacheTime: time.oneHour,
     retryDelay: time.oneSecond,
     optimisticResults: true,
-    refetchInterval: time.halfHour,
+    refetchInterval: time.oneMinute,
     useErrorBoundary: true,
     refetchOnMount: false,
     enabled: tokenInfo && tokenInfo.info?.id.length === 0,
