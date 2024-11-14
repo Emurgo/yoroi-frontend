@@ -532,10 +532,13 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     const foreignInputDetails = [];
     if (foreignInputs.length) {
-      const foreignUtxos = await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
-        network,
-        utxos: foreignInputs,
-      });
+      const foreignUtxos = await Promise.all(foreignInputs.map(async (foreignInput) => {
+        // currently this endpoint only supports querying one at a time
+        return (await this.stores.substores.ada.stateFetchStore.fetcher.getUtxoData({
+          network,
+          utxos: [foreignInput],
+        }))[0];
+      }));
       for (let i = 0; i < foreignUtxos.length; i++) {
         const foreignUtxo = foreignUtxos[i];
         if (foreignUtxo == null || typeof foreignUtxo !== 'object') {
