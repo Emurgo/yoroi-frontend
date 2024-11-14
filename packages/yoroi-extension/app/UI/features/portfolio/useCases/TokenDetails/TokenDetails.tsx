@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Stack } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import React from 'react';
 import { BackButton, Card } from '../../../../components';
@@ -21,18 +21,6 @@ const TokenInfo = styled(Stack)({
 interface Props {
   tokenInfo: TokenInfoType;
 }
-
-const SButton = styled(Button)(({ theme }: any) => ({
-  color: theme.palette.ds.el_gray_medium,
-  '&.MuiButton-sizeMedium': {
-    padding: '13px 16px',
-  },
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_medium,
-    },
-  },
-}));
 
 const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
