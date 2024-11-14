@@ -51,7 +51,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_900">
-        {`${tokenInfo.info.name} ${strings.balance}`}
+        {strings.balance}
       </Typography>
 
       <Stack direction="column" spacing={theme.spacing(0.5)}>
