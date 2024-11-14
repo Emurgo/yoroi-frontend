@@ -328,6 +328,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
               id="bringweb3"
               className={styles.iframe}
               src={iframeSrc}
+              style={{ verticalAlign: "bottom" }}
               width="100%"
               height="100%"
             />
