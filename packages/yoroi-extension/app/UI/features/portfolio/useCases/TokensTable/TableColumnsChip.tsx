@@ -90,13 +90,12 @@ export const TokenPriceChangeChip = ({
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={variantPnl} withIcon>
-        <Typography fontSize="13px" sx={{ width: '42px' }}>
+        <Typography fontSize="13px">
           {noDataToDisplay
             ? '-'
             : formatPriceChange(
                 isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
               )}
-          %
         </Typography>
       </PnlTag>
     </Box>

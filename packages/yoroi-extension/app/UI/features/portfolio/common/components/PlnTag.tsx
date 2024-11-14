@@ -38,6 +38,9 @@ const PnlTag = ({ children, withIcon = false, variant = 'neutral' }: Props) => {
       <StyledTypography mode={variant} fontSize="12px">
         {children}
       </StyledTypography>
+      <StyledTypography mx="2px" mode={variant}>
+        %
+      </StyledTypography>
     </TagContainer>
   );
 };
