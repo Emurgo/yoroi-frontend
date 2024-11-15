@@ -164,9 +164,13 @@ class SupportSettings extends Component<Props & InjectedProps> {
           <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.paperWallet)}
           </Typography>
-          <Button variant="contained" onClick={this.props.onPaperWalletTransfer} sx={{
-            fontSize: '0.8rem',
-          }}>
+          <Button
+            variant="contained"
+            onClick={this.props.onPaperWalletTransfer}
+            sx={{
+              fontSize: '0.8rem',
+            }}
+          >
             {intl.formatMessage(messages.paperWalletTransfer)}
           </Button>
         </Box>
