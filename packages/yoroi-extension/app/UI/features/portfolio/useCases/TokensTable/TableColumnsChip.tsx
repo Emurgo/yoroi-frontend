@@ -52,6 +52,8 @@ export const TokenPriceChangeChip = ({
 }: TokenPriceChangeChipProps) => {
   const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
 
+  console.log('ptTokenDataInterval', ptTokenDataInterval);
+
   if (secondaryTokenActivity === null || primaryTokenActivity === null || isFetching) {
     return <Skeleton variant="text" width="60px" height="30px" />;
   }
@@ -94,7 +96,7 @@ export const TokenPriceChangeChip = ({
           {noDataToDisplay
             ? '-'
             : formatPriceChange(
-                isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
+                isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[167]?.changePercent ?? 0 : changePercent ?? 0
               )}
         </Typography>
       </PnlTag>
