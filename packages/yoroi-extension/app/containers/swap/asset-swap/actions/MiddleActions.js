@@ -2,9 +2,11 @@
 import { Box, Button } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../../assets/images/revamp/icons/switch.inline.svg';
 import { useSwapForm } from '../../context/swap-form';
+import { useStrings } from '../../common/useStrings';
 
 export const MiddleActions = (): React$Node => {
   const { clearSwapForm, switchTokens, onChangeLimitPrice } = useSwapForm();
+  const { clear } = useStrings();
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -19,7 +21,7 @@ export const MiddleActions = (): React$Node => {
       </Box>
       <Box>
         <Button onClick={() => clearSwapForm()} variant="tertiary" color="primary">
-          Clear
+          {clear}
         </Button>
       </Box>
     </Box>

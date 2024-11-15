@@ -11,6 +11,7 @@ import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
 import SwapPoolFullInfo from './PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import { useStrings } from '../../common/useStrings';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -26,6 +27,7 @@ type Props = {|
 |};
 
 export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
+  const { dexLabel } = useStrings();
   const [showFullInfo, setShowFullInfo] = useState(true);
   const { orderData } = useSwap();
 
@@ -62,7 +64,7 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
       >
         <Box display="flex" gap="8px" alignItems="center">
           <Typography component="div" variant="body1" color="ds.text_gray_medium">
-            DEX
+            {dexLabel}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>

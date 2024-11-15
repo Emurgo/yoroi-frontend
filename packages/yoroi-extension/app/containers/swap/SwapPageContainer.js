@@ -14,6 +14,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { IntlProvider } from './context/intl/IntlProvider.tsx';
 
 type Props = {|
   +children?: Node,
@@ -42,14 +43,10 @@ export default class SwapPageContainer extends Component<AllProps> {
   render(): Node {
     const { children } = this.props;
     const { actions, stores } = this.props;
+    const { intl } = this.context;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
 
-    const menu = (
-      <SwapMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={this.isActivePage}
-      />
-    );
+    const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
 
     return (
       <TopBarLayout
@@ -59,18 +56,16 @@ export default class SwapPageContainer extends Component<AllProps> {
           <NavBarContainerRevamp
             actions={actions}
             stores={stores}
-            title={
-              <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />
-            }
+            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
             menu={menu}
           />
         }
         showInContainer
         withPadding={false}
       >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-          {children}
-        </SwapFormProvider>
+        <IntlProvider intl={intl}>
+          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+        </IntlProvider>
       </TopBarLayout>
     );
   }

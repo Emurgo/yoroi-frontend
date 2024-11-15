@@ -4,6 +4,7 @@ import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
 import SwapInput from '../../../../components/swap/SwapInput';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import { useStrings } from '../../common/useStrings';
 
 type Props = {|
   onAssetSelect(): void,
@@ -11,11 +12,8 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
 |};
 
-export default function EditBuyAmount({
-  onAssetSelect,
-  defaultTokenInfo,
-  getTokenInfo,
-}: Props): Node {
+export default function EditBuyAmount({ onAssetSelect, defaultTokenInfo, getTokenInfo }: Props): Node {
+  const { swapToLabel } = useStrings();
   const { orderData } = useSwap();
   const {
     buyQuantity: { displayValue: buyDisplayValue, error: fieldError },
@@ -38,7 +36,7 @@ export default function EditBuyAmount({
   return (
     <SwapInput
       key={tokenId}
-      label="Swap to"
+      label={swapToLabel}
       disabled={!isValidTickers}
       handleAmountChange={handleAmountChange()}
       value={buyDisplayValue}
