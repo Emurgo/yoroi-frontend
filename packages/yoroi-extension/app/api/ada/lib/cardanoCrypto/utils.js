@@ -58,8 +58,14 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
     try {
       if (s.startsWith('drep1')) {
         if (s.length === 58) {
+          // CIP129 drep1 encoding is extended value with internal prefix
           return maybe(base32ToHex(s), dRepToMaybeCredentialHex);
         }
+        // Pre CIP129 drep1 encoding means same as drep_vkh1 now
+        return Module.WalletV4.Credential
+          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+      }
+      if (s.startsWith('drep_vkh1')) {
         return Module.WalletV4.Credential
           .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
       }
