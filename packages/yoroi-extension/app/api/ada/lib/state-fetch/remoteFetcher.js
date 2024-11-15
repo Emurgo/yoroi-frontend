@@ -578,7 +578,7 @@ export class RemoteFetcher implements IFetcher {
 
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => {
     const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getLatestBlockBySlot)} missing backend url`);
     return axios(
       `${BackendService}/api/v2.1/lastBlockBySlot`,
       {
