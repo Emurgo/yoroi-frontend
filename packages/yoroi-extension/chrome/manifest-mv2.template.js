@@ -73,7 +73,7 @@ export default ({
     ],
     content_scripts: [
       {
-        matches: ['*://connect.trezor.io/*/popup.html'],
+        matches: ['*://connect.trezor.io/*/popup.html*'],
         js: ['js/trezor-content-script.js'],
       },
     ],

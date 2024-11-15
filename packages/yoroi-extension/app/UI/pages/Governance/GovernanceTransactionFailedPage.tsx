@@ -11,7 +11,7 @@ type Props = {
 const GovernanceTransactionFailedPage = (props: Props): any => {
   return (
     <GovernanceLayout {...props}>
-      <TransactionFailed />
+      <TransactionFailed error={props.stores.substores.ada.delegationTransaction.error} />
     </GovernanceLayout>
   );
 };

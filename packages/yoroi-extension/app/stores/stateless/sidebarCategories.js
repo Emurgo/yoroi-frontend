@@ -179,7 +179,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => selected != null && selected.type !== 'trezor',
+    isVisible: ({ selected }) => selected != null,
   },
   {
     className: 'settings',
