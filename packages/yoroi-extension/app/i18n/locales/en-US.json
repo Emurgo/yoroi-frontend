@@ -308,6 +308,8 @@
   "settings.noexternal.dialog.content": "Your memos are stored locally. They will not automatically sync with other Yoroi instances and will be lost if you delete Yoroi",
   "settings.noexternal.dialog.title": "No external storage",
   "settings.revamp.unitOfAccount.note": "Please note, that the coin price is approximate and may not match the price of any given trading platform. Any transactions based on this price approximates are done at your own risk",
+  "settings.support.paperWallet.title": "Paper Wallet",
+  "settings.support.paperWallet.button": "Transfer from Paper Wallet",
   "settings.support.faq.blogLinkUrl": "https://emurgo.io/en/blog/yoroi-custom-themes",
   "settings.support.faq.blogLinkWrapper": "blog post",
   "settings.support.faq.content": "If you are experiencing issues, please see the {faqLink} for guidance on known issues.",
