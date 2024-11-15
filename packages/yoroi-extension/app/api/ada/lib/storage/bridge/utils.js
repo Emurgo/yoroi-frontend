@@ -7,7 +7,7 @@ import type { NetworkRow } from '../database/primitives/tables';
 import { isCardanoHaskell } from '../database/prepackaged/networks';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
-import { bech32, bech32 as bech32Module } from 'bech32';
+import { bech32 as bech32Module } from 'bech32';
 import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import { bytesToHex, fail, hexToBytes, maybe } from '../../../../../coreUtils';
 
@@ -71,7 +71,7 @@ export function addressToKind(
 
 // <TODO:FIX> THIS IS TERRIBLE, messages in api and the return type is awful
 export function isValidReceiveAddress(
-  bechAddress: string,
+  bech32: string,
   network: $ReadOnly<NetworkRow>
 ): true | [false, $Exact<$npm$ReactIntl$MessageDescriptor>, number] {
   const messages = defineMessages({
@@ -98,7 +98,7 @@ export function isValidReceiveAddress(
     },
   });
 
-  const kind = tryAddressToKind(bechAddress, 'bech32', network);
+  const kind = tryAddressToKind(bech32, 'bech32', network);
   if (kind == null) {
     return [false, messages.invalidAddress, 1];
   }
@@ -107,7 +107,7 @@ export function isValidReceiveAddress(
       return [false, messages.cannotSendToReward, 2];
     }
     if (isCardanoHaskellAddress(kind)) {
-      const addr = normalizeToAddress(bechAddress);
+      const addr = normalizeToAddress(bech32);
       if (addr == null) throw new Error('Should never happen');
 
       const expectedNetworkId = Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10);
@@ -169,7 +169,7 @@ export const base32ToHex = (base32: string): ?string => {
 };
 
 export const hexToBase32 = (hex: string, prefix: string): string => {
-  return bech32.encode(prefix, bech32.toWords(hexToBytes(hex)));
+  return bech32Module.encode(prefix, bech32Module.toWords(hexToBytes(hex)));
 };
 
 /* eslint-disable */
