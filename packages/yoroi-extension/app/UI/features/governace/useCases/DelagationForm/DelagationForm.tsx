@@ -9,6 +9,7 @@ import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/sta
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
+import { dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -111,6 +112,9 @@ export const DelagationForm = () => {
     setIsIncorectPassword(false);
   }, [password]);
 
+  const specifiedDrep = governanceVote.drepID;
+  const normalizedDrep = dRepNormalize(specifiedDrep);
+
   return (
     <Container>
       <Stack>
@@ -142,9 +146,22 @@ export const DelagationForm = () => {
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee={txFee} />
+                  <OperationInfo label={(
+                    <>
+                      <Typography variant="body1" color="ds.text_gray_medium">
+                        Delegate voting to DRep (CIP 129): {normalizedDrep}
+                      </Typography>
+                      {specifiedDrep !== normalizedDrep ? (
+                        <Typography variant="body1" color="ds.text_gray_medium">
+                          Specified as: {specifiedDrep}
+                        </Typography>
+                      ) : null}
+                    </>
+                  )} fee={txFee} />
                 )}
-                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee={txFee} />}
+                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && (
+                  <OperationInfo label={strings.selectAbstein} fee={txFee} />
+                )}
                 {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
                   <OperationInfo label={strings.selectNoConfidence} fee={txFee} />
                 )}
@@ -186,16 +203,18 @@ export const DelagationForm = () => {
 };
 
 type OperationInfoProps = {
-  label: string;
+  label: string | JSX.Element;
   fee: string;
 };
 
 const OperationInfo = ({ label, fee }: OperationInfoProps) => {
   return (
     <>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {label}
-      </Typography>
+      {typeof label === 'string' ? (
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {label}
+        </Typography>
+      ) : label}
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="body1" fontWeight="500" color="ds.text_gray_normal">
           Transaction fee

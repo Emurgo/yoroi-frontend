@@ -1,8 +1,8 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { bytesToHex, hexToBytes, maybe } from '../../../../coreUtils';
-import { base32ToHex } from '../storage/bridge/utils';
+import { bytesToHex, forceNonNull, hexToBytes, maybe } from '../../../../coreUtils';
+import { base32ToHex, hexToBase32 } from '../storage/bridge/utils';
 
 export function v4PublicToV2(
   v4Key: RustModule.WalletV4.Bip32PublicKey
@@ -83,6 +83,35 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
       }
     } catch {} // eslint-disable-line no-empty
     return null;
+  })
+}
+
+export function dRepNormalize(drep: string, kind?: string): string {
+  function encodeDrepHash(hash: string, isScript: boolean): string {
+    // cip129 prefix
+    const prefix = isScript ? '23' : '22';
+    return hexToBase32(prefix + hash, 'drep');
+  }
+  if (kind != null) {
+    // drep is hash hex
+    return encodeDrepHash(drep, kind === 'scripthash');
+  }
+  if (drep.startsWith('drep1') && drep.length === 58) {
+    // drep already cip129
+    return drep;
+  }
+  // parse drep
+  const credentialHex = dRepToMaybeCredentialHex(drep);
+  if (!credentialHex) {
+    throw new Error('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind));
+  }
+  return RustModule.WasmScope(Module => {
+    const cred = Module.WalletV4.Credential.from_hex(credentialHex);
+    const isScript = cred.kind() === Module.WalletV4.CredKind.Script;
+    const hash = isScript ?
+      forceNonNull(cred.to_scripthash()).to_hex()
+      : forceNonNull(cred.to_keyhash()).to_hex();
+    return encodeDrepHash(hash, isScript);
   })
 }
 
