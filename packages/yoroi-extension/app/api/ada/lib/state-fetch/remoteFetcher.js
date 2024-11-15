@@ -563,7 +563,7 @@ export class RemoteFetcher implements IFetcher {
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => [ response.data ])
+      ).then(response => response.data)
         .catch((error) => {
           if (error.response.status === 404 && error.response.data === 'No outputs found') {
             return [ null ];
