@@ -14,6 +14,7 @@ import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
+import { maybe } from '../../../../../coreUtils'
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -113,7 +114,7 @@ export const DelagationForm = () => {
   }, [password]);
 
   const specifiedDrep = governanceVote.drepID;
-  const normalizedDrep = dRepNormalize(specifiedDrep);
+  const normalizedDrep = maybe(specifiedDrep, dRepNormalize);
 
   return (
     <Container>
