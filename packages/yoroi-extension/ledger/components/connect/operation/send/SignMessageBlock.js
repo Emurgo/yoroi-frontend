@@ -9,17 +9,20 @@ import semverGte from 'semver/functions/gte';
 import type { DeviceCodeType }  from '../../../../types/enum';
 import HintBlock from '../../../widgets/hint/HintBlock';
 import HintGap from '../../../widgets/hint/HintGap';
-import type { Certificate } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { SignTransactionRequest, Certificate } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
+  AddressType,
   CertificateType,
+  TxAuxiliaryDataType,
   CredentialParamsType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import {
   pathToString,
 } from '../../../../utils/cmn';
+import { bech32 } from 'bech32';
+import { getAddressHintBlock } from '../../../widgets/hint/AddressHintBlock';
 
 import styles from './SendTxHintBlock.scss';
-import { hexToBase32 } from '../../../../../app/api/ada/lib/storage/bridge/utils';
 
 const message = defineMessages({
   sStartNewTx: {
@@ -260,7 +263,10 @@ export default class SendTxHintBlock extends React.Component<Props> {
       // Starting from version 2.4.1, the Ledger Cardano app show the pool ID
       // in bech32, complying with CIP0005
       if (semverGte(request.deviceVersion, '2.4.1')) {
-        poolId = hexToBase32(params.poolKeyHashHex, 'pool');
+        poolId = bech32.encode(
+          'pool',
+          bech32.toWords(Buffer.from(params.poolKeyHashHex, 'hex'))
+        );
       } else {
         poolId = params.poolKeyHashHex;
       }
