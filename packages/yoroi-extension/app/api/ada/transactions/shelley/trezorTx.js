@@ -206,7 +206,7 @@ function formatTrezorCertificates(
         break;
       case RustModule.WalletV4.DRepKind.ScriptHash:
         dRep = {
-          type: CardanoDRepType.KEY_HASH,
+          type: CardanoDRepType.SCRIPT_HASH,
           scriptHash: forceNonNull(voteDelegation.drep().to_script_hash()).to_hex(),
         };
         break;
