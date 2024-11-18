@@ -9,7 +9,7 @@ import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/sta
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
-import { dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
+import { dRepNormalize, dRepToPreCip129 } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -76,9 +76,7 @@ export const DelagationForm = () => {
   const strings = useStrings();
   const confirmDelegation = async () => {
     const response = await checkUserPassword(password);
-    if (isHardwareWallet) {
-      signGovernanceTx();
-    } else if (response?.name === 'WrongPassphraseError') {
+    if (response?.name === 'WrongPassphraseError') {
       setIsIncorectPassword(true);
     } else {
       signGovernanceTx();
@@ -115,6 +113,7 @@ export const DelagationForm = () => {
 
   const specifiedDrep = governanceVote.drepID;
   const normalizedDrep = maybe(specifiedDrep, dRepNormalize);
+  const preCip129Drep = maybe(specifiedDrep, dRepToPreCip129);
 
   return (
     <Container>
@@ -143,6 +142,7 @@ export const DelagationForm = () => {
         </Typography>
         <Box mb="40px">
           <Collapsible
+            expanded={isHardwareWallet}
             title={strings.operations}
             content={
               <TransactionDetails>
@@ -155,6 +155,11 @@ export const DelagationForm = () => {
                       {specifiedDrep !== normalizedDrep ? (
                         <Typography variant="body1" color="ds.text_gray_medium">
                           Specified as: {specifiedDrep}
+                        </Typography>
+                      ) : null}
+                      {isHardwareWallet && (preCip129Drep !== specifiedDrep) ? (
+                        <Typography variant="body1" color="ds.text_gray_medium">
+                          On a Hardware device this DRep ID might be displayed in old format: {preCip129Drep}
                         </Typography>
                       ) : null}
                     </>
