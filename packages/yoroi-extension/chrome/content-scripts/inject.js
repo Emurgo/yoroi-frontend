@@ -194,6 +194,8 @@ async function connectorEventListener(event) {
         await handleConnectorConnectRequest(event, protocol);
     } else if (dataType === 'scripted_injected') {
         resolveScriptedInject();
+    } else if (dataType === 'bring_rpc_request') {
+      await chrome.runtime.sendMessage(event.data);
     }
 }
 
@@ -247,5 +249,12 @@ window.addEventListener('message', function (event) {
       event.data?.type === 'exchange callback'
   ) {
     chrome.runtime.sendMessage(event.data);
+  }
+});
+
+// relay message from background to Bring
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'bring_rpc_response') {
+    window.postMessage(message, location.origin);
   }
 });

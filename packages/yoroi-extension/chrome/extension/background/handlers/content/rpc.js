@@ -67,7 +67,6 @@ import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
 import { getProtocolParameters } from '../yoroi/protocolParameters';
 import { hexToBytes } from '../../../../../app/coreUtils';
-import { getPublicDeriverById } from '../yoroi/utils';
 
 declare var chrome;
 
@@ -642,25 +641,6 @@ const Handlers = Object.freeze({
       );
     }
   }),
-
-  'get-theme-mode': NewHandler.basic<
-    void,
-    'dark' | 'light'
-  >(async () => {
-    const localStorageApi = new LocalStorageApi();
-    let theme = await localStorageApi.getUserThemeMode();
-    if (theme !== 'light' && theme !== 'dark') {
-      theme = 'light';
-    }
-    return { ok: theme };
-  }),
-
-  'pop-up-wallet-creation': NewHandler.basic<
-    void,
-    void,
-  >(async () => {
-    chrome.tabs.create({ url: 'main_window.html' });
-  }),
 });
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {
@@ -708,26 +688,7 @@ export async function handleRpc(message: Object, sender: Object) {
 
     let connectedWallet = undefined;
     if (handler.needConnectedWallet) {
-      try {
-        connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
-      } catch (error) {
-        // fixme: unsafe
-        const localStorageApi = new LocalStorageApi();
-        const publicDeriverId = await localStorageApi.getSelectedWalletId();
-        if (publicDeriverId != null) {
-          connectedWallet = await getPublicDeriverById(publicDeriverId);
-        }
-        if (connectedWallet == null) {
-          sendRpcResponse(
-            {
-              err: 'no wallet',
-            },
-            tabId,
-            message.uid,
-          );
-          return;
-        }
-      }
+      connectedWallet = await getConnectedWallet(tabId, handler.syncConnectedWallet);
     }
 
     const result = await handler.handle({

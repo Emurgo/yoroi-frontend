@@ -1,12 +1,13 @@
 // @flow
-
-/*::
-declare var chrome;
-*/
-
 import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
+import {
+  getFirstAddress,
+  getTheme,
+  popUpWalletCreation,
+  listenForActiveWalletOpen,
+} from './bringLib';
 
-const darkTheme = {
+const darkTheme = Object.freeze({
   // font
   fontUrl: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap',
   fontFamily: '"Rubik", sans-serif',
@@ -106,9 +107,9 @@ const darkTheme = {
   activateTitleBoldFS: "16px",
   activateTitleBoldFW: "500",
   activateTitleBoldFC: "#E1E6F5",
-}
+});
 
-const lightTheme = {
+const lightTheme = Object.freeze({
 
   // Popup
   popupBg: "#FFFFFF",
@@ -206,62 +207,7 @@ const lightTheme = {
   activateTitleBoldFS: "16px",
   activateTitleBoldFW: "500",
   activateTitleBoldFC: "#242838",
-}
-
-
-function getFromBackground(functionName: string, params: any): Promise<any> {
-  const uid = Math.random();
-  return new Promise((resolve, reject) => {
-    chrome.runtime.onMessage.addListener((msg, sender) => {
-      if (msg.type === 'connector_rpc_response' && msg.uid === uid) {
-        if (msg.return.ok) {
-          resolve(msg.return.ok);
-        } else {
-          reject(new Error(msg.return.err));
-        }
-      }
-    });
-
-    window.postMessage({
-      type: "connector_rpc_request",
-      url: location.hostname,
-      uid,
-      function: functionName,
-      params,
-      returnType: 'json',
-    });
-  });
-}
-
-async function getFirstAddress(): Promise<string | typeof undefined> {
-  try {
-    const usedAddresses = await getFromBackground('get_used_addresses', [undefined]);
-    if (usedAddresses.length > 0) {
-      return usedAddresses[0];
-    }
-    const unusedAddresses = await getFromBackground('get_unused_addresses', [undefined]);
-    return unusedAddresses[0];
-  } catch (error) {
-    return undefined
-  }
-}
-
-function getTheme(): Promise<'light' | 'dark'> {
-  return getFromBackground('get-theme-mode', [undefined]);
-}
-
-function popUpWalletCreation(): void {
-  getFromBackground('pop-up-wallet-creation');
-}
-
-function listenForActiveWalletOpen(callback) {
-  // todo: verify sender extension id
-  chrome.runtime.onMessage.addListener((msg, sender) => {
-    if (msg.type === 'active-wallet-open') {
-      callback();
-    }
-  });
-}
+});
 
 (async () => {
   await bringInitContentScript({
