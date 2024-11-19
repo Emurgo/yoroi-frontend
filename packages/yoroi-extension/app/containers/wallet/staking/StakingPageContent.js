@@ -39,11 +39,19 @@ type InjectedLayoutProps = {|
   +renderLayoutComponent: LayoutComponentMap => Node,
 |};
 
+type State = {|
+  govStatusFetched: boolean;
+|}
+
 type AllProps = {| ...StoresAndActionsProps, ...InjectedLayoutProps |};
 @observer
-class StakingPageContent extends Component<AllProps> {
+class StakingPageContent extends Component<AllProps, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
+  };
+
+  state: State = {
+    govStatusFetched: false,
   };
 
   onClose: void => void = () => {
@@ -55,10 +63,14 @@ class StakingPageContent extends Component<AllProps> {
     if (wallet == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-    // Check governance only for certain network
-    if (wallet.type !== 'trezor') {
-      noop(this.props.stores.delegation.checkGovernanceStatus(wallet));
-    }
+    this.props.stores.delegation.checkGovernanceStatus(wallet).then(() => {
+      this.setState({
+        govStatusFetched: true,
+      });
+      return null;
+    }).catch(e => {
+      console.error('Failed to fetch governance status', e);
+    });
     if (this.props.stores.delegation.getPoolTransitionConfig(wallet).shouldUpdatePool) {
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(wallet);
       if (poolTransitionInfo?.suggestedPool) {
@@ -213,6 +225,16 @@ class StakingPageContent extends Component<AllProps> {
 
     const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation != null;
 
+    const handleRewardsWithdrawal = async () => {
+      if (!isParticipatingToGovernance) {
+        this.props.actions.dialogs.open.trigger({
+          dialog: GovernanceParticipateDialog,
+        });
+        return;
+      }
+      this.createWithdrawalTx(false) // shouldDeregister=false
+    };
+
     return (
       <Box>
         {isWalletWithNoFunds ? (
@@ -227,17 +249,7 @@ class StakingPageContent extends Component<AllProps> {
                   dialog: OverviewModal,
                 })
               }
-              withdrawRewards={
-                isParticipatingToGovernance === false
-                  ? async () => {
-                      this.props.actions.dialogs.open.trigger({
-                        dialog: GovernanceParticipateDialog,
-                      });
-                    }
-                  : isStakeRegistered
-                  ? async () => this.createWithdrawalTx(false) // shouldDeregister=false
-                  : undefined
-              }
+              withdrawRewards={isStakeRegistered && this.state.govStatusFetched ? handleRewardsWithdrawal : undefined}
               unitOfAccount={this.toUnitOfAccount}
               getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={stores.profile.shouldHideBalance}
