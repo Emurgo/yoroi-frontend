@@ -125,6 +125,7 @@ export const useGetPortfolioTokenChart = (
           .filter(Boolean) as TokenChartData[];
         return records;
       }
+
       throw new Error('Failed to fetch token chart data');
     },
   });

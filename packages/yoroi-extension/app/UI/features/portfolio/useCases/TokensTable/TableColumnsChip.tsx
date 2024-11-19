@@ -6,7 +6,7 @@ import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
-import { DEFAULT_FIAT_PAIR } from '../../common/helpers/constants';
+import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
@@ -52,6 +52,11 @@ export const TokenPriceChangeChip = ({
 }: TokenPriceChangeChipProps) => {
   const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
 
+  const deltaPtTokenDataInterval =
+    timeInterval === TOKEN_CHART_INTERVAL.WEEK
+      ? ptTokenDataInterval?.[167]?.changePercent
+      : ptTokenDataInterval?.[179]?.changePercent;
+
   if (secondaryTokenActivity === null || primaryTokenActivity === null || isFetching) {
     return <Skeleton variant="text" width="60px" height="30px" />;
   }
@@ -66,9 +71,16 @@ export const TokenPriceChangeChip = ({
 
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
-  // console.log('ptTokenDataInterval?.[50]?.changePercent', ptTokenDataInterval?.[50]?.changePercent);
-
   const noDataToDisplay = Number.isNaN(changePercent);
+
+  const deltaVariantPnl =
+    isPrimaryToken && timeInterval !== undefined && deltaPtTokenDataInterval
+      ? deltaPtTokenDataInterval < 0
+        ? 'danger'
+        : deltaPtTokenDataInterval > 0
+        ? 'success'
+        : 'neutral'
+      : variantPnl;
 
   if (noDataToDisplay || changePercent === undefined) {
     return (
@@ -89,12 +101,12 @@ export const TokenPriceChangeChip = ({
   }
   return (
     <Box sx={{ display: 'flex' }}>
-      <PnlTag variant={variantPnl} withIcon>
+      <PnlTag variant={deltaVariantPnl} withIcon>
         <Typography fontSize="13px">
           {noDataToDisplay
             ? '-'
             : formatPriceChange(
-                isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[167]?.changePercent ?? 0 : changePercent ?? 0
+                isPrimaryToken && timeInterval !== undefined ? deltaPtTokenDataInterval ?? 0 : changePercent ?? 0
               )}
         </Typography>
       </PnlTag>
