@@ -1,7 +1,7 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { bytesToHex, forceNonNull, hexToBytes, maybe } from '../../../../coreUtils';
+import { bytesToHex, fail, forceNonNull, hexToBytes, maybe } from '../../../../coreUtils';
 import { base32ToHex, hexToBase32 } from '../storage/bridge/utils';
 
 export function v4PublicToV2(
@@ -86,6 +86,21 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
   })
 }
 
+function parseDrep(drep: string): ?{| hash: string, isScript: boolean |} {
+  const credentialHex = dRepToMaybeCredentialHex(drep);
+  if (!credentialHex) {
+    return null;
+  }
+  return RustModule.WasmScope(Module => {
+    const cred = Module.WalletV4.Credential.from_hex(credentialHex);
+    const isScript = cred.kind() === Module.WalletV4.CredKind.Script;
+    const hash = isScript ?
+      forceNonNull(cred.to_scripthash()).to_hex()
+      : forceNonNull(cred.to_keyhash()).to_hex();
+    return { hash, isScript };
+  })
+}
+
 export function dRepNormalize(drep: string, kind?: string): string {
   function encodeDrepHash(hash: string, isScript: boolean): string {
     // cip129 prefix
@@ -100,19 +115,17 @@ export function dRepNormalize(drep: string, kind?: string): string {
     // drep already cip129
     return drep;
   }
-  // parse drep
-  const credentialHex = dRepToMaybeCredentialHex(drep);
-  if (!credentialHex) {
-    throw new Error('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind));
+  return maybe(parseDrep(drep), r => encodeDrepHash(r.hash, r.isScript))
+    ?? fail('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind));
+}
+
+export function dRepToPreCip129(drep: string): string {
+  if ((drep.startsWith('drep1') && drep.length < 58) || drep.startsWith('drep_script1')) {
+    // drep already pre cip129 compatible
+    return drep;
   }
-  return RustModule.WasmScope(Module => {
-    const cred = Module.WalletV4.Credential.from_hex(credentialHex);
-    const isScript = cred.kind() === Module.WalletV4.CredKind.Script;
-    const hash = isScript ?
-      forceNonNull(cred.to_scripthash()).to_hex()
-      : forceNonNull(cred.to_keyhash()).to_hex();
-    return encodeDrepHash(hash, isScript);
-  })
+  return maybe(parseDrep(drep), r => hexToBase32(r.hash, r.isScript ? 'drep_script' : 'drep'))
+    ?? fail('Failed to normalize drep: ' + drep);
 }
 
 export function pubKeyHashToRewardAddress(hex: string, network: number): string {
