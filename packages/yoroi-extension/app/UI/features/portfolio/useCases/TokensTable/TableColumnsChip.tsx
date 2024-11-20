@@ -40,7 +40,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
         <Typography fontWeight="500" color="ds.text_gray_normal">
           {token.info.name}
         </Typography>
-        <Typography variant="body2" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {token.info.name}
         </Typography>
       </Stack>
