@@ -14,9 +14,6 @@ import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTrans
 import { maybe } from '../../coreUtils';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 
-declare var chrome;
-declare var browser;
-
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
@@ -161,13 +158,15 @@ export default class LocalStorageApi {
 
   clear: void => Promise<void> = async () => {
     const storage = JSON.parse(await this.getStorage());
-    await Object.keys(storage).forEach(async key => {
-      // changing this key would cause the tab to close
-      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
-      if (!isTabCloseKey) {
-        await removeLocalItem(key);
-      }
-    });
+    const tabKeys = new Set(Object.values(TabIdKeys));
+    await Promise.all(
+      Object.keys(storage).map(async key => {
+        // changing this key would cause the tab to close
+        if (!tabKeys.has(key)) {
+          await removeLocalItem(key);
+        }
+      })
+    );
   };
 
   // ========== Show/hide Balance ========== //
@@ -213,7 +212,7 @@ export default class LocalStorageApi {
     const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
     const filteredWhitelist = JSON.parse(result);
-    this.setWhitelist(filteredWhitelist);
+    await this.setWhitelist(filteredWhitelist);
     return filteredWhitelist;
   };
 
@@ -306,15 +305,6 @@ export default class LocalStorageApi {
   // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
   _getIsAnalyticsAllowedKey: () => string = () => {
     let key = storageKeys.IS_ANALYTICS_ALLOWED;
-    if (environment.userAgentInfo.isFirefox()) {
-      key += '-firefox';
-    }
-    return key;
-  }
-
-  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
-  _getIsAnalyticsAllowedKey: () => string = () => {
-    let key = storageKeys.IS_ANALYTICS_ALLOWED;
     if (environment.isFirefox()) {
       key += '-firefox';
     }
@@ -358,13 +348,15 @@ export default class LocalStorageApi {
     });
 
   setStorage: ({ [key: string]: string, ... }) => Promise<void> = async localStorageData => {
-    await Object.keys(localStorageData).forEach(async key => {
-      // changing this key would cause the tab to close
-      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
-      if (!isTabCloseKey) {
-        await setLocalItem(key, localStorageData[key]);
-      }
-    });
+    await Promise.all(
+      Object.keys(localStorageData).map(async key => {
+        // changing this key would cause the tab to close
+        const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
+        if (!isTabCloseKey) {
+          await setLocalItem(key, localStorageData[key]);
+        }
+      })
+    );
   };
 
   getStorage: void => Promise<string> = () => {
