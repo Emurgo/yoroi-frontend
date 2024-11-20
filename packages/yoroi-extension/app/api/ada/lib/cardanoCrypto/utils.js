@@ -1,8 +1,8 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { bytesToHex, hexToBytes, maybe } from '../../../../coreUtils';
-import { base32ToHex } from '../storage/bridge/utils';
+import { bytesToHex, fail, forceNonNull, hexToBytes, maybe } from '../../../../coreUtils';
+import { base32ToHex, hexToBase32 } from '../storage/bridge/utils';
 
 export function v4PublicToV2(
   v4Key: RustModule.WalletV4.Bip32PublicKey
@@ -58,8 +58,14 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
     try {
       if (s.startsWith('drep1')) {
         if (s.length === 58) {
+          // CIP129 drep1 encoding is extended value with internal prefix
           return maybe(base32ToHex(s), dRepToMaybeCredentialHex);
         }
+        // Pre CIP129 drep1 encoding means same as drep_vkh1 now
+        return Module.WalletV4.Credential
+          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+      }
+      if (s.startsWith('drep_vkh1')) {
         return Module.WalletV4.Credential
           .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
       }
@@ -78,6 +84,48 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
     } catch {} // eslint-disable-line no-empty
     return null;
   })
+}
+
+function parseDrep(drep: string): ?{| hash: string, isScript: boolean |} {
+  const credentialHex = dRepToMaybeCredentialHex(drep);
+  if (!credentialHex) {
+    return null;
+  }
+  return RustModule.WasmScope(Module => {
+    const cred = Module.WalletV4.Credential.from_hex(credentialHex);
+    const isScript = cred.kind() === Module.WalletV4.CredKind.Script;
+    const hash = isScript ?
+      forceNonNull(cred.to_scripthash()).to_hex()
+      : forceNonNull(cred.to_keyhash()).to_hex();
+    return { hash, isScript };
+  })
+}
+
+export function dRepNormalize(drep: string, kind?: string): string {
+  function encodeDrepHash(hash: string, isScript: boolean): string {
+    // cip129 prefix
+    const prefix = isScript ? '23' : '22';
+    return hexToBase32(prefix + hash, 'drep');
+  }
+  if (kind != null) {
+    // drep is hash hex
+    return encodeDrepHash(drep, kind === 'scripthash');
+  }
+  if (drep.startsWith('drep1') && drep.length === 58) {
+    // drep already cip129
+    return drep;
+  }
+  return maybe(parseDrep(drep), r => encodeDrepHash(r.hash, r.isScript))
+    ?? fail('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind));
+}
+
+export function dRepToPreCip129(drep: string): string {
+  if ((drep.startsWith('drep1') && drep.length < 58) || drep.startsWith('drep_script1')) {
+    // drep already pre cip129 compatible
+    return drep;
+  }
+  return maybe(parseDrep(drep), r => hexToBase32(r.hash, r.isScript ? 'drep_script' : 'drep'))
+    ?? fail('Failed to normalize drep: ' + drep);
 }
 
 export function pubKeyHashToRewardAddress(hex: string, network: number): string {

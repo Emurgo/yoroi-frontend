@@ -168,6 +168,10 @@ export const base32ToHex = (base32: string): ?string => {
   return maybe(base32Words?.words, convertBase32ToHex);
 };
 
+export const hexToBase32 = (hex: string, prefix: string): string => {
+  return bech32Module.encode(prefix, bech32Module.toWords(hexToBytes(hex)));
+};
+
 /* eslint-disable */
 const bigIntToBase58 = n => {
   const base58Alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';

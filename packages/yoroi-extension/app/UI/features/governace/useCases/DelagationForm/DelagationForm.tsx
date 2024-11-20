@@ -9,10 +9,12 @@ import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/sta
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
+import { dRepNormalize, dRepToPreCip129 } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
+import { maybe } from '../../../../../coreUtils'
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -74,9 +76,7 @@ export const DelagationForm = () => {
   const strings = useStrings();
   const confirmDelegation = async () => {
     const response = await checkUserPassword(password);
-    if (isHardwareWallet) {
-      signGovernanceTx();
-    } else if (response?.name === 'WrongPassphraseError') {
+    if (response?.name === 'WrongPassphraseError') {
       setIsIncorectPassword(true);
     } else {
       signGovernanceTx();
@@ -111,6 +111,10 @@ export const DelagationForm = () => {
     setIsIncorectPassword(false);
   }, [password]);
 
+  const specifiedDrep = governanceVote.drepID;
+  const normalizedDrep = maybe(specifiedDrep, dRepNormalize);
+  const preCip129Drep = maybe(specifiedDrep, dRepToPreCip129);
+
   return (
     <Container>
       <Stack>
@@ -138,13 +142,32 @@ export const DelagationForm = () => {
         </Typography>
         <Box mb="40px">
           <Collapsible
+            expanded={isHardwareWallet}
             title={strings.operations}
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <OperationInfo label={`Delegate voting to ${governanceVote.drepID}`} fee={txFee} />
+                  <OperationInfo label={(
+                    <>
+                      <Typography variant="body1" color="ds.text_gray_medium">
+                        Delegate voting to DRep (CIP 129): {normalizedDrep}
+                      </Typography>
+                      {specifiedDrep !== normalizedDrep ? (
+                        <Typography variant="body1" color="ds.text_gray_medium">
+                          Specified as: {specifiedDrep}
+                        </Typography>
+                      ) : null}
+                      {isHardwareWallet && (preCip129Drep !== specifiedDrep) ? (
+                        <Typography variant="body1" color="ds.text_gray_medium">
+                          On a Hardware device this DRep ID might be displayed in old format: {preCip129Drep}
+                        </Typography>
+                      ) : null}
+                    </>
+                  )} fee={txFee} />
                 )}
-                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && <OperationInfo label={strings.selectAbstein} fee={txFee} />}
+                {governanceVote.kind === DREP_ALWAYS_ABSTAIN && (
+                  <OperationInfo label={strings.selectAbstein} fee={txFee} />
+                )}
                 {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
                   <OperationInfo label={strings.selectNoConfidence} fee={txFee} />
                 )}
@@ -186,16 +209,18 @@ export const DelagationForm = () => {
 };
 
 type OperationInfoProps = {
-  label: string;
+  label: string | JSX.Element;
   fee: string;
 };
 
 const OperationInfo = ({ label, fee }: OperationInfoProps) => {
   return (
     <>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {label}
-      </Typography>
+      {typeof label === 'string' ? (
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {label}
+        </Typography>
+      ) : label}
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="body1" fontWeight="500" color="ds.text_gray_normal">
           Transaction fee
