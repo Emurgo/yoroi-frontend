@@ -18,10 +18,10 @@ window.addEventListener('message', (event) => {
 function callBackground(functionName: string, params: any): Promise<any> {
   return new Promise((resolve, reject) => {
     callbacks.push((msg) => {
-      if (msg.return.ok) {
-        resolve(msg.return.ok);
-      } else {
+      if (msg.return.err) {
         reject(new Error(msg.return.err));
+      } else {
+        resolve(msg.return.ok);
       }
     });
   
@@ -36,11 +36,11 @@ function callBackground(functionName: string, params: any): Promise<any> {
 }
 
 export async function getFirstAddress(): Promise<string | typeof undefined> {
-  return await callBackground('get-address', [undefined]);
+  return await callBackground('get-address');
 }
 
 export function getTheme(): Promise<'light' | 'dark'> {
-  return callBackground('get-theme-mode', [undefined]);
+  return callBackground('get-theme-mode');
 }
 
 export function popUpWalletCreation(): void {
@@ -54,4 +54,12 @@ export function listenForActiveWalletOpen(callback: () => void): void {
       callback();
     }
   });
+}
+
+export async function getWallets(): Promise<Array<{| id: number, name: string, address: string, |}>> {
+  return callBackground('get-wallets');
+}
+
+export async function setCashbackWallet(id: number): Promise<void> {
+  return callBackground('set-cashback-wallet', id);
 }

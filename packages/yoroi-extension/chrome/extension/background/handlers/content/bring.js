@@ -32,6 +32,28 @@ const handlers = Object.freeze({
     const result = (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0];
     return { ok: result.address.Hash };
   },
+
+  'get-wallets': async () => {
+    const db = await getDb();
+    const publicDerivers = await loadWalletsFromStorage(db);
+    const result = [];
+    for (const publicDeriver of publicDerivers) {
+      if (!isTrezorTWallet(publicDeriver.getParent())) {
+        result.push({
+          id: publicDeriver.getPublicDeriverId(),
+          address: (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0].address.Hash,
+          name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name
+        });
+      }
+    }
+    return { ok: result };
+  },
+
+  'set-cashback-wallet': async (id: number) => {
+    const localStorageApi = new LocalStorageApi();
+    await localStorageApi.saveCashbackWalletId(id);
+    return { ok: undefined };
+  },
 });
 
 async function getCashbackWallet(): Promise<PublicDeriver<> | null> {
@@ -90,6 +112,6 @@ export async function handleBringRpc(message: Object, sender: Object) {
     throw new Error('missing Bring handler for ' + message.function);
   }
 
-  const result = await handler();
+  const result = await handler(message.params);
   sendRpcResponse(result, sender.tab.id, message.uid);
 }
