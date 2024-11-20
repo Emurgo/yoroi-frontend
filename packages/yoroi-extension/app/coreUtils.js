@@ -225,11 +225,13 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
  * @return same value or a copy in case the value is an object
  */
 export function sanitizeForLog(v: any): any {
+  const fields: Array<any> = ['password'];
   if (v != null && typeof v === 'object') {
     let r = Object.keys(v).reduce((o, k) => ({ ...o, [k]: sanitizeForLog(v[k]) }) , {})
-    // $FlowIgnore[incompatible-use]
-    if (r.password != null) {
-      r = { ...r, password: '[sanitized]' };
+    for (const f of fields) {
+      if (r[f] != null) {
+        r = { ...r, [f]: '[sanitized]' };
+      }
     }
     return r;
   }

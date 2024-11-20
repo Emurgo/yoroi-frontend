@@ -361,7 +361,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     this.actions.connector.cancelSignInTx.remove(this._cancelSignInTx);
     await ampli.dappPopupSignTransactionSubmitted();
-    this._closeWindow();
   };
   @action
   _cancelSignInTx: void => void = () => {
