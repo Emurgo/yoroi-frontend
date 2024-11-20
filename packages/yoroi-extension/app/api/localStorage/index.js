@@ -348,11 +348,11 @@ export default class LocalStorageApi {
     });
 
   setStorage: ({ [key: string]: string, ... }) => Promise<void> = async localStorageData => {
+    const tabKeys = new Set(Object.values(TabIdKeys));
     await Promise.all(
       Object.keys(localStorageData).map(async key => {
         // changing this key would cause the tab to close
-        const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
-        if (!isTabCloseKey) {
+        if (!tabKeys.has(key)) {
           await setLocalItem(key, localStorageData[key]);
         }
       })
