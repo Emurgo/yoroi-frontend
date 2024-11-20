@@ -54,7 +54,7 @@ init().catch(console.error);
 startMonitorServerStatus();
 startPoll();
 
-if (environment.userAgentInfo.isFirefox()) {
+if (environment.isFirefox()) {
   browser.runtime.onInstalled.addListener(async () => {
     const analyticsFlag = await new LocalStorageApi().loadIsAnalyticsAllowed();
     if (analyticsFlag == null) {

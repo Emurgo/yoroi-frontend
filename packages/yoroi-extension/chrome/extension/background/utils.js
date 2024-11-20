@@ -17,10 +17,10 @@ async function createFetcher(
     () => environment.getVersion(),
     () => locale,
     () => {
-      if (environment.userAgentInfo.isFirefox()) {
+      if (environment.isFirefox()) {
         return 'firefox';
       }
-      if (environment.userAgentInfo.isChrome()) {
+      if (environment.isChrome()) {
         return 'chrome';
       }
       return '-';
@@ -40,10 +40,10 @@ export async function getCommonStateFetcher(): Promise<IFetcherCommon> {
     () => environment.getVersion(),
     () => locale,
     () => {
-      if (environment.userAgentInfo.isFirefox()) {
+      if (environment.isFirefox()) {
         return 'firefox';
       }
-      if (environment.userAgentInfo.isChrome()) {
+      if (environment.isChrome()) {
         return 'chrome';
       }
       return '-';
