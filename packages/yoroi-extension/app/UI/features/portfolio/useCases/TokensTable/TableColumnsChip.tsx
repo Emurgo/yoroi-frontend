@@ -17,14 +17,25 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   return (
     <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
       <Box
+        display="inline-flex"
+        alignItems="center"
+        justifyContent="center"
         width="40px"
         height="40px"
-        sx={{
-          borderRadius: `${theme.shape.borderRadius}px`,
-        }}
-        component="img"
-        src={token.info.image ?? tokenPng}
-      ></Box>
+        overflow="hidden"
+        flexShrink="0"
+        borderRadius="8px"
+      >
+        <img
+          width="100%"
+          src={token.info.image ?? tokenPng}
+          alt={token.info.name}
+          onError={e => {
+            // @ts-ignore
+            e.target.src = tokenPng;
+          }}
+        />
+      </Box>
       <Stack direction="column">
         <Typography fontWeight="500" color="ds.text_gray_normal">
           {token.info.name}
