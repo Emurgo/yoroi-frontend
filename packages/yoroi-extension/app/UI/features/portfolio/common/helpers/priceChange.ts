@@ -21,4 +21,4 @@ export const priceChange = (previous: number, current: number): Return => {
 };
 
 export const formatPriceChange = (change: number, decimals?: number) =>
-  Math.abs(Number(new BigNumber(change).toFormat(decimals ?? 2)));
+  Math.abs(Number(new BigNumber(change).toFormat(decimals ?? 2))).toString();
