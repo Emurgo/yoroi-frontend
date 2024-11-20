@@ -30,7 +30,7 @@ const handlers = Object.freeze({
       return;
     }
     const result = (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0];
-    debugger
+    return { ok: result.address.Hash };
   },
 });
 

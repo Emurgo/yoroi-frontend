@@ -16,10 +16,8 @@ window.addEventListener('message', (event) => {
 });
 
 function callBackground(functionName: string, params: any): Promise<any> {
-  console.log('>>>bring call', functionName, params);
   return new Promise((resolve, reject) => {
     callbacks.push((msg) => {
-      console.log('>>>bring return', msg.return);
       if (msg.return.ok) {
         resolve(msg.return.ok);
       } else {
@@ -38,7 +36,7 @@ function callBackground(functionName: string, params: any): Promise<any> {
 }
 
 export async function getFirstAddress(): Promise<string | typeof undefined> {
-  return await callBackground('get_addresses', [undefined]);
+  return await callBackground('get-address', [undefined]);
 }
 
 export function getTheme(): Promise<'light' | 'dark'> {

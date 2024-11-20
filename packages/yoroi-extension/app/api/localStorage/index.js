@@ -126,15 +126,21 @@ export default class LocalStorageApi {
 
   // ========== Select Wallet ========== //
 
-  getSelectedWalletId: void => number | null = () => {
-    const id = localStorage.getItem(storageKeys.SELECTED_WALLET);
-    if (!id) return null;
+  getSelectedWalletId: void => Promise<number | null> = async () => {
+    let id = await getLocalItem(storageKeys.SELECTED_WALLET);
+    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
+    if (!id) {
+      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
+    }
+    if (!id) {
+      return null;
+    }
     if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
     return Number(id);
   };
 
-  setSelectedWalletId: number => void = id => {
-    localStorage.setItem(storageKeys.SELECTED_WALLET, id.toString());
+  setSelectedWalletId: number => Promise<void> = async (id) => {
+    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
   };
 
   // ========== Legacy Theme ========== //
