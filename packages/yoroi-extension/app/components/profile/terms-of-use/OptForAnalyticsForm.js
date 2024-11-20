@@ -49,9 +49,13 @@ const messages = defineMessages({
     id: 'profile.analytics.learnMore',
     defaultMessage: '!!!Learn more about user insights',
   },
+  privacyNotice: {
+    id: 'profile.analytics.seePrivacyNotice',
+    defaultMessage: '!!!See Privacy Notice',
+  },
   collectedData: {
     id: 'profile.analytics.collectedData',
-    defaultMessage: '!!!Collected data includes: visited pages, browser version, selected language, time of analytical events',
+    defaultMessage: '!!!Collected data includes: visited Yoroi extension pages, browser version, selected language, time of analytical events',
   },
   rejectionImpact: {
     id: 'profile.analytics.rejectionImpact',
@@ -97,7 +101,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
-    const isFirefox = environment.userAgentInfo.isFirefox();
+    const isFirefox = environment.isFirefox();
 
     const analyticsDetails = [
       [YesIcon, messages.line1],
@@ -153,16 +157,36 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
       </Box>
 
       {isFirefox ? (
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: isStartupScreen ? 'center' : 'flex-start',
-            marginTop: '15px',
-            fontSize: '0.8rem',
-          }}
-        >
-          {intl.formatMessage(messages.collectedData)}
+        <Box className={styles.component}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
+              marginTop: '15px',
+              fontSize: '0.8rem',
+            }}
+          >
+            {intl.formatMessage(messages.collectedData)}
+          </Box>
+
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
+              marginTop: '15px',
+            }}
+          >
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href={environment.externalPrivacyPolicyURL()}
+              className={styles.learnMore}
+            >
+              {intl.formatMessage(messages.privacyNotice)}
+            </a>
+          </Box>
         </Box>
       ) : null}
 

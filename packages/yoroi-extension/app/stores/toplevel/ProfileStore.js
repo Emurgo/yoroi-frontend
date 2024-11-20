@@ -37,7 +37,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
   @observable
   SETUP_STEPS: Array<{| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |}> = [
     // Firefox policy requires this to be the first
-    ...(environment.userAgentInfo.isFirefox() ? [this._analyticsStep] : []),
+    ...(environment.isFirefox() ? [this._analyticsStep] : []),
     {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
@@ -60,7 +60,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         ampli.createWalletTermsPageViewed();
       },
     },
-    ...(environment.userAgentInfo.isFirefox() ? [] : [this._analyticsStep]),
+    ...(environment.isFirefox() ? [] : [this._analyticsStep]),
     {
       isDone: () => this.isComplexityLevelSelected,
       action: async () => {
@@ -82,7 +82,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
       },
     },
     {
-      isDone: () => !environment.userAgentInfo.canRegisterProtocol() || this.isUriSchemeAccepted,
+      isDone: () => !environment.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
         if (this.stores.app.currentRoute === route) {

@@ -312,6 +312,15 @@ export default class LocalStorageApi {
     return key;
   }
 
+  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
+  _getIsAnalyticsAllowedKey: () => string = () => {
+    let key = storageKeys.IS_ANALYTICS_ALLOWED;
+    if (environment.isFirefox()) {
+      key += '-firefox';
+    }
+    return key;
+  }
+
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
     const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
     if (!json) {
