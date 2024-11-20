@@ -46,6 +46,8 @@ const storageKeys = {
   // ========== LEGACY USED FOR MIGRATIONS ========== //
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
+
+  CASHBACK_WALLET_ID: 'CASHBACK_WALLET_ID',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -331,6 +333,16 @@ export default class LocalStorageApi {
   };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
+  saveCashbackWalletId: (number) => Promise<void> = (id) => setLocalItem(
+    storageKeys.CASHBACK_WALLET_ID,
+    String(id)
+  );
+
+  getCashbackWalletId: () => Promise<number> = async () => {
+    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    return Number(v);
+  }
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();

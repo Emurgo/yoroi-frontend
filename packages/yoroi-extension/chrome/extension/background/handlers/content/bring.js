@@ -35,24 +35,36 @@ const handlers = Object.freeze({
 });
 
 async function getCashbackWallet(): Promise<PublicDeriver<> | null> {
-  const localStorageApi = new LocalStorageApi();
-  // todo
-  const selectedPublicDeriverId = await localStorageApi.getSelectedWalletId();
-
   const db = await getDb();
   const publicDerivers = await loadWalletsFromStorage(db);
-
+  const localStorageApi = new LocalStorageApi();
+  // try to load saved cashback wallet
+  const savedCashbackWalletId = await localStorageApi.getCashbackWalletId();
   for (const publicDeriver of publicDerivers) {
     if (
-      publicDeriver.getPublicDeriverId() === selectedPublicDeriverId &&
+      publicDeriver.getPublicDeriverId() === savedCashbackWalletId &&
         !isTrezorTWallet(publicDeriver.getParent())
     ) {
       return publicDeriver;
     }
   }
 
+  // default to the selected wallet
+  const selectedPublicDeriverId = await localStorageApi.getSelectedWalletId();
+  for (const publicDeriver of publicDerivers) {
+    if (
+      publicDeriver.getPublicDeriverId() === selectedPublicDeriverId &&
+        !isTrezorTWallet(publicDeriver.getParent())
+    ) {
+      await localStorageApi.saveCashbackWalletId(publicDeriver.getPublicDeriverId());
+      return publicDeriver;
+    }
+  }
+
+  // selected wallet is a Trezor wallet, fall back to the first non-Trezor wallet
   for (const publicDeriver of publicDerivers) {
     if (!isTrezorTWallet(publicDeriver.getParent())) {
+      await localStorageApi.saveCashbackWalletId(publicDeriver.getPublicDeriverId());
       return publicDeriver;
     }
   }
