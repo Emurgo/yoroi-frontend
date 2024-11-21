@@ -22,10 +22,6 @@ class CreateWalletStepThree extends AddWalletBase {
     };
   };
   // functions
-  _wordIsAdded = async wordWebElement => {
-    const cursorState = await wordWebElement.getCssValue('cursor');
-    return cursorState === 'not-allowed';
-  };
   async getRecoveryPhraseFromStorage() {
     this.logger.info(`CreateWalletStepThree::getRecoveryPhraseFromStorage is called`);
     const result = await this.getFromLocalStorage('recoveryPhrase');
@@ -34,15 +30,20 @@ class CreateWalletStepThree extends AddWalletBase {
   async enterRecoveryPhrase(recoveryPhrase) {
     this.logger.info(`CreateWalletStepThree::enterRecoveryPhrase is called`);
     await this.waitForElement(this.verifyPhraseComponentLocator);
+    const arrayOfIndexes = [];
+    for (let wordIndex = 0; wordIndex < WalletWordsSize.Shelley; wordIndex++) {
+      arrayOfIndexes.push(wordIndex);
+    }
     for (const recoveryPhraseWord of recoveryPhrase) {
-      for (let wordIndex = 0; wordIndex < WalletWordsSize.Shelley; wordIndex++) {
+      for (const wordIndex of arrayOfIndexes) {
         const elementLocator = this._getRecoveryPhraseBoxLocator(wordIndex);
-        const webElement = await this.findElement(elementLocator);
-        const wordIsAdded = await this._wordIsAdded(webElement);
-        if (!wordIsAdded) {
-          const elementText = await webElement.getText();
+        const wordButtonIsEnabled = await this.buttonIsEnabled(elementLocator);
+        if (wordButtonIsEnabled) {
+          const elementText = await this.getText(elementLocator);
           if (elementText === recoveryPhraseWord) {
-            await webElement.click();
+            await this.click(elementLocator);
+            const indexOfIndex = arrayOfIndexes.indexOf(wordIndex);
+            arrayOfIndexes.splice(indexOfIndex, 1);
             break;
           }
         }
