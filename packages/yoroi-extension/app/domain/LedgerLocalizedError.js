@@ -45,7 +45,7 @@ export const ledgerErrors: * = defineMessages({
   },
   deviceVersionNoDataSigningSpecific: {
     id: 'wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific',
-    defaultMessage: '!!!CIP-8 message signing is only supported by Ledger app version 7.1.0 or above.',
+    defaultMessage: '!!!CIP-8 message signing is only supported by Cardano app version 7.1.0 or above.',
   },
   deviceStatusError: {
     id: 'wallet.hw.ledger.error.deviceStatus',
