@@ -51,10 +51,10 @@ export default class SignTxContainer extends Component<
       // will throw a WrongPasswordError if password is wrong
       await getPrivateStakingKey({ publicDeriverId: deriver.publicDeriverId, password });
     }
+    await this.props.actions.connector.confirmSignInTx.trigger(password);
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
-
-    await this.props.actions.connector.confirmSignInTx.trigger(password);
+    window.close();
   };
   onCancel: () => void = () => {
     window.removeEventListener('beforeunload', this.onUnload);

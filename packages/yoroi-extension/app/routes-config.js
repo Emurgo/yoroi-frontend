@@ -42,6 +42,7 @@ export const ROUTES = {
     SUPPORT: '/settings/support',
     LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
     ANALYTICS: '/settings/analytics',
+    PAPER_WALLET: '/settings/paper-wallet',
   },
   TRANSFER: {
     ROOT: '/transfer',
