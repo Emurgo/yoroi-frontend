@@ -22,24 +22,24 @@ class InitialStepsPage extends BasePage {
     method: 'id',
   };
   analyticsSkipButtonLocator = {
-    locator: '//div[@class="OptForAnalyticsForm_skip"]/button',
-    method: 'xpath',
+    locator: 'startupAnalytics-skip-button',
+    method: 'id',
   };
   analyticsAcceptButtonLocator = {
-    locator: '//div[@class="OptForAnalyticsForm_accpet"]/button',
-    method: 'xpath',
+    locator: 'startupAnalytics-accept-button',
+    method: 'id',
   };
   cardanoUrlPromptFormLocator = {
     locator: '.UriPromptForm_component',
     method: 'css',
   };
   cardanoPaymentUrlAllowButtonLocator = {
-    locator: '.allowButton',
-    method: 'css',
+    locator: 'uriPrompt-allow-button',
+    method: 'id',
   };
   cardanoPaymentUrlSkipButtonLocator = {
-    locator: '.MuiButton-secondary',
-    method: 'css',
+    locator: 'uriPrompt-skip-button',
+    method: 'id',
   };
   getLanguageMenuItem = countryCode => {
     return {
