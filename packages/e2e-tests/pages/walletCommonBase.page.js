@@ -1,5 +1,12 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import { defaultWaitTimeout, halfSecond, oneMinute, oneSecond } from '../helpers/timeConstants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
@@ -132,7 +139,7 @@ class WalletCommonBase extends BasePage {
 
     const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
       const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-      const [numberPart, ] = rawBalanceText.split(' ');
+      const [numberPart] = rawBalanceText.split(' ');
       const digits = numberPart.split('\n');
       return Number(digits.join(''));
     });
@@ -161,8 +168,12 @@ class WalletCommonBase extends BasePage {
   }
   async closeUpdatesModalWindow() {
     this.logger.info(`WalletCommonBase::closeUpdatesModalWindow is called`);
-    await this.waitForElement(this.dialogUpdatesTitleLocator);
-    await this.waitForElement(this.dialogUpdatesGoToWalletButtonLocator);
+    await this.customWaitIsPresented(this.dialogUpdatesTitleLocator, fiveSeconds, quarterSecond);
+    await this.customWaitIsPresented(
+      this.dialogUpdatesGoToWalletButtonLocator,
+      fiveSeconds,
+      quarterSecond
+    );
     await this.click(this.dialogUpdatesGoToWalletButtonLocator);
     await this.sleep(500);
   }
@@ -170,9 +181,11 @@ class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
     const state = await this.customWaiter(
       async () => {
-        const elAmount = await this.findElements(this.prepareWalletBannerLocator);
-        const loadersAmount = await this.findElements(this.walletIsLoadingSpinnerLocator);
-        return elAmount.length === 0 && loadersAmount.length === 0;
+        const bannersElems = await this.findElements(this.prepareWalletBannerLocator);
+        // const loadersElems = await this.findElements(this.walletIsLoadingSpinnerLocator);
+        // TEMPORARY SOLUTION because of the issue https://emurgo.atlassian.net/browse/YOEXT-1288
+        const loadersElems = [];
+        return bannersElems.length === 0 && loadersElems.length === 0;
       },
       oneMinute,
       halfSecond
