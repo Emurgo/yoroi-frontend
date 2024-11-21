@@ -192,7 +192,7 @@ export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChange
   return (
     <PnlTag variant={variantPnl} withIcon>
       <Typography variant="caption" lineHeight="16px">
-        {changePercent}%
+        {changePercent}
       </Typography>
     </PnlTag>
   );
@@ -206,7 +206,7 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
   const { currency } = useCurrencyPairing();
 
   return (
-    <PnlTag variant={variantPnl}>
+    <PnlTag variant={variantPnl} withPercentSign={false}>
       <Typography variant="caption" lineHeight="16px">{`${
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>
