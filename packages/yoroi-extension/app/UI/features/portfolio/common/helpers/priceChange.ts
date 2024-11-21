@@ -20,5 +20,4 @@ export const priceChange = (previous: number, current: number): Return => {
   return { changeValue, changePercent, variantPnl };
 };
 
-export const formatPriceChange = (change: number, decimals?: number) =>
-  Math.abs(Number(new BigNumber(change).toFormat(decimals ?? 2))).toString();
+export const formatPriceChange = (change: number, decimals?: number) => new BigNumber(change).toFormat(decimals ?? 2);

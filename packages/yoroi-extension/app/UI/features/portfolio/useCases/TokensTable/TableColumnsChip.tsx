@@ -110,16 +110,14 @@ export const TokenPriceChangeChip = ({
       </Stack>
     );
   }
+
+  const priceChangeProcent = formatPriceChange(
+    isPrimaryToken && timeInterval !== undefined ? deltaPtTokenDataInterval ?? 0 : changePercent ?? 0
+  );
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={deltaVariantPnl} withIcon>
-        <Typography fontSize="13px">
-          {noDataToDisplay
-            ? '-'
-            : formatPriceChange(
-                isPrimaryToken && timeInterval !== undefined ? deltaPtTokenDataInterval ?? 0 : changePercent ?? 0
-              )}
-        </Typography>
+        <Typography fontSize="13px">{Math.abs(Number(priceChangeProcent))}</Typography>
       </PnlTag>
     </Box>
   );
