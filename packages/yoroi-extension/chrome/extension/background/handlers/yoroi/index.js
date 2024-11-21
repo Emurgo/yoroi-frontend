@@ -43,7 +43,6 @@ import {
 } from './connector';
 import { GetProtocolParameters } from './protocolParameters';
 import { subscribe } from '../../subscriptionManager';
-import { notifyAllTabsActiveWalletOpen } from './utils';
 
 const handlerMap = Object.freeze({
   [GetHistoricalCoinPrices.typeTag]: GetHistoricalCoinPrices.handle,
@@ -99,10 +98,6 @@ export function getHandler(typeTag: string): ?Handler {
   if (typeTag === 'subscribe') {
     return async (request, sender, sendResponse) => {
       subscribe(sender.tab.id, request.request.activeWalletId);
-      if (request.request.changed) {
-        // notify content scripts in all tabs
-        notifyAllTabsActiveWalletOpen(request.request.activeWalletId);
-      }
       sendResponse(undefined);
     };
   }

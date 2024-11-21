@@ -13,7 +13,7 @@ import { getCardanoStateFetcher } from '../../utils';
 import LocalStorageApi, {
   loadSubmittedTransactions, persistSubmittedTransactions
 } from '../../../../../app/api/localStorage';
-import { getPublicDeriverById, notifyAllTabsActiveWalletOpen } from './utils';
+import { getPublicDeriverById, notifyAllTabsCashbackWalletChange } from './utils';
 import { removePublicDeriver } from '../../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import {
@@ -29,6 +29,8 @@ import type { ReferenceTransaction, BaseGetTransactionsRequest } from '../../../
 import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
+import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
+import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -66,9 +68,8 @@ export const CreateWallet: HandlerType<CreateWalletRequest, CreateWalletResponse
         publicDeriverId,
       }
     });
-    syncWallet(publicDerivers[0], 'new wallet', 1).then(() => {
-      notifyAllTabsActiveWalletOpen(publicDeriverId);
-    });
+    await syncWallet(publicDerivers[0], 'new wallet', 1);
+    maybeNotifyCashbackWalletChange(publicDerivers[0]);
     return await getPlaceHolderWalletState(publicDerivers[0]);
   },
 });
@@ -115,13 +116,19 @@ export const CreateHardwareWallet: HandlerType<
         publicDeriverId,
       }
     });
-    syncWallet(publicDeriver, 'new wallet', 1).then(() => {
-      notifyAllTabsActiveWalletOpen(publicDeriverId);
-    });;
-
+    await syncWallet(publicDeriver, 'new wallet', 1);
+    maybeNotifyCashbackWalletChange(publicDeriver);
     return await getPlaceHolderWalletState(publicDeriver);
   },
 });
+
+async function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
+  const db = await getDb();
+  const publicDerivers = await loadWalletsFromStorage(db);
+  if (publicDerivers.length === 1 && !isTrezorTWallet(newWallet.getParent())) {
+    notifyAllTabsCashbackWalletChange(newWallet.getPublicDeriverId());
+  }
+}
 
 export const RemoveWallet: HandlerType<
   {| publicDeriverId: number |},

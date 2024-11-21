@@ -47,10 +47,10 @@ export function popUpWalletCreation(): void {
   callBackground('pop-up-wallet-creation');
 }
 
-export function listenForActiveWalletOpen(callback: () => void): void {
+export function listenForCashbackWalletChange(callback: () => void): void {
   // todo: verify sender extension id
   chrome.runtime.onMessage.addListener((msg, sender) => {
-    if (msg.type === 'active-wallet-open') {
+    if (msg.type === 'cashback-wallet-change') {
       callback();
     }
   });

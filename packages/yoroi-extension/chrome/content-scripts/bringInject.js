@@ -4,7 +4,7 @@ import {
   getFirstAddress,
   getTheme,
   popUpWalletCreation,
-  listenForActiveWalletOpen,
+  listenForCashbackWalletChange,
 } from './bringLib';
 
 const darkTheme = Object.freeze({
@@ -213,7 +213,7 @@ const lightTheme = Object.freeze({
   await bringInitContentScript({
     getWalletAddress: getFirstAddress,
     promptLogin: popUpWalletCreation,
-    walletAddressUpdateCallback: listenForActiveWalletOpen,
+    walletAddressUpdateCallback: listenForCashbackWalletChange,
     theme: await getTheme(),
     lightTheme,
     darkTheme,

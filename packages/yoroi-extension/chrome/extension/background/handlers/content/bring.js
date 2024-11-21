@@ -6,6 +6,7 @@ import { getAllAddressesForWallet } from '../../../../../app/api/ada/lib/storage
 import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getDb } from '../../state';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
+import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
 
 declare var chrome;
 
@@ -52,6 +53,7 @@ const handlers = Object.freeze({
   'set-cashback-wallet': async (id: number) => {
     const localStorageApi = new LocalStorageApi();
     await localStorageApi.saveCashbackWalletId(id);
+    notifyAllTabsCashbackWalletChange(id);
     return { ok: undefined };
   },
 });
