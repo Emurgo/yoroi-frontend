@@ -17,7 +17,6 @@ import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { ReactComponent as assetsIcon } from '../../assets/images/sidebar/revamp/assets.inline.svg';
 
 export type SidebarCategory = {|
   +className: string,
@@ -130,13 +129,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
     isVisible: ({ selected }) => !selected?.isTestnet,
-  },
-  {
-    className: 'assets',
-    route: ROUTES.ASSETS.ROOT,
-    icon: assetsIcon,
-    label: globalMessages.sidebarAssets,
-    isVisible: () => environment.isProduction() || environment.isDev(),
   },
   {
     className: 'portfolio',

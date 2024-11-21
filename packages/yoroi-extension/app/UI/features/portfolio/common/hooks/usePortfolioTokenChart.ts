@@ -72,8 +72,6 @@ type TokenChartData = {
 //   return chartData;
 // }
 
-const ptTicker = 'ADA';
-
 export const useGetPortfolioTokenChart = (
   timeInterval = TOKEN_CHART_INTERVAL.DAY as TokenChartInterval,
   tokenInfo,
@@ -85,7 +83,7 @@ export const useGetPortfolioTokenChart = (
   > = {}
 ) => {
   // const { currency } = useCurrencyPairing();
-  const { unitOfAccount } = usePortfolio();
+  const { unitOfAccount, primaryTokenInfo } = usePortfolio();
 
   const currency = unitOfAccount;
 
@@ -94,7 +92,7 @@ export const useGetPortfolioTokenChart = (
     cacheTime: time.oneHour,
     retryDelay: time.oneSecond,
     optimisticResults: true,
-    refetchInterval: time.halfHour,
+    refetchInterval: time.oneMinute,
     useErrorBoundary: true,
     refetchOnMount: false,
     enabled: tokenInfo && tokenInfo.info?.id.length === 0,
@@ -109,7 +107,7 @@ export const useGetPortfolioTokenChart = (
 
         const tickers = response.value.data.tickers;
         // @ts-ignore
-        const validCurrency = currency === ptTicker ? supportedCurrencies.USD : currency ?? supportedCurrencies.USD;
+        const validCurrency = currency === primaryTokenInfo.name ? supportedCurrencies.USD : currency ?? supportedCurrencies.USD;
 
         const initialPrice = tickers[0]?.prices[validCurrency];
         const records = tickers
@@ -127,6 +125,7 @@ export const useGetPortfolioTokenChart = (
           .filter(Boolean) as TokenChartData[];
         return records;
       }
+
       throw new Error('Failed to fetch token chart data');
     },
   });
