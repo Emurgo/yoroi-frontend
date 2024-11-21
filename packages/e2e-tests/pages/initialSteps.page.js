@@ -124,10 +124,8 @@ class InitialStepsPage extends BasePage {
   }
   async skipCardanoPaymentUrls() {
     this.logger.info(`InitialStepsPage::skipCardanoPaymentUrls is called`);
-    await this.waitPresentedAndAct(
-      this.cardanoPaymentUrlSkipButtonLocator,
-      async () => await this.click(this.cardanoPaymentUrlSkipButtonLocator)
-    )
+    await this.waitForElement(this.cardanoPaymentUrlSkipButtonLocator);
+    await this.click(this.cardanoPaymentUrlSkipButtonLocator);
   }
   async skipInitialSteps() {
     this.logger.info(`InitialStepsPage::skipInitialSteps is called`);
