@@ -98,8 +98,10 @@ class WalletSendPage extends Component<AllProps> {
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
-    loadProtocolParametersRequest.reset();
-    loadProtocolParametersRequest.execute();
+    if (!loadProtocolParametersRequest.wasExecuted && !loadProtocolParametersRequest.isExecuting) {
+      loadProtocolParametersRequest.reset();
+      loadProtocolParametersRequest.execute();
+    }
     ampli.sendInitiated();
   }
 
