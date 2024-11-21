@@ -266,7 +266,7 @@ class BasePage {
       .logs()
       .get(logging.Type.DRIVER, logging.Level.INFO);
       const driverLogsStrings = driverLogEntries.map(l =>`[${l.level}] [${l.timestamp}] ${l.message}`);
-    await writeFile(driverLogsPaths, driverLogsStrings.join(','));
+    await writeFile(driverLogsPaths, driverLogsStrings.join(''));
   }
   async waitForElementLocated(locator) {
     this.logger.info(
@@ -331,7 +331,7 @@ class BasePage {
   ) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
-    await this.setImplicitTimeout(oneSecond, this.customWaiter.name);
+    await this.setImplicitTimeout(halfSecond, this.customWaiter.name);
 
     while (endTime >= Date.now()) {
       const conditionState = await conditionFunc();
