@@ -16,7 +16,7 @@ import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
+import { getWallets, subscribe, listenForWalletStateUpdate, setCashbackWallet } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
@@ -434,6 +434,23 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       wallet.allUtxoAddresses,
       submittedTxs,
     );
+  }
+
+  async getCashbackWallet(): Promise<?WalletState> {
+    const savedCashbackWalletId = await this.api.localStorage.getCashbackWalletId();
+    if (typeof savedCashbackWalletId !== 'number') {
+      return null;
+    }
+    for (const wallet of this.wallets) {
+      if (wallet.publicDeriverId === savedCashbackWalletId) {
+        return wallet;
+      }
+    }
+    return null;
+  }
+
+  setCashbackWallet(id: number): void {
+    setCashbackWallet(id);
   }
 }
 

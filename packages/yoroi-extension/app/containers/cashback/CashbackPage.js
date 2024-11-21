@@ -33,6 +33,8 @@ import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl, defineMessages, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { forceNonNull } from '../../coreUtils';
+import { constructPlate32 } from '../../components/topbar/WalletCard';
 
 const messages = defineMessages({
   claim: {
@@ -50,6 +52,26 @@ const messages = defineMessages({
   message: {
     id: 'cashback.claim.dialog.message.label',
     defaultMessage: '!!!Message',
+  },
+  notCurrentText: {
+    id: 'cashback.not.current.warning.text',
+    defaultMessage: '!!!Your cashback rewards are currently linked to another wallet. To claim your ADA cashback, either switch to the wallet connected to Bring or change the rewards wallet to the one you\'re using now. You can always access settings at anytime to change your cashback wallet and make claiming rewards relevant for you.',
+  },
+  currentWalletLabel: {
+    id: 'cashback.not.current.warning.current',
+    defaultMessage: '!!!Current rewards wallet'
+  },
+  warning: {
+    id: 'cashback.not.current.warning.title',
+    defaultMessage: '!!!WARNING',
+  },
+  useThis: {
+    id: 'cashback.not.current.warning.use.this',
+    defaultMessage: '!!!use this wallet',
+  },
+  keep: {
+    id: 'cashback.not.current.warning.keep',
+    defaultMessage: '!!!keep current wallet',
   },
 });
 
@@ -230,6 +252,17 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     };
   }, [iframeSrc, fetchIframeUrl, handleMessage]);
 
+  const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
+
+  useEffect(() => {
+    stores.wallets.getCashbackWallet().then((currentCashbackWallet) => {
+      if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
+        setShownCashbackWallet(currentCashbackWallet);
+        setPopup(true);
+      }
+    });
+  }, []);
+  
   const closePopup = useCallback(() => {
     iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
     setPopup(false);
@@ -258,6 +291,52 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     >
       <FullscreenLayout bottomPadding={0}>
         <Suspense fallback={null}>
+          {shownCashbackWallet && (
+            <Dialog
+              title={intl.formatMessage(messages.warning)}
+              actions={[
+                {
+                  label: intl.formatMessage(messages.useThis),
+                  onClick: () => {
+                    stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
+                    setShownCashbackWallet(null);
+                    setPopup(false);
+                  }
+                },
+                {
+                  label: intl.formatMessage(messages.keep),
+                  primary: true,
+                  onClick: () => {
+                    setShownCashbackWallet(null);
+                    setPopup(false);
+                  }
+                }
+              ]}
+            >
+              <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
+                {intl.formatMessage(messages.notCurrentText)}
+              </Typography>
+              <Typography sx={{ fontSize: '12px', fontHeight: '16px',lineHeight: '16px' }}>
+                {intl.formatMessage(messages.currentWalletLabel)}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+                {constructPlate32(shownCashbackWallet.plate)[1]}
+                <Typography
+                  sx={{
+                    fontWeight: '500px',
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    marginTop: 'auto',
+                    marginBottom: 'auto',
+                    marginLeft: '1em',
+                  }}
+                >
+                  {shownCashbackWallet.plate.TextPart}
+                </Typography>
+              </Box>
+            </Dialog>
+          )}
+
           {signaturePopup ?
             <Dialog
               title={intl.formatMessage(messages.claim)}
@@ -315,6 +394,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
               </Box>
             </Dialog>
             : null}
+
           {popup ? (
             <div
               className={styles.iframe_overlay}
@@ -322,6 +402,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
               onClick={closePopup}
             />
           ) : null}
+
           {iframeSrc && (
             <iframe
               ref={iframeRef}
