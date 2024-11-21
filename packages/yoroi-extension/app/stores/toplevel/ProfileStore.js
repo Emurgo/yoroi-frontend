@@ -116,7 +116,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
           }
           const isRevamp = this.stores.profile.isRevampTheme;
           if (isRevamp) {
-            const lastSelectedWallet = this.stores.wallets.getLastSelectedWallet();
+            const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
             this.actions.router.goToRoute.trigger({
               route: ROUTES.WALLETS.ROOT,
               publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,

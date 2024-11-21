@@ -288,13 +288,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     );
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
-    // Cache select wallet
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
     subscribe(publicDeriverId);
   };
 
-  getLastSelectedWallet: void => ?WalletState = () => {
-    const walletId = this.api.localStorage.getSelectedWalletId();
+  getLastSelectedWallet: void => Promise<?WalletState> = async () => {
+    const walletId: ?number = await this.api.localStorage.getSelectedWalletId();
     return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 
