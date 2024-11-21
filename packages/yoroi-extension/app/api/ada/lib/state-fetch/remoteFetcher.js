@@ -109,7 +109,7 @@ export const sendTx: ({|
       res: error.response?.data || null,
     }
     Logger.error(`${nameof(RemoteFetcher)}::${nameof(sendTx)} error: ${stringifyError(err)}`);
-    if (error.request.response.includes('Invalid witness')) {
+    if (JSON.stringify(error.response?.data ?? '').includes('InvalidWitnessesUTXOW')) {
       throw new InvalidWitnessError();
     }
     throw new SendTransactionApiError();
