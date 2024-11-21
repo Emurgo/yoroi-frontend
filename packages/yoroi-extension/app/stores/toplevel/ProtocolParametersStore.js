@@ -20,6 +20,7 @@ export default class ProtocolParametersStore<
   async loadProtocolParameters(): Promise<void> {
     for (const key of Object.keys(networks)) {
       const networkId = networks[key].NetworkId;
+      if (networkId === networks.CardanoSanchoTestnet.NetworkId) continue;
       const protocolParameters = await getProtocolParameters({ networkId });
       this.cache.set(networkId, protocolParameters);
     }
