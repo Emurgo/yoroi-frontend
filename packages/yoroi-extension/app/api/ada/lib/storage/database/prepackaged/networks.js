@@ -182,7 +182,7 @@ export const networks = Object.freeze({
 
 export function listRelevantNetworkNamesForEnvironment(): Array<string> {
   const keys = Object.keys(networks);
-  if (environment.isProduction()) {
+  if (environment.isProduction() && !environment.isNightly()) {
     return keys.filter(k => networks[k].isInProduction);
   }
   return keys;
