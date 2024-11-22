@@ -13,6 +13,9 @@ import StepController from './StepController';
 
 const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_1,
+  '&:hover': {
+    backgroundImage: theme.palette.ds.bg_gradient_2,
+  },
 }));
 
 const messages: * = defineMessages({
