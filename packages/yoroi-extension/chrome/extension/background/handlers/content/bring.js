@@ -53,12 +53,11 @@ const handlers = Object.freeze({
   'set-cashback-wallet': async (id: number) => {
     const localStorageApi = new LocalStorageApi();
     await localStorageApi.saveCashbackWalletId(id);
-    notifyAllTabsCashbackWalletChange(id);
     return { ok: undefined };
   },
 });
 
-async function getCashbackWallet(): Promise<PublicDeriver<> | null> {
+export async function getCashbackWallet(): Promise<PublicDeriver<> | null> {
   const db = await getDb();
   const publicDerivers = await loadWalletsFromStorage(db);
   const localStorageApi = new LocalStorageApi();

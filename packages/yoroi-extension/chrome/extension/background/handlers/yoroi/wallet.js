@@ -30,7 +30,7 @@ import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
 import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
-import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/';
+import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -126,7 +126,7 @@ async function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
   const db = await getDb();
   const publicDerivers = await loadWalletsFromStorage(db);
   if (publicDerivers.length === 1 && !isTrezorTWallet(newWallet.getParent())) {
-    notifyAllTabsCashbackWalletChange(newWallet.getPublicDeriverId());
+    notifyAllTabsCashbackWalletChange();
   }
 }
 
@@ -151,6 +151,11 @@ export const RemoveWallet: HandlerType<
         publicDeriverId: request.publicDeriverId,
       }
     });
+
+    const localStorageApi = new LocalStorageApi();
+    if (await localStorageApi.getCashbackWalletId() === request.publicDeriverId) {
+      notifyAllTabsCashbackWalletChange();
+    }
   },
 });
 

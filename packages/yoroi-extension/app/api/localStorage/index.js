@@ -339,8 +339,11 @@ export default class LocalStorageApi {
     String(id)
   );
 
-  getCashbackWalletId: () => Promise<number> = async () => {
+  getCashbackWalletId: () => Promise<number | null> = async () => {
     const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    if (!v) {
+      return null;
+    }
     return Number(v);
   }
 

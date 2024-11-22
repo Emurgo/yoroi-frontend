@@ -13,7 +13,7 @@ export async function getPublicDeriverById(publicDeriverId: number): Promise<Pub
   throw new Error(`missing public deriver ${publicDeriverId}`);
 }
 
-export function notifyAllTabsCashbackWalletChange(activeWalletId: number) {
+export function notifyAllTabsCashbackWalletChange() {
   declare var chrome;
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
@@ -21,7 +21,6 @@ export function notifyAllTabsCashbackWalletChange(activeWalletId: number) {
         tab.id,
         {
           type: 'cashback-wallet-change',
-          activeWalletId,
         }
       );
     }

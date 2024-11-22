@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, intlShape, type $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
@@ -23,6 +23,12 @@ type InjectedLayoutProps = {|
 |};
 type AllProps = {| ...Props, ...InjectedLayoutProps |};
 
+type State = {|
+  warning1Text: ?$npm$ReactIntl$MessageDescriptor,
+  warning2Text: ?$npm$ReactIntl$MessageDescriptor,
+  acceptText: ?$npm$ReactIntl$MessageDescriptor,
+|};
+
 const dialogMessages = defineMessages({
   warning2: {
     id: 'wallet.settings.delete.warning2',
@@ -34,16 +40,51 @@ const dialogMessages = defineMessages({
     id: 'wallet.settings.delete.accept',
     defaultMessage: '!!!I still have the means to restore this wallet',
   },
+  cashbackWarning1: {
+    id: 'wallet.settings.delete.warning1.cashback',
+    defaultMessage: '!!!Removing this wallet will not impact its balance, but as it’s connected to Bring, this may disrupt your cashback process. You can also use another wallet for connecting the cashback before removing this wallet.'
+  },
+  cashbackWarning2: {
+    id: 'wallet.settings.delete.warning2.cashback',
+    defaultMessage: '!!!This wallet can be restored again at any time, but double-check if you still have the means to restore access to it. If you cannot, removing the wallet may result in irreversible loss of funds.'
+  },
+  cashbackAccept: {
+    id: 'wallet.settings.delete.accept.cashback',
+    defaultMessage: '!!!I still have the means to restore this wallet and want to stop generating cashback rewards for this wallet.'
+  },
 });
 
 @observer
-class RemoveWalletDialogContainer extends Component<AllProps> {
+class RemoveWalletDialogContainer extends Component<AllProps, State> {
+  state = {
+    warning1Text: null,
+    warning2Text: null,
+    acceptText: null,
+  }
+
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   componentWillUnmount() {
     this.props.stores.walletSettings.removeWalletRequest.reset();
+  }
+
+  async componentDidMount() {
+    const { wallets } = this.props.stores;
+    if (await wallets.getCashbackWallet() === wallets.selected) {
+      this.setState({
+        warning1Text: dialogMessages.cashbackWarning1,
+        warning2Text: dialogMessages.cashbackWarning2,
+        acceptText: dialogMessages.cashbackAccept,
+      });
+    } else {
+      this.setState({
+        warning1Text: messages.removeExplanation,
+        warning2Text: dialogMessages.warning2,
+        acceptText: dialogMessages.accept,
+      });
+    }
   }
 
   @observable isChecked: boolean = false;
@@ -78,10 +119,15 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
     const settingsStore = this.props.stores.walletSettings;
     const settingsActions = this.props.actions.walletSettings;
 
+    const { warning1Text, warning2Text, acceptText } = this.state;
+    if (!warning1Text || !warning2Text || !acceptText) {
+      return null;
+    }
+
     const DangerousActionDialogClassic = (
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
-        checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
+        checkboxAcknowledge={intl.formatMessage(acceptText)}
         isChecked={this.isChecked}
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
@@ -100,14 +146,14 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         }}
         id="removeWalletDialog"
       >
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        <p>{intl.formatMessage(warning1Text)}</p>
+        <p>{intl.formatMessage(warning2Text)}</p>
       </DangerousActionDialog>
     );
     const DangerousActionDialogRevamp = (
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
-        checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
+        checkboxAcknowledge={intl.formatMessage(acceptText)}
         isChecked={this.isChecked}
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
@@ -122,8 +168,8 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         }}
         id="removeWalletDialog"
       >
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        <p>{intl.formatMessage(warning1Text)}</p>
+        <p>{intl.formatMessage(warning2Text)}</p>
       </DangerousActionDialog>
     );
 
