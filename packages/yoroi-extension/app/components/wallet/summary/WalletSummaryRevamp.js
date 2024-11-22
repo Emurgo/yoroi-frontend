@@ -225,7 +225,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             }}
           >
             <Grid item xs={4}>
-              <Typography variant="body2" color="ds.text_gray_medium">
+              <Typography variant="body2" color="ds.text_gray_low">
                 {intl.formatMessage({ id: 'wallet.summary.page.type' })}
               </Typography>
             </Grid>
