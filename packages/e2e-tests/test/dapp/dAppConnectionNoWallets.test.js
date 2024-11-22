@@ -42,7 +42,7 @@ describe('dApp, connection, no wallets', function () {
   });
 
   it('Request connection', async function () {
-    await mockedDApp.requestNonAuthAccess();
+    await mockedDApp.requestAccess();
     const dappConnectPage = new DAppConnectWallet(webdriver, logger);
     const popUpAppeared = await dappConnectPage.popUpIsDisplayed(windowManager);
     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;

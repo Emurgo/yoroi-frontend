@@ -1,6 +1,10 @@
 // @flow
+
+export const PAGE_ERROR_SUBROUTE: string = '/page-error';
+
 export const ROUTES = {
   ROOT: '/',
+  PAGE_ERROR: PAGE_ERROR_SUBROUTE,
   NIGHTLY_INFO: '/nightly',
   MY_WALLETS: '/my-wallets',
   PROFILE: {
@@ -38,6 +42,7 @@ export const ROUTES = {
     SUPPORT: '/settings/support',
     LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
     ANALYTICS: '/settings/analytics',
+    PAPER_WALLET: '/settings/paper-wallet',
   },
   TRANSFER: {
     ROOT: '/transfer',
@@ -74,7 +79,8 @@ export const ROUTES = {
   },
   SWAP: {
     ROOT: '/swap',
-    ERROR: '/swap/page-error',
+    // $FlowIgnore
+    ERROR: '/swap' + PAGE_ERROR_SUBROUTE,
     ORDERS: '/swap/orders',
   },
   EXCHANGE_END: '/exchange-end',

@@ -1068,7 +1068,7 @@ const getColors = (ds, type) => {
   return colorsByType[type] || { bg: ds.primary_100, icon: ds.primary_600 };
 };
 
-const IconWrapper = styled(Box)(({ isDark, colors, theme }) => ({
+const IconWrapper = styled(Box)(({ isDark, colors }) => ({
   '& svg': {
     '& rect': {
       fill: isDark && colors.bg,

@@ -10,7 +10,12 @@ import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import { isChrome, walletNameShortener } from '../utils/utils.js';
-import { extensionTabName, serviceWorkersTabName, WindowManager } from './windowManager.js';
+import {
+  extensionTabName,
+  serviceWorkersLink,
+  serviceWorkersTabName,
+  WindowManager,
+} from './windowManager.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -106,7 +111,7 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   expect(state, 'The Add new wallet page is not displayed').to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
   // It is necessary to re-run the service worker after loading info into the indexedDB
-  if (isChrome()){
+  if (isChrome()) {
     await restartServiceWorker(webdriver, logger);
   } else {
     await addWalletPage.refreshPage();
@@ -125,7 +130,7 @@ export const restartServiceWorker = async (webdriver, logger) => {
   logger.info(`--------------------- restartServiceWorker START ---------------------`);
   const windowManager = new WindowManager(webdriver, logger);
   windowManager.init();
-  await windowManager.openNewTab(serviceWorkersTabName, serviceWorkersTabName);
+  await windowManager.openNewTab(serviceWorkersTabName, serviceWorkersLink);
 
   const basepage = new BasePage(webdriver, logger);
 
@@ -163,4 +168,4 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
   basepage.getBrowserLogs(mochaContext.test.parent.title, 'preparationSteps');
   basepage.getDriverLogs(mochaContext.test.parent.title, 'preparationSteps');
   logger.info(`--------------------- collectInfo END ---------------------`);
-}
+};

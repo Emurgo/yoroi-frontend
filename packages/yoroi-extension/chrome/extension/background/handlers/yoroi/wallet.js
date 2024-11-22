@@ -244,13 +244,13 @@ export const GetPrivateStakingKey: HandlerType<
       });
       return stakingKey.to_hex();
     } catch (error) {
-      return { error: error.name };
+      return { error: error.message };
     }
   },
 });
 
 export const RemoveAllTransactions: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'remove-all-transactions',
@@ -275,7 +275,7 @@ export const RemoveAllTransactions: HandlerType<
 });
 
 export const PopAddress: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'pop-address',
@@ -354,6 +354,7 @@ export const RefreshTransactions: HandlerType<
       // initial transaction list loading
       txs = await adaApi.refreshTransactions(refreshTxRequest);
     }
-    return txs;
+    // $FlowIgnore
+    return JSON.stringify(txs);
   },
 });
