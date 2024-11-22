@@ -20,7 +20,7 @@ export default class ProtocolParametersStore<
 
   cache: Map<number, ProtocolParameters> = new Map();
 
-  setup() {
+  setup(): void {
     this.loadProtocolParametersRequest.execute();
   }
 
