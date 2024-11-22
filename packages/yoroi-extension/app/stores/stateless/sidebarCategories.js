@@ -166,7 +166,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: _request => true,
+    isVisible: ({ selected }) => selected?.type !== 'trezor',
   },
   {
     className: 'connected-websites',
