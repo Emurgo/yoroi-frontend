@@ -234,7 +234,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
                 {intl.formatMessage({ id: 'wallet.summary.page.status' })}
               </Typography>
             </Grid>
-            <Grid item xs={2} sx={{ textAlign: 'right' }} color="ds.text_gray_medium">
+            <Grid item xs={2} sx={{ textAlign: 'right' }} color="ds.text_gray_low">
               <Typography variant="body2">{intl.formatMessage(globalMessages.feeLabel)}</Typography>
             </Grid>
             <Grid item xs={4} sx={{ textAlign: 'right', pr: '30px' }} color="ds.text_gray_medium">
