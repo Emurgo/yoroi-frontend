@@ -4,12 +4,14 @@ declare var chrome;
 // We pass the RPC call inject.js and have it relay the request and reponse messages to the background,
 // instead of directly calling the background with chrome.runtime.sendMessage, so that this lib can also
 // be used in the web page process.
-const callbacks = [];
+const callbacks: Map<number, (Object) => void> = new Map();
+let uid = 0;
 
 window.addEventListener('message', (event) => {
   if (event.data.type === 'bring_rpc_response') {
-    const callback = callbacks.splice(event.data.uid, 1)[0];
+    const callback = callbacks.get(event.data.uid);
     if (callback) {
+      callbacks.delete(event.data.uid);
       callback(event.data);
     }
   }
@@ -17,7 +19,7 @@ window.addEventListener('message', (event) => {
 
 function callBackground(functionName: string, params: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    callbacks.push((msg) => {
+    callbacks.set(uid, (msg) => {
       if (msg.return.err) {
         reject(new Error(msg.return.err));
       } else {
@@ -28,10 +30,11 @@ function callBackground(functionName: string, params: any): Promise<any> {
     window.postMessage({
       type: 'bring_rpc_request',
       url: location.hostname,
-      uid: callbacks.length - 1,
+      uid,
       function: functionName,
       params,
     });
+    uid += 1;
   });
 }
 
@@ -45,6 +48,10 @@ export function getTheme(): Promise<'light' | 'dark'> {
 
 export function popUpWalletCreation(): void {
   callBackground('pop-up-wallet-creation');
+}
+
+export function popUpCashbackWalletSelection(): void {
+  callBackground('pop-up-cashback-wallet-selection');
 }
 
 export function listenForCashbackWalletChange(callback: () => void): void {

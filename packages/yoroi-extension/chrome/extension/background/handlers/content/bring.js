@@ -7,6 +7,7 @@ import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/Pu
 import { getDb } from '../../state';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
+import { getBoundsForTabWindow, popupProps } from './utils';
 
 declare var chrome;
 
@@ -21,7 +22,18 @@ const handlers = Object.freeze({
   },
 
   'pop-up-wallet-creation': async () => {
-    chrome.tabs.create({ url: 'main_window.html' });
+    chrome.tabs.create({ url: 'main_window.html#/wallets/add' });
+    return { ok: undefined };
+  },
+
+  'pop-up-cashback-wallet-selection': async (_: void, tabId: number) => {
+    const bounds = await getBoundsForTabWindow(tabId);
+    chrome.windows.create({
+      ...popupProps,
+      url: chrome.runtime.getURL('main_window_connector.html#/select-cashback-wallet'),
+      left: (bounds.width + bounds.positionX) - popupProps.width,
+      top: bounds.positionY + 80,
+    });
     return { ok: undefined };
   },
 
@@ -113,6 +125,6 @@ export async function handleBringRpc(message: Object, sender: Object) {
     throw new Error('missing Bring handler for ' + message.function);
   }
 
-  const result = await handler(message.params);
+  const result = await handler(message.params, sender.tab.id);
   sendRpcResponse(result, sender.tab.id, message.uid);
 }

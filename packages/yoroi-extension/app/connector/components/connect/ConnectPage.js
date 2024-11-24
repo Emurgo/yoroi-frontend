@@ -74,6 +74,14 @@ const messages = defineMessages({
     id: 'connector.connect.hardwareWalletsConnectWithAuthNotSupported',
     defaultMessage: '!!!Connecting to hardware wallet with authentication is not supported',
   },
+  cashbackApplyAll: {
+    id: 'connector.connect.cashback.apply.all',
+    defaultMessage: '!!!The wallet you select will be applied for all parter websites.'
+  },
+  cashbackDisabledTrezor: {
+    id: 'connector.connect.cashback.trezor.disabled',
+    defaultMessage: '!!!Bring cashback service doesn’t support Trezor wallet connection',
+  },
 });
 
 type Props = {|
@@ -97,6 +105,7 @@ type Props = {|
   +unitOfAccount: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
+  +isSelectingCashbackWallet?: boolean,
 |};
 
 type InjectedProps = {| +isRevampLayout: boolean |};
@@ -188,6 +197,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
       onUpdateHideBalance,
       isRevampLayout,
       selectedWallet,
+      isSelectingCashbackWallet = false,
     } = this.props;
     const isNightly = environment.isNightly();
     const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
@@ -258,7 +268,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
       <div className={componentClasses}>
         {hasWallets ? (
           <>
-            <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
+            {!isSelectingCashbackWallet && (<ProgressBar step={isAppAuth ? 2 : 1} max={2} />)}
             <Typography
               component="div"
               variant="h4"
@@ -272,19 +282,21 @@ class ConnectPage extends Component<Props & InjectedProps> {
             >
               {intl.formatMessage(messages.connectWallet)}
             </Typography>
-            <div className={styles.connectWrapper}>
-              <div className={styles.image}>
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
-              </div>
-              <Box marginTop="16px">
-                <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
-                  {intl.formatMessage(messages.subtitle)}{' '}
-                  <Typography as="span" variant="body-1" fontWeight="500">
-                    {url}
+            {!isSelectingCashbackWallet && (
+              <div className={styles.connectWrapper}>
+                <div className={styles.image}>
+                  {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+                </div>
+                <Box marginTop="16px">
+                  <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
+                    {intl.formatMessage(messages.subtitle)}{' '}
+                    <Typography as="span" variant="body-1" fontWeight="500">
+                      {url}
+                    </Typography>
                   </Typography>
-                </Typography>
-              </Box>
-            </div>
+                </Box>
+              </div>
+            )}
           </>
         ) : null}
         <Box flex={1}>
@@ -308,42 +320,56 @@ class ConnectPage extends Component<Props & InjectedProps> {
                     </button>
                   </div>
 
+                  {isSelectingCashbackWallet && (
+                    <div className={styles.cashbackApplyAll}>{intl.formatMessage(messages.cashbackApplyAll)}</div>
+                  )}
+
                   <ul className={styles.list}>
-                    {publicDerivers.map((wallet, idx) => (
-                      <li key={wallet.publicDeriverId} className={styles.listItem}>
-                        <WalletButton onClick={() => onSelectWallet(wallet, wallet.plate)}>
-                          <ConnectedWallet
-                            publicDeriver={wallet}
-                            walletBalance={
-                              <Box
-                                sx={{
-                                  ml: 'auto',
-                                  textAlign: 'right',
-                                }}
-                              >
-                                <AmountDisplay
-                                  shouldHideBalance={this.props.shouldHideBalance}
-                                  amount={wallet.balance}
-                                  getTokenInfo={this.props.getTokenInfo}
-                                  unitOfAccountSetting={this.props.unitOfAccount}
-                                  getCurrentPrice={this.props.getCurrentPrice}
-                                  showFiat
-                                  showAmount
-                                  id={'dAppConnector:connect:walletList:walletCard_' + idx}
-                                />
-                              </Box>
-                            }
-                          />
-                        </WalletButton>
-                      </li>
-                    ))}
+                    {publicDerivers.map((wallet, idx) => {
+                      const isTrezor = isSelectingCashbackWallet && wallet.type === 'trezor';
+                      const Button = isTrezor ? DisabledWalletButton : WalletButton;
+                      return (
+                        <li
+                          key={wallet.publicDeriverId}
+                          className={[styles.listItem, isTrezor ? '' : styles.enabledWallet].join(' ')}
+                        >
+                          <Button onClick={() => onSelectWallet(wallet, wallet.plate)}>
+                            <ConnectedWallet
+                              disabledForReason={
+                                isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null
+                              }
+                              publicDeriver={wallet}
+                              walletBalance={
+                                <Box
+                                  sx={{
+                                    ml: 'auto',
+                                    textAlign: 'right',
+                                  }}
+                                >
+                                  <AmountDisplay
+                                    shouldHideBalance={this.props.shouldHideBalance}
+                                    amount={wallet.balance}
+                                    getTokenInfo={this.props.getTokenInfo}
+                                    unitOfAccountSetting={this.props.unitOfAccount}
+                                    getCurrentPrice={this.props.getCurrentPrice}
+                                    showFiat
+                                    showAmount
+                                    id={'dAppConnector:connect:walletList:walletCard_' + idx}
+                                  />
+                                </Box>
+                              }
+                            />
+                          </Button>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ) : null}
             </>
           )}
         </Box>
-        {hasWallets && !isAppAuth ? (
+        {!isSelectingCashbackWallet && hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
             <div className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</div>
             <div className={styles.infoText}>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
@@ -361,4 +387,7 @@ const WalletButton = styled('button')({
   width: '100%',
   fontSize: '1rem',
   padding: '16px',
+});
+const DisabledWalletButton = styled(WalletButton)({
+  cursor: 'default',
 });
