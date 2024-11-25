@@ -40,7 +40,7 @@ const handlers = Object.freeze({
   'get-address': async () => {
     const publicDeriver = await getCashbackWallet();
     if (!publicDeriver) {
-      return;
+      return { ok: undefined };
     }
     const result = (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0];
     return { ok: result.address.Hash };

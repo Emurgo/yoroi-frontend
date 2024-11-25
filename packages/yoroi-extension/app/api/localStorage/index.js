@@ -132,7 +132,7 @@ export default class LocalStorageApi {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
     // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
     if (!id) {
-      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
+      id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
     }
     if (!id) {
       return null;
