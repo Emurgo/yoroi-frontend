@@ -640,7 +640,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   variant="caption1"
                   align="right"
                   color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                  sx={{ position: 'relative', top: '-44px' }}
+                  sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
@@ -684,7 +684,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 variant="caption1"
                 align="right"
                 color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                sx={{ position: 'relative', top: '-44px' }}
+                sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>
