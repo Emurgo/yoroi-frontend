@@ -73,13 +73,13 @@ function SelectNetworkStep(props: Props & Intl): Node {
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
           <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
         </Box>
-        <Typography component="div" variant="h3" fontWeight={500}>
+        <Typography component="div" variant="h3" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}
         </Typography>
       </Box>
       <Stack direction="column" alignItems="center" justifyContent="center" mb="72px">
         <Stack mb="38px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography component="div">
+          <Typography component="div" color="ds.text_gray_medium">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
         </Stack>
@@ -87,7 +87,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
         <Stack alignItems="center" justifyContent="center" gap="16px">
           {networksList.map(({ name, networkInfo }) => (
             <GradientBox component="button" className={styles.networkCard} key={name} onClick={() => onSelect(networkInfo)}>
-              <Typography color="ds.text_gray_max" variant="h3" fontWeight={500}>
+              <Typography color="ds.text_gray_medium" variant="h3" fontWeight={500}>
                 {name}
               </Typography>
             </GradientBox>
