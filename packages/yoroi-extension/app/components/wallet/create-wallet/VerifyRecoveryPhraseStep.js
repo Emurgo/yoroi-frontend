@@ -91,7 +91,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box
           sx={{
-            border: 'double 2px transparent',
+            border: '2px transparent',
             borderRadius: '8px',
             borderColor: 'ds.primary_200',
             marginBottom: '16px',
