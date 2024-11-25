@@ -76,7 +76,7 @@ const messages = defineMessages({
   },
   cashbackApplyAll: {
     id: 'connector.connect.cashback.apply.all',
-    defaultMessage: '!!!The wallet you select will be applied for all parter websites.'
+    defaultMessage: '!!!The wallet you select will be applied for all partner websites.'
   },
   cashbackDisabledTrezor: {
     id: 'connector.connect.cashback.trezor.disabled',

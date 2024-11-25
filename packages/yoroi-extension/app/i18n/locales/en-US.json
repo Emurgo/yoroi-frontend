@@ -84,7 +84,7 @@
   "connector.assetsReceived": "{quantity} assets received",
   "connector.assetsSent": "{quantity} assets sent",
   "connector.connect.connectedWallets": "Connected Wallets",
-  "connector.connect.cashback.apply.all": "The wallet you select will be applied for all parter websites.",
+  "connector.connect.cashback.apply.all": "The wallet you select will be applied for all partner websites.",
   "connector.connect.cashback.trezor.disabled": "Bring cashback service doesn’t support Trezor wallet connection",
   "connector.connect.connectedWallets.active": "Active",
   "connector.connect.createWallet": "create wallet",
