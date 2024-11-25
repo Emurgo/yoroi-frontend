@@ -213,7 +213,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     zIndex: 10,
                   }}
                   variant="body1"
-                  color={isAdded ? 'primary.400' : 'primary.600'}
+                  color={isAdded ? 'ds.text_primary_min' : 'ds.text_primary_medium'}
                 >
                   {word}
                 </Typography>
