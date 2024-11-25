@@ -35,6 +35,8 @@ import { injectIntl, defineMessages, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { forceNonNull } from '../../coreUtils';
 import { constructPlate32 } from '../../components/topbar/WalletCard';
+import LocalStorageApi from '../../api/localStorage';
+import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 
 const messages = defineMessages({
   claim: {
@@ -252,6 +254,8 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     };
   }, [iframeSrc, fetchIframeUrl, handleMessage]);
 
+  // If the current cashback wallet is not the current wallet, this value initially holds the current cashback
+  // wallet, to be shown in a warning dialog.
   const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
 
   useEffect(() => {
@@ -262,7 +266,19 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
       }
     });
   }, []);
-  
+
+  const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    const localStorageApi = new LocalStorageApi();
+    localStorageApi.isDisclaimerShown('cashback').then((result) => {
+      if (!result) {
+        setShouldShowDisclaimer(true);
+        setPopup(true);
+      }
+    });
+  }, []);
+
   const closePopup = useCallback(() => {
     iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
     setPopup(false);
@@ -291,7 +307,20 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     >
       <FullscreenLayout bottomPadding={0}>
         <Suspense fallback={null}>
-          {shownCashbackWallet && (
+          {shouldShowDisclaimer && (
+            <DisclaimerDialog
+              onProceed={() => {
+                setShouldShowDisclaimer(false);
+                if (!shownCashbackWallet) {
+                  setPopup(false);
+                }
+                const localStorageApi = new LocalStorageApi();
+                localStorageApi.setShownDisclaimer('cashback');
+              }}
+            />
+          )}
+
+          {shownCashbackWallet && !shouldShowDisclaimer && (
             <Dialog
               title={intl.formatMessage(messages.warning)}
               actions={[

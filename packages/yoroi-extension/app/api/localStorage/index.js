@@ -48,6 +48,7 @@ const storageKeys = {
   THEME: networkForLocalStorage + '-THEME',
 
   CASHBACK_WALLET_ID: 'CASHBACK_WALLET_ID',
+  SHOWN_DISCLAIMERS: 'SHOWN_DISCLAIMERS',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -57,6 +58,8 @@ export type SetCustomUserThemeRequest = {|
 export type WalletsNavigation = {|
   cardano: number[],
 |};
+
+type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 
 /**
  * This api layer provides access to the electron local storage
@@ -345,6 +348,23 @@ export default class LocalStorageApi {
       return null;
     }
     return Number(v);
+  }
+
+  _getShownDisclaimerObject: () => Promise<Object> = async () => {
+    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+    const val = raw ? JSON.parse(raw) : {};
+    return val;
+  }
+
+  setShownDisclaimer: (Disclaimer) => Promise<void> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    val[which] = true;
+    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+  };
+
+  isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    return val[which] === true;
   }
 
   async reset(): Promise<void> {
