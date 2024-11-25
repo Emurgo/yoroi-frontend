@@ -51,18 +51,10 @@ const messages = defineMessages({
     id: 'buysell.dialog.providerFee',
     defaultMessage: '!!!Provider fee',
   },
-  disclaimer: {
-    id: 'buysell.dialog.disclaimer',
-    defaultMessage: '!!!Disclaimer',
-  },
   disclaimerText: {
     id: 'buysell.dialog.disclaimerText',
     defaultMessage:
       '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges. By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.',
-  },
-  proceed: {
-    id: 'buysell.dialog.proceed',
-    defaultMessage: 'PROCEED',
   },
   urlGenerationErrorDialogTitle: {
     id: 'buysell.dialog.error.dialog.title',
@@ -411,7 +403,7 @@ export default class BuySellDialog extends Component<Props, State> {
               <InfoIcon style={{ verticalAlign: 'middle' }} />
             </IconWrapper>
             <Typography style={{ verticalAlign: 'middle' }} color="ds.text_gray_medium">
-              {intl.formatMessage(messages.disclaimer)}
+              {intl.formatMessage(globalMessages.disclaimer)}
             </Typography>
           </header>
           <Typography color="ds.text_gray_medium">{intl.formatMessage(messages.disclaimerText)}</Typography>
@@ -479,7 +471,7 @@ export default class BuySellDialog extends Component<Props, State> {
         forceBottomDivider
         actions={[
           {
-            label: intl.formatMessage(messages.proceed),
+            label: intl.formatMessage(globalMessages.proceed),
             primary: true,
             disabled: state.amountAda === '' || state.inputError !== null,
             onClick: this.onSubmit,

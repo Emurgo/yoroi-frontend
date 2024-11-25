@@ -1012,6 +1012,14 @@ const globalMessages: * = defineMessages({
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
   },
+  disclaimer: {
+    id: 'buysell.dialog.disclaimer',
+    defaultMessage: '!!!Disclaimer',
+  },
+  proceed: {
+    id: 'buysell.dialog.proceed',
+    defaultMessage: 'PROCEED',
+  },
 });
 export default globalMessages;
 
