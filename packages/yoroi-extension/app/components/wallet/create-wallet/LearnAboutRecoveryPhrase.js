@@ -172,6 +172,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             display: 'block',
             py: '16px',
             mb: '20px',
+            color: 'ds.text_primary_medium',
           }}
         >
           {intl.formatMessage(infoDialogMessages.learnMore)}
