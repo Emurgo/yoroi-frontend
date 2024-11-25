@@ -160,7 +160,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     variant="body1"
                     color="primary.600"
                   >
-                    <Typography component="div" variant="body1" color="primary.400" width="20px">
+                    <Typography component="div" variant="body1" color="ds.text_primary_medium" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word !== null &&
