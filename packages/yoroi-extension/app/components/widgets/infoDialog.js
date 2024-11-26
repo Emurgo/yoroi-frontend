@@ -1,6 +1,6 @@
 // @flow
 import Fade from '@mui/material/Fade';
-import { Dialog, Typography, Button, Stack, Link } from '@mui/material';
+import { Dialog, Typography, Button, Stack, Link, IconButton } from '@mui/material';
 import React from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
+import { ReactComponent as CrossIcon } from '../../assets/images/revamp/icons/cross.inline.svg';
 
 export const messages: Object = defineMessages({
   dialogTitle: {
@@ -46,7 +47,7 @@ function InfoDialog(props: Props & Intl): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'ds.bg_color_min',
+        background: 'ds.bg_color_max',
         '& .MuiPaper-root': {
           maxWidth: 'unset',
           backgroundImage: 'none',
@@ -54,13 +55,27 @@ function InfoDialog(props: Props & Intl): Node {
       }}
       id="infoDialog"
     >
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={theme => ({
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          '& svg': {
+            '& path': {
+              fill: theme.palette.ds.el_gray_medium,
+            },
+          },
+        })}
+      >
+        <CrossIcon />
+      </IconButton>
       <Box
         sx={{
-          background: 'ds.bg_color_min',
-
+          background: 'ds.bg_color_max',
           width: '648px',
           borderRadius: '8px',
-
           padding: '24px',
           display: 'flex',
           alignitems: 'center',
@@ -110,7 +125,7 @@ function InfoDialog(props: Props & Intl): Node {
             disableRipple={false}
             onClick={onClose}
             sx={{
-              width: '176px',
+              width: '100%',
             }}
             id="infoDialogContinueButton"
           >

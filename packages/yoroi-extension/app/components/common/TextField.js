@@ -91,7 +91,7 @@ function TextField({
           letterSpacing: '0.2px',
         },
         '& .MuiFormLabel-root': {
-          color: theme => `${theme.palette.ds.text_gray_medium} !important`,
+          color: theme => `${theme.palette.ds.text_gray_low} !important`,
           backgroundColor: theme => `${theme.palette.ds.bg_color_max} !important`,
           padding: '0 4px',
         },

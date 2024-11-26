@@ -215,6 +215,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   ml: '-6px',
                   minWidth: 0,
                   minHeight: 0,
+                  color: 'ds.text_primary_medium',
                   '&:hover': { border: 0 },
                   '&.Mui-disabled': { border: 0 },
                 }}

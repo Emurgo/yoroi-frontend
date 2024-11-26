@@ -91,7 +91,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box
           sx={{
-            border: 'double 2px transparent',
+            border: '2px transparent',
             borderRadius: '8px',
             borderColor: 'ds.primary_200',
             marginBottom: '16px',
@@ -160,7 +160,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     variant="body1"
                     color="primary.600"
                   >
-                    <Typography component="div" variant="body1" color="primary.400" width="20px">
+                    <Typography component="div" variant="body1" color="ds.text_primary_medium" width="20px">
                       {idx + 1}.
                     </Typography>
                     {word !== null &&
@@ -213,7 +213,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
                     zIndex: 10,
                   }}
                   variant="body1"
-                  color={isAdded ? 'primary.400' : 'primary.600'}
+                  color={isAdded ? 'ds.text_primary_min' : 'ds.text_primary_medium'}
                 >
                   {word}
                 </Typography>

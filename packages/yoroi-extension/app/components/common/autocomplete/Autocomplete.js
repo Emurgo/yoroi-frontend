@@ -201,8 +201,9 @@ function Autocomplete({
                     key={`${item}${index}`}
                     sx={{
                       padding: '16px',
-                      backgroundColor: highlightedIndex === index ? 'ds.gray_200' : 'ds.bg_color_min',
+                      backgroundColor: highlightedIndex === index ? 'ds.gray_50' : 'ds.bg_color_max',
                       cursor: 'pointer',
+                      boxShadow: '0px 3px 10px 0px rgba(24, 26, 30, 0.08)',
                     }}
                     {...getItemProps({ item, index })}
                   >
@@ -260,7 +261,8 @@ const InputWrapper = styled(Box)(
   cursor: text;
   margin-bottom: 0;
   border-radius: 8px;
-  
+  marginBottom: '2px';
+
   & input {
     background-color: transparent;
     color: ${theme.palette.primary[600]};

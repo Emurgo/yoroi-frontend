@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Stack, Typography } from '@mui/material';
-import { Box } from '@mui/system';
+import { Stack, Typography, styled, Box } from '@mui/material';
 import { usePlate } from './plate';
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
@@ -9,6 +8,14 @@ import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitive
 import WalletChecksumTipsDialog from './WalletChecksumTipsDialog';
 import { TIPS_DIALOGS } from './steps';
 import type { ManageDialogsProps } from './CreateWalletPage';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   recoveryPhrase: Array<string>,
@@ -20,22 +27,15 @@ function WalletPlate(props: Props): Node {
   const { recoveryPhrase, selectedNetwork, openDialog, closeDialog, isDialogOpen } = props;
   const plate = usePlate(recoveryPhrase, selectedNetwork);
 
-  const plateImagePart = (
-    <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={6} scalePx={4} />
-  );
+  const plateImagePart = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={6} scalePx={4} />;
 
   return (
-    <Stack
-      direction="row"
-      gap="8px"
-      alignItems="center"
-      justifyContent="center"
-      mt="-3px"
-      mb="30px"
-    >
+    <Stack direction="row" gap="8px" alignItems="center" justifyContent="center" mt="-3px" mb="30px">
       {plateImagePart}
-      <Typography component="div" variant="body1" id="walletPlateText">{plate.TextPart}</Typography>
-      <Box
+      <Typography component="div" variant="body1" id="walletPlateText">
+        {plate.TextPart}
+      </Typography>
+      <IconWrapper
         component="button"
         sx={{
           cursor: 'pointer',
@@ -46,7 +46,7 @@ function WalletPlate(props: Props): Node {
         onClick={() => openDialog(WalletChecksumTipsDialog)}
       >
         <InfoIcon />
-      </Box>
+      </IconWrapper>
       <WalletChecksumTipsDialog
         open={isDialogOpen(WalletChecksumTipsDialog)}
         onClose={() => closeDialog(TIPS_DIALOGS.WALLET_CHECKSUM)}
