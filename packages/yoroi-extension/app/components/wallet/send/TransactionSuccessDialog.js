@@ -10,7 +10,6 @@ import { Stack, Typography } from '@mui/material';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import { ReactComponent as SuccessImg } from '../../../assets/images/revamp/tx-submitted.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import { fontWeight } from '../../../styles/themes/tokens/tokens';
 
 const messages = defineMessages({
   title: {

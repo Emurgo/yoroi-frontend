@@ -82,8 +82,8 @@ export default class ExportTransactionDialog extends Component<Props> {
               return (
                 <TextField
                   {...params}
-                  sx={{ mb: '24px' }}
                   sx={{
+                    mb: '24px',
                     svg: { color: 'ds.gray_max' },
                   }}
                 />

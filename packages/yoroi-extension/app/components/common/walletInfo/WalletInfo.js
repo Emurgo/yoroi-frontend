@@ -14,7 +14,6 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
-import { fontWeight } from '../../../styles/themes/tokens/tokens';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
