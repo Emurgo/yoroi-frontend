@@ -45,6 +45,7 @@ import WalletReceiveRevamp from '../../components/wallet/WalletReceiveRevamp';
 import UnmangleTxDialogContainer from '../transfer/UnmangleTxDialogContainer';
 import StandardHeaderRevamp from '../../components/wallet/receive/StandardHeaderRevamp';
 import { maybe } from '../../coreUtils';
+import { ROUTES } from '../../routes-config';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -119,6 +120,7 @@ class WalletReceivePage extends Component<AllProps> {
     };
 
     const isHwWallet = publicDeriver.type !== 'mnemonic';
+    const isAddressBook = this.props.stores.router.location.pathname.startsWith(`${ROUTES.WALLETS.RECEIVE.ROOT}/addressBook/all`)
 
     const onCopyAddressTooltip = (address, elementId) => {
       if (!uiNotifications.isOpen(elementId)) {
@@ -357,6 +359,7 @@ class WalletReceivePage extends Component<AllProps> {
             cancel={actions.ada.hwVerifyAddress.closeAddressDetailDialog.trigger}
             classicTheme={profile.isClassicTheme}
             complexityLevel={profile.selectedComplexityLevel}
+            isAddressBook={isAddressBook}
           />
         ) : null}
       </VerticalFlexContainer>
