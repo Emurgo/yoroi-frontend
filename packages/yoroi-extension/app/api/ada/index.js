@@ -1801,6 +1801,57 @@ export default class AdaApi {
     }
   }
 
+  async cloneWallet(
+    db: lf$Database,
+    publicDeriver: PublicDeriver<>,
+    network: $ReadOnly<NetworkRow>,
+  ): Promise<RestoreWalletResponse> {
+    const withSigningKey = asGetSigningKey(publicDeriver);
+    if (!withSigningKey) {
+      throw new Error('unable to get signing key');
+    }
+    const signingKey = await withSigningKey.getSigningKey();
+    const encryptedRoot = signingKey.row.Hash;
+
+    const withPublicKey = asGetPublicKey(publicDeriver);
+    if (!withPublicKey) {
+      throw new Error('unable to get public key');
+    }
+    const publicKey = await withPublicKey.getPublicKey();
+    const accountPublicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicKey.Hash);
+
+    const accountIndex = signingKey.path[3].Index;
+    if (accountIndex === null) {
+      throw new Error('missing account index');
+    }
+
+    const walletName = (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name;
+
+    const newPubDerivers = [];
+    const wallet = await createStandardCip1852Wallet({
+      db,
+      encryptedRoot,
+      accountPublicKey,
+      accountIndex,
+      walletName,
+      accountName: '', // set account name empty now
+      network,
+    });
+    const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+      db,
+      wallet.cip1852WrapperRow,
+    );
+    for (const pubDeriver of wallet.publicDeriver) {
+      newPubDerivers.push(await PublicDeriver.createPublicDeriver(
+        pubDeriver.publicDeriverResult,
+        cip1852Wallet,
+      ));
+    }
+    return {
+      publicDerivers: newPubDerivers,
+    };
+  }
+
   /**
    * Creates wallet and saves result to DB
   */
