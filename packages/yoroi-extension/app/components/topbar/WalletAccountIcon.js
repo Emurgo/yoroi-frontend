@@ -43,7 +43,6 @@ export default class WalletAccountIcon extends Component<Props> {
   };
 
   render(): Node {
-    console.log('this.props', this.props);
     const { iconSeed, scalePx, size, saturationFactor } = this.props;
     if (iconSeed === '') {
       return <div style={{ width: '42px', height: '42px' }} />;
