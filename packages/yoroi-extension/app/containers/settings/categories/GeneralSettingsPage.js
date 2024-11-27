@@ -8,6 +8,7 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
+import BringCashbackSettings from '../../../components/settings/categories/general-setting/BringCashbackSettings';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -50,6 +51,24 @@ const currencyLabels = defineMessages({
   },
 });
 
+const getGeneratedWalletIds = (sortedWalletListIdx, currentWalletIdx) => {
+  let generatedWalletIds;
+  if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
+    const newWalletIds = currentWalletIdx.filter(id => {
+      const index = sortedWalletListIdx.indexOf(id);
+      if (index === -1) {
+        return true;
+      }
+      return false;
+    });
+    generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
+  } else {
+    generatedWalletIds = currentWalletIdx;
+  }
+
+  return generatedWalletIds;
+};
+
 @observer
 export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -64,8 +83,14 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
+  onSelectBringCashbackWallet: string => Promise<void> = async value => {
+    console.log('CASHBACK Wallet Selected', value);
+  };
+
   render(): Node {
     const { intl } = this.context;
+    const { wallets } = this.props.stores.wallets;
+
     const profileStore = this.props.stores.profile;
     const coinPriceStore = this.props.stores.coinPriceStore;
 
@@ -92,6 +117,24 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
+    const cardanoWallets = [];
+
+    const selectedWalletName = this.props.stores.wallets.selectedWalletName;
+
+    wallets.forEach(wallet => {
+      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
+
+      const walletMap = {
+        walletId: wallet.publicDeriverId,
+        plate: wallet.plate,
+        type: wallet.type,
+        name: wallet.name,
+        isSelected: wallet.name === selectedWalletName,
+      };
+
+      cardanoWallets.push(walletMap);
+    });
+
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
         {profileStore.isRevampTheme && (
@@ -105,6 +148,13 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
+        />
+        <BringCashbackSettings
+          onSelect={this.onSelectBringCashbackWallet}
+          isSubmitting={false}
+          cardanoWallets={cardanoWallets}
+          currentValue={cardanoWallets.filter(wallet => wallet.isSelected)}
+          error={null}
         />
         <UnitOfAccountSettings
           onSelect={this.onSelectUnitOfAccount}
