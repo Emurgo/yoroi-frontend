@@ -14,9 +14,6 @@ import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTrans
 import { maybe } from '../../coreUtils';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 
-declare var chrome;
-declare var browser;
-
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
@@ -117,15 +114,24 @@ export default class LocalStorageApi {
 
   // ========== Select Wallet ========== //
 
-  getSelectedWalletId: void => number | null = () => {
-    const id = localStorage.getItem(storageKeys.SELECTED_WALLET);
-    if (!id) return null;
+  getSelectedWalletId: void => Promise<number | null> = async () => {
+    let id = await getLocalItem(storageKeys.SELECTED_WALLET);
+    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
+    if (!id) {
+      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
+      if (/^\d+$/.test(id)) {
+        await this.setSelectedWalletId(Number(id));
+      }
+    }
+    if (!id) {
+      return null;
+    }
     if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
     return Number(id);
   };
 
-  setSelectedWalletId: number => void = id => {
-    localStorage.setItem(storageKeys.SELECTED_WALLET, id.toString());
+  setSelectedWalletId: number => Promise<void> = async (id) => {
+    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
   };
 
   // ========== Legacy Theme ========== //
@@ -161,13 +167,15 @@ export default class LocalStorageApi {
 
   clear: void => Promise<void> = async () => {
     const storage = JSON.parse(await this.getStorage());
-    await Object.keys(storage).forEach(async key => {
-      // changing this key would cause the tab to close
-      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
-      if (!isTabCloseKey) {
-        await removeLocalItem(key);
-      }
-    });
+    const tabKeys = new Set(Object.values(TabIdKeys));
+    await Promise.all(
+      Object.keys(storage).map(async key => {
+        // changing this key would cause the tab to close
+        if (!tabKeys.has(key)) {
+          await removeLocalItem(key);
+        }
+      })
+    );
   };
 
   // ========== Show/hide Balance ========== //
@@ -213,7 +221,7 @@ export default class LocalStorageApi {
     const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
     if (result === undefined || result === null) return undefined;
     const filteredWhitelist = JSON.parse(result);
-    this.setWhitelist(filteredWhitelist);
+    await this.setWhitelist(filteredWhitelist);
     return filteredWhitelist;
   };
 
@@ -303,17 +311,26 @@ export default class LocalStorageApi {
 
   unsetAcceptedTosVersion: void => Promise<void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
 
+  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
+  _getIsAnalyticsAllowedKey: () => string = () => {
+    let key = storageKeys.IS_ANALYTICS_ALLOWED;
+    if (environment.isFirefox()) {
+      key += '-firefox';
+    }
+    return key;
+  }
+
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
-    const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+    const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
     if (!json) {
       return undefined;
     }
     return JSON.parse(json);
   };
 
-  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
-    await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
-  };
+  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
+    await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
+  }
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
@@ -340,13 +357,15 @@ export default class LocalStorageApi {
     });
 
   setStorage: ({ [key: string]: string, ... }) => Promise<void> = async localStorageData => {
-    await Object.keys(localStorageData).forEach(async key => {
-      // changing this key would cause the tab to close
-      const isTabCloseKey = new Set(Object.values(TabIdKeys)).has(key);
-      if (!isTabCloseKey) {
-        await setLocalItem(key, localStorageData[key]);
-      }
-    });
+    const tabKeys = new Set(Object.values(TabIdKeys));
+    await Promise.all(
+      Object.keys(localStorageData).map(async key => {
+        // changing this key would cause the tab to close
+        if (!tabKeys.has(key)) {
+          await setLocalItem(key, localStorageData[key]);
+        }
+      })
+    );
   };
 
   getStorage: void => Promise<string> = () => {
