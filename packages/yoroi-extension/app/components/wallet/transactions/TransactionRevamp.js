@@ -18,7 +18,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { Button, Grid, Typography, useTheme, styled, Box } from '@mui/material';
+import { Grid, Typography, useTheme, styled, Box } from '@mui/material';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
