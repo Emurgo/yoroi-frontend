@@ -18,7 +18,7 @@ import { intlShape } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
-import { Button, Grid, Typography, useTheme, styled, Box } from '@mui/material';
+import { Grid, Typography, useTheme, styled, Box } from '@mui/material';
 import { ReactComponent as AddMemoSvg } from '../../../assets/images/revamp/add-memo.inline.svg';
 import { ReactComponent as EditSvg } from '../../../assets/images/edit.inline.svg';
 import { ReactComponent as SendIcon } from '../../../assets/images/transaction/send.inline.svg';
@@ -664,7 +664,7 @@ export default class TransactionRevamp extends Component<Props, State> {
               </div>
             )}
             <Box sx={{ overflowX: 'overlay', bgcolor: 'ds.bg_color_max' }}>
-              <Box className={styles.addressContent} sx={{ border: '1px solid', borderColor: 'ds.gray_200' }}>
+              <Box className={styles.addressContent} sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_200' }}>
                 <div>
                   <Box
                     sx={{
@@ -706,6 +706,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                       });
                     })}
                   </Box>
+                  {this.getWithdrawals(data, txIdFullInfoBasePart)}
                 </div>
                 <Box sx={{ borderLeft: '1px solid', borderColor: 'grayscale.200' }}>
                   <Box
@@ -746,11 +747,12 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </div>
                 </Box>
               </Box>
-              {this.getWithdrawals(data, txIdFullInfoBasePart)}
-              {this.getCertificate(data, txIdFullInfoBasePart)}
+              {/* Grid for additional info */}
+              <Box display="grid" gridTemplateColumns="minmax(232px, 1fr) minmax(232px, 1fr)" p="24px">
+                {/* tx info */}
+                <Box>
+                  {this.getCertificate(data, txIdFullInfoBasePart)}
 
-              <Box display="flex" p="24px">
-                <Box flexShrink={0}>
                   {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
                     <Box display="flex" gap="8px" mb="16px" flexDirection="column">
                       <Typography variant="caption1" fontWeight={500}>
@@ -766,7 +768,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     </Box>
                   )}
 
-                  <Box display="flex" gap="8px" mt="16px" flexDirection="column">
+                  <Box display="flex" gap="8px" mb="16px" flexDirection="column">
                     <Typography variant="caption1" fontWeight={500}>
                       {intl.formatMessage(globalMessages.transactionId)}
                     </Typography>
@@ -787,14 +789,10 @@ export default class TransactionRevamp extends Component<Props, State> {
                     </ExplorableHashContainer>
                   </Box>
 
-                  {this.getMetadata(data)}
-                </Box>
-                <Box display="flex" width="100%" alignItems="flex-end" justifyContent="flex-end">
-                  {this.props.memo != null ? (
-                    <div className={styles.row}>
-                      <h2>
-                        {intl.formatMessage(memoMessages.memoLabel)}
-
+                  <Box display="flex" gap="8px" mt="16px" flexDirection="column">
+                    <Typography variant="caption1" fontWeight={500}>
+                      {intl.formatMessage(memoMessages.memoLabel)}
+                      {this.props.memo != null ? (
                         <button
                           type="button"
                           onClick={onEditMemo.bind(this, data)}
@@ -804,39 +802,34 @@ export default class TransactionRevamp extends Component<Props, State> {
                           )}
                           id={txIdFullInfoBasePart + '-editMemo-button'}
                         >
-                          <div className={styles.editMemoIcon}>
+                          <Box className={styles.editMemoIcon}>
                             <EditSvg />
-                          </div>
+                          </Box>
                         </button>
-                      </h2>
-                      <span
-                        className={classnames(
-                          styles.rowData,
-                          'memoContent' // for tests
-                        )}
-                        id={txIdFullInfoBasePart + '-memoContent-text'}
-                      >
-                        {this.props.memo?.Content}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className={styles.row}>
-                      <Button
-                        variant="tertiary"
-                        color="primary"
-                        type="button"
-                        onClick={onAddMemo.bind(this, data)}
-                        className="addMemoButton" // for tests
-                        startIcon={<AddMemoSvg />}
-                        id={txIdFullInfoBasePart + '-addMemo-button'}
-                      >
-                        <Typography variant="button2" fontWeight={500}>
-                          {intl.formatMessage(memoMessages.addMemo)}
-                        </Typography>
-                      </Button>
-                    </div>
-                  )}
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={onAddMemo.bind(this, data)}
+                          className={classnames(
+                            styles.editButton,
+                            'addMemoButton' // for tests
+                          )}
+                          id={txIdFullInfoBasePart + '-editMemo-button'}
+                        >
+                          <Box className={styles.editMemoIcon}>
+                            <AddMemoSvg />
+                          </Box>
+                        </button>
+                      )}
+                    </Typography>
+                    <Box width="446px">
+                      <Typography variant="caption1" id={txIdFullInfoBasePart + '-memoContent-text'} color="grayscale.600">
+                        {this.props.memo != null ? this.props.memo?.Content : '-'}
+                      </Typography>
+                    </Box>
+                  </Box>
                 </Box>
+                <Box>{this.getMetadata(data)}</Box>
               </Box>
             </Box>
           </Box>
@@ -929,44 +922,51 @@ export default class TransactionRevamp extends Component<Props, State> {
       return null;
     }
     return (
-      <Box className={styles.addressContent} sx={{ borderBottom: '1px solid', borderColor: 'ds.gray_200' }}>
-        <div>
-          <Box
-            sx={{
-              display: 'grid',
-              gap: '15px',
-              gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              px: '24px',
-            }}
-          >
-            <Typography variant="caption1">
-              {intl.formatMessage(globalMessages.withdrawalsLabel)}:{' '}
-              <span style={{ fontWeight: 500 }}>{data.withdrawals.length}</span>
-            </Typography>
-            <Typography variant="caption1" textAlign="center">
-              {intl.formatMessage(messages.addressType)}
-            </Typography>
-            <Typography variant="caption1" textAlign="center">
-              {intl.formatMessage(globalMessages.amountLabel)}
-            </Typography>
-          </Box>
-          <div className={styles.addressList}>
-            {data.withdrawals.map((address, addressIndex) => {
-              const addressRowId = `${txIdFullInfoBasePart}:withdrawalAddresses:address_${addressIndex}`;
-              return this.renderRow({
-                kind: 'withdrawal',
-                data,
-                address,
-                addressIndex,
-                transform: amount => amount.abs().negated(),
-                addressRowId,
-              });
-            })}
-          </div>
-        </div>
-        <div />
+      <Box
+        sx={{
+          px: '24px',
+          py: '16px',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'grid',
+            gap: '15px',
+            gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="caption1">
+            {intl.formatMessage(globalMessages.withdrawalsLabel)}:{' '}
+            <span style={{ fontWeight: 500 }}>{data.withdrawals.length}</span>
+          </Typography>
+          <Typography variant="caption1" textAlign="center">
+            {intl.formatMessage(messages.addressType)}
+          </Typography>
+          <Typography variant="caption1" textAlign="center">
+            {intl.formatMessage(globalMessages.amountLabel)}
+          </Typography>
+        </Box>
+        <Box
+          sx={{
+            color: 'grayscale.600',
+            borderColor: 'ds.gray_200',
+            pt: '16px',
+          }}
+        >
+          {data.withdrawals.map((address, addressIndex) => {
+            const addressRowId = `${txIdFullInfoBasePart}:withdrawalAddresses:address_${addressIndex}`;
+            return this.renderRow({
+              kind: 'withdrawal',
+              data,
+              address,
+              addressIndex,
+              transform: amount => amount.abs().negated(),
+              addressRowId,
+            });
+          })}
+        </Box>
       </Box>
     );
   };
@@ -975,7 +975,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const { intl } = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
-      <Box display="flex" flexDirection="column" gap="8px" px="24px" mt="24px">
+      <Box display="flex" flexDirection="column" gap="8px" mb="16px">
         <Typography variant="caption1" fontWeight={500}>
           {manyCerts ? intl.formatMessage(messages.certificatesLabel) : intl.formatMessage(messages.certificateLabel)}
         </Typography>
@@ -1037,11 +1037,14 @@ export default class TransactionRevamp extends Component<Props, State> {
         metadata = <CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />;
       }
       return (
-        <div className={styles.row}>
-          <h2>{intl.formatMessage(messages.transactionMetadata)}</h2>
-
-          <Typography className={styles.rowData}>{metadata}</Typography>
-        </div>
+        <Box display="flex" gap="8px" flexDirection="column">
+          <Typography variant="caption1" fontWeight={500}>
+            {intl.formatMessage(messages.transactionMetadata)}
+          </Typography>
+          <Typography variant="caption1" color="grayscale.600">
+            {metadata}
+          </Typography>
+        </Box>
       );
     }
     return null;
