@@ -177,7 +177,6 @@ export default class WalletListDialog extends Component<Props, State> {
     } = this.props;
 
     const walletsTotal = this.renderWalletsTotal();
-    console.log('cardanoWalletsIdx', cardanoWalletsIdx);
     return (
       <Dialog
         className={styles.component}
