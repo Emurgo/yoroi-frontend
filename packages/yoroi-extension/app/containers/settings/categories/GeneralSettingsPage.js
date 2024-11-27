@@ -51,24 +51,6 @@ const currencyLabels = defineMessages({
   },
 });
 
-const getGeneratedWalletIds = (sortedWalletListIdx, currentWalletIdx) => {
-  let generatedWalletIds;
-  if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
-    const newWalletIds = currentWalletIdx.filter(id => {
-      const index = sortedWalletListIdx.indexOf(id);
-      if (index === -1) {
-        return true;
-      }
-      return false;
-    });
-    generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
-  } else {
-    generatedWalletIds = currentWalletIdx;
-  }
-
-  return generatedWalletIds;
-};
-
 @observer
 export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
