@@ -47,7 +47,7 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onItemClick, isActiveItem, isRevampLayout } = this.props;
+    const { onItemClick, isActiveItem } = this.props;
     const isProduction = environmnent.isProduction();
     const settingOptions: Array<SubMenuOption> = [
       {
@@ -72,9 +72,7 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         hidden: isProduction,
       },
       {
-        label: intl.formatMessage(
-          isRevampLayout ? globalMessages.termsOfService : globalMessages.termsOfUse
-        ),
+        label: intl.formatMessage(globalMessages.termsOfService),
         route: ROUTES.SETTINGS.TERMS_OF_USE,
         className: 'termsOfUse',
       },
@@ -92,18 +90,10 @@ class SettingsMenu extends Component<Props & InjectedLayoutProps> {
         label: intl.formatMessage(settingsMenuMessages.analytics),
         route: ROUTES.SETTINGS.ANALYTICS,
         className: 'analytics',
-        hidden: !isRevampLayout,
       },
     ];
 
-    return (
-      <SubMenu
-        options={settingOptions}
-        onItemClick={onItemClick}
-        isActiveItem={isActiveItem}
-        locationId='settings'
-      />
-    );
+    return <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} locationId="settings" />;
   }
 }
 

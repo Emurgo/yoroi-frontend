@@ -121,7 +121,7 @@ const SImageButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const STypography = styled(Typography)(({ theme }) => ({
-  color: theme.palette.ds.el_gray_medium
+  color: theme.palette.ds.el_gray_medium,
 }));
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
@@ -172,7 +172,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
       <SButton LinkComponent={Link} to={ROUTES.NFTS.ROOT} startIcon={<BackArrow />}>
-        <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
+        <Typography fontWeight="500" fontSize="14px">
+          {intl.formatMessage(messages.back)}
+        </Typography>
       </SButton>
       <Grid
         container

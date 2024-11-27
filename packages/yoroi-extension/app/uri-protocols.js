@@ -12,7 +12,7 @@ const cardanoURI = {
 };
 
 const registerProtocols = () => {
-  if (!environment.userAgentInfo.canRegisterProtocol()) {
+  if (!environment.canRegisterProtocol()) {
     Logger.error(`uri-protocols:registerProtocols cannot use registerProtocolHandler on this page`);
     return;
   }

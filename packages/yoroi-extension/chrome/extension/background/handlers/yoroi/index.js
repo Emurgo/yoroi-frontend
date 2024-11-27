@@ -43,6 +43,7 @@ import {
 } from './connector';
 import { GetProtocolParameters } from './protocolParameters';
 import { subscribe } from '../../subscriptionManager';
+import { sanitizeForLog } from '../../../../../app/coreUtils';
 
 const handlerMap = Object.freeze({
   [GetHistoricalCoinPrices.typeTag]: GetHistoricalCoinPrices.handle,
@@ -107,6 +108,7 @@ export function getHandler(typeTag: string): ?Handler {
     return async (request, send, sendResponse) => {
       try {
         const result = await handler(request.request);
+        console.debug(`BACKGROUND [${typeTag}] sending result: `, JSON.stringify(sanitizeForLog(result)));
         sendResponse(result);
       } catch (error) {
         sendResponse({ error: error.message });

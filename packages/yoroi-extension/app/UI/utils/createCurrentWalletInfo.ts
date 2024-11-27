@@ -141,7 +141,7 @@ const groupTransactionsByDay = transactions => {
 };
 
 export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undefined => {
-  const { wallets, delegation, tokenInfoStore } = stores;
+  const { wallets, delegation, tokenInfoStore, explorers } = stores;
 
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
@@ -173,10 +173,13 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const isHardware: boolean = selectedWallet.isHardware;
 
-    // Asset List
+    // FT Asset List
     const ftAssetList = getAssetWalletAssetList(stores);
 
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
+
+    const selectedExplorer = explorers.selectedExplorer.get(networkId);
+    const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -197,6 +200,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
       ftAssetList: ftAssetList,
+      explorer: { tokenInfo: explorerTransactionInfo },
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);

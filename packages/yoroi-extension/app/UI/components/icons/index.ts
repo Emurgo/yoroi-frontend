@@ -1,17 +1,18 @@
+import { Cancel } from './Cancel';
+import { ChevronDown } from './ChevronDown';
+import { ChevronUp } from './ChevronUp';
+import { ChipArrowDown } from './ChipArrowDown';
+import { ChipArrowUp } from './ChipArrowUp';
 import { CloseIcon } from './CloseIcon';
+import { Copied } from './Copied';
+import { Copy } from './Copy';
+import { Expand } from './Expand';
+import { Search } from './Search';
+import { Send } from './Send';
+import { Staking } from './Staking';
+import { Switch } from './Switch';
 import { VisibilityOff } from './VisibilityOff';
 import { VisibilityOn } from './VisibilityOn';
-import { Copy } from './Copy';
-import { Copied } from './Copied';
-import { ChipArrowUp } from './ChipArrowUp';
-import { ChipArrowDown } from './ChipArrowDown';
-import { Send } from './Send';
-import { Cancel } from './Cancel';
-import { Staking } from './Staking';
-import { Expand } from './Expand';
-import { ChevronUp } from './ChevronUp';
-import { ChevronDown } from './ChevronDown';
-import { Search } from './Search';
 
 export const Icon = {
   CloseIcon,
@@ -28,4 +29,5 @@ export const Icon = {
   ChevronDown,
   ChevronUp,
   Search,
+  Switch,
 };
