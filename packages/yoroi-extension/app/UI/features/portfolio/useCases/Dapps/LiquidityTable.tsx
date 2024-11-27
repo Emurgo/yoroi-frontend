@@ -1,18 +1,17 @@
-import React from 'react';
-import { useMemo, useState } from 'react';
-import { TableCell, TableRow, Typography, Stack, Box } from '@mui/material';
+import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import React, { useMemo, useState } from 'react';
 import adaPng from '../../../../../assets/images/ada.png';
+import { Skeleton } from '../../../../components';
 import hoskyPng from '../../common/assets/images/hosky-token.png';
 import minswapPng from '../../common/assets/images/minswap-dex.png';
-import { Skeleton } from '../../../../components';
+import Table from '../../common/components/Table';
+import { formatNumber } from '../../common/helpers/formatHelper';
 import { useStrings } from '../../common/hooks/useStrings';
 import useTableSort, { ISortState } from '../../common/hooks/useTableSort';
-import Table from '../../common/components/Table';
-import { IHeadCell } from '../../common/types/table';
 import { LiquidityItemType } from '../../common/types/index';
-import { formatNumber } from '../../common/helpers/formatHelper';
+import { IHeadCell } from '../../common/types/table';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const TableRowSkeleton = ({ theme, ...props }) => (
   <TableRow
@@ -73,7 +72,7 @@ interface Props {
 const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const { unitOfAccount } = usePortfolio();
+  const { unitOfAccount, primaryTokenInfo } = usePortfolio();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
     order: null,
     orderBy: null,
@@ -183,7 +182,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
               <Typography color="ds.gray_900">
                 {formatNumber(row.firstTokenValue)} {row.firstToken.name}
               </Typography>
-              {row.firstToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+              {row.firstToken.name === primaryTokenInfo.name && unitOfAccount === primaryTokenInfo.name ? null : (
                 <Typography variant="body2" sx={{ color: theme.palette.ds.gray_600 }}>
                   {formatNumber(row.firstTokenValueUsd)} {unitOfAccount}
                 </Typography>
@@ -196,7 +195,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
               <Typography color="ds.gray_900">
                 {formatNumber(row.secondTokenValue)} {row.secondToken.name}
               </Typography>
-              {row.secondToken.name === 'ADA' && unitOfAccount === 'ADA' ? null : (
+              {row.secondToken.name === primaryTokenInfo.name && unitOfAccount === primaryTokenInfo.name ? null : (
                 <Typography variant="body2" sx={{ color: theme.palette.ds.gray_600 }}>
                   {formatNumber(row.secondTokenValueUsd)} {unitOfAccount}
                 </Typography>
@@ -213,7 +212,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
               <Typography color="ds.gray_900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>
-              {unitOfAccount === 'ADA' && row.firstToken.name === 'ADA' ? null : (
+              {unitOfAccount === primaryTokenInfo.name && row.firstToken.name === primaryTokenInfo.name ? null : (
                 <Typography variant="body2" color="ds.gray_600" sx={{ textAlign: 'right' }}>
                   {formatNumber(row.totalValueUsd)} {unitOfAccount}
                 </Typography>

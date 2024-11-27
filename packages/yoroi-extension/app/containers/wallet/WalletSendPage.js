@@ -32,6 +32,9 @@ import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNF
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import FullscreenLayout from '../../components/layout/FullscreenLayout';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -95,8 +98,10 @@ class WalletSendPage extends Component<AllProps> {
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
-    loadProtocolParametersRequest.reset();
-    loadProtocolParametersRequest.execute();
+    if (!loadProtocolParametersRequest.wasExecuted && !loadProtocolParametersRequest.isExecuting) {
+      loadProtocolParametersRequest.reset();
+      loadProtocolParametersRequest.execute();
+    }
     ampli.sendInitiated();
   }
 
@@ -145,7 +150,13 @@ class WalletSendPage extends Component<AllProps> {
     } = this.props.stores;
 
     if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
-      return null;
+      return (
+        <FullscreenLayout bottomPadding={0}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </FullscreenLayout>
+      );
     }
 
     const { actions } = this.props;

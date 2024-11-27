@@ -6,29 +6,41 @@ import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import PnlTag from '../../common/components/PlnTag';
-import { DEFAULT_FIAT_PAIR } from '../../common/helpers/constants';
+import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   const theme = useTheme();
+
   return (
     <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
       <Box
+        display="inline-flex"
+        alignItems="center"
+        justifyContent="center"
         width="40px"
         height="40px"
-        sx={{
-          borderRadius: `${theme.shape.borderRadius}px`,
-        }}
-        component="img"
-        src={token.info.image || tokenPng}
-      ></Box>
+        overflow="hidden"
+        flexShrink="0"
+        borderRadius="8px"
+      >
+        <img
+          width="100%"
+          src={token.info.image ?? tokenPng}
+          alt={token.info.name}
+          onError={e => {
+            // @ts-ignore
+            e.target.src = tokenPng;
+          }}
+        />
+      </Box>
       <Stack direction="column">
         <Typography fontWeight="500" color="ds.text_gray_normal">
           {token.info.name}
         </Typography>
-        <Typography variant="body2" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {token.info.name}
         </Typography>
       </Stack>
@@ -51,6 +63,11 @@ export const TokenPriceChangeChip = ({
 }: TokenPriceChangeChipProps) => {
   const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
 
+  const deltaPtTokenDataInterval =
+    timeInterval === TOKEN_CHART_INTERVAL.WEEK
+      ? ptTokenDataInterval?.[167]?.changePercent
+      : ptTokenDataInterval?.[179]?.changePercent;
+
   if (secondaryTokenActivity === null || primaryTokenActivity === null || isFetching) {
     return <Skeleton variant="text" width="60px" height="30px" />;
   }
@@ -65,15 +82,42 @@ export const TokenPriceChangeChip = ({
 
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <PnlTag variant={variantPnl} withIcon>
-        <Typography fontSize="13px">
-          {formatPriceChange(
-            isPrimaryToken && timeInterval !== undefined ? ptTokenDataInterval?.[50]?.changePercent ?? 0 : changePercent ?? 0
-          )}
+  const noDataToDisplay = Number.isNaN(changePercent);
+
+  const deltaVariantPnl =
+    isPrimaryToken && timeInterval !== undefined && deltaPtTokenDataInterval
+      ? deltaPtTokenDataInterval < 0
+        ? 'danger'
+        : deltaPtTokenDataInterval > 0
+        ? 'success'
+        : 'neutral'
+      : variantPnl;
+
+  if (noDataToDisplay || changePercent === undefined) {
+    return (
+      <Stack
+        direction="row"
+        sx={{ backgroundColor: 'ds.gray_100', width: '42px', borderRadius: '20px' }}
+        justifyContent="center"
+        gap="4px"
+      >
+        <Typography variant="caption" color="ds.text_gray_low">
+          -
+        </Typography>
+        <Typography variant="caption" color="ds.text_gray_low">
           %
         </Typography>
+      </Stack>
+    );
+  }
+
+  const priceChangeProcent = formatPriceChange(
+    isPrimaryToken && timeInterval !== undefined ? deltaPtTokenDataInterval ?? 0 : changePercent ?? 0
+  );
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <PnlTag variant={deltaVariantPnl} withIcon>
+        <Typography fontSize="13px">{Math.abs(Number(priceChangeProcent))}</Typography>
       </PnlTag>
     </Box>
   );
@@ -121,7 +165,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
   const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
 
-  const showingAda = accountPair?.from.name === 'ADA';
+  const showingAda = accountPair?.from.name === primaryTokenInfo.name;
   const currency = accountPair?.from.name;
   const decimals = isPrimary ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
 
@@ -134,32 +178,20 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
       .times(showingAda ? 1 : new BigNumber(ptPrice))
       .toFormat(decimals);
 
-  // if (token.info.name === 'SHIBA') {
-  //   console.log('Token CALC DETAILS', {
-  //     ptPrice,
-  //     tokenQuantityAsBigInt,
-  //     tokenPrice,
-  //     name: token.info.name,
-  //     decimals,
-  //     confff: config.decimals,
-  //     showingAda,
-  //   });
-
-  //   console.log('totaPrice', totaPrice);
-  // }
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
   const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || DEFAULT_FIAT_PAIR}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography color="ds.text_gray_normal">
-          {isPrimary ? walletBalance?.ada : token.formatedAmount} {token.info.name}
+        <Typography color="ds.text_gray_normal" sx={{ display: 'flex' }}>
+          <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+          <Typography>{token.info.name}</Typography>
         </Typography>
         {token.name === accountPair?.to.name ? (
-          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
-          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
             {totalTokenPrice}
           </Typography>
         )}
@@ -174,10 +206,13 @@ export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
   const ptPrice = ptActivity?.close;
   const ptUnitPrice = tokenPrice * ptPrice;
+  const priceDisplay = parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4);
+
+  const noDataToDisplay = priceDisplay === 'NaN';
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium">
-      {parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4)} {unitOfAccount}
+      {noDataToDisplay ? '-' : `${priceDisplay} ${unitOfAccount}`}
     </Typography>
   );
 };

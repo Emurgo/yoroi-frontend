@@ -101,7 +101,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                 <LineChart
                   margin={{ top: 10, left: -16, right: 0, bottom: 0 }}
                   data={chartData}
-                  onMouseDown={handleMouseDown}
+                  onMouseOver={handleMouseDown}
                   onMouseUp={handleMouseUp}
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseUp}
