@@ -51,6 +51,7 @@ export const networks = Object.freeze({
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
+    isInProduction: true,
   }: NetworkRow),
   CardanoPreprodTestnet: ({
     NetworkId: 2_50,
@@ -178,6 +179,14 @@ export const networks = Object.freeze({
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
 });
+
+export function listRelevantNetworkNamesForEnvironment(): Array<string> {
+  const keys = Object.keys(networks);
+  if (environment.isProduction() && !environment.isNightly()) {
+    return keys.filter(k => networks[k].isInProduction);
+  }
+  return keys;
+}
 
 export function isTestnet(
   network: $ReadOnly<NetworkRow>,

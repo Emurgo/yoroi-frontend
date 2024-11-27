@@ -43,9 +43,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   addNewWallet: void => Promise<void> = async () => {
-    await localStorage.unsetPortfolioFiatPair();
     this.props.actions.dialogs.closeActiveDialog.trigger();
     this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    await localStorage.unsetPortfolioFiatPair();
   };
 
   onSelectWallet: number => Promise<void> = async newWalletId => {
