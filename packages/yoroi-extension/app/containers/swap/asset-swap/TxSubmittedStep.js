@@ -8,9 +8,10 @@ type Props = {|
   txSubmitErrorState: State<?Error>,
   onTryAgain: void => void,
   onSuccess: void => void,
+  onDownloadLogs: void => void,
 |};
 
-export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess }: Props): React$Node {
+export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess, onDownloadLogs }: Props): React$Node {
   const isSuccessful = txSubmitErrorState.value == null;
   return (
     <Box display="flex" flexDirection="column" gap="16px" alignItems="center" width="404px" mx="auto" mt="131px">
@@ -32,7 +33,7 @@ export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSucc
       </Box>
       {!isSuccessful && (
         <Box>
-          <Button variant="tertiary" color="primary">
+          <Button variant="tertiary" color="primary" onClick={onDownloadLogs}>
             Download log file
           </Button>
         </Box>
