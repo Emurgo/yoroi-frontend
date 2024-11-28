@@ -1,15 +1,16 @@
 // @flow
+import type { Node } from 'react';
+import type { PriceImpact } from './types';
 import { Box, Button, Typography, useTheme, styled } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
-import type { Node } from 'react';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import { ReactComponent as ExclamationCircleIcon } from '../../assets/images/revamp/exclamation.circle.svg';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
 import { Quantities } from '../../utils/quantities';
+import { PRICE_PRECISION } from './common';
 import Percent from '../common/Percent';
 import Dialog from '../widgets/Dialog';
-import { PRICE_PRECISION } from './common';
-import type { PriceImpact } from './types';
+import { FormattedHTMLMessage } from 'react-intl';
 
 function colorsBySeverity(isSevere: boolean) {
   const theme = useTheme();
@@ -75,17 +76,11 @@ function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   const { palette } = useTheme();
   return isSevere ? (
     <Typography variant="body1" sx={{ color: palette.ds.text_gray_medium }}>
-      <Typography component="span" fontWeight="500" color="ds.text_gray_medium">
-        Price impact over 10%&nbsp;
-      </Typography>
-      may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.
+      {strings.priceImpactSevere}
     </Typography>
   ) : (
     <Typography component="div" variant="body1" color={palette.ds.text_gray_medium}>
-      <Typography component="span" fontWeight="500">
-        Price impact over 1%&nbsp;
-      </Typography>
-      may cause a difference in the amount you actually receive. Consider this at your own risk.
+      {strings.priceImpactNotSevere}
     </Typography>
   );
 }
@@ -105,7 +100,7 @@ export function PriceImpactTitle({ isSevere, small, sx }: {| isSevere: boolean, 
               fontWeight: '500',
             })}
       >
-        Price impact
+        {strings.priceImpact}
       </Typography>
     </Box>
   );
@@ -179,7 +174,7 @@ export function PriceImpactAlert({ onContinue, onCancel }: {| onContinue: () => 
       </Box>
       <Box maxWidth="648px" display="flex" gap="24px" pt="23px">
         <Button fullWidth variant="secondary" onClick={onCancel}>
-          Cancel
+          {strings.cancel}
         </Button>
         <Button
           fullWidth
@@ -190,7 +185,7 @@ export function PriceImpactAlert({ onContinue, onCancel }: {| onContinue: () => 
             '&:hover': { backgroundColor: 'magenta.600' },
           }}
         >
-          Continue
+          {strings.continue}
         </Button>
       </Box>
     </Dialog>
