@@ -129,6 +129,10 @@
   }
 
   .inputSelected {
-    border-color: #dce0e9;
+    border-color: #a7afc0;
+  }
+
+  .inputError {
+    border-color: #ff1351 !important;
   }
 }

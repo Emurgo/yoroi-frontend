@@ -85,7 +85,7 @@ const SORTING_COLUMNS = {
 export const messages: Object = defineMessages({
   nTokens: {
     id: 'wallet.send.form.dialog.nToken',
-    defaultMessage: '!!!Token ({number})',
+    defaultMessage: '!!!Tokens ({number})',
   },
   title: {
     id: 'wallet.send.form.dialog.title',
@@ -148,7 +148,9 @@ export default class AddTokenDialog extends Component<Props, State> {
   onSelect: ($ReadOnly<TokenRow>) => void = token => {
     // Remove if it already in the list
     const selectedTokens = this.state.selectedTokens.filter(({ token: t }) => t.Identifier !== token.Identifier);
-    this.setState({ selectedTokens: [...selectedTokens, { token, included: true, amount: this.getCurrentAmount(token) || null }] });
+    this.setState({
+      selectedTokens: [...selectedTokens, { token, included: true, amount: this.getCurrentAmount(token) || null }],
+    });
   };
 
   onRemoveToken: ($ReadOnly<TokenRow>) => void = token => {
@@ -317,7 +319,7 @@ export default class AddTokenDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.title)}
+        title={intl.formatMessage(messages.nTokens, { number: fullTokensList.length })}
         actions={[
           {
             disabled:

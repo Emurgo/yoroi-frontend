@@ -779,7 +779,7 @@
   "wallet.send.form.dialog.maxNumberAllowed": "<strong>{number} Assets</strong> is maximum number allowed to be send in one transaction",
   "wallet.send.form.dialog.minAda": "Min-ADA: {minAda}",
   "wallet.send.form.dialog.nNft": "NFT ({number})",
-  "wallet.send.form.dialog.nToken": "Token ({number})",
+  "wallet.send.form.dialog.nToken": "Tokens ({number})",
   "wallet.send.form.dialog.title": "Tokens",
   "wallet.send.form.dialog.noNFTsFound": "No NFTs found",
   "wallet.send.form.dialog.noNFTsYet": "There are no NFTs in your wallet yet",

@@ -47,7 +47,7 @@ type State = {|
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough balance',
+    defaultMessage: '!!!Not enough balance.',
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
@@ -96,6 +96,7 @@ export default class SingleTokenRow extends Component<Props, State> {
             [styles.amountError]: !isValid && this.props.isTokenIncluded(token.info),
             [styles.inputFocused]: this.state.isInputFocused && this.props.isTokenIncluded(token.info),
             [styles.inputSelected]: this.props.isTokenIncluded(token.info),
+            [styles.inputError]: !isValid,
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
           border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
