@@ -111,7 +111,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   mr: '8px',
                   borderWidth: isPrevStep ? '0px' : '2px',
                   borderStyle: 'solid',
-                  borderColor: isCurrentStep ? 'ds.text_primary_medium' : 'unset',
+                  borderColor: isCurrentStep ? 'ds.el_primary_medium' : 'ds.el_gray_min',
                   borderRadius: '50%',
                   transition: 'color 300ms ease',
                   bgcolor: isCurrentStep ? 'ds.text_primary_medium' : 'unset',
