@@ -30,6 +30,10 @@ import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackage
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
+import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
+import { useSwapFeeDisplay } from '../hooks';
+import { downloadLogs } from '../../../utils/logging';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -88,6 +92,8 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const priceImpactState: PriceImpact | null =
     impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
+  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
+
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
@@ -123,6 +129,14 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const disclaimerFlag = props.stores.substores.ada.swapStore.swapDisclaimerAcceptanceFlag;
 
   useEffect(() => {
+    // MOUNT
+
+    ampli.swapInitiated({
+      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+      slippage_tolerance: defaultSlippage,
+      order_type: orderType,
+    });
+
     disclaimerFlag
       .get()
       .then(setDisclaimerStatus)
@@ -174,6 +188,9 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       slippage.save(newSlippage);
       slippageChanged(newSlippage);
       setSlippageValue(String(newSlippage));
+      ampli.swapSlippageChanged({
+        slippage_tolerance: newSlippage,
+      });
     });
   };
 
@@ -259,6 +276,19 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       // $FlowIgnore[incompatible-call]
       await props.stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
+      try {
+        ampli.swapOrderSubmitted({
+          ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+          from_amount: sellQuantity.displayValue,
+          to_amount: buyQuantity.displayValue,
+          pool_source: selectedPoolCalculation?.pool.provider,
+          order_type: orderType,
+          slippage_tolerance: Number(slippageValue),
+          swap_fees: Number(formattedFeeQuantity),
+        });
+      } catch (e) {
+        console.error('analytics fail', e);
+      }
       resetSwapForm();
     } catch (e) {
       handleTransactionError(e);
@@ -369,6 +399,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               onSuccess={() => {
                 props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
               }}
+              onDownloadLogs={downloadLogs}
             />
           )}
         </Box>

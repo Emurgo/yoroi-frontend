@@ -84,12 +84,12 @@ export const lightThemeBase: any = {
     gradients: {
       bg_gradient_1: 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
       bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
-      bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
+      bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 100%)',
       // legacy ones
       'blue-green-bg': 'linear-gradient(180deg, #E4E8F7 0%, #C6F7F7 100%)',
       'blue-green-banner': 'linear-gradient(269.97deg, #E4E8F7 0%, #C6F7ED 100%)',
       green: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
-      blue: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)',
+      blue: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 100%)',
     },
     background: {
       bg_color_max: light.gray_min,

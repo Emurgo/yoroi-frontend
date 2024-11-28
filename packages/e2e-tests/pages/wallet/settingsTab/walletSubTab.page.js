@@ -1,6 +1,6 @@
 import { Key } from 'selenium-webdriver';
 import SettingsTab from './settingsTab.page.js';
-import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
+import { fiveSeconds, halfSecond, quarterSecond } from '../../../helpers/timeConstants.js';
 
 class WalletSubTab extends SettingsTab {
   // locator
@@ -151,15 +151,60 @@ class WalletSubTab extends SettingsTab {
       }
     }
   }
+  async passwordErrDisplayedAndNotEmpty() {
+    this.logger.info(`WalletSubTab::passwordErrDisplayedAndNotEmpty is called.`);
+    return await this.customWaiter(
+      async () => {
+        const elems = await this.findElements(this.changePasswordErrorMessageLocator);
+        if (elems.length !== 0) {
+          const errMsg = await this.getText(this.changePasswordErrorMessageLocator);
+          return errMsg !== '';
+        }
+        return false;
+      },
+      fiveSeconds,
+      halfSecond,
+    );
+  }
   async getPasswordErrorMsg() {
     this.logger.info(`WalletSubTab::getPasswordErrorMsg is called.`);
     await this.waitElementTextMatches(this.changePasswordErrorMessageLocator, /\w+/g);
     return await this.getText(this.changePasswordErrorMessageLocator);
   }
+  async newPasswordErrDisplayedAndNotEmpty() {
+    this.logger.info(`WalletSubTab::newPasswordErrDisplayedAndNotEmpty is called.`);
+    return await this.customWaiter(
+      async () => {
+        const elems = await this.findElements(this.changePasswordNewPaswordHelpMsgTextLocator);
+        if (elems.length !== 0) {
+          const errMsg = await this.getText(this.changePasswordNewPaswordHelpMsgTextLocator);
+          return errMsg !== '';
+        }
+        return false;
+      },
+      fiveSeconds,
+      halfSecond,
+    );
+  }
   async getNewPasswordErrorMsg() {
     this.logger.info(`WalletSubTab::getNewPasswordErrorMsg is called.`);
     await this.waitElementTextMatches(this.changePasswordNewPaswordHelpMsgTextLocator, /\w+/g);
     return await this.getText(this.changePasswordNewPaswordHelpMsgTextLocator);
+  }
+  async repeatNewPasswordErrDisplayedAndNotEmpty() {
+    this.logger.info(`WalletSubTab::repeatNewPasswordErrDisplayedAndNotEmpty is called.`);
+    return await this.customWaiter(
+      async () => {
+        const elems = await this.findElements(this.changePasswordRepeatNewPaswordHelpMsgLocator);
+        if (elems.length !== 0) {
+          const errMsg = await this.getText(this.changePasswordRepeatNewPaswordHelpMsgLocator);
+          return errMsg !== '';
+        }
+        return false;
+      },
+      fiveSeconds,
+      halfSecond,
+    );
   }
   async getRepeatNewPasswordErrorMsg() {
     this.logger.info(`WalletSubTab::getRepeatNewPasswordErrorMsg is called.`);

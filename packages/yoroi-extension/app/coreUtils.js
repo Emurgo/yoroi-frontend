@@ -219,6 +219,26 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
 }
 
 /**
+ * In case the value is an object, this creates a copy and hides some potentially sensitive fields from it.
+ *
+ * @param v - any value
+ * @return same value or a copy in case the value is an object
+ */
+export function sanitizeForLog(v: any): any {
+  const fields: Array<any> = ['password'];
+  if (v != null && typeof v === 'object') {
+    let r = Object.keys(v).reduce((o, k) => ({ ...o, [k]: sanitizeForLog(v[k]) }) , {})
+    for (const f of fields) {
+      if (r[f] != null) {
+        r = { ...r, [f]: '[sanitized]' };
+      }
+    }
+    return r;
+  }
+  return v;
+}
+
+/**
  * Makes sure the result is an array.
  * Either returns the passed array or wraps the item into an array.
  * Might be useful with flat-mapping.

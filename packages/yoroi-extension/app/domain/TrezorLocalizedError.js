@@ -20,6 +20,10 @@ const messages = defineMessages({
     defaultMessage:
       '!!!Could not sign the transaction. Please ensure the passphrase you entered is the passhprase used to create this wallet.',
   },
+  conwayNotSupportedByFirmwareError: {
+    id: 'wallet.send.trezor.error.conway.firmware',
+    defaultMessage: '!!!Conway features not supported by your Trezor firmware version. Please upgrade to 2.8.1 or above.',
+  },
 });
 
 /** Converts error(from API or Trezor API) to LocalizableError */
@@ -35,6 +39,8 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       localizableError = new LocalizableError(messages.noWitnessError);
     } else if (/Cancelled/.test(error.message)) {
       localizableError = new LocalizableError(messages.signTxError101);
+    } else if (/Feature Conway not supported by device firmware/.test(error.message)) {
+      localizableError = new LocalizableError(messages.conwayNotSupportedByFirmwareError);
     } else {
       // Trezor device related error happend, convert then to LocalizableError
       switch (error.message) {

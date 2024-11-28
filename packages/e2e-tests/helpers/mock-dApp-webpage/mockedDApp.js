@@ -6,7 +6,8 @@ import {
   getCSLPubKeyHash,
   getCslValue,
   getDRepIDHexAndBechFromHex,
-  mapCborUtxos, bytesToHex,
+  mapCborUtxos,
+  bytesToHex,
 } from './dAppTxHelper.js';
 
 class MockDAppWebpageError extends Error {}
@@ -22,13 +23,9 @@ export class MockDAppWebpage {
     this.logger = logger;
   }
 
-  async _requestAccess(auth = false) {
-    this.logger.info(
-      `MockDApp::_requestAccess Requesting the access ${auth ? 'with' : 'without'} authentication`
-    );
-    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable(${
-      auth ? '{requestIdentification: true}' : ''
-    })`;
+  async requestAccess() {
+    this.logger.info(`MockDApp::requestAccess Requesting the access without authentication`);
+    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable()`;
     await this.driver.executeScript(scriptString);
   }
 
@@ -163,14 +160,6 @@ export class MockDAppWebpage {
     }
     this.logger.info(`MockDApp::getAddresses Result: ${JSON.stringify(addressesResult, null, 2)}`);
     return addressesResult;
-  }
-
-  async requestNonAuthAccess() {
-    await this._requestAccess();
-  }
-
-  async requestAuthAccess() {
-    await this._requestAccess(true);
   }
 
   async checkAccessRequest() {
@@ -639,7 +628,7 @@ export class MockDAppWebpage {
   }
 
   async getSigningDataCIP95Result() {
-    this.logger.info(`MockDApp::getSigningDataResult Getting signing data result`);
+    this.logger.info(`MockDApp::getSigningDataCIP95Result Getting signing data result`);
     const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signDataCIP95Promise
@@ -656,7 +645,7 @@ export class MockDAppWebpage {
         });
     });
     this.logger.info(
-      `MockDApp::getSigningDataResult Signing data result: ${JSON.stringify(signingResult, null, 2)}`
+      `MockDApp::getSigningDataCIP95Result Signing data result: ${JSON.stringify(signingResult, null, 2)}`
     );
     return signingResult;
   }

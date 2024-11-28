@@ -10,6 +10,7 @@ export function useSwapFeeDisplay(
   defaultTokenInfo: RemoteTokenInfo
 ): {|
   formattedFee: string,
+  formattedFeeQuantity: string,
   ptAmount: string,
   formattedPtAmount: string,
   nonPtAmount: ?string,
@@ -23,6 +24,7 @@ export function useSwapFeeDisplay(
   if (cost == null) {
     return {
       formattedFee: '',
+      formattedFeeQuantity: '',
       ptAmount: '',
       formattedPtAmount: '',
       nonPtAmount: null,
@@ -43,7 +45,8 @@ export function useSwapFeeDisplay(
     cost.frontendFeeInfo.fee.quantity,
   ]);
 
-  const formattedFee = Quantities.format(totalFeesPtToken, ptDecimals, ptDecimals) + ` ${ptTicker}`;
+  const formattedFeeQuantity = Quantities.format(totalFeesPtToken, ptDecimals, ptDecimals);
+  const formattedFee = formattedFeeQuantity + ` ${ptTicker}`;
 
   if (sellTokenIsPtToken) {
     // put together the sell and the fees
@@ -54,6 +57,7 @@ export function useSwapFeeDisplay(
       ptAmount,
       formattedPtAmount,
       formattedFee,
+      formattedFeeQuantity,
       nonPtAmount: null,
       formattedNonPtAmount: null,
     };
@@ -67,5 +71,6 @@ export function useSwapFeeDisplay(
     nonPtAmount: sellAmount,
     formattedNonPtAmount: formattedSell,
     formattedFee,
+    formattedFeeQuantity,
   };
 }

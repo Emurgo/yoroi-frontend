@@ -4,7 +4,7 @@ import {
   delay, ensureArray,
   hexToBytes, hexToUtf,
   iterateLenGet,
-  iterateLenGetMap,
+  iterateLenGetMap, sanitizeForLog,
   timeCached, utfToBytes,
   zipGenerators
 } from './coreUtils';
@@ -32,6 +32,18 @@ describe('utils', () => {
     expect(ensureArray([[{}]])).toEqual([[{}]]);
     expect(ensureArray(undefined)).toEqual([undefined]);
     expect(ensureArray([undefined])).toEqual([undefined]);
+  });
+
+  test('sanitizeForLog', () => {
+    expect(sanitizeForLog(null)).toEqual(null);
+    expect(sanitizeForLog('qwe')).toEqual('qwe');
+    expect(sanitizeForLog(42)).toEqual(42);
+    expect(sanitizeForLog(true)).toEqual(true);
+    expect(sanitizeForLog({})).toEqual({});
+    expect(sanitizeForLog({ a: 12, b: 22 })).toEqual({ a: 12, b: 22 });
+    expect(sanitizeForLog({ a: 12, b: 22, password: 'qwe' })).toEqual({ a: 12, b: 22, password: '[sanitized]' });
+    expect(sanitizeForLog({ a: 12, b: 22, c: { password: 'qwe' } })).toEqual({ a: 12, b: 22, c: { password: '[sanitized]' } });
+    expect(sanitizeForLog({ a: 12, b: 22, c: { x: false, y: 5.5, z: { password: 'qwe' } } })).toEqual({ a: 12, b: 22, c: { x: false, y: 5.5, z: { password: '[sanitized]' } } });
   });
 
 });

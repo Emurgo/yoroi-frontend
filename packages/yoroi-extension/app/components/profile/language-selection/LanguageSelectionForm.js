@@ -29,6 +29,7 @@ type Props = {|
   +error?: ?LocalizableError,
   +localizedTermsOfUse: string,
   +localizedPrivacyNotice: string,
+  +externalPrivacyPolicyURL: ?string,
 |};
 
 type State = {|
@@ -82,7 +83,13 @@ class LanguageSelectionForm extends Component<Props & InjectedLayoutProps, State
     if (target.id === 'tosLink') {
       this.setState({ showing: 'tos' });
     } else if (target.id === 'privacyLink') {
-      this.setState({ showing: 'privacy' });
+      const externalURL = this.props.externalPrivacyPolicyURL;
+      if (externalURL != null) {
+        window.open(externalURL, '_blank');
+        event.preventDefault();
+      } else {
+        this.setState({ showing: 'privacy' });
+      }
     }
   };
 

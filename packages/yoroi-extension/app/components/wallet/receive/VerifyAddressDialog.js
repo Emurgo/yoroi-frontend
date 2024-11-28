@@ -60,6 +60,7 @@ type Props = {|
   +addressInfo: $ReadOnly<StandardAddress>,
   +classicTheme: boolean,
   +complexityLevel: ?ComplexityLevelType,
+  +isAddressBook: boolean,
 |};
 
 @observer
@@ -75,7 +76,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
   render(): Node {
     const { intl } = this.context;
 
-    const dialogActions = !this.props.isHardware
+    const dialogActions = !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
       ? []
       : [
           {
@@ -145,7 +146,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     return (
       <>
         <div align="center">
-          <QrCodeWrapper fgColor="black" value={this.props.addressInfo.address} size={152} />
+          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
         </div>
         <br />
         <br />

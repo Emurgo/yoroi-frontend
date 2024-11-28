@@ -22,6 +22,8 @@ import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
+import { ampli } from '../../../../ampli/index';
+import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 
 const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_3,
@@ -71,7 +73,7 @@ export default function ConfirmSwapTransaction({
     bestPoolCalculation: { pool: bestPool },
   } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
-  const { ptAmount, formattedPtAmount, formattedNonPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
+  const { ptAmount, formattedPtAmount, formattedNonPtAmount, formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
@@ -91,6 +93,18 @@ export default function ConfirmSwapTransaction({
     },
   });
   useEffect(() => {
+    // MOUNT
+
+    ampli.swapOrderSelected({
+      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+      from_amount: sellQuantity.displayValue,
+      to_amount: buyQuantity.displayValue,
+      order_type: orderData.type,
+      pool_source: pool?.provider,
+      slippage_tolerance: orderData.slippage,
+      swap_fees: Number(formattedFeeQuantity),
+    });
+
     if (walletAddress == null) {
       alert('Wallet address is not available');
       return;

@@ -206,7 +206,7 @@ class ProcolParameterApi {
 }
 
 export const GetProtocolParameters: HandlerType<
-  { networkId: number, ... },
+  {| networkId: number |},
   ProtocolParameters
 > = Object.freeze({
   typeTag: 'get-protocol-parameters',
