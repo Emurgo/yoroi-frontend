@@ -35,7 +35,7 @@ const messages: * = defineMessages({
   },
   restoreDesc: {
     id: 'wallet.restore.fourthStep.description',
-    defaultMessage: '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong>',
+    defaultMessage: '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
@@ -209,6 +209,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
             openDialog={openDialog}
             closeDialog={closeDialog}
             isDialogOpen={isDialogOpen}
+            borderRadius={4}
           />
 
           <StepController

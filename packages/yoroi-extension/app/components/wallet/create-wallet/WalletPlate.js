@@ -20,18 +20,28 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 type Props = {|
   recoveryPhrase: Array<string>,
   selectedNetwork: $ReadOnly<NetworkRow>,
+  borderRadius?: number,
   ...ManageDialogsProps,
 |};
 
 function WalletPlate(props: Props): Node {
-  const { recoveryPhrase, selectedNetwork, openDialog, closeDialog, isDialogOpen } = props;
+  const { recoveryPhrase, selectedNetwork, openDialog, closeDialog, isDialogOpen, borderRadius } = props;
   const plate = usePlate(recoveryPhrase, selectedNetwork);
+  const radius = borderRadius != null && typeof borderRadius === 'number' ? `${borderRadius}px` : '0px';
 
   const plateImagePart = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={6} scalePx={4} />;
 
   return (
     <Stack direction="row" gap="8px" alignItems="center" justifyContent="center" mt="-3px" mb="30px">
-      {plateImagePart}
+      <Box
+        sx={{
+          '& .identicon': {
+            borderRadius: `${radius}`,
+          },
+        }}
+      >
+        {plateImagePart}
+      </Box>
       <Typography component="div" variant="body1" id="walletPlateText" color="ds.text_gray_medium">
         {plate.TextPart}
       </Typography>
