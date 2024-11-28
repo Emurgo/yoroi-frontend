@@ -140,6 +140,8 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     const allWordsEntered = recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
     const mnemonicError = intl.formatMessage(messages.incorrectRecoveryPhrase);
+    const wordEntered = recoveryPhrase.some(word => Boolean(word.value));
+    const clearAllButtonColor = wordEntered ? 'ds.text_primary_medium' : 'ds.text_primary_min';
 
     if (isValidPhrase && !form.submitted) this.submit();
 
@@ -202,26 +204,27 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
               <Button
                 variant="outlined"
                 color="primary"
-                size="small"
                 onClick={form.onReset}
-                disabled={!recoveryPhrase.some(word => Boolean(word.value))}
+                disabled={!wordEntered}
                 sx={{
                   border: 0,
                   height: '32px',
                   fontSize: '14px',
                   lineHeight: '15px',
-                  padding: '0px',
-                  mb: '8px',
-                  ml: '-6px',
+                  '&.MuiButton-sizeMedium': {
+                    px: "20px",
+                    py: "9px",
+                  },
                   minWidth: 0,
                   minHeight: 0,
-                  color: 'ds.text_primary_medium',
                   '&:hover': { border: 0 },
                   '&.Mui-disabled': { border: 0 },
                 }}
                 id="clearAllButton"
               >
-                {intl.formatMessage(messages.clearAll)}
+                <Typography variant="button2" color={clearAllButtonColor}>
+                  {intl.formatMessage(messages.clearAll)}
+                </Typography>
               </Button>
             </Fade>
 
