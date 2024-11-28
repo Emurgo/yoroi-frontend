@@ -1813,22 +1813,22 @@ export default class AdaApi {
     const publicKey = await withPublicKey.getPublicKey();
     const accountPublicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicKey.Hash);
 
-    const withStakingKey = asGetStakingKey(publicDeriver);
-    if (!withStakingKey) {
-      throw new Error('unable to get staking key');
-    }
-    const stakingKey = await withStakingKey.getStakingKey();
-
     const conceptualWallet = publicDeriver.getParent();
     const walletName = (await conceptualWallet.getFullConceptualWalletInfo()).Name;
 
-    const hwMeta = conceptualWallet.getHwWalletMeta();
-    if (!hwMeta) {
-      throw new Error('unexpectedly missing hardware metadata');
-    }
-
     let wallet;
     if (conceptualWallet.getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+      const withStakingKey = asGetStakingKey(publicDeriver);
+      if (!withStakingKey) {
+        throw new Error('unable to get staking key');
+      }
+      const stakingKey = await withStakingKey.getStakingKey();
+
+      const hwMeta = conceptualWallet.getHwWalletMeta();
+      if (!hwMeta) {
+        throw new Error('unexpectedly missing hardware metadata');
+      }
+
       wallet = await createHardwareCip1852Wallet({
         db,
         accountPublicKey,

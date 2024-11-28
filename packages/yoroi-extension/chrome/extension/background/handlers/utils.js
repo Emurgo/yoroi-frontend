@@ -35,8 +35,10 @@ import { getDb } from '../state/databaseManager';
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getProtocolParameters } from './yoroi/protocolParameters';
+import { getNetworkById } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import AdaApi from '../../../../app/api/ada';
 
-export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
+export async function getWalletsState(publicDeriverId: ?number, targetNetworkId?: number): Promise<Array<WalletState>> {
   const db = await getDb();
   let publicDerivers = await loadWalletsFromStorage(db);
   if (publicDeriverId != null) {
@@ -47,7 +49,47 @@ export async function getWalletsState(publicDeriverId: ?number): Promise<Array<W
     publicDerivers = publicDeriver ? [publicDeriver] : [];
   }
 
-  const maybeWalletStates = await Promise.all(publicDerivers.map(async publicDeriver => {
+  let publicDeriversOfNetwork;
+  if (publicDeriverId == null && targetNetworkId !== undefined) {
+    publicDeriversOfNetwork = [];
+    // group wallets by staking key
+    const publicDeriversByPublicKey = new Map<string, Array<PublicDeriver<>>>;
+    for (const publicDeriver of publicDerivers) {
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      const key = (await withPublicKey.getPublicKey()).Hash;
+      let value = publicDeriversByPublicKey.get(key);
+      if (!value) {
+        value = [];
+        publicDeriversByPublicKey.set(key, value);
+      }
+      value.push(publicDeriver);
+    }
+    // for each staking key, either find an existing wallet or clone one
+    for (const value of publicDeriversByPublicKey.values()) {
+      let found = false;
+      for (const publicDeriver of value) {
+        if (publicDeriver.getParent().getNetworkInfo().NetworkId === targetNetworkId) {
+          publicDeriversOfNetwork.push(publicDeriver);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const db = await getDb();
+        const network = getNetworkById(targetNetworkId);
+        const adaApi = new AdaApi();
+        const clonedWallet = await adaApi.cloneWallet(db, value[0], network);
+        publicDeriversOfNetwork.push(clonedWallet);
+      }
+    }
+  } else {
+    publicDeriversOfNetwork = publicDerivers;
+  }
+
+  const maybeWalletStates = await Promise.all(publicDeriversOfNetwork.map(async publicDeriver => {
     try {
       return await getWalletState(publicDeriver);
     } catch (err) {
