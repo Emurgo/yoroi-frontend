@@ -190,7 +190,7 @@ function Autocomplete({
         {isOpen && (
           <>
             {filteredList.length === 0 ? (
-              <Typography color="ds.text_primary_medium" sx={{ padding: '16px', bgcolor: 'ds.bg_color_min' }}>
+              <Typography color="ds.text_gray_medium" sx={{ padding: '16px', bgcolor: 'ds.bg_color_max' }}>
                 {noResultsMessage}
               </Typography>
             ) : (
@@ -207,10 +207,10 @@ function Autocomplete({
                     }}
                     {...getItemProps({ item, index })}
                   >
-                    <Typography component="span" color="ds.el_gray_medium" style={{ fontWeight: 'bold' }}>
+                    <Typography component="span" color="ds.text_gray_medium" style={{ fontWeight: 'bold' }}>
                       {inputValue?.toLowerCase()}
                     </Typography>
-                    <Typography component="span" color="ds.el_gray_medium">
+                    <Typography component="span" color="ds.text_gray_medium">
                       {regularPart}
                     </Typography>
                   </Box>
