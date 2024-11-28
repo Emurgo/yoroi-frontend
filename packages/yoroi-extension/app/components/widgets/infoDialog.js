@@ -114,6 +114,7 @@ function InfoDialog(props: Props & Intl): Node {
             display: 'block',
             textAlign: 'center',
             py: '24px',
+            color: 'ds.text_primary_medium'
           }}
         >
           {intl.formatMessage(messages.learnMore)}
