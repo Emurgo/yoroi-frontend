@@ -47,7 +47,7 @@ type State = {|
 const messages = defineMessages({
   notEnoughMoneyToSendError: {
     id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Not enough balance.',
+    defaultMessage: '!!!Not enough balance',
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
