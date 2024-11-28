@@ -26,7 +26,7 @@ function callBackground(functionName: string, params: any): Promise<any> {
         resolve(msg.return.ok);
       }
     });
-  
+
     window.postMessage({
       type: 'bring_rpc_request',
       url: location.hostname,
@@ -52,6 +52,15 @@ export function popUpWalletCreation(): void {
 
 export function popUpCashbackWalletSelection(): void {
   callBackground('pop-up-cashback-wallet-selection');
+}
+
+export async function promptCreationOrSelection() {
+  const address = await getFirstAddress()
+  if (address) {
+    return await popUpCashbackWalletSelection()
+  } else {
+    return await popUpWalletCreation()
+  }
 }
 
 export function listenForCashbackWalletChange(callback: () => void): void {

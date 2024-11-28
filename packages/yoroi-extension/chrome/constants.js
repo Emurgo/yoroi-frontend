@@ -5,11 +5,11 @@ export function genCSP(request: {|
   isDev: boolean,
   additional: {|
     'default-src'?: Array<string>,
-    'frame-src'?: Array<string>,
-    'object-src'?: Array<string>,
-    'connect-src'?: Array<string>,
-    'style-src'?: Array<string>,
-    'img-src'?: Array<string>,
+      'frame-src' ?: Array < string >,
+      'object-src' ?: Array < string >,
+      'connect-src' ?: Array < string >,
+      'style-src' ?: Array < string >,
+      'img-src' ?: Array < string >,
   |},
 |}): string {
   const defaultSrc = request.additional['default-src'] ?? [];
@@ -46,7 +46,8 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
 
-  // Bring
+  // Bringweb3
+  frameSrc.push('http://localhost:5173/')
   frameSrc.push('https://*.bringweb3.io/')
   connectSrc.push('https://*.bringweb3.io')
 
