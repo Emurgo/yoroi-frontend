@@ -236,7 +236,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage" color="ds.gray_900">
+            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage" color="ds.text_gray_medium">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

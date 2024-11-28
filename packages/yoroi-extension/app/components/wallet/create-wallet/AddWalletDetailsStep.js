@@ -151,7 +151,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
       <Stack alignItems="center" justifyContent="center" id="addWalletDetailsStepComponent">
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
-            <Typography component="div" variant="body1">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...descriptionMessage} />
             </Typography>
             <IconWrapper

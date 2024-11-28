@@ -32,7 +32,7 @@ function WalletPlate(props: Props): Node {
   return (
     <Stack direction="row" gap="8px" alignItems="center" justifyContent="center" mt="-3px" mb="30px">
       {plateImagePart}
-      <Typography component="div" variant="body1" id="walletPlateText">
+      <Typography component="div" variant="body1" id="walletPlateText" color="ds.text_gray_medium">
         {plate.TextPart}
       </Typography>
       <IconWrapper

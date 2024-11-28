@@ -103,7 +103,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
         justifyContent="center"
         maxWidth={length === 15 ? '636px' : '760px'}
       >
-        <Typography component="div" mb="16px">
+        <Typography component="div" mb="16px" color="ds.text_gray_medium">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 

@@ -85,7 +85,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center" id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
-        <Typography component="div" mb="16px">
+        <Typography component="div" mb="16px" color="ds.text_gray_medium">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
@@ -239,7 +239,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
           <Fade in={isValidPhrase}>
             <Stack gap="10px" direction="row" id="isValidPhraseMessage">
               <VerifiedIcon />
-              <Typography component="div" variant="body1" fontWeight={500}>
+              <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
                 {intl.formatMessage(messages.verified)}
               </Typography>
             </Stack>
