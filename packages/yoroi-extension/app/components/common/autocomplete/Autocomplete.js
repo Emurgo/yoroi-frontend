@@ -207,10 +207,10 @@ function Autocomplete({
                     }}
                     {...getItemProps({ item, index })}
                   >
-                    <Typography component="span" color="ds.text_primary_medium" style={{ fontWeight: 'bold' }}>
+                    <Typography component="span" color="ds.el_gray_medium" style={{ fontWeight: 'bold' }}>
                       {inputValue?.toLowerCase()}
                     </Typography>
-                    <Typography component="span" color="ds.text_primary_medium">
+                    <Typography component="span" color="ds.el_gray_medium">
                       {regularPart}
                     </Typography>
                   </Box>
