@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box, styled } from '@mui/material';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import styles from './SelectNetworkStep.scss';
 import globalMessages from '../../../i18n/global-messages';
@@ -15,6 +15,18 @@ const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_1,
   '&:hover': {
     backgroundImage: theme.palette.ds.bg_gradient_2,
+  },
+}));
+
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& defs': {
+      '& linearGradient': {
+        '& stop': {
+          'stop-color': theme.palette.ds.el_primary_medium,
+        },
+      },
+    },
   },
 }));
 
@@ -71,7 +83,9 @@ function SelectNetworkStep(props: Props & Intl): Node {
         }}
       >
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
+          <LogoIconWrapper>
+            <YoroiLogo />
+          </LogoIconWrapper>
         </Box>
         <Typography component="div" variant="h3" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}

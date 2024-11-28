@@ -3,10 +3,10 @@ import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { observer } from 'mobx-react';
 import { RESTORE_WALLET_STEPS, getFirstRestorationStep } from './steps';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
 import Stepper from '../../common/stepper/Stepper';
 import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
@@ -43,6 +43,18 @@ const messages: * = defineMessages({
     defaultMessage: '!!!Add wallet details',
   },
 });
+
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& defs': {
+      '& linearGradient': {
+        '& stop': {
+          'stop-color': theme.palette.ds.el_primary_medium,
+        },
+      },
+    },
+  },
+}));
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -227,7 +239,9 @@ function RestoreWalletPage(props: Props & Intl): Node {
         }}
       >
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
+          <LogoIconWrapper>
+            <YoroiLogo />
+          </LogoIconWrapper>
         </Box>
         <Typography component="div" variant="h3" fontWeight={500} id="restoreTitle" color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}
