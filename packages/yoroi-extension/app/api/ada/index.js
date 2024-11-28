@@ -493,7 +493,6 @@ export type CreateHardwareWalletRequest = {|
   publicKey: string,
   ...Addressing,
   hwFeatures: HWFeatures,
-  checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
 |};
 export type CreateHardwareWalletResponse = {|

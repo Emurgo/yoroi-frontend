@@ -91,8 +91,6 @@ export const CreateHardwareWallet: HandlerType<
 
     const db = await getDb();
 
-    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
-
     const adaApi = new AdaApi();
     const { publicDeriver } = await adaApi.createHardwareWallet({
       db,
@@ -100,7 +98,6 @@ export const CreateHardwareWallet: HandlerType<
       walletName: request.walletName,
       publicKey: request.publicKey,
       hwFeatures: request.hwFeatures,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
       addressing: request.addressing,
     });
 
