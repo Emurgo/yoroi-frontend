@@ -234,6 +234,20 @@ const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
   },
 }));
 
+const STextField = styled(TextField)(({ theme }) => ({
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected': {
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+    '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
+  },
+  '& .MuiFormHelperText-root': {
+    marginInline: 0,
+    mt: 0.5,
+    fontSize: '0.750rem',
+    lineHeight: '1rem',
+    letterSpacing: '0.2px',
+  },
+}));
+
 type State = {|
   currentStep: number,
   invalidMemo: boolean,
@@ -612,7 +626,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Box>
             ) : null}
             <Box sx={{ position: 'relative' }}>
-              <TextField
+              <STextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
@@ -624,15 +638,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
-                sx={{
-                  '& .MuiFormHelperText-root': {
-                    marginInline: 0,
-                    mt: 0.5,
-                    fontSize: '0.750rem',
-                    lineHeight: '1rem',
-                    letterSpacing: '0.2px',
-                  },
-                }}
               />
               {domainResolverResult != null ? (
                 <Typography
