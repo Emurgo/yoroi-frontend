@@ -2,12 +2,13 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Typography, Box, Stack, Button, Dialog, Fade } from '@mui/material';
+import { Typography, Box, Stack, Button, Dialog, Fade, IconButton } from '@mui/material';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../../i18n/global-messages';
 import React from 'react';
 import { genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
 import WalletInfo from '../../../../common/walletInfo/WalletInfo';
+import { ReactComponent as CrossIcon } from '../../../../../assets/images/revamp/icons/cross.inline.svg';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
@@ -63,6 +64,22 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
         '& .MuiPaper-root': { maxWidth: 'unset' },
       }}
     >
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={theme => ({
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          '& svg': {
+            '& path': {
+              fill: theme.palette.ds.el_gray_medium,
+            },
+          },
+        })}
+      >
+        <CrossIcon />
+      </IconButton>
       <Box
         sx={{
           width: '648px',
