@@ -54,7 +54,7 @@ export function popUpCashbackWalletSelection(): void {
   callBackground('pop-up-cashback-wallet-selection');
 }
 
-export async function promptCreationOrSelection() {
+export async function promptCreationOrSelection(): Promise<void> {
   const address = await getFirstAddress()
   if (address) {
     return await popUpCashbackWalletSelection()
