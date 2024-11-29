@@ -234,6 +234,20 @@ const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
   },
 }));
 
+const STextField = styled(TextField)(({ theme }) => ({
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected': {
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+    '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
+  },
+  '& .MuiFormHelperText-root': {
+    marginInline: 0,
+    mt: 0.5,
+    fontSize: '0.750rem',
+    lineHeight: '1rem',
+    letterSpacing: '0.2px',
+  },
+}));
+
 type State = {|
   currentStep: number,
   invalidMemo: boolean,
@@ -612,7 +626,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Box>
             ) : null}
             <Box sx={{ position: 'relative' }}>
-              <TextField
+              <STextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
@@ -624,22 +638,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
-                sx={{
-                  '& .MuiFormHelperText-root': {
-                    marginInline: 0,
-                    mt: 0.5,
-                    fontSize: '0.750rem',
-                    lineHeight: '1rem',
-                    letterSpacing: '0.2px',
-                  },
-                }}
               />
               {domainResolverResult != null ? (
                 <Typography
                   component="div"
                   variant="caption1"
+                  align="right"
                   color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                  sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
@@ -681,8 +687,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="caption1"
+                align="right"
                 color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                sx={{ position: 'absolute', bottom: '5px', right: '0' }}
+                sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>
@@ -801,7 +808,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                <Typography component="div" variant="button2" color="ds.text_gray_low" fontWeight={500} mr="12px">
                   ADA
                 </Typography>
 

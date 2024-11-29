@@ -424,7 +424,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {(isButtonLoader && <LoadingSpinner />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
+              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
             </Button>
           </Box>
         )}

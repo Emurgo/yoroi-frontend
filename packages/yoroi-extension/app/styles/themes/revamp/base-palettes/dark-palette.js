@@ -35,11 +35,11 @@ export const darkPalette = {
   black_static: '#000000',
   white_static: '#FFFFFF',
 
-  sys_magenta_700: '#FF6B92',
-  sys_magenta_600: '#FD3468',
+  sys_magenta_700: '#FFC0D0',
+  sys_magenta_600: '#FB9CB5',
   sys_magenta_500: '#FF7196',
-  sys_magenta_300: '#572835',
-  sys_magenta_100: '#2F171D',
+  sys_magenta_300: '#64303E',
+  sys_magenta_100: '#3B252A',
 
   sys_cyan_500: '#59B1F4',
   sys_cyan_100: '#112333',
@@ -54,4 +54,5 @@ export const darkPalette = {
     'linear-gradient(195.39deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.1) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
   bg_gradient_2: 'linear-gradient(205.51deg, rgba(11, 153, 125, 0.49) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
   bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 100%)',
+  light_shadow_dropdown_menu: `0px 4px 20px 0px #0000007A`, // dropdown shadow
 };
