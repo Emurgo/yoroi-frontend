@@ -18,6 +18,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
+import type { WalletChecksum } from '@emurgo/cip4-js';
 
 const messages = defineMessages({
   bringCashbackTitle: {
@@ -35,20 +36,11 @@ const messages = defineMessages({
   },
 });
 
-type currentValue = Array<{
-  isSelected: boolean,
-  name: string,
-  plate: any,
-  type: string,
-  walletId: number,
-  ...
-}>;
-
 type Props = {|
-  +onSelect: string => Promise<void>,
+  +onSelect: number => Promise<void>,
   +isSubmitting: boolean,
-  +cardanoWallets: any,
-  +currentValue: currentValue,
+  +cardanoWallets: Array<{ publicDeriverId: number, name: string, plate: WalletChecksum, ... }>,
+  +currentValue: ?number,
   +error?: ?LocalizableError,
 |};
 
@@ -88,8 +80,8 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
     const optionRenderer = option => {
       return (
         <MenuItem
-          key={option.name}
-          value={option.name}
+          key={option.publicDeriverId}
+          value={option.publicDeriverId}
           sx={{ height: '60px' }}
           id={'selectCashbackWallet-' + option.name + '-menuItem'}
         >
@@ -138,7 +130,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
             error={!!error}
             {...cashbackWalletId.bind()}
             onChange={this.props.onSelect}
-            value={currentValue[0]}
+            value={currentValue}
             menuProps={{
               sx: {
                 '& .MuiMenu-paper': {
@@ -146,14 +138,20 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
                 },
               },
             }}
-            renderValue={value => (
-              <Stack direction="row">
-                <WalletIcon imagePart={value.plate.ImagePart} />
-                <Typography variant="body1" color="ds.text_gray_medium" mt="2px">
-                  {value.name}| {value.plate.TextPart}
-                </Typography>
-              </Stack>
-            )}
+            renderValue={value => {
+              const wallet = cardanoWallets.find(({ publicDeriverId }) => publicDeriverId === value);
+              if (!wallet) {
+                throw new Error('unexpected selected value');
+              }
+              return (
+                <Stack direction="row">
+                  <WalletIcon imagePart={wallet.plate.ImagePart} />
+                  <Typography variant="body1" color="ds.text_gray_medium" mt="2px">
+                    {wallet.name}| {wallet.plate.TextPart}
+                  </Typography>
+                </Stack>
+              );
+            }}
           >
             {cardanoWallets.map(option => optionRenderer(option))}
           </Select>

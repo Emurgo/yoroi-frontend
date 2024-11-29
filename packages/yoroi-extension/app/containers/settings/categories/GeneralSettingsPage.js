@@ -75,6 +75,12 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     intl: intlShape.isRequired,
   };
 
+  componentDidMount() {
+    const request = this.props.stores.wallets.getCashbackWalletRequest;
+    request.reset();
+    request.execute();
+  }
+
   onSelectUnitOfAccount: string => Promise<void> = async value => {
     const localStorageApi = new LocalStorageApi();
 
@@ -83,13 +89,13 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
   };
 
-  onSelectBringCashbackWallet: string => Promise<void> = async value => {
-    console.log('CASHBACK Wallet Selected', value);
+  onSelectBringCashbackWallet: number => Promise<void> = async value => {
+    this.props.stores.wallets.setCashbackWallet(value);
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { wallets } = this.props.stores.wallets;
+    const { wallets, getCashbackWalletRequest } = this.props.stores.wallets;
 
     const profileStore = this.props.stores.profile;
     const coinPriceStore = this.props.stores.coinPriceStore;
@@ -117,24 +123,6 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
-    const cardanoWallets = [];
-
-    const selectedWalletName = this.props.stores.wallets.selectedWalletName;
-
-    wallets.forEach(wallet => {
-      const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-
-      const walletMap = {
-        walletId: wallet.publicDeriverId,
-        plate: wallet.plate,
-        type: wallet.type,
-        name: wallet.name,
-        isSelected: wallet.name === selectedWalletName,
-      };
-
-      cardanoWallets.push(walletMap);
-    });
-
     return (
       <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
         {profileStore.isRevampTheme && (
@@ -152,8 +140,10 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
         <BringCashbackSettings
           onSelect={this.onSelectBringCashbackWallet}
           isSubmitting={false}
-          cardanoWallets={cardanoWallets}
-          currentValue={cardanoWallets.filter(wallet => wallet.isSelected)}
+          // $FlowFixMe this is apparently correct, flow is out of its mind
+          cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
+          // $FlowFixMe this is apparently correct, flow is out of its mind
+          currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
           error={null}
         />
         <UnitOfAccountSettings

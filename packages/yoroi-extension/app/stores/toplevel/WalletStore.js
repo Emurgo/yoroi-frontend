@@ -77,6 +77,10 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   flagStorage: StorageAPI;
   absoluteSlotGetters: { [string]: () => Promise<number> } = {};
 
+  @observable getCashbackWalletRequest: Request<
+    () => Promise<?WalletState>
+  > = new Request(this.getCashbackWallet.bind(this));
+
   setup(): void {
     super.setup();
     const { wallets } = this.actions;
@@ -450,6 +454,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   }
 
   setCashbackWallet(id: number): void {
+    this.getCashbackWalletRequest.patch(() => this.wallets.find(w => w.publicDeriverId === id));
     setCashbackWallet(id);
   }
 }
