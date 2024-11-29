@@ -3,7 +3,7 @@ import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
 import {
   getFirstAddress,
   getTheme,
-  popUpWalletCreation,
+  promptCreationOrSelection,
   listenForCashbackWalletChange,
 } from './bringLib';
 
@@ -212,11 +212,12 @@ const lightTheme = Object.freeze({
 (async () => {
   await bringInitContentScript({
     getWalletAddress: getFirstAddress,
-    promptLogin: popUpWalletCreation,
+    promptLogin: promptCreationOrSelection,
     walletAddressUpdateCallback: listenForCashbackWalletChange,
     theme: await getTheme(),
     lightTheme,
     darkTheme,
-    text: 'upper'
+    text: 'upper',
+    switchWallet: true
   });
 })().catch(console.error);
