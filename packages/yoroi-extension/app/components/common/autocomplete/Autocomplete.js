@@ -178,8 +178,8 @@ function Autocomplete({
       <ULList
         component="ul"
         {...getMenuProps()}
+        isOpen
         sx={{
-          boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
           maxHeight: 44 * maxVisibleOptions + 'px',
           color: 'ds.gray_900',
           borderRadius: '8px',
@@ -201,9 +201,8 @@ function Autocomplete({
                     key={`${item}${index}`}
                     sx={{
                       padding: '16px',
-                      backgroundColor: highlightedIndex === index ? 'ds.gray_50' : 'ds.bg_color_max',
+                      backgroundColor: highlightedIndex === index ? 'ds.bg_color_contrast_min' : 'ds.bg_color_contrast_high',
                       cursor: 'pointer',
-                      boxShadow: '0px 3px 10px 0px rgba(24, 26, 30, 0.08)',
                     }}
                     {...getItemProps({ item, index })}
                   >
@@ -233,7 +232,7 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
 };
 
-const ULList = styled(Box)(() => ({
+const ULList = styled(Box)(({ theme, isOpen }) => ({
   width: '100%',
   margin: 0,
   borderTop: 0,
@@ -247,6 +246,7 @@ const ULList = styled(Box)(() => ({
   outline: '0',
   transition: 'opacity .1s ease',
   borderRadius: 0,
+  boxShadow: isOpen ? theme.palette.ds.light_shadow_dropdown_menu : 'unset',
 }));
 
 const InputWrapper = styled(Box)(
