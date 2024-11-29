@@ -39,8 +39,6 @@ import {
   Mixin,
 } from 'mixwith';
 
-import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
-
 import {
   DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
 } from '../../database/walletTypes/common/api/write';
@@ -56,7 +54,6 @@ import {
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
-import { hexToBytes } from '../../../../../../coreUtils';
 
 // ===========================
 //   DerivePublicFromPrivate

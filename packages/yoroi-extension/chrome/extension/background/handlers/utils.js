@@ -24,7 +24,11 @@ import {
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { isLedgerNanoWallet, isTrezorTWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { isCardanoHaskell, isTestnet, } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isTestnet,
+  getNetworkById
+} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat, } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
@@ -35,7 +39,6 @@ import { getDb } from '../state/databaseManager';
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getProtocolParameters } from './yoroi/protocolParameters';
-import { getNetworkById } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import AdaApi from '../../../../app/api/ada';
 
 export async function getWalletsState(publicDeriverId: ?number, targetNetworkId?: number): Promise<Array<WalletState>> {
@@ -78,7 +81,6 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId?
         }
       }
       if (!found) {
-        const db = await getDb();
         const network = getNetworkById(targetNetworkId);
         const adaApi = new AdaApi();
         const clonedWallet = await adaApi.cloneWallet(db, value[0], network);
