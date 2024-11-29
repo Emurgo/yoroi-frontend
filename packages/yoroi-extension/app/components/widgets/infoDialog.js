@@ -1,6 +1,6 @@
 // @flow
 import Fade from '@mui/material/Fade';
-import { Dialog, Typography, Button, Stack, Link } from '@mui/material';
+import { Dialog, Typography, Button, Stack, Link, IconButton } from '@mui/material';
 import React from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/system';
@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
+import { ReactComponent as CrossIcon } from '../../assets/images/revamp/icons/cross.inline.svg';
 
 export const messages: Object = defineMessages({
   dialogTitle: {
@@ -43,26 +44,38 @@ function InfoDialog(props: Props & Intl): Node {
       onClose={onClose}
       TransitionComponent={Transition}
       sx={{
-        background: 'ds.web_overlay',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        background: 'ds.bg_color_max',
         '& .MuiPaper-root': {
-          background: 'none',
           maxWidth: 'unset',
+          backgroundImage: 'none',
         },
       }}
       id="infoDialog"
     >
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={theme => ({
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          '& svg': {
+            '& path': {
+              fill: theme.palette.ds.el_gray_medium,
+            },
+          },
+        })}
+      >
+        <CrossIcon />
+      </IconButton>
       <Box
         sx={{
+          background: 'ds.bg_color_max',
           width: '648px',
-          background: 'var(--yoroi-palette-common-white)',
           borderRadius: '8px',
-          boxShadow: '0px 13px 20px -1px rgba(0, 0, 0, 0.15)',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: 'grey.200',
           padding: '24px',
           display: 'flex',
           alignitems: 'center',
@@ -72,6 +85,7 @@ function InfoDialog(props: Props & Intl): Node {
       >
         <Typography
           component="div"
+          color="ds.text_gray_medium"
           sx={{
             display: 'block',
             fontSize: '16px',
@@ -100,6 +114,7 @@ function InfoDialog(props: Props & Intl): Node {
             display: 'block',
             textAlign: 'center',
             py: '24px',
+            color: 'ds.text_primary_medium'
           }}
         >
           {intl.formatMessage(messages.learnMore)}
@@ -111,7 +126,7 @@ function InfoDialog(props: Props & Intl): Node {
             disableRipple={false}
             onClick={onClose}
             sx={{
-              width: '176px',
+              width: '100%',
             }}
             id="infoDialogContinueButton"
           >

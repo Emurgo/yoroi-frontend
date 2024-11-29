@@ -5,20 +5,23 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Typography, Tooltip } from '@mui/material';
-import {
-  splitAmount,
-  truncateToken,
-  truncateLongName,
-  maxNameLengthBeforeTruncation,
-} from '../../../utils/formatters';
+import { Typography, Tooltip, styled, Box } from '@mui/material';
+import { splitAmount, truncateToken, truncateLongName, maxNameLengthBeforeTruncation } from '../../../utils/formatters';
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/forms/password-eye.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/forms/password-eye-close.inline.svg';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
-import WalletAccountIcon from '../../topbar/WalletAccountIcon';
+import { constructPlate40 } from '../../topbar/WalletCard';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Props = {|
   +onUpdateHideBalance: void => Promise<void>,
@@ -31,23 +34,6 @@ type Props = {|
   +conceptualWalletName: string,
 |};
 
-function constructPlate(
-  plate: WalletChecksum,
-  saturationFactor: number,
-  divClass: string
-): [string, React$Element<'div'>] {
-  return [
-    plate.TextPart,
-    <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
-    </div>,
-  ];
-}
-
 @observer
 export default class WalletInfo extends Component<Props> {
   static contextTypes: {| infoText: void |} = {
@@ -57,29 +43,37 @@ export default class WalletInfo extends Component<Props> {
   render(): Node {
     const { shouldHideBalance, onUpdateHideBalance, walletAmount, conceptualWalletName } = this.props;
 
-    const [accountPlateId, iconComponent] = this.props.plate
-      ? constructPlate(this.props.plate, 0, styles.icon)
-      : [];
+    const [accountPlateId, iconComponent] = this.props.plate ? constructPlate40(this.props.plate) : [];
 
     return (
       <div className={styles.wrapper}>
         <div className={styles.plateAndName}>
           {iconComponent}
           <div className={styles.content}>
-            <div className={styles.name} id='walletInfo-walletName-text'>
+            <Typography className={styles.name} id="walletInfo-walletName-text" color="ds.text_gray_medium" fontWeight="500">
               {this.generateNameElem(conceptualWalletName)}
-            </div>
+            </Typography>
             <div className={styles.type}>
-              <div className={styles.plate} id='walletInfo-walletPlate-text'>{accountPlateId}</div>
+              <Typography className={styles.plate} id="walletInfo-walletPlate-text" color="ds.text_gray_medium">
+                {accountPlateId}
+              </Typography>
             </div>
           </div>
         </div>
         <div className={styles.amountAndHideIcon}>
-          <div className={styles.amount} id='walletInfo-amount-text'>
+          <Typography className={styles.amount} color="ds.text_gray_medium" id="walletInfo-amount-text">
             {this.renderAmountDisplay({ shouldHideBalance, amount: walletAmount })}
-          </div>
+          </Typography>
           <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
-            {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
+            {shouldHideBalance ? (
+              <IconWrapper>
+                <IconEyeClosed />{' '}
+              </IconWrapper>
+            ) : (
+              <IconWrapper>
+                <IconEyeOpen />
+              </IconWrapper>
+            )}
           </button>
         </div>
       </div>
@@ -102,10 +96,7 @@ export default class WalletInfo extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -131,8 +122,16 @@ export default class WalletInfo extends Component<Props> {
     const truncatedName = truncateLongName(walletName);
 
     return (
-      <Tooltip title={<Typography component="div" variant="body3">{walletName}</Typography>}>
-        <Typography component="div" variant="body-2-medium">{truncatedName}</Typography>
+      <Tooltip
+        title={
+          <Typography component="div" variant="body3">
+            {walletName}
+          </Typography>
+        }
+      >
+        <Typography component="div" variant="body-2-medium">
+          {truncatedName}
+        </Typography>
       </Tooltip>
     );
   };
