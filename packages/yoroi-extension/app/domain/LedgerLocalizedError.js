@@ -43,9 +43,9 @@ export const ledgerErrors: * = defineMessages({
     id: 'wallet.hw.ledger.catalyst.cip36.unsupported',
     defaultMessage: '!!!Catalyst registration requires Ledger app version 6.',
   },
-  deviceVersionNoDataSigning: {
-    id: 'wallet.hw.ledger.error.deviceVersionNoDataSigning',
-    defaultMessage: '!!!CIP-8 message signing not supported by your Ledger app version',
+  deviceVersionNoDataSigningSpecific: {
+    id: 'wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific',
+    defaultMessage: '!!!CIP-8 message signing is only supported by Cardano app version 7.1.0 or above.',
   },
   deviceStatusError: {
     id: 'wallet.hw.ledger.error.deviceStatus',
@@ -83,7 +83,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       }
     }
     if (/^DeviceVersionUnsupported/.test(error.message)) {
-      return new LocalizableError(ledgerErrors.deviceVersionNoDataSigning);
+      return new LocalizableError(ledgerErrors.deviceVersionNoDataSigningSpecific);
     }
     if (/Invalid data supplied to Ledger/.test(error.message)) {
       return new LocalizableError(
@@ -103,6 +103,11 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     ) {
       return new LocalizableError(
         ledgerErrors.cardanoAppNotRunning
+      );
+    }
+    if (/CIP-8 message signing not supported by Ledger app/.test(error.message)) {
+      return new LocalizableError(
+        ledgerErrors.deviceVersionNoDataSigningSpecific
       );
     }
     // Ledger device related error happened, convert then to LocalizableError

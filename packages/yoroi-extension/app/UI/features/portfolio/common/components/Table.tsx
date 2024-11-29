@@ -1,10 +1,10 @@
-import React, { ReactElement, ReactNode, cloneElement } from 'react';
-import { Table as MuiTable, TableBody, Stack, Box, Typography } from '@mui/material';
+import { Box, Table as MuiTable, Stack, TableBody, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useStrings } from '../hooks/useStrings';
+import React, { ReactElement, ReactNode, cloneElement } from 'react';
 import noResultsPng from '../assets/illustrations/no-results.png';
-import SortableTableHead from './SortableTableHead';
+import { useStrings } from '../hooks/useStrings';
 import { IHeadCell } from '../types/table';
+import SortableTableHead from './SortableTableHead';
 
 interface Props {
   name: string;

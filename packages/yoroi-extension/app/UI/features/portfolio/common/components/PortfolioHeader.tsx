@@ -1,8 +1,9 @@
-import { Box, Skeleton, Stack, Typography, useTheme } from '@mui/material';
+import { Box, IconButton, Skeleton, Stack, styled, Typography, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import LocalStorageApi from '../../../../../api/localStorage/index';
 import { SearchInput, Tooltip } from '../../../../components';
+import { Switch } from '../../../../components/icons/Switch';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { WalletBalance } from '../../../../types/currrentWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
@@ -12,6 +13,14 @@ import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
 import { HeaderPrice } from './HeaderPrice';
 import PnlTag from './PlnTag';
+
+const IconWrapper: any = styled(IconButton)(({ theme }: any) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 export function formatValue(value: BigNumber): string {
   if (value.isZero()) {
@@ -45,10 +54,10 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
 
   const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
 
-  const showADA = accountPair?.from.name === 'ADA';
+  const showADA = accountPair?.from.name === primaryTokenInfo.name;
 
   const totalTokenPrice = React.useMemo(() => {
-    const showingAda = accountPair?.from.name !== 'ADA';
+    const showingAda = accountPair?.from.name !== primaryTokenInfo.name;
     const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
 
     if (ptPrice == null) return `... ${currency}`;
@@ -61,10 +70,13 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const handleCurrencyChange = async () => {
     const pair = {
       from: {
-        name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : 'ADA',
+        name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
         value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
       },
-      to: { name: showADA ? 'ADA' : unitOfAccount ?? DEFAULT_FIAT_PAIR, value: showADA ? walletBalance.ada : totalTokenPrice },
+      to: {
+        name: showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR,
+        value: showADA ? walletBalance.ada : totalTokenPrice,
+      },
     };
     localStorageApi.setSetPortfolioFiatPair(pair);
     changeUnitOfAccountPair(pair);
@@ -77,7 +89,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
       const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
 
       const pair = {
-        from: { name: 'ADA', value: walletBalance?.ada || '0' },
+        from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
         to: { name: unitOfAccount || DEFAULT_FIAT_PAIR, value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
       };
 
@@ -111,11 +123,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
               {String(accountPair?.from.value)}
             </Typography>
           )}
-          <CurrencyDisplay
-            from={accountPair?.from?.name}
-            to={accountPair?.to?.name}
-            handleCurrencyChange={handleCurrencyChange}
-          />
+          <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
@@ -154,22 +162,15 @@ const LoadingSkeleton = () => (
   </Stack>
 );
 
-const CurrencyDisplay = ({ from, to, handleCurrencyChange }) => (
-  <Typography variant="body2" fontWeight="500" color="ds.black_static" textAlign="center">
-    <Typography component="span" variant="body2" fontWeight="500" color="ds.text_gray_medium">
+const CurrencyDisplay = ({ from, handleCurrencyChange }) => (
+  <Stack direction="row" alignItems="flex-end" gap="4px" ml="2px">
+    <Typography component="span" variant="body1" fontWeight="500" color="ds.text_gray_medium">
       {from}
     </Typography>
-    <Typography
-      component="span"
-      variant="body2"
-      fontWeight="500"
-      color="ds.text_gray_low"
-      onClick={handleCurrencyChange}
-      sx={{ cursor: 'pointer', display: 'inline' }}
-    >
-      /{to}
-    </Typography>
-  </Typography>
+    <IconWrapper onClick={handleCurrencyChange}>
+      <Switch />
+    </IconWrapper>
+  </Stack>
 );
 
 const Skeletons = ({ theme }) => (
@@ -191,7 +192,7 @@ export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChange
   return (
     <PnlTag variant={variantPnl} withIcon>
       <Typography variant="caption" lineHeight="16px">
-        {changePercent}%
+        {changePercent}
       </Typography>
     </PnlTag>
   );
@@ -205,7 +206,7 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
   const { currency } = useCurrencyPairing();
 
   return (
-    <PnlTag variant={variantPnl}>
+    <PnlTag variant={variantPnl} withPercentSign={false}>
       <Typography variant="caption" lineHeight="16px">{`${
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>

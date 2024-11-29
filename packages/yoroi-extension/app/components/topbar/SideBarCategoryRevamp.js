@@ -48,7 +48,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         id={label.id}
         onClick={onClick}
         disabled={active}
-        active={active}
+        active={active.toString()}
       >
         <span className={styles.icon}>
           <SvgElem />

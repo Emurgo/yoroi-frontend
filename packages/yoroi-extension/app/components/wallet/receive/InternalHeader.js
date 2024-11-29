@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   blogLinkUrl: {
     id: 'wallet.receive.page.internal.learnMore',
-    defaultMessage: '!!!https://emurgo.io/en/blog/understanding-unspent-transaction-outputs-in-cardano',
+    defaultMessage: '!!!https://www.emurgo.io/press-news/yoroi-wallet-a-guide-to-the-receive-menu/',
   },
 });
 

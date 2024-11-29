@@ -17,6 +17,7 @@ import {
   SendTransactionApiError,
   GenericApiError,
   IncorrectWalletPasswordError,
+  InvalidWitnessError,
 } from './common/errors';
 import type { ResponseTicker } from './common/lib/state-fetch/types';
 //import type { HandlerType } from '../../chrome/extension/background/handlers/yoroi/type';
@@ -107,9 +108,12 @@ declare var chrome;
 
 // UI -> background queries:
 
-export function callBackground<T, R>(message: T): Promise<R> {
+export function callBackground<R>(message: {| type: string, request?: Object |}): Promise<R> {
   return new Promise((resolve, reject) => {
-    window.chrome.runtime.sendMessage(message, response => {
+    const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
+    window.chrome.runtime.sendMessage(serializedMessage, response => {
+      // $FlowIgnore
+      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(`Error ${window.chrome.runtime.lastError} when calling the background with: ${JSON.stringify(sanitizeForLog(message)) ?? 'undefined'}`);
@@ -233,11 +237,13 @@ export async function signAndBroadcastTransaction(
     type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
   });
+  handleKnownSubmissionErrors(result);
   return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export async function broadcastTransaction(request: BroadcastTransactionRequestType): Promise<void> {
   const result = await callBackground({ type: BroadcastTransaction.typeTag, request });
+  handleKnownSubmissionErrors(result);
   if (result?.error) {
     throw new Error(result.error);
   }
@@ -290,7 +296,8 @@ export async function removeAllTransactions(
   }
 }
 
-export const popAddress: GetEntryFuncType<typeof PopAddress> = async ({ publicDeriverId }) => {
+type PopAddressType = ({ publicDeriverId: number, ...}) => ReturnType<GetEntryFuncType<typeof PopAddress>>;
+export const popAddress:  PopAddressType = async ({ publicDeriverId }) => {
   await callBackground({ type: PopAddress.typeTag, request: { publicDeriverId } });
 }
 
@@ -306,11 +313,12 @@ function deserializeTx(tx: any): ?WalletTransaction {
 }
 
 export const refreshTransactions: GetEntryFuncType<typeof RefreshTransactions> = async (request) => {
-  const txs = await callBackground({ type: 'refresh-transactions', request });
-  if (txs.error) {
-    console.error('Failed to refresh transactions!', txs.error);
+  const resp = await callBackground({ type: RefreshTransactions.typeTag, request });
+  if (resp.error) {
+    console.error('Failed to refresh transactions!', resp.error);
     return [];
   }
+  const txs = JSON.parse(resp);
   return txs.map(tx => {
     try {
       return deserializeTx(tx);
@@ -398,8 +406,11 @@ export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = asy
   return await callBackground({ type: GetConnectedSites.typeTag });
 }
 
-export const getProtocolParameters: GetEntryFuncType<typeof GetProtocolParameters> = async (request) => {
-  return await callBackground({ type: GetProtocolParameters.typeTag, request });
+type GetProtocolParametersType = ({ networkId: number, ... }) => ReturnType<GetEntryFuncType<typeof GetProtocolParameters>>;
+export const getProtocolParameters: GetProtocolParametersType = async (
+  { networkId }
+) => {
+  return await callBackground({ type: GetProtocolParameters.typeTag, request: { networkId } });
 }
 
 
@@ -413,8 +424,34 @@ const callbacks = Object.freeze({
   serverStatusUpdate: [],
   coinPriceUpdate: [],
 });
-chrome.runtime.onMessage.addListener(async (message, _sender, _sendResponse) => {
-  //fixme: verify sender.id/origin
+const APP_ORIGIN = window.location.origin || null;
+const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
+chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
+  if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
+    Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + ')');
+    return;
+  }
+  if (rawMessage.type !== EXPECTED_MESSAGE_TYPE) {
+    Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + ')');
+    return;
+  }
+  const serializedMessage = rawMessage.data;
+  const messageType = typeof serializedMessage;
+  if (messageType !== 'string') {
+    Logger.error('[client] unexpected message type (' + messageType + ') a JSON string is expected, but received: ' + JSON.stringify(sanitizeForLog(serializedMessage)));
+    return;
+  }
+  let message;
+  try {
+    message = JSON.parse(serializedMessage);
+  } catch (error) {
+    Logger.error('unparsable message: ' + serializedMessage + ' | Error: ' + stringifyError(error));
+    return;
+  }
+  if (typeof message !== 'object') {
+    Logger.error('unrecognizable message type: ' + (typeof message) + ' (expected object); Original message: ' + serializedMessage);
+    return;
+  }
   Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
 
   if (message.type === 'wallet-state-update') {
@@ -488,4 +525,14 @@ function handleWrongPassword<
     throw new SendTransactionApiError();
   }
   return result;
+}
+
+function handleKnownSubmissionErrors<
+  T: { error?: string, ... }
+>(
+  result: T,
+): void {
+  if (result?.error?.includes('api.errors.invalidWitnessError')) {
+    throw new InvalidWitnessError()
+  }
 }

@@ -1,15 +1,14 @@
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
-import { bech32 } from 'bech32';
 import * as React from 'react';
 
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
-import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
 type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
@@ -125,14 +124,14 @@ export const GovernanceContextProvider = ({
     });
 
     const governanceStatusState: any = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
+    const { drep, drepKind } = governanceStatusState?.drepDelegation ?? {};
 
-    if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'abstain') {
+    if (drep === 'abstain') {
       setGovernanceStatus({ status: DREP_ALWAYS_ABSTAIN, drep: null });
-    } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
+    } else if (drep === 'no_confidence') {
       setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
-    } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
-      const words = bech32.toWords(hexToBytes(governanceStatusState.drepDelegation?.drep));
-      const encoded = bech32.encode('drep', words, 64);
+    } else if (drep?.length > 0) {
+      const encoded = dRepNormalize(drep, drepKind);
       setGovernanceStatus({ status: 'delegate', drep: encoded || null });
     } else {
       setGovernanceStatus({ status: 'none', drep: null });

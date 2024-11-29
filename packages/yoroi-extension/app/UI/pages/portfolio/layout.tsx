@@ -35,7 +35,7 @@ const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
         <NavBarContainerRevamp
           actions={actions}
           stores={stores}
-          title={<NavBarTitle title={isDetailPage ? 'Token details' : 'Tokens'} />}
+          title={<NavBarTitle title={isDetailPage ? 'Portfolio' : 'Portfolio'} />}
           // menu={menu}
         />
       }

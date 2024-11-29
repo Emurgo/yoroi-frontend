@@ -38,17 +38,18 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }: any) => ({
 type Props = {
   title: string;
   content: React.ReactNode;
+  expanded?: boolean,
 };
 
-export const Collapsible = ({ title, content }: Props) => {
-  const [expanded, setExpanded] = React.useState<any>('none');
+export const Collapsible = ({ title, content, expanded: startExpanded }: Props) => {
+  const [expanded, setExpanded] = React.useState<boolean>(startExpanded ?? false);
 
-  const handleChange = (panel: string | false) => (_: React.SyntheticEvent, newExpanded: boolean) => {
-    setExpanded(newExpanded ? panel : false);
+  const handleChange = (_: React.SyntheticEvent, newExpanded: boolean) => {
+    setExpanded(newExpanded);
   };
 
   return (
-    <Accordion disableGutters elevation={0} square expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+    <Accordion disableGutters elevation={0} square expanded={expanded} onChange={handleChange}>
       <AccordionSummary
         aria-controls="panel1d-content"
         id="panel1d-header"

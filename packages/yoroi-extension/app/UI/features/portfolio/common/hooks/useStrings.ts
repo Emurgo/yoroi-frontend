@@ -70,8 +70,8 @@ export const messages = Object.freeze(
       defaultMessage: '!!!in 24 hours',
     },
     backToPortfolio: {
-      id: 'portfolio.button.backToPortfolio',
-      defaultMessage: '!!!Back to portfolio',
+      id: 'global.labels.back',
+      defaultMessage: '!!!Back',
     },
     swap: {
       id: 'portfolio.button.swap',

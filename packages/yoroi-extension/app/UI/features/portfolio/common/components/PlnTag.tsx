@@ -7,6 +7,7 @@ interface Props {
   withIcon?: boolean;
   children: React.ReactNode;
   style?: React.CSSProperties;
+  withPercentSign?: boolean;
 }
 
 const IconWrapper: any = styled(Box)(({ theme, mode }: any) => ({
@@ -18,7 +19,7 @@ const IconWrapper: any = styled(Box)(({ theme, mode }: any) => ({
   },
 }));
 
-const PnlTag = ({ children, withIcon = false, variant = 'neutral' }: Props) => {
+const PnlTag = ({ children, withIcon = false, variant = 'neutral', withPercentSign = true }: Props) => {
   const icon =
     variant === 'danger' ? (
       <IconWrapper mode={variant}>
@@ -38,6 +39,13 @@ const PnlTag = ({ children, withIcon = false, variant = 'neutral' }: Props) => {
       <StyledTypography mode={variant} fontSize="12px">
         {children}
       </StyledTypography>
+      {withPercentSign ? (
+        <StyledTypography mx="2px" mode={variant}>
+          %
+        </StyledTypography>
+      ) : (
+        <></>
+      )}
     </TagContainer>
   );
 };
