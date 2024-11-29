@@ -680,7 +680,7 @@
   "wallet.receive.page.generateNewAddressButtonLabel": "Tạo địa chỉ mới",
   "wallet.receive.page.generateURLLabel": "Tạo URL",
   "wallet.receive.page.generatedAddressesSectionTitle": "Đã tạo các địa chỉ",
-  "wallet.receive.page.internal.learnMore": "https://emurgo.io/en/blog/understanding-unspent-transaction-outputs-in-cardano",
+  "wallet.receive.page.internal.learnMore": "https://www.emurgo.io/press-news/yoroi-wallet-a-guide-to-the-receive-menu/",
   "wallet.receive.page.internalWarning1": "Internal addresses (or \"change\" addresses) maintain your privacy by obscuring which addresses belong to you on the blockchain.",
   "wallet.receive.page.internalWarning2": "addresses are shown here for personal auditing purposes and should never be used.",
   "wallet.receive.page.label": "Nhãn",
