@@ -68,7 +68,7 @@ export const tokenMessages: Object = defineMessages({
 });
 
 export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network => {
-  return isTestnet(network) ? 'https://testnet.cardanoscan.io/token' : 'https://cardanoscan.io/token';
+  return isTestnet(network) ? 'https://preprod.cardanoscan.io/token' : 'https://cardanoscan.io/token';
 };
 
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
