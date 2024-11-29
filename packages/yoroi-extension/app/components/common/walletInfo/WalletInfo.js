@@ -14,6 +14,7 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
 import WalletAccountIcon from '../../topbar/WalletAccountIcon';
+import { constructPlate40 } from '../../topbar/WalletCard';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -34,15 +35,6 @@ type Props = {|
   +conceptualWalletName: string,
 |};
 
-function constructPlate(plate: WalletChecksum, saturationFactor: number, divClass: string): [string, React$Element<'div'>] {
-  return [
-    plate.TextPart,
-    <div className={divClass}>
-      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
-    </div>,
-  ];
-}
-
 @observer
 export default class WalletInfo extends Component<Props> {
   static contextTypes: {| infoText: void |} = {
@@ -52,7 +44,7 @@ export default class WalletInfo extends Component<Props> {
   render(): Node {
     const { shouldHideBalance, onUpdateHideBalance, walletAmount, conceptualWalletName } = this.props;
 
-    const [accountPlateId, iconComponent] = this.props.plate ? constructPlate(this.props.plate, 0, styles.icon) : [];
+    const [accountPlateId, iconComponent] = this.props.plate ? constructPlate40(this.props.plate) : [];
 
     return (
       <div className={styles.wrapper}>
