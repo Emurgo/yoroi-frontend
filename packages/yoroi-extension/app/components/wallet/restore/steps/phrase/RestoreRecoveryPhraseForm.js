@@ -212,8 +212,8 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   fontSize: '14px',
                   lineHeight: '15px',
                   '&.MuiButton-sizeMedium': {
-                    px: "20px",
-                    py: "9px",
+                    px: '20px',
+                    py: '9px',
                   },
                   minWidth: 0,
                   minHeight: 0,

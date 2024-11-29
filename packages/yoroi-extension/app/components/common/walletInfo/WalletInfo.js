@@ -13,7 +13,6 @@ import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import styles from './WalletInfo.scss';
-import WalletAccountIcon from '../../topbar/WalletAccountIcon';
 import { constructPlate40 } from '../../topbar/WalletCard';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
