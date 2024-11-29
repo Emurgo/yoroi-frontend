@@ -16,14 +16,18 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import { useTheme } from '@mui/material';
 import { walletSignData, encodeHardwareWalletSignResult } from '../../api/ada';
 import { getPublicDeriverById } from '../../../chrome/extension/background/handlers/yoroi/utils';
 import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
-import DialogTextBlock from '../../components/widgets/DialogTextBlock'
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { Box, TextField, InputAdornment, IconButton, Tooltip, Typography, DialogContentText } from '@mui/material';
+import {
+  useTheme,
+  Box,
+  TextField,
+  Typography,
+  DialogContentText
+} from '@mui/material';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
@@ -98,13 +102,10 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
 
   const iframeRef = useRef < HTMLIFrameElement | null > (null);
   const [iframeSrc, setIframeSrc] = useState('');
-  const [status, setStatus] = useState('loading');
   const [popup, setPopup] = useState(false);
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [errMsg, setErrMsg] = useState('')
   const [message, setMessage] = useState('')
-  const [claimAmount, setClaimAmount] = useState(0)
   const [signaturePopup, setSignaturePopup] = useState(false);
   const [overlayBgColor, setOverlayBgColor] = useState('#000000fa');
 
@@ -130,7 +131,6 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
       url.searchParams.set('theme', theme.name.split('-')[0]);
 
       setIframeSrc(url.href);
-      setStatus('done');
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -142,7 +142,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
       .join('');
   }
 
-  const signMessage = useCallback(async (message: string, password: string) => {
+  const signMessage = useCallback(async (msg: string, pwd: string) => {
     const { address, addressing } = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
 
     try {
@@ -150,7 +150,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
       if (wallet.type === 'mnemonic') {
         const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId)
         try {
-          res = await walletSignData(publicDeriver, password, address, stringToHex(message))
+          res = await walletSignData(publicDeriver, pwd, address, stringToHex(msg))
         } catch (error) {
           if (error instanceof WrongPassphraseError) {
             throw new IncorrectWalletPasswordError();
@@ -164,7 +164,7 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         try {
           const network = getNetworkById(wallet.networkId);
           const config = network.BaseConfig[0];
-          const messageHex = stringToHex(message);
+          const messageHex = stringToHex(msg);
           const hashPayload = true;
           const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
             serial: null,
@@ -227,8 +227,6 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
     const messageData: IframeMessageData = (event.data: any);
 
     if (messageData.action === 'SIGN_MESSAGE') {
-      setClaimAmount(messageData.amount)
-
       setMessage(messageData.messageToSign)
       setSignaturePopup(true)
     } else if (messageData.action === 'POPUP_OPENED') {
@@ -264,7 +262,8 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         setShownCashbackWallet(currentCashbackWallet);
         setPopup(true);
       }
-    });
+      return 'nonsense';
+    }).catch(console.error);
   }, []);
 
   const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
@@ -276,7 +275,8 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         setShouldShowDisclaimer(true);
         setPopup(true);
       }
-    });
+      return 'nonsense';
+    }).catch(console.error);
   }, []);
 
   const closePopup = useCallback(() => {
@@ -380,7 +380,12 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
               }]}
             >
               <Box>
-                <Typography sx={{ marginBottom: "16px", color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5' }}>
+                <Typography
+                  sx={{
+                    marginBottom: '16px',
+                    color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
+                  }}
+                >
                   {intl.formatMessage(wallet.type === 'mnemonic' ?
                     messages.passwordClaimInstruction : messages. hardwardClaimInstruction
                   )}
@@ -424,21 +429,23 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
             </Dialog>
             : null}
 
-          {popup ? (
+           {popup ? (
+            // eslint-disable-next-line
             <div
               className={styles.iframe_overlay}
               style={{ background: overlayBgColor }}
               onClick={closePopup}
             />
-          ) : null}
+           ) : null}
 
           {iframeSrc && (
             <iframe
+              title="cashback"
               ref={iframeRef}
               id="bringweb3"
               className={styles.iframe}
               src={iframeSrc}
-              style={{ verticalAlign: "bottom" }}
+              style={{ verticalAlign: 'bottom' }}
               width="100%"
               height="100%"
             />

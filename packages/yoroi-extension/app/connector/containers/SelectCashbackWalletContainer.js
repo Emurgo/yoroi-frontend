@@ -2,7 +2,6 @@
 import { Component, type Node } from 'react';
 import ConnectPage from '../components/connect/ConnectPage';
 import { observer } from 'mobx-react';
-import { autorun } from 'mobx';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { setCashbackWallet } from '../../api/thunk';
@@ -44,7 +43,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
         unitOfAccount={stores.profile.unitOfAccount}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         onUpdateHideBalance={actions.profile.updateHideBalance.trigger}
-        isSelectingCashbackWallet={true}
+        isSelectingCashbackWallet
       />
     );
   }

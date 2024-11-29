@@ -1,5 +1,4 @@
 // @flow
-import { sendToInjector, } from './utils';
 import LocalStorageApi from '../../../../../app/api/localStorage';
 import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { getAllAddressesForWallet } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
@@ -7,7 +6,7 @@ import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/Pu
 import { getDb } from '../../state';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
-import { getBoundsForTabWindow, popupProps } from './utils';
+import { getBoundsForTabWindow, popupProps, sendToInjector } from './utils';
 
 declare var chrome;
 
@@ -65,6 +64,8 @@ const handlers = Object.freeze({
   'set-cashback-wallet': async (id: number) => {
     const localStorageApi = new LocalStorageApi();
     await localStorageApi.saveCashbackWalletId(id);
+
+    notifyAllTabsCashbackWalletChange()
     return { ok: undefined };
   },
 });

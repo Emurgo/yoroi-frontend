@@ -123,12 +123,14 @@ export const CreateHardwareWallet: HandlerType<
   },
 });
 
-async function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
-  const db = await getDb();
-  const publicDerivers = await loadWalletsFromStorage(db);
-  if (publicDerivers.length === 1 && !isTrezorTWallet(newWallet.getParent())) {
-    notifyAllTabsCashbackWalletChange();
-  }
+function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
+  (async () => {
+    const db = await getDb();
+    const publicDerivers = await loadWalletsFromStorage(db);
+    if (publicDerivers.length === 1 && !isTrezorTWallet(newWallet.getParent())) {
+      notifyAllTabsCashbackWalletChange();
+    }
+  })().catch(console.error);
 }
 
 export const RemoveWallet: HandlerType<

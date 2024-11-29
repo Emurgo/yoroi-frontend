@@ -327,13 +327,13 @@ class ConnectPage extends Component<Props & InjectedProps> {
                   <ul className={styles.list}>
                     {publicDerivers.map((wallet, idx) => {
                       const isTrezor = isSelectingCashbackWallet && wallet.type === 'trezor';
-                      const Button = isTrezor ? DisabledWalletButton : WalletButton;
+                      const Btn = isTrezor ? DisabledWalletButton : WalletButton;
                       return (
                         <li
                           key={wallet.publicDeriverId}
                           className={[styles.listItem, isTrezor ? '' : styles.enabledWallet].join(' ')}
                         >
-                          <Button onClick={() => onSelectWallet(wallet, wallet.plate)}>
+                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)}>
                             <ConnectedWallet
                               disabledForReason={
                                 isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null
@@ -359,7 +359,7 @@ class ConnectPage extends Component<Props & InjectedProps> {
                                 </Box>
                               }
                             />
-                          </Button>
+                          </Btn>
                         </li>
                       );
                     })}

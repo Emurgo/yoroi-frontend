@@ -44,14 +44,6 @@ type Props = {|
   +error?: ?LocalizableError,
 |};
 
-const saturationFactor = {
-  saturationFactor: 0,
-  size: 8,
-  scalePx: 4,
-  iconSize: 32,
-  borderRadius: 4,
-};
-
 @observer
 class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
   static defaultProps: {| error: void |} = {

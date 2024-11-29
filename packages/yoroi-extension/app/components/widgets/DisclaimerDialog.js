@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   disclaimerNote: {
     id: 'cashback.disclaimer.note',
-    defaultMessage: '!!! Please note:',
+    defaultMessage: '!!!Please note:',
   },
   disclaimerNote1: {
     id: 'cashback.disclaimer.note.1',

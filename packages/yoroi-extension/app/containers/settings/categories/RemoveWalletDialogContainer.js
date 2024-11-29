@@ -3,8 +3,8 @@ import type { ComponentType, Node } from 'react';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape, type $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
