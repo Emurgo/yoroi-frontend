@@ -1,9 +1,9 @@
-// flow
+// TODO: Add types once migration to new structure
 import * as React from 'react';
 
-const IntlProviderContext = React.createContext<{ intl: any }>({ intl: null });
+const IntlProviderContext = React.createContext({ intl: null });
 
-export const IntlProvider = ({ children, intl }: { children: React.ReactNode; intl: any }) => {
+export const IntlProvider = ({ children, intl }) => {
   return <IntlProviderContext.Provider value={{ intl }}>{children}</IntlProviderContext.Provider>;
 };
 

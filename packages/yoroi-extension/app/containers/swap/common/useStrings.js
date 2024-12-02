@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { defineMessages, FormattedHTMLMessage } from 'react-intl';
-import { useIntl } from '../context/intl/IntlProvider.tsx';
+import { useIntl } from '../context/intl/IntlProvider.js';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -437,5 +437,3 @@ export const useStrings = () => {
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
   }).current;
 };
-
-intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_BUY_ADA.toString() });

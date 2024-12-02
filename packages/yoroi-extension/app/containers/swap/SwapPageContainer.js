@@ -49,24 +49,24 @@ export default class SwapPageContainer extends Component<AllProps> {
     const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
 
     return (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainerRevamp
-            actions={actions}
-            stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-            menu={menu}
-          />
-        }
-        showInContainer
-        withPadding={false}
-      >
-        <IntlProvider intl={intl}>
+      <IntlProvider intl={intl}>
+        <TopBarLayout
+          banner={<BannerContainer actions={actions} stores={stores} />}
+          sidebar={sidebarContainer}
+          navbar={
+            <NavBarContainerRevamp
+              actions={actions}
+              stores={stores}
+              title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+              menu={menu}
+            />
+          }
+          showInContainer
+          withPadding={false}
+        >
           <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-        </IntlProvider>
-      </TopBarLayout>
+        </TopBarLayout>
+      </IntlProvider>
     );
   }
 }
