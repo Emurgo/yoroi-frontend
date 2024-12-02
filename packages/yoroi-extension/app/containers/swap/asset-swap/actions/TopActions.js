@@ -26,6 +26,7 @@ export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
 
   const [rotationDegrees, setRotationDegrees] = useState(0);
 
+  // <TODO:SWAP> Implement refresh
   const handleRefresh = () => {
     document.activeElement?.blur();
     setRotationDegrees(prevDegrees => prevDegrees + 360);
