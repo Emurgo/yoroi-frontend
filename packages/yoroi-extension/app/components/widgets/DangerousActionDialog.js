@@ -98,7 +98,7 @@ class DangerousActionDialog extends Component<Props & InjectedLayoutProps> {
               />
             }
             id={id + '-acknowledgeAction-checkbox'}
-            sx={{ marginLeft: '-0px' }}
+            sx={{ marginLeft: '-0px', color: 'ds.text_gray_medium' }}
           />
         </Box>
         {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}

@@ -1,4 +1,4 @@
-import { TableCell, TableRow } from '@mui/material';
+import { TableCell, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -15,6 +15,19 @@ import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../module/PortfolioTokenActivityProvider';
 import { TokenDisplay, TokenPrice, TokenPriceChangeChip, TokenPriceTotal, TokenProcentage } from './TableColumnsChip';
 import { useProcessedTokenData } from './useProcentage';
+
+const STableRow = styled(TableRow)(({ theme }: any) => ({
+  cursor: 'pointer',
+  transition: 'all 0.3s ease-in-out',
+  borderRadius: `${theme.shape.borderRadius}px`,
+  '& td': { border: 0 },
+  '&:hover': {
+    backgroundColor: theme.palette.ds.bg_color_min,
+  },
+}));
+const STableCell = styled(TableCell)(() => ({
+  width: '15%',
+}));
 
 interface Props {
   data: TokenType[];
@@ -58,7 +71,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
     },
   ];
 
-  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h });
+  const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h, data30d, data7d });
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
   return (
@@ -73,61 +86,49 @@ const StatsTable = ({ data }: Props): JSX.Element => {
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {getSortedData(assetFormatedList).map((row: any) => (
-        <TableRow
-          key={row.id}
-          onClick={() => navigateTo.portfolioDetail(row.id)}
-          sx={{
-            cursor: 'pointer',
-            transition: 'all 0.3s ease-in-out',
-            borderRadius: `${theme.shape.borderRadius}px`,
-            '& td': { border: 0 },
-            '&:hover': {
-              backgroundColor: theme.palette.ds.gray_c50,
-            },
-          }}
-        >
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenDisplay token={row} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex', marginTop: '10px' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
+          <STableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.WEEK}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.MONTH}
             />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem', display: 'flex-end' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenProcentage procentage={row.percentage} />
-          </TableCell>
+          </STableCell>
 
-          <TableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
-          </TableCell>
-        </TableRow>
+          </STableCell>
+        </STableRow>
       ))}
     </Table>
   );

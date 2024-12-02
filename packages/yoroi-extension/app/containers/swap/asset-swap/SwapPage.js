@@ -33,6 +33,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
+import { downloadLogs } from '../../../utils/logging';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -398,6 +399,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               onSuccess={() => {
                 props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
               }}
+              onDownloadLogs={downloadLogs}
             />
           )}
         </Box>
@@ -422,7 +424,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {(isButtonLoader && <LoadingSpinner />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
+              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
             </Button>
           </Box>
         )}

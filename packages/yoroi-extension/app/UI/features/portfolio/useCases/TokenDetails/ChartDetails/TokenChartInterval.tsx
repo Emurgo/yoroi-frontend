@@ -16,17 +16,18 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
   padding: '6px !important',
   minWidth: '36px',
   backgroundColor:
-    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `transparent`,
+    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_400) : `transparent`,
+  color: 'ds.gray_min',
 
   '&.MuiButton-contained': {
-    color: theme.palette.ds.gray_min,
+    color: 'ds.gray_min',
   },
   '&.MuiButton-secondary': {
-    color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.text_primary_medium,
+    color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.gray_min,
   },
   '&:hover': {
     backgroundColor:
-      variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `transparent`,
+      variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `ds.primary_200`,
   },
 }));
 
@@ -101,7 +102,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                 <LineChart
                   margin={{ top: 10, left: -16, right: 0, bottom: 0 }}
                   data={chartData}
-                  onMouseDown={handleMouseDown}
+                  onMouseOver={handleMouseDown}
                   onMouseUp={handleMouseUp}
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseUp}

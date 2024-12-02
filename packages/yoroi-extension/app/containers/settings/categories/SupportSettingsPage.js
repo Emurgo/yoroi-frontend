@@ -8,6 +8,7 @@ import { downloadLogs } from '../../../utils/logging';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import IncludePublicKeyDialog from './IncludePublicKeyDialog';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
+import { ROUTES } from '../../../routes-config';
 
 @observer
 export default class SupportSettingsPage extends Component<StoresAndActionsProps> {
@@ -54,12 +55,14 @@ export default class SupportSettingsPage extends Component<StoresAndActionsProps
   };
 
   render(): Node {
+    const { actions } = this.props;
     return (
       <>
         {this.getDialog()}
         <SupportSettings
           onExternalLinkClick={handleExternalLinkClick}
           onDownloadLogs={this.handleDownloadLogs}
+          onPaperWalletTransfer={() => actions.router.redirect.trigger({ route: ROUTES.TRANSFER.ROOT })}
         />
       </>
     );

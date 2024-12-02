@@ -21,13 +21,11 @@ const messages: Object = defineMessages({
   },
   thirdTip: {
     id: 'wallet.create.dialog.howToSaveRecoveryPhrase.thirdTip',
-    defaultMessage:
-      '!!!Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ',
+    defaultMessage: '!!!Write the recovery phrase on a piece of paper and store in a secure location like a safety deposit box. ',
   },
   forthTip: {
     id: 'wallet.create.dialog.howToSaveRecoveryPhrase.forthTip',
-    defaultMessage:
-      '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
+    defaultMessage: '!!!It is recommended to have 2 or 3 copies of the recovery phrase in different secure locations.',
   },
 });
 
@@ -53,13 +51,13 @@ function HowToSaveRecoveryPhraseTipsDialog(props: Props & Intl): Node {
 
   return (
     <InfoDialog open={open} onClose={onClose}>
-      <Typography component="div" textAlign="center" variant="body1" fontWeight="500" mb="16px">
+      <Typography component="div" textAlign="center" variant="body1" fontWeight="500" mb="16px" color="ds.text_gray_medium">
         {intl.formatMessage(messages.title)}
       </Typography>
       <Box component="ul" sx={{ listStyle: 'outside', px: '24px' }}>
         {tips.map(([tipId, tipTxt]) => (
           <Box key={tipId} component="li">
-            <Typography component="div" variant="body1" color="grey.800">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(tipTxt)}
             </Typography>
           </Box>

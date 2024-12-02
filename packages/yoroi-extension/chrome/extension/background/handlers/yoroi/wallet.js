@@ -65,6 +65,7 @@ export const CreateWallet: HandlerType<CreateWalletRequest, CreateWalletResponse
         publicDeriverId: publicDerivers[0].getPublicDeriverId(),
       }
     });
+    // noinspection ES6MissingAwait
     syncWallet(publicDerivers[0], 'new wallet', 1);
     return await getPlaceHolderWalletState(publicDerivers[0]);
   },
@@ -250,7 +251,7 @@ export const GetPrivateStakingKey: HandlerType<
 });
 
 export const RemoveAllTransactions: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'remove-all-transactions',
@@ -275,7 +276,7 @@ export const RemoveAllTransactions: HandlerType<
 });
 
 export const PopAddress: HandlerType<
-  { publicDeriverId: number, ... },
+  {| publicDeriverId: number |},
   void
 > = Object.freeze({
   typeTag: 'pop-address',
@@ -354,6 +355,7 @@ export const RefreshTransactions: HandlerType<
       // initial transaction list loading
       txs = await adaApi.refreshTransactions(refreshTxRequest);
     }
-    return txs;
+    // $FlowIgnore
+    return JSON.stringify(txs);
   },
 });

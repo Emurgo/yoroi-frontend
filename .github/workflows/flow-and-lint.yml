@@ -1,4 +1,4 @@
-name: Flow and lint
+name: Flow and Lint and TSC
 
 on:
   workflow_dispatch:
@@ -44,3 +44,6 @@ jobs:
       - name: lint
         run: |
           npm run eslint
+      - name: tsc
+        run: |
+          npm run tsc

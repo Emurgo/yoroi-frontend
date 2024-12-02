@@ -2,7 +2,7 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -14,6 +14,18 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& defs': {
+      '& linearGradient': {
+        '& stop': {
+          'stop-color': theme.palette.ds.el_primary_medium,
+        }
+      }
     },
   },
 }));
@@ -70,7 +82,9 @@ export default class AddWalletPageHeader extends Component<Props> {
               mb: '24px',
             }}
           >
-            <img src={YoroiLogo} alt="Yoroi" />
+            <LogoIconWrapper>
+              <YoroiLogo />
+            </LogoIconWrapper>
           </Box>
           <Typography component="div" variant="h1" fontWeight={500} color="primary.600" mb="8px">
             {intl.formatMessage(globalMessages.yoroi)}

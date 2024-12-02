@@ -122,6 +122,7 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
 
 const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, headCells, tokenName }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { primaryTokenInfo } = usePortfolio();
 
   return (
     <TableRow key={`${row.label} ${index}`} sx={{ '& td, & th': { border: 0 } }}>
@@ -177,7 +178,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             {row.feeValue ? `${row.feeValue.toFixed(2)} ADA` : '-'}
           </Typography>
           {isExpanded &&
-            (unitOfAccount === 'ADA' ? null : (
+            (unitOfAccount === primaryTokenInfo.name ? null : (
               <Typography variant="body2" color="ds.text_gray_low">
                 {row.feeValueUsd ? `${row.feeValueUsd.toFixed(2)} ${unitOfAccount}` : '-'}
               </Typography>
@@ -204,7 +205,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             </Typography>
             {isExpanded ? (
               <Box sx={{ transition: 'all ease 0.3s' }}>
-                {unitOfAccount === 'ADA' ? null : (
+                {unitOfAccount === primaryTokenInfo.name ? null : (
                   <Typography variant="body2" color="ds.gray_600" sx={{ textAlign: 'right' }}>
                     {(row.type === HistoryItemType.RECEIVED ||
                       row.type === HistoryItemType.WITHDRAW ||
