@@ -10,7 +10,7 @@ import { Quantities } from '../../utils/quantities';
 import { PRICE_PRECISION } from './common';
 import Percent from '../common/Percent';
 import Dialog from '../widgets/Dialog';
-import { FormattedHTMLMessage } from 'react-intl';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 function colorsBySeverity(isSevere: boolean) {
   const theme = useTheme();
@@ -74,6 +74,7 @@ const IconWrapper = styled(Box)(({ theme, isSevere }) => ({
 
 function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
   const { palette } = useTheme();
+  const strings = useStrings();
   return isSevere ? (
     <Typography variant="body1" sx={{ color: palette.ds.text_gray_medium }}>
       {strings.priceImpactSevere}
@@ -86,6 +87,7 @@ function PriceImpactWarningText({ isSevere }: {| isSevere: boolean |}): Node {
 }
 
 export function PriceImpactTitle({ isSevere, small, sx }: {| isSevere: boolean, small?: boolean, sx?: any |}): Node {
+  const strings = useStrings();
   return (
     <Box sx={{ display: 'flex', ...(sx ?? {}) }}>
       <PriceImpactIcon small={small} isSevere={isSevere} />
@@ -160,6 +162,7 @@ export function PriceImpactBanner({ priceImpactState }: {| priceImpactState: ?Pr
 }
 
 export function PriceImpactAlert({ onContinue, onCancel }: {| onContinue: () => void, onCancel: () => void |}): Node {
+  const strings = useStrings();
   return (
     <Dialog
       title="Warning"

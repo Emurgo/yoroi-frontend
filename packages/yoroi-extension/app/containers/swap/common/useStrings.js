@@ -36,7 +36,7 @@ export const messages = Object.freeze(
       id: 'swap.max',
       defaultMessage: '!!!MAX',
     },
-    max: {
+    currentBalance: {
       id: 'swap.currentBalance',
       defaultMessage: '!!!Current balance:',
     },
@@ -360,7 +360,7 @@ export const useStrings = () => {
     total: intl.formatMessage(messages.total),
     manual: intl.formatMessage(messages.manual),
     max: intl.formatMessage(messages.max),
-    max: intl.formatMessage(messages.max),
+    currentBalance: intl.formatMessage(messages.currentBalance),
     swap: intl.formatMessage(messages.swap),
     auto: intl.formatMessage(messages.auto),
     assetSwapLabel: intl.formatMessage(messages.assetSwapLabel),
@@ -400,7 +400,7 @@ export const useStrings = () => {
     priceImpactTooltip: intl.formatMessage(messages.priceImpactTooltip),
     priceImpactSevere: <FormattedHTMLMessage {...messages.priceImpactSevere} />,
     priceImpactNotSevere: <FormattedHTMLMessage {...messages.priceImpactNotSevere} />,
-    numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num: num }),
+    numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num }),
     numAssetsAvailable: num => intl.formatMessage(messages.numAssetsAvailable, { num }),
     noAssetFoundWithTerm: term => intl.formatMessage(messages.noAssetFoundWithTerm, { searchTerm: term }),
     noAssetFoundToSwap: intl.formatMessage(messages.noAssetFoundToSwap),

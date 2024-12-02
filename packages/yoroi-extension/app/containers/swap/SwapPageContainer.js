@@ -14,7 +14,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
-import { IntlProvider } from './context/intl/IntlProvider.tsx';
+import { IntlProvider } from './context/intl/IntlProvider.js';
 
 type Props = {|
   +children?: Node,
