@@ -97,6 +97,9 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
       </Dialog>
     ) : null;
 
+    const mainnetWallets =
+      cardanoWallets.filter(({ isTestnet }) => !isTestnet);
+
     return (
       <Box
         sx={{
@@ -145,7 +148,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
               );
             }}
           >
-            {cardanoWallets.map(option => optionRenderer(option))}
+            {mainnetWallets.map(option => optionRenderer(option))}
           </Select>
           <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700">
             <FormattedHTMLMessage {...messages.note} />
