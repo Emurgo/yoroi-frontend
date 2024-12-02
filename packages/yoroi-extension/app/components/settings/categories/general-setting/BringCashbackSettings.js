@@ -81,7 +81,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
             <WalletIcon imagePart={option.plate.ImagePart} />
             <Box sx={{ marginLeft: '8px' }}>
               <Typography variant="body1" color="ds.text_gray_medium">
-                {option.name}| {option.plate.TextPart}
+                {option.plate.TextPart}&nbsp;|&nbsp;{option.name}
               </Typography>
             </Box>
           </Box>
