@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, FormattedHTMLMessage } from 'react-intl';
 import { useIntl } from '../context/intl/IntlProvider.tsx';
 
 export const messages = Object.freeze(
@@ -196,12 +196,12 @@ export const messages = Object.freeze(
     priceImpactSevere: {
       id: 'swap.priceImpactSevere',
       defaultMessage:
-        '!!!<b>Price impact over 10%<b> may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.',
+        '!!!<strong>Price impact over 10%</strong> may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.',
     },
     priceImpactNotSevere: {
       id: 'swap.priceImpactNotSevere',
       defaultMessage:
-        '!!!<b>Price impact over 1%<b> may cause a difference in the amount you actually receive. Consider this at your own risk.',
+        '!!!<strong>Price impact over 1%</strong> may cause a difference in the amount you actually receive. Consider this at your own risk.',
     },
     numAssetsFound: {
       id: 'swap.numAssetsFound',
@@ -211,8 +211,8 @@ export const messages = Object.freeze(
       id: 'swap.numAssetsAvailable',
       defaultMessage: '!!!{num} assets available',
     },
-    noTokensFoundWithTerm: {
-      id: 'swap.noTokensFoundWithTerms',
+    noAssetFoundWithTerm: {
+      id: 'swap.noAssetFoundWithTerm',
       defaultMessage: '!!!No tokens found for “{searchTerm}”',
     },
     noAssetFoundToSwap: {
@@ -353,28 +353,89 @@ export const useStrings = () => {
 
   return useRef({
     back: intl.formatMessage(messages.back),
+    apply: intl.formatMessage(messages.apply),
+    confirm: intl.formatMessage(messages.confirm),
+    continue: intl.formatMessage(messages.continue),
+    cancel: intl.formatMessage(messages.cancel),
+    total: intl.formatMessage(messages.total),
+    manual: intl.formatMessage(messages.manual),
+    max: intl.formatMessage(messages.max),
+    max: intl.formatMessage(messages.max),
     swap: intl.formatMessage(messages.swap),
+    auto: intl.formatMessage(messages.auto),
+    assetSwapLabel: intl.formatMessage(messages.assetSwapLabel),
+    orderSwapLabel: intl.formatMessage(messages.orderSwapLabel),
     slippageTolerance: intl.formatMessage(messages.slippageTolerance),
+    defaultSlippageTolerance: intl.formatMessage(messages.defaultSlippageTolerance),
     slippageToleranceTooltip: intl.formatMessage(messages.slippageToleranceTooltip),
+    slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     clear: intl.formatMessage(messages.clear),
     marketTabLabel: intl.formatMessage(messages.marketTabLabel),
     limitTabLabel: intl.formatMessage(messages.limitTabLabel),
     swapToLabel: intl.formatMessage(messages.swapToLabel),
+    swapFromLabel: intl.formatMessage(messages.swapFromLabel),
     dexLabel: intl.formatMessage(messages.dexLabel),
     sendUsingLedgerNano: intl.formatMessage(messages.sendUsingLedgerNano),
     sendUsingTrezorT: intl.formatMessage(messages.sendUsingTrezorT),
     cancelOrderTitle: intl.formatMessage(messages.cancelOrderTitle),
     cancelOrderContent: intl.formatMessage(messages.cancelOrderContent),
+    asset: intl.formatMessage(messages.asset),
+    amount: intl.formatMessage(messages.amount),
     assetPrice: intl.formatMessage(messages.assetPrice),
     assetAmount: intl.formatMessage(messages.assetAmount),
     totalReturned: intl.formatMessage(messages.totalReturned),
+    timeExecuted: intl.formatMessage(messages.timeExecuted),
+    timeCreated: intl.formatMessage(messages.timeCreated),
     totalReturnedTooltip: intl.formatMessage(messages.totalReturnedTooltip),
     cancellationFee: intl.formatMessage(messages.cancellationFee),
     password: intl.formatMessage(messages.password),
     passwordIncorrect: intl.formatMessage(messages.passwordIncorrect),
     limitPrice: intl.formatMessage(messages.limitPrice),
+    limitPriceTooltip: intl.formatMessage(messages.limitPriceTooltip),
     limitPriceContent: intl.formatMessage(messages.limitPriceContent),
     yourLimitPrice: intl.formatMessage(messages.yourLimitPrice),
     marketPrice: intl.formatMessage(messages.marketPrice),
+    marketPriceTooltip: intl.formatMessage(messages.marketPriceTooltip),
+    priceImpact: intl.formatMessage(messages.priceImpact),
+    priceImpactTooltip: intl.formatMessage(messages.priceImpactTooltip),
+    priceImpactSevere: <FormattedHTMLMessage {...messages.priceImpactSevere} />,
+    priceImpactNotSevere: <FormattedHTMLMessage {...messages.priceImpactNotSevere} />,
+    numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num: num }),
+    numAssetsAvailable: num => intl.formatMessage(messages.numAssetsAvailable, { num }),
+    noAssetFoundWithTerm: term => intl.formatMessage(messages.noAssetFoundWithTerm, { searchTerm: term }),
+    noAssetFoundToSwap: intl.formatMessage(messages.noAssetFoundToSwap),
+    swapDisclamerInfo: <FormattedHTMLMessage {...messages.swapDisclamerInfo} />,
+    swapDisclamerButton: intl.formatMessage(messages.swapDisclamerButton),
+    pairNotAvailable: intl.formatMessage(messages.pairNotAvailable),
+    noPoolFound: intl.formatMessage(messages.noPoolFound),
+    adaDepositTooltip: intl.formatMessage(messages.adaDepositTooltip),
+    minAda: intl.formatMessage(messages.minAda),
+    fees: intl.formatMessage(messages.fees),
+    feesIncluded: intl.formatMessage(messages.feesIncluded),
+    dexFee: intl.formatMessage(messages.dexFee),
+    frontendFee: intl.formatMessage(messages.frontendFee),
+    minimumAssets: intl.formatMessage(messages.minimumAssets),
+    minimumAssetsTooltip: intl.formatMessage(messages.minimumAssetsTooltip),
+    lpFee: intl.formatMessage(messages.lpFee),
+    lpFeeTooltip: intl.formatMessage(messages.lpFeeTooltip),
+    confirmSwapTx: intl.formatMessage(messages.confirmSwapTx),
+    txSubmitted: intl.formatMessage(messages.txSubmitted),
+    txFailed: intl.formatMessage(messages.txFailed),
+    txId: intl.formatMessage(messages.txId),
+    checkTx: intl.formatMessage(messages.checkTx),
+    txNotProcessed: intl.formatMessage(messages.txNotProcessed),
+    goToTxs: intl.formatMessage(messages.goToTxs),
+    tryAgain: intl.formatMessage(messages.tryAgain),
+    downloadLogFile: intl.formatMessage(messages.downloadLogFile),
+    notEnoughBalance: intl.formatMessage(messages.notEnoughBalance),
+    notEnoughBalanceFees: intl.formatMessage(messages.notEnoughBalanceFees),
+    noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
+    noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
+    startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
+    ordersPairs: intl.formatMessage(messages.ordersPairs),
+    ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
+    openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
   }).current;
 };
+
+intl.formatMessage(messages.lessThanMinimum, { amount: MINIMUM_BUY_ADA.toString() });

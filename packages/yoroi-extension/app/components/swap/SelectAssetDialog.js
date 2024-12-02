@@ -115,8 +115,7 @@ export default function SelectAssetDialog({
           </Box>
           <Box sx={{ marginBottom: '16px' }}>
             <Typography component="div" variant="body2" color="ds.text_gray_low">
-              {searchTerm ? strings.numAssetsFound : strings.numAssetsAvailable}
-              {/* {filteredAssets.length} assets {searchTerm ? 'found' : 'available'} */}
+              {searchTerm ? strings.numAssetsFound(filteredAssets.length) : strings.numAssetsAvailable(filteredAssets.length)}
             </Typography>
           </Box>
         </>
@@ -147,8 +146,7 @@ export default function SelectAssetDialog({
           <Box display="flex" flexDirection="column" gap="16px" alignItems="center" justifyContent="center">
             <Box mt="60px">{assetsStillLoading ? <LoadingSpinner /> : <NoAssetsFound />}</Box>
             <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
-              {type === 'from' ? strings.noAssetFoundWithTerm : strings.noAssetFoundToSwap}
-              {/* {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'} */}
+              {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}
             </Typography>
           </Box>
         </Box>
