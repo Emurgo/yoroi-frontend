@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
-import { Box, MenuItem, Typography } from '@mui/material';
+import { Box, MenuItem, Typography, styled } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -36,6 +36,23 @@ const messages = defineMessages({
   },
 });
 
+const SMenuItem = styled(MenuItem)(({ theme, isSelected }: any) => ({
+  '&.Mui-selected': {
+    backgroundColor: theme.palette.ds.bg_color_contrast_min,
+    '&:hover': {
+      backgroundColor: theme.palette.ds.bg_color_contrast_min,
+    },
+    '&.Mui-focusVisible': {
+      backgroundColor: theme.palette.ds.bg_color_contrast_min,
+    },
+  },
+  backgroundColor: theme.palette.ds.bg_color_contrast_high,
+  opacity: '1',
+  '&:hover': {
+    backgroundColor: theme.palette.ds.bg_color_contrast_min,
+  },
+}));
+
 @observer
 class GeneralSettings extends Component<Props & InjectedLayoutProps> {
   static defaultProps: {| error: void |} = {
@@ -54,9 +71,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
     fields: {
       languageId: {
         label: this.context.intl.formatMessage(
-          this.props.isRevampLayout
-            ? messages.languageSelectLabel
-            : globalMessages.languageSelectLabel
+          this.props.isRevampLayout ? messages.languageSelectLabel : globalMessages.languageSelectLabel
         ),
         value: this.props.currentLocale,
       },
@@ -74,6 +89,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
       svg: language.svg,
     }));
     const componentClassNames = classNames([styles.component, 'general']);
+    const selectedLanguage = languageOptions.filter(item => item.value === this.props.currentLocale)[0];
 
     return (
       <div className={componentClassNames}>
@@ -93,31 +109,38 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             onChange={this.selectLanguage}
             disabled={isSubmitting}
             renderValue={value => (
-              <Typography component="div" variant="body1">
-                {languageOptions.filter(item => item.value === value)[0].label}
+              <Typography component="div" variant="body1" color="ds.text_gray_medium">
+                {selectedLanguage.label}
               </Typography>
             )}
           >
             {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
+              <SMenuItem
+                key={option.value}
+                value={option.value}
+                id={'selectLanguage-' + option.value + '-menuItem'}
+                isSelected={selectedLanguage.value === option.value}
+              >
                 <FlagLabel svg={option.svg} label={option.label} />
-              </MenuItem>
+              </SMenuItem>
             ))}
           </Select>
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
 
         {!tier1Languages.includes(languageId.value) && (
-          <div className={styles.info}>
-            <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
-            <div>
+          <Box component="div" className={styles.info}>
+            <Typography variant="body2" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(globalMessages.languageSelectLabelInfo)}
+            </Typography>
+            <Typography variant="body2" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.languageSelectInfo)}{' '}
               {listOfTranslators(
                 intl.formatMessage(globalMessages.translationContributors),
                 intl.formatMessage(globalMessages.translationAcknowledgment)
               )}
-            </div>
-          </div>
+            </Typography>
+          </Box>
         )}
       </div>
     );
