@@ -1,6 +1,6 @@
 // @flow
 
-import type { ConfigType, Network } from '../config/config-types';
+import type { BringConfigType, ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
 import type { UserAgentInfo } from './utils/userAgentInfo';
 import userAgentInfo from './utils/userAgentInfo';
@@ -90,6 +90,11 @@ function getVersion(): string {
 
 const FIREFOX_PRIVACY_POLICY_URL = 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/privacy';
 
+/**
+ * This can be replaced with `.bringSandbox`
+ */
+const BRING_CONFIG = CONFIG.bring; // CONFIG.bringSandbox;
+
 export const environment = ((
   {
     ...process.env,
@@ -115,9 +120,11 @@ export const environment = ((
     getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
     getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
     userAgentInfo,
-    bringBaseUrl: CONFIG.bring.baseUrl,
-    bringIdentifier: CONFIG.bring.identifier,
-    bringApiEndpoint: CONFIG.bring.apiEndpoint,
+    bring: {
+      baseUrl: BRING_CONFIG.baseUrl,
+      identifier: BRING_CONFIG.identifier,
+      apiEndpoint: BRING_CONFIG.apiEndpoint,
+    },
     isFirefox,
     isChrome,
     isExtension,
@@ -145,9 +152,7 @@ export const environment = ((
   getServerStatusRefreshInterval: void => number,
   userAgentInfo: UserAgentInfo,
   isLight: boolean,
-  bringBaseUrl: string,
-  bringIdentifier: string,
-  bringApiEndpoint: string,
+  bring: BringConfigType,
   isExtension: void => boolean,
   isFirefox: void => boolean,
   isChrome: void => boolean,

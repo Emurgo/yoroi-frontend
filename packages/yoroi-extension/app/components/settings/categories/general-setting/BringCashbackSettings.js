@@ -39,7 +39,7 @@ const messages = defineMessages({
 type Props = {|
   +onSelect: number => Promise<void>,
   +isSubmitting: boolean,
-  +cardanoWallets: Array<{ publicDeriverId: number, name: string, plate: WalletChecksum, ... }>,
+  +cardanoWallets: Array<{ publicDeriverId: number, name: string, plate: WalletChecksum, isTestnet: boolean, ... }>,
   +currentValue: ?number,
   +error?: ?LocalizableError,
 |};

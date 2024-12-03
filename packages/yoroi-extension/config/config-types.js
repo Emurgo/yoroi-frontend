@@ -4,14 +4,14 @@ export type ConfigType = {|
   network: NetworkConfigType,
   poolExplorer: PoolExplorerConfigType,
   app: AppConfigType,
-  bring: BringConfigType
-  bringSandbox: BringConfigType
+  bring: BringConfigType,
+  bringSandbox: BringConfigType,
 |};
 
 export type BringConfigType = {|
   baseUrl: string,
   identifier: string,
-  apiEndpoint: string
+  apiEndpoint: string,
 |};
 
 export type PoolExplorerConfigType = {|

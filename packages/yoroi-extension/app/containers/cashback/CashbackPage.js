@@ -117,10 +117,10 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
         publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address
       ).to_bech32();
 
-      const response = await fetch(`${environment.bringBaseUrl}check/portal`, {
+      const response = await fetch(`${environment.bring.baseUrl}check/portal`, {
         method: 'POST',
         headers: {
-          'x-api-key': environment.bringIdentifier,
+          'x-api-key': environment.bring.identifier,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ walletAddress }),

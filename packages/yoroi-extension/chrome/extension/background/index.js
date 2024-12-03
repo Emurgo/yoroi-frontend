@@ -20,8 +20,8 @@ declare var browser;
 */
 
 bringInitBackground({
-  identifier: environment.bringIdentifier,
-  apiEndpoint: environment.bringApiEndpoint,
+  identifier: environment.bring.identifier,
+  apiEndpoint: environment.bring.apiEndpoint,
   cashbackPagePath: '/main_window.html#/cashback'
 });
 
