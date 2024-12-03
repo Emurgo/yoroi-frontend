@@ -219,7 +219,7 @@ export default function ConfirmSwapTransaction({
           <TextField
             className="walletPassword"
             value={userPasswordState.value}
-            label="Password"
+            label={strings.password}
             type="password"
             onChange={e => {
               txSubmitErrorState.update(null);
