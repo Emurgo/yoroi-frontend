@@ -13,6 +13,7 @@ import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import type { LayoutComponentMap } from '../../../styles/context/layout';
 import { withLayout } from '../../../styles/context/layout';
+import { Typography } from '@mui/material';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -103,9 +104,7 @@ class RemoveWalletDialogContainer extends Component<AllProps, State> {
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
-      'cardano': walletsNavigation.cardano.filter(
-        walletId => walletId !== selectedWalletId
-      ),
+      cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
     };
     await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
 
@@ -146,8 +145,8 @@ class RemoveWalletDialogContainer extends Component<AllProps, State> {
         }}
         id="removeWalletDialog"
       >
-        <p>{intl.formatMessage(warning1Text)}</p>
-        <p>{intl.formatMessage(warning2Text)}</p>
+        <Typography color="ds.text_gray_medium">{intl.formatMessage(warning1Text)}</Typography>
+        <Typography color="ds.text_gray_medium"> {intl.formatMessage(warning2Text)}</Typography>
       </DangerousActionDialog>
     );
     const DangerousActionDialogRevamp = (
@@ -168,8 +167,13 @@ class RemoveWalletDialogContainer extends Component<AllProps, State> {
         }}
         id="removeWalletDialog"
       >
-        <p>{intl.formatMessage(warning1Text)}</p>
-        <p>{intl.formatMessage(warning2Text)}</p>
+        <Typography varint="body1" sx={{ color: 'ds.text_gray_medium' }}>
+          {intl.formatMessage(warning1Text)}
+        </Typography>
+        <Typography varint="body1" sx={{ color: 'ds.text_gray_medium' }}>
+          {' '}
+          {intl.formatMessage(warning2Text)}
+        </Typography>
       </DangerousActionDialog>
     );
 

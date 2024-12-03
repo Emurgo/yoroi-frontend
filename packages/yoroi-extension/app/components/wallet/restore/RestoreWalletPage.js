@@ -3,10 +3,10 @@ import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { observer } from 'mobx-react';
 import { RESTORE_WALLET_STEPS, getFirstRestorationStep } from './steps';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
 import Stepper from '../../common/stepper/Stepper';
 import EnterRecoveryPhraseStep from './steps/phrase/EnterRecoveryPhraseStep';
@@ -44,6 +44,18 @@ const messages: * = defineMessages({
   },
 });
 
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& defs': {
+      '& linearGradient': {
+        '& stop': {
+          'stop-color': theme.palette.ds.el_primary_medium,
+        },
+      },
+    },
+  },
+}));
+
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -64,21 +76,11 @@ type Props = {|
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
   const { profile, router, wallets: walletsActions } = actions;
-  const {
-    walletRestore,
-    profile: profileData,
-    wallets,
-    tokenInfoStore,
-  } = stores;
+  const { walletRestore, profile: profileData, wallets, tokenInfoStore } = stores;
 
   const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
   const [selectedRestoreMode, setSelectedRestoreMode] = useState<?RestoreModeType>(null);
-  const {
-    recoveryPhrase,
-    duplicatedWallet,
-    setRestoreWalletData,
-    resetRestoreWalletData,
-  } = useRestoreWallet();
+  const { recoveryPhrase, duplicatedWallet, setRestoreWalletData, resetRestoreWalletData } = useRestoreWallet();
 
   const getDuplicatedWalletData = () => {
     if (!duplicatedWallet) return null;
@@ -132,12 +134,11 @@ function RestoreWalletPage(props: Props & Intl): Node {
         <SelectWalletTypeStep
           onNext={mode => {
             resetRestoreWalletData();
-            if (!environment.isDev() && !environment.isNightly())
-              profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
+            if (!environment.isDev() && !environment.isNightly()) profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
             runInAction(() => {
               setSelectedRestoreMode(mode);
               setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
-            })
+            });
             ampli.restoreWalletEnterPhraseStepViewed({
               recovery_phrase_lenght: mode.length === 15 ? '15' : '24',
             });
@@ -161,7 +162,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           isDialogOpen={isDialogOpen}
           openDialog={openDialog}
           closeDialog={closeDialog}
-          setCurrentStep={(step) => {
+          setCurrentStep={step => {
             setCurrentStep(step);
             ampli.restoreWalletDetailsStepViewed();
           }}
@@ -169,12 +170,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
             if (!selectedRestoreMode) {
               throw new Error('unexpected nullish restore mode');
             }
-            const isValid = walletRestore.isValidMnemonic(
-              { mnemonic: phrase, mode: selectedRestoreMode }
-            );
-            ampli.restoreWalletEnterPhraseStepStatus(
-              { recovery_prhase_status: isValid }
-            );
+            const isValid = walletRestore.isValidMnemonic({ mnemonic: phrase, mode: selectedRestoreMode });
+            ampli.restoreWalletEnterPhraseStepStatus({ recovery_prhase_status: isValid });
             return isValid;
           }}
           openDuplicatedWallet={lastDuplicatedWalletId => {
@@ -189,12 +186,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
             if (!selectedNetwork) {
               throw new Error('unexpectedly missing selected network');
             }
-            const existingWallet = await isWalletExist(
-              importedWallets,
-              enteredRecoveryPhrase,
-              accountIndex,
-              selectedNetwork
-            );
+            const existingWallet = await isWalletExist(importedWallets, enteredRecoveryPhrase, accountIndex, selectedNetwork);
 
             setRestoreWalletData({
               duplicatedWallet: existingWallet,
@@ -217,8 +209,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           selectedNetwork={forceNonNull(profileData.selectedNetwork)}
           onSubmit={(walletName: string, walletPassword: string) => {
             if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
-            if (!profileData.selectedNetwork)
-              throw new Error('Network must be selected to create a wallet. Should never happen');
+            if (!profileData.selectedNetwork) throw new Error('Network must be selected to create a wallet. Should never happen');
 
             restoreWallet({ walletName, walletPassword, recoveryPhrase });
             ampli.restoreWalletDetailsSettled();
@@ -248,9 +239,11 @@ function RestoreWalletPage(props: Props & Intl): Node {
         }}
       >
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
+          <LogoIconWrapper>
+            <YoroiLogo />
+          </LogoIconWrapper>
         </Box>
-        <Typography component="div" variant="h3" fontWeight={500} id="restoreTitle">
+        <Typography component="div" variant="h3" fontWeight={500} id="restoreTitle" color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}
         </Typography>
       </Box>

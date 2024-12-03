@@ -81,7 +81,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
             <WalletIcon imagePart={option.plate.ImagePart} />
             <Box sx={{ marginLeft: '8px' }}>
               <Typography variant="body1" color="ds.text_gray_medium">
-                {option.name}| {option.plate.TextPart}
+                {option.plate.TextPart}&nbsp;|&nbsp;{option.name}
               </Typography>
             </Box>
           </Box>
@@ -96,6 +96,9 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
         </VerticalFlexContainer>
       </Dialog>
     ) : null;
+
+    const mainnetWallets =
+      cardanoWallets.filter(({ isTestnet }) => !isTestnet);
 
     return (
       <Box
@@ -145,7 +148,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
               );
             }}
           >
-            {cardanoWallets.map(option => optionRenderer(option))}
+            {mainnetWallets.map(option => optionRenderer(option))}
           </Select>
           <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700">
             <FormattedHTMLMessage {...messages.note} />
