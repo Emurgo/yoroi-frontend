@@ -7,7 +7,6 @@ import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
-import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -426,7 +425,6 @@ const CashbackPageContainer = observer((props: AllProps) => {
         />
       }
     >
-      <FullscreenLayout bottomPadding={0}>
         <Suspense fallback={null}>
           {shouldShowDisclaimer && (
             <DisclaimerDialog
@@ -542,7 +540,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
             />
           )}
         </Suspense>
-      </FullscreenLayout>
+
     </TopBarLayout >
   );
 });
