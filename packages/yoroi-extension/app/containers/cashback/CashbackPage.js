@@ -6,8 +6,6 @@ import { observer } from 'mobx-react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
 import SidebarContainer from '../SidebarContainer';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import environment from '../../environment';
@@ -81,10 +79,9 @@ const messages = defineMessages({
   },
 });
 
-type Props = StoresAndActionsProps;
+type Props = $ReadOnly<StoresAndActionsProps>;
 
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps, intl: $npm$ReactIntl$IntlShape, |};
+type AllProps = {| ...Props, intl: $npm$ReactIntl$IntlShape, |};
 
 type IframeMessageData = {|
   action: string,
@@ -93,7 +90,8 @@ type IframeMessageData = {|
   amount: number
 |};
 
-const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllProps) => {
+
+const CashbackPageContainer = observer((props: AllProps) => {
   const { actions, stores, intl } = props;
   const wallet = stores.wallets.selected;
   if (!wallet) throw Error('no publicDeriver');
@@ -456,4 +454,4 @@ const CashbackPageContainer: React$ComponentType<Props> = observer((props: AllPr
   );
 });
 
-export default (injectIntl((withLayout(CashbackPageContainer))): React$ComponentType < Props >);
+export default (injectIntl(CashbackPageContainer): React$ComponentType < Props >);
