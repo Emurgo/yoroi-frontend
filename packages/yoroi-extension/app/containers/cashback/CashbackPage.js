@@ -77,11 +77,134 @@ const messages = defineMessages({
     id: 'cashback.not.current.warning.keep',
     defaultMessage: '!!!keep current wallet',
   },
+  chooseTitle: {
+    id: 'cashback.not.current.warning.title.choose',
+    defaultMessage: '!!!choose cashback wallet',
+  },
+  setThis: {
+    id: 'cashback.not.current.warning.button.set.this',
+    defaultMessage: '!!!set this wallet',
+  },
+  switch: {
+    id: 'cashback.not.current.warning.button.switch',
+    defaultMessage: '!!!switch wallet',
+  },
+  chooseText1: {
+    id: 'cashback.not.current.warning.text.choose.1',
+    defaultMessage: '!!!Your cashback rewards are currently linked to another wallet.',
+  },
+  chooseText2: {
+    id: 'cashback.not.current.warning.text.choose.2',
+    defaultMessage: '!!!Would you like to set this wallet as your cashback wallet?',
+  },
+  setCurrentTitle: {
+    id: 'cashback.not.current.warning.title.set.current',
+    defaultMessage: '!!!Set my Current Wallet as my Cashback Wallet'
+  },
+  no: {
+    id: 'cashback.not.current.warning.button.no',
+    defaultMessage: '!!!no'
+  },
+  yes: {
+    id: 'cashback.not.current.warning.button.yes',
+    defaultMessage: '!!!yes'
+  },
+  switchText: {
+    id: 'cashback.not.current.warning.text.switch',
+    defaultMessage: '!!!To claim your ADA cashback, either switch to your Cashback Wallet or choose your current wallet as your new Cashback Wallet.'
+  },
 });
 
-type Props = $ReadOnly<StoresAndActionsProps>;
+type NotCurrentWalletModalProps = {|
+  onSetCurrentAsCashbackWallet: () => void,
+  onSwitchToCashbackWallet: () => void,
+  shownCashbackWallet: {
+    plate: {|
+      ImagePart: string,
+      TextPart: string,
+    |},
+    name: string,
+    ...,
+  },
+  intl: $npm$ReactIntl$IntlShape,
+|};
 
-type AllProps = {| ...Props, intl: $npm$ReactIntl$IntlShape, |};
+const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalProps) => {
+  const { intl } = props;
+
+  const [state, setState] = useState<'switchOrSet' | 'confirmSet'>('switchOrSet');
+
+  if (state === 'switchOrSet') {
+    return (
+      <Dialog
+        title={intl.formatMessage(messages.chooseTitle)}
+        actions={[
+          {
+            label: intl.formatMessage(messages.setThis),
+            onClick: () => {
+              setState('confirmSet');
+            }
+          },
+          {
+            label: intl.formatMessage(messages.switch),
+            primary: true,
+            onClick: props.onSwitchToCashbackWallet,
+          }
+        ]}
+      >
+        <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
+          {intl.formatMessage(messages.chooseText1)}
+        </Typography>
+        <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
+          {intl.formatMessage(messages.chooseText2)}
+        </Typography>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Dialog
+      title={intl.formatMessage(messages.setCurrentTitle)}
+      actions={[
+        {
+          label: intl.formatMessage(messages.no),
+          onClick: () => {
+            setState('switchOrSet');
+          }
+        },
+        {
+          label: intl.formatMessage(messages.yes),
+          primary: true,
+          onClick: props.onSetCurrentAsCashbackWallet,
+        }
+      ]}
+    >
+      <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
+        {intl.formatMessage(messages.switchText)}
+      </Typography>
+      <Typography sx={{ fontSize: '12px', fontHeight: '16px',lineHeight: '16px' }}>
+        {intl.formatMessage(messages.currentWalletLabel)}
+      </Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
+        {constructPlate32(props.shownCashbackWallet.plate)[1]}
+        <Typography
+          sx={{
+            fontWeight: '500px',
+            fontSize: '16px',
+            lineHeight: '24px',
+            marginTop: 'auto',
+            marginBottom: 'auto',
+            marginLeft: '1em',
+          }}
+        >
+          {props.shownCashbackWallet.plate.TextPart}
+        </Typography>
+      </Box>
+    </Dialog>
+  );
+}));
+
+type AllProps = {| ...StoresAndActionsProps, intl: $npm$ReactIntl$IntlShape, |};
 
 type IframeMessageData = {|
   action: string,
@@ -319,49 +442,19 @@ const CashbackPageContainer = observer((props: AllProps) => {
           )}
 
           {shownCashbackWallet && !shouldShowDisclaimer && (
-            <Dialog
-              title={intl.formatMessage(messages.warning)}
-              actions={[
-                {
-                  label: intl.formatMessage(messages.useThis),
-                  onClick: () => {
-                    stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
-                    setShownCashbackWallet(null);
-                    setPopup(false);
-                  }
-                },
-                {
-                  label: intl.formatMessage(messages.keep),
-                  primary: true,
-                  onClick: () => {
-                    setShownCashbackWallet(null);
-                    setPopup(false);
-                  }
-                }
-              ]}
-            >
-              <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
-                {intl.formatMessage(messages.notCurrentText)}
-              </Typography>
-              <Typography sx={{ fontSize: '12px', fontHeight: '16px',lineHeight: '16px' }}>
-                {intl.formatMessage(messages.currentWalletLabel)}
-              </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
-                {constructPlate32(shownCashbackWallet.plate)[1]}
-                <Typography
-                  sx={{
-                    fontWeight: '500px',
-                    fontSize: '16px',
-                    lineHeight: '24px',
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                    marginLeft: '1em',
-                  }}
-                >
-                  {shownCashbackWallet.plate.TextPart}
-                </Typography>
-              </Box>
-            </Dialog>
+            <NotCurrentWalletModal
+              shownCashbackWallet={shownCashbackWallet}
+              onSetCurrentAsCashbackWallet={() => {
+                stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
+                setShownCashbackWallet(null);
+                setPopup(false);
+              }}
+              onSwitchToCashbackWallet={() => {
+                props.actions.wallets.setActiveWallet.trigger(
+                  { publicDeriverId: shownCashbackWallet.publicDeriverId }
+                );
+              }}
+            />
           )}
 
           {signaturePopup ?
@@ -454,4 +547,4 @@ const CashbackPageContainer = observer((props: AllProps) => {
   );
 });
 
-export default (injectIntl(CashbackPageContainer): React$ComponentType < Props >);
+export default (injectIntl(CashbackPageContainer): React$ComponentType<StoresAndActionsProps>);
