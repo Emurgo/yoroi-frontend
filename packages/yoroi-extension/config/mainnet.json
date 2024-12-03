@@ -21,5 +21,10 @@
     "baseUrl": "https://api.bringweb3.io/v1/extension/",
     "identifier": "G1TjqDrfxS8jhRYz15Sg2fMGsvZpdFF8IWgKe0g8",
     "apiEndpoint": "prod"
+  },
+  "bringSandbox": {
+    "baseUrl": "https://sandbox-api.bringweb3.io/v1/extension/",
+    "identifier": "G1TjqDrfxS8jhRYz15Sg2fMGsvZpdFF8IWgKe0g8",
+    "apiEndpoint": "sandbox"
   }
 }
