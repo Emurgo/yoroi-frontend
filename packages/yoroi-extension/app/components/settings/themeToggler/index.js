@@ -1,6 +1,6 @@
 //@flow
 
-import { Box, FormControlLabel, Radio, RadioGroup, useTheme, styled } from '@mui/material';
+import { Box, FormControlLabel, Radio, RadioGroup, Typography, useTheme, styled } from '@mui/material';
 import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
@@ -48,13 +48,22 @@ const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => 
           <FormControlLabel
             value={'light'}
             control={<SRadio size="small" />}
-            label={intl.formatMessage(messages.lightTheme)}
+            label={
+              <Typography component="span" variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.lightTheme)}
+              </Typography>
+            }
             id="switchToNewVersionButton"
+            input
           />
           <FormControlLabel
             value={'dark'}
             control={<SRadio size="small" />}
-            label={intl.formatMessage(messages.darkTheme)}
+            label={
+              <Typography component="span" variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.darkTheme)}
+              </Typography>
+            }
             id="switchToOldVersionButton"
             sx={{
               marginRight: '20px',

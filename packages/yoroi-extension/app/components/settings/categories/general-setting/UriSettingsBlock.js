@@ -40,7 +40,13 @@ class UriSettingsBlock extends Component<Props & InjectedProps> {
           borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
         }}
       >
-        <Typography component="div" variant={isRevampLayout ? 'body1' : 'h5'} fontWeight={500} mb="12px">
+        <Typography
+          component="div"
+          variant={isRevampLayout ? 'body1' : 'h5'}
+          fontWeight={500}
+          mb="12px"
+          color="ds.text_gray_medium"
+        >
           {intl.formatMessage(globalMessages.uriSchemeLabel)}
         </Typography>
 

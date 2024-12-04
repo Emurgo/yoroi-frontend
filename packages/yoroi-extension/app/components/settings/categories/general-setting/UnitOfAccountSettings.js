@@ -152,6 +152,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
+          color="ds.text_gray_medium"
         >
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </Typography>
@@ -194,6 +195,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
                 component="div"
                 variant={isRevampLayout ? 'body1' : 'body2'}
                 fontWeight={isRevampLayout ? '400' : '300'}
+                color="ds.text_gray_medium"
               >
                 {/* $FlowFixMe[prop-missing] */}
                 {value} - {currencies.filter(item => item.value === value)[0].name}
@@ -205,7 +207,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
 
           {isRevampLayout && (
             <>
-              <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
+              <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
               </Typography>
               <Typography
@@ -217,6 +219,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
                 }}
                 mt="16px"
                 mb="35px"
+                color="ds.text_gray_medium"
               >
                 <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
               </Typography>

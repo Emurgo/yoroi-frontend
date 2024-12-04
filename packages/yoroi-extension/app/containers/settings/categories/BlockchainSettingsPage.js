@@ -42,7 +42,7 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
     return (
       <>
         {profileStore.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
             {intl.formatMessage(settingsMenuMessages.blockchain)}
           </Typography>
         )}

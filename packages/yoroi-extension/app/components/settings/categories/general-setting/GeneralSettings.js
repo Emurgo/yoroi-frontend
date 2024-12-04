@@ -79,7 +79,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
     return (
       <div className={componentClassNames}>
         {isRevampLayout && (
-          <Typography component="div" variant="body1" mb="16px" color="grayscale.900" fontWeight={500}>
+          <Typography component="div" variant="body1" mb="16px" color="ds.text_gray_medium" fontWeight={500}>
             {intl.formatMessage(messages.languageLabel)}
           </Typography>
         )}
