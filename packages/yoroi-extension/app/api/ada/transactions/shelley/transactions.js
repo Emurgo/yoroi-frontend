@@ -584,8 +584,6 @@ export async function newAdaUnsignedTxFromUtxo(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
-    // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: Number(protocolParams.coinsPerUtxoByte) * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -594,7 +592,7 @@ export async function newAdaUnsignedTxFromUtxo(
     )
   );
 
-  const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
+  const txBuilder = await TxBuilder.new(defaultNetworkConfig);
 
   // When both hash and datum are present - datum is added as extra witness
   const extraWitnessDatumsPresent =
@@ -687,6 +685,7 @@ export async function newAdaUnsignedTxFromUtxo(
     await txBuilder.calcScriptDataHash('default');
   }
 
+  await txBuilder.selectInputsFrom(utxoSet);
   await txBuilder.addChangeAndFee(changeAddress);
 
   let unsignedTx;
@@ -879,8 +878,6 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
-    // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: Number(protocolParams.coinsPerUtxoByte) * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -889,7 +886,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     )
   );
 
-  const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
+  const txBuilder = await TxBuilder.new(defaultNetworkConfig);
 
   await txBuilder.addRequiredInputs(
     await Promise.all(
@@ -997,6 +994,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       }
     );
 
+  await txBuilder.selectInputsFrom(utxoSet);
   await txBuilder.addChangeAndFee(changeAddress);
 
   const unsignedTx = await txBuilder.build();
