@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
-import { Box, MenuItem, Typography, styled } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -16,6 +16,8 @@ import globalMessages, { listOfTranslators } from '../../../../i18n/global-messa
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
+import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
+import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -35,23 +37,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Select your language',
   },
 });
-
-const SMenuItem = styled(MenuItem)(({ theme, isSelected }: any) => ({
-  '&.Mui-selected': {
-    backgroundColor: theme.palette.ds.bg_color_contrast_min,
-    '&:hover': {
-      backgroundColor: theme.palette.ds.bg_color_contrast_min,
-    },
-    '&.Mui-focusVisible': {
-      backgroundColor: theme.palette.ds.bg_color_contrast_min,
-    },
-  },
-  backgroundColor: theme.palette.ds.bg_color_contrast_high,
-  opacity: '1',
-  '&:hover': {
-    backgroundColor: theme.palette.ds.bg_color_contrast_min,
-  },
-}));
 
 @observer
 class GeneralSettings extends Component<Props & InjectedLayoutProps> {
@@ -103,6 +88,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             width: isRevampLayout ? '506px' : '100%',
           }}
         >
+          <GlobalStyledScrollbar />
           <Select
             labelId="languages-select"
             {...languageId.bind()}
@@ -115,14 +101,13 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             )}
           >
             {languageOptions.map(option => (
-              <SMenuItem
+              <MenuItemStyled
                 key={option.value}
                 value={option.value}
                 id={'selectLanguage-' + option.value + '-menuItem'}
-                isSelected={selectedLanguage.value === option.value}
               >
                 <FlagLabel svg={option.svg} label={option.label} />
-              </SMenuItem>
+              </MenuItemStyled>
             ))}
           </Select>
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}

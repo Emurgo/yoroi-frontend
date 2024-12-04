@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
-import { MenuItem, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
@@ -17,6 +17,8 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
+import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
+import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -75,9 +77,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: this.context.intl.formatMessage(
-          this.props.isRevampLayout ? messages.revampInputLabel : messages.label
-        ),
+        label: this.context.intl.formatMessage(this.props.isRevampLayout ? messages.revampInputLabel : messages.label),
       },
     },
   });
@@ -92,7 +92,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
     const optionRenderer = option => {
       const SvgElem = option.svg;
       return (
-        <MenuItem
+        <MenuItemStyled
           key={option.value}
           value={option.value}
           sx={{ height: '80px' }}
@@ -121,18 +121,14 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               )}
             </Box>
           </Box>
-        </MenuItem>
+        </MenuItemStyled>
       );
     };
 
-    const lastUpdated =
-      lastUpdatedTimestamp != null ? new Date(lastUpdatedTimestamp).toLocaleString() : '-';
+    const lastUpdated = lastUpdatedTimestamp != null ? new Date(lastUpdatedTimestamp).toLocaleString() : '-';
 
     const dialog = this.props.isSubmitting ? (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <VerticalFlexContainer>
           <LoadingSpinner />
         </VerticalFlexContainer>
@@ -178,6 +174,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
             marginTop: isRevampLayout ? '0px' : '40px',
           }}
         >
+          <GlobalStyledScrollbar />
           <Select
             formControlProps={{ error: !!error }}
             helperText={error && intl.formatMessage(error, error.values)}
@@ -193,7 +190,8 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               },
             }}
             renderValue={value => (
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant={isRevampLayout ? 'body1' : 'body2'}
                 fontWeight={isRevampLayout ? '400' : '300'}
               >
@@ -210,7 +208,8 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
               <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
               </Typography>
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="body1"
                 fontWeight={500}
                 sx={{
