@@ -16,6 +16,7 @@ import LedgerSendActions from '../../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
 import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../../../chrome/extension/background/types';
+import { HaskellShelleyTxSignRequest } from '../../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -54,10 +55,6 @@ type Props = {|
   +trezorSend: TrezorSendActions,
   selectedExplorer: Map<number, SelectedExplorer>,
   +selectedWallet: WalletState,
-  receiverHandle: ?{|
-    nameServer: string,
-    handle: string,
-  |},
 |};
 
 @observer
@@ -112,7 +109,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
-      receiverHandle,
     } = this.props;
 
     if (selectedWallet == null)
@@ -126,12 +122,18 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     const maxOutput = size ? Math.max(...size.outputs) : 0;
     const showSize =
       size != null && (size.full > MAX_TX_BYTES - 1000 || maxOutput > MAX_VALUE_BYTES - 1000);
-    const receivers = signRequest.receivers(false);
     const network = getNetworkById(selectedWallet.networkId);
+
+    const receiverWithHandle = signRequest instanceof HaskellShelleyTxSignRequest
+      ? signRequest.receiverWithHandle()
+      : null;
+    const receiver = {
+      address: receiverWithHandle?.address ?? signRequest.receivers(false)[0],
+      handle: receiverWithHandle?.handle,
+    }
 
     return (
       <WalletSendPreviewStep
-        receiverHandle={receiverHandle}
         staleTx={this.props.staleTx}
         selectedExplorer={
           selectedExplorer.get(selectedWallet.networkId) ??
@@ -142,7 +144,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         getTokenInfo={getTokenInfo}
         getCurrentPrice={getCurrentPrice}
         amount={totalInput.joinSubtractCopy(fee)}
-        receivers={receivers}
+        receiver={receiver}
         totalAmount={totalInput}
         transactionFee={fee}
         transactionSize={
