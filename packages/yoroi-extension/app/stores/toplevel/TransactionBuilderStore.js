@@ -47,6 +47,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   @observable plannedTxInfoMap: PlannedTxInfoMap= [];
 
   @observable receiver: string | null;
+  @observable receiverHandle: {| handle: string, nameServer: string |} | null;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | ISignRequest<any>;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -310,6 +311,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
     }
 
     const receiver = this.receiver;
+    const receiverHandle = this.receiverHandle ?? undefined;
     if (receiver == null) return;
 
     if (this.createUnsignedTx.isExecuting) {
@@ -331,6 +333,7 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver,
         receiver,
+        receiverHandle,
         tokens: this._genTokenList(),
         filter: this.filter,
         absSlotNumber,
@@ -373,8 +376,12 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
 
   /** Should only set to valid address or undefined */
   @action
-  _updateReceiver: (void | string) => void = (receiver) => {
-    this.receiver = receiver ?? null;
+  _updateReceiver: ({|
+    address: void | string,
+    handle?: void | {| handle: string, nameServer: string |},
+  |}) => void = ({ address, handle }) => {
+    this.receiver = address ?? null;
+    this.receiverHandle = handle ?? null;
   }
 
   @action
@@ -543,7 +550,9 @@ export default class TransactionBuilderStore extends Store<StoresMap, ActionsMap
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
     this._setFilter(request.filter);
     const nextUnusedInternal = request.publicDeriver.receiveAddress;
-    this._updateReceiver(nextUnusedInternal.addr.Hash);
+    this._updateReceiver({
+      address: nextUnusedInternal.addr.Hash,
+    });
     // Todo: update shouldSendAll
     if (this.shouldSendAll === false) {
       this._updateSendAllStatus(true);

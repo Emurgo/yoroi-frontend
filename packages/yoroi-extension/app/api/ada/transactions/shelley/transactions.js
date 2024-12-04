@@ -77,7 +77,7 @@ type TxMetadata = {
 };
 
 export function sendAllUnsignedTx(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -288,7 +288,7 @@ function addUtxoInput(
 }
 
 export function sendAllUnsignedTxFromUtxo(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
   protocolParams: {|

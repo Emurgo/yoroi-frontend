@@ -9,7 +9,10 @@ import type { TokenRow, } from '../../api/ada/lib/storage/database/primitives/ta
 import BigNumber from 'bignumber.js';
 
 export default class TxBuilderActions {
-  updateReceiver: Action<void | string> = new Action();
+  updateReceiver: Action<{|
+    address: void | string,
+    handle?: void | {| handle: string, nameServer: string |},
+  |}> = new Action();
   updateAmount: Action<?BigNumber> = new Action();
   updateMemo: Action<void | string> = new Action();
   addToken: Action<{|
