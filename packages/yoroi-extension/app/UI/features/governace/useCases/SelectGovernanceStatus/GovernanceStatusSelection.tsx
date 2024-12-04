@@ -7,6 +7,7 @@ import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { useModal } from '../../../../components/modals/ModalContext';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
@@ -49,6 +50,7 @@ export const GovernanceStatusSelection = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { openModal, closeModal, startLoading } = useModal();
+  const { openTxReviewModal } = useTxReviewModal();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
@@ -97,7 +99,10 @@ export const GovernanceStatusSelection = () => {
       startLoading();
       setTimeout(async () => {
         await createDrepDelegationTransaction(kind);
-        navigateTo.delegationForm();
+        openTxReviewModal({
+          title: 'Transaction confirmation',
+        });
+        // navigateTo.delegationForm(); // TODO add condition for production
         setLoadingUnsignTx(false);
         setError(null);
       }, 200);

@@ -6,8 +6,11 @@ import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
 import { withLayout } from '../../styles/context/layout';
 import { ModalProvider } from '../components/modals/ModalContext';
+
 import { ModalManager } from '../components/modals/ModalManager';
 import { IntlProvider } from '../context/IntlProvider';
+import { ReviewTxManager } from '../features/transaction-review/module/ReviewTxManager';
+import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 
 @observer
 class GeneralPageLayout extends React.Component {
@@ -26,12 +29,19 @@ class GeneralPageLayout extends React.Component {
 
     return (
       <IntlProvider intl={intl}>
-        <ModalProvider>
-          <ModalManager />
-          <TopBarLayout banner={<BannerContainer actions={actions} stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
-            {children}
-          </TopBarLayout>
-        </ModalProvider>
+        <ReviewTxProvider>
+          <ModalProvider>
+            <ModalManager />
+            <ReviewTxManager />
+            <TopBarLayout
+              banner={<BannerContainer actions={actions} stores={stores} />}
+              sidebar={sidebarContainer}
+              navbar={navbar}
+            >
+              {children}
+            </TopBarLayout>
+          </ModalProvider>
+        </ReviewTxProvider>
       </IntlProvider>
     );
   }
