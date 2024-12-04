@@ -94,7 +94,7 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
             {...languageId.bind()}
             onChange={this.selectLanguage}
             disabled={isSubmitting}
-            renderValue={value => (
+            renderValue={() => (
               <Typography component="div" variant="body1" color="ds.text_gray_medium">
                 {selectedLanguage.label}
               </Typography>

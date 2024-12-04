@@ -1,6 +1,7 @@
+// @flow
 import GlobalStyles from '@mui/material/GlobalStyles';
 
-export const GlobalStyledScrollbar = () => {
+export const GlobalStyledScrollbar = (): React$Element<any> => {
     return (
       <GlobalStyles
         styles={theme => ({

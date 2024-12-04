@@ -1,6 +1,8 @@
-import { MenuItem, styled } from "@mui/material";
+// @flow
+import { MenuItem, styled } from '@mui/material';
+import type { ComponentType } from 'react';
 
-export const MenuItemStyled = styled(MenuItem)(({ theme }: any) => ({
+export const MenuItemStyled: ComponentType<any> = styled(MenuItem)(({ theme }: any) => ({
   '&.Mui-selected': {
     backgroundColor: theme.palette.ds.bg_color_contrast_min,
     '&:hover': {
