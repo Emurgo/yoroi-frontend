@@ -1,6 +1,6 @@
 //@flow
 
-import { Box, FormControlLabel, Radio, RadioGroup, useTheme } from '@mui/material';
+import { Box, FormControlLabel, Radio, RadioGroup, useTheme, styled } from '@mui/material';
 import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
@@ -17,6 +17,13 @@ const messages = defineMessages({
     defaultMessage: '!!!Dark Theme',
   },
 });
+
+const SRadio = styled(Radio)(({ theme }: any) => ({
+  color: theme.palette.ds.el_primary_medium,
+  '&.Mui-checked': {
+    color: theme.palette.ds.el_primary_medium,
+  },
+}));
 
 const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => {
   const { toggleColorMode } = useThemeMode();
@@ -40,20 +47,13 @@ const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => 
         >
           <FormControlLabel
             value={'light'}
-            control={
-              <Radio
-                sx={{
-                  color: 'primary.500',
-                }}
-                size="small"
-              />
-            }
+            control={<SRadio size="small" />}
             label={intl.formatMessage(messages.lightTheme)}
             id="switchToNewVersionButton"
           />
           <FormControlLabel
             value={'dark'}
-            control={<Radio sx={{ color: 'primary.500' }} size="small" />}
+            control={<SRadio size="small" />}
             label={intl.formatMessage(messages.darkTheme)}
             id="switchToOldVersionButton"
             sx={{
