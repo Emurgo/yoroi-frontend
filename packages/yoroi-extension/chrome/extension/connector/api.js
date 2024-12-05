@@ -865,14 +865,14 @@ export async function connectorCreateCardanoTx(
 
 export async function connectorSendTxCardano(
   wallet: IPublicDeriver</* ConceptualWallet */>,
-  signedTx: Buffer,
+  signedTxHex: string,
   localStorage: LocalStorageApi,
 ): Promise<void> {
   await sendTx({
     body: {
       network: wallet.getParent().getNetworkInfo(),
-      id: transactionHexToHash(bytesToHex(signedTx)),
-      encodedTx: signedTx,
+      id: transactionHexToHash(signedTxHex),
+      encodedTx: bytesToHex(signedTxHex),
     },
     lastLaunchVersion: await localStorage.getLastLaunchVersion() ?? '',
     currentLocale: await localStorage.getUserLocale() ?? '',
@@ -888,7 +888,7 @@ export async function connectorSendTxCardano(
 
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
-  tx: RustModule.WalletV4.Transaction,
+  sourceTxHex: string,
   addressedUtxos?: ?Array<CardanoAddressedUtxo>,
 ) {
   const withUtxos = asGetAllUtxos(publicDeriver);
@@ -916,7 +916,8 @@ export async function connectorRecordSubmittedCardanoTransaction(
     submittedTxs,
   );
 
-  const txId = transactionHexToHash(tx.to_hex());
+  const txId = transactionHexToHash(sourceTxHex);
+  const tx = RustModule.WalletV4.Transaction.from_hex(sourceTxHex);
   const defaultToken = publicDeriver.getParent().defaultToken;
   const defaults = {
     defaultNetworkId: defaultToken.NetworkId,
@@ -927,8 +928,10 @@ export async function connectorRecordSubmittedCardanoTransaction(
   const addresses = { from: [], to: [] };
   let isIntraWallet = true;
   const txBody = tx.body();
+
   const fee = new MultiToken([], defaults);
   fee.joinAddMutable(fee.createDefaultEntry(new BigNumber(txBody.fee().to_str())));
+
   const usedUtxos = [];
   for (const input of iterateLenGet(txBody.inputs())) {
     const txHash = input.transaction_id().to_hex();

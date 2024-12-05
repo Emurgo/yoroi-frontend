@@ -67,6 +67,7 @@ import type { CardanoTxRequest } from '../../../../../app/api/ada';
 import type { NFTMetadata } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
 import { getProtocolParameters } from '../yoroi/protocolParameters';
 import { hexToBytes } from '../../../../../app/coreUtils';
+import { transactionHexToHash } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 
 declare var chrome;
 
@@ -388,28 +389,23 @@ const Handlers = Object.freeze({
     [ string /* tx hex */ ],
     string,
   >(async ({ wallet, message }) => {
-    const txBuffer = hexToBytes(message.params[0]);
+    const txHex = message.params[0];
     await connectorSendTxCardano(
       wallet,
-      txBuffer,
+      txHex,
       new LocalStorageApi(),
     );
-    const tx = RustModule.WalletV4.Transaction.from_bytes(
-      txBuffer
-    );
-    const id = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
     try {
       await connectorRecordSubmittedCardanoTransaction(
         wallet,
-        tx,
+        txHex,
       );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('error recording submitted tx', error);
     }
-    tx.free();
 
-    return { ok: id };
+    return { ok: transactionHexToHash(txHex) };
   }),
 
   'ping': NewHandler.basic<void, boolean>(async () => {

@@ -20,7 +20,7 @@ import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoa
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import LocalStorageApi from '../../../../../app/api/localStorage/index';
 import { getCardanoStateFetcher } from '../../utils';
-import { hexToBytes } from '../../../../../app/coreUtils';
+import { bytesToHex, hexToBytes } from '../../../../../app/coreUtils';
 import { getWalletsState  } from '../utils';
 import type { CardanoAddressedUtxo } from '../../../../../app/api/ada/transactions/types';
 
@@ -141,7 +141,7 @@ export const SignAndBroadcastTransaction: HandlerType<
         try {
           await connectorRecordSubmittedCardanoTransaction(
             publicDeriver,
-            Scope.WalletV4.Transaction.from_hex(signedTxHex)
+            signedTxHex,
           );
         } catch (_error) {
           // ignore
@@ -198,11 +198,11 @@ export const BroadcastTransaction: HandlerType<
       });
       try {
         for (let i = 0; i < txs.length; i++) {
-          await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
+          await connectorRecordSubmittedCardanoTransaction(
             publicDeriver,
-            Scope.WalletV4.Transaction.from_bytes(txs[i].encodedTx),
+            bytesToHex(txs[i].encodedTx),
             addressedUtxoArray[i]
-          ));
+          );
         }
       } catch (_error) {
         // ignore
