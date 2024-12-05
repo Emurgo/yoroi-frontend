@@ -685,7 +685,21 @@ export async function newAdaUnsignedTxFromUtxo(
     await txBuilder.calcScriptDataHash('default');
   }
 
-  await txBuilder.selectInputsFrom(utxoSet);
+  try {
+    await txBuilder.selectInputsFrom(utxoSet);
+  } catch (error) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
+      throw new NotEnoughMoneyToSendError();
+    }
+    if (error instanceof LibOverflowError) {
+      throw new AssetOverflowError();
+    }
+    if (String(error).includes('less than the minimum UTXO value')) {
+      throw new CannotSendBelowMinimumValueError();
+    }
+    throw error;
+  }
+
   await txBuilder.addChangeAndFee(changeAddress);
 
   let unsignedTx;
@@ -994,7 +1008,21 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       }
     );
 
-  await txBuilder.selectInputsFrom(utxoSet);
+  try {
+    await txBuilder.selectInputsFrom(utxoSet);
+  } catch (error) {
+    if (error instanceof LibNotEnoughMoneyToSendError) {
+      throw new NotEnoughMoneyToSendError();
+    }
+    if (error instanceof LibOverflowError) {
+      throw new AssetOverflowError();
+    }
+    if (String(error).includes('less than the minimum UTXO value')) {
+      throw new CannotSendBelowMinimumValueError();
+    }
+    throw error;
+  }
+
   await txBuilder.addChangeAndFee(changeAddress);
 
   const unsignedTx = await txBuilder.build();
