@@ -38,6 +38,7 @@ import { forceNonNull } from '../../coreUtils';
 import { constructPlate32 } from '../../components/topbar/WalletCard';
 import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
+import type { BringConfigType } from '../../../config/config-types';
 
 const messages = defineMessages({
   claim: {
@@ -113,6 +114,9 @@ const messages = defineMessages({
     defaultMessage: '!!!To claim your ADA cashback, either switch to your Cashback Wallet or choose your current wallet as your new Cashback Wallet.'
   },
 });
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
 
 type NotCurrentWalletModalProps = {|
   onSetCurrentAsCashbackWallet: () => void,
@@ -212,11 +216,12 @@ type IframeMessageData = {|
   amount: number
 |};
 
-
 const CashbackPageContainer = observer((props: AllProps) => {
   const { actions, stores, intl } = props;
   const wallet = stores.wallets.selected;
   if (!wallet) throw Error('no publicDeriver');
+
+  const bringConfig: BringConfigType = CONFIG.bring;
 
   const theme = useTheme();
 
@@ -237,10 +242,10 @@ const CashbackPageContainer = observer((props: AllProps) => {
         publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address
       ).to_bech32();
 
-      const response = await fetch(`${environment.bring.baseUrl}check/portal`, {
+      const response = await fetch(`${bringConfig.baseUrl}check/portal`, {
         method: 'POST',
         headers: {
-          'x-api-key': environment.bring.identifier,
+          'x-api-key': bringConfig.identifier,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ walletAddress }),

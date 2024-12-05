@@ -11,6 +11,10 @@ import axios from 'axios';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import { sanitizeForLog } from '../../../app/coreUtils';
 import LocalStorageApi from '../../../app/api/localStorage/index';
+import type { ConfigType } from '../../../config/config-types';
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
 
 axios.defaults.adapter = fetchAdapter;
 
@@ -20,8 +24,8 @@ declare var browser;
 */
 
 bringInitBackground({
-  identifier: environment.bring.identifier,
-  apiEndpoint: environment.bring.apiEndpoint,
+  identifier: CONFIG.bring.identifier,
+  apiEndpoint: CONFIG.bring.apiEndpoint,
   cashbackPagePath: '/main_window.html#/cashback'
 });
 
