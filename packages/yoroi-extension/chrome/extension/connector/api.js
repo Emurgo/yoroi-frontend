@@ -924,10 +924,11 @@ export async function connectorRecordSubmittedCardanoTransaction(
   };
 
   const amount = new MultiToken([], defaults);
-  const fee = new MultiToken([], defaults);
   const addresses = { from: [], to: [] };
   let isIntraWallet = true;
   const txBody = tx.body();
+  const fee = new MultiToken([], defaults);
+  fee.joinAddMutable(fee.createDefaultEntry(new BigNumber(txBody.fee().to_str())));
   const usedUtxos = [];
   for (const input of iterateLenGet(txBody.inputs())) {
     const txHash = input.transaction_id().to_hex();
@@ -960,7 +961,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     if (allAddresses.has(utxo.receiver)) {
       amount.joinSubtractMutable(value);
     }
-    fee.joinAddMutable(value);
   }
   for (const output of iterateLenGet(txBody.outputs())) {
     const value = multiTokenFromCardanoValue(output.amount(), defaults);
@@ -975,7 +975,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     } else {
       isIntraWallet = false;
     }
-    fee.joinSubtractMutable(value);
   }
 
   const withdrawalsData = iterateLenGetMap(txBody.withdrawals())
