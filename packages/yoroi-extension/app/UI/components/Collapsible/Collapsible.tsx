@@ -36,9 +36,9 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }: any) => ({
 }));
 
 type Props = {
-  title: string;
+  title: string | React.ReactNode;
   content: React.ReactNode;
-  expanded?: boolean,
+  expanded?: boolean;
 };
 
 export const Collapsible = ({ title, content, expanded: startExpanded }: Props) => {

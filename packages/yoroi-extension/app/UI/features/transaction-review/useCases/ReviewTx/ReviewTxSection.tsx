@@ -7,11 +7,13 @@ import Drawer from '@mui/material/Drawer';
 import Menu from '../../../portfolio/common/components/Menu';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { OverviewTab } from './Overview/OverviewTab';
+import { UTxOsTab } from './UTxOs/UTxOsTab';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
     width: '530px',
     backgroundColor: theme.palette.ds.bg_color_max,
+    overflow: 'scroll',
   },
 }));
 
@@ -89,6 +91,11 @@ export const ReviewTxSection = () => {
       {selectedTab === subMenuOptions[0]?.route ? (
         <TabContent>
           <OverviewTab />
+        </TabContent>
+      ) : null}
+      {selectedTab === subMenuOptions[1]?.route ? (
+        <TabContent>
+          <UTxOsTab />
         </TabContent>
       ) : null}
     </StyledDrawer>

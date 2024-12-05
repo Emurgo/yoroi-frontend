@@ -7,6 +7,8 @@ import { CloseIcon } from './CloseIcon';
 import { Copied } from './Copied';
 import { Copy } from './Copy';
 import { Expand } from './Expand';
+import { Indicator } from './Indicator';
+import { Info } from './Info';
 import { Search } from './Search';
 import { Send } from './Send';
 import { Staking } from './Staking';
@@ -30,4 +32,6 @@ export const Icon = {
   ChevronUp,
   Search,
   Switch,
+  Indicator,
+  Info,
 };

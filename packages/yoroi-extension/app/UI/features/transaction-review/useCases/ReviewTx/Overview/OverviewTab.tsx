@@ -101,7 +101,7 @@ const MyWalletTokens = () => {
         </Box>
       </Stack>
       {['-10 Token 1', '-50 Token 2', '-100 Token 3', '-1 NFT 1', "-10 Token 1'"].map(item => (
-        <TokenItem label={item} />
+        <TokenItem label={item} isPrimaryToken={false} />
       ))}
     </Stack>
   );
