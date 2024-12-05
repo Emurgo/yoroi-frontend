@@ -146,6 +146,14 @@ export default class BaseProfileStore
     (void) => Promise<?boolean>
   > = new Request(this.api.localStorage.loadIsAnalyticsAllowed);
 
+  @observable setBringSandboxRequest: Request<
+    (boolean) => Promise<void>
+    > = new Request(this.api.localStorage.setBringSandbox);
+
+  @observable getBringSandboxRequest: Request<
+    (void) => Promise<boolean>
+    > = new Request(this.api.localStorage.getBringSandbox);
+
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
   setup(): void {

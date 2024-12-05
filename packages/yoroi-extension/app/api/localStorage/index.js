@@ -33,6 +33,7 @@ const storageKeys = {
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -216,6 +217,19 @@ export default class LocalStorageApi {
     setLocalItem(storageKeys.TOGGLE_SIDEBAR, JSON.stringify(!toggleSidebar));
 
   unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
+
+  // ========== Expand / retract Sidebar ========== //
+
+  getBringSandbox: void => Promise<boolean> = () =>
+    getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+
+  setBringSandbox: boolean => Promise<void> = flag => {
+    return flag
+      ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
+      : this.unsetBringSandbox();
+  };
+
+  unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
 
   // ============ External storage provider ============ //
 

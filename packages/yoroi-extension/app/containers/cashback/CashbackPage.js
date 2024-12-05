@@ -216,12 +216,12 @@ type IframeMessageData = {|
   amount: number
 |};
 
+const canUseSandbox = environment.isDev() || environment.isNightly();
+
 const CashbackPageContainer = observer((props: AllProps) => {
   const { actions, stores, intl } = props;
   const wallet = stores.wallets.selected;
   if (!wallet) throw Error('no publicDeriver');
-
-  const bringConfig: BringConfigType = CONFIG.bring;
 
   const theme = useTheme();
 
@@ -234,7 +234,18 @@ const CashbackPageContainer = observer((props: AllProps) => {
   const [signaturePopup, setSignaturePopup] = useState(false);
   const [overlayBgColor, setOverlayBgColor] = useState('#000000fa');
 
+  const bringSandboxRequest = stores.profile.getBringSandboxRequest;
   const fetchIframeUrl = useCallback(async () => {
+
+    if (canUseSandbox) {
+      if (!bringSandboxRequest.wasExecuted) {
+        bringSandboxRequest.execute();
+      }
+      await bringSandboxRequest.promise;
+    }
+    const isBringSandbox = canUseSandbox && (bringSandboxRequest.result ?? false);
+    const bringConfig: BringConfigType = isBringSandbox ? CONFIG.bringSandbox : CONFIG.bring;
+
     try {
       const publicDeriver = stores.wallets.selected;
       if (!publicDeriver) throw Error('no publicDeriver');
@@ -259,7 +270,10 @@ const CashbackPageContainer = observer((props: AllProps) => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }, [stores.wallets.selected]);
+  }, [
+    stores.wallets.selected,
+    bringSandboxRequest.result,
+  ]);
 
   function stringToHex(str) {
     return Array.from(str)
