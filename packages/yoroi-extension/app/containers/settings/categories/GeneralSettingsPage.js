@@ -15,6 +15,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';
+import environment from '../../../environment';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -50,6 +51,8 @@ const currencyLabels = defineMessages({
     defaultMessage: '!!!Brazilian real',
   },
 });
+
+const canUseSandbox = environment.isDev() || environment.isNightly();
 
 @observer
 export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
@@ -126,6 +129,11 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
           // $FlowFixMe this is apparently correct, flow is out of its mind
           currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
+          isUseSandbox={profileStore.getBringSandboxRequest.result}
+          onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
+            await profileStore.setBringSandboxRequest.execute(useSandbox);
+            await profileStore.getBringSandboxRequest.execute();
+          }) : null}
           error={null}
         />
         <UnitOfAccountSettings

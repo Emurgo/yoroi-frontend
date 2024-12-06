@@ -1,7 +1,6 @@
 // @flow
-import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
+import { useState, useEffect, useCallback, Suspense, useRef, useMemo } from 'react';
 import styles from './styles.module.css'
-import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -235,15 +234,14 @@ const CashbackPageContainer = observer((props: AllProps) => {
   const [overlayBgColor, setOverlayBgColor] = useState('#000000fa');
 
   const bringSandboxRequest = stores.profile.getBringSandboxRequest;
+  const isBringSandbox: ?boolean = useMemo(
+  () => canUseSandbox && bringSandboxRequest.result,
+  [bringSandboxRequest.result],
+  );
+
+
   const fetchIframeUrl = useCallback(async () => {
 
-    if (canUseSandbox) {
-      if (!bringSandboxRequest.wasExecuted) {
-        bringSandboxRequest.execute();
-      }
-      await bringSandboxRequest.promise;
-    }
-    const isBringSandbox = canUseSandbox && (bringSandboxRequest.result ?? false);
     const bringConfig: BringConfigType = isBringSandbox ? CONFIG.bringSandbox : CONFIG.bring;
 
     try {
@@ -270,10 +268,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }, [
-    stores.wallets.selected,
-    bringSandboxRequest.result,
-  ]);
+  }, [stores.wallets.selected, isBringSandbox]);
 
   function stringToHex(str) {
     return Array.from(str)
@@ -440,7 +435,9 @@ const CashbackPageContainer = observer((props: AllProps) => {
         <NavBarContainerRevamp
           actions={actions}
           stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
+          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback) + (
+            isBringSandbox ? ' (sandbox)' : ''
+          )} />}
         />
       }
     >

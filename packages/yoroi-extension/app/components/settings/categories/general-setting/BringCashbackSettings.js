@@ -19,6 +19,8 @@ import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
+import { RevampSwitch } from '../../../widgets/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const messages = defineMessages({
   bringCashbackTitle: {
@@ -42,12 +44,16 @@ type Props = {|
   +cardanoWallets: Array<{ publicDeriverId: number, name: string, plate: WalletChecksum, isTestnet: boolean, ... }>,
   +currentValue: ?number,
   +error?: ?LocalizableError,
+  +isUseSandbox?: boolean,
+  +onSetUseSandbox?: ?((boolean) => *),
 |};
 
 @observer
 class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
   static defaultProps: {| error: void |} = {
     error: undefined,
+    isUseSandbox: false,
+    onSetUseSandbox: null,
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -154,6 +160,21 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
             <FormattedHTMLMessage {...messages.note} />
           </Typography>
         </Box>
+        {this.props.onSetUseSandbox != null ? (
+          <FormControlLabel
+            label="Use Sandbox Backend"
+            control={
+              <Box ml="8px">
+                <RevampSwitch
+                  checked={this.props.isUseSandbox ?? false}
+                  onChange={event => this.props.onSetUseSandbox(event.target.checked)}
+                />
+              </Box>
+            }
+            labelPlacement="start"
+            sx={{ marginLeft: '0px', marginTop: '40px' }}
+          />
+        ) : null}
       </Box>
     );
   }

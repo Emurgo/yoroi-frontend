@@ -175,6 +175,7 @@ export default class BaseProfileStore
     this._getSelectComplexityLevel(); // eagerly cache
     noop(this.isRevampAnnounced);
     noop(this.didUserMigratedToRevampTheme);
+    this.getBringSandboxRequest.execute();
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',
