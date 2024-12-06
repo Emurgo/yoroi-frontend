@@ -1034,7 +1034,7 @@ export default class TransactionRevamp extends Component<Props, State> {
           metadata = <span>0x{data.metadata}</span>;
         }
       } else {
-        metadata = <CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 2)} </pre>} />;
+        metadata = <CodeBlock code={<pre>{JSON.stringify(data.metadata, null, 4)} </pre>} />;
       }
       return (
         <Box display="flex" gap="8px" flexDirection="column">
