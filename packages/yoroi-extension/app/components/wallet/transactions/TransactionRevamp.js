@@ -362,9 +362,9 @@ export default class TransactionRevamp extends Component<Props, State> {
     if (request.assets.length === 1) {
       const entry = request.assets[0];
       return (
-        <div className={classnames([styles.asset])}>
+        <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_max">
           {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
-        </div>
+        </Typography>
       );
     }
     // request.assets.length > 1
@@ -388,10 +388,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     }
 
     return (
-      <div className={classnames([styles.asset])}>
+      <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_medium">
         {sign}
         {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
-      </div>
+      </Typography>
     );
   };
 
