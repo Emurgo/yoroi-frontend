@@ -1,7 +1,6 @@
 // @flow
-import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
+import { useState, useEffect, useCallback, Suspense, useRef, useMemo } from 'react';
 import styles from './styles.module.css'
-import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -38,6 +37,7 @@ import { forceNonNull } from '../../coreUtils';
 import { constructPlate32 } from '../../components/topbar/WalletCard';
 import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
+import type { BringConfigType } from '../../../config/config-types';
 
 const messages = defineMessages({
   claim: {
@@ -113,6 +113,9 @@ const messages = defineMessages({
     defaultMessage: '!!!To claim your ADA cashback, either switch to your Cashback Wallet or choose your current wallet as your new Cashback Wallet.'
   },
 });
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
 
 type NotCurrentWalletModalProps = {|
   onSetCurrentAsCashbackWallet: () => void,
@@ -212,6 +215,7 @@ type IframeMessageData = {|
   amount: number
 |};
 
+const canUseSandbox = environment.isDev() || environment.isNightly();
 
 const CashbackPageContainer = observer((props: AllProps) => {
   const { actions, stores, intl } = props;
@@ -229,7 +233,17 @@ const CashbackPageContainer = observer((props: AllProps) => {
   const [signaturePopup, setSignaturePopup] = useState(false);
   const [overlayBgColor, setOverlayBgColor] = useState('#000000fa');
 
+  const bringSandboxRequest = stores.profile.getBringSandboxRequest;
+  const isBringSandbox: ?boolean = useMemo(
+  () => canUseSandbox && bringSandboxRequest.result,
+  [bringSandboxRequest.result],
+  );
+
+
   const fetchIframeUrl = useCallback(async () => {
+
+    const bringConfig: BringConfigType = isBringSandbox ? CONFIG.bringSandbox : CONFIG.bring;
+
     try {
       const publicDeriver = stores.wallets.selected;
       if (!publicDeriver) throw Error('no publicDeriver');
@@ -237,10 +251,10 @@ const CashbackPageContainer = observer((props: AllProps) => {
         publicDeriver.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address
       ).to_bech32();
 
-      const response = await fetch(`${environment.bringBaseUrl}check/portal`, {
+      const response = await fetch(`${bringConfig.baseUrl}check/portal`, {
         method: 'POST',
         headers: {
-          'x-api-key': environment.bringIdentifier,
+          'x-api-key': bringConfig.identifier,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ walletAddress }),
@@ -254,7 +268,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }, [stores.wallets.selected]);
+  }, [stores.wallets.selected, isBringSandbox]);
 
   function stringToHex(str) {
     return Array.from(str)
@@ -421,7 +435,9 @@ const CashbackPageContainer = observer((props: AllProps) => {
         <NavBarContainerRevamp
           actions={actions}
           stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback)} />}
+          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback) + (
+            isBringSandbox ? ' (sandbox)' : ''
+          )} />}
         />
       }
     >

@@ -146,6 +146,14 @@ export default class BaseProfileStore
     (void) => Promise<?boolean>
   > = new Request(this.api.localStorage.loadIsAnalyticsAllowed);
 
+  @observable setBringSandboxRequest: Request<
+    (boolean) => Promise<void>
+    > = new Request(this.api.localStorage.setBringSandbox);
+
+  @observable getBringSandboxRequest: Request<
+    (void) => Promise<boolean>
+    > = new Request(this.api.localStorage.getBringSandbox);
+
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
   setup(): void {
@@ -167,6 +175,7 @@ export default class BaseProfileStore
     this._getSelectComplexityLevel(); // eagerly cache
     noop(this.isRevampAnnounced);
     noop(this.didUserMigratedToRevampTheme);
+    this.getBringSandboxRequest.execute();
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',

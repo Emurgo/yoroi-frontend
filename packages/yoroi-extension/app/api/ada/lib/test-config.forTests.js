@@ -25,7 +25,12 @@ const CONFIG: ConfigType = {
     baseUrl: '',
     identifier: '',
     apiEndpoint: ''
-  }
+  },
+  bringSandbox: {
+    baseUrl: '',
+    identifier: '',
+    apiEndpoint: ''
+  },
 };
 
 global.CONFIG = CONFIG;
