@@ -47,6 +47,9 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
 
+    const isStakeRegistered = this.props.stores.delegation
+      .isStakeRegistered(publicDeriver.publicDeriverId);
+
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
     const stakePools = errorIfPresent ?? this.getStakePools(
       publicDeriver.publicDeriverId,
@@ -84,7 +87,7 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
           getLocalPoolInfo: this.props.stores.delegation.getLocalPoolInfo,
           tokenInfo: this.props.stores.tokenInfoStore.tokenInfo,
         })}
-        isUnregistered={!this.props.stores.delegation.isStakeRegistered(publicDeriver.publicDeriverId)}
+        isUnregistered={!isStakeRegistered}
         epochLength={this.getEpochLengthInDays(publicDeriver)}
         ticker={truncateToken(
           getTokenName(
@@ -115,10 +118,12 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
     if (delegationRequests == null) {
       throw new Error(`${nameof(StakingDashboardPage)} opened for non-reward wallet`);
     }
+    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(publicDeriverId);
     if (
-      !delegationRequests.getDelegatedBalance.wasExecuted ||
-      delegationRequests.getDelegatedBalance.isExecuting ||
-      delegationRequests.getDelegatedBalance.result == null
+      !delegationRequests.getDelegatedBalance.wasExecuted
+      || delegationRequests.getDelegatedBalance.isExecuting
+      || delegationRequests.getDelegatedBalance.result == null
+      || !isStakeRegistered
     ) {
       return { pools: null };
     }

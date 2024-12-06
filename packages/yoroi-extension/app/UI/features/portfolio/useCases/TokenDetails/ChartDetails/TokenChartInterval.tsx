@@ -7,6 +7,20 @@ import useChart from '../../../common/hooks/useChart';
 import { useGetPortfolioTokenChart } from '../../../common/hooks/usePortfolioTokenChart';
 import { TokenMarketPriceOverview } from './MarketPriceOverview';
 
+const getHoverBgColor = (variant: string, disabled: boolean, theme: any) => {
+  if (variant === 'contained') {
+    return disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium;
+  }
+  return disabled ? `transparent` : theme.palette.ds.primary_100;
+};
+
+const getGeneralBgColor = (variant: string, disabled: boolean, theme: any) => {
+  if (variant === 'contained') {
+    return disabled ? theme.palette.ds.gray_100 : theme.palette.ds.el_primary_medium;
+  }
+  return 'transparent';
+};
+
 // Styling for the period buttons
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -15,8 +29,7 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
   height: '30px',
   padding: '6px !important',
   minWidth: '36px',
-  backgroundColor:
-    variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_400) : `transparent`,
+  backgroundColor: getGeneralBgColor(variant, disabled, theme),
   color: 'ds.gray_min',
 
   '&.MuiButton-contained': {
@@ -26,8 +39,8 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
     color: disabled ? theme.palette.ds.gray_100 : theme.palette.ds.gray_min,
   },
   '&:hover': {
-    backgroundColor:
-      variant === 'contained' ? (disabled ? theme.palette.ds.gray_100 : theme.palette.ds.primary_500) : `ds.primary_200`,
+    backgroundColor: getHoverBgColor(variant, disabled, theme),
+    color: variant === 'contained' || disabled ? theme.palette.ds.gray_min : theme.palette.ds.text_primary_max,
   },
 }));
 
