@@ -1,3 +1,4 @@
+import { Back } from './Back';
 import { Cancel } from './Cancel';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
@@ -34,4 +35,5 @@ export const Icon = {
   Switch,
   Indicator,
   Info,
+  Back,
 };

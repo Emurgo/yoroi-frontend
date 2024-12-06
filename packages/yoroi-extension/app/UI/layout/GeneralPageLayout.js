@@ -29,7 +29,7 @@ class GeneralPageLayout extends React.Component {
 
     return (
       <IntlProvider intl={intl}>
-        <ReviewTxProvider>
+        <ReviewTxProvider stores={stores}>
           <ModalProvider>
             <ModalManager />
             <ReviewTxManager />

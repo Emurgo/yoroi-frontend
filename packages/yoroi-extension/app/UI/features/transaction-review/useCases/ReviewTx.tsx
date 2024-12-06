@@ -1,5 +1,6 @@
 import React from 'react';
+import { ReviewTxManager } from '../module/ReviewTxManager';
 
 export const ReviewTxModal = () => {
-  return <div>ReviewTx</div>;
+  return <ReviewTxManager />;
 };

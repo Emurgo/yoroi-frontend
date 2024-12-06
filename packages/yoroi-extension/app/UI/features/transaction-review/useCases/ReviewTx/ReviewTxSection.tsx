@@ -3,19 +3,12 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 import { Box, Divider } from '@mui/material';
-import Drawer from '@mui/material/Drawer';
 import Menu from '../../../portfolio/common/components/Menu';
+import { mockReviewTX } from '../../common/mockData';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { OverviewTab } from './Overview/OverviewTab';
+import { ReferenceInputsTab } from './ReferenceInputs/ReferenceInputsTab';
 import { UTxOsTab } from './UTxOs/UTxOsTab';
-
-const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
-  '& .MuiDrawer-paper': {
-    width: '530px',
-    backgroundColor: theme.palette.ds.bg_color_max,
-    overflow: 'scroll',
-  },
-}));
 
 const TabContent = styled(Box)({
   flex: 1,
@@ -28,26 +21,8 @@ export interface SubMenuOption {
 
 export const ReviewTxSection = () => {
   const theme = useTheme();
-  const [state, setState] = React.useState({
-    top: false,
-    left: false,
-    bottom: false,
-    right: false,
-  });
 
-  const { height, width, closeTxReviewModal, content, title, isOpen } = useTxReviewModal();
-
-  const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
-    if (
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift')
-    ) {
-      return;
-    }
-
-    setState({ ...state, [anchor]: open });
-    closeTxReviewModal();
-  };
+  const { title } = useTxReviewModal();
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -64,7 +39,7 @@ export const ReviewTxSection = () => {
     },
     {
       label: 'Reference inputs',
-      route: 'inputs',
+      route: 'referenceInputs',
     },
   ];
   const [selectedTab, setSelectedTab] = React.useState(subMenuOptions[0]?.route);
@@ -78,11 +53,7 @@ export const ReviewTxSection = () => {
   };
 
   return (
-    <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'}>
-      <Typography variant="h3" my="24px" fontWeight="500" textAlign="center">
-        {title}
-      </Typography>
-
+    <Box>
       <Box sx={{ backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>
         <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
         <Divider />
@@ -98,6 +69,16 @@ export const ReviewTxSection = () => {
           <UTxOsTab />
         </TabContent>
       ) : null}
-    </StyledDrawer>
+      {selectedTab === subMenuOptions[2]?.route ? (
+        <TabContent>
+          <Typography>Metadata here - TODO</Typography>
+        </TabContent>
+      ) : null}
+      {selectedTab === subMenuOptions[3]?.route ? (
+        <TabContent>
+          <ReferenceInputsTab referenceInputs={mockReviewTX.referenceInputs} />
+        </TabContent>
+      ) : null}
+    </Box>
   );
 };

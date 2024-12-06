@@ -2,10 +2,12 @@ import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 import { Box, Divider, Stack, styled } from '@mui/material';
+import WalletAccountIcon from '../../../../../../components/topbar/WalletAccountIcon';
 import { truncateAddressShort } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { TokenItem } from '../../../common/TokenItem';
+import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
 export interface SubMenuOption {
   label: string;
@@ -21,10 +23,35 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
 }));
 
 export const OverviewTab = () => {
+  const { currentWalletDetails, changeModalView } = useTxReviewModal();
+  const { selected, selectedWalletName } = currentWalletDetails;
+
+  const { plate } = selected;
+
+  const currentWalletIcon = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={8} scalePx={4} />;
+
+  const waletInfoDsiplay = (
+    <Stack direction="row" alignItems="center" gap="8px">
+      {currentWalletIcon}
+      <Box
+        component="button"
+        onClick={() => {
+          changeModalView({ modalView: 'walletInfo', title: 'Wallet Details' });
+        }}
+      >
+        <Typography
+          variant="body1"
+          color="ds.text_primary_medium"
+          fontWeight={500}
+        >{`${selectedWalletName} | ${plate.TextPart}`}</Typography>
+      </Box>
+    </Stack>
+  );
+
   return (
     <Stack sx={{ padding: '24px' }}>
       <Stack direction="column" gap="8px">
-        <InfoInline label="Wallet" value="Test Wallet" />
+        <InfoInline label="Wallet" value={waletInfoDsiplay} />
         {/* <InfoInline label="Connected to" value="dapp" /> */}
         <InfoInline label="Fee" value="-0.2323232 ADA" />
       </Stack>

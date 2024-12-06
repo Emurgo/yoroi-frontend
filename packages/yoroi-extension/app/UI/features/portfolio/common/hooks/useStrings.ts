@@ -326,6 +326,7 @@ export const messages = Object.freeze(
 
 export const useStrings = () => {
   const { intl } = useIntl();
+  console.log('useStrings intlintl', intl);
   return React.useRef({
     mainHeaderText: intl.formatMessage(messages.mainHeaderText),
     detailHeaderText: intl.formatMessage(messages.detailHeaderText),

@@ -1,6 +1,7 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
+import { useStrings } from '../../../common/hooks/useStrings';
 import { mockReviewTX } from '../../../common/mockData'; // Adjust this path as necessary
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
 
@@ -43,8 +44,7 @@ export const UTxOsTab: React.FC = () => {
   );
 };
 
-// Inputs Component
-const Inputs: React.FC<InputsProps> = ({ inputs }) => {
+export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
   return (
     <Stack>
       <Collapsible
@@ -66,7 +66,6 @@ const Inputs: React.FC<InputsProps> = ({ inputs }) => {
   );
 };
 
-// Inputs Component
 const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
   return (
     <Stack>
@@ -90,6 +89,10 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
 };
 
 const Input: React.FC<InputProps> = ({ input }) => {
+  const strings = useStrings();
+
+  console.log('INPUT', strings);
+
   const renderAssets = () => {
     if (!input.assets.length) return null;
 
@@ -116,7 +119,7 @@ const Input: React.FC<InputProps> = ({ input }) => {
         <Typography sx={{ wordWrap: 'break-word', maxWidth: '450px' }} variant="body1">
           {input.address}
         </Typography>
-        <CopyButton textToCopy={input.address} />
+        <CopyButton textToCopy={input.address} strings={strings} />
       </Stack>
 
       {input.assets.length > 0 && (

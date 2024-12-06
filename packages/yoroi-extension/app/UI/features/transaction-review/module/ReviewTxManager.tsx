@@ -1,7 +1,54 @@
 import * as React from 'react';
 
+import { Drawer, styled } from '@mui/material';
+import { TopActions } from '../common/TopActionSection/TopActions';
 import { ReviewTxSection } from '../useCases/ReviewTx/ReviewTxSection';
+import { WalletInfoSection } from '../useCases/WalletInfo/WalletInfoSection';
+import { useTxReviewModal } from './ReviewTxProvider';
+
+const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
+  '& .MuiDrawer-paper': {
+    width: '530px',
+    backgroundColor: theme.palette.ds.bg_color_max,
+    overflow: 'scroll',
+  },
+}));
 
 export const ReviewTxManager = () => {
-  return <ReviewTxSection />;
+  const [state, setState] = React.useState({
+    top: false,
+    left: false,
+    bottom: false,
+    right: false,
+  });
+
+  const { isOpen, closeTxReviewModal, modalView, changeModalView } = useTxReviewModal();
+  console.log('modalView', modalView);
+
+  const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
+    if (
+      event.type === 'keydown' &&
+      ((event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift')
+    ) {
+      return;
+    }
+
+    setState({ ...state, [anchor]: open });
+    closeTxReviewModal();
+  };
+
+  const handleOnBack = () => {
+    if (modalView === 'walletInfo') {
+      changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+    }
+    return undefined;
+  };
+
+  return (
+    <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'}>
+      <TopActions onBack={handleOnBack} />
+      {modalView === 'transactionReview' && <ReviewTxSection />}
+      {modalView === 'walletInfo' && <WalletInfoSection />}
+    </StyledDrawer>
+  );
 };

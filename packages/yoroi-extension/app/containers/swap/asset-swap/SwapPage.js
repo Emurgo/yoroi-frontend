@@ -33,6 +33,7 @@ import { defineMessages, injectIntl } from 'react-intl';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
+import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -44,7 +45,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Send using Trezor',
   },
 });
-
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -59,6 +59,8 @@ type Intl = {|
 function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const [openedDialog, setOpenedDialog] = useState('');
   const { orderStep, setOrderStepValue } = props.stores.substores.ada.swapStore;
+
+  const { openTxReviewModal } = useTxReviewModal();
 
   const {
     slippage,
@@ -78,13 +80,10 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const walletType: string = wallet.type;
   const isHardwareWallet = wallet.isHardware;
   const network = getNetworkById(wallet.networkId);
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
     props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    getTokenInfoBatch([id])[id].then(res => res ?? {});
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -117,9 +116,8 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     buyQuantity.error == null &&
     isValidTickers;
 
-  const confirmationCanContinue =
-    (isHardwareWallet || userPasswordState?.value !== '')
-    && signRequest != null;
+  // const confirmationCanContinue = (isHardwareWallet || userPasswordState?.value !== '') && signRequest != null;
+  const confirmationCanContinue = true;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
@@ -208,7 +206,13 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       if (orderStep === 0) {
         handleInitialStep();
       } else if (orderStep === 1) {
-        await handleSubmitTransaction();
+        // await handleSubmitTransaction();
+        openTxReviewModal({
+          title: 'Transaction confirmation (Swap in progress)',
+          modalView: 'transactionReview',
+          // receiverCustomTitle: liquidityPool ?? undefined,
+          // details: {component: <TransactionSummary orderData={orderData} />, title: strings.swapDetailsTitle},
+        });
       }
     } catch (error) {
       console.error('Error handling next step', error);
@@ -268,8 +272,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     const baseBroadcastRequest = { wallet, signRequest };
     const broadcastRequest = isHardwareWallet
       ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password },
-    };
+      : { normal: { ...baseBroadcastRequest, password } };
     try {
       const refreshWallet = () => props.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
       // $FlowIgnore[incompatible-call]

@@ -100,7 +100,8 @@ export const GovernanceStatusSelection = () => {
       setTimeout(async () => {
         await createDrepDelegationTransaction(kind);
         openTxReviewModal({
-          title: 'Transaction confirmation',
+          title: 'Transaction Review',
+          modalView: 'transactionReview',
         });
         // navigateTo.delegationForm(); // TODO add condition for production
         setLoadingUnsignTx(false);

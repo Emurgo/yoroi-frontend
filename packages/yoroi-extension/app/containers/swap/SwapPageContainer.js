@@ -17,6 +17,8 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { ROUTES } from '../../routes-config';
+import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -80,8 +82,12 @@ class SwapPageContainer extends Component<AllProps> {
         showInContainer
         showAsCard
         withPadding={false}
+        intl={this.context.intl}
       >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+        <ReviewTxProvider stores={stores}>
+          <ReviewTxModal />
+          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+        </ReviewTxProvider>
       </TopBarLayout>
     );
   }

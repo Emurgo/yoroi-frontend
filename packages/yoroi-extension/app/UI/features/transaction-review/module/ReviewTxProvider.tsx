@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 type ModalState = {
   isOpen: boolean;
@@ -7,9 +7,11 @@ type ModalState = {
   height: string;
   width: string;
   isLoading: boolean;
+  modalView: 'transactionReview' | 'walletInfo';
 };
 type ModalActions = {
   openTxReviewModal: any;
+  changeModalView: any;
   closeTxReviewModal: () => void;
   startLoadingTxReview: () => void;
   stopLoadingTxReview: () => void;
@@ -25,8 +27,24 @@ export const useTxReviewModal = (): any => {
   return value;
 };
 
-export const ReviewTxProvider = ({ children, initialState }: { children: React.ReactNode; initialState?: ModalState }) => {
+export const ReviewTxProvider = ({
+  children,
+  initialState,
+  stores,
+}: {
+  children: React.ReactNode;
+  initialState?: ModalState;
+}) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
+
+  useEffect(() => {
+    const { wallets } = stores;
+    const { selected, selectedWalletName } = wallets;
+    const { plate } = selected;
+
+    console.log('Current Wallet details', { selected, selectedWalletName, plate });
+  }, []);
+
   const actions = React.useRef<ModalActions>({
     closeTxReviewModal: () => {
       dispatch({ type: 'close' });
@@ -40,11 +58,18 @@ export const ReviewTxProvider = ({ children, initialState }: { children: React.R
         width: payload.width,
       });
     },
+    changeModalView: (payload: any) => {
+      console.log('CHANGE MODAL VIEW ACTIONS', payload);
+      dispatch({
+        type: 'changeModalView',
+        modalView: payload.modalView,
+      });
+    },
     startLoadingTxReview: () => dispatch({ type: 'startLoading' }),
     stopLoadingTxReview: () => dispatch({ type: 'stopLoading' }),
   }).current;
 
-  const context: any = React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
+  const context: any = React.useMemo(() => ({ ...state, currentWalletDetails: stores.wallets, ...actions }), [state, actions]);
 
   return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
 };
@@ -62,7 +87,13 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         title: action.title,
         isOpen: true,
         isLoading: false,
+        modalView: action.modalView ?? defaultState.modalView,
       };
+
+    case 'changeModalView':
+      console.log('CHANGE MODAL VIEW REDUCER', action);
+
+      return { ...state, modalView: action.modalView, title: action.title };
 
     case 'close':
       return { ...defaultState, isOpen: false };
@@ -85,4 +116,5 @@ const defaultState: ModalState = Object.freeze({
   height: '648px',
   width: '648px',
   isLoading: false,
+  modalView: 'transactionReview',
 });

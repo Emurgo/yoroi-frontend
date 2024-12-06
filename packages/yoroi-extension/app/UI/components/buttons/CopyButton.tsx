@@ -1,7 +1,6 @@
 import { IconButton, styled } from '@mui/material';
 import React, { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { useStrings } from '../../features/portfolio/common/hooks/useStrings';
 import { Icon } from '../icons/index';
 import { Tooltip } from '../Tooltip';
 
@@ -20,7 +19,7 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
 
 export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
-  const strings = useStrings();
+  // const strings = useStrings();
 
   const handleCopy = () => {
     setCopied(true);
@@ -31,7 +30,7 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
 
   return (
     <CopyToClipboard text={textToCopy} onCopy={handleCopy} {...props}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow placement="bottom-start">
+      <Tooltip title={copied ? 'Copied' : 'Copy to clipboard'} arrow placement="bottom-start">
         <IconWrapper disabled={disabled} sx={{ padding: 0 }}>
           {copied ? <Icon.Copied /> : <Icon.Copy />}
         </IconWrapper>

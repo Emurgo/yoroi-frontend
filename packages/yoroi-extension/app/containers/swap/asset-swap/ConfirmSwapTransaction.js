@@ -218,7 +218,7 @@ export default function ConfirmSwapTransaction({
           </Typography>
         </Box>
       </GradientBox>
-      {userPasswordState != null && (
+      {/* {userPasswordState != null && (
         <Box>
           <TextField
             className="walletPassword"
@@ -232,7 +232,7 @@ export default function ConfirmSwapTransaction({
             error={isIncorrectPassword && 'Incorrect password!'}
           />
         </Box>
-      )}
+      )} */}
     </Box>
   );
 }
