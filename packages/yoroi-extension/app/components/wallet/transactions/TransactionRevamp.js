@@ -1042,7 +1042,7 @@ export default class TransactionRevamp extends Component<Props, State> {
       }
       return (
         <Box display="flex" gap="8px" flexDirection="column">
-          <Typography variant="caption1" fontWeight={500}>
+          <Typography variant="caption1" fontWeight={500} color="ds.text_gray_medium">
             {intl.formatMessage(messages.transactionMetadata)}
           </Typography>
           <Typography variant="body2" color="ds.text_gray_low">
