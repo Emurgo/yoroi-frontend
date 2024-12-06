@@ -670,7 +670,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     sx={{
                       px: '24px',
                       display: 'grid',
-                      color: 'grayscale.max',
+                      color: 'ds.text_gray_medium',
                       gap: '15px',
                       gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
                       justifyContent: 'space-between',
@@ -713,7 +713,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     sx={{
                       px: '24px',
                       display: 'grid',
-                      color: 'grayscale.max',
+                      color: 'ds.text_gray_medium',
                       gap: '15px',
                       gridTemplateColumns: 'minmax(232px, 1fr) 105px 1fr',
                       justifyContent: 'space-between',
@@ -755,10 +755,10 @@ export default class TransactionRevamp extends Component<Props, State> {
 
                   {state === TxStatusCodes.IN_BLOCK && this.props.numberOfConfirmations != null && (
                     <Box display="flex" gap="8px" mb="16px" flexDirection="column">
-                      <Typography variant="caption1" fontWeight={500}>
+                      <Typography variant="caption1" fontWeight={500} color="ds.text_gray_medium">
                         {intl.formatMessage(messages.assuranceLevel)}
                       </Typography>
-                      <Typography variant="caption1" color="grayscale.600">
+                      <Typography variant="caption1" color="ds.text_gray_low">
                         <span className={styles.assuranceLevel}>{status}</span>.{' '}
                         <span className="confirmationCount" id={txIdFullInfoBasePart + '-numberOfConfirmations-text'}>
                           {this.props.numberOfConfirmations}
@@ -769,7 +769,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                   )}
 
                   <Box display="flex" gap="8px" mb="16px" flexDirection="column">
-                    <Typography variant="caption1" fontWeight={500}>
+                    <Typography variant="caption1" fontWeight={500} color="ds.text_gray_medium">
                       {intl.formatMessage(globalMessages.transactionId)}
                     </Typography>
                     <ExplorableHashContainer
@@ -780,7 +780,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                     >
                       <Typography
                         variant="caption1"
-                        color="grayscale.600"
+                        color="ds.text_gray_low"
                         className={classnames('txid' /* for tests */)}
                         id={txIdFullInfoBasePart + '-transactionId-text'}
                       >
@@ -790,40 +790,44 @@ export default class TransactionRevamp extends Component<Props, State> {
                   </Box>
 
                   <Box display="flex" gap="8px" mt="16px" flexDirection="column">
-                    <Typography variant="caption1" fontWeight={500}>
+                    <Typography variant="caption1" fontWeight={500} color="ds.text_gray_medium" display="inline-flex">
                       {intl.formatMessage(memoMessages.memoLabel)}
                       {this.props.memo != null ? (
-                        <button
+                        <Box
                           type="button"
-                          onClick={onEditMemo.bind(this, data)}
-                          className={classnames(
-                            styles.editButton,
-                            'editMemoButton' // for tests
-                          )}
+                          onClick={onEditMemo.bind(this, data)}                          
+                          marginLeft="6px"
+                          sx={{
+                            cursor: 'pointer'
+                          }}
                           id={txIdFullInfoBasePart + '-editMemo-button'}
                         >
-                          <Box className={styles.editMemoIcon}>
-                            <EditSvg />
+                          <Box>
+                            <MemoIconWrapper>
+                              <EditSvg />
+                            </MemoIconWrapper>
                           </Box>
-                        </button>
+                        </Box>
                       ) : (
-                        <button
+                        <Box
                           type="button"
                           onClick={onAddMemo.bind(this, data)}
-                          className={classnames(
-                            styles.editButton,
-                            'addMemoButton' // for tests
-                          )}
-                          id={txIdFullInfoBasePart + '-editMemo-button'}
+                          marginLeft="6px"
+                          sx={{
+                            cursor: 'pointer'
+                          }}
+                          id={txIdFullInfoBasePart + '-addMemo-button'}
                         >
-                          <Box className={styles.editMemoIcon}>
-                            <AddMemoSvg />
+                          <Box>
+                            <MemoIconWrapper>
+                              <AddMemoSvg />
+                            </MemoIconWrapper>
                           </Box>
-                        </button>
+                        </Box>
                       )}
                     </Typography>
                     <Box width="446px">
-                      <Typography variant="caption1" id={txIdFullInfoBasePart + '-memoContent-text'} color="grayscale.600">
+                      <Typography variant="caption1" id={txIdFullInfoBasePart + '-memoContent-text'} color="ds.text_gray_low">
                         {this.props.memo != null ? this.props.memo?.Content : '-'}
                       </Typography>
                     </Box>
@@ -1096,3 +1100,13 @@ const TypeIcon = ({ type }) => {
     </Box>
   );
 };
+
+const MemoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    height: '15px',
+    width: '15px',
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
