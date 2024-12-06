@@ -404,6 +404,7 @@ export default class LocalStorageApi {
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
     await this.unsetPortfolioFiatPair();
+    await this.unsetBringSandbox();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);
