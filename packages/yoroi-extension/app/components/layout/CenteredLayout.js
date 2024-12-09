@@ -14,7 +14,7 @@ function CenteredLayout({ children }: Props): Node {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'var(--yoroi-loading-background-color)',
+        backgroundColor: 'ds.bg_color_max',
         height: '100%',
       }}
     >

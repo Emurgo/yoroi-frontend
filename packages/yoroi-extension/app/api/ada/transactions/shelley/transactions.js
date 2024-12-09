@@ -77,7 +77,7 @@ type TxMetadata = {
 };
 
 export function sendAllUnsignedTx(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -288,7 +288,7 @@ function addUtxoInput(
 }
 
 export function sendAllUnsignedTxFromUtxo(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -584,8 +584,6 @@ export async function newAdaUnsignedTxFromUtxo(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
-    // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: Number(protocolParams.coinsPerUtxoByte) * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(

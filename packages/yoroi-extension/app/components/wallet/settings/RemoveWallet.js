@@ -55,11 +55,7 @@ class RemoveWallet extends Component<Props & InjectedProps> {
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
-        <Typography
-          variant={isRevampLayout ? 'body1' : 'body2'}
-          color="ds.text_gray_medium"
-          mb={isRevampLayout ? '16px' : '12px'}
-        >
+        <Typography variant="body1" color="ds.text_gray_medium" mb={isRevampLayout ? '16px' : '12px'}>
           {intl.formatMessage(messages.removeExplanation)}
         </Typography>
 

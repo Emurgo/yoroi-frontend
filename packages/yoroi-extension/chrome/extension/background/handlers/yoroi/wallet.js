@@ -65,6 +65,7 @@ export const CreateWallet: HandlerType<CreateWalletRequest, CreateWalletResponse
         publicDeriverId: publicDerivers[0].getPublicDeriverId(),
       }
     });
+    // noinspection ES6MissingAwait
     syncWallet(publicDerivers[0], 'new wallet', 1);
     return await getPlaceHolderWalletState(publicDerivers[0]);
   },
