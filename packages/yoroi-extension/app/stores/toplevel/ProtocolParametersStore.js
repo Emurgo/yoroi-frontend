@@ -5,7 +5,10 @@
 import Store from '../base/Store';
 import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 import { getProtocolParameters } from '../../api/thunk';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  listRelevantNetworkNamesForEnvironment,
+  networks
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import { observable } from 'mobx';
 
@@ -17,9 +20,14 @@ export default class ProtocolParametersStore<
 
   cache: Map<number, ProtocolParameters> = new Map();
 
+  setup(): void {
+    this.loadProtocolParametersRequest.execute();
+  }
+
   async loadProtocolParameters(): Promise<void> {
-    for (const key of Object.keys(networks)) {
+    for (const key of listRelevantNetworkNamesForEnvironment()) {
       const networkId = networks[key].NetworkId;
+      if (networkId === networks.CardanoSanchoTestnet.NetworkId) continue;
       const protocolParameters = await getProtocolParameters({ networkId });
       this.cache.set(networkId, protocolParameters);
     }
