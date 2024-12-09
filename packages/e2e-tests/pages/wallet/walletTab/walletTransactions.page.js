@@ -519,6 +519,10 @@ export class TransactionsSubTab extends WalletTab {
     const noMemoState = await this.customWaiter(
       async () => {
         const allElements = await this.findElements(memoMsgLocator);
+        if (allElements.length === 1) {
+          const memoContent = await this.getAttribute(memoMsgLocator, 'textContent');
+          return memoContent === '-';
+        }
         return allElements.length === 0;
       },
       threeSeconds,
