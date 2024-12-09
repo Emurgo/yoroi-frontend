@@ -7,7 +7,11 @@ import {
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
-import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
+import {
+  convertPrettyDateToNormal,
+  convertPrettyTimeToNormal,
+  groupDateIsInPeriod,
+} from '../../../utils/utils.js';
 import MemoWarningModal from './transactionsModals/memoWarningModal.page.js';
 import { balanceReplacer } from '../../../helpers/constants.js';
 
@@ -197,7 +201,7 @@ export class TransactionsSubTab extends WalletTab {
     const displayedTxsGroups = await this.__getTxsGroups();
     return emptyBannerIsDisplayed && displayedTxsGroups == 0;
   }
-  async __getTxsGroups() {
+  async __getTxsGroups(usePeriod = false, startDate = '00000000', endDate = '00000000') {
     const locatorForAllGroups = {
       locator: '//div[starts-with(@id, "wallet:transactions:transactionsList-transactionsGroup_")]',
       method: 'xpath',
@@ -210,10 +214,20 @@ export class TransactionsSubTab extends WalletTab {
         this.walletTransactionsGroupDateTextLocator(groupIndex)
       );
       const groupDate = convertPrettyDateToNormal(groupDatePrettified);
-      result.push({
-        groupDate,
-        groupIndex,
-      });
+
+      if (usePeriod) {
+        if (groupDateIsInPeriod(groupDate, startDate, endDate)) {
+          result.push({
+            groupDate,
+            groupIndex,
+          });
+        }
+      } else {
+        result.push({
+          groupDate,
+          groupIndex,
+        });
+      }
     }
     await this.setImplicitTimeout(defaultWaitTimeout, this.__getTxsGroups.name);
     return result;
@@ -306,9 +320,9 @@ export class TransactionsSubTab extends WalletTab {
     this.logger.info(`TransactionsSubTab::getExportDialog is called`);
     return new ExportTransactionsModal(this.driver, this.logger);
   }
-  async getTxsInfo() {
+  async getTxsInfo(startDate, endDate) {
     this.logger.info(`TransactionsSubTab::getTxsInfo is called`);
-    const allGroups = await this.__getTxsGroups();
+    const allGroups = await this.__getTxsGroups(true, startDate, endDate);
     const allTxsInfo = [];
     for (const group of allGroups) {
       const txsInfoInGroup = await this.__getAllTxsInGroup(group);
@@ -542,7 +556,9 @@ export class TransactionsSubTab extends WalletTab {
       // check all to addresses
       const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
       for (let addrToIndex = 0; addrToIndex < amountToAddrs; addrToIndex++) {
-        const addrToAmountRawStr = await this.getText(this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex));
+        const addrToAmountRawStr = await this.getText(
+          this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex)
+        );
         const addrToAmountStr = addrToAmountRawStr.split(' ')[0];
         result.push(addrToAmountStr === balanceReplacer);
       }

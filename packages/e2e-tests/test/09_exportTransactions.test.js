@@ -16,10 +16,15 @@ import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
 import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
 
+// There is an issue https://emurgo.atlassian.net/browse/YOEXT-1589
 describe('Export transactions, positive', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
+  // mm/dd/yyyy - 11/13/2023, it is only for testWallet1
+  const startDate = '11132023';
+  // mm/dd/yyyy - 03/08/2024, it is only for testWallet1
+  const endDate = '03082024';
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
@@ -41,10 +46,8 @@ describe('Export transactions, positive', function () {
   it('Set correct dates', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const exportDialog = transactionsPage.getExportDialog();
-    // mm/dd/yyyy - 11/13/2023, it is only for testWallet1
-    await exportDialog.setStartDate('11132023');
-    // mm/dd/yyyy - 03/08/2024, it is only for testWallet1
-    await exportDialog.setEndDate('03082024');
+    await exportDialog.setStartDate(startDate);
+    await exportDialog.setEndDate(endDate);
     await exportDialog.clickIncludeTxsIDs();
     const btnEnabled = await exportDialog.exportButtonIsEnabled();
     expect(btnEnabled, 'The export button is not enabled').to.be.true;
@@ -74,7 +77,7 @@ describe('Export transactions, positive', function () {
     const parsedFileContent = parseExportedCSV(fileContent);
 
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    const displayedTxs = await transactionsPage.getTxsInfo();
+    const displayedTxs = await transactionsPage.getTxsInfo(startDate, endDate);
     compareExportedTxsAndDisplayedTxs(parsedFileContent, displayedTxs);
   });
 
