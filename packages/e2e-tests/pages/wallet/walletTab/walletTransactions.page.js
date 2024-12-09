@@ -1,6 +1,7 @@
 import {
   defaultWaitTimeout,
   fiveSeconds,
+  oneSecond,
   quarterSecond,
   threeSeconds,
   twoSeconds,
@@ -370,8 +371,8 @@ export class TransactionsSubTab extends WalletTab {
       return false;
     }
   }
-  async waitLoaderIsNotDisplayed(timeout, repearPeriod) {
-    this.logger.info(`TransactionsSubTab::waitLoaderIsNotDisplayed is called`);
+  async waitTxLoaderIsNotDisplayed(timeout, repearPeriod) {
+    this.logger.info(`TransactionsSubTab::waitTxLoaderIsNotDisplayed is called`);
     const loaderIsNotDisplayed = await this.customWaiter(
       async () => {
         const displayed = await this.loaderIsDisplayed();
@@ -381,7 +382,7 @@ export class TransactionsSubTab extends WalletTab {
       repearPeriod
     );
     this.logger.info(
-      `TransactionsSubTab::waitLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`
+      `TransactionsSubTab::waitTxLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`
     );
 
     return loaderIsNotDisplayed;
@@ -390,6 +391,7 @@ export class TransactionsSubTab extends WalletTab {
     const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
     const loaderIsDisplayed = await this.loaderIsDisplayed();
     if (!showMoreIsDisplayed && !loaderIsDisplayed) {
+      this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
       return false;
     }
     if (showMoreIsDisplayed) {
@@ -401,7 +403,7 @@ export class TransactionsSubTab extends WalletTab {
     if (loaderIsDisplayed) {
       const thirtySec = 3 * defaultWaitTimeout;
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-      const result = await this.waitLoaderIsNotDisplayed(thirtySec, quarterSecond);
+      const result = await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
       if (!result) {
         throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
       }
@@ -414,13 +416,17 @@ export class TransactionsSubTab extends WalletTab {
       if (!canLoadMore) {
         break;
       }
+      await this.sleep(oneSecond);
     }
+    const thirtySec = 3 * defaultWaitTimeout;
+    await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
   }
   async downloadAllTxs() {
     this.logger.info(`TransactionsSubTab::downloadAllTxs is called`);
     let canLoadMore = true;
     while (canLoadMore) {
       canLoadMore = await this._loadMore();
+      await this.sleep(oneSecond);
     }
   }
   async __getAddrsLinks(groupIndex, txIndex, addrsAmount, getLocatorFunc) {
