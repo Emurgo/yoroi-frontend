@@ -72,7 +72,7 @@ class WalletNameSetting extends Component<Props & InjectedLayoutProps> {
     return (
       <>
         {isRevampLayout && (
-          <Typography component="div" variant="body1" fontWeight={500} mb="16px">
+          <Typography component="div" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
             {intl.formatMessage(messages.title)}
           </Typography>
         )}
