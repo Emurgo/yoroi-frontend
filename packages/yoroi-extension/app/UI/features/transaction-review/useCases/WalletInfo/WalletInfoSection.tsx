@@ -1,6 +1,7 @@
 import { Box, Stack, Typography, styled } from '@mui/material';
 import React from 'react';
 import WalletAccountIcon from '../../../../components/WalletAccountIcon/WalletAccountIcon';
+import { AssetCarousel } from '../../common/AssetCarousel/AssetCarousel';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 
 export const WalletInfoSection = () => {
@@ -22,6 +23,8 @@ export const WalletInfoSection = () => {
         </Typography>
       </Stack>
       <WalletStats />
+
+      <WalletAssets />
     </Stack>
   );
 };
@@ -55,5 +58,27 @@ const WalletStats = () => {
         <Typography color="ds.white_static">PLN tag here</Typography>
       </Stack>
     </StyledStack>
+  );
+};
+
+const WalletAssets = () => {
+  const { ftAssetsList } = useTxReviewModal();
+  return (
+    <Stack direction="row" gap="16px">
+      <WalletAssetsSection data={ftAssetsList} label="Tokens" />
+      <WalletAssetsSection data={ftAssetsList} label="Tokens" />
+    </Stack>
+  );
+};
+
+const WalletAssetsSection = ({ data, label }) => {
+  return (
+    <Stack direction="column" height="152px" width="233px" sx={{ border: '1px solid gray', borderRadius: '8px' }}>
+      <Typography>{label}</Typography>
+      <Stack direction="column">
+        <Typography>{data.length}</Typography>
+        <AssetCarousel />
+      </Stack>
+    </Stack>
   );
 };

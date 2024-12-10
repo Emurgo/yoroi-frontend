@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
 type ModalState = {
   isOpen: boolean;
@@ -36,6 +37,8 @@ export const ReviewTxProvider = ({
   initialState?: ModalState;
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+  console.log('[currentWalletInfo]', currentWalletInfo?.ftAssetList);
 
   useEffect(() => {
     const { wallets } = stores;
@@ -69,7 +72,10 @@ export const ReviewTxProvider = ({
     stopLoadingTxReview: () => dispatch({ type: 'stopLoading' }),
   }).current;
 
-  const context: any = React.useMemo(() => ({ ...state, currentWalletDetails: stores.wallets, ...actions }), [state, actions]);
+  const context: any = React.useMemo(
+    () => ({ ...state, ftAssetsList: currentWalletInfo?.ftAssetList, currentWalletDetails: stores.wallets, ...actions }),
+    [state, actions]
+  );
 
   return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
 };
