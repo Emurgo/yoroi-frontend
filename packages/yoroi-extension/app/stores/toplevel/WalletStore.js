@@ -454,8 +454,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
   }
 
   setCashbackWallet(id: number): void {
-    this.getCashbackWalletRequest.patch(() => this.wallets.find(w => w.publicDeriverId === id));
     setCashbackWallet(id);
+    this.getCashbackWalletRequest.patch(() => this.wallets.find(w => w.publicDeriverId === id));
   }
 }
 
