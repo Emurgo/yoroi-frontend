@@ -119,22 +119,22 @@ declare var CONFIG: ConfigType;
 
 type NotCurrentWalletModalProps = {|
   onSetCurrentAsCashbackWallet: () => void,
-  onSwitchToCashbackWallet: () => void,
-  shownCashbackWallet: {
-    plate: {|
-      ImagePart: string,
+    onSwitchToCashbackWallet: () => void,
+      shownCashbackWallet: {
+  plate: {|
+    ImagePart: string,
       TextPart: string,
     |},
-    name: string,
+  name: string,
     ...,
-  },
-  intl: $npm$ReactIntl$IntlShape,
+},
+intl: $npm$ReactIntl$IntlShape,
 |};
 
 const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalProps) => {
   const { intl } = props;
 
-  const [state, setState] = useState<'switchOrSet' | 'confirmSet'>('switchOrSet');
+  const [state, setState] = useState < 'switchOrSet' | 'confirmSet' > ('switchOrSet');
 
   if (state === 'switchOrSet') {
     return (
@@ -184,7 +184,7 @@ const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalP
       <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>
         {intl.formatMessage(messages.switchText)}
       </Typography>
-      <Typography sx={{ fontSize: '12px', fontHeight: '16px',lineHeight: '16px' }}>
+      <Typography sx={{ fontSize: '12px', fontHeight: '16px', lineHeight: '16px' }}>
         {intl.formatMessage(messages.currentWalletLabel)}
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
@@ -210,10 +210,10 @@ type AllProps = {| ...StoresAndActionsProps, intl: $npm$ReactIntl$IntlShape, |};
 
 type IframeMessageData = {|
   action: string,
-  overlayBgColor ?: string,
-  messageToSign: string,
-  amount: number
-|};
+    overlayBgColor ?: string,
+    messageToSign: string,
+      amount: number
+        |};
 
 const canUseSandbox = environment.isDev() || environment.isNightly();
 
@@ -235,8 +235,8 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
   const bringSandboxRequest = stores.profile.getBringSandboxRequest;
   const isBringSandbox: ?boolean = useMemo(
-  () => canUseSandbox && bringSandboxRequest.result,
-  [bringSandboxRequest.result],
+    () => canUseSandbox && bringSandboxRequest.result,
+    [bringSandboxRequest.result],
   );
 
 
@@ -278,6 +278,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
   const signMessage = useCallback(async (msg: string, pwd: string) => {
     const { address, addressing } = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+    console.log('BRING', { msg });
 
     try {
       let res;
@@ -339,7 +340,8 @@ const CashbackPageContainer = observer((props: AllProps) => {
           to: 'bringweb3',
           action: 'SIGNATURE',
           ...res,
-          message, address
+          message: msg,
+          address
         },
         '*'
       );
@@ -360,205 +362,205 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
     const messageData: IframeMessageData = (event.data: any);
 
-    if (messageData.action === 'SIGN_MESSAGE') {
-      setMessage(messageData.messageToSign)
-      setSignaturePopup(true)
-    } else if (messageData.action === 'POPUP_OPENED') {
-      setPopup(true);
-      setOverlayBgColor(messageData.overlayBgColor || overlayBgColor);
-    } else if (messageData.action === 'POPUP_CLOSED') {
-      setPopup(false);
-    }
-  }, [iframeSrc, overlayBgColor]);
-
-  useEffect(() => {
-    if (environment.isLight) {
-      actions.router.goToRoute.trigger({
-        route: ROUTES.MY_WALLETS,
-      });
-    }
-    if (!iframeSrc) fetchIframeUrl();
-
-    window.addEventListener('message', handleMessage);
-
-    return () => {
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [iframeSrc, fetchIframeUrl, handleMessage]);
-
-  // If the current cashback wallet is not the current wallet, this value initially holds the current cashback
-  // wallet, to be shown in a warning dialog.
-  const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
-
-  useEffect(() => {
-    stores.wallets.getCashbackWallet().then((currentCashbackWallet) => {
-      if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
-        setShownCashbackWallet(currentCashbackWallet);
-        setPopup(true);
-      }
-      return 'nonsense';
-    }).catch(console.error);
-  }, []);
-
-  const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
-
-  useEffect(() => {
-    const localStorageApi = new LocalStorageApi();
-    localStorageApi.isDisclaimerShown('cashback').then((result) => {
-      if (!result) {
-        setShouldShowDisclaimer(true);
-        setPopup(true);
-      }
-      return 'nonsense';
-    }).catch(console.error);
-  }, []);
-
-  const closePopup = useCallback(() => {
-    iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
+  if (messageData.action === 'SIGN_MESSAGE') {
+    setMessage(messageData.messageToSign)
+    setSignaturePopup(true)
+  } else if (messageData.action === 'POPUP_OPENED') {
+    setPopup(true);
+    setOverlayBgColor(messageData.overlayBgColor || overlayBgColor);
+  } else if (messageData.action === 'POPUP_CLOSED') {
     setPopup(false);
-  }, []);
+  }
+}, [iframeSrc, overlayBgColor]);
 
-  const abortClaim = useCallback(() => {
-    iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'ABORT_SIGN_MESSAGE' }, '*');
-    setSignaturePopup(false)
-    setPassword('')
-    setErrMsg('')
-  }, []);
+useEffect(() => {
+  if (environment.isLight) {
+    actions.router.goToRoute.trigger({
+      route: ROUTES.MY_WALLETS,
+    });
+  }
+  if (!iframeSrc) fetchIframeUrl();
 
-  const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+  window.addEventListener('message', handleMessage);
 
-  return (
-    <TopBarLayout
-      banner={<BannerContainer actions={actions} stores={stores} />}
-      sidebar={sidebarContainer}
-      navbar={
-        <NavBarContainerRevamp
-          actions={actions}
-          stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback) + (
-            isBringSandbox ? ' (sandbox)' : ''
-          )} />}
+  return () => {
+    window.removeEventListener('message', handleMessage);
+  };
+}, [iframeSrc, fetchIframeUrl, handleMessage]);
+
+// If the current cashback wallet is not the current wallet, this value initially holds the current cashback
+// wallet, to be shown in a warning dialog.
+const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
+
+useEffect(() => {
+  stores.wallets.getCashbackWallet().then((currentCashbackWallet) => {
+    if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
+      setShownCashbackWallet(currentCashbackWallet);
+      setPopup(true);
+    }
+    return 'nonsense';
+  }).catch(console.error);
+}, []);
+
+const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
+
+useEffect(() => {
+  const localStorageApi = new LocalStorageApi();
+  localStorageApi.isDisclaimerShown('cashback').then((result) => {
+    if (!result) {
+      setShouldShowDisclaimer(true);
+      setPopup(true);
+    }
+    return 'nonsense';
+  }).catch(console.error);
+}, []);
+
+const closePopup = useCallback(() => {
+  iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'CLOSE_POPUP' }, '*');
+  setPopup(false);
+}, []);
+
+const abortClaim = useCallback(() => {
+  iframeRef.current?.contentWindow.postMessage({ to: 'bringweb3', action: 'ABORT_SIGN_MESSAGE' }, '*');
+  setSignaturePopup(false)
+  setPassword('')
+  setErrMsg('')
+}, []);
+
+const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+
+return (
+  <TopBarLayout
+    banner={<BannerContainer actions={actions} stores={stores} />}
+    sidebar={sidebarContainer}
+    navbar={
+      <NavBarContainerRevamp
+        actions={actions}
+        stores={stores}
+        title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback) + (
+          isBringSandbox ? ' (sandbox)' : ''
+        )} />}
+      />
+    }
+  >
+    <Suspense fallback={null}>
+      {shouldShowDisclaimer && (
+        <DisclaimerDialog
+          onProceed={() => {
+            setShouldShowDisclaimer(false);
+            if (!shownCashbackWallet) {
+              setPopup(false);
+            }
+            const localStorageApi = new LocalStorageApi();
+            localStorageApi.setShownDisclaimer('cashback');
+          }}
         />
-      }
-    >
-        <Suspense fallback={null}>
-          {shouldShowDisclaimer && (
-            <DisclaimerDialog
-              onProceed={() => {
-                setShouldShowDisclaimer(false);
-                if (!shownCashbackWallet) {
-                  setPopup(false);
-                }
-                const localStorageApi = new LocalStorageApi();
-                localStorageApi.setShownDisclaimer('cashback');
-              }}
-            />
-          )}
+      )}
 
-          {shownCashbackWallet && !shouldShowDisclaimer && (
-            <NotCurrentWalletModal
-              shownCashbackWallet={shownCashbackWallet}
-              onSetCurrentAsCashbackWallet={() => {
-                stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
-                setShownCashbackWallet(null);
-                setPopup(false);
-              }}
-              onSwitchToCashbackWallet={() => {
-                props.actions.wallets.setActiveWallet.trigger(
-                  { publicDeriverId: shownCashbackWallet.publicDeriverId }
-                );
-              }}
-            />
-          )}
+      {shownCashbackWallet && !shouldShowDisclaimer && (
+        <NotCurrentWalletModal
+          shownCashbackWallet={shownCashbackWallet}
+          onSetCurrentAsCashbackWallet={() => {
+            stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
+            setShownCashbackWallet(null);
+            setPopup(false);
+          }}
+          onSwitchToCashbackWallet={() => {
+            props.actions.wallets.setActiveWallet.trigger(
+              { publicDeriverId: shownCashbackWallet.publicDeriverId }
+            );
+          }}
+        />
+      )}
 
-          {signaturePopup ?
-            <Dialog
-              title={intl.formatMessage(messages.claim)}
-              closeOnOverlayClick
-              closeButton={<DialogCloseButton />}
-              onClose={abortClaim}
-              actions={[{
-                label: intl.formatMessage(globalMessages.confirm),
-                primary: true,
-                disabled: wallet.type === 'mnemonic' && !password,
-                onClick: () => signMessage(message, password)
-              }]}
+      {signaturePopup ?
+        <Dialog
+          title={intl.formatMessage(messages.claim)}
+          closeOnOverlayClick
+          closeButton={<DialogCloseButton />}
+          onClose={abortClaim}
+          actions={[{
+            label: intl.formatMessage(globalMessages.confirm),
+            primary: true,
+            disabled: wallet.type === 'mnemonic' && !password,
+            onClick: () => signMessage(message, password)
+          }]}
+        >
+          <Box>
+            <Typography
+              sx={{
+                marginBottom: '16px',
+                color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
+              }}
             >
-              <Box>
-                <Typography
-                  sx={{
-                    marginBottom: '16px',
-                    color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
-                  }}
-                >
-                  {intl.formatMessage(wallet.type === 'mnemonic' ?
-                    messages.passwordClaimInstruction : messages. hardwardClaimInstruction
-                  )}
-                </Typography>
-                <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
-                  {intl.formatMessage(messages.message)}
-                </Typography>
-                <DialogContentText sx={{
-                  whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
-                }}>
-                  {message}
-                </DialogContentText>
-                {wallet.type === 'mnemonic' && (
-                  <TextField
-                    className="walletPassword"
-                    value={password}
-                    label="Password"
-                    type="password"
-                    // endAdornment={
-                    //   <InputAdornment position="end">
-                    //     <IconButton
-                    //       aria-label="toggle password visibility"
-                    //       onClick={() => setShowPassword(!showPassword)}
-                    //       edge="end"
-                    //     >
-                    //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
-                    //     </IconButton>
-                    //   </InputAdornment>
-                    // }
-                    onChange={e => {
-                      setPassword(e.target.value);
-                    }}
-                    error={!!errMsg}
-                    disabled={false}
-                  />
-                )}
-                <Typography color="ds.text_error">
-                  { errMsg }
-                </Typography>
-              </Box>
-            </Dialog>
-            : null}
+              {intl.formatMessage(wallet.type === 'mnemonic' ?
+                messages.passwordClaimInstruction : messages.hardwardClaimInstruction
+              )}
+            </Typography>
+            <Typography sx={{ color: theme.name === 'light-theme' ? '#6B7384' : '#7C85A3' }}>
+              {intl.formatMessage(messages.message)}
+            </Typography>
+            <DialogContentText sx={{
+              whiteSpace: 'pre-wrap', wordBreak: 'break-word', color: theme.name === 'light-theme' ? '#242838' : '#E1E6F5'
+            }}>
+              {message}
+            </DialogContentText>
+            {wallet.type === 'mnemonic' && (
+              <TextField
+                className="walletPassword"
+                value={password}
+                label="Password"
+                type="password"
+                // endAdornment={
+                //   <InputAdornment position="end">
+                //     <IconButton
+                //       aria-label="toggle password visibility"
+                //       onClick={() => setShowPassword(!showPassword)}
+                //       edge="end"
+                //     >
+                //       {!showPassword ? <Icon.VisibilityOff /> : <Icon.VisibilityOn />}
+                //     </IconButton>
+                //   </InputAdornment>
+                // }
+                onChange={e => {
+                  setPassword(e.target.value);
+                }}
+                error={!!errMsg}
+                disabled={false}
+              />
+            )}
+            <Typography color="ds.text_error">
+              {errMsg}
+            </Typography>
+          </Box>
+        </Dialog>
+        : null}
 
-           {popup ? (
-            // eslint-disable-next-line
-            <div
-              className={styles.iframe_overlay}
-              style={{ background: overlayBgColor }}
-              onClick={closePopup}
-            />
-           ) : null}
+      {popup ? (
+        // eslint-disable-next-line
+        <div
+          className={styles.iframe_overlay}
+          style={{ background: overlayBgColor }}
+          onClick={closePopup}
+        />
+      ) : null}
 
-          {iframeSrc && (
-            <iframe
-              title="cashback"
-              ref={iframeRef}
-              id="bringweb3"
-              className={styles.iframe}
-              src={iframeSrc}
-              style={{ verticalAlign: 'bottom' }}
-              width="100%"
-              height="100%"
-            />
-          )}
-        </Suspense>
+      {iframeSrc && (
+        <iframe
+          title="cashback"
+          ref={iframeRef}
+          id="bringweb3"
+          className={styles.iframe}
+          src={iframeSrc}
+          style={{ verticalAlign: 'bottom' }}
+          width="100%"
+          height="100%"
+        />
+      )}
+    </Suspense>
 
-    </TopBarLayout >
-  );
+  </TopBarLayout >
+);
 });
 
-export default (injectIntl(CashbackPageContainer): React$ComponentType<StoresAndActionsProps>);
+export default (injectIntl(CashbackPageContainer): React$ComponentType < StoresAndActionsProps >);
