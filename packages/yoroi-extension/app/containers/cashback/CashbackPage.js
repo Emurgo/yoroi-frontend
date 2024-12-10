@@ -78,7 +78,7 @@ const messages = defineMessages({
   },
   chooseTitle: {
     id: 'cashback.not.current.warning.title.choose',
-    defaultMessage: '!!!choose cashback wallet',
+    defaultMessage: '!!!wrong wallet',
   },
   setThis: {
     id: 'cashback.not.current.warning.button.set.this',
@@ -94,7 +94,7 @@ const messages = defineMessages({
   },
   chooseText2: {
     id: 'cashback.not.current.warning.text.choose.2',
-    defaultMessage: '!!!Would you like to set this wallet as your cashback wallet?',
+    defaultMessage: '!!!Switch wallet to access your rewards or set this wallet as your cashback wallet.',
   },
   setCurrentTitle: {
     id: 'cashback.not.current.warning.title.set.current',
@@ -110,7 +110,7 @@ const messages = defineMessages({
   },
   switchText: {
     id: 'cashback.not.current.warning.text.switch',
-    defaultMessage: '!!!To claim your ADA cashback, either switch to your Cashback Wallet or choose your current wallet as your new Cashback Wallet.'
+    defaultMessage: '!!!You will no longer be able to claim rewards linked to your previous cashback wallet until you link it again.'
   },
 });
 
@@ -278,7 +278,6 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
   const signMessage = useCallback(async (msg: string, pwd: string) => {
     const { address, addressing } = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
-    console.log('BRING', { msg });
 
     try {
       let res;
