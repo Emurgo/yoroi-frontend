@@ -37,7 +37,7 @@ import { forceNonNull } from '../../coreUtils';
 import { constructPlate32 } from '../../components/topbar/WalletCard';
 import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
-import type { BringConfigType } from '../../../config/config-types';
+import type { BringConfigType, ConfigType } from '../../../config/config-types';
 
 const messages = defineMessages({
   claim: {

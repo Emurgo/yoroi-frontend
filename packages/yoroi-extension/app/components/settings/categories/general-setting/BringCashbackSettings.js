@@ -44,16 +44,15 @@ type Props = {|
   +cardanoWallets: Array<{ publicDeriverId: number, name: string, plate: WalletChecksum, isTestnet: boolean, ... }>,
   +currentValue: ?number,
   +error?: ?LocalizableError,
-  +isUseSandbox?: boolean,
-  +onSetUseSandbox?: ?((boolean) => *),
+  +isUseSandbox: ?boolean,
+  +onSetUseSandbox: null | (boolean) => *,
 |};
 
 @observer
 class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
-  static defaultProps: {| error: void |} = {
+  static defaultProps = {
     error: undefined,
     isUseSandbox: false,
-    onSetUseSandbox: null,
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -69,7 +68,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
   });
 
   render(): Node {
-    const { cardanoWallets, error, currentValue } = this.props;
+    const { cardanoWallets, error, currentValue, onSetUseSandbox } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const cashbackWalletId = form.$('cashbackWalletId');
@@ -160,14 +159,14 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
             <FormattedHTMLMessage {...messages.note} />
           </Typography>
         </Box>
-        {this.props.onSetUseSandbox != null ? (
+        {onSetUseSandbox != null ? (
           <FormControlLabel
             label="Use Sandbox Backend"
             control={
               <Box ml="8px">
                 <RevampSwitch
                   checked={this.props.isUseSandbox ?? false}
-                  onChange={event => this.props.onSetUseSandbox(event.target.checked)}
+                  onChange={event => onSetUseSandbox(event.target.checked)}
                 />
               </Box>
             }
