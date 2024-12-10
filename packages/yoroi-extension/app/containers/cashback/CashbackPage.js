@@ -392,7 +392,7 @@ useEffect(() => {
 const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
 
 useEffect(() => {
-  stores.wallets.getCashbackWallet().then((currentCashbackWallet) => {
+  stores.wallets.getCashbackWalletRequest.execute().then((currentCashbackWallet) => {
     if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
       setShownCashbackWallet(currentCashbackWallet);
       setPopup(true);
