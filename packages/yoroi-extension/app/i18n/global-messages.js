@@ -1008,6 +1008,22 @@ const globalMessages: * = defineMessages({
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
   },
+  mainnet: {
+    id: 'networkName.mainnet',
+    defaultMessage: '!!!Mainnet',
+  },
+  preprod: {
+    id: 'networkName.preprod',
+    defaultMessage: '!!!Preproduction testnet',
+  },
+  preview: {
+    id: 'networkName.preview',
+    defaultMessage: '!!!Preview testnet',
+  },
+  sancho: {
+    id: 'networkName.sancho',
+    defaultMessage: '!!!Sancho testnet',
+  },
 });
 export default globalMessages;
 

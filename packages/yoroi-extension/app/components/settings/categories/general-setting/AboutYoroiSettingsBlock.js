@@ -20,7 +20,7 @@ import RawHash from '../../../widgets/hashWrappers/RawHash';
 import ExplorableHash from '../../../widgets/hashWrappers/ExplorableHash';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Link, Typography, Button } from '@mui/material';
 import { withLayout } from '../../../../styles/context/layout';
 import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 
@@ -81,6 +81,10 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.git.branch',
     defaultMessage: '!!!Branch:',
   },
+  switchNetwork: {
+    id: 'settings.general.aboutYoroi.switchNetwork',
+    defaultMessage: '!!!SWITCH NETWORK',
+  },
 });
 
 const basePageComponentPath = 'settings:general';
@@ -134,7 +138,8 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | { isTestnet: boolean, ... }
+  wallet: null | { isTestnet: boolean, ... },
+  onSwitchNetwork: () => void,
 |};
 
 @observer
@@ -268,6 +273,13 @@ class AboutYoroiSettingsBlock extends Component<Props & InjectedLayoutProps> {
             componentId={basePageComponentPath + '-branchInfo-text'}
           />
         )}
+
+        <Button
+          onClick={this.props.onSwitchNetwork}
+          variant="primary"
+        >
+          {intl.formatMessage(messages.switchNetwork)}
+        </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

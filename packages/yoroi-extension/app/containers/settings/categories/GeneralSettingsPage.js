@@ -14,6 +14,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';
+import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -66,8 +67,9 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
   render(): Node {
     const { intl } = this.context;
-    const profileStore = this.props.stores.profile;
-    const coinPriceStore = this.props.stores.coinPriceStore;
+    const { stores, actions } = this.props;
+    const profileStore = stores.profile;
+    const coinPriceStore = stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -100,7 +102,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           </Typography>
         )}
         <GeneralSettings
-          onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
+          onSelectLanguage={actions.profile.updateLocale.trigger}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
@@ -115,7 +117,23 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock />
-        <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
+        <AboutYoroiSettingsBlock
+          wallet={stores.wallets.selected}
+          onSwitchNetwork={() =>
+            actions.dialogs.open.trigger({
+              dialog: SwitchNetworkDialogContainer,
+            })
+          }
+        />
+        {/* pop up dialogs */}
+        {
+          stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && (
+            <SwitchNetworkDialogContainer
+              actions={actions}
+              stores={stores}
+            />
+          )
+        }
       </Box>
     );
   }
