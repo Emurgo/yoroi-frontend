@@ -117,11 +117,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
       <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
           {isSettingsScreen && (
-            <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
+            <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(messages.title)}
+            </Typography>
           )}
 
           {isSettingsScreen ? (
-            <Box my="24px">{intl.formatMessage(messages.share)}</Box>
+            <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
           ) : (
             <div className={styles.illustration}>
               <AnalyticsIllustration />
@@ -146,7 +148,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 }}
               >
                 <Icon />
-                <Typography component="div">
+                <Typography component="div" color="ds.text_gray_medium">
                   <FormattedHTMLMessage {...msg} />
                 </Typography>
               </Box>
@@ -221,7 +223,11 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 </Box>
               }
               labelPlacement="start"
-              sx={{ marginLeft: '0px', marginTop: '40px' }}
+              sx={{
+                marginLeft: '0px',
+                marginTop: '40px',
+                color: 'ds.text_gray_medium',
+              }}
             />
           ) : (
             <>
