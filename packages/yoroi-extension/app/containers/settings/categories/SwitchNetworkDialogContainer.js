@@ -24,23 +24,25 @@ const networkNames = Object.freeze({
 
 @observer
 export default class SwitchNetworkDialogContainer extends Component<Props> {
-  componentWillUnmount() {
-  }
-
   render(): Node {
+    const walletStore = this.props.stores.wallets;
+
     return (
       <SwitchNetworkDialog
         onCancel={() => {
           this.props.actions.dialogs.closeActiveDialog.trigger();
         }}
-        onApply={(networkId) => {
-          console.log('>>>', networkId);
+        onApply={async (networkId) => {
+          if (networkId !== walletStore.getCurrentNetworkId()) {
+            await walletStore.setCurrentNetworkId(networkId);
+            window.location.reload();
+          }
         }}
         networks={Object.keys(networks).map(network => ({
           id: networks[network].NetworkId,
           name: networkNames[network],
         }))}
-        currentNetworkId={0}
+        currentNetworkId={walletStore.getCurrentNetworkId()}
       />
     );
   }

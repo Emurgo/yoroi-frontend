@@ -44,7 +44,7 @@ type Props = {|
     id: number,
     name: $npm$ReactIntl$MessageDescriptor,
   |}>,
-  +onApply: (number) => void,
+  +onApply: (number) => Promise<void>,
   +currentNetworkId: number,
 |};
 

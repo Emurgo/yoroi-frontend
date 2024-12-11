@@ -41,7 +41,7 @@ import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/mode
 import { getProtocolParameters } from './yoroi/protocolParameters';
 import AdaApi from '../../../../app/api/ada';
 
-export async function getWalletsState(publicDeriverId: ?number, targetNetworkId?: number): Promise<Array<WalletState>> {
+export async function getWalletsState(publicDeriverId: ?number, targetNetworkId: ?number): Promise<Array<WalletState>> {
   const db = await getDb();
   let publicDerivers = await loadWalletsFromStorage(db);
   if (publicDeriverId != null) {
@@ -53,7 +53,7 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId?
   }
 
   let publicDeriversOfNetwork;
-  if (publicDeriverId == null && targetNetworkId !== undefined) {
+  if (publicDeriverId == null && targetNetworkId != null) {
     publicDeriversOfNetwork = [];
     // group wallets by staking key
     const publicDeriversByPublicKey = new Map<string, Array<PublicDeriver<>>>;

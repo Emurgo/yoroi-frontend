@@ -148,6 +148,8 @@ export default class BaseProfileStore
 
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
+  currentNetworkId: ?number = undefined;
+
   setup(): void {
     super.setup();
     this.actions.profile.updateLocale.listen(this._updateLocale);
@@ -175,6 +177,14 @@ export default class BaseProfileStore
       this._loadWhetherAnalyticsAllowed(),
       'load-analytics-flag',
     );
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadCurrentNetworkId(),
+      'load-current-network-id',
+    );
+  }
+
+  _loadCurrentNetworkId: () => Promise<void> = async () => {
+    this.currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
   }
 
   _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {

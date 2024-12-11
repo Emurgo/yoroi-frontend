@@ -154,8 +154,8 @@ function patchWalletState(walletState: Object): WalletState {
   return walletState;
 }
 
-export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
-  const resp = await callBackground({ type: GetWallets.typeTag, request: { walletId } });
+export async function getWallets(networkId: number): Promise<Array<WalletState>> {
+  const resp = await callBackground({ type: GetWallets.typeTag, request: { networkId } });
   if (resp.error) {
     console.error('error when loading wallets:', resp.error);
     throw new Error(`error when loading wallets: ${resp.error}`);

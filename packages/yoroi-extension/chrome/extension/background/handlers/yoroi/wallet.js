@@ -168,13 +168,13 @@ export const RenameConceptualWallet: HandlerType<
 });
 
 export const GetWallets: HandlerType<
-  {| walletId: ?number |},
+  {| networkId: number |},
   Array<WalletState>,
 > = Object.freeze({
   typeTag: 'get-wallets',
 
   handle: async (request) => {
-    return await getWalletsState(request.walletId);
+    return await getWalletsState(undefined, request.networkId);
   },
 });
 

@@ -33,6 +33,7 @@ const storageKeys = {
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -342,6 +343,18 @@ export default class LocalStorageApi {
   }
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
+  loadCurrentNetworkId: () => Promise<?number> = async () => {
+    const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
+    if (raw == null) {
+      return undefined;
+    }
+    return Number(raw);
+  }
+
+  saveCurrentNetworkId: (number) => Promise<void> = async (networkId) => {
+    await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+  }
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
