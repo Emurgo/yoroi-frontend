@@ -3,8 +3,10 @@
 const Link = {
   styleOverrides: {
     root: {
-        color: 'ds.text_primary_medium',
-        textDecoration: 'none'
+      color: 'ds.text_primary_medium',
+      '&:hover': {
+        textDecoration: 'underline',
+      },
     },
   },
 };
