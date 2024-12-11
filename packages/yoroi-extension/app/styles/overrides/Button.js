@@ -164,9 +164,13 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.gray_min },
-    '& .MuiButton-startIcon svg': { fill: themePalette.gray_min },
-    '& .MuiButton-startIcon svg path': { fill: themePalette.gray_min },
+    '&.MuiLoadingButton-root.Mui-disabled': {
+      backgroundColor: themePalette.primary_500,
+      opacity: '0.8',
+    },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.white_static },
+    '& .MuiButton-startIcon svg': { fill: themePalette.white_static },
+    '& .MuiButton-startIcon svg path': { fill: themePalette.white_static },
   };
 }
 
@@ -196,6 +200,7 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Objec
       pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
+    '& .MuiLoadingButton-root': { backgroundColor: themePalette.primary_500 },
     '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
     '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
   };
