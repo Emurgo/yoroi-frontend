@@ -209,7 +209,7 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Objec
 function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_500`],
+    color: themePalette.text_primary_medium,
     ':hover': {
       backgroundColor: themePalette.gray_50,
       color: themePalette[`${variant}_600`],
@@ -234,7 +234,7 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_200`] },
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette.text_primary_medium },
+    '& .MuiButton-startIcon svg path': { fill: themePalette.text_primary_medium },
   };
 }
