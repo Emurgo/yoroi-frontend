@@ -41,7 +41,7 @@ const handlers = Object.freeze({
     if (!publicDeriver) {
       return { ok: undefined };
     }
-    const result = (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0];
+    const result = (await getAllAddressesForWallet(publicDeriver)).utxoAddresses[0];
     return { ok: result.address.Hash };
   },
 
