@@ -24,8 +24,8 @@ export const dark: DSColorPalette = {
 
   bg_color_max: darkPalette.gray_50, // bottom surface
   bg_color_min: darkPalette.gray_100, // upper surface
-  bg_color_contrast_min: darkPalette.gray_100, // dropdown selected\highlighted item
   bg_color_contrast_high: darkPalette.gray_50 , // dropdown idle item
+  bg_color_contrast_min: darkPalette.gray_100, // dropdown selected\highlighted item
 
   el_primary_max: darkPalette.primary_700, // hover'nd pressed state, actianable elements
   el_primary_medium: darkPalette.primary_600, // actionable elements

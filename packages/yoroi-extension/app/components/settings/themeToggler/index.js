@@ -1,6 +1,6 @@
 //@flow
 
-import { Box, FormControlLabel, Radio, RadioGroup, useTheme } from '@mui/material';
+import { Box, FormControlLabel, Radio, RadioGroup, Typography, useTheme, styled } from '@mui/material';
 import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
@@ -17,6 +17,13 @@ const messages = defineMessages({
     defaultMessage: '!!!Dark Theme',
   },
 });
+
+const SRadio = styled(Radio)(({ theme }: any) => ({
+  color: theme.palette.ds.el_primary_medium,
+  '&.Mui-checked': {
+    color: theme.palette.ds.el_primary_medium,
+  },
+}));
 
 const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => {
   const { toggleColorMode } = useThemeMode();
@@ -40,21 +47,23 @@ const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => 
         >
           <FormControlLabel
             value={'light'}
-            control={
-              <Radio
-                sx={{
-                  color: 'primary.500',
-                }}
-                size="small"
-              />
+            control={<SRadio size="small" />}
+            label={
+              <Typography component="span" variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.lightTheme)}
+              </Typography>
             }
-            label={intl.formatMessage(messages.lightTheme)}
             id="switchToNewVersionButton"
+            input
           />
           <FormControlLabel
             value={'dark'}
-            control={<Radio sx={{ color: 'primary.500' }} size="small" />}
-            label={intl.formatMessage(messages.darkTheme)}
+            control={<SRadio size="small" />}
+            label={
+              <Typography component="span" variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.darkTheme)}
+              </Typography>
+            }
             id="switchToOldVersionButton"
             sx={{
               marginRight: '20px',
