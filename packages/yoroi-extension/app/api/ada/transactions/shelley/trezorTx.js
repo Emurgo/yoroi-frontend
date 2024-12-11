@@ -760,12 +760,13 @@ export function toTrezorSignRequest(
     for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
       const rewardAddressPayload = rewardAddress.to_address().to_hex();
       const path = ownAddressMap(rewardAddressPayload);
-      if (path != null) {
-        result.push({
-          amount: withdrawalAmount.to_str(),
-          path,
-        });
+      if (path == null) {
+        throw new Error('foreign withdrawal reward address');
       }
+      result.push({
+        amount: withdrawalAmount.to_str(),
+        path,
+      });
     }
     formattedWithdrawals = result;
   }

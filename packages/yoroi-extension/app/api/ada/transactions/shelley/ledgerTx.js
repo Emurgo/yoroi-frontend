@@ -304,17 +304,37 @@ function formatLedgerWithdrawals(
   for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
     const rewardAddressPayload = rewardAddress.to_address().to_hex();
     const addressing = addressingMap(rewardAddressPayload);
-    if (addressing == null) {
-      throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own address ${rewardAddressPayload}`);
+    let stakeCredential;
+    if (addressing != null) {
+      stakeCredential = {
+        type: CredentialParamsType.KEY_PATH,
+        keyPath: addressing.path,
+      };
+    } else {
+      const cred = rewardAddress.payment_cred();
+      const maybeKeyHash = cred.to_keyhash();
+      const maybeScriptHash = cred.to_scripthash();
+      if (maybeKeyHash) {
+        stakeCredential = {
+          type: CredentialParamsType.KEY_HASH,
+          keyHashHex: maybeKeyHash.to_hex(),
+        };
+      } else if (maybeScriptHash) {
+        stakeCredential = {
+          type: CredentialParamsType.SCRIPT_HASH,
+          keyHashHex: maybeScriptHash.to_hex(),
+        };
+      }
+    }
+    if (stakeCredential == null) {
+      throw new Error('Failed to resolve credential type for reward address: ' + rewardAddressPayload);
     }
     result.push({
       amount: withdrawalAmount.to_str(),
-      stakeCredential: {
-        type: CredentialParamsType.KEY_PATH,
-        keyPath: addressing.path,
-      },
+      stakeCredential,
     });
   }
+  // $FlowIgnore[incompatible-return]
   return result;
 }
 
