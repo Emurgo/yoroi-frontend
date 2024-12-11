@@ -51,6 +51,13 @@ function InfoDialog(props: Props & Intl): Node {
         '& .MuiPaper-root': {
           maxWidth: 'unset',
           backgroundImage: 'none',
+          backgroundColor: 'ds.bg_color_max',
+        },
+        '& .MuiDialog-paper': {
+          backgroundColor: 'ds.bg_color_max',
+        },
+        '& .MuiDialog-backdrop': {
+          backgroundColor: 'rgba(31, 35, 46, 0.8)',
         },
       }}
       id="infoDialog"
@@ -110,11 +117,9 @@ function InfoDialog(props: Props & Intl): Node {
           target="_blank"
           rel="noreferrer noopener"
           sx={{
-            textDecoration: 'none',
             display: 'block',
             textAlign: 'center',
             py: '24px',
-            color: 'ds.text_primary_medium'
           }}
         >
           {intl.formatMessage(messages.learnMore)}
