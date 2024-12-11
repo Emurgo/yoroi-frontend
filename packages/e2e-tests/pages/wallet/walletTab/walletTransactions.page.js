@@ -387,19 +387,18 @@ export class TransactionsSubTab extends WalletTab {
 
     return loaderIsNotDisplayed;
   }
+  async _pressShowMoreTransactions() {
+    await this.scrollIntoView(this.showMoreTxsButtonLocator);
+    await this.click(this.showMoreTxsButtonLocator);
+    await this.sleep(quarterSecond);
+    return true;
+  }
   async _loadMore() {
     const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
-    const loaderIsDisplayed = await this.loaderIsDisplayed();
-    if (!showMoreIsDisplayed && !loaderIsDisplayed) {
-      this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
-      return false;
-    }
     if (showMoreIsDisplayed) {
-      await this.scrollIntoView(this.showMoreTxsButtonLocator);
-      await this.click(this.showMoreTxsButtonLocator);
-      await this.sleep(quarterSecond);
-      return true;
+      return await this._pressShowMoreTransactions();
     }
+    const loaderIsDisplayed = await this.loaderIsDisplayed();
     if (loaderIsDisplayed) {
       const thirtySec = 3 * defaultWaitTimeout;
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
@@ -407,7 +406,13 @@ export class TransactionsSubTab extends WalletTab {
       if (!result) {
         throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
       }
+      const btnIsDisplayed = await this.showMoreBtnIsDisplayed();
+      if (btnIsDisplayed) {
+        return await this._pressShowMoreTransactions();
+      }
     }
+    this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
+    return false;
   }
   async loadMoreTxs(amountOfLoads = 1) {
     this.logger.info(`TransactionsSubTab::loadMoreTxs is called. Amount of loads ${amountOfLoads}`);
