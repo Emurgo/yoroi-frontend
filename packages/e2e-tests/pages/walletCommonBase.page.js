@@ -114,6 +114,10 @@ class WalletCommonBase extends BasePage {
     locator: '.AmountDisplay_isLoading',
     method: 'css',
   };
+  walletIsLoadingLogo = {
+    locator: '.Loading_yoroiLogo',
+    method: 'css',
+  };
   // modal window of selecting a wallet
   // "Discover a new Yoroi" modal window
   dialogUpdatesTitleLocator = {
@@ -193,6 +197,22 @@ class WalletCommonBase extends BasePage {
     if (!state) {
       this.logger.error(
         `WalletCommonBase::waitPrepareWalletBannerIsClosed The prepare wallet banner is still displayed after ${
+          oneMinute / 1000
+        } seconds`
+      );
+      throw new Error(`The wallet is still loading after ${oneMinute / 1000} seconds`);
+    }
+  }
+  async waitInitialWalletLoaderIsClosed() {
+    this.logger.info(`WalletCommonBase::waitInitialWalletLoaderisClosed is called`);
+    const state = await this.customWaitIsNotPresented(
+      this.walletIsLoadingLogo,
+      oneMinute,
+      halfSecond,
+    );
+    if (!state) {
+      this.logger.error(
+        `WalletCommonBase::waitInitialWalletLoaderisClosed The wallet loading banner is still displayed after ${
           oneMinute / 1000
         } seconds`
       );

@@ -14,7 +14,7 @@ import {
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../helpers/customChecks.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 // There is an issue https://emurgo.atlassian.net/browse/YOEXT-1589
 describe('Export transactions, positive', function () {
@@ -27,10 +27,9 @@ describe('Export transactions, positive', function () {
   const endDate = '03082024';
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
     cleanDownloads();
   });
 

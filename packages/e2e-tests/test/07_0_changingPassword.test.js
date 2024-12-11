@@ -11,7 +11,7 @@ import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { WRONG_PASSWORD } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import { collectInfo, preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Changing wallet password. Positive', function () {
   this.timeout(2 * oneMinute);
@@ -20,14 +20,8 @@ describe('Changing wallet password. Positive', function () {
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
-    try {
-      webdriver = await driversPoolsManager.getDriverFromPool();
-      await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-      await waitTxPage(webdriver, logger);
-    } catch (error) {
-      await collectInfo(this, webdriver, logger);
-      throw error;
-    }
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   const oldPassword = getPassword();

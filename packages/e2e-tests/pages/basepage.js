@@ -193,10 +193,11 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
+    await this.sleep(250);
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
-    await this.sleep(200);
+    await this.sleep(500);
     await input.sendKeys(Key.NULL);
-    await input.sendKeys(Key.DELETE);
+    await input.sendKeys(Key.BACK_SPACE);
   }
   async setImplicitTimeout(timeoutMs, functionName) {
     this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
