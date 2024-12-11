@@ -1,7 +1,7 @@
 // @flow
 
-import { lightThemeBase } from '../themes/light-theme-base';
 import { darkThemeBase } from '../themes/dark-theme-base';
+import { lightThemeBase } from '../themes/light-theme-base';
 
 const { palette: darkThemePalette } = darkThemeBase;
 const { palette: lightThemePalette } = lightThemeBase;
@@ -171,11 +171,12 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
 }
 
 function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
+  console.log('themePalette', themePalette);
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_500`],
+    color: themePalette.text_primary_medium,
     border: '2px solid',
-    borderColor: themePalette[`${variant}_500`],
+    borderColor: themePalette.el_primary_medium,
     ':hover': {
       border: '2px solid',
       color: themePalette[`${variant}_600`],
