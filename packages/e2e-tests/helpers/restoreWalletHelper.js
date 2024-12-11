@@ -136,8 +136,8 @@ export const restartServiceWorker = async (webdriver, logger) => {
   const basepage = new BasePage(webdriver, logger);
 
   const stopBtnLocator = {
-    locator: '//button[text()="Stop"]',
-    method: 'xpath',
+    locator: '.stop',
+    method: 'css',
   };
   const btnLocator = {
     locator: '//button',
