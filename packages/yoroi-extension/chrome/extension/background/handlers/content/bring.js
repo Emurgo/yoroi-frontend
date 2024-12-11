@@ -1,12 +1,13 @@
 // @flow
 import LocalStorageApi from '../../../../../app/api/localStorage';
 import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
-import { getAllAddressesForWallet } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
+import { getAllAddressesForDisplay } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getDb } from '../../state';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
 import { getBoundsForTabWindow, popupProps, sendToInjector } from './utils';
+import { CoreAddressTypes } from '../../../../../app/api/ada/lib/storage/database/primitives/enums';
 
 declare var chrome;
 
@@ -41,8 +42,9 @@ const handlers = Object.freeze({
     if (!publicDeriver) {
       return { ok: undefined };
     }
-    const result = (await getAllAddressesForWallet(publicDeriver)).utxoAddresses[0];
-    return { ok: result.address.Hash };
+    const { address } = (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0];
+    const s: string = address;
+    return { ok: address };
   },
 
   'get-wallets': async () => {
@@ -53,7 +55,7 @@ const handlers = Object.freeze({
       if (!isTrezorTWallet(publicDeriver.getParent())) {
         result.push({
           id: publicDeriver.getPublicDeriverId(),
-          address: (await getAllAddressesForWallet(publicDeriver)).accountingAddresses[0].address.Hash,
+          address: (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address,
           name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name
         });
       }
