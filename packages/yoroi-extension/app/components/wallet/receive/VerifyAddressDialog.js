@@ -69,23 +69,20 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     intl: intlShape.isRequired,
   };
 
-  getLabelStyle: void => string = () => {
-    return this.props.classicTheme ? 'SimpleFormField_label FormFieldOverridesClassic_label' : styles.label;
-  };
-
   render(): Node {
     const { intl } = this.context;
 
-    const dialogActions = !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
-      ? []
-      : [
-          {
-            label: intl.formatMessage(messages.verifyAddressButtonLabel),
-            primary: true,
-            isSubmitting: this.props.isActionProcessing,
-            onClick: this.props.verify,
-          },
-        ];
+    const dialogActions =
+      !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
+        ? []
+        : [
+            {
+              label: intl.formatMessage(messages.verifyAddressButtonLabel),
+              primary: true,
+              isSubmitting: this.props.isActionProcessing,
+              onClick: this.props.verify,
+            },
+          ];
 
     return (
       <Dialog
@@ -113,7 +110,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const notificationId = 'verify-address-notification';
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.addressLabel)}
         </Typography>
         <div className="verificationAddress">
@@ -174,7 +171,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (stakingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
         </Typography>
         <div className="stakingKey" id="verifyAddressDialog-stakingKeyHash-text">
@@ -210,7 +207,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (spendingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body1" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.spendingKeyHashLabel)}
         </Typography>
         <div className="spendingKey">
@@ -246,7 +243,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
 
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body1" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.keyRegistrationPointer)}sdsds
         </Typography>
         <Typography className="keyPointer" variant="body1" color="ds.text_gray_low">
@@ -265,7 +262,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body1" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </Typography>
         <div className={derivationClasses}>
@@ -273,7 +270,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
             className={styles.hash}
             id="verifyAddressDialog-derivationPath-text"
             variant="body1"
-            color="ds.text_gray_low"
+            color="ds.text_gray_medium"
           >
             {toDerivationPathString(addressing.path)}
           </Typography>
