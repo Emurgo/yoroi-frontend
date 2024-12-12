@@ -36,7 +36,15 @@ import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
 import { ChainDerivations, } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, fail, forceNonNull, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import {
+  bytesToHex,
+  fail,
+  forceNonNull,
+  hexToBytes,
+  iterateLenGet,
+  iterateLenGetMap,
+  maybe
+} from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
 
 // ==================== LEDGER ==================== //
@@ -48,7 +56,18 @@ export function createLedgerSignTxPayload(request: {|
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   cip36: boolean,
 |}): SignTransactionRequest {
-  const txBody = request.signRequest.unsignedTx.build();
+
+  const tx = request.signRequest.unsignedTx.build_tx();
+  const txBody = tx.body();
+
+  const tagsState = RustModule.WasmScope(Module =>
+    Module.WalletV4.has_transaction_set_tag(tx.to_bytes()));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
 
   // Inputs
   const ledgerInputs = _transformToLedgerInputs(
@@ -166,7 +185,7 @@ export function createLedgerSignTxPayload(request: {|
     },
     additionalWitnessPaths: [],
     options: {
-      tagCborSets: false,
+      tagCborSets: txHasSetTags,
     }
   };
 }
@@ -304,17 +323,37 @@ function formatLedgerWithdrawals(
   for (const [rewardAddress, withdrawalAmount] of iterateLenGetMap(withdrawals).nonNullValue()) {
     const rewardAddressPayload = rewardAddress.to_address().to_hex();
     const addressing = addressingMap(rewardAddressPayload);
-    if (addressing == null) {
-      throw new Error(`${nameof(formatLedgerWithdrawals)} Ledger can only withdraw from own address ${rewardAddressPayload}`);
+    let stakeCredential;
+    if (addressing != null) {
+      stakeCredential = {
+        type: CredentialParamsType.KEY_PATH,
+        keyPath: addressing.path,
+      };
+    } else {
+      const cred = rewardAddress.payment_cred();
+      const maybeKeyHash = cred.to_keyhash();
+      const maybeScriptHash = cred.to_scripthash();
+      if (maybeKeyHash) {
+        stakeCredential = {
+          type: CredentialParamsType.KEY_HASH,
+          keyHashHex: maybeKeyHash.to_hex(),
+        };
+      } else if (maybeScriptHash) {
+        stakeCredential = {
+          type: CredentialParamsType.SCRIPT_HASH,
+          scriptHashHex: maybeScriptHash.to_hex(),
+        };
+      }
+    }
+    if (stakeCredential == null) {
+      throw new Error('Failed to resolve credential type for reward address: ' + rewardAddressPayload);
     }
     result.push({
       amount: withdrawalAmount.to_str(),
-      stakeCredential: {
-        type: CredentialParamsType.KEY_PATH,
-        keyPath: addressing.path,
-      },
+      stakeCredential,
     });
   }
+  // $FlowIgnore[incompatible-return]
   return result;
 }
 
@@ -772,6 +811,16 @@ export function toLedgerSignRequest(
   additionalRequiredSigners: Array<string> = [],
 ): SignTransactionRequest {
 
+  const tagsState = RustModule.WasmScope(Module => Module.WalletV4.has_transaction_set_tag(
+    Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
+  ));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
+
   const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
@@ -1076,6 +1125,9 @@ export function toLedgerSignRequest(
       referenceInputs: formattedReferenceInputs,
     },
     additionalWitnessPaths,
+    options: {
+      tagCborSets: txHasSetTags,
+    }
   };
 }
 
