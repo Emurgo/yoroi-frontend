@@ -123,7 +123,7 @@ class Wallet extends Component<AllProps> {
     const warning = this.getWarning(selectedWallet.publicDeriverId);
     if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
-    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
+    const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 

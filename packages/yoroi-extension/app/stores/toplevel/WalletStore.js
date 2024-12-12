@@ -39,7 +39,6 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 export default class WalletStore extends Store<StoresMap, ActionsMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable initialSyncingWalletIds: Set<number> = observable.set();
   @observable wallets: Array<WalletState> = [];
   @observable selectedIndex: null | number = null;
   // mobx is not smart enough to update the wallet name on the nav bar without this
@@ -104,12 +103,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
           runInAction(() => {
             Object.assign(this.wallets[index], newWalletState);
           });
-          if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
-            this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
-          }
-          runInAction(() => {
-            this.initialSyncingWalletIds.delete(params.publicDeriverId);
-          });
+          this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
           await this.stores.transactions.updateNewTransactions(params.newTxs, this.wallets[index]);
         }
       } else if (params.eventType === 'remove') {
@@ -186,7 +180,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         publicDeriverId: newWallet.publicDeriverId,
       });
       this.actions.dialogs.closeActiveDialog.trigger();
-      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
     });
   };
@@ -225,7 +218,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
     runInAction(() => {
       this.wallets.push(wallet);
-      this.initialSyncingWalletIds.add(wallet.publicDeriverId);
     });
   };
 
@@ -411,10 +403,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     if (resp == null) throw new Error(`Should never happen`);
     return resp;
   };
-
-  isInitialSyncing: (number) => boolean = (publicDeriverId) => {
-    return this.initialSyncingWalletIds.has(publicDeriverId);
-  }
 
   @action onRenameSelectedWallet: (string) => void = (newName) => {
     this.selectedWalletName = newName;
