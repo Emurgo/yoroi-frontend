@@ -26,7 +26,7 @@ import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage
 import { MultiToken, } from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { cardanoValueFromMultiToken, cardanoValueFromRemoteFormat, multiTokenFromCardanoValue, asAddressedUtxo, multiTokenFromRemote } from '../utils';
-import { forceNonNull, hexToBytes, iterateLenGet, logErr } from '../../../../coreUtils';
+import { hexToBytes, iterateLenGet, logErr } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig, getNetworkById } from '../../lib/storage/database/prepackaged/networks';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
