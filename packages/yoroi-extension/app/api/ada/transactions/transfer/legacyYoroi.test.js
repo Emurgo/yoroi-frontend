@@ -128,7 +128,7 @@ describe('Haskell Shelley era tx format tests', () => {
       protocolParams: getProtocolParams(),
     });
 
-    const expectedFee = new BigNumber('166337');
+    const expectedFee = new BigNumber('166601');
     expect(transferInfo.fee.getDefault().toString()).toBe(expectedFee.toString());
     expect(transferInfo.recoveredBalance.getDefault().toString()).toBe(inputAmount.toString());
     expect(transferInfo.senders).toEqual([addr1.address]);
@@ -155,6 +155,6 @@ describe('Haskell Shelley era tx format tests', () => {
     if (witnesses == null) throw new Error('no bootstrap witnesses found');
     expect(witnesses.len()).toBe(1);
     expect(witnesses.get(0).to_hex())
-      .toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e584019d98b819060294910b7669d0e7e4b6c8843f9524626ff53b028ac9d38f415eb389141bad0589f858133423a07b13245af641f152bf4b06287171315676ae2045820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
+      .toBe('84582007cc5b01ab460562479f3e7fdf782b11636c4a1b721c19b9c1609bc7360b518e5840dfa4a46f92326070f09781cdf2c6e319f8b1b3cc425a257c655ebcfe4445def365c1e888f2b78cdf268586848999ca2ae093d4a9f9bf7667f7e11b2f141bae0d5820f3748736afd541361c4fb90b2963723fe9a10d237a024530d378181df4bf2c6841a0');
   });
 });

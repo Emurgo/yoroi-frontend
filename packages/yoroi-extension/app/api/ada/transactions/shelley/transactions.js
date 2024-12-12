@@ -1086,15 +1086,15 @@ export function signTransaction(
   if (unsignedTx instanceof RustModule.WalletV4.Transaction) {
     txBody = unsignedTx.body();
     txWitSet = unsignedTx.witness_set();
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.from_hex(unsignedTx.to_hex()).transaction_hash();
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
     const tx = unsignedTx.build_tx();
     txBody = tx.body();
     txWitSet = tx.witness_set();
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash();
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
     txBody = unsignedTx;
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.new_from_body_bytes(txBody.to_bytes()).transaction_hash();
   } else if (unsignedTx instanceof Buffer || unsignedTx instanceof Uint8Array) {
     // note: we are calculating the tx hash from the raw tx body bytes, which
     // probably won't match the serialized `txBody`. But this happens only for

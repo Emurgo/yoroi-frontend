@@ -352,7 +352,7 @@ test('Create Ledger transaction', async () => {
 
   expect(response).toStrictEqual(({
     options: {
-      tagCborSets: false,
+      tagCborSets: true,
     },
     signingMode: TransactionSigningMode.ORDINARY_TRANSACTION,
     tx: {
