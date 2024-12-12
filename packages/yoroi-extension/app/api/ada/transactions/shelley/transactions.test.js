@@ -954,11 +954,9 @@ describe('Create signed transactions', () => {
       accountPrivateKey,
       new Set([
         RustModule.WalletV4.make_vkey_witness(
-          RustModule.WalletV4.hash_transaction(
-            RustModule.WalletV4.TransactionBody.from_bytes(
-              unsignedTxResponse.txBuilder.build().to_bytes(),
-            ),
-          ),
+          RustModule.WalletV4.FixedTransaction.from_hex(
+            unsignedTxResponse.txBuilder.build_tx().to_hex(),
+          ).transaction_hash(),
           stakingKey,
         ).to_hex()
       ]),
@@ -1031,11 +1029,9 @@ describe('Create signed transactions', () => {
       accountPrivateKey,
       new Set([
         RustModule.WalletV4.make_vkey_witness(
-          RustModule.WalletV4.hash_transaction(
-            RustModule.WalletV4.TransactionBody.from_bytes(
-              unsignedTxResponse.txBuilder.build().to_bytes(),
-            ),
-          ),
+          RustModule.WalletV4.FixedTransaction.from_hex(
+            unsignedTxResponse.txBuilder.build_tx().to_hex()
+          ).transaction_hash(),
           stakingKey,
         ).to_hex(),
       ]),
