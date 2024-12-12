@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Box, Typography, styled } from '@mui/material';
 import { observer } from 'mobx-react';
-import { RESTORE_WALLET_STEPS, getFirstRestorationStep } from './steps';
+import { RESTORE_WALLET_STEPS } from './steps';
 import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import SelectWalletTypeStep from './steps/type/SelectWalletTypeStep';
 import Stepper from '../../common/stepper/Stepper';
@@ -14,7 +14,6 @@ import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
-import SelectNetworkStep from '../create-wallet/SelectNetworkStep';
 import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
@@ -78,7 +77,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   const { profile, router, wallets: walletsActions } = actions;
   const { walletRestore, profile: profileData, wallets, tokenInfoStore } = stores;
 
-  const [currentStep, setCurrentStep] = useState(getFirstRestorationStep());
+  const [currentStep, setCurrentStep] = useState(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
   const [selectedRestoreMode, setSelectedRestoreMode] = useState<?RestoreModeType>(null);
   const { recoveryPhrase, duplicatedWallet, setRestoreWalletData, resetRestoreWalletData } = useRestoreWallet();
 
@@ -113,20 +112,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
   }
 
   const steps = {
-    [RESTORE_WALLET_STEPS.SELECT_NETWORK]: {
-      stepId: RESTORE_WALLET_STEPS.SELECT_NETWORK,
-      message: messages.firstStep,
-      component: (
-        <SelectNetworkStep
-          onSelect={network => {
-            profile.setSelectedNetwork.trigger(network);
-            setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
-            ampli.restoreWalletTypeStepViewed();
-          }}
-          goBack={goToAddWalletScreen}
-        />
-      ),
-    },
     [RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE]: {
       stepId: RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE,
       message: messages.firstStep,
@@ -145,8 +130,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           }}
           goBack={() => {
             resetRestoreWalletData();
-            if (!environment.isDev() && !environment.isNightly()) goToAddWalletScreen();
-            else setCurrentStep(RESTORE_WALLET_STEPS.SELECT_NETWORK);
+            goToAddWalletScreen();
           }}
         />
       ),
@@ -222,11 +206,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
 
   const stepperSteps = Object.keys(steps)
     .map(key => ({ stepId: steps[key].stepId, message: steps[key].message }))
-    .filter(step => step.stepId !== RESTORE_WALLET_STEPS.SELECT_NETWORK);
 
   const CurrentStep = steps[currentStep].component;
-
-  if (currentStep === RESTORE_WALLET_STEPS.SELECT_NETWORK) return CurrentStep;
 
   return (
     <Box>

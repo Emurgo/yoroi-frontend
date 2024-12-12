@@ -5,7 +5,6 @@ import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
@@ -14,8 +13,6 @@ import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap> {
-  @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
-
   /**
    * We only want to redirect users once when the app launches
    */
@@ -175,7 +172,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     this.actions.profile.acceptTermsOfUse.listen(this._acceptTermsOfUse);
     this.actions.profile.acceptUriScheme.listen(this._acceptUriScheme);
     this.actions.profile.toggleSidebar.listen(this._toggleSidebar);
-    this.actions.profile.setSelectedNetwork.listen(this._setSelectedNetwork);
     this.registerReactions([
       this._checkSetupSteps,
     ]);
@@ -193,16 +189,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
       EXPONENTIAL_AT: (1e9: any),
       FORMAT: this.bigNumberDecimalFormat,
     });
-  };
-
-  // ========== Active API ========== //
-
-  @computed get selectedNetwork(): void | $ReadOnly<NetworkRow> {
-    return this.__selectedNetwork;
-  }
-
-  @action _setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
-    this.__selectedNetwork = type;
   };
 
   // ========== Paper Wallets ========== //
