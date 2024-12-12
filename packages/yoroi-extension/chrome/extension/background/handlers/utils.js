@@ -34,12 +34,12 @@ import { asAddressedUtxo, cardanoValueFromRemoteFormat, } from '../../../../app/
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
-import { getDb } from '../state/databaseManager';
 // eslint-disable-next-line import/no-cycle
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getProtocolParameters } from './yoroi/protocolParameters';
 import AdaApi from '../../../../app/api/ada';
+import { getDb, syncWallet } from '../state';
 
 export async function getWalletsState(publicDeriverId: ?number, targetNetworkId: ?number): Promise<Array<WalletState>> {
   const db = await getDb();
@@ -85,6 +85,7 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId:
         const adaApi = new AdaApi();
         const clonedWallet = await adaApi.cloneWallet(db, value[0], network);
         publicDeriversOfNetwork.push(clonedWallet);
+        syncWallet(clonedWallet, 'cloned wallet').catch(error => console.error);
       }
     }
   } else {
