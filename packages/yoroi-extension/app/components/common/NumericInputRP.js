@@ -528,7 +528,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
             lineHeight: '32px',
             marginTop: '-16px',
           },
-          '& input::placeholder': { color: 'grayscale.600' },
+          '& input::placeholder': { color: 'ds.text_gray_medium' },
         }}
       >
         <NumericInputRP {...this.props} />

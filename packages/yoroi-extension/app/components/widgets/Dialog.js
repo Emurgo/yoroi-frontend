@@ -3,7 +3,7 @@
 import type { Node, Element, ComponentType } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
 import { map } from 'lodash';
-import { Modal, Typography, Button } from '@mui/material';
+import { Modal, Typography, IconButton } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { withLayout } from '../../styles/context/layout';
@@ -243,7 +243,7 @@ export const CloseButton = ({
 // eslint-disable-next-line no-unused-vars
 const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
 
-const SIconBtn = styled(Button)(({ theme, active }) => ({
+const SIconBtn = styled(IconButton)(({ theme, active }) => ({
   backgroundColor: active && theme.palette.ds.gray_200,
   '& svg': {
     '& path': {

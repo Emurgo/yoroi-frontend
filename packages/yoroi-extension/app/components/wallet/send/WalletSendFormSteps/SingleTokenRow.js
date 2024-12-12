@@ -25,7 +25,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
       fill: theme.palette.ds.gray_max,
     },
     '& rect': {
-      fill: theme.palette.ds.bg_color_max,
+      fill: theme.palette.ds.bg_color_contrast_min,
     },
   },
 }));
@@ -99,12 +99,17 @@ export default class SingleTokenRow extends Component<Props, State> {
             [styles.inputError]: !isValid,
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
-          border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
-          borderColor={this.props.isTokenIncluded(token.info) ? 'grayscale.400' : 'transparent'}
+          sx={{
+            border: this.props.isTokenIncluded(token.info) ? '2px solid' : '2px solid',
+            borderColor: this.props.isTokenIncluded(token.info) ? 'ds.el_gray_max' : 'transparent',
+            '&:hover': { border: '2px solid', borderColor: 'ds.el_gray_max' },
+          }}
         >
           <div className={styles.amountTokenName}>
             <div className={styles.logo}>
-              <NoAssetLogo />
+              <IconWrapper>
+                <NoAssetLogo />
+              </IconWrapper>
             </div>
             <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
               {truncateAddressShort(token.label, token.label.startsWith('asset') ? 14 : 12)}
@@ -135,11 +140,11 @@ export default class SingleTokenRow extends Component<Props, State> {
                   autoFocus
                 />
               </Box>
-              <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
-                <IconWrapper className={styles.closeIcon}>
+              <Box component="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
+                <IconWrapper>
                   <CloseIcon />
                 </IconWrapper>
-              </button>
+              </Box>
               <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
             </>
           ) : (
