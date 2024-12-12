@@ -25,7 +25,7 @@ const networkNames = Object.freeze({
 @observer
 export default class SwitchNetworkDialogContainer extends Component<Props> {
   render(): Node {
-    const walletStore = this.props.stores.wallets;
+    const profileStore = this.props.stores.profile;
 
     return (
       <SwitchNetworkDialog
@@ -33,8 +33,8 @@ export default class SwitchNetworkDialogContainer extends Component<Props> {
           this.props.actions.dialogs.closeActiveDialog.trigger();
         }}
         onApply={async (networkId) => {
-          if (networkId !== walletStore.getCurrentNetworkId()) {
-            await walletStore.setCurrentNetworkId(networkId);
+          if (networkId !== profileStore.getCurrentNetworkId()) {
+            await profileStore.setCurrentNetworkId(networkId);
             window.location.reload();
           }
         }}
@@ -42,7 +42,7 @@ export default class SwitchNetworkDialogContainer extends Component<Props> {
           id: networks[network].NetworkId,
           name: networkNames[network],
         }))}
-        currentNetworkId={walletStore.getCurrentNetworkId()}
+        currentNetworkId={profileStore.getCurrentNetworkId()}
       />
     );
   }

@@ -14,11 +14,7 @@ import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWa
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
 import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
-import {
-  getNetworkById,
-  getCardanoHaskellBaseConfig,
-  networks,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
@@ -235,7 +231,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const result = await this.getInitialWallets.execute(this.getCurrentNetworkId()).promise;
+    const result = await this.getInitialWallets.execute(
+      this.stores.profile.getCurrentNetworkId()
+    ).promise;
     if (result == null || result.length === 0) return;
 
     for (const publicDeriver of result) {
@@ -434,19 +432,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       wallet.allUtxoAddresses,
       submittedTxs,
     );
-  }
-
-  getCurrentNetworkId(): number {
-    const { currentNetworkId } = this.stores.profile;
-    if (currentNetworkId == null) {
-      return networks.CardanoMainnet.NetworkId;
-    }
-    return currentNetworkId;
-  }
-
-  async setCurrentNetworkId(id: number): Promise<void> {
-    this.stores.profile.currentNetworkId = id;
-    await this.api.localStorage.saveCurrentNetworkId(id);
   }
 }
 

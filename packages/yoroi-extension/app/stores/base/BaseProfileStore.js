@@ -19,6 +19,8 @@ import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
 import { refreshCurrentCoinPrice } from '../../api/thunk';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
@@ -183,8 +185,25 @@ export default class BaseProfileStore
     );
   }
 
+  getCurrentNetworkId(): number {
+    const { currentNetworkId } = this;
+    if (currentNetworkId == null) {
+      return networks.CardanoMainnet.NetworkId;
+    }
+    return currentNetworkId;
+  }
+
+  async setCurrentNetworkId(id: number): Promise<void> {
+    this.currentNetworkId = id;
+    await this.api.localStorage.saveCurrentNetworkId(id);
+  }
+
   _loadCurrentNetworkId: () => Promise<void> = async () => {
     this.currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
+  }
+
+  get selectedNetwork(): $ReadOnly<NetworkRow> {
+    return getNetworkById(this.getCurrentNetworkId());
   }
 
   _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {
