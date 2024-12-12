@@ -322,7 +322,7 @@ function formatLedgerWithdrawals(
       } else if (maybeScriptHash) {
         stakeCredential = {
           type: CredentialParamsType.SCRIPT_HASH,
-          keyHashHex: maybeScriptHash.to_hex(),
+          scriptHashHex: maybeScriptHash.to_hex(),
         };
       }
     }
