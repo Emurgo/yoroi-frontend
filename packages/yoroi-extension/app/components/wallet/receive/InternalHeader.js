@@ -72,7 +72,15 @@ export default class InternalHeader extends Component<Props> {
               <Typography variant="body1" color="ds.text_gray_medium">
                 {intl.formatMessage(messages.warning1)}
               </Typography>
-              <Typography variant="body1" color="ds.text_gray_medium">
+              <Typography
+                variant="body1"
+                color="ds.text_gray_medium"
+                sx={{
+                  '& a': {
+                    color: 'ds.text_primary_medium',
+                  },
+                }}
+              >
                 <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
               </Typography>
               <Typography variant="body1" color="ds.text_gray_medium">
