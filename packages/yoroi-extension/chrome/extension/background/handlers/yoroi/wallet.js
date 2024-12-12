@@ -21,6 +21,7 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
   asHasLevels,
+  asGetPublicKey,
 } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   removeAllTransactions,
@@ -122,12 +123,27 @@ export const RemoveWallet: HandlerType<
   typeTag: 'remove-wallet',
 
   handle: async (request) => {
-    const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+    const removeKey = await (async () => {
+      const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      return (await withPublicKey.getPublicKey()).Hash;
+    })();
 
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
+    for (const publicDeriver of await loadWalletsFromStorage(await getDb())) {
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      if ((await withPublicKey.getPublicKey()).Hash === removeKey) {
+        await removePublicDeriver({
+          publicDeriver,
+          conceptualWallet: publicDeriver.getParent(),
+        });
+      }
+    }
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
