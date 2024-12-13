@@ -157,7 +157,7 @@
     "@emurgo/cip14-js": "2.0.0",
     "@emurgo/cip4-js": "1.0.5",
     "@emurgo/cross-csl-browser": "6.1.0",
-    "@emurgo/yoroi-eutxo-txs": "0.0.4-alpha.2",
+    "@emurgo/yoroi-eutxo-txs": "0.0.4",
     "@emurgo/yoroi-lib": "1.2.3",
     "@ledgerhq/hw-transport-u2f": "5.36.0-deprecated",
     "@ledgerhq/hw-transport-webauthn": "5.36.0-deprecated",
