@@ -160,13 +160,11 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
     '&.Mui-disabled': {
       color: themePalette.gray_min,
       backgroundColor: themePalette[`${variant}_200`],
-      opacity: '0.8',
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
     '&.MuiLoadingButton-root.Mui-disabled': {
-      backgroundColor: themePalette.primary_500,
-      opacity: '0.8',
+      backgroundColor: themePalette.primary_200,
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette.white_static },
     '& .MuiButton-startIcon svg': { fill: themePalette.white_static },
