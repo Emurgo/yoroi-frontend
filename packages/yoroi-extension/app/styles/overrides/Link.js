@@ -12,6 +12,7 @@ export const LightLink = {
   styleOverrides: {
     root: {
       color: ltDs.text_primary_medium,
+      textDecoration: 'none',
       '&:hover': {
         textDecoration: 'underline',
         color: ltDs.text_primary_max,
@@ -24,6 +25,7 @@ export const DarkLink = {
   styleOverrides: {
     root: {
       color: dtDs.text_primary_medium,
+      textDecoration: 'none',
       '&:hover': {
         textDecoration: 'underline',
         color: dtDs.text_primary_max,
