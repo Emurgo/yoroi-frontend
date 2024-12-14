@@ -27,13 +27,14 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
+  WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
+
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -44,6 +45,7 @@ const storageKeys = {
   // ========== LEGACY USED FOR MIGRATIONS ========== //
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -354,6 +356,18 @@ export default class LocalStorageApi {
 
   saveCurrentNetworkId: (number) => Promise<void> = async (networkId) => {
     await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+  }
+
+  loadWalletListOrder: () => Promise<Array<string>> = async () => {
+    const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
+    if (raw == null) {
+      return [];
+    }
+    return JSON.parse(raw);
+  }
+
+  saveWalletListOrder: Array<string> => Promise<void> = async (publicKeyList) => {
+    await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   }
 
   async reset(): Promise<void> {

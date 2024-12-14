@@ -123,26 +123,16 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
 
     if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
-      const cardanoWallets = [];
-
-      wallets.forEach(wallet => {
-        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(wallet);
-
-        const walletMap = {
-          walletId: wallet.publicDeriverId,
-          rewards,
-          amount: wallet.balance,
-          plate: wallet.plate,
-          type: wallet.type,
-          name: wallet.name,
-        };
-
-        cardanoWallets.push(walletMap);
-      });
-
       return (
         <WalletListDialog
-          cardanoWallets={cardanoWallets}
+          cardanoWallets={wallets.map(wallet => ({
+            walletId: wallet.publicDeriverId,
+            rewards: this.props.stores.delegation.getRewardBalanceOrZero(wallet),
+            amount: wallet.balance,
+            plate: wallet.plate,
+            type: wallet.type,
+            name: wallet.name,
+          }))}
           onSelect={wallet => {
             this.checkAndResetGovRoutes();
             this.onSelectWallet(wallet);
@@ -157,8 +147,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
           onAddWallet={this.addNewWallet}
-          updateSortedWalletList={this.props.actions.profile.updateSortedWalletList.trigger}
-          walletsNavigation={this.props.stores.profile.walletsNavigation}
+          onUpdateWalletListOrder={async (from, to) => {
+            await this.props.stores.wallets.reorderWallets(from, to);
+          }}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         />

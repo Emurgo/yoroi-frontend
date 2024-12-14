@@ -175,9 +175,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
     this.registerReactions([
       this._checkSetupSteps,
     ]);
-    this.actions.profile.updateSortedWalletList.listen(this._updateSortedWalletList);
     this._getUriSchemeAcceptance(); // eagerly cache
-    this._getSortedWalletList()
   }
 
   teardown(): void {
@@ -248,24 +246,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap, ActionsMap
         return;
       }
     }
-  };
-
-  // ========== Sort wallets - Revamp ========== //
-  @computed get walletsNavigation(): WalletsNavigation {
-    let { result } = this.getWalletsNavigationRequest;
-    if (result == null) {
-      result = this.getWalletsNavigationRequest.execute().result;
-    }
-    return result ?? { cardano: [] };
-  }
-  _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getWalletsNavigationRequest.execute();
-  };
-
-  _updateSortedWalletList: WalletsNavigation => Promise<void>
-    = async (walletsNavigation) => {
-    await this.setWalletsNavigationRequest.execute(walletsNavigation);
-    await this.getWalletsNavigationRequest.execute();
   };
 }
 

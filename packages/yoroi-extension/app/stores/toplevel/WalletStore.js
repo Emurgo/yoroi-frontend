@@ -237,6 +237,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     }
 
+    const orderMap: Map<string, number> = new Map();
+    (await this.api.localStorage.loadWalletListOrder()).forEach((publicKey, index) => {
+      orderMap.set(publicKey, index)
+    });
+    result.sort((w1, w2) => (
+      (orderMap.get(w1.publicKey) ?? Number.MAX_VALUE) -
+        (orderMap.get(w2.publicKey) ?? Number.MAX_VALUE)
+    ));
+
     runInAction(() => {
       this.wallets.push(...result);
     });
@@ -420,6 +429,16 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
       wallet.allUtxoAddresses,
       submittedTxs,
     );
+  }
+
+  async reorderWallets(from: number, to: number): Promise<void> {
+    const selectedWallet = this.selected;
+    runInAction(() => {
+      const [moved] = this.wallets.splice(from, 1);
+      this.wallets.splice(to, 0, moved);
+      this.selectedIndex = this.wallets.indexOf(selectedWallet);
+    });
+    await this.api.localStorage.saveWalletListOrder(this.wallets.map(wallet => wallet.publicKey));
   }
 }
 
