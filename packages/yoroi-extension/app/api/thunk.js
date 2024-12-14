@@ -218,7 +218,7 @@ export async function signAndBroadcastTransaction(
 ): Promise<{| txId: string |}> {
   const tx = request.signRequest.unsignedTx.build_tx();
   const txBody = tx.body();
-  const txHash = RustModule.WalletV4.hash_transaction(txBody);
+  const txHash = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash();
 
   const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,

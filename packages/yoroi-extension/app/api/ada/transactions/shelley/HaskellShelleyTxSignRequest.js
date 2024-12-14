@@ -92,7 +92,9 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   }
 
   txId(): string {
-    return RustModule.WalletV4.hash_transaction(this.unsignedTx.build()).to_hex();
+    return RustModule.WalletV4.FixedTransaction.from_hex(
+      this.unsignedTx.build_tx().to_hex()
+    ).transaction_hash().to_hex();
   }
 
   size(): {| full: number, outputs: number[] |} {
