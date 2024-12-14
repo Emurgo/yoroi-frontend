@@ -112,6 +112,9 @@ function Dialog(props: Props & InjectedProps): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'transparent',
+        },
       }}
       // $FlowIgnore
       id={id + '-dialogWindow-modalWindow'}

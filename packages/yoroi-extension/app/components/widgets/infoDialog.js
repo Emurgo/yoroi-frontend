@@ -47,17 +47,20 @@ function InfoDialog(props: Props & Intl): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'ds.bg_color_max',
+        backgroundColor: 'ds.special_web_overlay',
         '& .MuiPaper-root': {
           maxWidth: 'unset',
           backgroundImage: 'none',
-          backgroundColor: 'ds.bg_color_max',
+          backgroundColor: 'ds.bg_color_contrast_high',
         },
         '& .MuiDialog-paper': {
-          backgroundColor: 'ds.bg_color_max',
+          backgroundColor: 'ds.bg_color_contrast_high',
         },
-        '& .MuiDialog-backdrop': {
-          backgroundColor: 'rgba(31, 35, 46, 0.8)',
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'transparent',
+        },
+        '& .MuiModal-backdrop': {
+          backgroundColor: 'transparent',
         },
       }}
       id="infoDialog"
