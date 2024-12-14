@@ -362,7 +362,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     if (request.assets.length === 1) {
       const entry = request.assets[0];
       return (
-        <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_max">
+        <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_medium">
           {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </Typography>
       );
