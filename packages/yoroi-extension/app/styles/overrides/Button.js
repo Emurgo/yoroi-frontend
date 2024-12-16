@@ -173,7 +173,6 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
 }
 
 function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
-  console.log('themePalette', themePalette);
   return {
     backgroundColor: 'transparent',
     color: themePalette.text_primary_medium,
