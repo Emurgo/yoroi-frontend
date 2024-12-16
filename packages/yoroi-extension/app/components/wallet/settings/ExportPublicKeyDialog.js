@@ -30,7 +30,7 @@ export const messages: * = defineMessages({
 type Props = {|
   +onClose: void => void,
   +publicKeyHex: string,
-  +pathToPublic: Array<number>
+  +pathToPublic: Array<number>,
 |};
 
 const SListItem = styled(ListItem)(({ theme }) => ({
@@ -46,7 +46,7 @@ const SListItem = styled(ListItem)(({ theme }) => ({
 
 @observer
 export default class ExportPublicKeyDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -66,31 +66,21 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         className="ExportWalletDialogContainer"
       >
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}>
-
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
           <Box marginBottom="20px">
-            <Typography
-              variant='body1'
-              mb='16px'
-              color="ds.text_gray_medium"
-            >
+            <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.publicKeyExplanationLine1} />
             </Typography>
-            <Typography
-              variant='body1'
-              mb='16px'
-              color="ds.text_gray_medium"
-            >
+            <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...globalMessages.publicKeyExplanation} />
             </Typography>
-            <Typography
-              variant='body1'
-              color="ds.text_gray_medium"
-            >
+            <Typography variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.whyUse)}
             </Typography>
             <List disablePadding>
@@ -114,40 +104,43 @@ export default class ExportPublicKeyDialog extends Component<Props> {
     );
   }
 
-  renderQrCode: {|
+  renderQrCode: ({|
     publicKeyHex: string,
     path: Array<number>,
-  |} => Node = (walletInfo) => {
+  |}) => Node = walletInfo => {
     return (
       <>
-        <div align="center">
-          <QrCodeWrapper
-            value={JSON.stringify(walletInfo)}
-            size={152}
-          />
-        </div>
-        <br />
-        <br />
+        <Box display="flex" justifyContent="center" marginBottom="16px">
+          <Box
+            padding="16px"
+            width="184px"
+            height="184px"
+            borderRadius="8px"
+            sx={{
+              backgroundColor: 'ds.white_static',
+            }}
+          >
+            <QrCodeWrapper value={JSON.stringify(walletInfo)} size={152} />
+          </Box>
+        </Box>
       </>
     );
-  }
+  };
 
-  renderKey: string => Node = (key) => {
+  renderKey: string => Node = key => {
     const { intl } = this.context;
     return (
       <>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(globalMessages.keyLabel)}
         </Typography>
-        <CodeBlock
-          code={key}
-        />
+        <CodeBlock code={key} />
         <br />
       </>
     );
-  }
+  };
 
-  renderPath: Array<number> => Node = (addressing) => {
+  renderPath: (Array<number>) => Node = addressing => {
     const { intl } = this.context;
     return (
       <>
@@ -162,5 +155,5 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         <br />
       </>
     );
-  }
+  };
 }
