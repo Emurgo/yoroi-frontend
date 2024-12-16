@@ -2,7 +2,6 @@
 
 import { darkThemeBase } from '../themes/dark-theme-base';
 import { lightThemeBase } from '../themes/light-theme-base';
-import { opacity } from '../themes/tokens/tokens';
 
 const { palette: darkThemePalette } = darkThemeBase;
 const { palette: lightThemePalette } = lightThemeBase;

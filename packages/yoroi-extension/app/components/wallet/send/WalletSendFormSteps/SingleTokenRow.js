@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './SingleTokenRow.scss';
-import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/token-default-logo.inline.svg';
 import {
   truncateAddressShort,
   formattedAmountToNaturalUnits,
