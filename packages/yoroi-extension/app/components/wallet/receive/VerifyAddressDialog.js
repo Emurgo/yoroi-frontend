@@ -35,7 +35,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -110,7 +110,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const notificationId = 'verify-address-notification';
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_low">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.addressLabel)}
         </Typography>
         <div className="verificationAddress">
@@ -142,11 +142,19 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
   renderQrCode: void => Node = () => {
     return (
       <>
-        <div align="center">
-          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
-        </div>
-        <br />
-        <br />
+        <Box display="flex" justifyContent="center" marginBottom="16px">
+          <Box
+            padding="16px"
+            width="184px"
+            height="184px"
+            borderRadius="8px"
+            sx={{
+              backgroundColor: 'ds.white_static',
+            }}
+          >
+            <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
+          </Box>
+        </Box>
       </>
     );
   };
@@ -171,7 +179,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (stakingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_low">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
         </Typography>
         <div className="stakingKey" id="verifyAddressDialog-stakingKeyHash-text">
@@ -207,7 +215,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (spendingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_low">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.spendingKeyHashLabel)}
         </Typography>
         <div className="spendingKey">
@@ -243,7 +251,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
 
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_low">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.keyRegistrationPointer)}sdsds
         </Typography>
         <Typography className="keyPointer" variant="body1" color="ds.text_gray_low">
@@ -262,7 +270,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_low">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </Typography>
         <div className={derivationClasses}>
