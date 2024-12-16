@@ -76,6 +76,7 @@ export default class IncludedTokens extends Component<Props> {
                     '> img': {
                       objectFit: 'cover',
                       display: 'inline-block',
+                      borderRadius: '4px',
                     },
                   }}
                 >

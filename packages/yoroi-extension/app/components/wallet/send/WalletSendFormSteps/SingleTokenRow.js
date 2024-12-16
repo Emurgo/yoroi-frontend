@@ -18,14 +18,15 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
 import { Box, Typography, styled } from '@mui/material';
+import TokenImage from './TokenImage';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
-    '& path:nth-child(1)': {
-      fill: theme.palette.ds.bg_color_contrast_min,
+    '& path': {
+      fill: theme.palette.ds.gray_max,
     },
-    '& path:nth-child(2)': {
-      fill: theme.palette.ds.el_gray_medium,
+    '& rect': {
+      fill: theme.palette.ds.bg_color_contrast_min,
     },
   },
 }));
@@ -106,11 +107,24 @@ export default class SingleTokenRow extends Component<Props, State> {
           }}
         >
           <div className={styles.amountTokenName}>
-            <div className={styles.logo}>
-              <IconWrapper>
-                <NoAssetLogo />
-              </IconWrapper>
-            </div>
+            <Box
+              width={30}
+              height={30}
+              marginRight="16px"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                '> img': {
+                  objectFit: 'cover',
+                  display: 'inline-block',
+                  borderRadius: '4px',
+                },
+              }}
+            >
+              <TokenImage image={token.info.Metadata.logo ?? null} name={token.label} width="30px" height="30px" />
+            </Box>
             <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
               {truncateAddressShort(token.label, token.label.startsWith('asset') ? 14 : 12)}
             </Typography>
