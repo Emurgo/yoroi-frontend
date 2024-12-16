@@ -2,6 +2,7 @@
 
 import { darkThemeBase } from '../themes/dark-theme-base';
 import { lightThemeBase } from '../themes/light-theme-base';
+import { opacity } from '../themes/tokens/tokens';
 
 const { palette: darkThemePalette } = darkThemeBase;
 const { palette: lightThemePalette } = lightThemeBase;
@@ -219,10 +220,10 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
     backgroundColor: 'transparent',
     color: themePalette.text_primary_medium,
     ':hover': {
-      backgroundColor: themePalette.gray_50,
-      color: themePalette[`${variant}_600`],
-      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_600`] },
-      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_600`] },
+      backgroundColor: themePalette[`${variant}_100`],
+      color: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max,
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
     },
     ':active': {
       backgroundColor: themePalette.gray_100,
@@ -235,11 +236,19 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       outlineColor: themePalette.sys_yellow_500,
     },
     ':disabled': {
-      color: themePalette[`${variant}_200`],
+      color: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
       cursor: 'not-allowed',
       pointerEvents: 'unset',
-      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_200`] },
-      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_200`] },
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+    },
+    '&.Mui-disabled': {
+      color: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
+      opacity: 1,
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
     '& .MuiButton-startIcon svg': { fill: themePalette.text_primary_medium },
