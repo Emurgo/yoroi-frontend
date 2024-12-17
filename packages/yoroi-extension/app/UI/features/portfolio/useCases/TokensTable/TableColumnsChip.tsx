@@ -180,7 +180,9 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
   const totalTokenPrice =
-    isPrimary && showingAda ? '' : `${tokenPrice !== undefined ? totaPrice : '-'} ${totalTicker || DEFAULT_FIAT_PAIR}`;
+    isPrimary && showingAda
+      ? ''
+      : `${isPrimary ? totaPrice : tokenPrice !== undefined ? totaPrice : '-'} ${totalTicker || DEFAULT_FIAT_PAIR}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
