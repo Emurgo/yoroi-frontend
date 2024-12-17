@@ -11,7 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
 
@@ -180,14 +180,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
               marginTop: '15px',
             }}
           >
-            <a
+            <Link
               target="_blank"
               rel="noreferrer"
               href={environment.externalPrivacyPolicyURL()}
-              className={styles.learnMore}
             >
               {intl.formatMessage(messages.privacyNotice)}
-            </a>
+            </Link>
           </Box>
         </Box>
       ) : null}
@@ -201,14 +200,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
               justifyContent: isStartupScreen ? 'center' : 'flex-start',
             }}
           >
-            <a
+            <Link
               target="_blank"
               rel="noreferrer"
               href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/7594394140303-What-s-user-insights-"
-              className={styles.learnMore}
             >
               {intl.formatMessage(messages.learnMore)}
-            </a>
+            </Link>
           </Box>
 
           {isSettingsScreen ? (
