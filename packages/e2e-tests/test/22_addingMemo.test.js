@@ -7,7 +7,7 @@ import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestString } from '../helpers/constants.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Adding a memo to a completed Tx', function () {
   this.timeout(2 * oneMinute);
@@ -18,8 +18,7 @@ describe('Adding a memo to a completed Tx', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   // open the latests tx

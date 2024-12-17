@@ -7,7 +7,7 @@ import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { getRewarKeyHashFromBech32 } from '../helpers/mock-dApp-webpage/dAppTxHelper.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Verify addresses', function () {
   this.timeout(2 * oneMinute);
@@ -19,8 +19,7 @@ describe('Verify addresses', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   it('Open the Receive tab', async function () {

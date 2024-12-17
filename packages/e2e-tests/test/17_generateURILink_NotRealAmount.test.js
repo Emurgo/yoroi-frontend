@@ -5,8 +5,7 @@ import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.pag
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { restoreWallet } from '../helpers/restoreWalletHelper.js';
-import { getSpendableWallet } from '../utils/testWallets.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import { INVALID_AMOUNT } from '../helpers/messages.js';
 
@@ -18,11 +17,7 @@ describe('Generating URL-link with really big amount', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-  });
-
-  it('Restore a 15-word wallet', async function () {
-    const testWallet = getSpendableWallet();
-    await restoreWallet(webdriver, logger, testWallet);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   it('Go to Receive tab', async function () {
