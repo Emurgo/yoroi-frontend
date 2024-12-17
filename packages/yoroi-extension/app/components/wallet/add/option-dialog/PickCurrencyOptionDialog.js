@@ -12,6 +12,7 @@ import OptionBlock from '../../../widgets/options/OptionBlock';
 import environment from '../../../../environment';
 
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
+import { Typography, Link } from '@mui/material';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -24,7 +25,8 @@ const messages = defineMessages({
   },
   testnetDescription: {
     id: 'wallet.currency.pick.testnetDescription',
-    defaultMessage: '!!!Testnet are alternative chain to be used for testing. This allows application developers or testers to experiment, without having to use real coins.',
+    defaultMessage:
+      '!!!Testnet are alternative chain to be used for testing. This allows application developers or testers to experiment, without having to use real coins.',
   },
 });
 
@@ -39,7 +41,7 @@ type Props = {|
 
 @observer
 export default class PickCurrencyOptionDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -62,17 +64,18 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
               title="Cardano"
               learnMoreText={
                 <>
-                  {intl.formatMessage(messages.cardanoDescription)}<br />
-                  <a
+                  <Typography color="ds.text_gray_low">{intl.formatMessage(messages.cardanoDescription)}</Typography>
+                  <Link
                     href="https://cardano.org"
                     onClick={event => this.props.onExternalLinkClick(event)}
                   >
                     {intl.formatMessage(globalMessages.learnMore)}
-                  </a>
-                </>}
+                  </Link>
+                </>
+              }
               onSubmit={this.props.onCardano}
             />
-            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) && (
               <>
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
@@ -81,18 +84,20 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   onSubmit={this.props.onCardanoPreprodTestnet}
                   learnMoreText={
                     <>
-                      {intl.formatMessage(messages.testnetDescription)}<br />
-                      <a
+                      {intl.formatMessage(messages.testnetDescription)}
+                      <br />
+                      <Link
                         href="https://testnets.cardano.org/"
                         onClick={event => this.props.onExternalLinkClick(event)}
                       >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
-                    </>}
+                      </Link>
+                    </>
+                  }
                 />
               </>
-            }
-            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+            )}
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) && (
               <>
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
@@ -101,18 +106,20 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   onSubmit={this.props.onCardanoPreviewTestnet}
                   learnMoreText={
                     <>
-                      {intl.formatMessage(messages.testnetDescription)}<br />
-                      <a
+                      {intl.formatMessage(messages.testnetDescription)}
+                      <br />
+                      <Link
                         href="https://testnets.cardano.org/"
                         onClick={event => this.props.onExternalLinkClick(event)}
                       >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
-                    </>}
+                      </Link>
+                    </>
+                  }
                 />
               </>
-            }
-            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) &&
+            )}
+            {(!environment.isProduction() || environment.isNightly() || environment.isTest()) && (
               <>
                 <OptionBlock
                   parentName="PickCurrencyOptionDialog"
@@ -121,17 +128,19 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                   onSubmit={this.props.onCardanoSanchoTestnet}
                   learnMoreText={
                     <>
-                      {intl.formatMessage(messages.testnetDescription)}<br />
-                      <a
+                      {intl.formatMessage(messages.testnetDescription)}
+                      <br />
+                      <Link
                         href="https://testnets.cardano.org/"
                         onClick={event => this.props.onExternalLinkClick(event)}
                       >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
-                    </>}
+                      </Link>
+                    </>
+                  }
                 />
               </>
-            }
+            )}
           </ul>
         </div>
       </Dialog>

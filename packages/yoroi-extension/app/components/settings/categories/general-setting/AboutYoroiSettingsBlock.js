@@ -151,7 +151,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           mt: '40px',
         }}
       >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
+        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 
@@ -216,10 +216,11 @@ function LabelWithValue({
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <Typography component="div" variant="body1" fontWeight={500} color="grayscale.max">
+      <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
         {label}
       </Typography>
-      <Typography component="div"
+      <Typography
+        component="div"
         {...(url
           ? {
               as: Link,
@@ -228,7 +229,7 @@ function LabelWithValue({
             }
           : {})}
         variant="body1"
-        color="grayscale.max"
+        color="ds.text_gray_medium"
         sx={{ textDecoration: 'none' }}
         id={componentId || 'somewhere-someValue-text'}
       >

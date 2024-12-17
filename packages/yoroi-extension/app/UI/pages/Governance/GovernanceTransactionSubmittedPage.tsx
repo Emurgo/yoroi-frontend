@@ -4,6 +4,7 @@ import { ROUTES } from '../../../routes-config';
 import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
 import { useStrings } from '../../features/governace/common/useStrings';
 import GovernanceLayout from './layout';
+import {useGovernance} from "../../features/governace/module/GovernanceContextProvider";
 
 type Props = {
   stores: any;
@@ -22,6 +23,13 @@ const GovernanceTransactionSubmittedPage = (props: Props): any => {
 const TransactionSubmittedWrapper = () => {
   const history = useHistory();
   const strings = useStrings();
+
+  const { ampli } = useGovernance();
+  React.useEffect(() => {
+    // ON MOUNT
+    ampli?.governanceTransactionSuccessPageViewed();
+  }, []);
+
   return (
     <TransactionSubmitted
       title={strings.thanksForParticipation}

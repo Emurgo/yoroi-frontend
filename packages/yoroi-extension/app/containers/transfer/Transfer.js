@@ -1,20 +1,18 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
-import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
 import NoWalletMessage from '../wallet/NoWalletMessage';
-import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
 const WalletTransferPage = lazy(WalletTransferPagePromise);
@@ -39,21 +37,15 @@ export default class Transfer extends Component<AllProps> {
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
     const navbar = (
-      <NavBarContainer
+      <NavBarContainerRevamp
         actions={actions}
         stores={stores}
-        title={
-          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
-        }
+        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />}
       />
     );
+
     return (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        navbar={navbar}
-        sidebar={sidebarContainer}
-        showInContainer
-      >
+      <TopBarLayout banner={<BannerContainer actions={actions} stores={stores} />} navbar={navbar} sidebar={sidebarContainer}>
         {this.getContent()}
       </TopBarLayout>
     );
@@ -65,23 +57,11 @@ export default class Transfer extends Component<AllProps> {
     if (wallet == null) {
       return <NoWalletMessage />;
     }
-    // temporary solution: will need to handle more cases later for different currencies
-    if (wallet.isCardanoHaskell) {
-      return <UnsupportedWallet />;
-    }
+
     return (
-      <>
-        <HorizontalLine />
-        <BackgroundColoredLayout>
-          <Suspense fallback={null}>
-            <WalletTransferPage
-              actions={actions}
-              stores={stores}
-              publicDeriver={wallet}
-            />
-          </Suspense>
-        </BackgroundColoredLayout>
-      </>
+      <Suspense fallback={null}>
+        <WalletTransferPage actions={actions} stores={stores} />
+      </Suspense>
     );
   };
 }

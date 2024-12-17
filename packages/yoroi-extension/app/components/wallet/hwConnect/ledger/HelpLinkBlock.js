@@ -4,9 +4,20 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
+import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Link, styled, Box } from '@mui/material';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  marginRight: '8px',
+  marginLeft: '8px',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 const messages = defineMessages({
   helpLinkYoroiWithLedger: {
@@ -25,9 +36,8 @@ type Props = {|
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
@@ -36,13 +46,17 @@ export default class HelpLinkBlock extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <a
+        <Link
           href={intl.formatMessage(messages.helpLinkYoroiWithLedger)}
           onClick={event => onExternalLinkClick(event)}
+          sx={{ display: 'flex', alignItems: 'center' }}
         >
           {intl.formatMessage(messages.helpLinkYoroiWithLedgerText)}
-          <ExternalLinkSVG />
-        </a>
-      </div>);
+          <IconWrapper>
+            <ExternalLinkSVG />
+          </IconWrapper>
+        </Link>
+      </div>
+    );
   }
 }

@@ -30,7 +30,7 @@ export const connectNonAuth = async (
   testWalettObj,
   checkBalance = true
 ) => {
-  await mockedDApp.requestNonAuthAccess();
+  await mockedDApp.requestAccess();
   const dappConnectPage = new DAppConnectWallet(webdriver, logger);
   // the window focus is switched to the pop-up here
   const popUpAppeared = await dappConnectPage.popUpIsDisplayed(windowManager);

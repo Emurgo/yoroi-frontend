@@ -1,6 +1,6 @@
 // @flow
 
-import { action, observable, reaction } from 'mobx';
+import { observable, action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
@@ -26,6 +26,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
+
+  @observable error: ?Error = null;
 
   // eslint-disable-next-line no-restricted-syntax
   _updateTxBuilderReaction: void => mixed = reaction(
@@ -146,45 +148,51 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
       this.stores.delegation.disablePoolTransitionState(request.wallet);
       return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
     };
-
-    if (request.wallet.type === 'ledger') {
+    try {
+      if (request.wallet.type === 'ledger') {
+        await this.stores.substores.ada.wallets.adaSendAndRefresh({
+          broadcastRequest: {
+            ledger: {
+              signRequest: result.signTxRequest,
+              wallet: request.wallet,
+            },
+          },
+          refreshWallet,
+        });
+        return;
+      }
+      if (request.wallet.type === 'trezor') {
+        await this.stores.substores.ada.wallets.adaSendAndRefresh({
+          broadcastRequest: {
+            trezor: {
+              signRequest: result.signTxRequest,
+              wallet: request.wallet,
+            },
+          },
+          refreshWallet,
+        });
+        return;
+      }
+      // normal password-based wallet
+      if (request.password == null) {
+        throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
+      }
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
-          ledger: {
-            signRequest: result.signTxRequest,
+          normal: {
             wallet: request.wallet,
+            password: request.password,
+            signRequest: result.signTxRequest,
           },
         },
         refreshWallet,
       });
-      return;
-    }
-    if (request.wallet.type === 'trezor') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          trezor: {
-            signRequest: result.signTxRequest,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet,
+    } catch (error) {
+      runInAction(() => {
+        this.error = error;
       });
-      return;
+      throw error;
     }
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this._signTransaction)} missing password for non-hardware signing`);
-    }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          wallet: request.wallet,
-          password: request.password,
-          signRequest: result.signTxRequest,
-        },
-      },
-      refreshWallet,
-    });
     if (request.dialog) this.actions.dialogs.open.trigger({ dialog: request.dialog });
   };
 

@@ -193,10 +193,11 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
+    await this.sleep(250);
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
-    await this.sleep(200);
+    await this.sleep(500);
     await input.sendKeys(Key.NULL);
-    await input.sendKeys(Key.DELETE);
+    await input.sendKeys(Key.BACK_SPACE);
   }
   async setImplicitTimeout(timeoutMs, functionName) {
     this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
@@ -242,27 +243,31 @@ class BasePage {
     );
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
-    const logsPaths = path.resolve(testRundDataDir, `console_${cleanName}-log.json`);
+    const logsPaths = path.resolve(testRundDataDir, `console_browser_${cleanName}.log`);
     if (isChrome()) {
       const logEntries = await this.driver
         .manage()
         .logs()
         .get(logging.Type.BROWSER, logging.Level.ALL);
-      const jsonLogs = logEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
-      await writeFile(logsPaths, `[\n${jsonLogs.join(',\n')}\n]`);
+      const jsonLogsStrings = logEntries.map(l => {
+        const splitMsg = l.message.split(' ');
+        const message = splitMsg.slice(2).join(' ');
+        return `[${l.level}] [${l.timestamp}] ${message}`
+      });
+      await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
     }
   }
   async getDriverLogs(testSuiteName, logFileName) {
     this.logger.info(`BasePage::getDriverLogs is called.`);
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
-    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}-log.json`);
+    const driverLogsPaths = path.resolve(testRundDataDir, `driver_${cleanName}.log`);
     const driverLogEntries = await this.driver
       .manage()
       .logs()
       .get(logging.Type.DRIVER, logging.Level.INFO);
-    const jsonDriverLogs = driverLogEntries.map(l => JSON.stringify(l.toJSON(), null, 2));
-    await writeFile(driverLogsPaths, `[\n${jsonDriverLogs.join(',\n')}\n]`);
+      const driverLogsStrings = driverLogEntries.map(l =>`[${l.level}] [${l.timestamp}] ${l.message}`);
+    await writeFile(driverLogsPaths, driverLogsStrings.join(''));
   }
   async waitForElementLocated(locator) {
     this.logger.info(
@@ -327,7 +332,7 @@ class BasePage {
   ) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
-    await this.setImplicitTimeout(oneSecond, this.customWaiter.name);
+    await this.setImplicitTimeout(halfSecond, this.customWaiter.name);
 
     while (endTime >= Date.now()) {
       const conditionState = await conditionFunc();

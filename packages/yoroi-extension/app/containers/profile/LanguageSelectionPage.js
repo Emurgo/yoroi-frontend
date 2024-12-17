@@ -70,6 +70,7 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
           error={props.stores.profile.setProfileLocaleRequest.error}
           localizedTermsOfUse={this.props.stores.profile.termsOfUse}
           localizedPrivacyNotice={this.props.stores.profile.privacyNotice}
+          externalPrivacyPolicyURL={environment.externalPrivacyPolicyURL()}
         />
       </TopBarLayout>
     );

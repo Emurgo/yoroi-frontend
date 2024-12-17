@@ -10,7 +10,7 @@ import driversPoolsManager from '../utils/driversPool.js';
 
 const testWallet = getSpendableWallet();
 
-describe('Show more txs 5 times', function () {
+describe('Show more txs 4 times', function () {
   this.timeout(5 * oneMinute);
   let webdriver = null;
   let logger = null;
@@ -35,7 +35,7 @@ describe('Show more txs 5 times', function () {
 
   it('Load txs and check amount', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.loadMoreTxs(5);
+    await transactionsPage.loadMoreTxs(4);
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
     expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(
       testWallet.minTxs

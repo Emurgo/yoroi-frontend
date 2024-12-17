@@ -47,6 +47,13 @@ import {
 import { TxBuilder, SendRequest } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
 import blake2b from 'blake2b';
 import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import type { DerivationInfo } from '@emurgo/yoroi-eutxo-txs/dist/classes';
+import { DerivationLevel } from '@emurgo/yoroi-eutxo-txs/dist/classes/addresses/derivation-info.type';
+import type { RequiredInput, TxMint } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
+import type { NetworkConfig } from '@emurgo/yoroi-eutxo-txs/dist/kernel';
+
+// <TODO:FETCH> unmagic this
+const COSMODELS = 'a30098a61a000189b41901a401011903e818ad00011903e819ea350401192baf18201a000312591920a404193e801864193e801864193e801864193e801864193e801864193e80186418641864193e8018641a000170a718201a00020782182019f016041a0001194a18b2000119568718201a0001643519030104021a00014f581a00037c71187a0001011903e819a7a90402195fe419733a1826011a000db464196a8f0119ca3f19022e011999101903e819ecb2011a00022a4718201a000144ce1820193bc318201a0001291101193371041956540a197147184a01197147184a0119a9151902280119aecd19021d0119843c18201a00010a9618201a00011aaa1820191c4b1820191cdf1820192d1a18201a00014f581a00037c71187a0001011a0001614219020700011a000122c118201a00014f581a00037c71187a0001011a00014f581a00037c71187a0001011a0004213c19583c041a00163cad19fc3604194ff30104001a00022aa818201a000189b41901a401011a00013eff182019e86a1820194eae182019600c1820195108182019654d182019602f18201a032e93af1937fd0a0198af1a000189b41901a401011903e818ad00011903e819ea350401192baf18201a000312591920a404193e801864193e801864193e801864193e801864193e801864193e80186418641864193e8018641a000170a718201a00020782182019f016041a0001194a18b2000119568718201a0001643519030104021a00014f581a00037c71187a0001011903e819a7a90402195fe419733a1826011a000db464196a8f0119ca3f19022e011999101903e819ecb2011a00022a4718201a000144ce1820193bc318201a0001291101193371041956540a197147184a01197147184a0119a9151902280119aecd19021d0119843c18201a00010a9618201a00011aaa1820191c4b1820191cdf1820192d1a18201a00014f581a00037c71187a0001011a0001614219020700011a000122c118201a00014f581a00037c71187a0001011a00014f581a00037c71187a0001011a000e94721a0003414000021a0004213c19583c041a00163cad19fc3604194ff30104001a00022aa818201a000189b41901a401011a00013eff182019e86a1820194eae182019600c1820195108182019654d182019602f18201a0290f1e70a1a032e93af1937fd0a1a0298e40b1966c40a029901291a000189b41901a401011903e818ad00011903e819ea350401192baf18201a000312591920a404193e801864193e801864193e801864193e801864193e801864193e80186418641864193e8018641a000170a718201a00020782182019f016041a0001194a18b2000119568718201a0001643519030104021a00014f581a0001e143191c893903831906b419022518391a00014f580001011903e819a7a90402195fe419733a1826011a000db464196a8f0119ca3f19022e011999101903e819ecb2011a00022a4718201a000144ce1820193bc318201a0001291101193371041956540a197147184a01197147184a0119a9151902280119aecd19021d0119843c18201a00010a9618201a00011aaa1820191c4b1820191cdf1820192d1a18201a00014f581a0001e143191c893903831906b419022518391a00014f5800011a0001614219020700011a000122c118201a00014f581a0001e143191c893903831906b419022518391a00014f580001011a00014f581a0001e143191c893903831906b419022518391a00014f5800011a000e94721a0003414000021a0004213c19583c041a00163cad19fc3604194ff30104001a00022aa818201a000189b41901a401011a00013eff182019e86a1820194eae182019600c1820195108182019654d182019602f18201a0290f1e70a1a032e93af1937fd0a1a0298e40b1966c40a193e801864193e8018641a000eaf1f121a002a6e06061a0006be98011a0321aac7190eac121a00041699121a048e466e1922a4121a0327ec9a121a001e743c18241a0031410f0c1a000dbf9e011a09f2f6d31910d318241a0004578218241a096e44021967b518241a0473cee818241a13e62472011a0f23d40118481a00212c5618481a0022814619fc3b041a00032b00192076041a0013be0419702c183f00011a000f59d919aa6718fb00011a000187551902d61902cf00011a000187551902d61902cf00011a000187551902d61902cf00011a0001a5661902a800011a00017468011a00044a391949a000011a0002bfe2189f01011a00026b371922ee00011a00026e9219226d00011a0001a3e2190ce2011a00019e4919028f011a001df8bb195fc803';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -61,12 +68,6 @@ export type TxOutput = {|
   data?: string,
 |};
 
-type TxMint = {|
-  policyScript: string, // HEX of the WASM policy script,
-  assetName: string, // HEX
-  amount: string,
-|};
-
 type TxAuxiliaryData = {|
   metadata: ?TxMetadata,
   nativeScripts: ?Array<string>,
@@ -77,7 +78,7 @@ type TxMetadata = {
 };
 
 export function sendAllUnsignedTx(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<CardanoAddressedUtxo>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -288,7 +289,7 @@ function addUtxoInput(
 }
 
 export function sendAllUnsignedTxFromUtxo(
-  receiver: {| ...Address, ...InexactSubset<Addressing> |},
+  receiver: { ...Address, ...InexactSubset<Addressing>, ... },
   allUtxos: Array<RemoteUnspentOutput>,
   absSlotNumber: BigNumber,
   protocolParams: {|
@@ -584,8 +585,6 @@ export async function newAdaUnsignedTxFromUtxo(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
-    // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: Number(protocolParams.coinsPerUtxoByte) * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -673,18 +672,25 @@ export async function newAdaUnsignedTxFromUtxo(
   // miscalculate the tx fee by several bytes fewer
   txBuilder.setTtl(absSlotNumber.plus(defaultTtlOffset).toNumber());
 
-  const changeAddress = changeAdaAddr &&
-    await LibWalletAddress.from(
+  let changeAddress;
+  if (changeAdaAddr != null) {
+    // $FlowIgnore[incompatible-type]
+    const derivationLevel: $Values<typeof DerivationLevel> = changeAdaAddr.addressing.startLevel;
+    if (derivationLevel < 1 || derivationLevel > 5) {
+      throw new Error('Invalid derivation level in change: ' + derivationLevel);
+    }
+    changeAddress = await LibWalletAddress.from(
       changeAdaAddr.address,
       WalletType.Shelley,
       {
         path: changeAdaAddr.addressing.path,
-        start: changeAdaAddr.addressing.startLevel,
+        start: derivationLevel,
       }
     );
+  }
 
   if (extraWitnessDatumsPresent) {
-    await txBuilder.calcScriptDataHash('default');
+    await txBuilder.calcScriptDataHash(COSMODELS);
   }
 
   await txBuilder.addChangeAndFee(changeAddress);
@@ -700,15 +706,20 @@ export async function newAdaUnsignedTxFromUtxo(
   }
 
   const signRequestChangeAddr = [];
-  if (unsignedTx.change) {
+  const change = unsignedTx.change;
+  if (change != null) {
+    const spendingKeyInfo = change.address.spendingKeyInfo;
+    if (spendingKeyInfo == null) {
+      throw new Error('Missing spending key info in change: ' + JSON.stringify(change));
+    }
     signRequestChangeAddr.push({
-      address: unsignedTx.change.address.hex,
+      address: change.address.hex,
       addressing: {
-        path: unsignedTx.change.address.spendingKeyInfo.path,
-        startLevel: unsignedTx.change.address.spendingKeyInfo.start,
+        path: spendingKeyInfo.path,
+        startLevel: spendingKeyInfo.start,
       },
       values: libValueToMultiToken(
-        unsignedTx.change.value,
+        change.value,
         networkId,
         PRIMARY_ASSET_CONSTANTS.Cardano
       ),
@@ -716,7 +727,8 @@ export async function newAdaUnsignedTxFromUtxo(
   }
   const utxosMap = new Map(utxos.map(u => [u.utxo_id, u]));
   return {
-    senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)),
+    senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)).filter(Boolean),
+    // $FlowIgnore[prop-missing] .wasm extracts original CSL instance from coss-csl wrapper
     txBuilder: unsignedTx.builder.wasm,
     changeAddr: signRequestChangeAddr,
   };
@@ -865,7 +877,8 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   await RustModule.load();
   setRuntime(RustModule.CrossCsl.init);
 
-  const defaultNetworkConfig = {
+  const defaultNetworkConfig: NetworkConfig = {
+    networkId,
     linearFee: {
       coefficient: protocolParams.linearFeeCoefficient,
       constant: protocolParams.linearFeeConstant,
@@ -879,8 +892,6 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     memPriceTo: 1000,
     stepPriceFrom: 721,
     stepPriceTo: 10000000,
-    // todo remove this after updating the eUtxo lib
-    coinsPerUtxoWord: Number(protocolParams.coinsPerUtxoByte) * 8 + 2,
   };
 
   const utxoSet = new LibUtxoSet(
@@ -896,7 +907,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       mustIncludeUtxos.map(async ([utxo, witness]) => {
         let taggedWitness;
         if (witness == null) {
-          taggedWitness = [];
+          taggedWitness = [undefined];
         } else if (witness.nativeScript) {
           taggedWitness = [{
             type: 'native',
@@ -912,7 +923,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
         } else {
           throw new Error('unxpected witness value');
         }
-        return [await toLibUTxO(utxo), ...taggedWitness];
+        return ([await toLibUTxO(utxo), ...taggedWitness]: RequiredInput);
       })
     )
   );
@@ -987,30 +998,43 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     protocolParams.networkId > 0 ? 'vasil' : 'default'
   );
 
-  const changeAddress = changeAdaAddr &&
-    await LibWalletAddress.from(
+  let changeAddress;
+  if (changeAdaAddr != null) {
+    // $FlowIgnore[incompatible-type]
+    const derivationLevel: $Values<typeof DerivationLevel> = changeAdaAddr.addressing.startLevel;
+    if (derivationLevel < 1 || derivationLevel > 5) {
+      throw new Error('Invalid derivation level in change: ' + derivationLevel);
+    }
+    const spendingKeyInfo: DerivationInfo = {
+      path: changeAdaAddr.addressing.path,
+      start: derivationLevel,
+    };
+    changeAddress = await LibWalletAddress.from(
       changeAdaAddr.address,
       WalletType.Shelley,
-      {
-        path: changeAdaAddr.addressing.path,
-        start: changeAdaAddr.addressing.startLevel,
-      }
+      spendingKeyInfo,
     );
+  }
 
   await txBuilder.addChangeAndFee(changeAddress);
 
   const unsignedTx = await txBuilder.build();
 
   const signRequestChangeAddr = [];
-  if (unsignedTx.change) {
+  const change = unsignedTx.change;
+  if (change != null) {
+    const spendingKeyInfo = change.address.spendingKeyInfo;
+    if (spendingKeyInfo == null) {
+      throw new Error('Missing spending key info in change: ' + JSON.stringify(change));
+    }
     signRequestChangeAddr.push({
-      address: unsignedTx.change.address.hex,
+      address: change.address.hex,
       addressing: {
-        path: unsignedTx.change.address.spendingKeyInfo.path,
-        startLevel: unsignedTx.change.address.spendingKeyInfo.start,
+        path: spendingKeyInfo.path,
+        startLevel: spendingKeyInfo.start,
       },
       values: libValueToMultiToken(
-        unsignedTx.change.value,
+        change?.value,
         networkId,
         PRIMARY_ASSET_CONSTANTS.Cardano
       ),
@@ -1024,7 +1048,8 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     ].map(u => [u.utxo_id, u])
   );
   return {
-    senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)),
+    senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)).filter(Boolean),
+    // $FlowIgnore[prop-missing] .wasm extracts original CSL instance from coss-csl wrapper
     txBuilder: unsignedTx.builder.wasm,
     changeAddr: signRequestChangeAddr,
   };
@@ -1086,15 +1111,15 @@ export function signTransaction(
   if (unsignedTx instanceof RustModule.WalletV4.Transaction) {
     txBody = unsignedTx.body();
     txWitSet = unsignedTx.witness_set();
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.from_hex(unsignedTx.to_hex()).transaction_hash();
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
     const tx = unsignedTx.build_tx();
     txBody = tx.body();
     txWitSet = tx.witness_set();
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash();
   } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
     txBody = unsignedTx;
-    txHash = RustModule.WalletV4.hash_transaction(txBody);
+    txHash = RustModule.WalletV4.FixedTransaction.new_from_body_bytes(txBody.to_bytes()).transaction_hash();
   } else if (unsignedTx instanceof Buffer || unsignedTx instanceof Uint8Array) {
     // note: we are calculating the tx hash from the raw tx body bytes, which
     // probably won't match the serialized `txBody`. But this happens only for

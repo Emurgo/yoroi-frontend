@@ -46,7 +46,7 @@ export default class ResyncBlock extends Component<Props> {
           variant="body1"
           fontWeight={500}
           mb="16px"
-          color="grayscale.900"
+          color="ds.text_gray_medium"
         >
           {intl.formatMessage(messages.titleLabel)}
         </Typography>

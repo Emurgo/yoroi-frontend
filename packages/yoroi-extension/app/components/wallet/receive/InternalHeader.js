@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   blogLinkUrl: {
     id: 'wallet.receive.page.internal.learnMore',
-    defaultMessage: '!!!https://emurgo.io/en/blog/understanding-unspent-transaction-outputs-in-cardano',
+    defaultMessage: '!!!https://www.emurgo.io/press-news/yoroi-wallet-a-guide-to-the-receive-menu/',
   },
 });
 
@@ -72,7 +72,15 @@ export default class InternalHeader extends Component<Props> {
               <Typography variant="body1" color="ds.text_gray_medium">
                 {intl.formatMessage(messages.warning1)}
               </Typography>
-              <Typography variant="body1" color="ds.text_gray_medium">
+              <Typography
+                variant="body1"
+                color="ds.text_gray_medium"
+                sx={{
+                  '& a': {
+                    color: 'ds.text_primary_medium',
+                  },
+                }}
+              >
                 <FormattedMessage {...globalMessages.blogLearnMore} values={{ blogLink }} />
               </Typography>
               <Typography variant="body1" color="ds.text_gray_medium">

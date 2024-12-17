@@ -1,17 +1,23 @@
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
-import { bech32 } from 'bech32';
 import * as React from 'react';
 
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
-import {hexToBytes} from "../../../tsCoreUtils";
 
 type drepDelegation = { status: string | null; drep: string | null };
+type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
+
+type GovernanceAnalytics = {
+  governanceChooseDrepPageViewed: () => void,
+  governanceConfirmTransactionPageViewed: () => void,
+  governanceTransactionSuccessPageViewed: () => void,
+};
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -32,6 +38,7 @@ const initialGovernanceProvider = {
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
   submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
+  ampli: (null as GovernanceAnalytics | null),
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -45,6 +52,8 @@ type GovernanceProviderProps = {
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
+  getCurrentPrice: GetCurrentPrice;
+  ampli: GovernanceAnalytics;
 };
 
 export const GovernanceContextProvider = ({
@@ -56,6 +65,8 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
+  getCurrentPrice,
+  ampli,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -71,7 +82,6 @@ export const GovernanceContextProvider = ({
     backendService,
     defaultTokenInfo,
     unitOfAccount,
-    getCurrentPrice,
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,
@@ -114,14 +124,14 @@ export const GovernanceContextProvider = ({
     });
 
     const governanceStatusState: any = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
+    const { drep, drepKind } = governanceStatusState?.drepDelegation ?? {};
 
-    if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'abstain') {
+    if (drep === 'abstain') {
       setGovernanceStatus({ status: DREP_ALWAYS_ABSTAIN, drep: null });
-    } else if (governanceStatusState && governanceStatusState.drepDelegation?.drep === 'no_confidence') {
+    } else if (drep === 'no_confidence') {
       setGovernanceStatus({ status: DREP_ALWAYS_NO_CONFIDENCE, drep: null });
-    } else if (governanceStatusState !== null && governanceStatusState.drepDelegation?.drep.length > 0) {
-      const words = bech32.toWords(hexToBytes(governanceStatusState.drepDelegation?.drep));
-      const encoded = bech32.encode('drep', words, 64);
+    } else if (drep?.length > 0) {
+      const encoded = dRepNormalize(drep, drepKind);
       setGovernanceStatus({ status: 'delegate', drep: encoded || null });
     } else {
       setGovernanceStatus({ status: 'none', drep: null });
@@ -162,6 +172,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
+    ampli,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

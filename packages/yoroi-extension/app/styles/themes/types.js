@@ -61,6 +61,8 @@ export type DSColorPalette = {|
   text_info: string,
   bg_color_max: string,
   bg_color_min: string,
+  bg_color_contrast_min: string,
+  bg_color_contrast_high: string,
   el_primary_max: string,
   el_primary_medium: string,
   el_primary_min: string,
@@ -75,4 +77,5 @@ export type DSColorPalette = {|
   web_sidebar_item_active_bg: string,
   mobile_overlay: string,
   mobile_bg_blur: string,
+  light_shadow_dropdown_menu: string,
 |};

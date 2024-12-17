@@ -28,6 +28,7 @@ import RawHash from '../../../components/widgets/hashWrappers/RawHash';
 import Warning from '../../../components/common/Warning';
 import Dialog from '../../../components/widgets/Dialog';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import HorizintallyCenteredLayout from '../../../components/layout/HorizintallyCenteredLayout';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -167,10 +168,12 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     if (!tentativeTx)
       return (
         <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
-          <Box width="350px">
+          <Box>
             <LegacyTransferLayout>
               <VerticallyCenteredLayout>
-                <LoadingSpinner />
+                <HorizintallyCenteredLayout>
+                  <LoadingSpinner />
+                </HorizintallyCenteredLayout>
               </VerticallyCenteredLayout>
             </LegacyTransferLayout>
           </Box>

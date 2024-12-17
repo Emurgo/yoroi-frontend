@@ -14,6 +14,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { ROUTES } from '../../routes-config';
 
 type Props = {|
   +children?: Node,
@@ -39,38 +40,40 @@ export default class SwapPageContainer extends Component<AllProps> {
     return false;
   };
 
+  isErrorPage: void => boolean = () => {
+    const { location } = this.props.stores.router;
+    if (location) {
+      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
+    }
+    return false;
+  };
+
   render(): Node {
     const { children } = this.props;
     const { actions, stores } = this.props;
     const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const isErrorPage = this.isErrorPage();
 
-    const menu = (
-      <SwapMenu
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={this.isActivePage}
-      />
-    );
+    const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
 
     return (
       <TopBarLayout
         banner={<BannerContainer actions={actions} stores={stores} />}
         sidebar={sidebarContainer}
+        isErrorPage={isErrorPage}
         navbar={
           <NavBarContainerRevamp
             actions={actions}
             stores={stores}
-            title={
-              <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />
-            }
+            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
             menu={menu}
+            isErrorPage={isErrorPage}
           />
         }
         showInContainer
         withPadding={false}
       >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-          {children}
-        </SwapFormProvider>
+        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
       </TopBarLayout>
     );
   }

@@ -31,16 +31,16 @@ export default class BlockchainSettingsPage extends Component<StoresAndActionsPr
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 
     const uriSettings =
-      selected.isCardanoHaskell && environment.userAgentInfo.canRegisterProtocol() ? (
+      selected.isCardanoHaskell && environment.canRegisterProtocol() ? (
         <UriSettingsBlock
           registerUriScheme={() => registerProtocols()}
-          isFirefox={environment.userAgentInfo.isFirefox()}
+          isFirefox={environment.isFirefox()}
         />
       ) : null;
 
     return (
       <>
-        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
           {intl.formatMessage(settingsMenuMessages.blockchain)}
         </Typography>
         <ExplorerSettings

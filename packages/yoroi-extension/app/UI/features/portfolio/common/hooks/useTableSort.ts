@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import React from 'react';
 import { IHeadCell, TableSortType } from '../types/table';
 
 export interface ISortState {
@@ -13,7 +13,6 @@ interface Props {
   headCells: IHeadCell[];
   data: any[];
 }
-
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
   const handleRequestSort = (property: string) => {
     let direction: string | null = 'asc';
@@ -21,7 +20,7 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
       if (order === 'asc') {
         direction = 'desc';
       } else if (order === 'desc') {
-        direction = null;
+        direction = 'asc';
       }
     }
     setSortState({
@@ -34,32 +33,26 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
     if (!orderBy || !order) return 0;
     switch (sortType) {
       case 'numeric':
-        if (parseFloat(b[orderBy]) < parseFloat(a[orderBy])) {
-          return -1;
-        } else {
-          return 1;
-        }
+        const aValue = Number(a[orderBy]);
+        const bValue = Number(b[orderBy]);
+        return bValue === aValue ? 0 : bValue < aValue ? -1 : 1;
       case 'character':
-        return String(a[orderBy]).localeCompare(b[orderBy]);
+        return String(b.info[orderBy]).localeCompare(a.info[orderBy]);
       default:
-        if (b[orderBy] < a[orderBy]) {
-          return -1;
-        } else {
-          return 1;
-        }
+        return b[orderBy] === a[orderBy] ? 0 : b[orderBy] < a[orderBy] ? -1 : 1;
     }
   };
 
-  const getSortedData = useCallback(
+  const getSortedData = React.useCallback(
     (arr: any[]) => {
       if (!orderBy || !order) return data;
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';
-      return arr.sort((a, b) => {
+      return [...arr].sort((a, b) => {
         return order === 'desc' ? descendingComparator(a, b, sortType) : -descendingComparator(a, b, sortType);
       });
     },
-    [order, orderBy, headCells]
+    [order, orderBy, headCells, data]
   );
 
   return { getSortedData, handleRequestSort };

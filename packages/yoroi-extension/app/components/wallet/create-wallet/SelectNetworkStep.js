@@ -3,13 +3,32 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, styled } from '@mui/material';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import YoroiLogo from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
+import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import styles from './SelectNetworkStep.scss';
 import globalMessages from '../../../i18n/global-messages';
 import StepController from './StepController';
+
+const GradientBox = styled(Box)(({ theme }: any) => ({
+  backgroundImage: theme.palette.ds.bg_gradient_1,
+  '&:hover': {
+    backgroundImage: theme.palette.ds.bg_gradient_2,
+  },
+}));
+
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& defs': {
+      '& linearGradient': {
+        '& stop': {
+          'stop-color': theme.palette.ds.el_primary_medium,
+        },
+      },
+    },
+  },
+}));
 
 const messages: * = defineMessages({
   title: {
@@ -64,31 +83,28 @@ function SelectNetworkStep(props: Props & Intl): Node {
         }}
       >
         <Box sx={{ width: '56px', height: '48px', mb: '38px' }}>
-          <img src={YoroiLogo} alt="Yoroi" title="Yoroi" />
+          <LogoIconWrapper>
+            <YoroiLogo />
+          </LogoIconWrapper>
         </Box>
-        <Typography component="div" variant="h3" fontWeight={500}>
+        <Typography component="div" variant="h3" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}
         </Typography>
       </Box>
       <Stack direction="column" alignItems="center" justifyContent="center" mb="72px">
         <Stack mb="38px" mt="24px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography component="div">
+          <Typography component="div" color="ds.text_gray_medium">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
         </Stack>
 
         <Stack alignItems="center" justifyContent="center" gap="16px">
           {networksList.map(({ name, networkInfo }) => (
-            <Box
-              component="button"
-              className={styles.networkCard}
-              key={name}
-              onClick={() => onSelect(networkInfo)}
-            >
-              <Typography component="div" variant="h3" fontWeight={500}>
+            <GradientBox component="button" className={styles.networkCard} key={name} onClick={() => onSelect(networkInfo)}>
+              <Typography color="ds.text_gray_medium" variant="h3" fontWeight={500}>
                 {name}
               </Typography>
-            </Box>
+            </GradientBox>
           ))}
         </Stack>
       </Stack>

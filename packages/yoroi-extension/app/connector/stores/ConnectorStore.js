@@ -361,7 +361,6 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
 
     this.actions.connector.cancelSignInTx.remove(this._cancelSignInTx);
     await ampli.dappPopupSignTransactionSubmitted();
-    this._closeWindow();
   };
   @action
   _cancelSignInTx: void => void = () => {
@@ -1065,7 +1064,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         s => ownAddressMap[s],
         addressedUtxos,
       );
-    } catch {
+    } catch (e) {
+      console.error('toTrezorSignRequest failed: ', e);
       runInAction(() => {
         this.hwWalletError = unsupportedTransactionError;
         this.isHwWalletErrorRecoverable = false;

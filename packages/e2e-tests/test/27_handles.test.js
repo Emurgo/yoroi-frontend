@@ -3,9 +3,9 @@ import BasePage from '../pages/basepage.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { getTestLogger } from '../utils/utils.js';
+import { getTestLogger, isLocalRun } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import { getTestString } from '../helpers/constants.js';
 import { RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
@@ -18,8 +18,7 @@ describe('Handle handles', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   const testDataPositive = [
@@ -31,11 +30,10 @@ describe('Handle handles', function () {
       userHandle: 'rahul.ada',
       provider: 'Cardano Name Service (CNS)',
     },
-    // Commented because of this https://emurgo.slack.com/archives/GCN6JLZK7/p1720772972481959
-    // {
-    //   userHandle: 'stackchain.blockchain',
-    //   provider: 'Unstoppable Domains',
-    // },
+    {
+      userHandle: 'stackchain.blockchain',
+      provider: 'Unstoppable Domains',
+    },
   ];
 
   const testDataNegative = [
@@ -47,14 +45,16 @@ describe('Handle handles', function () {
       userHandle: `${getTestString('', 7, false)}.ada`,
       provider: 'Cardano Name Service (CNS)',
     },
-    // Commented because of this https://emurgo.slack.com/archives/GCN6JLZK7/p1720772972481959
-    // {
-    //   userHandle: `${getTestString('', 10, false)}.blockchain`,
-    //   provider: 'Unstoppable Domains',
-    // },
+    {
+      userHandle: `${getTestString('', 10, false)}.blockchain`,
+      provider: 'Unstoppable Domains',
+    },
   ];
 
   for (const testDatum of testDataPositive) {
+    if (testDatum.provider === 'Unstoppable Domains' && isLocalRun()) {
+      continue;
+    }
     describe(`Positive case, ${testDatum.provider}`, function () {
       it(`${testDatum.provider}. Refresh page`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
@@ -108,6 +108,9 @@ describe('Handle handles', function () {
   }
 
   for (const testNegativeDatum of testDataNegative) {
+    if (testNegativeDatum.provider === 'Unstoppable Domains' && isLocalRun()) {
+      continue;
+    }
     describe(`Negative case, ${testNegativeDatum.provider}`, function () {
       it(`${testNegativeDatum.provider}. Refresh page`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);

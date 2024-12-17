@@ -36,18 +36,14 @@ import { ReactComponent as AttentionIcon } from '../../../../assets/images/atten
 
 const SBox = styled(Box)(({ theme }) => ({
   backgroundImage: theme.palette.ds.bg_gradient_3,
-  color: 'grayscale.min',
+  color: 'ds.gray_min',
 }));
 
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: SelectedExplorer,
   +amount: MultiToken,
-  +receivers: Array<string>,
-  +receiverHandle: ?{|
-    nameServer: string,
-    handle: string,
-  |},
+  +receiver: {| address: string, handle: {| handle: string, nameServer: string |} | void |},
   +totalAmount: MultiToken,
   +transactionFee: MultiToken,
   +transactionSize: ?string,
@@ -436,7 +432,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     const { form } = this;
     const { intl } = this.context;
     const walletPasswordField = form.$('walletPassword');
-    const { amount, receivers, isSubmitting, walletType } = this.props;
+    const { amount, receiver, isSubmitting, walletType } = this.props;
     const { passwordError } = this.state;
 
     const staleTxWarning = (
@@ -449,8 +445,6 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       </div>
     );
 
-    const { receiverHandle } = this.props;
-
     return (
       <div className={styles.component}>
         <Box
@@ -462,7 +456,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
           <Box width="506px" mx="auto">
             {this.renderError()}
             {this.props.staleTx ? <div className={styles.staleTxWarning}>{staleTxWarning}</div> : null}
-            {receiverHandle ? (
+            {receiver.handle != null ? (
               <div style={{ marginBottom: '20px' }}>
                 <Box mb="8px">
                   <Typography component="div" variant="body1" color="ds.text_gray_medium">
@@ -479,7 +473,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                     }}
                     id="wallet:send:confrimTransactionStep-receiverHandleInfo-text"
                   >
-                    {receiverHandle.nameServer}: {receiverHandle.handle}
+                    {receiver.handle?.nameServer}: {receiver.handle?.handle}
                   </Typography>
                 </Box>
               </div>
@@ -500,7 +494,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
                   }}
                   id="wallet:send:confrimTransactionStep-receiverAddress-text"
                 >
-                  {this.props.addressToDisplayString(receivers[0])}
+                  {this.props.addressToDisplayString(receiver.address)}
                 </Typography>
               </Box>
             </div>

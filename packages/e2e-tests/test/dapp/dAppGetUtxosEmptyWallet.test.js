@@ -11,7 +11,7 @@ import { getTestWalletName } from '../../helpers/constants.js';
 import { createWallet } from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
-describe('dApp, getUtxos, empty wallet, not auth', function () {
+describe('dApp, getUtxos, empty wallet', function () {
   const testWalletName = getTestWalletName();
   let newTestWallet = {
     name: '',

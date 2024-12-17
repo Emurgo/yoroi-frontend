@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './AssetsDropdown.scss';
-import { ReactComponent as DefaultAssetIcon } from '../../../../assets/images/assets-page/asset-no.inline.svg';
+import { ReactComponent as DefaultAssetIcon } from '../../../../assets/images/assets-page/token-default-logo.inline.svg';
 import { ReactComponent as ArrowUpIcon } from '../../../../assets/images/arrow-up.inline.svg';
 import { ReactComponent as ArrowDownIcon } from '../../../../assets/images/arrow-down.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
@@ -17,6 +17,17 @@ import { splitAmount } from '../../../../utils/formatters';
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
+const LogoIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path:nth-child(1)': {
+      fill: theme.palette.ds.bg_color_contrast_min,
+    },
+    '& path:nth-child(2)': {
       fill: theme.palette.ds.el_gray_medium,
     },
   },
@@ -60,9 +71,9 @@ export default class AssetsDropdown extends Component<Props, State> {
       return (
         <div className={styles.token}>
           <div className={styles.label}>
-            <IconWrapper>
+            <LogoIconWrapper>
               <DefaultAssetIcon />
-            </IconWrapper>
+            </LogoIconWrapper>
             <Typography color="ds.text_gray_medium">{token.label}</Typography>
           </div>
           <Typography color="ds.text_gray_medium" className={styles.amount}>

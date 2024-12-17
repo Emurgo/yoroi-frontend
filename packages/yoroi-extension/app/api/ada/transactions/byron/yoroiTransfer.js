@@ -101,7 +101,7 @@ export async function buildYoroiTransferTx(payload: {|
     return {
       recoveredBalance: totalBalance,
       fee,
-      id: RustModule.WalletV4.hash_transaction(signedTx.body()).to_hex(),
+      id: RustModule.WalletV4.FixedTransaction.from_hex(signedTx.to_hex()).transaction_hash().to_hex(),
       encodedTx: signedTx.to_bytes(),
       // only display unique addresses
       senders: Array.from(new Set(senderUtxos.map(utxo => utxo.receiver))),

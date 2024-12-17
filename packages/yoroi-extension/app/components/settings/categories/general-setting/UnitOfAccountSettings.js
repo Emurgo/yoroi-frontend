@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
-import { MenuItem, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
@@ -15,6 +15,10 @@ import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { withLayout } from '../../../../styles/context/layout';
+import type { InjectedLayoutProps } from '../../../../styles/context/layout';
+import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
+import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -88,7 +92,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
     const optionRenderer = option => {
       const SvgElem = option.svg;
       return (
-        <MenuItem
+        <MenuItemStyled
           key={option.value}
           value={option.value}
           sx={{ height: '80px' }}
@@ -117,18 +121,14 @@ export default class UnitOfAccountSettings extends Component<Props> {
               )}
             </Box>
           </Box>
-        </MenuItem>
+        </MenuItemStyled>
       );
     };
 
-    const lastUpdated =
-      lastUpdatedTimestamp != null ? new Date(lastUpdatedTimestamp).toLocaleString() : '-';
+    const lastUpdated = lastUpdatedTimestamp != null ? new Date(lastUpdatedTimestamp).toLocaleString() : '-';
 
     const dialog = this.props.isSubmitting ? (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <VerticalFlexContainer>
           <LoadingSpinner />
         </VerticalFlexContainer>
@@ -152,6 +152,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
           variant="body1"
           fontWeight={500}
           mb="16px"
+          color="ds.text_gray_medium"
         >
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </Typography>
@@ -162,6 +163,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
             marginTop: '0px',
           }}
         >
+          <GlobalStyledScrollbar />
           <Select
             formControlProps={{ error: !!error }}
             helperText={error && intl.formatMessage(error, error.values)}
@@ -180,6 +182,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
               <Typography component="div"
                 variant="body1"
                 fontWeight="400"
+                color="ds.text_gray_medium"
               >
                 {/* $FlowFixMe[prop-missing] */}
                 {value} - {currencies.filter(item => item.value === value)[0].name}
@@ -191,10 +194,11 @@ export default class UnitOfAccountSettings extends Component<Props> {
 
           {(
             <>
-              <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700" mt="4px">
+              <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
               </Typography>
-              <Typography component="div"
+              <Typography
+                component="div"
                 variant="body1"
                 fontWeight={500}
                 sx={{
@@ -202,6 +206,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                 }}
                 mt="16px"
                 mb="35px"
+                color="ds.text_gray_medium"
               >
                 <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
               </Typography>
