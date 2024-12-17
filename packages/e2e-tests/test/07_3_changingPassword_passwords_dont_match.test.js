@@ -8,7 +8,7 @@ import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import { getPassword } from '../helpers/constants.js';
 import { PASSWORDS_DONT_MATCH } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import { collectInfo, preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Changing wallet password. Negative. Wrong repeated password', function () {
   this.timeout(2 * oneMinute);
@@ -17,14 +17,8 @@ describe('Changing wallet password. Negative. Wrong repeated password', function
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
-    try {
-      webdriver = await driversPoolsManager.getDriverFromPool();
-      await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-      await waitTxPage(webdriver, logger);
-    } catch (error) {
-      await collectInfo(this, webdriver, logger);
-      throw error;
-    }
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   const oldPassword = getPassword();

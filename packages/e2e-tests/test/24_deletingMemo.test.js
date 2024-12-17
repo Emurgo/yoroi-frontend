@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import { getSnapshotedMemo as getOldMemo } from '../helpers/constants.js';
 
 describe('Deleting a memo', function () {
@@ -14,10 +14,9 @@ describe('Deleting a memo', function () {
   let logger = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1MemoAdded');
-    await waitTxPage(webdriver, logger);
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1MemoAdded', this);
   });
 
   it('Expand tx', async function () {

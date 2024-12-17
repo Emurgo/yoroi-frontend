@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
 import driversPoolsManager from '../../utils/driversPool.js';
-import { preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../../helpers/restoreWalletHelper.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 
 // Issue https://emurgo.atlassian.net/browse/YOEXT-1218
@@ -18,8 +18,7 @@ describe('Hide and show balance', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
   // check the default state. The balance should be displayed
   it('Check default state', async function () {

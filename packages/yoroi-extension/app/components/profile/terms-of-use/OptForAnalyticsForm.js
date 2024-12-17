@@ -230,7 +230,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
           ) : (
             <>
               <div className={styles.skip}>
-                <button type="button" onClick={() => this.onOpt(false)}>
+                <button type="button" onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
                   {intl.formatMessage(globalMessages.skipLabel)}
                 </button>
               </div>
@@ -239,6 +239,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                   variant="primary"
                   onClick={() => this.onOpt(true)}
                   loading={this.state.isSubmitting}
+                  id="startupAnalytics-accept-button"
                 >
                   {intl.formatMessage(messages.accept)}
                 </LoadingButton>
