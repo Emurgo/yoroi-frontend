@@ -23,7 +23,7 @@ export type Environment = 'production' | 'development';
 
 export const ApiKey: Record<Environment, string> = {
   production: 'd44950b777177c2ebee5f21f194c1231',
-  development: '52a980fd5fb8da5fc680687d7e991e18',
+  development: '52a980fd5fb8da5fc680687d7e991e18'
 };
 
 /**
@@ -34,26 +34,21 @@ export const DefaultConfiguration: BrowserOptions = {
     version: '7',
     branch: 'main',
     source: 'extension',
-    versionId: 'a0985241-d0c0-4bda-bc6d-271830af0067',
+    versionId: 'a0985241-d0c0-4bda-bc6d-271830af0067'
   },
   ...{
     ingestionMetadata: {
       sourceName: 'browser-typescript-ampli',
-      sourceVersion: '2.0.0',
-    },
-  },
+      sourceVersion: '2.0.0'
+    }
+  }
 };
 
-export interface LoadOptionsBase {
-  disabled?: boolean;
-}
+export interface LoadOptionsBase { disabled?: boolean }
 
-export type LoadOptionsWithEnvironment = LoadOptionsBase & {
-  environment: Environment;
-  client?: { configuration?: BrowserOptions };
-};
-export type LoadOptionsWithApiKey = LoadOptionsBase & { client: { apiKey: string; configuration?: BrowserOptions } };
-export type LoadOptionsWithClientInstance = LoadOptionsBase & { client: { instance: BrowserClient } };
+export type LoadOptionsWithEnvironment = LoadOptionsBase & { environment: Environment; client?: { configuration?: BrowserOptions; }; };
+export type LoadOptionsWithApiKey = LoadOptionsBase & { client: { apiKey: string; configuration?: BrowserOptions; } };
+export type LoadOptionsWithClientInstance = LoadOptionsBase & { client: { instance: BrowserClient; } };
 
 export type LoadOptions = LoadOptionsWithEnvironment | LoadOptionsWithApiKey | LoadOptionsWithClientInstance;
 
@@ -83,7 +78,7 @@ export interface ConnectWalletDetailsSubmittedProperties {
    * |---|---|
    * | Enum Values | Ledger, Trezor |
    */
-  hardware_wallet: 'Ledger' | 'Trezor';
+  hardware_wallet: "Ledger" | "Trezor";
 }
 
 export interface CreateWalletVerifyPhraseWordSelectedProperties {
@@ -108,7 +103,7 @@ export interface GovernanceConfirmTransactionPageViewedProperties {
    * |---|---|
    * | Enum Values | Delegate, Abstain, No Confidence |
    */
-  governance_selection: 'Delegate' | 'Abstain' | 'No Confidence';
+  governance_selection: "Delegate" | "Abstain" | "No Confidence";
 }
 
 export interface GovernanceTransactionSuccessPageViewedProperties {
@@ -117,7 +112,7 @@ export interface GovernanceTransactionSuccessPageViewedProperties {
    * |---|---|
    * | Enum Values | Delegate, Abstain, No Confidence |
    */
-  governance_selection: 'Delegate' | 'Abstain' | 'No Confidence';
+  governance_selection: "Delegate" | "Abstain" | "No Confidence";
 }
 
 export interface NetworkSelectedProperties {
@@ -128,7 +123,7 @@ export interface NetworkSelectedProperties {
    * |---|---|
    * | Enum Values | preprod, preview, mainnet, sancho |
    */
-  from_network: 'preprod' | 'preview' | 'mainnet' | 'sancho';
+  from_network: "preprod" | "preview" | "mainnet" | "sancho";
   /**
    * Network selected
    *
@@ -136,7 +131,7 @@ export interface NetworkSelectedProperties {
    * |---|---|
    * | Enum Values | preprod, preview, mainnet, sancho |
    */
-  to_network: 'preprod' | 'preview' | 'mainnet' | 'sancho';
+  to_network: "preprod" | "preview" | "mainnet" | "sancho";
 }
 
 export interface NftGalleryDetailsNavigationProperties {
@@ -147,7 +142,7 @@ export interface NftGalleryDetailsNavigationProperties {
    * |---|---|
    * | Enum Values | Next, Previous |
    */
-  nft_navigation: 'Next' | 'Previous';
+  nft_navigation: "Next" | "Previous";
 }
 
 export interface NftGalleryDetailsTabProperties {
@@ -156,7 +151,7 @@ export interface NftGalleryDetailsTabProperties {
    * |---|---|
    * | Enum Values | Overview, Metadata |
    */
-  nft_tab: 'Overview' | 'Metadata';
+  nft_tab: "Overview" | "Metadata";
 }
 
 export interface NftGalleryGridViewSelectedProperties {
@@ -167,7 +162,7 @@ export interface NftGalleryGridViewSelectedProperties {
    * |---|---|
    * | Enum Values | 4_rows, 6_rows |
    */
-  nft_grid_view?: '4_rows' | '6_rows';
+  nft_grid_view?: "4_rows" | "6_rows";
 }
 
 export interface NftGalleryPageViewedProperties {
@@ -204,7 +199,7 @@ export interface PortfolioTokenDetailsProperties {
    * |---|---|
    * | Enum Values | Performance, Overview, Transactions |
    */
-  token_details_tab: 'Performance' | 'Overview' | 'Transactions';
+  token_details_tab: "Performance" | "Overview" | "Transactions";
 }
 
 export interface PortfolioTokensListPageViewedProperties {
@@ -215,7 +210,7 @@ export interface PortfolioTokensListPageViewedProperties {
    * |---|---|
    * | Enum Values | Wallet Token, Dapps Token |
    */
-  tokens_tab: 'Wallet Token' | 'Dapps Token';
+  tokens_tab: "Wallet Token" | "Dapps Token";
 }
 
 export interface PortfolioTokensListSearchActivatedProperties {
@@ -244,7 +239,7 @@ export interface ReceiveCopyAddressClickedProperties {
    * |---|---|
    * | Enum Values | CTA Copy Address, Tap Address Details, Long Press wallet Address |
    */
-  copy_address_location: 'CTA Copy Address' | 'Tap Address Details' | 'Long Press wallet Address';
+  copy_address_location: "CTA Copy Address" | "Tap Address Details" | "Long Press wallet Address";
 }
 
 export interface RestoreWalletEnterPhraseStepStatusProperties {
@@ -257,7 +252,7 @@ export interface RestoreWalletEnterPhraseStepViewedProperties {
    * |---|---|
    * | Enum Values | 15, 24 |
    */
-  recovery_phrase_lenght: '15' | '24';
+  recovery_phrase_lenght: "15" | "24";
 }
 
 export interface SendSelectAssetSelectedProperties {
@@ -523,7 +518,7 @@ export interface SwapConfirmedPageViewedProperties {
    * |---|---|
    * | Enum Values | Open Orders, Completed Orders |
    */
-  swap_tab: 'Open Orders' | 'Completed Orders';
+  swap_tab: "Open Orders" | "Completed Orders";
 }
 
 export interface SwapInitiatedProperties {
@@ -551,7 +546,7 @@ export interface SwapInitiatedProperties {
    * |---|---|
    * | Enum Values | limit, market |
    */
-  order_type: 'limit' | 'market';
+  order_type: "limit" | "market";
   /**
    * The default slippage tolerance is 1%, but users are free to change the slippage.
    *
@@ -605,7 +600,7 @@ export interface SwapOrderSelectedProperties {
    * |---|---|
    * | Enum Values | limit, market |
    */
-  order_type?: 'limit' | 'market';
+  order_type?: "limit" | "market";
   /**
    * The name of liquidity pool used for this swap transaction
    */
@@ -681,7 +676,7 @@ export interface SwapOrderSubmittedProperties {
    * |---|---|
    * | Enum Values | limit, market |
    */
-  order_type?: 'limit' | 'market';
+  order_type?: "limit" | "market";
   /**
    * The name of liquidity pool used for this swap transaction
    */
@@ -745,7 +740,7 @@ export interface ThemeSelectedProperties {
    * |---|---|
    * | Enum Values | auto, light, dark |
    */
-  theme: 'auto' | 'light' | 'dark';
+  theme: "auto" | "light" | "dark";
 }
 
 export interface SendProperties {
@@ -813,7 +808,7 @@ export interface SwapProperties {
    * |---|---|
    * | Enum Values | limit, market |
    */
-  order_type?: 'limit' | 'market';
+  order_type?: "limit" | "market";
   /**
    * The name of liquidity pool used for this swap transaction
    */
@@ -875,7 +870,9 @@ export class ClaimAdaPageViewed implements BaseEvent {
 export class ClaimAdaTransactionSettled implements BaseEvent {
   event_type = 'Claim Ada Transaction Settled';
 
-  constructor(public event_properties: ClaimAdaTransactionSettledProperties) {
+  constructor(
+    public event_properties: ClaimAdaTransactionSettledProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -883,7 +880,9 @@ export class ClaimAdaTransactionSettled implements BaseEvent {
 export class ClaimAdaTransactionSubmitted implements BaseEvent {
   event_type = 'Claim Ada Transaction Submitted';
 
-  constructor(public event_properties: ClaimAdaTransactionSubmittedProperties) {
+  constructor(
+    public event_properties: ClaimAdaTransactionSubmittedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -903,7 +902,9 @@ export class ConnectWalletDetailsPageViewed implements BaseEvent {
 export class ConnectWalletDetailsSubmitted implements BaseEvent {
   event_type = 'Connect Wallet Details Submitted';
 
-  constructor(public event_properties: ConnectWalletDetailsSubmittedProperties) {
+  constructor(
+    public event_properties: ConnectWalletDetailsSubmittedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -951,7 +952,9 @@ export class CreateWalletVerifyPhraseStepViewed implements BaseEvent {
 export class CreateWalletVerifyPhraseWordSelected implements BaseEvent {
   event_type = 'Create Wallet Verify Phrase Word Selected';
 
-  constructor(public event_properties?: CreateWalletVerifyPhraseWordSelectedProperties) {
+  constructor(
+    public event_properties?: CreateWalletVerifyPhraseWordSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -963,7 +966,9 @@ export class DappPopupAddCollateralPageViewed implements BaseEvent {
 export class DappPopupConnectWalletPageViewed implements BaseEvent {
   event_type = 'Dapp Popup Connect Wallet Page Viewed';
 
-  constructor(public event_properties: DappPopupConnectWalletPageViewedProperties) {
+  constructor(
+    public event_properties: DappPopupConnectWalletPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -987,7 +992,9 @@ export class GovernanceChooseDrepPageViewed implements BaseEvent {
 export class GovernanceConfirmTransactionPageViewed implements BaseEvent {
   event_type = 'Governance Confirm Transaction Page Viewed';
 
-  constructor(public event_properties: GovernanceConfirmTransactionPageViewedProperties) {
+  constructor(
+    public event_properties: GovernanceConfirmTransactionPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -999,7 +1006,9 @@ export class GovernanceDashboardPageViewed implements BaseEvent {
 export class GovernanceTransactionSuccessPageViewed implements BaseEvent {
   event_type = 'Governance Transaction Success Page Viewed';
 
-  constructor(public event_properties: GovernanceTransactionSuccessPageViewedProperties) {
+  constructor(
+    public event_properties: GovernanceTransactionSuccessPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1007,7 +1016,9 @@ export class GovernanceTransactionSuccessPageViewed implements BaseEvent {
 export class NetworkSelected implements BaseEvent {
   event_type = 'Network Selected';
 
-  constructor(public event_properties: NetworkSelectedProperties) {
+  constructor(
+    public event_properties: NetworkSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1019,7 +1030,9 @@ export class NftGalleryDetailsImageViewed implements BaseEvent {
 export class NftGalleryDetailsNavigation implements BaseEvent {
   event_type = 'NFT Gallery Details Navigation';
 
-  constructor(public event_properties: NftGalleryDetailsNavigationProperties) {
+  constructor(
+    public event_properties: NftGalleryDetailsNavigationProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1031,7 +1044,9 @@ export class NftGalleryDetailsPageViewed implements BaseEvent {
 export class NftGalleryDetailsTab implements BaseEvent {
   event_type = 'NFT Gallery Details Tab';
 
-  constructor(public event_properties: NftGalleryDetailsTabProperties) {
+  constructor(
+    public event_properties: NftGalleryDetailsTabProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1039,7 +1054,9 @@ export class NftGalleryDetailsTab implements BaseEvent {
 export class NftGalleryGridViewSelected implements BaseEvent {
   event_type = 'NFT Gallery Grid View Selected';
 
-  constructor(public event_properties?: NftGalleryGridViewSelectedProperties) {
+  constructor(
+    public event_properties?: NftGalleryGridViewSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1047,7 +1064,9 @@ export class NftGalleryGridViewSelected implements BaseEvent {
 export class NftGalleryPageViewed implements BaseEvent {
   event_type = 'NFT Gallery Page Viewed';
 
-  constructor(public event_properties: NftGalleryPageViewedProperties) {
+  constructor(
+    public event_properties: NftGalleryPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1055,7 +1074,9 @@ export class NftGalleryPageViewed implements BaseEvent {
 export class NftGallerySearchActivated implements BaseEvent {
   event_type = 'NFT Gallery Search Activated';
 
-  constructor(public event_properties: NftGallerySearchActivatedProperties) {
+  constructor(
+    public event_properties: NftGallerySearchActivatedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1067,7 +1088,9 @@ export class OnboardingAnalyticsPageViewed implements BaseEvent {
 export class PortfolioTokenDetails implements BaseEvent {
   event_type = 'Portfolio Token Details';
 
-  constructor(public event_properties: PortfolioTokenDetailsProperties) {
+  constructor(
+    public event_properties: PortfolioTokenDetailsProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1075,7 +1098,9 @@ export class PortfolioTokenDetails implements BaseEvent {
 export class PortfolioTokensListPageViewed implements BaseEvent {
   event_type = 'Portfolio Tokens List Page Viewed';
 
-  constructor(public event_properties: PortfolioTokensListPageViewedProperties) {
+  constructor(
+    public event_properties: PortfolioTokensListPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1083,7 +1108,9 @@ export class PortfolioTokensListPageViewed implements BaseEvent {
 export class PortfolioTokensListSearchActivated implements BaseEvent {
   event_type = 'Portfolio Tokens List Search Activated';
 
-  constructor(public event_properties: PortfolioTokensListSearchActivatedProperties) {
+  constructor(
+    public event_properties: PortfolioTokensListSearchActivatedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1091,7 +1118,9 @@ export class PortfolioTokensListSearchActivated implements BaseEvent {
 export class ReceiveAmountGeneratedPageViewed implements BaseEvent {
   event_type = 'Receive Amount Generated Page Viewed';
 
-  constructor(public event_properties: ReceiveAmountGeneratedPageViewedProperties) {
+  constructor(
+    public event_properties: ReceiveAmountGeneratedPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1103,7 +1132,9 @@ export class ReceiveAmountPageViewed implements BaseEvent {
 export class ReceiveCopyAddressClicked implements BaseEvent {
   event_type = 'Receive Copy Address Clicked';
 
-  constructor(public event_properties: ReceiveCopyAddressClickedProperties) {
+  constructor(
+    public event_properties: ReceiveCopyAddressClickedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1135,7 +1166,9 @@ export class RestoreWalletDetailsStepViewed implements BaseEvent {
 export class RestoreWalletEnterPhraseStepStatus implements BaseEvent {
   event_type = 'Restore Wallet Enter Phrase Step Status';
 
-  constructor(public event_properties: RestoreWalletEnterPhraseStepStatusProperties) {
+  constructor(
+    public event_properties: RestoreWalletEnterPhraseStepStatusProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1143,7 +1176,9 @@ export class RestoreWalletEnterPhraseStepStatus implements BaseEvent {
 export class RestoreWalletEnterPhraseStepViewed implements BaseEvent {
   event_type = 'Restore Wallet Enter Phrase Step Viewed';
 
-  constructor(public event_properties: RestoreWalletEnterPhraseStepViewedProperties) {
+  constructor(
+    public event_properties: RestoreWalletEnterPhraseStepViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1171,7 +1206,9 @@ export class SendSelectAssetPageViewed implements BaseEvent {
 export class SendSelectAssetSelected implements BaseEvent {
   event_type = 'Send Select Asset Selected';
 
-  constructor(public event_properties: SendSelectAssetSelectedProperties) {
+  constructor(
+    public event_properties: SendSelectAssetSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1179,7 +1216,9 @@ export class SendSelectAssetSelected implements BaseEvent {
 export class SendSelectAssetUpdated implements BaseEvent {
   event_type = 'Send Select Asset Updated';
 
-  constructor(public event_properties: SendSelectAssetUpdatedProperties) {
+  constructor(
+    public event_properties: SendSelectAssetUpdatedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1187,7 +1226,9 @@ export class SendSelectAssetUpdated implements BaseEvent {
 export class SendSummaryPageViewed implements BaseEvent {
   event_type = 'Send Summary Page Viewed';
 
-  constructor(public event_properties: SendSummaryPageViewedProperties) {
+  constructor(
+    public event_properties: SendSummaryPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1195,7 +1236,9 @@ export class SendSummaryPageViewed implements BaseEvent {
 export class SendSummarySubmitted implements BaseEvent {
   event_type = 'Send Summary Submitted';
 
-  constructor(public event_properties: SendSummarySubmittedProperties) {
+  constructor(
+    public event_properties: SendSummarySubmittedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1215,7 +1258,9 @@ export class StakingCenterPageViewed implements BaseEvent {
 export class SwapAssetFromChanged implements BaseEvent {
   event_type = 'Swap Asset From Changed';
 
-  constructor(public event_properties: SwapAssetFromChangedProperties) {
+  constructor(
+    public event_properties: SwapAssetFromChangedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1223,7 +1268,9 @@ export class SwapAssetFromChanged implements BaseEvent {
 export class SwapAssetToChanged implements BaseEvent {
   event_type = 'Swap Asset To Changed';
 
-  constructor(public event_properties: SwapAssetToChangedProperties) {
+  constructor(
+    public event_properties: SwapAssetToChangedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1231,7 +1278,9 @@ export class SwapAssetToChanged implements BaseEvent {
 export class SwapCancelationSubmitted implements BaseEvent {
   event_type = 'Swap Cancelation Submitted';
 
-  constructor(public event_properties: SwapCancelationSubmittedProperties) {
+  constructor(
+    public event_properties: SwapCancelationSubmittedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1239,7 +1288,9 @@ export class SwapCancelationSubmitted implements BaseEvent {
 export class SwapConfirmedPageViewed implements BaseEvent {
   event_type = 'Swap Confirmed  Page Viewed';
 
-  constructor(public event_properties: SwapConfirmedPageViewedProperties) {
+  constructor(
+    public event_properties: SwapConfirmedPageViewedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1247,7 +1298,9 @@ export class SwapConfirmedPageViewed implements BaseEvent {
 export class SwapInitiated implements BaseEvent {
   event_type = 'Swap Initiated';
 
-  constructor(public event_properties: SwapInitiatedProperties) {
+  constructor(
+    public event_properties: SwapInitiatedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1255,7 +1308,9 @@ export class SwapInitiated implements BaseEvent {
 export class SwapOrderSelected implements BaseEvent {
   event_type = 'Swap Order Selected';
 
-  constructor(public event_properties: SwapOrderSelectedProperties) {
+  constructor(
+    public event_properties: SwapOrderSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1263,7 +1318,9 @@ export class SwapOrderSelected implements BaseEvent {
 export class SwapOrderSubmitted implements BaseEvent {
   event_type = 'Swap Order Submitted';
 
-  constructor(public event_properties: SwapOrderSubmittedProperties) {
+  constructor(
+    public event_properties: SwapOrderSubmittedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1275,7 +1332,9 @@ export class SwapPoolChanged implements BaseEvent {
 export class SwapSlippageChanged implements BaseEvent {
   event_type = 'Swap Slippage Changed';
 
-  constructor(public event_properties: SwapSlippageChangedProperties) {
+  constructor(
+    public event_properties: SwapSlippageChangedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
@@ -1283,7 +1342,9 @@ export class SwapSlippageChanged implements BaseEvent {
 export class ThemeSelected implements BaseEvent {
   event_type = 'Theme Selected';
 
-  constructor(public event_properties: ThemeSelectedProperties) {
+  constructor(
+    public event_properties: ThemeSelectedProperties,
+  ) {
     this.event_properties = event_properties;
   }
 }
