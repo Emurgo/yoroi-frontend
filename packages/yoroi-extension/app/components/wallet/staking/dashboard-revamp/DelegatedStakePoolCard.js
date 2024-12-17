@@ -36,7 +36,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
 
     return (
       <UndelegateButton
-        variant="text"
+        variant="tertiary"
         onClick={undelegate}
         disabled={!undelegate}
         sx={{

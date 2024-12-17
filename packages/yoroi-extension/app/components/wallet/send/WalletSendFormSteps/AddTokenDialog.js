@@ -407,7 +407,8 @@ export default class AddTokenDialog extends Component<Props, State> {
                 height="320px"
                 overflow="auto"
                 pr={currentTokensList.length > 4 ? '4px' : '24px'}
-                py="10px"
+                pb="10px"
+                pt="20px"
                 className="CurrentTokensList"
               >
                 {currentTokensList.map(token => (

@@ -18,7 +18,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import ExplorableHashContainer from '../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { truncateAddressShort, splitAmount, truncateToken } from '../../utils/formatters';
-import { ReactComponent as NoTransactionModernSvg } from '../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import { ReactComponent as NoTransactionsSvg } from '../../assets/images/transaction/no-transactions.inline.svg';
 import { hiddenAmount } from '../../utils/strings';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -264,9 +264,11 @@ export default class WalletReceiveRevamp extends Component<Props> {
         <div className={styles.component}>
           {this.props.header}
           <div className={styles.notFound} id={this.locationId + '-noAddresses-component'}>
-            <NoTransactionModernSvg />
-            <h1>{intl.formatMessage(messages.noResultsFoundLabel)}</h1>
-            <div>{intl.formatMessage(messages.notFoundAnyAddresses)}</div>
+            <NoTransactionsSvg />
+            <Typography variant="h4" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(messages.noResultsFoundLabel)}
+            </Typography>
+            <Typography variant="body1" color="ds.text_gray_low">{intl.formatMessage(messages.notFoundAnyAddresses)}</Typography>
           </div>
         </div>
       );
