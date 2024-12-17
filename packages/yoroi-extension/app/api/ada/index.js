@@ -717,7 +717,7 @@ export default class AdaApi {
         );
 
         return {
-          txHash: Scope.WalletV4.hash_transaction(signedTx.body()).to_hex(),
+          txHash: Scope.WalletV4.FixedTransaction.from_hex(signedTx.to_hex()).transaction_hash().to_hex(),
           encodedTx: signedTx.to_bytes(),
         }
       })
@@ -1579,13 +1579,13 @@ export default class AdaApi {
       );
 
       {
-        const body = unsignedTxResponse.txBuilder.build();
+        const tx = unsignedTxResponse.txBuilder.build_tx();
         for (const withdrawal of request.withdrawals) {
           if (withdrawal.privateKey != null) {
             const { privateKey } = withdrawal;
             neededKeys.wits.add(
               RustModule.WalletV4.make_vkey_witness(
-                RustModule.WalletV4.hash_transaction(body),
+                RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash(),
                 privateKey
               ).to_hex()
             );
