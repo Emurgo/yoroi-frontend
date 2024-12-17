@@ -39,6 +39,10 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
       const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
       const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
 
+      if (tokenPrice === undefined && !isPrimaryToken) {
+        return '-';
+      }
+
       const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
         .bn.times(tokenPrice ?? 1)
         .times(String(ptPrice))
