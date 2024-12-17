@@ -8,7 +8,7 @@ import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
-import { collectInfo, preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Removing a wallet, one wallet is added', function () {
   this.timeout(2 * oneMinute);
@@ -17,14 +17,8 @@ describe('Removing a wallet, one wallet is added', function () {
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
-    try {
-      webdriver = await driversPoolsManager.getDriverFromPool();
-      await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-      await waitTxPage(webdriver, logger);
-    } catch (error) {
-      await collectInfo(this, webdriver, logger);
-      throw new Error(error);
-    }
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   it('Remove wallet', async function () {
