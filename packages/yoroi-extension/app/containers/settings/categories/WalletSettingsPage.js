@@ -59,7 +59,7 @@ export default class WalletSettingsPage extends Component <StoresAndActionsProps
       <div id="walletSettingsPage">
         {this.getDialog(selectedWallet.publicDeriverId)}
         {profile.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
             {intl.formatMessage(globalMessages.walletLabel)}
           </Typography>
         )}

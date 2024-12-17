@@ -1064,7 +1064,8 @@ export default class ConnectorStore extends Store<StoresMap, ActionsMap> {
         s => ownAddressMap[s],
         addressedUtxos,
       );
-    } catch {
+    } catch (e) {
+      console.error('toTrezorSignRequest failed: ', e);
       runInAction(() => {
         this.hwWalletError = unsupportedTransactionError;
         this.isHwWalletErrorRecoverable = false;

@@ -3,7 +3,6 @@
 import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme, styled } from '@mui/material';
-import { ReactComponent as ErrorIcon } from '../../assets/images/forms/error.inline.svg';
 import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inline.svg';
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
@@ -121,7 +120,7 @@ function TextField({
           </InputAdornment>
         ) : type === 'password' ? (
           <InputAdornment position="end" sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}>
-            {Boolean(error) === true && !isRevampTheme ? <ErrorIcon /> : done === true && !isRevampTheme ? <DoneIcon /> : null}
+            {done === true && !isRevampTheme ? <DoneIcon /> : null}
             <SIconButton
               aria-label="toggle password visibility"
               onClick={handleClickShowPassword}
@@ -137,16 +136,14 @@ function TextField({
           </InputAdornment>
         ) : QRHandler ? (
           <InputAdornment position="end" sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}>
-            {Boolean(error) === true && !isRevampTheme ? <ErrorIcon /> : done === true && !isRevampTheme ? <DoneIcon /> : null}
+            {done === true && !isRevampTheme ? <DoneIcon /> : null}
             <SIconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
               <QRLogo />
             </SIconButton>
           </InputAdornment>
         ) : (
           <InputAdornment position="end">
-            {Boolean(error) === true && !isRevampTheme ? (
-              <ErrorIcon id="input-error-icon" />
-            ) : (done === true && !isRevampTheme) || greenCheck ? (
+            {(done === true && !isRevampTheme) || greenCheck ? (
               <DoneIcon id="input-done-icon" />
             ) : null}
           </InputAdornment>

@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import styles from './ExportPublicKeyDialog.scss';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
 import CodeBlock from '../../widgets/CodeBlock';
@@ -11,6 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
+import { Box, List, ListItem, Typography, styled } from '@mui/material';
 
 export const messages: * = defineMessages({
   publicKeyExplanationLine1: {
@@ -30,12 +30,23 @@ export const messages: * = defineMessages({
 type Props = {|
   +onClose: void => void,
   +publicKeyHex: string,
-  +pathToPublic: Array<number>
+  +pathToPublic: Array<number>,
 |};
+
+const SListItem = styled(ListItem)(({ theme }) => ({
+  paddingLeft: '8px',
+  paddingBottom: '0px',
+  '::before': {
+    content: '"●"',
+    marginRight: '0.4em',
+    fontSize: '0.8em',
+    color: theme.palette.ds.text_gray_medium,
+  },
+}));
 
 @observer
 export default class ExportPublicKeyDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
@@ -55,71 +66,94 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         className="ExportWalletDialogContainer"
       >
-        <div className={styles.component}>
-          <div className={styles.header}>
-            <p><FormattedHTMLMessage {...messages.publicKeyExplanationLine1} /></p>
-            <p><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></p>
-            <p>{intl.formatMessage(globalMessages.whyUse)}</p>
-            <ul>
-              <li key="1">{intl.formatMessage(messages.reason1)}</li>
-              <li key="2">{intl.formatMessage(messages.reason2)}</li>
-            </ul>
-          </div>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexDirection: 'column',
+          }}
+        >
+          <Box marginBottom="20px">
+            <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
+              <FormattedHTMLMessage {...messages.publicKeyExplanationLine1} />
+            </Typography>
+            <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
+              <FormattedHTMLMessage {...globalMessages.publicKeyExplanation} />
+            </Typography>
+            <Typography variant="body1" color="ds.text_gray_medium">
+              {intl.formatMessage(globalMessages.whyUse)}
+            </Typography>
+            <List disablePadding>
+              <SListItem key="1">
+                <Typography color="ds.text_gray_medium" mb="0px">
+                  {intl.formatMessage(messages.reason1)}
+                </Typography>
+              </SListItem>
+              <SListItem key="2">
+                <Typography color="ds.text_gray_medium" mb="0px">
+                  {intl.formatMessage(messages.reason2)}
+                </Typography>
+              </SListItem>
+            </List>
+          </Box>
           {this.renderQrCode(walletInfo)}
           {this.renderKey(walletInfo.publicKeyHex)}
           {this.renderPath(walletInfo.path)}
-        </div>
+        </Box>
       </Dialog>
     );
   }
 
-  renderQrCode: {|
+  renderQrCode: ({|
     publicKeyHex: string,
     path: Array<number>,
-  |} => Node = (walletInfo) => {
+  |}) => Node = walletInfo => {
     return (
       <>
-        <div align="center">
-          <QrCodeWrapper
-            value={JSON.stringify(walletInfo)}
-            size={152}
-          />
-        </div>
-        <br />
-        <br />
+        <Box display="flex" justifyContent="center" marginBottom="16px">
+          <Box
+            padding="16px"
+            width="184px"
+            height="184px"
+            borderRadius="8px"
+            sx={{
+              backgroundColor: 'ds.white_static',
+            }}
+          >
+            <QrCodeWrapper value={JSON.stringify(walletInfo)} size={152} />
+          </Box>
+        </Box>
       </>
     );
-  }
+  };
 
-  renderKey: string => Node = (key) => {
+  renderKey: string => Node = key => {
     const { intl } = this.context;
     return (
       <>
-        <span className={styles.label}>
+        <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(globalMessages.keyLabel)}
-        </span>
-        <CodeBlock
-          code={key}
-        />
+        </Typography>
+        <CodeBlock code={key} />
         <br />
       </>
     );
-  }
+  };
 
-  renderPath: Array<number> => Node = (addressing) => {
+  renderPath: (Array<number>) => Node = addressing => {
     const { intl } = this.context;
     return (
       <>
-        <span className={styles.label}>
+        <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
-        </span>
-        <div className={styles.derivation}>
-          <div className={styles.hash}>
+        </Typography>
+        <Box fontFamily="RobotoMono">
+          <Typography variant="body1" color="ds.text_gray_low">
             {toDerivationPathString(addressing)}
-          </div>
-        </div>
+          </Typography>
+        </Box>
         <br />
       </>
     );
-  }
+  };
 }

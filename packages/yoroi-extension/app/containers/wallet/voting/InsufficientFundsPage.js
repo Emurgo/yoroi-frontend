@@ -6,6 +6,7 @@ import FullscreenMessage from '../../../components/wallet/layouts/FullscreenMess
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
+import { ReactComponent as InsufficientFundsSvg } from '../../../assets/images/uri/invalid-uri.inline.svg';
 
 export const messages: * = defineMessages({
   title: {
@@ -44,6 +45,7 @@ export default class InsufficientFundsPage extends Component<Props> {
             tokenName: this.props.tokenName,
           }
         )}
+        image={<InsufficientFundsSvg />}
       />
     );
   }

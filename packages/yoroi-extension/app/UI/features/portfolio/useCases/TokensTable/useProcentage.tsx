@@ -2,18 +2,25 @@ import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { formatValue } from '../../common/components/PortfolioHeader';
+import { TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { priceChange } from '../../common/helpers/priceChange';
+import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { bigNumberToBigInt } from './TableColumnsChip';
 
 export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data30d }) => {
   const { primaryTokenInfo } = usePortfolio();
+  const { data: ptTokenDataInterval7d } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.WEEK, {
+    info: { id: '' },
+  });
+  const { data: ptTokenDataInterval1M } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.MONTH, {
+    info: { id: '' },
+  });
 
   // Helper to calculate fiat value and unit price for a token
   const calculateTotalFiatForToken = token => {
     const isPrimaryToken = token.id === '-';
     const secondaryToken24Activity = data24h?.[token.info.id];
-
     const tokenPrice =
       isPrimaryToken && !secondaryToken24Activity ? ptActivity?.close : secondaryToken24Activity?.[1].price?.close || 1;
 
@@ -34,6 +41,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
 
   const getTokenActivityChange = (tokenId, activityData, isPrimaryToken) => {
     const activity = activityData?.[tokenId];
+
     return isPrimaryToken
       ? { open: ptActivity?.open, close: ptActivity?.close }
       : { open: activity?.[1].price?.open, close: activity?.[1].price?.close };
@@ -71,12 +79,12 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
           totalAmount: totalValue,
           price: unitPrice,
           '24h': changePercent24,
-          '1W': Number(changePercent7d),
-          '1M': changePercent30d,
+          '1W': isPrimaryToken ? ptTokenDataInterval7d?.[167]?.changePercent : changePercent7d,
+          '1M': isPrimaryToken ? ptTokenDataInterval1M?.[179]?.changePercent : changePercent30d,
         };
       })
       .sort((a, b) => b.percentage - a.percentage);
-  }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo]);
+  }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo, ptTokenDataInterval7d, ptTokenDataInterval1M]);
 
   return processedData;
 };

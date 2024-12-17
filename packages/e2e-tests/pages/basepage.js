@@ -193,10 +193,11 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
+    await this.sleep(250);
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
-    await this.sleep(200);
+    await this.sleep(500);
     await input.sendKeys(Key.NULL);
-    await input.sendKeys(Key.DELETE);
+    await input.sendKeys(Key.BACK_SPACE);
   }
   async setImplicitTimeout(timeoutMs, functionName) {
     this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
@@ -266,7 +267,7 @@ class BasePage {
       .logs()
       .get(logging.Type.DRIVER, logging.Level.INFO);
       const driverLogsStrings = driverLogEntries.map(l =>`[${l.level}] [${l.timestamp}] ${l.message}`);
-    await writeFile(driverLogsPaths, driverLogsStrings.join(','));
+    await writeFile(driverLogsPaths, driverLogsStrings.join(''));
   }
   async waitForElementLocated(locator) {
     this.logger.info(
@@ -331,7 +332,7 @@ class BasePage {
   ) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
-    await this.setImplicitTimeout(oneSecond, this.customWaiter.name);
+    await this.setImplicitTimeout(halfSecond, this.customWaiter.name);
 
     while (endTime >= Date.now()) {
       const conditionState = await conditionFunc();

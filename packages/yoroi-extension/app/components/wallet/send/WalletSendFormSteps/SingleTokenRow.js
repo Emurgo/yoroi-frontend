@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './SingleTokenRow.scss';
-import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import {
   truncateAddressShort,
   formattedAmountToNaturalUnits,
@@ -18,6 +17,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
 import { Box, Typography, styled } from '@mui/material';
+import TokenImage from './TokenImage';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -25,7 +25,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
       fill: theme.palette.ds.gray_max,
     },
     '& rect': {
-      fill: theme.palette.ds.bg_color_max,
+      fill: theme.palette.ds.bg_color_contrast_min,
     },
   },
 }));
@@ -99,13 +99,31 @@ export default class SingleTokenRow extends Component<Props, State> {
             [styles.inputError]: !isValid,
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
-          border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
-          borderColor={this.props.isTokenIncluded(token.info) ? 'grayscale.400' : 'transparent'}
+          sx={{
+            border: this.props.isTokenIncluded(token.info) ? '2px solid' : '2px solid',
+            borderColor: this.props.isTokenIncluded(token.info) ? 'ds.el_gray_max' : 'transparent',
+            '&:hover': { border: '2px solid', borderColor: 'ds.el_gray_max' },
+          }}
         >
           <div className={styles.amountTokenName}>
-            <div className={styles.logo}>
-              <NoAssetLogo />
-            </div>
+            <Box
+              width={30}
+              height={30}
+              marginRight="16px"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                '> img': {
+                  objectFit: 'cover',
+                  display: 'inline-block',
+                  borderRadius: '4px',
+                },
+              }}
+            >
+              <TokenImage image={token.info.Metadata.logo ?? null} name={token.label} width="30px" height="30px" />
+            </Box>
             <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
               {truncateAddressShort(token.label, token.label.startsWith('asset') ? 14 : 12)}
             </Typography>
@@ -135,11 +153,11 @@ export default class SingleTokenRow extends Component<Props, State> {
                   autoFocus
                 />
               </Box>
-              <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
-                <IconWrapper className={styles.closeIcon}>
+              <Box component="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
+                <IconWrapper>
                   <CloseIcon />
                 </IconWrapper>
-              </button>
+              </Box>
               <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
             </>
           ) : (
