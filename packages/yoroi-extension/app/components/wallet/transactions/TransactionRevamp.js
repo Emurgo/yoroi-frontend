@@ -362,7 +362,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     if (request.assets.length === 1) {
       const entry = request.assets[0];
       return (
-        <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_max">
+        <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_medium">
           {this.renderAmountDisplay({ entry })} {this.getTicker(entry)}
         </Typography>
       );
@@ -557,11 +557,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: isFailedTransaction
-                      ? 'var(--yoroi-palette-error-100)'
-                      : isPendingTransaction
-                      ? 'grayscale.400'
-                      : 'grayscale.900',
+                    color: isFailedTransaction ? 'ds.text_error' : isPendingTransaction ? 'grayscale.400' : 'grayscale.900',
                     textTransform: 'capitalize',
                   }}
                   id={txIdBasePart + '-txStatus-text'}
@@ -795,10 +791,10 @@ export default class TransactionRevamp extends Component<Props, State> {
                       {this.props.memo != null ? (
                         <Box
                           type="button"
-                          onClick={onEditMemo.bind(this, data)}                          
+                          onClick={onEditMemo.bind(this, data)}
                           marginLeft="6px"
                           sx={{
-                            cursor: 'pointer'
+                            cursor: 'pointer',
                           }}
                           id={txIdFullInfoBasePart + '-editMemo-button'}
                         >
@@ -814,7 +810,7 @@ export default class TransactionRevamp extends Component<Props, State> {
                           onClick={onAddMemo.bind(this, data)}
                           marginLeft="6px"
                           sx={{
-                            cursor: 'pointer'
+                            cursor: 'pointer',
                           }}
                           id={txIdFullInfoBasePart + '-addMemo-button'}
                         >

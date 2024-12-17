@@ -8,7 +8,7 @@ import {
   FormHelperText,
   InputLabel,
   LightButton,
-  Link,
+  LightLink,
   Menu,
   MenuItem,
   OutlinedInput,
@@ -37,7 +37,7 @@ const lightThemeComponents = {
     MuiTabPanel: TabPanel,
     MuiChip: Chip,
     MuiTooltip: Tooltip,
-    MuiLink: Link,
+    MuiLink: LightLink,
   },
 };
 

@@ -546,10 +546,11 @@ export function toRemoteByronTx(
   request: SignedRequestInternal,
 ): RemoteTransaction {
   const tx = Array.isArray(request.signedTx) ? forceNonNull(last(request.signedTx)) : request.signedTx;
-  const signedTx = RustModule.WalletV4.Transaction.from_bytes(Buffer.from(tx, 'base64'));
+  const txBytes = Buffer.from(tx, 'base64');
+  const signedTx = RustModule.WalletV4.Transaction.from_bytes(txBytes);
 
   const body = signedTx.body();
-  const hash = RustModule.WalletV4.hash_transaction(body).to_hex();
+  const hash = RustModule.WalletV4.FixedTransaction.from_bytes(txBytes).transaction_hash().to_hex();
 
   const outputs = iterateLenGet(body.outputs()).map(output => ({
     address: toHexOrBase58(output.address()),

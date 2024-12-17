@@ -31,7 +31,7 @@ import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe, forceNonNull } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe, forceNonNull, hexToBytes } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
@@ -58,7 +58,17 @@ export function createTrezorSignTxPayload(
     return result;
   })();
 
-  const txBody = signRequest.unsignedTx.build();
+  const tx = signRequest.unsignedTx.build_tx();
+  const txBody = tx.body();
+
+  const tagsState = RustModule.WasmScope(Module =>
+    Module.WalletV4.has_transaction_set_tag(tx.to_bytes()));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
@@ -143,6 +153,12 @@ export function createTrezorSignTxPayload(
           hash: blake2b(256 / 8).update(metadata.to_bytes()).digest('hex')
         }
       };
+  }
+  if (txHasSetTags) {
+    request = {
+      ...request,
+      tagCborSets: true,
+    };
   }
   return request;
 }
@@ -546,6 +562,16 @@ export function toTrezorSignRequest(
   senderUtxos: Array<CardanoAddressedUtxo>,
 ): $Exact<CardanoSignTransaction> {
 
+  const tagsState = RustModule.WasmScope(Module => Module.WalletV4.has_transaction_set_tag(
+    Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
+  ));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
+
   const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
@@ -859,6 +885,9 @@ export function toTrezorSignRequest(
   }
   if (additionalWitnessRequests.length > 0) {
     result.additionalWitnessRequests = additionalWitnessRequests;
+  }
+  if (txHasSetTags) {
+    result.tagCborSets = true;
   }
 
   return result;

@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { withLayout } from '../../../styles/context/layout';
@@ -66,23 +66,23 @@ class SupportSettings extends Component<Props & InjectedProps> {
     const { intl } = this.context;
 
     const faqLink = (
-      <a
+      <Link
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-faq-link"
       >
         {intl.formatMessage(messages.faqLink)}
-      </a>
+      </Link>
     );
 
     const supportRequestLink = (
-      <a
+      <Link
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-requestSupport-link"
       >
         {intl.formatMessage(messages.supportRequestLink)}
-      </a>
+      </Link>
     );
 
     const downloadLogsLink = (
@@ -135,12 +135,6 @@ class SupportSettings extends Component<Props & InjectedProps> {
                 </Typography>
                 <Typography
                   component="div"
-                  sx={{
-                    '& a': {
-                      color: 'ds.primary_500',
-                      textDecoration: isRevampLayout ? 'none' : 'underline',
-                    },
-                  }}
                   color="ds.text_gray_medium"
                   variant={isRevampLayout ? 'body1' : 'body2'}
                 >

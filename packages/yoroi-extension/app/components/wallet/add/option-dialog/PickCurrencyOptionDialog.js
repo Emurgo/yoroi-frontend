@@ -65,7 +65,10 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
               learnMoreText={
                 <>
                   <Typography color="ds.text_gray_low">{intl.formatMessage(messages.cardanoDescription)}</Typography>
-                  <Link href="https://cardano.org" onClick={event => this.props.onExternalLinkClick(event)}>
+                  <Link
+                    href="https://cardano.org"
+                    onClick={event => this.props.onExternalLinkClick(event)}
+                  >
                     {intl.formatMessage(globalMessages.learnMore)}
                   </Link>
                 </>
@@ -83,9 +86,12 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                     <>
                       {intl.formatMessage(messages.testnetDescription)}
                       <br />
-                      <a href="https://testnets.cardano.org/" onClick={event => this.props.onExternalLinkClick(event)}>
+                      <Link
+                        href="https://testnets.cardano.org/"
+                        onClick={event => this.props.onExternalLinkClick(event)}
+                      >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
+                      </Link>
                     </>
                   }
                 />
@@ -102,9 +108,12 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                     <>
                       {intl.formatMessage(messages.testnetDescription)}
                       <br />
-                      <a href="https://testnets.cardano.org/" onClick={event => this.props.onExternalLinkClick(event)}>
+                      <Link
+                        href="https://testnets.cardano.org/"
+                        onClick={event => this.props.onExternalLinkClick(event)}
+                      >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
+                      </Link>
                     </>
                   }
                 />
@@ -121,9 +130,12 @@ export default class PickCurrencyOptionDialog extends Component<Props> {
                     <>
                       {intl.formatMessage(messages.testnetDescription)}
                       <br />
-                      <a href="https://testnets.cardano.org/" onClick={event => this.props.onExternalLinkClick(event)}>
+                      <Link
+                        href="https://testnets.cardano.org/"
+                        onClick={event => this.props.onExternalLinkClick(event)}
+                      >
                         {intl.formatMessage(globalMessages.learnMore)}
-                      </a>
+                      </Link>
                     </>
                   }
                 />
