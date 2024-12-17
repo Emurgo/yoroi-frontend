@@ -131,11 +131,11 @@ function listenToBackgroundServiceWorker() {
     connected = true;
 }
 
-const RETRY_COUNT = 1;
+const ATTEMPT_COUNT = 2;
 const RETRY_DELAY = 3000;
 
 async function sendMessageToBackground(message) {
-  for (let c = 0; c <= RETRY_COUNT; c++) {
+  for (let c = 0; c < ATTEMPT_COUNT; c++) {
     try {
       return chrome.runtime.sendMessage(message);
     } catch (error) {
