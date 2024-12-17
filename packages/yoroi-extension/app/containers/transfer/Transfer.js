@@ -11,7 +11,6 @@ import SidebarContainer from '../SidebarContainer';
 import NoWalletMessage from '../wallet/NoWalletMessage';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
-import HorizontalLine from '../../components/widgets/HorizontalLine';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');
