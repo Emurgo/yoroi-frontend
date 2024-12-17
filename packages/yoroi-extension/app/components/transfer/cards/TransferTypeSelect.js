@@ -5,7 +5,6 @@ import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TransferCards from './TransferCards';
-import styles from './TransferTypeSelect.scss';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { Box, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
@@ -60,26 +59,6 @@ export default class TransferTypeSelect extends Component<Props> {
           <TransferCards onByron={this.props.onByron} />
         </Box>
       </Box>
-      // <div className={styles.component}>
-      //   <div className={styles.hero}>
-      //     <div className={styles.instructions}>
-      //       <div className={styles.headerText}>
-      //         {intl.formatMessage(
-      //           messages.instruction,
-      //           { ticker: this.props.ticker }
-      //         )}
-      //       </div>
-      //       <span>
-      //         {intl.formatMessage(
-      //           messages.subInstruction,
-      //           { ticker: this.props.ticker }
-      //         )}
-      //         <a onClick={event => handleExternalLinkClick(event)} href="https://yoroi-wallet.com/#/faq/1"> FAQ</a>
-      //       </span>
-      //     </div>
-      //     <TransferCards onByron={this.props.onByron} />
-      //   </div>
-      // </div>
     );
   }
 }
