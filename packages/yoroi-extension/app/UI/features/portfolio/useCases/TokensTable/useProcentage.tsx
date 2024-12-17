@@ -36,7 +36,8 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
     const unitPrice = parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
     const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity?.close)));
 
-    return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : totalValue, unitPrice };
+    const tokenValueDisplay = secondaryToken24Activity && secondaryToken24Activity[0] === 500 ? 0 : totalValue;
+    return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : tokenValueDisplay, unitPrice };
   };
 
   const getTokenActivityChange = (tokenId, activityData, isPrimaryToken) => {
