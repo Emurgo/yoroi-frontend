@@ -11,8 +11,6 @@ import { messages } from '../../../components/wallet/settings/RemoveWallet';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
-import { withLayout } from '../../../styles/context/layout';
 import { Typography } from '@mui/material';
 
 type Props = {|

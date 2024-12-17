@@ -13,8 +13,6 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ExplorerRow } from '../../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
 type Props = {|
