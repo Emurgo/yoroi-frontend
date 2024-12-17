@@ -39,11 +39,11 @@ export const ReviewTxManager = () => {
 
   const handleOnBack = () => {
     if (modalView === 'walletInfo') {
-      changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
     }
     return undefined;
   };
-
+  console.log('modalView', modalView);
   return (
     <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'}>
       <TopActions onBack={handleOnBack} />

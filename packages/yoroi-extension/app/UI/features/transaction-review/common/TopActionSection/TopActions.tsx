@@ -17,7 +17,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 export const TopActions = ({ onBack }: { onBack?: () => void }) => {
   const { closeTxReviewModal, title, modalView } = useTxReviewModal();
   console.log('title', title, modalView);
-  const showOnBackIcon = onBack !== undefined;
+  const showOnBackIcon = modalView === 'walletInfo';
 
   const getModalTitle = () => {
     if (modalView === 'transactionConfiramtion') {

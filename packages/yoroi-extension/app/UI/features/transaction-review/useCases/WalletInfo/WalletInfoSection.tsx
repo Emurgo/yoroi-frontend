@@ -73,11 +73,20 @@ const WalletAssets = () => {
 
 const WalletAssetsSection = ({ data, label }) => {
   return (
-    <Stack direction="column" height="152px" width="233px" sx={{ border: '1px solid gray', borderRadius: '8px' }}>
-      <Typography>{label}</Typography>
-      <Stack direction="column">
-        <Typography>{data.length}</Typography>
-        <AssetCarousel />
+    <Stack
+      direction="column"
+      height="160px"
+      width="233px"
+      sx={{ border: '1px solid gray', borderRadius: '8px', position: 'relative' }}
+      p="16px"
+      gap="16px"
+    >
+      <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
+        {label}
+      </Typography>
+      <Stack direction="column" justifyContent="space-between" gap="8px">
+        <Typography variant="h3">{data.length}</Typography>
+        <AssetCarousel data={data} />
       </Stack>
     </Stack>
   );

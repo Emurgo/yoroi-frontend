@@ -1,87 +1,68 @@
+import { Box } from '@mui/material';
 import React, { useState } from 'react';
 import Carousel from 'react-simply-carousel';
+import { Icon } from '../../../../components';
 
-export const AssetCarousel = () => {
-  const [activeSlide, setActiveSlide] = useState(0);
+export const AssetCarousel = ({ data }) => {
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+
+  console.log('data', data);
 
   return (
-    <div>
+    <Box height="40px">
       <Carousel
-        containerProps={{
-          style: {
-            width: '100%',
-            justifyContent: 'space-between',
-            userSelect: 'none',
-          },
-        }}
-        preventScrollOnSwipe
-        swipeTreshold={60}
-        activeSlideIndex={activeSlide}
-        activeSlideProps={{
-          style: {
-            background: 'blue',
-          },
-        }}
-        onRequestChange={setActiveSlide}
+        activeSlideIndex={activeSlideIndex}
+        onRequestChange={setActiveSlideIndex}
+        itemsToShow={4}
+        itemsToScroll={4}
         forwardBtnProps={{
-          children: '>',
+          //here you can also pass className, or any other button element attributes
           style: {
-            width: 60,
-            height: 60,
-            minWidth: 60,
             alignSelf: 'center',
+            border: 'none',
+            cursor: 'pointer',
+
+            position: 'absolute',
+            top: '16px',
+            right: '0',
           },
+          children: <Icon.RightArrow />,
         }}
         backwardBtnProps={{
-          children: '<',
+          //here you can also pass className, or any other button element attributes
           style: {
-            width: 60,
-            height: 60,
-            minWidth: 60,
             alignSelf: 'center',
+            border: 'none',
+            cursor: 'pointer',
+
+            position: 'absolute',
+            top: '16px',
+            right: '40px',
           },
+          children: <Icon.LeftArrow />,
         }}
-        dotsNav={{
-          show: true,
-          itemBtnProps: {
-            style: {
-              height: 16,
-              width: 16,
-              borderRadius: '50%',
-              border: 0,
-            },
-          },
-          activeItemBtnProps: {
-            style: {
-              height: 16,
-              width: 16,
-              borderRadius: '50%',
-              border: 0,
-              background: 'black',
-            },
-          },
-        }}
-        itemsToShow={2}
         speed={400}
-        centerMode
+        easing="linear"
       >
-        {Array.from({ length: 10 }).map((item, index) => (
-          <div
-            style={{
-              background: 'yellow',
-              width: 300,
-              height: 300,
-              border: '30px solid white',
-              textAlign: 'center',
-              lineHeight: '240px',
-              boxSizing: 'border-box',
-            }}
-            key={index}
-          >
-            {index}
-          </div>
-        ))}
+        {data &&
+          data.map(token => (
+            <Box
+              style={{
+                width: 50,
+                height: 50,
+                backgroundColor: 'transparent',
+                marginRight: '8px',
+                padding: '0px',
+                position: 'relative',
+              }}
+            >
+              <Box zIndex={1}>
+                <img width="48px" height="48px" src={token.info.image} />
+              </Box>
+              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%' }} />
+            </Box>
+          ))}
       </Carousel>
-    </div>
+    </Box>
   );
 };
