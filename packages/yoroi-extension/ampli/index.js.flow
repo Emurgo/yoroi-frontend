@@ -46,6 +46,32 @@ export type LoadOptions =
   | LoadOptionsWithEnvironment
   | LoadOptionsWithApiKey
   | LoadOptionsWithClientInstance;
+export type ClaimAdaTransactionSettledProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  reward_amount: number,
+|};
+export type ClaimAdaTransactionSubmittedProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  reward_amount: number,
+|};
+export type ConnectWalletDetailsSubmittedProperties = {|
+  /**
+   * The name of the hardware wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | Ledger, Trezor |
+   */
+  hardware_wallet: "Ledger" | "Trezor",
+|};
 export type CreateWalletVerifyPhraseWordSelectedProperties = {|
   recovery_word_order?: any,
 |};
@@ -182,7 +208,7 @@ export type ReceiveAmountGeneratedPageViewedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  ada_amount: number,
+  ada_amount?: number,
 |};
 export type ReceiveCopyAddressClickedProperties = {|
   /**
@@ -329,11 +355,28 @@ export type SendSummaryPageViewedProperties = {|
 |};
 export type SendSummarySubmittedProperties = {|
   /**
+   * The amount of ADA that the user will be exchanging.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  ada_amount?: number,
+
+  /**
    * | Rule | Value |
    * |---|---|
    * | Type | number |
    */
   asset_count: number,
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  nft_amount?: number,
+  nft_name?: string,
 
   /**
    * ```
@@ -349,6 +392,14 @@ export type SendSummarySubmittedProperties = {|
    * ```
    */
   nfts?: any[],
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  token_amount?: number,
+  token_name?: string,
 
   /**
    * ```
@@ -527,6 +578,13 @@ export type SwapOrderSelectedProperties = {|
   from_asset: any[],
 
   /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  from_asset_fiat_value?: number,
+
+  /**
    * The type of order selected on a given transaction
    *
    * | Rule | Value |
@@ -559,6 +617,11 @@ export type SwapOrderSelectedProperties = {|
   swap_fees?: number,
 
   /**
+   * Cryptocurrency pairs being swapped (e.g., ADA to SNEK {ADA/SNEK}).
+   */
+  swap_pair?: string,
+
+  /**
    * The amount of asset that the user is swapping to
    */
   to_amount: string,
@@ -571,6 +634,13 @@ export type SwapOrderSelectedProperties = {|
    * Policy ID
    */
   to_asset: any[],
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  to_asset_fiat_value?: number,
 |};
 export type SwapOrderSubmittedProperties = {|
   /**
@@ -593,6 +663,13 @@ export type SwapOrderSubmittedProperties = {|
   from_asset: any[],
 
   /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  from_asset_fiat_value?: number,
+
+  /**
    * The type of order selected on a given transaction
    *
    * | Rule | Value |
@@ -625,6 +702,11 @@ export type SwapOrderSubmittedProperties = {|
   swap_fees?: number,
 
   /**
+   * Cryptocurrency pairs being swapped (e.g., ADA to SNEK {ADA/SNEK}).
+   */
+  swap_pair?: string,
+
+  /**
    * The amount of asset that the user is swapping to
    */
   to_amount: string,
@@ -637,6 +719,13 @@ export type SwapOrderSubmittedProperties = {|
    * Policy ID
    */
   to_asset: any[],
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  to_asset_fiat_value?: number,
 |};
 export type SwapSlippageChangedProperties = {|
   /**
@@ -647,6 +736,16 @@ export type SwapSlippageChangedProperties = {|
    * | Type | number |
    */
   slippage_tolerance: number,
+|};
+export type ThemeSelectedProperties = {|
+  /**
+   * The theme that is selected.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | auto, light, dark |
+   */
+  theme: "auto" | "light" | "dark",
 |};
 export type SendProperties = {|
   /**
@@ -755,14 +854,47 @@ export type SwapProperties = {|
    */
   to_asset: any[],
 |};
+declare export class ToDeleteGovernanceAbstainPageViewed mixins BaseEvent {
+  event_type: string;
+}
 declare export class AllWalletsPageViewed mixins BaseEvent {
   event_type: string;
 }
 declare export class AssetsPageViewed mixins BaseEvent {
   event_type: string;
 }
+declare export class BuyAdaInputAmount mixins BaseEvent {
+  event_type: string;
+}
+declare export class BuyAdaSuccessRedirect mixins BaseEvent {
+  event_type: string;
+}
 declare export class ClaimAdaPageViewed mixins BaseEvent {
   event_type: string;
+}
+declare export class ClaimAdaTransactionSettled mixins BaseEvent {
+  event_properties: ClaimAdaTransactionSettledProperties;
+  event_type: string;
+  constructor(event_properties: ClaimAdaTransactionSettledProperties): this;
+}
+declare export class ClaimAdaTransactionSubmitted mixins BaseEvent {
+  event_properties: ClaimAdaTransactionSubmittedProperties;
+  event_type: string;
+  constructor(event_properties: ClaimAdaTransactionSubmittedProperties): this;
+}
+declare export class ConnectWalletCheckPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletConnectPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletDetailsPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletDetailsSubmitted mixins BaseEvent {
+  event_properties: ConnectWalletDetailsSubmittedProperties;
+  event_type: string;
+  constructor(event_properties: ConnectWalletDetailsSubmittedProperties): this;
 }
 declare export class ConnectorPageViewed mixins BaseEvent {
   event_type: string;
@@ -876,6 +1008,9 @@ declare export class NftGallerySearchActivated mixins BaseEvent {
   event_type: string;
   constructor(event_properties: NftGallerySearchActivatedProperties): this;
 }
+declare export class OnboardingAnalyticsPageViewed mixins BaseEvent {
+  event_type: string;
+}
 declare export class PortfolioTokenDetails mixins BaseEvent {
   event_properties: PortfolioTokenDetailsProperties;
   event_type: string;
@@ -894,10 +1029,10 @@ declare export class PortfolioTokensListSearchActivated mixins BaseEvent {
   ): this;
 }
 declare export class ReceiveAmountGeneratedPageViewed mixins BaseEvent {
-  event_properties: ReceiveAmountGeneratedPageViewedProperties;
+  event_properties?: ReceiveAmountGeneratedPageViewedProperties;
   event_type: string;
   constructor(
-    event_properties: ReceiveAmountGeneratedPageViewedProperties
+    event_properties?: ReceiveAmountGeneratedPageViewedProperties
   ): this;
 }
 declare export class ReceiveAmountPageViewed mixins BaseEvent {
@@ -943,6 +1078,12 @@ declare export class RestoreWalletEnterPhraseStepViewed mixins BaseEvent {
 declare export class RestoreWalletTypeStepViewed mixins BaseEvent {
   event_type: string;
 }
+declare export class SellAdaInputAmount mixins BaseEvent {
+  event_type: string;
+}
+declare export class SellAdaSuccessRedirect mixins BaseEvent {
+  event_type: string;
+}
 declare export class SendInitiated mixins BaseEvent {
   event_type: string;
 }
@@ -970,6 +1111,9 @@ declare export class SendSummarySubmitted mixins BaseEvent {
   constructor(event_properties: SendSummarySubmittedProperties): this;
 }
 declare export class SettingsPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class StakingCenterDelegationInitiated mixins BaseEvent {
   event_type: string;
 }
 declare export class StakingCenterPageViewed mixins BaseEvent {
@@ -1018,6 +1162,11 @@ declare export class SwapSlippageChanged mixins BaseEvent {
   event_type: string;
   constructor(event_properties: SwapSlippageChangedProperties): this;
 }
+declare export class ThemeSelected mixins BaseEvent {
+  event_properties: ThemeSelectedProperties;
+  event_type: string;
+  constructor(event_properties: ThemeSelectedProperties): this;
+}
 declare export class TransactionsPageViewed mixins BaseEvent {
   event_type: string;
 }
@@ -1063,6 +1212,18 @@ declare export class Ampli {
   track(event: Event, options?: EventOptions): PromiseResult<Result>;
 
   /**
+   * (to delete)Governance Abstain Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/(to%20delete)Governance%20Abstain%20Page%20Viewed)
+   *
+   * This event tracks when a user selects abstain governance status and the confirm transaction page is displayed
+   * @param options Amplitude event options.
+   */
+  toDeleteGovernanceAbstainPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * All Wallets Page Viewed
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/All%20Wallets%20Page%20Viewed)
@@ -1088,6 +1249,30 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Buy Ada Input Amount
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Input%20Amount)
+   *
+   * Event to track when a user starts the buy flow and must input amount of ADA to buy
+   * @param options Amplitude event options.
+   */
+  buyAdaInputAmount(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Buy Ada Success Redirect
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Success%20Redirect)
+   *
+   * This event tracks when a user is redirected to Yoroi after successfully buying ADA
+   * @param options Amplitude event options.
+   */
+  buyAdaSuccessRedirect(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Claim ADA Page Viewed
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20ADA%20Page%20Viewed)
@@ -1098,6 +1283,84 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   claimAdaPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Claim Ada Transaction Settled
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Settled)
+   *
+   * Event to track when a user successfully claims ADA and transaction is settled on chain
+   * @param properties The event's properties (e.g. reward_amount)
+   * @param options Amplitude event options.
+   */
+  claimAdaTransactionSettled(
+    properties: ClaimAdaTransactionSettledProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Claim Ada Transaction Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Submitted)
+   *
+   * This Event to track when a user submits a transaction to claim ADA.
+   * @param properties The event's properties (e.g. reward_amount)
+   * @param options Amplitude event options.
+   */
+  claimAdaTransactionSubmitted(
+    properties: ClaimAdaTransactionSubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Check Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Check%20Page%20Viewed)
+   *
+   * This event tracks when user chooses the connect hardware wallet option. This is the 1st step of the connect hardware wallet flow. In this page, the information about connecting a harware wallet is displayed to the user.
+   * @param options Amplitude event options.
+   */
+  connectWalletCheckPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Connect Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Connect%20Page%20Viewed)
+   *
+   * This event tracks when user connects the device and instructions are displayed. This is the 2nd step of the flow.
+   * @param options Amplitude event options.
+   */
+  connectWalletConnectPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Details Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Page%20Viewed)
+   *
+   * This event tracks when user accesses the enter wallet name page. This is the 3rd and final step of the flow
+   * @param options Amplitude event options.
+   */
+  connectWalletDetailsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Details Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Submitted)
+   *
+   * This event captures the submission of the wallet name on the last step of the connecting a hardware wallet flow.
+   * @param properties The event's properties (e.g. hardware_wallet)
+   * @param options Amplitude event options.
+   */
+  connectWalletDetailsSubmitted(
+    properties: ConnectWalletDetailsSubmittedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1464,6 +1727,18 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Onboarding Analytics Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Onboarding%20Analytics%20Page%20Viewed)
+   *
+   * Event to track when a user views the onboarding analytics page.
+   * @param options Amplitude event options.
+   */
+  onboardingAnalyticsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Portfolio Token Details
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Token%20Details)
@@ -1515,7 +1790,7 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   receiveAmountGeneratedPageViewed(
-    properties: ReceiveAmountGeneratedPageViewedProperties,
+    properties?: ReceiveAmountGeneratedPageViewedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1662,6 +1937,30 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Sell Ada Input Amount
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Input%20Amount)
+   *
+   * Event to track when user starts the Sell ada flow so after selecting the sell option and having to input amount of ADA to sell
+   * @param options Amplitude event options.
+   */
+  sellAdaInputAmount(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Sell Ada Success Redirect
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Success%20Redirect)
+   *
+   * This event tracks when a user is redirected to Yoroi after successfully selling ADA
+   * @param options Amplitude event options.
+   */
+  sellAdaSuccessRedirect(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Send Initiated
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Send%20Initiated)
@@ -1734,7 +2033,7 @@ declare export class Ampli {
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Send%20Summary%20Submitted)
    *
    * When a user click "send" on the "Preview" step on the send flow.
-   * @param properties The event's properties (e.g. asset_count)
+   * @param properties The event's properties (e.g. ada_amount)
    * @param options Amplitude event options.
    */
   sendSummarySubmitted(
@@ -1751,6 +2050,18 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   settingsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Staking Center Delegation Initiated
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Initiated)
+   *
+   * Event to track when a user initiates the delegation process in the Staking Center, accessing the delegate modal after selecting a pool
+   * @param options Amplitude event options.
+   */
+  stakingCenterDelegationInitiated(
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1905,6 +2216,20 @@ declare export class Ampli {
    */
   swapSlippageChanged(
     properties: SwapSlippageChangedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Theme Selected
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Theme%20Selected)
+   *
+   * This event is triggrered when a user had selected a theme.
+   * @param properties The event's properties (e.g. theme)
+   * @param options Amplitude event options.
+   */
+  themeSelected(
+    properties: ThemeSelectedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
