@@ -36,16 +36,10 @@ describe('Invalid address for sending', function () {
     await sendStep1Page.enterReceiver(invalidAddress);
   });
 
-  it(`Wait for checking`, async function () {
+  it(`Wait and check displayed info`, async function () {
     const sendStep1Page = new SendSubTab(webdriver, logger);
-    const errorMarkIsDisplayed = await sendStep1Page.receiverIsIncorrect();
-    expect(errorMarkIsDisplayed, 'There is no error for receiver').to.be.true;
-  });
-
-  it(`Check displayed info`, async function () {
-    const sendStep1Page = new SendSubTab(webdriver, logger);
-    const helperText = await sendStep1Page.getReceiverHelperText();
-    expect(helperText, 'A different error message is displayed').to.equal(INVALID_ADDRESS);
+    const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(INVALID_ADDRESS);
+    expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
   });
 
   afterEach(function (done) {
