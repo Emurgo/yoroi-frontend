@@ -130,16 +130,10 @@ describe('Handle handles', function () {
         await sendStep1Page.enterReceiver(testNegativeDatum.userHandle);
       });
 
-      it(`${testNegativeDatum.provider}. Wait for domain resolver response`, async function () {
+      it(`${testNegativeDatum.provider}. Wait and check displayed info`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
-        const errorMarkIsDisplayed = await sendStep1Page.receiverIsIncorrect();
-        expect(errorMarkIsDisplayed, 'There is no error for receiver').to.be.true;
-      });
-
-      it(`${testNegativeDatum.provider}. Check displayed info and continue`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        const helperText = await sendStep1Page.getReceiverHelperText();
-        expect(helperText, 'A different error message is displayed').to.equal(RECEIVER_DOESNT_EXIST);
+        const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
+        expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
       });
     });
   }
