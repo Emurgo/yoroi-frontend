@@ -34,10 +34,10 @@ const storageKeys = {
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
+  SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
-  SELECTED_WALLET: 'SELECTED_WALLET',
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
@@ -46,6 +46,7 @@ const storageKeys = {
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -124,17 +125,17 @@ export default class LocalStorageApi {
   setUserRevampAnnouncementStatus: boolean => Promise<void> = status =>
     setLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED, status.toString());
 
-  // ========== Select Wallet ========== //
+  // ========== Legacy Select Wallet ========== //
 
   getSelectedWalletId: void => Promise<number | null> = async () => {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
-    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
     if (!id) {
       id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
-      if (/^\d+$/.test(id)) {
-        await this.setSelectedWalletId(Number(id));
+      if (!/^\d+$/.test(id)) {
+        id = null;
       }
     }
+
     if (!id) {
       return null;
     }
@@ -142,9 +143,14 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  setSelectedWalletId: number => Promise<void> = async (id) => {
-    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
+  // ========== Selected Wallet ========== //
+  getSelectedWalletPublicKey: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
   };
+
+  setSelectedWalletPublicKey: string => Promise<void> = async (publicKey) => {
+    await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
+  }
 
   // ========== Legacy Theme ========== //
 

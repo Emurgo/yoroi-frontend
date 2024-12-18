@@ -291,13 +291,15 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     );
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
-    this.api.localStorage.setSelectedWalletId(publicDeriverId);
+    this.api.localStorage.setSelectedWalletPublicKey(
+      this.wallets[walletIndex].publicKey
+    ).catch(console.error);
     subscribe(publicDeriverId);
   };
 
   getLastSelectedWallet: void => Promise<?WalletState> = async () => {
-    const walletId: ?number = await this.api.localStorage.getSelectedWalletId();
-    return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
+    const lastSelectedPublicKey: ?string = await this.api.localStorage.getSelectedWalletPublicKey();
+    return this.wallets.find(wallet => wallet.publicKey === lastSelectedPublicKey);
   };
 
   @action _unsetActiveWallet: void => void = () => {
