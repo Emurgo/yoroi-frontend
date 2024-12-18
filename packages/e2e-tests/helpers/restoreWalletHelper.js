@@ -16,6 +16,7 @@ import {
   serviceWorkersTabName,
   WindowManager,
 } from './windowManager.js';
+import { quarterSecond } from './timeConstants.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -134,6 +135,7 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await windowManager.openNewTab(serviceWorkersTabName, serviceWorkersLink);
 
   const basepage = new BasePage(webdriver, logger);
+  await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
     locator: '.stop',
@@ -145,7 +147,12 @@ export const restartServiceWorker = async (webdriver, logger) => {
   };
 
   const stopBtnElems = await basepage.findElements(stopBtnLocator);
-  const stopBtnElem = stopBtnElems[1];
+  let stopBtnElem;
+  if (stopBtnElems.length === 1) {
+    stopBtnElem = stopBtnElems[0];
+  } else {
+    stopBtnElem = stopBtnElems[1];
+  }
   await stopBtnElem.click();
 
   await basepage.sleep(500);

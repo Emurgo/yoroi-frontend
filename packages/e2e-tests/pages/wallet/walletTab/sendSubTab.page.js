@@ -1,5 +1,5 @@
 import WalletTab from './walletTab.page.js';
-import { quarterSecond, fiveSeconds, halfSecond } from '../../../helpers/timeConstants.js';
+import { quarterSecond, fiveSeconds, halfSecond, defaultWaitTimeout } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -131,13 +131,20 @@ class SendSubTab extends WalletTab {
     this.logger.info(`SendSubTab::receiverIsGood is called.`);
     return await this.customWaitIsPresented(this.receiverDoneIcon, fiveSeconds, quarterSecond);
   }
-  async receiverIsIncorrect() {
-    this.logger.info(`SendSubTab::receiverIsIncorrect is called.`);
-    return await this.customWaitIsPresented(this.receiverErrorIcon, fiveSeconds, quarterSecond);
-  }
   async getReceiverHelperText() {
     this.logger.info(`SendSubTab::getReceiverHelperText is called.`);
     return await this.getText(this.receiverHelperTextLocator);
+  }
+  async waitReceiverHelperTextEqual(expectedText) {
+    this.logger.info(`SendSubTab::waitReceiverHelperTextEqual is called.`);
+    return await this.customWaiter(
+      async () => {
+        const currentText = await this.getReceiverHelperText();
+        return currentText === expectedText;
+      },
+      defaultWaitTimeout,
+      quarterSecond
+    );
   }
   async getReceiverHandlerAddress() {
     this.logger.info(`SendSubTab::getReceiverHandlerAddress is called.`);
