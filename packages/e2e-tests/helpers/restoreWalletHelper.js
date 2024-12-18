@@ -121,6 +121,7 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
 
 export const waitTxPage = async (webdriver, logger) => {
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
+  await transactionsPage.waitInitialWalletLoaderIsClosed();
   await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
@@ -135,8 +136,8 @@ export const restartServiceWorker = async (webdriver, logger) => {
   const basepage = new BasePage(webdriver, logger);
 
   const stopBtnLocator = {
-    locator: '//button[text()="Stop"]',
-    method: 'xpath',
+    locator: '.stop',
+    method: 'css',
   };
   const btnLocator = {
     locator: '//button',
@@ -169,3 +170,13 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
   basepage.getDriverLogs(mochaContext.test.parent.title, 'preparationSteps');
   logger.info(`--------------------- collectInfo END ---------------------`);
 };
+
+export const prepareWallet = async (webdriver, logger, testWalletName, mochaContext) => {
+  try {
+    await preloadDBAndStorage(webdriver, logger, testWalletName);
+    await waitTxPage(webdriver, logger); 
+  } catch (error) {
+    await collectInfo(mochaContext, webdriver, logger);
+    throw new Error(error);
+  }
+}

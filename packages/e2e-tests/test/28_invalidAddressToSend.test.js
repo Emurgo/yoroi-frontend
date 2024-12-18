@@ -6,7 +6,7 @@ import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { expect } from 'chai';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import { getTestString } from '../helpers/constants.js';
 import { INVALID_ADDRESS } from '../helpers/messages.js';
 
@@ -20,8 +20,7 @@ describe('Invalid address for sending', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   it(`Go to Send page`, async function () {
