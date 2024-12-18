@@ -45,6 +45,18 @@ const PortfolioWallet = (): JSX.Element => {
     } else {
       setTokenList([]);
     }
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const sendMetrics = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        ampli.portfolioTokensListSearchActivated({ search_term: lowercaseKeyword });
+      }, 500); // 0.5s requirement
+    };
+
+    if (lowercaseKeyword.length > 0) sendMetrics();
+
+    return () => clearTimeout(timeout);
   }, [keyword]);
 
   return (
