@@ -4,6 +4,7 @@
  * Flowgen v1.21.0
  * @flow
  */
+class BaseEvent {}
 
 import * as amplitude from "@amplitude/analytics-browser";
 export type Environment = "production" | "development";
@@ -207,7 +208,7 @@ export type ReceiveAmountGeneratedPageViewedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  ada_amount: number,
+  ada_amount?: number,
 |};
 export type ReceiveCopyAddressClickedProperties = {|
   /**
@@ -360,7 +361,7 @@ export type SendSummarySubmittedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  ada_amount: number,
+  ada_amount?: number,
 
   /**
    * | Rule | Value |
@@ -374,8 +375,8 @@ export type SendSummarySubmittedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  nft_amount: number,
-  nft_name: string,
+  nft_amount?: number,
+  nft_name?: string,
 
   /**
    * ```
@@ -397,8 +398,8 @@ export type SendSummarySubmittedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  token_amount: number,
-  token_name: string,
+  token_amount?: number,
+  token_name?: string,
 
   /**
    * ```
@@ -581,7 +582,7 @@ export type SwapOrderSelectedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  from_asset_fiat_value: number,
+  from_asset_fiat_value?: number,
 
   /**
    * The type of order selected on a given transaction
@@ -639,7 +640,7 @@ export type SwapOrderSelectedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  to_asset_fiat_value: number,
+  to_asset_fiat_value?: number,
 |};
 export type SwapOrderSubmittedProperties = {|
   /**
@@ -666,7 +667,7 @@ export type SwapOrderSubmittedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  from_asset_fiat_value: number,
+  from_asset_fiat_value?: number,
 
   /**
    * The type of order selected on a given transaction
@@ -724,7 +725,7 @@ export type SwapOrderSubmittedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  to_asset_fiat_value: number,
+  to_asset_fiat_value?: number,
 |};
 export type SwapSlippageChangedProperties = {|
   /**
@@ -1028,10 +1029,10 @@ declare export class PortfolioTokensListSearchActivated mixins BaseEvent {
   ): this;
 }
 declare export class ReceiveAmountGeneratedPageViewed mixins BaseEvent {
-  event_properties: ReceiveAmountGeneratedPageViewedProperties;
+  event_properties?: ReceiveAmountGeneratedPageViewedProperties;
   event_type: string;
   constructor(
-    event_properties: ReceiveAmountGeneratedPageViewedProperties
+    event_properties?: ReceiveAmountGeneratedPageViewedProperties
   ): this;
 }
 declare export class ReceiveAmountPageViewed mixins BaseEvent {
@@ -1220,7 +1221,7 @@ declare export class Ampli {
    */
   toDeleteGovernanceAbstainPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * All Wallets Page Viewed
@@ -1232,7 +1233,7 @@ declare export class Ampli {
    */
   allWalletsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Assets Page Viewed
@@ -1245,7 +1246,7 @@ declare export class Ampli {
    */
   assetsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Buy Ada Input Amount
@@ -1257,7 +1258,7 @@ declare export class Ampli {
    */
   buyAdaInputAmount(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Buy Ada Success Redirect
@@ -1269,7 +1270,7 @@ declare export class Ampli {
    */
   buyAdaSuccessRedirect(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Claim ADA Page Viewed
@@ -1283,7 +1284,7 @@ declare export class Ampli {
    */
   claimAdaPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Claim Ada Transaction Settled
@@ -1297,7 +1298,7 @@ declare export class Ampli {
   claimAdaTransactionSettled(
     properties: ClaimAdaTransactionSettledProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Claim Ada Transaction Submitted
@@ -1311,7 +1312,7 @@ declare export class Ampli {
   claimAdaTransactionSubmitted(
     properties: ClaimAdaTransactionSubmittedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Connect Wallet Check Page Viewed
@@ -1323,7 +1324,7 @@ declare export class Ampli {
    */
   connectWalletCheckPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Connect Wallet Connect Page Viewed
@@ -1335,7 +1336,7 @@ declare export class Ampli {
    */
   connectWalletConnectPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Connect Wallet Details Page Viewed
@@ -1347,7 +1348,7 @@ declare export class Ampli {
    */
   connectWalletDetailsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Connect Wallet Details Submitted
@@ -1361,7 +1362,7 @@ declare export class Ampli {
   connectWalletDetailsSubmitted(
     properties: ConnectWalletDetailsSubmittedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Connector Page Viewed
@@ -1373,7 +1374,7 @@ declare export class Ampli {
    */
   connectorPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Details Settled
@@ -1385,7 +1386,7 @@ declare export class Ampli {
    */
   createWalletDetailsSettled(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Details Step Viewed
@@ -1397,7 +1398,7 @@ declare export class Ampli {
    */
   createWalletDetailsStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Details Submitted
@@ -1409,7 +1410,7 @@ declare export class Ampli {
    */
   createWalletDetailsSubmitted(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Language Page Viewed
@@ -1421,7 +1422,7 @@ declare export class Ampli {
    */
   createWalletLanguagePageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Learn Phrase Step Viewed
@@ -1433,7 +1434,7 @@ declare export class Ampli {
    */
   createWalletLearnPhraseStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Save Phrase Step Viewed
@@ -1445,7 +1446,7 @@ declare export class Ampli {
    */
   createWalletSavePhraseStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Select Method Page Viewed
@@ -1463,7 +1464,7 @@ declare export class Ampli {
    */
   createWalletSelectMethodPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Terms Page Viewed
@@ -1475,7 +1476,7 @@ declare export class Ampli {
    */
   createWalletTermsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Verify Phrase Step Viewed
@@ -1487,7 +1488,7 @@ declare export class Ampli {
    */
   createWalletVerifyPhraseStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Create Wallet Verify Phrase Word Selected
@@ -1501,7 +1502,7 @@ declare export class Ampli {
   createWalletVerifyPhraseWordSelected(
     properties?: CreateWalletVerifyPhraseWordSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Dapp Popup Add Collateral Page Viewed
@@ -1513,7 +1514,7 @@ declare export class Ampli {
    */
   dappPopupAddCollateralPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Dapp Popup Connect Wallet Page Viewed
@@ -1527,7 +1528,7 @@ declare export class Ampli {
   dappPopupConnectWalletPageViewed(
     properties: DappPopupConnectWalletPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Dapp Popup Connect Wallet Password Page Viewed
@@ -1539,7 +1540,7 @@ declare export class Ampli {
    */
   dappPopupConnectWalletPasswordPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Dapp Popup Sign Transaction Page Viewed
@@ -1551,7 +1552,7 @@ declare export class Ampli {
    */
   dappPopupSignTransactionPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Dapp Popup Sign Transaction Submitted
@@ -1563,7 +1564,7 @@ declare export class Ampli {
    */
   dappPopupSignTransactionSubmitted(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Governance Choose Drep Page Viewed
@@ -1575,7 +1576,7 @@ declare export class Ampli {
    */
   governanceChooseDrepPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Governance Confirm Transaction Page Viewed
@@ -1589,7 +1590,7 @@ declare export class Ampli {
   governanceConfirmTransactionPageViewed(
     properties: GovernanceConfirmTransactionPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Governance Dashboard Page Viewed
@@ -1601,7 +1602,7 @@ declare export class Ampli {
    */
   governanceDashboardPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Governance Transaction Success Page Viewed
@@ -1615,7 +1616,7 @@ declare export class Ampli {
   governanceTransactionSuccessPageViewed(
     properties: GovernanceTransactionSuccessPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Network Selected
@@ -1629,7 +1630,7 @@ declare export class Ampli {
   networkSelected(
     properties: NetworkSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Image Viewed
@@ -1641,7 +1642,7 @@ declare export class Ampli {
    */
   nftGalleryDetailsImageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Navigation
@@ -1655,7 +1656,7 @@ declare export class Ampli {
   nftGalleryDetailsNavigation(
     properties: NftGalleryDetailsNavigationProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Page Viewed
@@ -1667,7 +1668,7 @@ declare export class Ampli {
    */
   nftGalleryDetailsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Details Tab
@@ -1681,7 +1682,7 @@ declare export class Ampli {
   nftGalleryDetailsTab(
     properties: NftGalleryDetailsTabProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Grid View Selected
@@ -1695,7 +1696,7 @@ declare export class Ampli {
   nftGalleryGridViewSelected(
     properties?: NftGalleryGridViewSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Page Viewed
@@ -1709,7 +1710,7 @@ declare export class Ampli {
   nftGalleryPageViewed(
     properties: NftGalleryPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * NFT Gallery Search Activated
@@ -1723,7 +1724,7 @@ declare export class Ampli {
   nftGallerySearchActivated(
     properties: NftGallerySearchActivatedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Onboarding Analytics Page Viewed
@@ -1735,7 +1736,7 @@ declare export class Ampli {
    */
   onboardingAnalyticsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Portfolio Token Details
@@ -1749,7 +1750,7 @@ declare export class Ampli {
   portfolioTokenDetails(
     properties: PortfolioTokenDetailsProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Portfolio Tokens List Page Viewed
@@ -1763,7 +1764,7 @@ declare export class Ampli {
   portfolioTokensListPageViewed(
     properties: PortfolioTokensListPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Portfolio Tokens List Search Activated
@@ -1777,7 +1778,7 @@ declare export class Ampli {
   portfolioTokensListSearchActivated(
     properties: PortfolioTokensListSearchActivatedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Amount Generated Page Viewed
@@ -1789,9 +1790,9 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   receiveAmountGeneratedPageViewed(
-    properties: ReceiveAmountGeneratedPageViewedProperties,
+    properties?: ReceiveAmountGeneratedPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Amount Page Viewed
@@ -1803,7 +1804,7 @@ declare export class Ampli {
    */
   receiveAmountPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Copy Address Clicked
@@ -1817,7 +1818,7 @@ declare export class Ampli {
   receiveCopyAddressClicked(
     properties: ReceiveCopyAddressClickedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Generate New Address Clicked
@@ -1829,7 +1830,7 @@ declare export class Ampli {
    */
   receiveGenerateNewAddressClicked(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Page List Viewed
@@ -1841,7 +1842,7 @@ declare export class Ampli {
    */
   receivePageListViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Page Viewed
@@ -1853,7 +1854,7 @@ declare export class Ampli {
    */
   receivePageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Receive Share Address Clicked
@@ -1865,7 +1866,7 @@ declare export class Ampli {
    */
   receiveShareAddressClicked(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Restore Wallet Details Settled
@@ -1877,7 +1878,7 @@ declare export class Ampli {
    */
   restoreWalletDetailsSettled(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Restore Wallet Details Step Viewed
@@ -1889,7 +1890,7 @@ declare export class Ampli {
    */
   restoreWalletDetailsStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Restore Wallet Enter Phrase Step Status
@@ -1903,7 +1904,7 @@ declare export class Ampli {
   restoreWalletEnterPhraseStepStatus(
     properties: RestoreWalletEnterPhraseStepStatusProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Restore Wallet Enter Phrase Step Viewed
@@ -1917,7 +1918,7 @@ declare export class Ampli {
   restoreWalletEnterPhraseStepViewed(
     properties: RestoreWalletEnterPhraseStepViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Restore Wallet Type Step Viewed
@@ -1933,7 +1934,7 @@ declare export class Ampli {
    */
   restoreWalletTypeStepViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Sell Ada Input Amount
@@ -1945,7 +1946,7 @@ declare export class Ampli {
    */
   sellAdaInputAmount(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Sell Ada Success Redirect
@@ -1957,7 +1958,7 @@ declare export class Ampli {
    */
   sellAdaSuccessRedirect(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Send Initiated
@@ -1967,7 +1968,7 @@ declare export class Ampli {
    * This event tracks when a user loads the default state of the first step of the multiasset transaction flow. That screen shows receiver address and optional memo
    * @param options Amplitude event options.
    */
-  sendInitiated(options?: EventOptions): PromiseResult<amplitude.Types.Result>;
+  sendInitiated(options?: EventOptions): PromiseResult<any>;
 
   /**
    * Send Select Asset Page Viewed
@@ -1979,7 +1980,7 @@ declare export class Ampli {
    */
   sendSelectAssetPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Send Select Asset Selected
@@ -1993,7 +1994,7 @@ declare export class Ampli {
   sendSelectAssetSelected(
     properties: SendSelectAssetSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Send Select Asset Updated
@@ -2010,7 +2011,7 @@ declare export class Ampli {
   sendSelectAssetUpdated(
     properties: SendSelectAssetUpdatedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Send Summary Page Viewed
@@ -2024,7 +2025,7 @@ declare export class Ampli {
   sendSummaryPageViewed(
     properties: SendSummaryPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Send Summary Submitted
@@ -2038,7 +2039,7 @@ declare export class Ampli {
   sendSummarySubmitted(
     properties: SendSummarySubmittedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Settings Page Viewed
@@ -2050,7 +2051,7 @@ declare export class Ampli {
    */
   settingsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Staking Center Delegation Initiated
@@ -2062,7 +2063,7 @@ declare export class Ampli {
    */
   stakingCenterDelegationInitiated(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Staking Center Page Viewed
@@ -2074,7 +2075,7 @@ declare export class Ampli {
    */
   stakingCenterPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Asset From Changed
@@ -2090,7 +2091,7 @@ declare export class Ampli {
   swapAssetFromChanged(
     properties: SwapAssetFromChangedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Asset To Changed
@@ -2106,7 +2107,7 @@ declare export class Ampli {
   swapAssetToChanged(
     properties: SwapAssetToChangedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Cancelation Submitted
@@ -2122,7 +2123,7 @@ declare export class Ampli {
   swapCancelationSubmitted(
     properties: SwapCancelationSubmittedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Confirmed  Page Viewed
@@ -2138,7 +2139,7 @@ declare export class Ampli {
   swapConfirmedPageViewed(
     properties: SwapConfirmedPageViewedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Initiated
@@ -2154,7 +2155,7 @@ declare export class Ampli {
   swapInitiated(
     properties: SwapInitiatedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Order Selected
@@ -2170,7 +2171,7 @@ declare export class Ampli {
   swapOrderSelected(
     properties: SwapOrderSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Order Submitted
@@ -2186,7 +2187,7 @@ declare export class Ampli {
   swapOrderSubmitted(
     properties: SwapOrderSubmittedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Pool Changed
@@ -2200,7 +2201,7 @@ declare export class Ampli {
    */
   swapPoolChanged(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Swap Slippage Changed
@@ -2216,7 +2217,7 @@ declare export class Ampli {
   swapSlippageChanged(
     properties: SwapSlippageChangedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Theme Selected
@@ -2230,7 +2231,7 @@ declare export class Ampli {
   themeSelected(
     properties: ThemeSelectedProperties,
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Transactions Page Viewed
@@ -2242,7 +2243,7 @@ declare export class Ampli {
    */
   transactionsPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Voting Page Viewed
@@ -2254,7 +2255,7 @@ declare export class Ampli {
    */
   votingPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 
   /**
    * Wallet Page Viewed
@@ -2266,14 +2267,13 @@ declare export class Ampli {
    */
   walletPageViewed(
     options?: EventOptions
-  ): PromiseResult<amplitude.Types.Result>;
+  ): PromiseResult<any>;
 }
 declare export var ampli: Ampli;
-declare type BrowserOptions = amplitude.Types.BrowserOptions;
-export type BrowserClient = amplitude.Types.BrowserClient;
-export type BaseEvent = amplitude.Types.BaseEvent;
-export type IdentifyEvent = amplitude.Types.IdentifyEvent;
-export type GroupEvent = amplitude.Types.GroupIdentifyEvent;
-export type Event = amplitude.Types.Event;
-export type EventOptions = amplitude.Types.EventOptions;
-export type Result = amplitude.Types.Result;
+declare type BrowserOptions = any;
+export type BrowserClient = any;
+export type IdentifyEvent = any;
+export type GroupEvent = any;
+export type Event = any;
+export type EventOptions = any;
+export type Result = any;
