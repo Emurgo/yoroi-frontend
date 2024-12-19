@@ -103,7 +103,7 @@ const useChart = (data: IChartData) => {
               x={rectX + rectWidth / 2}
               y={rectY + rectHeight / 2}
               textAnchor="middle"
-              fill={theme.palette.ds.primary_200}
+              fill={theme.palette.ds.white_static}
               alignmentBaseline="middle"
               sx={{
                 fontFamily: theme.typography.fontFamily,

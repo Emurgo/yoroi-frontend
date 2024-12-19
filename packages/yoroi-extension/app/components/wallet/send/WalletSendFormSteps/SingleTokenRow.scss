@@ -10,7 +10,6 @@
     align-items: center;
     border-radius: 8px;
     width: calc(100% - 6px);
-    border: 2px solid transparent;
     height: 56px;
 
     & > div {
@@ -36,10 +35,6 @@
       justify-self: flex-end;
     }
 
-    &:hover {
-      border: 2px solid #dce0e9;
-      border-radius: 8px;
-    }
   }
   .amountWrapper {
     display: grid;
@@ -110,26 +105,12 @@
       right: -12px;
     }
 
-    .closeIcon svg rect {
-      fill: #f0f3f5;
-    }
 
-    .closeIcon:hover {
-      color: lighten($color: #f0f3f5, $amount: 0.9);
-    }
   }
 
   .amountError {
     border: 2px solid #ff1351;
     color: #ff1351;
-  }
-
-  .inputFocused {
-    border: 2px solid var(--yoroi-palette-gray-max) !important;
-  }
-
-  .inputSelected {
-    border-color: #a7afc0;
   }
 
   .inputError {

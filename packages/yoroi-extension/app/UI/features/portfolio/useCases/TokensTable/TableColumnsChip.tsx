@@ -179,7 +179,10 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
       .toFormat(decimals);
 
   const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
-  const totalTokenPrice = isPrimary && showingAda ? '' : `${totaPrice} ${totalTicker || DEFAULT_FIAT_PAIR}`;
+  const totalTokenPrice =
+    isPrimary && showingAda
+      ? ''
+      : `${isPrimary ? totaPrice : tokenPrice !== undefined ? totaPrice : '-'} ${totalTicker || DEFAULT_FIAT_PAIR}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>

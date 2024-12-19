@@ -751,7 +751,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
             <Box
               sx={{
-                height: '129px',
+                height: showFiat ? '129px' : '64px',
                 position: 'relative',
                 padding: '16px 0px',
                 borderRadius: '8px',

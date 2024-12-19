@@ -46,6 +46,13 @@ export var DefaultConfiguration = __assign({ plan: {
         sourceVersion: '2.0.0'
     }
 });
+var ToDeleteGovernanceAbstainPageViewed = /** @class */ (function () {
+    function ToDeleteGovernanceAbstainPageViewed() {
+        this.event_type = '(to delete)Governance Abstain Page Viewed';
+    }
+    return ToDeleteGovernanceAbstainPageViewed;
+}());
+export { ToDeleteGovernanceAbstainPageViewed };
 var AllWalletsPageViewed = /** @class */ (function () {
     function AllWalletsPageViewed() {
         this.event_type = 'All Wallets Page Viewed';
@@ -60,6 +67,20 @@ var AssetsPageViewed = /** @class */ (function () {
     return AssetsPageViewed;
 }());
 export { AssetsPageViewed };
+var BuyAdaInputAmount = /** @class */ (function () {
+    function BuyAdaInputAmount() {
+        this.event_type = 'Buy Ada Input Amount';
+    }
+    return BuyAdaInputAmount;
+}());
+export { BuyAdaInputAmount };
+var BuyAdaSuccessRedirect = /** @class */ (function () {
+    function BuyAdaSuccessRedirect() {
+        this.event_type = 'Buy Ada Success Redirect';
+    }
+    return BuyAdaSuccessRedirect;
+}());
+export { BuyAdaSuccessRedirect };
 var ClaimAdaPageViewed = /** @class */ (function () {
     function ClaimAdaPageViewed() {
         this.event_type = 'Claim ADA Page Viewed';
@@ -67,6 +88,54 @@ var ClaimAdaPageViewed = /** @class */ (function () {
     return ClaimAdaPageViewed;
 }());
 export { ClaimAdaPageViewed };
+var ClaimAdaTransactionSettled = /** @class */ (function () {
+    function ClaimAdaTransactionSettled(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Claim Ada Transaction Settled';
+        this.event_properties = event_properties;
+    }
+    return ClaimAdaTransactionSettled;
+}());
+export { ClaimAdaTransactionSettled };
+var ClaimAdaTransactionSubmitted = /** @class */ (function () {
+    function ClaimAdaTransactionSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Claim Ada Transaction Submitted';
+        this.event_properties = event_properties;
+    }
+    return ClaimAdaTransactionSubmitted;
+}());
+export { ClaimAdaTransactionSubmitted };
+var ConnectWalletCheckPageViewed = /** @class */ (function () {
+    function ConnectWalletCheckPageViewed() {
+        this.event_type = 'Connect Wallet Check Page Viewed';
+    }
+    return ConnectWalletCheckPageViewed;
+}());
+export { ConnectWalletCheckPageViewed };
+var ConnectWalletConnectPageViewed = /** @class */ (function () {
+    function ConnectWalletConnectPageViewed() {
+        this.event_type = 'Connect Wallet Connect Page Viewed';
+    }
+    return ConnectWalletConnectPageViewed;
+}());
+export { ConnectWalletConnectPageViewed };
+var ConnectWalletDetailsPageViewed = /** @class */ (function () {
+    function ConnectWalletDetailsPageViewed() {
+        this.event_type = 'Connect Wallet Details Page Viewed';
+    }
+    return ConnectWalletDetailsPageViewed;
+}());
+export { ConnectWalletDetailsPageViewed };
+var ConnectWalletDetailsSubmitted = /** @class */ (function () {
+    function ConnectWalletDetailsSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Connect Wallet Details Submitted';
+        this.event_properties = event_properties;
+    }
+    return ConnectWalletDetailsSubmitted;
+}());
+export { ConnectWalletDetailsSubmitted };
 var ConnectorPageViewed = /** @class */ (function () {
     function ConnectorPageViewed() {
         this.event_type = 'Connector Page Viewed';
@@ -283,6 +352,13 @@ var NftGallerySearchActivated = /** @class */ (function () {
     return NftGallerySearchActivated;
 }());
 export { NftGallerySearchActivated };
+var OnboardingAnalyticsPageViewed = /** @class */ (function () {
+    function OnboardingAnalyticsPageViewed() {
+        this.event_type = 'Onboarding Analytics Page Viewed';
+    }
+    return OnboardingAnalyticsPageViewed;
+}());
+export { OnboardingAnalyticsPageViewed };
 var PortfolioTokenDetails = /** @class */ (function () {
     function PortfolioTokenDetails(event_properties) {
         this.event_properties = event_properties;
@@ -402,6 +478,20 @@ var RestoreWalletTypeStepViewed = /** @class */ (function () {
     return RestoreWalletTypeStepViewed;
 }());
 export { RestoreWalletTypeStepViewed };
+var SellAdaInputAmount = /** @class */ (function () {
+    function SellAdaInputAmount() {
+        this.event_type = 'Sell Ada Input Amount';
+    }
+    return SellAdaInputAmount;
+}());
+export { SellAdaInputAmount };
+var SellAdaSuccessRedirect = /** @class */ (function () {
+    function SellAdaSuccessRedirect() {
+        this.event_type = 'Sell Ada Success Redirect';
+    }
+    return SellAdaSuccessRedirect;
+}());
+export { SellAdaSuccessRedirect };
 var SendInitiated = /** @class */ (function () {
     function SendInitiated() {
         this.event_type = 'Send Initiated';
@@ -459,6 +549,13 @@ var SettingsPageViewed = /** @class */ (function () {
     return SettingsPageViewed;
 }());
 export { SettingsPageViewed };
+var StakingCenterDelegationInitiated = /** @class */ (function () {
+    function StakingCenterDelegationInitiated() {
+        this.event_type = 'Staking Center Delegation Initiated';
+    }
+    return StakingCenterDelegationInitiated;
+}());
+export { StakingCenterDelegationInitiated };
 var StakingCenterPageViewed = /** @class */ (function () {
     function StakingCenterPageViewed() {
         this.event_type = 'Staking Center Page Viewed';
@@ -545,6 +642,15 @@ var SwapSlippageChanged = /** @class */ (function () {
     return SwapSlippageChanged;
 }());
 export { SwapSlippageChanged };
+var ThemeSelected = /** @class */ (function () {
+    function ThemeSelected(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Theme Selected';
+        this.event_properties = event_properties;
+    }
+    return ThemeSelected;
+}());
+export { ThemeSelected };
 var TransactionsPageViewed = /** @class */ (function () {
     function TransactionsPageViewed() {
         this.event_type = 'Transactions Page Viewed';
@@ -664,6 +770,18 @@ var Ampli = /** @class */ (function () {
         return this.amplitude.track(event, undefined, options);
     };
     /**
+     * (to delete)Governance Abstain Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/(to%20delete)Governance%20Abstain%20Page%20Viewed)
+     *
+     * This event tracks when a user selects abstain governance status and the confirm transaction page is displayed
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.toDeleteGovernanceAbstainPageViewed = function (options) {
+        return this.track(new ToDeleteGovernanceAbstainPageViewed(), options);
+    };
+    /**
      * All Wallets Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/All%20Wallets%20Page%20Viewed)
@@ -689,6 +807,30 @@ var Ampli = /** @class */ (function () {
         return this.track(new AssetsPageViewed(), options);
     };
     /**
+     * Buy Ada Input Amount
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Input%20Amount)
+     *
+     * Event to track when a user starts the buy flow and must input amount of ADA to buy
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.buyAdaInputAmount = function (options) {
+        return this.track(new BuyAdaInputAmount(), options);
+    };
+    /**
+     * Buy Ada Success Redirect
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Success%20Redirect)
+     *
+     * This event tracks when a user is redirected to Yoroi after successfully buying ADA
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.buyAdaSuccessRedirect = function (options) {
+        return this.track(new BuyAdaSuccessRedirect(), options);
+    };
+    /**
      * Claim ADA Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20ADA%20Page%20Viewed)
@@ -701,6 +843,81 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.claimAdaPageViewed = function (options) {
         return this.track(new ClaimAdaPageViewed(), options);
+    };
+    /**
+     * Claim Ada Transaction Settled
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Settled)
+     *
+     * Event to track when a user successfully claims ADA and transaction is settled on chain
+     *
+     * @param properties The event's properties (e.g. reward_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.claimAdaTransactionSettled = function (properties, options) {
+        return this.track(new ClaimAdaTransactionSettled(properties), options);
+    };
+    /**
+     * Claim Ada Transaction Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Submitted)
+     *
+     * This Event to track when a user submits a transaction to claim ADA.
+     *
+     * @param properties The event's properties (e.g. reward_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.claimAdaTransactionSubmitted = function (properties, options) {
+        return this.track(new ClaimAdaTransactionSubmitted(properties), options);
+    };
+    /**
+     * Connect Wallet Check Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Check%20Page%20Viewed)
+     *
+     * This event tracks when user chooses the connect hardware wallet option. This is the 1st step of the connect hardware wallet flow. In this page, the information about connecting a harware wallet is displayed to the user.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.connectWalletCheckPageViewed = function (options) {
+        return this.track(new ConnectWalletCheckPageViewed(), options);
+    };
+    /**
+     * Connect Wallet Connect Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Connect%20Page%20Viewed)
+     *
+     * This event tracks when user connects the device and instructions are displayed. This is the 2nd step of the flow.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.connectWalletConnectPageViewed = function (options) {
+        return this.track(new ConnectWalletConnectPageViewed(), options);
+    };
+    /**
+     * Connect Wallet Details Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Page%20Viewed)
+     *
+     * This event tracks when user accesses the enter wallet name page. This is the 3rd and final step of the flow
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.connectWalletDetailsPageViewed = function (options) {
+        return this.track(new ConnectWalletDetailsPageViewed(), options);
+    };
+    /**
+     * Connect Wallet Details Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Submitted)
+     *
+     * This event captures the submission of the wallet name on the last step of the connecting a hardware wallet flow.
+     *
+     * @param properties The event's properties (e.g. hardware_wallet)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.connectWalletDetailsSubmitted = function (properties, options) {
+        return this.track(new ConnectWalletDetailsSubmitted(properties), options);
     };
     /**
      * Connector Page Viewed
@@ -1055,6 +1272,18 @@ var Ampli = /** @class */ (function () {
         return this.track(new NftGallerySearchActivated(properties), options);
     };
     /**
+     * Onboarding Analytics Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Onboarding%20Analytics%20Page%20Viewed)
+     *
+     * Event to track when a user views the onboarding analytics page.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.onboardingAnalyticsPageViewed = function (options) {
+        return this.track(new OnboardingAnalyticsPageViewed(), options);
+    };
+    /**
      * Portfolio Token Details
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Token%20Details)
@@ -1246,6 +1475,30 @@ var Ampli = /** @class */ (function () {
         return this.track(new RestoreWalletTypeStepViewed(), options);
     };
     /**
+     * Sell Ada Input Amount
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Input%20Amount)
+     *
+     * Event to track when user starts the Sell ada flow so after selecting the sell option and having to input amount of ADA to sell
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.sellAdaInputAmount = function (options) {
+        return this.track(new SellAdaInputAmount(), options);
+    };
+    /**
+     * Sell Ada Success Redirect
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Success%20Redirect)
+     *
+     * This event tracks when a user is redirected to Yoroi after successfully selling ADA
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.sellAdaSuccessRedirect = function (options) {
+        return this.track(new SellAdaSuccessRedirect(), options);
+    };
+    /**
      * Send Initiated
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Send%20Initiated)
@@ -1318,7 +1571,7 @@ var Ampli = /** @class */ (function () {
      *
      * When a user click "send" on the "Preview" step on the send flow.
      *
-     * @param properties The event's properties (e.g. asset_count)
+     * @param properties The event's properties (e.g. ada_amount)
      * @param options Amplitude event options.
      */
     Ampli.prototype.sendSummarySubmitted = function (properties, options) {
@@ -1335,6 +1588,18 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.settingsPageViewed = function (options) {
         return this.track(new SettingsPageViewed(), options);
+    };
+    /**
+     * Staking Center Delegation Initiated
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Initiated)
+     *
+     * Event to track when a user initiates the delegation process in the Staking Center, accessing the delegate modal after selecting a pool
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.stakingCenterDelegationInitiated = function (options) {
+        return this.track(new StakingCenterDelegationInitiated(), options);
     };
     /**
      * Staking Center Page Viewed
@@ -1481,6 +1746,19 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.swapSlippageChanged = function (properties, options) {
         return this.track(new SwapSlippageChanged(properties), options);
+    };
+    /**
+     * Theme Selected
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Theme%20Selected)
+     *
+     * This event is triggrered when a user had selected a theme.
+     *
+     * @param properties The event's properties (e.g. theme)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.themeSelected = function (properties, options) {
+        return this.track(new ThemeSelected(properties), options);
     };
     /**
      * Transactions Page Viewed

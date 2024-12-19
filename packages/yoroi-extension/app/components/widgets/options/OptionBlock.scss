@@ -53,16 +53,10 @@
             background-image: url(../../../assets/images/add-wallet/option-dialog/connect-trezor-modern.inline.svg);
           }
       }
-
-     
     }
 
     // LEARN MORE TEXT BLOCK
     .learnMoreTextBlock {
-      a {
-        @include underline(var(--yoroi-palette-gray-800));
-      }
-
       overflow: hidden;
       max-height: 0;
       transition: 300ms linear;

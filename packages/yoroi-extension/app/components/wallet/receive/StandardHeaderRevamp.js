@@ -88,7 +88,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
 
     const walletHeader = (
       <Box>
-        <Typography component="div" mb="24px" variant="body1" fontWeight={500}>
+        <Typography color="ds.text_gray_medium" mb="24px" variant="body1" fontWeight={500}>
           {intl.formatMessage(messages.walletAddressLabel)}
         </Typography>
 
@@ -138,7 +138,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
                   linkType="address"
                 >
                   <RawHash light={isWalletAddressUsed}>
-                    <Typography component="div" variant="body1" color="grayscale.max">
+                    <Typography component="div" variant="body1" color="ds.text_gray_medium">
                       {walletAddress}
                     </Typography>
                   </RawHash>
