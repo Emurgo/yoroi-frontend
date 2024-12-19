@@ -3,12 +3,11 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import CustomTooltip from '../../widgets/CustomTooltip';
 
-import { Box, Button, Typography, styled } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import PaperWalletLogo from '../../../assets/images/add-wallet/option-dialog/restore-paper-wallet-modern.inline.svg';
 
 const messages = defineMessages({
@@ -27,8 +26,8 @@ const GradientBox = styled(Box)(({ theme }: any) => ({
 
 const SBox = styled(Box)(({ theme }) => ({
   '& svg': {
-    width: "20px",
-    height: "20px",
+    width: '20px',
+    height: '20px',
     '& g': {
       fill: theme.palette.ds.el_gray_medium,
     },
