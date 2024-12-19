@@ -24,7 +24,7 @@ import { ReactComponent as AboutTrezorSvg } from '../../../../assets/images/hard
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../common/CheckDialog.scss';
-import { Link, Box, styled, Stack, List, ListItem, Typography } from '@mui/material';
+import { Link, Box, styled, Stack, Typography } from '@mui/material';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1Text: {
