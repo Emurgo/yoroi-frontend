@@ -85,7 +85,7 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId:
         const adaApi = new AdaApi();
         const clonedWallet = await adaApi.cloneWallet(db, value[0], network);
         publicDeriversOfNetwork.push(clonedWallet);
-        syncWallet(clonedWallet, 'cloned wallet').catch(error => console.error);
+        syncWallet(clonedWallet, 'cloned wallet').catch(console.error);
       }
     }
   } else {

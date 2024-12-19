@@ -1,5 +1,5 @@
 // @flow
-import { action, observable, computed, runInAction } from 'mobx';
+import { observable, computed, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';

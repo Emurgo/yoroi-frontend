@@ -1,9 +1,7 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { Component } from 'react';
-import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import SwitchNetworkDialog from '../../../components/wallet/settings/SwitchNetworkDialog';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';

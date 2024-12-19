@@ -1,6 +1,4 @@
 // @flow
-import environment from '../../../environment';
-
 export const CREATE_WALLET_SETPS = Object.freeze({
   LEARN_ABOUT_RECOVERY_PHRASE: 'LEARN_ABOUT_RECOVER_PHRASE',
   SAVE_RECOVERY_PHRASE: 'SAVE_RECOVERY_PHRASE',
