@@ -26,7 +26,7 @@ import type {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../stores/stateless/tokenHelpers';
-import { Box, Typography, styled, useTheme } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 
 const messages = defineMessages({
   addressFromLabel: {
