@@ -28,6 +28,10 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
           }}
           component="img"
           src={tokenInfo.info.image || tokenPng}
+          onError={e => {
+            // @ts-ignore
+            e.target.src = tokenPng;
+          }}
         ></Box>
 
         <Typography fontWeight="500" color="ds.gray_900">
