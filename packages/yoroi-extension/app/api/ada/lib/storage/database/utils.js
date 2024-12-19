@@ -193,7 +193,7 @@ export async function raii<T>(
       )
     ).join('\n');
     // eslint-disable-next-line no-console
-    console.error('rolling back Lovefield query for\n' + uniqueTableNames + ' with error ' + JSON.stringify(e));
+    console.error('rolling back Lovefield query for\n' + uniqueTableNames + ' with error ' + e.message);
     await tx.rollback();
     throw e;
   }

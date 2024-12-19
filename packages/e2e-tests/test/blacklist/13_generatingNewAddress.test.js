@@ -1,14 +1,15 @@
 import { expect } from 'chai';
-import BasePage from '../pages/basepage.js';
-import driversPoolsManager from '../utils/driversPool.js';
-import { getTestWalletName } from '../helpers/constants.js';
-import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { customAfterEach } from '../utils/customHooks.js';
-import { getTestLogger } from '../utils/utils.js';
-import { oneMinute } from '../helpers/timeConstants.js';
-import { createWallet } from '../helpers/restoreWalletHelper.js';
-import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
+import BasePage from '../../pages/basepage.js';
+import driversPoolsManager from '../../utils/driversPool.js';
+import { getTestWalletName } from '../../helpers/constants.js';
+import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
+import { customAfterEach } from '../../utils/customHooks.js';
+import { getTestLogger } from '../../utils/utils.js';
+import { oneMinute } from '../../helpers/timeConstants.js';
+import { createWallet } from '../../helpers/restoreWalletHelper.js';
+import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
 
+// Issue https://emurgo.atlassian.net/browse/YOEXT-1451
 describe('Generating a new address', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;

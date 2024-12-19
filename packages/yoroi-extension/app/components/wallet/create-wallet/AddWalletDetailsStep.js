@@ -13,15 +13,19 @@ import config from '../../../config';
 import WalletNameAndPasswordTipsDialog from './WalletNameAndPasswordTipsDialog';
 import TextField from '../../common/TextField';
 import WalletPlate from './WalletPlate';
-import {
-  isValidWalletName,
-  isValidWalletPassword,
-  isValidRepeatPassword,
-} from '../../../utils/validations';
+import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../../utils/validations';
 import { observer } from 'mobx-react';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, styled } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 const messages: * = defineMessages({
   createDesc: {
@@ -31,8 +35,7 @@ const messages: * = defineMessages({
   },
   restoreDesc: {
     id: 'wallet.restore.fourthStep.description',
-    defaultMessage:
-      '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
+    defaultMessage: '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
@@ -44,8 +47,7 @@ const messages: * = defineMessages({
   },
   passwordHint: {
     id: 'wallet.create.forthStep.passwordHint',
-    defaultMessage:
-      '!!!Use a combination of letters, numbers and symbols to make your password stronger',
+    defaultMessage: '!!!Use a combination of letters, numbers and symbols to make your password stronger',
   },
   repeatPasswordLabel: {
     id: 'wallet.create.forthStep.repeatPasswordLabel',
@@ -82,10 +84,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
           label: this.context.intl.formatMessage(messages.enterWalletName),
           value: '',
           validators: [
-            ({ field }) => [
-              isValidWalletName(field.value),
-              this.context.intl.formatMessage(globalMessages.invalidWalletName),
-            ],
+            ({ field }) => [isValidWalletName(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletName)],
           ],
         },
         walletPassword: {
@@ -98,10 +97,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
               if (repeatPasswordField.value.length > 0) {
                 repeatPasswordField.validate({ showErrors: true });
               }
-              return [
-                isValidWalletPassword(field.value),
-                this.context.intl.formatMessage(globalMessages.invalidWalletPassword),
-              ];
+              return [isValidWalletPassword(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletPassword)];
             },
           ],
         },
@@ -133,15 +129,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
   );
 
   render(): Node {
-    const {
-      prevStep,
-      recoveryPhrase,
-      isDialogOpen,
-      openDialog,
-      closeDialog,
-      selectedNetwork,
-      isRecovery,
-    } = this.props;
+    const { prevStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog, selectedNetwork, isRecovery } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const { intl } = this.context;
@@ -155,8 +143,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
       isValidWalletPassword(walletPassword) &&
       isValidRepeatPassword(walletPassword, repeatPassword);
 
-    if (!recoveryPhrase)
-      throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
+    if (!recoveryPhrase) throw new Error(`Recovery phrase is required to render AddWalletDetails component`);
 
     const descriptionMessage = Boolean(isRecovery) ? messages.restoreDesc : messages.createDesc;
 
@@ -164,10 +151,10 @@ export default class AddWalletDetailsStep extends Component<Props> {
       <Stack alignItems="center" justifyContent="center" id="addWalletDetailsStepComponent">
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
-            <Typography component="div" variant="body1">
+            <Typography component="div" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...descriptionMessage} />
             </Typography>
-            <Box
+            <IconWrapper
               component="button"
               sx={{
                 cursor: 'pointer',
@@ -178,7 +165,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
               onClick={() => openDialog(WalletNameAndPasswordTipsDialog)}
             >
               <InfoIcon />
-            </Box>
+            </IconWrapper>
           </Stack>
           <Box onSubmit={e => e.preventDefault()} component="form" autoComplete="off">
             <Box mb="8px">
@@ -200,9 +187,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
                   {...walletPasswordField.bind()}
                   done={walletPasswordField.isValid}
                   error={walletPasswordField.error}
-                  helperText={
-                    walletPasswordField.error || intl.formatMessage(messages.passwordHint)
-                  }
+                  helperText={walletPasswordField.error || intl.formatMessage(messages.passwordHint)}
                   id="walletPasswordInput"
                 />
               </Box>
@@ -224,6 +209,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
             openDialog={openDialog}
             closeDialog={closeDialog}
             isDialogOpen={isDialogOpen}
+            borderRadius={4}
           />
 
           <StepController
@@ -235,9 +221,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
                 type: 'secondary',
               },
               {
-                label: intl.formatMessage(
-                  Boolean(isRecovery) ? globalMessages.restore : globalMessages.create
-                ),
+                label: intl.formatMessage(Boolean(isRecovery) ? globalMessages.restore : globalMessages.create),
                 disabled: !isValidFields,
                 onClick: () => {
                   this.props.onSubmit(walletName, walletPassword);

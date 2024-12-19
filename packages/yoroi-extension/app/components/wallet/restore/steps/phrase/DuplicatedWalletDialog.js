@@ -2,12 +2,13 @@
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Typography, Box, Stack, Button, Dialog, Fade } from '@mui/material';
+import { Typography, Box, Stack, Button, Dialog, Fade, IconButton } from '@mui/material';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../../i18n/global-messages';
 import React from 'react';
 import { genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
 import WalletInfo from '../../../../common/walletInfo/WalletInfo';
+import { ReactComponent as CrossIcon } from '../../../../../assets/images/revamp/icons/cross.inline.svg';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
@@ -19,8 +20,7 @@ const messages: Object = defineMessages({
   },
   title: {
     id: 'wallet.restore.dialog.existingWallet.title',
-    defaultMessage:
-      '!!!This wallet already exists on your device, You can open it or go back and restore another wallet.',
+    defaultMessage: '!!!This wallet already exists on your device, You can open it or go back and restore another wallet.',
   },
   openWallet: {
     id: 'wallet.restore.dialog.walletExist.openWallet',
@@ -55,19 +55,35 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
       open={open}
       onClose={onClose}
       TransitionComponent={Transition}
-      id='duplicatedWalletDialog-dialog'
+      id="duplicatedWalletDialog-dialog"
       sx={{
-        background: 'rgb(18 31 77 / 70%)',
+        backgroundColor: 'ds.bg_color_max',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        '& .MuiPaper-root': { background: 'none', maxWidth: 'unset' },
+        '& .MuiPaper-root': { maxWidth: 'unset' },
       }}
     >
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={theme => ({
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          '& svg': {
+            '& path': {
+              fill: theme.palette.ds.el_gray_medium,
+            },
+          },
+        })}
+      >
+        <CrossIcon />
+      </IconButton>
       <Box
         sx={{
           width: '648px',
-          background: 'var(--yoroi-palette-common-white)',
+          backgroundColor: 'ds.bg_color_max',
           borderRadius: '8px',
           boxShadow: '0px 13px 20px -1px rgba(0, 0, 0, 0.15)',
           border: '1px solid grey.200',
@@ -82,13 +98,14 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
           <Typography
             component="div"
             sx={{ fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' }}
-            id='duplicatedWalletDialog-dialogTitle-text'
+            color="ds.text_gray_medium"
+            id="duplicatedWalletDialog-dialogTitle-text"
           >
             {intl.formatMessage(messages.dialogTitle)}
           </Typography>
         </Box>
         <Box sx={{ flex: 1, mb: '24px' }}>
-          <Typography component="div" textAlign="left" variant="body1" fontWeight="400" mb="16px">
+          <Typography component="div" textAlign="left" variant="body1" fontWeight="400" mb="16px" color="ds.text_gray_medium">
             {intl.formatMessage(messages.title)}
           </Typography>
           <Box component="ul" sx={{ listStyle: 'outside', mt: '16px' }}>
@@ -112,8 +129,8 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             color="primary"
             disableRipple={false}
             onClick={onClose}
-            style={{ width: '100%', height: '48px', fontSize: '16px' , borderWidth: 2}}
-            id='duplicatedWalletDialog-cancel-button'
+            style={{ width: '100%', height: '48px', fontSize: '16px', borderWidth: 2 }}
+            id="duplicatedWalletDialog-cancel-button"
           >
             {intl.formatMessage(globalMessages.cancel)}
           </Button>
@@ -123,7 +140,7 @@ function DuplicatedWalletDialog(props: Props & Intl): Node {
             disableRipple={false}
             onClick={onNext}
             style={{ width: '100%', height: '48px', fontSize: '16px' }}
-            id='duplicatedWalletDialog-openWallet-button'
+            id="duplicatedWalletDialog-openWallet-button"
           >
             {intl.formatMessage(messages.openWallet)}
           </Button>

@@ -6,7 +6,7 @@ import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { expect } from 'chai';
 import { oneMinute } from '../helpers/timeConstants.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet} from '../helpers/restoreWalletHelper.js';
 import { NOT_ENOUGH_BALANCE } from '../helpers/messages.js';
 import { testWallet1 } from '../utils/testWallets.js';
 
@@ -18,8 +18,7 @@ describe('Invalid amount for sending', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this)
   });
   // Go to Send page
   it(`Go to Send page`, async function () {

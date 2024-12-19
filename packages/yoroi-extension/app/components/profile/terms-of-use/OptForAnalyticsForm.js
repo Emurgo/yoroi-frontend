@@ -11,7 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
 
@@ -117,11 +117,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
       <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
           {isSettingsScreen && (
-            <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
+            <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(messages.title)}
+            </Typography>
           )}
 
           {isSettingsScreen ? (
-            <Box my="24px">{intl.formatMessage(messages.share)}</Box>
+            <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
           ) : (
             <div className={styles.illustration}>
               <AnalyticsIllustration />
@@ -146,7 +148,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 }}
               >
                 <Icon />
-                <Typography component="div">
+                <Typography component="div" color="ds.text_gray_medium">
                   <FormattedHTMLMessage {...msg} />
                 </Typography>
               </Box>
@@ -178,14 +180,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
               marginTop: '15px',
             }}
           >
-            <a
+            <Link
               target="_blank"
               rel="noreferrer"
               href={environment.externalPrivacyPolicyURL()}
-              className={styles.learnMore}
             >
               {intl.formatMessage(messages.privacyNotice)}
-            </a>
+            </Link>
           </Box>
         </Box>
       ) : null}
@@ -199,14 +200,13 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
               justifyContent: isStartupScreen ? 'center' : 'flex-start',
             }}
           >
-            <a
+            <Link
               target="_blank"
               rel="noreferrer"
               href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/7594394140303-What-s-user-insights-"
-              className={styles.learnMore}
             >
               {intl.formatMessage(messages.learnMore)}
-            </a>
+            </Link>
           </Box>
 
           {isSettingsScreen ? (
@@ -221,12 +221,16 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 </Box>
               }
               labelPlacement="start"
-              sx={{ marginLeft: '0px', marginTop: '40px' }}
+              sx={{
+                marginLeft: '0px',
+                marginTop: '40px',
+                color: 'ds.text_gray_medium',
+              }}
             />
           ) : (
             <>
               <div className={styles.skip}>
-                <button type="button" onClick={() => this.onOpt(false)}>
+                <button type="button" onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
                   {intl.formatMessage(globalMessages.skipLabel)}
                 </button>
               </div>
@@ -235,6 +239,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                   variant="primary"
                   onClick={() => this.onOpt(true)}
                   loading={this.state.isSubmitting}
+                  id="startupAnalytics-accept-button"
                 >
                   {intl.formatMessage(messages.accept)}
                 </LoadingButton>

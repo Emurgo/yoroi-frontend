@@ -46,6 +46,7 @@ export type TrezorTCatalystRegistrationTxSignData =
 export class HaskellShelleyTxSignRequest
 implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
 
+  receiver: ?{| address: string, handle: {| handle: string, nameServer: string |} | void |};
   senderUtxos: Array<CardanoAddressedUtxo>;
   unsignedTx: RustModule.WalletV4.TransactionBuilder;
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
@@ -75,6 +76,7 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       void | TrezorTCatalystRegistrationTxSignData;
     ledgerNanoCatalystRegistrationTxSignData?:
       void | LedgerNanoCatalystRegistrationTxSignData;
+    receiver?: ?{| address: string, handle: {| handle: string, nameServer: string |} | void |},
   |}) {
     this.senderUtxos = data.senderUtxos;
     this.unsignedTx = data.unsignedTx;
@@ -86,10 +88,13 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       data.trezorTCatalystRegistrationTxSignData;
     this.ledgerNanoCatalystRegistrationTxSignData =
       data.ledgerNanoCatalystRegistrationTxSignData;
+    this.receiver = data.receiver;
   }
 
   txId(): string {
-    return RustModule.WalletV4.hash_transaction(this.unsignedTx.build()).to_hex();
+    return RustModule.WalletV4.FixedTransaction.from_hex(
+      this.unsignedTx.build_tx().to_hex()
+    ).transaction_hash().to_hex();
   }
 
   size(): {| full: number, outputs: number[] |} {
@@ -239,6 +244,10 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
       kind: cert.kind(),
       payloadHex: cert.to_hex(),
     })).toArray();
+  }
+
+  receiverWithHandle(): null | {| address: string, handle: void | {| handle: string, nameServer: string |} |} {
+    return this.receiver ?? null;
   }
 
   receivers(includeChange: boolean): Array<string> {

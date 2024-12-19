@@ -98,8 +98,10 @@ class WalletSendPage extends Component<AllProps> {
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
-    loadProtocolParametersRequest.reset();
-    loadProtocolParametersRequest.execute();
+    if (!loadProtocolParametersRequest.wasExecuted && !loadProtocolParametersRequest.isExecuting) {
+      loadProtocolParametersRequest.reset();
+      loadProtocolParametersRequest.execute();
+    }
     ampli.sendInitiated();
   }
 
@@ -210,7 +212,8 @@ class WalletSendPage extends Component<AllProps> {
             hasAnyPending={hasAnyPending}
             isClassicTheme={profile.isClassicTheme}
             shouldSendAll={transactionBuilderStore.shouldSendAll}
-            updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
+            updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
+              txBuilderActions.updateReceiver.trigger({ address, handle })}
             updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
             updateSendAllStatus={txBuilderActions.updateSendAllStatus.trigger}
             fee={transactionBuilderStore.fee}
@@ -274,7 +277,7 @@ class WalletSendPage extends Component<AllProps> {
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           classicTheme={profile.isClassicTheme}
-          updateReceiver={(addr: void | string) => txBuilderActions.updateReceiver.trigger(addr)}
+          updateReceiver={(address: void | string) => txBuilderActions.updateReceiver.trigger({ address })}
           updateAmount={(value: ?BigNumber) => txBuilderActions.updateAmount.trigger(value)}
           updateMemo={(content: void | string) => txBuilderActions.updateMemo.trigger(content)}
           shouldSendAll={transactionBuilderStore.shouldSendAll}

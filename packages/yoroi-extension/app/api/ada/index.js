@@ -270,6 +270,7 @@ export type CreateUnsignedTxRequest = {|
   },
   absSlotNumber: BigNumber,
   receiver: string,
+  receiverHandle?: {| handle: string, nameServer: string |},
   filter: ElementOf<IGetAllUtxosResponse> => boolean,
   tokens: SendTokenList,
   metadata: Array<TransactionMetadata> | void,
@@ -329,6 +330,7 @@ export type CreateUnsignedTxForUtxosRequest = {|
   absSlotNumber: BigNumber,
   receivers: Array<{|
     ...Address,
+    +addressHandle?: {| handle: string, nameServer: string |},
     ...InexactSubset<Addressing>,
   |}>,
   network: $ReadOnly<NetworkRow>,
@@ -715,7 +717,7 @@ export default class AdaApi {
         );
 
         return {
-          txHash: Scope.WalletV4.hash_transaction(signedTx.body()).to_hex(),
+          txHash: Scope.WalletV4.FixedTransaction.from_hex(signedTx.to_hex()).transaction_hash().to_hex(),
           encodedTx: signedTx.to_bytes(),
         }
       })
@@ -863,11 +865,13 @@ export default class AdaApi {
 
       const { protocolParameters } = request;
 
+      let signRequestReceiver;
       if (hasSendAllDefault(request.tokens)) {
         if (request.receivers.length !== 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} wrong output size for sendAll`);
         }
         const receiver = request.receivers[0];
+        signRequestReceiver = { address: receiver.address, handle: receiver.addressHandle };
         unsignedTxResponse = shelleySendAllUnsignedTx(
           receiver,
           request.utxos,
@@ -903,23 +907,25 @@ export default class AdaApi {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} needs exactly one change address`);
         }
         const changeAddr = changeAddresses[0];
-        const otherAddresses: Array<{| ...Address, |}> = request.receivers.reduce(
+        const otherAddresses: Array<{| ...Address, +addressHandle?: {| handle: string, nameServer: string |}, |}> = request.receivers.reduce(
           (arr, next) => {
             if (next.addressing == null) {
-              arr.push({ address: next.address });
+              arr.push({ address: next.address, addressHandle: next.addressHandle });
               return arr;
             }
             return arr;
           },
-          ([]: Array<{| ...Address, |}>)
+          ([]: Array<{| ...Address, +addressHandle?: {| handle: string, nameServer: string |}, |}>)
         );
         if (otherAddresses.length > 1) {
           throw new Error(`${nameof(this.createUnsignedTxForUtxos)} can't send to more than one address`);
         }
+        const receiver = otherAddresses[0];
+        signRequestReceiver = { address: receiver.address, handle: receiver.addressHandle };
         unsignedTxResponse = await shelleyNewAdaUnsignedTx(
           otherAddresses.length === 1
             ? [{
-              address: otherAddresses[0].address,
+              address: receiver.address,
               amount: builtSendTokenList(
                 request.defaultToken,
                 request.tokens,
@@ -966,6 +972,7 @@ export default class AdaApi {
           neededHashes: new Set(),
           wits: new Set(),
         },
+        receiver: signRequestReceiver,
       });
     } catch (error) {
       Logger.error(
@@ -984,7 +991,8 @@ export default class AdaApi {
     const addressedUtxo = asAddressedUtxo(filteredUtxos);
 
     const receivers = [{
-      address: request.receiver
+      address: request.receiver,
+      addressHandle: request.receiverHandle,
     }];
 
     // note: we need to create a change address IFF we're not sending all of the default asset
@@ -1571,13 +1579,13 @@ export default class AdaApi {
       );
 
       {
-        const body = unsignedTxResponse.txBuilder.build();
+        const tx = unsignedTxResponse.txBuilder.build_tx();
         for (const withdrawal of request.withdrawals) {
           if (withdrawal.privateKey != null) {
             const { privateKey } = withdrawal;
             neededKeys.wits.add(
               RustModule.WalletV4.make_vkey_witness(
-                RustModule.WalletV4.hash_transaction(body),
+                RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash(),
                 privateKey
               ).to_hex()
             );

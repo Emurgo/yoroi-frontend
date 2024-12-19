@@ -170,7 +170,7 @@ type Props = {|
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
   +isClassicTheme: boolean,
-  +updateReceiver: (void | string) => void,
+  +updateReceiver: (void | string, void | {| handle: string, nameServer: string |}) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
   +shouldSendAll: boolean,
@@ -234,6 +234,20 @@ const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
   },
 }));
 
+const STextField = styled(TextField)(({ theme }) => ({
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected': {
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+    '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
+  },
+  '& .MuiFormHelperText-root': {
+    marginInline: 0,
+    mt: 0.5,
+    fontSize: '0.750rem',
+    lineHeight: '1rem',
+    letterSpacing: '0.2px',
+  },
+}));
+
 type State = {|
   currentStep: number,
   invalidMemo: boolean,
@@ -245,6 +259,7 @@ type State = {|
   |},
   domainResolverMessage: ?string,
   domainResolverIsLoading: boolean,
+  lastValidatedValue: ?string,
 |};
 
 @observer
@@ -260,6 +275,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     domainResolverResult: null,
     domainResolverMessage: null,
     domainResolverIsLoading: false,
+    lastValidatedValue: null,
   };
   maxStep: number = SEND_FORM_STEP.RECEIVER;
 
@@ -332,10 +348,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     isDomainResolvable: boolean,
     domainResolverMessage: ?string,
     resolvedAddress: ?string,
+    resolvedNameServer: ?string,
   |}> {
     let isDomainResolvable = false;
     let domainResolverMessage = null;
     let resolvedAddress = null;
+    let resolvedNameServer = null;
     const { resolveDomainAddress } = this.props;
     if (resolveDomainAddress != null) {
       isDomainResolvable = isResolvableDomain(handle);
@@ -347,6 +365,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           domainResolverMessage = this.context.intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
         } else if (res.address != null) {
           resolvedAddress = res.address;
+          resolvedNameServer = res.nameServer;
           domainResolverResult = {
             handle,
             address: res.address,
@@ -372,6 +391,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       isDomainResolvable,
       domainResolverMessage,
       resolvedAddress,
+      resolvedNameServer,
     };
   }
 
@@ -385,44 +405,57 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
-              let receiverValue = field.value;
-              if (receiverValue === '') {
-                this.props.updateReceiver();
-                this.setState({
-                  domainResolverResult: null,
-                  domainResolverMessage: null,
-                  domainResolverIsLoading: false,
-                });
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-              }
-              const updateReceiver = (isValid: boolean) => {
-                if (isValid) {
-                  this.props.updateReceiver(getAddressPayload(receiverValue, this.props.selectedNetwork));
-                } else {
+              const inputFieldValue = field.value;
+              let handle = undefined;
+              let receiverValue = inputFieldValue;
+              try {
+                if (receiverValue === '') {
                   this.props.updateReceiver();
+                  this.setState({
+                    domainResolverResult: null,
+                    domainResolverMessage: null,
+                    domainResolverIsLoading: false,
+                  });
+                  return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
                 }
-              };
+                const updateReceiver = (isValid: boolean) => {
+                  if (isValid) {
+                    this.props.updateReceiver(
+                      getAddressPayload(receiverValue, this.props.selectedNetwork),
+                      handle,
+                    );
+                  } else {
+                    this.props.updateReceiver();
+                  }
+                };
 
-              // DOMAIN RESOLVER
-              const { isDomainResolvable, domainResolverMessage, resolvedAddress } = await this.resolveDomainAddress(
-                receiverValue
-              );
-              if (resolvedAddress != null) {
-                receiverValue = resolvedAddress;
-              }
-              ////////////////////
+                // DOMAIN RESOLVER
+                const { isDomainResolvable, domainResolverMessage, resolvedAddress, resolvedNameServer } =
+                  // $FlowIgnore[incompatible-call]
+                  await this.resolveDomainAddress(receiverValue);
 
-              const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
-              if (isValid === true) {
-                updateReceiver(true);
-                return [isValid];
+                if (resolvedAddress != null) {
+                  handle = { handle: receiverValue, nameServer: resolvedNameServer };
+                  receiverValue = resolvedAddress;
+                }
+                ////////////////////
+
+                const isValid = isValidReceiveAddress(receiverValue, this.props.selectedNetwork);
+                if (isValid === true) {
+                  updateReceiver(true);
+                  return [isValid];
+                }
+                const [result, errorMessage, errorType] = isValid;
+                updateReceiver(result);
+                const fieldError = isDomainResolvable
+                  ? domainResolverMessage
+                  : this.context.intl.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
+                return [isValid[0], fieldError];
+              } finally {
+                this.setState({
+                  lastValidatedValue: inputFieldValue,
+                });
               }
-              const [result, errorMessage, errorType] = isValid;
-              updateReceiver(result);
-              const fieldError = isDomainResolvable
-                ? domainResolverMessage
-                : this.context.intl.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
-              return [isValid[0], fieldError];
             },
           ],
         },
@@ -612,7 +645,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Box>
             ) : null}
             <Box sx={{ position: 'relative' }}>
-              <TextField
+              <STextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
@@ -624,22 +657,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
-                sx={{
-                  '& .MuiFormHelperText-root': {
-                    marginInline: 0,
-                    mt: 0.5,
-                    fontSize: '0.750rem',
-                    lineHeight: '1rem',
-                    letterSpacing: '0.2px',
-                  },
-                }}
               />
               {domainResolverResult != null ? (
                 <Typography
                   component="div"
                   variant="caption1"
+                  align="right"
                   color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                  sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
@@ -681,8 +706,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="caption1"
+                align="right"
                 color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                sx={{ position: 'absolute', bottom: '5px', right: '0' }}
+                sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>
@@ -725,7 +751,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
             <Box
               sx={{
-                height: '129px',
+                height: showFiat ? '129px' : '64px',
                 position: 'relative',
                 padding: '16px 0px',
                 borderRadius: '8px',
@@ -801,7 +827,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                <Typography component="div" variant="button2" color="ds.text_gray_low" fontWeight={500} mr="12px">
                   ADA
                 </Typography>
 
@@ -940,14 +966,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
-            receiverHandle={
-              domainResolverResult
-                ? {
-                    nameServer: domainResolverResult.nameServer,
-                    handle: domainResolverResult.handle,
-                  }
-                : null
-            }
           />
         );
       default:
@@ -962,6 +980,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const { maxSendableAmount } = this.props;
 
     const receiverField = form.$('receiver');
+    const isValidatedValue = receiverField.value === this.state.lastValidatedValue;
+    const isValidValue = isValidatedValue && receiverField.isValid;
 
     switch (step) {
       case SEND_FORM_STEP.RECEIVER:
@@ -971,7 +991,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             variant="primary"
             size="medium"
             onClick={() => this.onUpdateStep(SEND_FORM_STEP.AMOUNT)}
-            disabled={invalidMemo || !receiverField.isValid}
+            disabled={invalidMemo || !isValidValue}
             id="wallet:send:enterAddressStep-nextToAddAssets-button"
           >
             {intl.formatMessage(globalMessages.nextButtonLabel)}
