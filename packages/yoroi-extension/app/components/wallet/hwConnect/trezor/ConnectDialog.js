@@ -17,10 +17,10 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
-import { ReactComponent as ConnectErrorImage }  from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
+import { ReactComponent as ConnectErrorImage } from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
 
 import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
-import { ReactComponent as ConnectErrorSVG }  from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
+import { ReactComponent as ConnectErrorSVG } from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import { StepState } from '../../../widgets/ProgressSteps';
@@ -30,6 +30,7 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Typography } from '@mui/material';
 
 const connectStartGIF = connectLoadGIF;
 
@@ -52,27 +53,18 @@ type Props = {|
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean
+  +classicTheme: boolean,
 |};
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      progressInfo,
-      isActionProcessing,
-      error,
-      onExternalLinkClick,
-      goBack,
-      submit,
-      cancel,
-      classicTheme
-    } = this.props;
+    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel, classicTheme } = this.props;
 
     const introBlock = classicTheme ? (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
@@ -85,11 +77,11 @@ export default class ConnectDialog extends Component<Props> {
       </div>
     ) : (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
-        <span>
+        <Typography component="span" color="ds.text_gray_low">
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
           {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
           {intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}
-        </span>
+        </Typography>
       </div>
     );
 
@@ -98,40 +90,42 @@ export default class ConnectDialog extends Component<Props> {
 
     switch (progressInfo.stepState) {
       case StepState.LOAD:
-        backButton = (<DialogBackButton onBack={goBack} />);
+        backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={classicTheme ? connectLoadGIF : connectLoadImage} alt="" />
-          </div>);
+          </div>
+        );
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={classicTheme ? connectStartGIF : connectLoadImage} alt="" />
-          </div>);
+          </div>
+        );
         break;
       case StepState.ERROR:
-        backButton = (<DialogBackButton onBack={goBack} />);
+        backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            {classicTheme
-              ? <ConnectErrorSVG />
-              : <ConnectErrorImage />
-            }
-          </div>);
+            {classicTheme ? <ConnectErrorSVG /> : <ConnectErrorImage />}
+          </div>
+        );
         break;
       default:
         Logger.error('trezorConnect::ConnectDialog::render: something unexpected happened');
         break;
     }
 
-    const dailogActions = [{
-      label: intl.formatMessage(globalMessages.connectLabel),
-      primary: true,
-      isSubmitting: isActionProcessing,
-      onClick: submit
-    }];
+    const dailogActions = [
+      {
+        label: intl.formatMessage(globalMessages.connectLabel),
+        primary: true,
+        isSubmitting: isActionProcessing,
+        onClick: submit,
+      },
+    ];
 
     return (
       <Dialog
@@ -146,10 +140,9 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
         {introBlock}
         {middleBlock}
-        {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
-        }
+        {error && <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />}
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 }
