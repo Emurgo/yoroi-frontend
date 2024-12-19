@@ -7,9 +7,9 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
-import styles from './BaseTransferPage.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +children: Node,
@@ -22,21 +22,17 @@ type Props = {|
 
 @observer
 export default class BaseTransferPage extends Component<Props> {
-
-  static defaultProps: {|error: void|} = {
-    error: undefined
+  static defaultProps: {| error: void |} = {
+    error: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      onBack,
-      step0,
-    } = this.props;
+    const { onBack, step0 } = this.props;
 
     const actions = [
       {
@@ -59,28 +55,35 @@ export default class BaseTransferPage extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         onClose={onBack}
-        className={styles.dialog}
+        className={undefined}
         backButton={<DialogBackButton onBack={onBack} />}
       >
-        <div className={styles.component}>
-          <div className={styles.body}>
-            <div>
-              <ul className={styles.instructionsList}>
-                <div className={styles.text}>
-                  {step0}
-                  <br /><br />
-                  {intl.formatMessage(globalMessages.step1)}
-                </div>
-              </ul>
-            </div>
+        <Box>
+          <Box>
+            <Box>
+              <Typography variant="body2" color="ds.text_gray_medium">
+                {step0}
+              </Typography>
+              <Typography
+                variant="body2"
+                color="ds.text_gray_medium"
+                sx={{
+                  pt: '16px',
+                }}
+              >
+                {intl.formatMessage(globalMessages.step1)}
+              </Typography>
+            </Box>
             {this.props.children}
             {this.props.error && (
-              <div className={styles.error}>
-                {intl.formatMessage(this.props.error, this.props.error.values)}
-              </div>
+              <Box textAlign="center">
+                <Typography variant="body1" color="ds.text_error">
+                  {intl.formatMessage(this.props.error, this.props.error.values)}
+                </Typography>
+              </Box>
             )}
-          </div>
-        </div>
+          </Box>
+        </Box>
       </Dialog>
     );
   }
