@@ -7,7 +7,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
-import { preloadDBAndStorage, waitTxPage } from '../helpers/restoreWalletHelper.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 
 describe('Changing language through the Settings', function () {
   this.timeout(2 * oneMinute);
@@ -17,8 +17,7 @@ describe('Changing language through the Settings', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   const testData = [

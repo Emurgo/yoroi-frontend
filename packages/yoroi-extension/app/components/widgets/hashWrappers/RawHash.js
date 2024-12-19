@@ -53,7 +53,7 @@ export default class RawHash extends Component<Props> {
         {this.props.children}
       </Box>
     ) : (
-      <Typography color="ds.text_gray_low" varinat="body1" className={addressClasses}>
+      <Typography color="ds.text_gray_medium" varinat="body1" className={addressClasses}>
         {this.props.children}
       </Typography>
     );

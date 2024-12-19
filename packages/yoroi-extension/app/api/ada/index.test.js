@@ -498,7 +498,7 @@ describe('app/api/ada/index', () => {
         {
           identifier: '',
           networkId: 300,
-          amount: new BigNumber('8812631')
+          amount: new BigNumber('8812367')
         },
         {
           amount: new BigNumber('45000000'),
@@ -508,7 +508,7 @@ describe('app/api/ada/index', () => {
       ]
     );
 
-    expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('187369');
+    expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('187633');
 
     function cmpOutputs(o1: any, o2: any): number {
       if (o1.address > o2.address) {
@@ -530,7 +530,7 @@ describe('app/api/ada/index', () => {
         collateral_return: null,
         current_treasury_value: null,
         donation: null,
-        fee: '187369',
+        fee: '187633',
         inputs: [
           {
             index: 1,
@@ -610,7 +610,7 @@ describe('app/api/ada/index', () => {
           {
             address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
             amount: {
-              coin: '2657551',
+              coin: '2657287',
               multiasset: null
             },
             plutus_data: null,

@@ -49,7 +49,7 @@ class ResyncBlock extends Component<Props & InjectedProps> {
           variant={isRevampLayout ? 'body1' : 'h5'}
           fontWeight={500}
           mb={isRevampLayout ? '16px' : '12px'}
-          color="grayscale.900"
+          color="ds.text_gray_medium"
         >
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
