@@ -90,6 +90,8 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.stakingCenterPageViewed();
     } else if (pathname === ROUTES.WALLETS.ROOT) {
       ampli.walletPageViewed();
+    } else if (pathname === ROUTES.Governance.ROOT) {
+      ampli.governanceDashboardPageViewed();
     }
   });
 };

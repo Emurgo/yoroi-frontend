@@ -1,18 +1,17 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
-import BackgroundColoredLayout from '../../components/layout/BackgroundColoredLayout';
 import NoWalletMessage from '../wallet/NoWalletMessage';
-import UnsupportedWallet from '../wallet/UnsupportedWallet';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-import NavBarContainer from '../NavBarContainer';
 import globalMessages from '../../i18n/global-messages';
+import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import HorizontalLine from '../../components/widgets/HorizontalLine';
 import type { StoresProps } from '../../stores';
 
@@ -39,13 +38,12 @@ export default class Transfer extends Component<AllProps> {
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const navbar = (
-      <NavBarContainer
+      <NavBarContainerRevamp
         stores={stores}
-        title={
-          <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />
-        }
+        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />}
       />
     );
+
     return (
       <TopBarLayout
         banner={<BannerContainer stores={stores} />}
@@ -64,22 +62,11 @@ export default class Transfer extends Component<AllProps> {
     if (wallet == null) {
       return <NoWalletMessage />;
     }
-    // temporary solution: will need to handle more cases later for different currencies
-    if (wallet.isCardanoHaskell) {
-      return <UnsupportedWallet />;
-    }
+
     return (
-      <>
-        <HorizontalLine />
-        <BackgroundColoredLayout>
-          <Suspense fallback={null}>
-            <WalletTransferPage
-              stores={stores}
-              publicDeriver={wallet}
-            />
-          </Suspense>
-        </BackgroundColoredLayout>
-      </>
+      <Suspense fallback={null}>
+        <WalletTransferPage stores={stores} />
+      </Suspense>
     );
   };
 }

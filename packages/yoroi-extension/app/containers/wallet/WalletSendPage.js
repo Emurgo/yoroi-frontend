@@ -27,6 +27,9 @@ import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNF
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
+import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({
@@ -83,8 +86,10 @@ export default class WalletSendPage extends Component<StoresProps> {
         this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
-    loadProtocolParametersRequest.reset();
-    loadProtocolParametersRequest.execute();
+    if (!loadProtocolParametersRequest.wasExecuted && !loadProtocolParametersRequest.isExecuting) {
+      loadProtocolParametersRequest.reset();
+      loadProtocolParametersRequest.execute();
+    }
     ampli.sendInitiated();
   }
 
@@ -133,7 +138,13 @@ export default class WalletSendPage extends Component<StoresProps> {
     } = stores;
 
     if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
-      return null;
+      return (
+        <FullscreenLayout bottomPadding={0}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </FullscreenLayout>
+      );
     }
 
     const { hasAnyPending } = stores.transactions;
@@ -174,7 +185,8 @@ export default class WalletSendPage extends Component<StoresProps> {
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={hasAnyPending}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
-          updateReceiver={(addr: void | string) => transactionBuilderStore.updateReceiver(addr)}
+          updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
+            transactionBuilderStore.updateReceiver({ address, handle })}
           updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
           updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
           fee={transactionBuilderStore.fee}

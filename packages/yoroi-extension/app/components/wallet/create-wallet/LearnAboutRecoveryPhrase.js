@@ -134,7 +134,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
   return (
     <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
-        <Typography component="div" mb="16px" variant="body1">
+        <Typography component="div" mb="16px" variant="body1" color="ds.text_gray_medium">
           <FormattedHTMLMessage {...text.shortDescription} />
         </Typography>
 
@@ -155,7 +155,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
           >
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
-                <Typography component="div" variant="body1" color="ds.gray_max" mb="4px">
+                <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
                   <FormattedHTMLMessage {...tip} />
                 </Typography>
               </Box>
@@ -172,6 +172,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             display: 'block',
             py: '16px',
             mb: '20px',
+            color: 'ds.text_primary_medium',
           }}
         >
           {intl.formatMessage(infoDialogMessages.learnMore)}

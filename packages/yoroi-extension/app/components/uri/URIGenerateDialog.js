@@ -141,7 +141,7 @@ export default class URIGenerateDialog extends Component<Props> {
       >
         <div>
           <div className={styles.receiverInput}>
-            <TextField className="receiver" {...receiverField.bind()} disabled />
+            <TextField {...receiverField.bind()} disabled />
           </div>
           <div className={styles.amountField}>
             <NumericInputRP

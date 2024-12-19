@@ -42,7 +42,7 @@ export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps)
       closeOnOverlayClick
       closeButton={<DialogCloseButton />}
     >
-      <Typography variant="body1" mb={2} mx="24px">
+      <Typography variant="body1" mb={2} mx="24px" color="ds.text_gray_medium">
         {intl.formatMessage(messages.contentInfo)}
       </Typography>
 

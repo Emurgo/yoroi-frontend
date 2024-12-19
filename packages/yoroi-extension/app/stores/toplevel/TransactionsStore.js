@@ -73,6 +73,19 @@ export default class TransactionsStore extends Store<StoresMap> {
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
 
+  setup(): void {
+    this.actions.profile.updateUnitOfAccount.listen(async () => {
+      const publicDeriver = this.stores.wallets.selected;
+      if (!publicDeriver) {
+        return;
+      }
+      const timestamps = new Set(this.getTxHistoryState(publicDeriver.publicDeriverId).txs.map(
+        tx => tx.date.valueOf()
+      ));
+      await this._updateTransactionPriceData(publicDeriver, timestamps);
+    });
+  }
+
   /** Calculate information about transactions that are still realistically reversible */
   @computed get unconfirmedAmount(): UnconfirmedAmount {
     const defaultUnconfirmedAmount = {
@@ -165,6 +178,18 @@ export default class TransactionsStore extends Store<StoresMap> {
         withdrawalIds.add(txid);
       }
     }
+    await this._updateTransactionPriceData(publicDeriver, timestamps);
+    await Promise.all([
+      // reload token info cache
+      // todo: use fetchMissingTokenInfo to fetch only missing tokens
+      this.stores.tokenInfoStore.refreshTokenInfo(),
+      this.stores.addresses.refreshAddressesFromDb(publicDeriver)
+    ]);
+  }
+
+  async _updateTransactionPriceData(
+    publicDeriver: { networkId: number, ... }, timestamps: Set<number>
+  ): Promise<void> {
     const defaultTokenInfo = this.stores.tokenInfoStore.getDefaultTokenInfo(
       publicDeriver.networkId,
     );
@@ -177,13 +202,6 @@ export default class TransactionsStore extends Store<StoresMap> {
       timestamps: Array.from(timestamps),
       defaultToken: ticker,
     });
-
-    await Promise.all([
-      // reload token info cache
-      // todo: use fetchMissingTokenInfo to fetch only missing tokens
-      this.stores.tokenInfoStore.refreshTokenInfo(),
-      this.stores.addresses.refreshAddressesFromDb(publicDeriver)
-    ]);
   }
 
   @action loadMoreTransactions: (WalletState) => Promise<void> = async (publicDeriver) => {

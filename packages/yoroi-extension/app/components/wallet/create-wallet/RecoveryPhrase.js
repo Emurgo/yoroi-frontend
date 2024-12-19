@@ -7,6 +7,14 @@ import { Box, Typography, Grid, Button, styled } from '@mui/material';
 import { ReactComponent as OpenedEyeIcon } from '../../../assets/images/open-eye-primary.inline.svg';
 import { ReactComponent as ClosedEyeIcon } from '../../../assets/images/close-eye-primary.inline.svg';
 
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.text_primary_medium,
+    },
+  },
+}));
+
 type Props = {|
   recoveryPhrase: Array<string> | null,
   shouldShowRecoveryPhrase: boolean,
@@ -45,6 +53,7 @@ function RecoveryPhrase(props: Props & Intl): Node {
               key={word}
               columns={7}
               sx={{
+                backgroundColor: 'ds.primary_100',
                 textAlign: 'center',
                 borderRadius: '8px',
                 display: 'flex',
@@ -56,7 +65,8 @@ function RecoveryPhrase(props: Props & Intl): Node {
               }}
               id={'recoveryPhraseWord' + idx}
             >
-              <Typography component="div"
+              <Typography
+                component="div"
                 sx={{
                   width: '124px',
                   whiteSpace: 'nowrap',
@@ -88,13 +98,17 @@ function RecoveryPhrase(props: Props & Intl): Node {
         onClick={toggleRecoveryPhrase}
         id="toggleRecoveryPhraseButton"
       >
-        {shouldShowRecoveryPhrase ? <ClosedEyeIcon /> : <OpenedEyeIcon />}
-        <Typography component="div" variant="body2" fontWeight="500">
-          {intl.formatMessage(
-            shouldShowRecoveryPhrase
-              ? messages.hideRecoveryPhraseBtn
-              : messages.showRecoveryPhraseBtn
-          )}
+        {shouldShowRecoveryPhrase ? (
+          <IconWrapper>
+            <ClosedEyeIcon />{' '}
+          </IconWrapper>
+        ) : (
+          <IconWrapper>
+            <OpenedEyeIcon />{' '}
+          </IconWrapper>
+        )}
+        <Typography component="div" variant="body2" fontWeight="500" color="ds.text_primary_medium">
+          {intl.formatMessage(shouldShowRecoveryPhrase ? messages.hideRecoveryPhraseBtn : messages.showRecoveryPhraseBtn)}
         </Typography>
       </Button>
     </Box>

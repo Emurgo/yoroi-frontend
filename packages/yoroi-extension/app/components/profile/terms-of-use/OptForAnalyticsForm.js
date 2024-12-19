@@ -11,8 +11,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
-import { Box, Typography } from '@mui/material';
+import { Box, Link, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   title: {
@@ -47,6 +48,18 @@ const messages = defineMessages({
   learnMore: {
     id: 'profile.analytics.learnMore',
     defaultMessage: '!!!Learn more about user insights',
+  },
+  privacyNotice: {
+    id: 'profile.analytics.seePrivacyNotice',
+    defaultMessage: '!!!See Privacy Notice',
+  },
+  collectedData: {
+    id: 'profile.analytics.collectedData',
+    defaultMessage: '!!!Collected data includes: visited Yoroi extension pages, browser version, selected language, time of analytical events',
+  },
+  rejectionImpact: {
+    id: 'profile.analytics.rejectionImpact',
+    defaultMessage: '!!!Opting out won’t impact your experience',
   },
   accept: {
     id: 'profile.analytics.accept',
@@ -88,23 +101,29 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
+    const isFirefox = environment.isFirefox();
+
     const analyticsDetails = [
       [YesIcon, messages.line1],
       [YesIcon, messages.line2],
+      (isFirefox ? [YesIcon, messages.rejectionImpact] : null),
       [NoIcon, messages.line3],
       [NoIcon, messages.line4],
       [NoIcon, messages.line5],
-    ];
+    ].filter(Boolean);
 
     return (
+      <>
       <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
         <div className={variant === 'startup' ? styles.centeredBox : ''}>
           {isSettingsScreen && (
-            <div className={styles.title}>{intl.formatMessage(messages.title)}</div>
+            <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(messages.title)}
+            </Typography>
           )}
 
           {isSettingsScreen ? (
-            <Box my="24px">{intl.formatMessage(messages.share)}</Box>
+            <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
           ) : (
             <div className={styles.illustration}>
               <AnalyticsIllustration />
@@ -129,11 +148,28 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 }}
               >
                 <Icon />
-                <Typography component="div">
+                <Typography component="div" color="ds.text_gray_medium">
                   <FormattedHTMLMessage {...msg} />
                 </Typography>
               </Box>
             ))}
+          </Box>
+
+        </div>
+      </Box>
+
+      {isFirefox ? (
+        <Box className={styles.component}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
+              marginTop: '15px',
+              fontSize: '0.8rem',
+            }}
+          >
+            {intl.formatMessage(messages.collectedData)}
           </Box>
 
           <Box
@@ -141,16 +177,36 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
               display: 'flex',
               alignItems: 'center',
               justifyContent: isStartupScreen ? 'center' : 'flex-start',
+              marginTop: '15px',
             }}
           >
-            <a
+            <Link
+              target="_blank"
+              rel="noreferrer"
+              href={environment.externalPrivacyPolicyURL()}
+            >
+              {intl.formatMessage(messages.privacyNotice)}
+            </Link>
+          </Box>
+        </Box>
+      ) : null}
+
+      <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
+        <div className={variant === 'startup' ? styles.centeredBox : ''}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isStartupScreen ? 'center' : 'flex-start',
+            }}
+          >
+            <Link
               target="_blank"
               rel="noreferrer"
               href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/7594394140303-What-s-user-insights-"
-              className={styles.learnMore}
             >
               {intl.formatMessage(messages.learnMore)}
-            </a>
+            </Link>
           </Box>
 
           {isSettingsScreen ? (
@@ -165,12 +221,16 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 </Box>
               }
               labelPlacement="start"
-              sx={{ marginLeft: '0px', marginTop: '40px' }}
+              sx={{
+                marginLeft: '0px',
+                marginTop: '40px',
+                color: 'ds.text_gray_medium',
+              }}
             />
           ) : (
             <>
               <div className={styles.skip}>
-                <button type="button" onClick={() => this.onOpt(false)}>
+                <button type="button" onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
                   {intl.formatMessage(globalMessages.skipLabel)}
                 </button>
               </div>
@@ -179,6 +239,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                   variant="primary"
                   onClick={() => this.onOpt(true)}
                   loading={this.state.isSubmitting}
+                  id="startupAnalytics-accept-button"
                 >
                   {intl.formatMessage(messages.accept)}
                 </LoadingButton>
@@ -187,6 +248,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
           )}
         </div>
       </Box>
+      </>
     );
   }
 }

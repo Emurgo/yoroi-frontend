@@ -283,15 +283,14 @@ export default class WalletStore extends Store<StoresMap> {
     );
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
-    // Cache select wallet
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
     noop(subscribe(publicDeriverId));
     // Catalyst update // todo: maybe check if network changed
     noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
   };
 
-  getLastSelectedWallet: void => ?WalletState = () => {
-    const walletId = this.api.localStorage.getSelectedWalletId();
+  getLastSelectedWallet: void => Promise<?WalletState> = async () => {
+    const walletId: ?number = await this.api.localStorage.getSelectedWalletId();
     return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 

@@ -231,7 +231,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
         metadata,
       );
 
-      const txId = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
+      const txId = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash().to_hex();
 
       await broadcastTransaction({
         publicDeriverId: request.wallet.publicDeriverId,

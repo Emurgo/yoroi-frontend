@@ -1,12 +1,14 @@
 // @flow
 import type { Node } from 'react';
+import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
+import { getTokenName } from '../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../utils/formatters';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
-import { PublicDeriver } from '../../api/ada/lib/storage/models/PublicDeriver';
 import YoroiTransferPage from './YoroiTransferPage';
 import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
@@ -17,7 +19,7 @@ type Props = {|
 |};
 
 @observer
-export default class WalletTransferPage extends Component<{| ...Props, ...StoresProps |}> {
+export default class WalletTransferPage extends Component<StoresProps> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
@@ -29,15 +31,17 @@ export default class WalletTransferPage extends Component<{| ...Props, ...Stores
   // <TODO:PENDING_REMOVAL> paper
   startTransferYoroiPaperFunds: void => void = () => {
     this.props.stores.yoroiTransfer.startTransferFunds();
-  }
+  };
 
   render(): Node {
     const { stores } = this.props;
-    const defaultToken = this.props.publicDeriver.getParent().getDefaultToken();
-    const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
-      identifier: defaultToken.defaultIdentifier,
-      networkId: defaultToken.defaultNetworkId,
-    });
+    const wallet = stores.wallets.selected;
+    if (wallet == null) {
+      return null;
+    }
+
+    const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfo(wallet.networkId);
+
     return (
       <>
         <TransferTypeSelect

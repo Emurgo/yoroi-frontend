@@ -16,14 +16,7 @@ function StepController(props: Props): Node {
   const { stepActions } = props;
 
   return (
-    <Stack
-      direction="row"
-      alignItems="center"
-      justifyContent="center"
-      mt="14px"
-      py="24px"
-      gap="24px"
-    >
+    <Stack direction="row" alignItems="center" justifyContent="center" mt="14px" py="24px" gap="24px">
       {stepActions.map(({ type, label, disabled, onClick }, idx) => {
         const isPrimary = type === 'primary';
         return (

@@ -9,6 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import { Typography } from '@mui/material';
 import type { StoresProps } from '../../../stores';
 
 type Props = {|
@@ -55,9 +56,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
-      'cardano': walletsNavigation.cardano.filter(
-        walletId => walletId !== selectedWalletId
-      ),
+      cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
     };
     await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
@@ -87,8 +86,13 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
         }}
         id="removeWalletDialog"
       >
-        <p>{intl.formatMessage(messages.removeExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning2)}</p>
+        <Typography varint="body1" sx={{ color: 'ds.text_gray_medium' }}>
+          {intl.formatMessage(messages.removeExplanation)}
+        </Typography>
+        <Typography varint="body1" sx={{ color: 'ds.text_gray_medium' }}>
+          {' '}
+          {intl.formatMessage(dialogMessages.warning2)}
+        </Typography>
       </DangerousActionDialog>
     );
   }

@@ -12,6 +12,7 @@ import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
+import LocalStorageApi from '../../../api/localStorage/index';
 import type { StoresProps } from '../../../stores';
 
 const currencyLabels = defineMessages({
@@ -56,8 +57,10 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
   };
 
   onSelectUnitOfAccount: string => Promise<void> = async value => {
-    const unitOfAccount =
-      value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    const localStorageApi = new LocalStorageApi();
+
+    const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
+    localStorageApi.unsetPortfolioFiatPair();
     await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
   };
 
@@ -68,8 +71,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const coinPriceStore = stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
-    const isSubmittingUnitOfAccount =
-      profileStore.setUnitOfAccountRequest.isExecuting;
+    const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
 
     const currencies = profileStore.UNIT_OF_ACCOUNT_OPTIONS.map(c => {
       const name = intl.formatMessage(currencyLabels[c.symbol]);
@@ -89,13 +91,11 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
       svg: AdaCurrency,
     });
 
-    const unitOfAccountValue = profileStore.unitOfAccount.enabled
-      ? profileStore.unitOfAccount.currency
-      : 'ADA';
+    const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
     return (
       <Box sx={{ pb: '50px' }}>
-        <Typography component="div" variant="h5" fontWeight={500} mb="24px">
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
           {intl.formatMessage(settingsMenuMessages.general)}
         </Typography>
         <GeneralSettings

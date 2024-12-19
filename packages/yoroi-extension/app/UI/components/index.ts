@@ -1,3 +1,4 @@
+export * from './BackButton';
 export * from './buttons/CopyButton';
 export * from './Card';
 export * from './Chip';
@@ -10,5 +11,5 @@ export * from './Skeleton';
 export * from './Tooltip';
 export * from './TransactionFailed/TransactionFailed';
 export * from './TransactionSubmitted/TransactionSubmitted';
-export * from './wrappers/IconButtonWrapper';
 export * from './wrappers/GradientBgBox';
+export * from './wrappers/IconButtonWrapper';

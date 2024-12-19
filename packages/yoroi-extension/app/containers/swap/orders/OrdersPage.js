@@ -31,6 +31,7 @@ import NoOpenOrders from './NoOpenOrders';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
+import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
 
 type ColumnContext = {|
@@ -201,6 +202,12 @@ export default function SwapOrdersPage(props: StoresProps): Node {
           collateral: utxoHex,
         },
       });
+      if (cancelTxCbor == null || !isHex(cancelTxCbor)) {
+        console.error('Failed to receive swap cancel tx from API. Expected cbor hex, got: ', cancelTxCbor);
+        // eslint-disable-next-line no-alert
+        alert('Unfortunately 3rd party API failed to produce cancellation transaction. Please retry later or report the issue and provide logs.');
+        return;
+      }
       const totalCancelOutput = getTransactionTotalOutputFromCbor(
         cancelTxCbor,
         wallet.balance.getDefaults()

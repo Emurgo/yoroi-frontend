@@ -34,10 +34,10 @@ export default class FullscreenMessage extends Component<Props> {
             }}
           >
             {image && <Box mb="32px">{image}</Box>}
-            <Typography component="div" variant="h5" mb="8px" fontWeight={500}>
+            <Typography component="div" variant="h5" mb="8px" fontWeight={500} color="ds.text_gray_medium">
               {title}
             </Typography>
-            <Typography component="div" variant="body1" color="grayscale.600" maxWidth="480px">
+            <Typography component="div" variant="body1" color="ds.text_gray_low" maxWidth="480px">
               {subtitle}
             </Typography>
           </Stack>

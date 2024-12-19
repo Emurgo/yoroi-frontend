@@ -8,7 +8,7 @@ import { AssertionError } from 'chai';
 const compareArrayLength = (arrayOne, arrayTwo) => {
   if (arrayOne.length !== arrayTwo.length) {
     throw new AssertionError(
-      `The exported txs array and displayed txs array have different length. Exported: ${exportedTxs.length}, Displayed: ${displayedTxs.length}`
+      `The exported txs array and displayed txs array have different length. Exported: ${arrayOne.length}, Displayed: ${arrayTwo.length}`
     );
   }
 };

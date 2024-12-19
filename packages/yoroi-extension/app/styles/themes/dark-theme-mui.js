@@ -8,7 +8,7 @@ import {
   FormControl,
   FormHelperText,
   InputLabel,
-  Link,
+  DarkLink,
   Menu,
   MenuItem,
   OutlinedInput,
@@ -37,7 +37,7 @@ const darkThemeComponents = {
     MuiTabPanel: TabPanel,
     MuiChip: Chip,
     MuiTooltip: Tooltip,
-    MuiLink: Link,
+    MuiLink: DarkLink,
   },
 };
 

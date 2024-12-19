@@ -13,6 +13,7 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { ROUTES } from '../../routes-config';
 import type { StoresProps } from '../../stores';
 
 type Props = {|
@@ -39,10 +40,19 @@ export default class SwapPageContainer extends Component<AllProps> {
     return false;
   };
 
+  isErrorPage: void => boolean = () => {
+    const { location } = this.props.stores.router;
+    if (location) {
+      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
+    }
+    return false;
+  };
+
   render(): Node {
     const { children } = this.props;
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
+    const isErrorPage = this.isErrorPage();
 
     const menu = (
       <SwapMenu
@@ -55,21 +65,19 @@ export default class SwapPageContainer extends Component<AllProps> {
       <TopBarLayout
         banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
+        isErrorPage={isErrorPage}
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={
-              <NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />
-            }
+            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
             menu={menu}
+            isErrorPage={isErrorPage}
           />
         }
         showInContainer
         withPadding={false}
       >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-          {children}
-        </SwapFormProvider>
+        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
       </TopBarLayout>
     );
   }

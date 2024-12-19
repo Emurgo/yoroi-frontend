@@ -3,9 +3,20 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Box, Typography } from '@mui/material';
+import { Stack, Box, Typography, styled } from '@mui/material';
 import { CREATE_WALLET_SETPS } from './steps';
 import { ReactComponent as StepMarkIcon } from '../../../assets/images/add-wallet/step-mark.inline.svg';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.bg_color_max,
+    },
+    '& rect': {
+      fill: theme.palette.ds.text_primary_min,
+    },
+  },
+}));
 
 const messages: * = defineMessages({
   firstStep: {
@@ -61,14 +72,7 @@ function CreateWalletSteps(props: Props & Intl): Node {
 
   return (
     <Box>
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        gap="24px"
-        mt="24px"
-        mb="48px"
-      >
+      <Stack direction="row" alignItems="center" justifyContent="center" gap="24px" mt="24px" mb="48px">
         {steps.map(({ stepId, message }, idx) => {
           const isCurrentStep = currentStepIdx === idx;
           const isPrevStep = idx < currentStepIdx;
@@ -76,9 +80,15 @@ function CreateWalletSteps(props: Props & Intl): Node {
           let stepColor = 'grey.400';
           let cursor = 'pointer';
 
-          if (isCurrentStep) stepColor = 'primary.600';
-          else if (isPrevStep) stepColor = 'primary.300';
-          if (isFutureStep) cursor = 'not-allowed';
+          if (isCurrentStep) {
+            stepColor = 'ds.text_gray_medium';
+          } else if (isPrevStep) {
+            stepColor = 'ds.text_primary_min';
+          }
+          if (isFutureStep) {
+            stepColor = 'ds.text_gray_min';
+            cursor = 'not-allowed';
+          }
 
           return (
             <Stack
@@ -101,16 +111,20 @@ function CreateWalletSteps(props: Props & Intl): Node {
                   mr: '8px',
                   borderWidth: isPrevStep ? '0px' : '2px',
                   borderStyle: 'solid',
-                  borderColor: stepColor,
+                  borderColor: isCurrentStep ? 'ds.el_primary_medium' : 'ds.el_gray_min',
                   borderRadius: '50%',
                   transition: 'color 300ms ease',
+                  bgcolor: isCurrentStep ? 'ds.text_primary_medium' : 'unset',
                   cursor,
                 }}
               >
                 {isPrevStep ? (
-                  <StepMarkIcon />
+                  <IconWrapper>
+                    <StepMarkIcon />
+                  </IconWrapper>
                 ) : (
-                  <Typography component="div"
+                  <Typography
+                    component="div"
                     sx={{
                       textAlign: 'center',
                       display: 'flex',
@@ -119,13 +133,19 @@ function CreateWalletSteps(props: Props & Intl): Node {
                     }}
                     variant="body2"
                     fontWeight={500}
-                    color={stepColor}
+                    color={isCurrentStep ? 'ds.bg_color_max' : stepColor}
                   >
                     {idx + 1}
                   </Typography>
                 )}
               </Box>
-              <Typography component="div" sx={{ cursor }} variant="body1" color={stepColor} fontWeight={500}>
+              <Typography
+                component="div"
+                sx={{ cursor }}
+                variant="body1"
+                color={isCurrentStep ? 'ds.text_primary_medium' : stepColor}
+                fontWeight={500}
+              >
                 {intl.formatMessage(message)}
               </Typography>
             </Stack>

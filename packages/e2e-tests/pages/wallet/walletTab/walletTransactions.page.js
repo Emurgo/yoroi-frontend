@@ -1,13 +1,18 @@
 import {
   defaultWaitTimeout,
   fiveSeconds,
+  oneSecond,
   quarterSecond,
   threeSeconds,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
-import { convertPrettyDateToNormal, convertPrettyTimeToNormal } from '../../../utils/utils.js';
+import {
+  convertPrettyDateToNormal,
+  convertPrettyTimeToNormal,
+  groupDateIsInPeriod,
+} from '../../../utils/utils.js';
 import MemoWarningModal from './transactionsModals/memoWarningModal.page.js';
 import { balanceReplacer } from '../../../helpers/constants.js';
 
@@ -176,16 +181,17 @@ export class TransactionsSubTab extends WalletTab {
   // methods
   async isDisplayed() {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
-    const submenuState = await this.customWaitIsPresented(
+    const submenuStatePromise = this.customWaitIsPresented(
       this.transactionsSubmenuItemLocator,
       fiveSeconds,
       quarterSecond
     );
-    const summaryState = await this.customWaitIsPresented(
+    const summaryStatePromise = this.customWaitIsPresented(
       this.walletSummaryBoxLocator,
       fiveSeconds,
       quarterSecond
     );
+    const [submenuState, summaryState] = await Promise.all([submenuStatePromise, summaryStatePromise]);
 
     return submenuState && summaryState;
   }
@@ -197,7 +203,7 @@ export class TransactionsSubTab extends WalletTab {
     const displayedTxsGroups = await this.__getTxsGroups();
     return emptyBannerIsDisplayed && displayedTxsGroups == 0;
   }
-  async __getTxsGroups() {
+  async __getTxsGroups(usePeriod = false, startDate = '00000000', endDate = '00000000') {
     const locatorForAllGroups = {
       locator: '//div[starts-with(@id, "wallet:transactions:transactionsList-transactionsGroup_")]',
       method: 'xpath',
@@ -210,10 +216,20 @@ export class TransactionsSubTab extends WalletTab {
         this.walletTransactionsGroupDateTextLocator(groupIndex)
       );
       const groupDate = convertPrettyDateToNormal(groupDatePrettified);
-      result.push({
-        groupDate,
-        groupIndex,
-      });
+
+      if (usePeriod) {
+        if (groupDateIsInPeriod(groupDate, startDate, endDate)) {
+          result.push({
+            groupDate,
+            groupIndex,
+          });
+        }
+      } else {
+        result.push({
+          groupDate,
+          groupIndex,
+        });
+      }
     }
     await this.setImplicitTimeout(defaultWaitTimeout, this.__getTxsGroups.name);
     return result;
@@ -306,9 +322,9 @@ export class TransactionsSubTab extends WalletTab {
     this.logger.info(`TransactionsSubTab::getExportDialog is called`);
     return new ExportTransactionsModal(this.driver, this.logger);
   }
-  async getTxsInfo() {
+  async getTxsInfo(startDate, endDate) {
     this.logger.info(`TransactionsSubTab::getTxsInfo is called`);
-    const allGroups = await this.__getTxsGroups();
+    const allGroups = await this.__getTxsGroups(true, startDate, endDate);
     const allTxsInfo = [];
     for (const group of allGroups) {
       const txsInfoInGroup = await this.__getAllTxsInGroup(group);
@@ -356,8 +372,8 @@ export class TransactionsSubTab extends WalletTab {
       return false;
     }
   }
-  async waitLoaderIsNotDisplayed(timeout, repearPeriod) {
-    this.logger.info(`TransactionsSubTab::waitLoaderIsNotDisplayed is called`);
+  async waitTxLoaderIsNotDisplayed(timeout, repearPeriod) {
+    this.logger.info(`TransactionsSubTab::waitTxLoaderIsNotDisplayed is called`);
     const loaderIsNotDisplayed = await this.customWaiter(
       async () => {
         const displayed = await this.loaderIsDisplayed();
@@ -367,31 +383,37 @@ export class TransactionsSubTab extends WalletTab {
       repearPeriod
     );
     this.logger.info(
-      `TransactionsSubTab::waitLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`
+      `TransactionsSubTab::waitTxLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`
     );
 
     return loaderIsNotDisplayed;
   }
+  async _pressShowMoreTransactions() {
+    await this.scrollIntoView(this.showMoreTxsButtonLocator);
+    await this.click(this.showMoreTxsButtonLocator);
+    await this.sleep(quarterSecond);
+    return true;
+  }
   async _loadMore() {
     const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
-    const loaderIsDisplayed = await this.loaderIsDisplayed();
-    if (!showMoreIsDisplayed && !loaderIsDisplayed) {
-      return false;
-    }
     if (showMoreIsDisplayed) {
-      await this.scrollIntoView(this.showMoreTxsButtonLocator);
-      await this.click(this.showMoreTxsButtonLocator);
-      await this.sleep(quarterSecond);
-      return true;
+      return await this._pressShowMoreTransactions();
     }
+    const loaderIsDisplayed = await this.loaderIsDisplayed();
     if (loaderIsDisplayed) {
       const thirtySec = 3 * defaultWaitTimeout;
       await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-      const result = await this.waitLoaderIsNotDisplayed(thirtySec, quarterSecond);
+      const result = await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
       if (!result) {
         throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
       }
+      const btnIsDisplayed = await this.showMoreBtnIsDisplayed();
+      if (btnIsDisplayed) {
+        return await this._pressShowMoreTransactions();
+      }
     }
+    this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
+    return false;
   }
   async loadMoreTxs(amountOfLoads = 1) {
     this.logger.info(`TransactionsSubTab::loadMoreTxs is called. Amount of loads ${amountOfLoads}`);
@@ -400,13 +422,17 @@ export class TransactionsSubTab extends WalletTab {
       if (!canLoadMore) {
         break;
       }
+      await this.sleep(oneSecond);
     }
+    const thirtySec = 3 * defaultWaitTimeout;
+    await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
   }
   async downloadAllTxs() {
     this.logger.info(`TransactionsSubTab::downloadAllTxs is called`);
     let canLoadMore = true;
     while (canLoadMore) {
       canLoadMore = await this._loadMore();
+      await this.sleep(oneSecond);
     }
   }
   async __getAddrsLinks(groupIndex, txIndex, addrsAmount, getLocatorFunc) {
@@ -499,6 +525,10 @@ export class TransactionsSubTab extends WalletTab {
     const noMemoState = await this.customWaiter(
       async () => {
         const allElements = await this.findElements(memoMsgLocator);
+        if (allElements.length === 1) {
+          const memoContent = await this.getAttribute(memoMsgLocator, 'textContent');
+          return memoContent === '-';
+        }
         return allElements.length === 0;
       },
       threeSeconds,
@@ -542,7 +572,9 @@ export class TransactionsSubTab extends WalletTab {
       // check all to addresses
       const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
       for (let addrToIndex = 0; addrToIndex < amountToAddrs; addrToIndex++) {
-        const addrToAmountRawStr = await this.getText(this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex));
+        const addrToAmountRawStr = await this.getText(
+          this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex)
+        );
         const addrToAmountStr = addrToAmountRawStr.split(' ')[0];
         result.push(addrToAmountStr === balanceReplacer);
       }

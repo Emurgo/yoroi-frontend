@@ -15,6 +15,7 @@ export default class ChangeWalletPasswordDialogContainer extends Component<{| ..
   render(): Node {
     const { stores } = this.props;
     const { uiDialogs, walletSettings } = stores;
+    const { updateDataForActiveDialog } = actions.dialogs;
     const { changeSigningKeyRequest } = walletSettings;
 
     return (

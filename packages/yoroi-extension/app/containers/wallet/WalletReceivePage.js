@@ -109,6 +109,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
     };
 
     const isHwWallet = publicDeriver.type !== 'mnemonic';
+    const isAddressBook = addressTypeStore.meta.name.group === AddressGroupTypes.addressBook;
 
     const onCopyAddressTooltip = (address, elementId) => {
       if (!uiNotifications.isOpen(elementId)) {
@@ -182,7 +183,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
           />
         );
       }
-      if (addressTypeStore.meta.name.group === AddressGroupTypes.addressBook) {
+      if (isAddressBook) {
         return null;
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.all) {
@@ -341,6 +342,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
             verify={() => stores.substores.ada.hwVerifyAddress.verifyAddress(publicDeriver)}
             cancel={stores.substores.ada.hwVerifyAddress.closeAddressDetailDialog}
             complexityLevel={profile.selectedComplexityLevel}
+            isAddressBook={isAddressBook}
           />
         ) : null}
       </VerticalFlexContainer>

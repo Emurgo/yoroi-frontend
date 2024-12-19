@@ -46,6 +46,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
   @observable plannedTxInfoMap: PlannedTxInfoMap= [];
 
   @observable receiver: string | null;
+  @observable receiverHandle: {| handle: string, nameServer: string |} | null;
   /** Stores the tx used to generate the information on the send form */
   @observable plannedTx: null | ISignRequest<any>;
   /** Stores the tx that will be sent if the user confirms sending */
@@ -299,6 +300,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
     }
 
     const receiver = this.receiver;
+    const receiverHandle = this.receiverHandle ?? undefined;
     if (receiver == null) return;
 
     if (this.createUnsignedTx.isExecuting) {
@@ -320,6 +322,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
       await this.createUnsignedTx.execute(() => this.api.ada.createUnsignedTx({
         publicDeriver,
         receiver,
+        receiverHandle,
         tokens: this._genTokenList(),
         filter: this.filter,
         absSlotNumber,
@@ -362,8 +365,12 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
 
   /** Should only set to valid address or undefined */
   @action
-  updateReceiver: (void | string) => void = (receiver) => {
-    this.receiver = receiver ?? null;
+  updateReceiver: ({|
+    address: void | string,
+    handle?: void | {| handle: string, nameServer: string |},
+  |}) => void = ({ address, handle }) => {
+    this.receiver = address ?? null;
+    this.receiverHandle = handle ?? null;
   }
 
   @action
@@ -527,7 +534,9 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
   _setupSelfTx: SetupSelfTxFunc = async (request): Promise<void> => {
     this.setFilter(request.filter);
     const nextUnusedInternal = request.publicDeriver.receiveAddress;
-    this.updateReceiver(nextUnusedInternal.addr.Hash);
+    this.updateReceiver({
+      address: nextUnusedInternal.addr.Hash,
+    });
     // Todo: update shouldSendAll
     if (this.shouldSendAll === false) {
       this.updateSendAllStatus(true);

@@ -8,6 +8,7 @@ import { defineMessages, intlShape } from 'react-intl';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
 import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import { Typography } from '@mui/material';
 import type { StoresProps } from '../../../stores';
 
 type Props = {|
@@ -68,8 +69,20 @@ export default class ResyncWalletDialogContainer extends Component<{| ...Props, 
         }}
         id="resyncWalletDialog"
       >
-        <p>{intl.formatMessage(messages.resyncExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning)}</p>
+        <Typography
+          variant='body1'
+          mb='16px'
+          color="ds.text_gray_medium"
+        >
+          {intl.formatMessage(messages.resyncExplanation)}
+        </Typography>
+        <Typography
+          variant='body1'
+          color="ds.text_gray_medium"
+          mb='16px'
+        >
+          {intl.formatMessage(dialogMessages.warning)}
+        </Typography>
       </DangerousActionDialog>
     );
   }

@@ -388,7 +388,8 @@ const Handlers = Object.freeze({
     [ string /* tx hex */ ],
     string,
   >(async ({ wallet, message }) => {
-    const txBuffer = hexToBytes(message.params[0]);
+    const txHex = message.params[0];
+    const txBuffer = hexToBytes(txHex);
     await connectorSendTxCardano(
       wallet,
       txBuffer,
@@ -397,7 +398,7 @@ const Handlers = Object.freeze({
     const tx = RustModule.WalletV4.Transaction.from_bytes(
       txBuffer
     );
-    const id = RustModule.WalletV4.hash_transaction(tx.body()).to_hex();
+    const id = RustModule.WalletV4.FixedTransaction.from_hex(txHex).transaction_hash().to_hex();
     try {
       await connectorRecordSubmittedCardanoTransaction(
         wallet,
