@@ -7,9 +7,8 @@ import { useCombobox, useMultipleSelection } from 'downshift';
 import { Input, Box, InputLabel, FormControl, FormHelperText, Chip, useTheme } from '@mui/material';
 import { styled } from '@mui/system';
 import { slice } from 'lodash';
-import { ReactComponent as SuccessIcon }  from '../../assets/images/forms/done.inline.svg';
-import { ReactComponent as ErrorIcon }  from '../../assets/images/forms/error.inline.svg';
-import { ReactComponent as CloseIcon }  from '../../assets/images/close-chip.inline.svg';
+import { ReactComponent as SuccessIcon } from '../../assets/images/forms/done.inline.svg';
+import { ReactComponent as CloseIcon } from '../../assets/images/close-chip.inline.svg';
 
 type Props = {|
   +options: Array<string>,
@@ -56,12 +55,7 @@ function Autocomplete({
     : options;
   const sliceArrayItems = slice(filteredList, 0, maxVisibleOptions);
 
-  const {
-    getSelectedItemProps,
-    getDropdownProps,
-    addSelectedItem,
-    removeSelectedItem,
-  } = useMultipleSelection({
+  const { getSelectedItemProps, getDropdownProps, addSelectedItem, removeSelectedItem } = useMultipleSelection({
     onSelectedItemsChange: ({ selectedItems }) => {
       onChange(selectedItems);
     },
@@ -131,7 +125,11 @@ function Autocomplete({
         {...(value.length || theme.name === 'classic' ? { shrink: true } : {})}
         htmlFor={id ?? 'autocomplete-combobox'}
         {...getLabelProps()}
-        sx={{ backgroundColor: 'var(--yoroi-palette-common-white)', padding: '0px 6px' }}
+        sx={{
+          backgroundColor: 'ds.bg_color_contrast_high',
+          padding: '0px 6px',
+          color: isOpen ? 'ds.text_gray_medium' : 'ds.text_gray_low',
+        }}
       >
         {label}
       </InputLabel>
@@ -177,10 +175,7 @@ function Autocomplete({
             })}
           />
         </Box>
-        <CheckWrapper>
-          {done === true ? <SuccessIcon /> : null}
-          {Boolean(error) === true ? <ErrorIcon /> : null}
-        </CheckWrapper>
+        <CheckWrapper>{done === true ? <SuccessIcon /> : null}</CheckWrapper>
       </InputWrapper>
       <FormHelperText id={id ?? 'autocomplete-combobox'}>{error}</FormHelperText>
 
@@ -195,7 +190,9 @@ function Autocomplete({
           <Box
             sx={{
               padding: '14px 20px',
-              bgcolor: 'var(--yoroi-palette-common-white)',
+              color: 'ds.text_gray_medium',
+              bgcolor: 'ds.bg_color_contrast_high',
+              boxShadow: isOpen ? 'ds.light_shadow_dropdown_menu' : 'unset',
             }}
           >
             {noResultsMessage}
@@ -208,11 +205,10 @@ function Autocomplete({
                   key={`${item}${index}`}
                   sx={{
                     padding: '14px 20px',
-                    backgroundColor:
-                      highlightedIndex === index
-                        ? 'var(--yoroi-palette-gray-50)'
-                        : 'var(--yoroi-palette-common-white)',
+                    color: 'ds.text_gray_medium',
+                    backgroundColor: highlightedIndex === index ? 'ds.bg_color_contrast_min' : 'ds.bg_color_contrast_high',
                     cursor: 'pointer',
+                    boxShadow: isOpen ? 'ds.light_shadow_dropdown_menu' : 'unset',
                   }}
                   {...getItemProps({
                     item,
@@ -270,17 +266,9 @@ const ULList = styled(Box)({
 const InputWrapper = styled(Box)(
   ({ theme, error, isOpen }) => `
   width: 100%;
-  border: ${isOpen ? '2px' : '1px'} solid ${
-    error
-      ? 'var(--yoroi-comp-input-error)'
-      : isOpen
-      ? 'var(--yoroi-comp-input-text-focus)'
-      : theme.name === 'classic'
-      ? '#c7ced6'
-      : 'var(--yoroi-comp-input-border)'
-  };
-  border-radius: ${theme.name === 'classic' ? '0' : '8px'};
-  background-color: ${theme.name === 'classic' ? '#f4f4f6' : 'var(--yoroi-palette-common-white)'};
+  border: ${isOpen ? '2px' : '1px'} solid ${error ? theme.palette.ds.sys_magenta_500 : theme.palette.ds.primary_200};
+  border-radius: 8px;
+  background-color: ${theme.palette.ds.bg_color_contrast_high};
   min-height: ${theme.name === 'classic' ? '73px' : '140px'};
   align-content: baseline;
   display: inline-flex;
@@ -292,7 +280,7 @@ const InputWrapper = styled(Box)(
   cursor: text;
   & input {
     background-color: transparent;
-    color: ${theme.name === 'classic' ? 'var(--yoroi-comp-input-border)' : '#000000d9'};
+    color: ${theme.palette.ds.text_gray_medium};
     font-size: 1rem;
     padding: 4px 6px;
     letter-spacing: 0;
