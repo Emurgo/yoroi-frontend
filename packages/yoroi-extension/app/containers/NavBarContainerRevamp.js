@@ -7,7 +7,7 @@ import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
-import { getNetworkById } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getNetworkById } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
@@ -17,6 +17,22 @@ import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
+import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
+
+const NETWORK_BADGES = Object.freeze({
+  [networks.CardanoPreprodTestnet.NetworkId]: {
+    color: 'rgba(236, 186, 9, 1)',
+    text: 'preprod',
+  },
+  [networks.CardanoPreviewTestnet.NetworkId]: {
+    color: 'rgba(143, 201, 246, 1)',
+    text: 'preview',
+  },
+  [networks.CardanoSanchoTestnet.NetworkId]: {
+    color: 'rgba(147, 245, 225, 1)',
+    text: 'sancho',
+  },
+});
 
 type Props = {|
   ...StoresAndActionsProps,
@@ -100,11 +116,38 @@ export default class NavBarContainerRevamp extends Component<Props> {
       );
     };
 
+    let title;
+    if (
+      this.props.stores.wallets.selected?.networkId === networks.CardanoMainnet.NetworkId ||
+      !this.props.stores.wallets.selected
+    ) {
+      title = this.props.title;
+    } else {
+      const { color, text } = NETWORK_BADGES[this.props.stores.wallets.selected.networkId];
+      title = (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          {this.props.title}
+          <button
+            style={{
+              backgroundColor: color,
+              marginLeft: '8px',
+              borderRadius: '16px',
+              paddingLeft: '8px',
+              paddingRight: '8px',
+            }}
+            onClick={() => this.props.actions.dialogs.open.trigger({ dialog: SwitchNetworkDialogContainer })}
+          >
+            {text}
+          </button>
+        </div>
+      );
+    }
+
     return (
       <>
         {this.getDialog()}
         <NavBarRevamp
-          title={this.props.title}
+          title={title}
           menu={this.props.menu}
           walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
@@ -175,6 +218,11 @@ export default class NavBarContainerRevamp extends Component<Props> {
       );
     }
 
+    if (this.props.stores.uiDialogs.isOpen(SwitchNetworkDialogContainer)) {
+      return <SwitchNetworkDialogContainer actions={this.props.actions} stores={this.props.stores} />;
+    }
+
     return null;
   };
+
 }
