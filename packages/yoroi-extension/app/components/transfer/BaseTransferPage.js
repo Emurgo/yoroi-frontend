@@ -55,7 +55,6 @@ export default class BaseTransferPage extends Component<Props> {
         actions={actions}
         closeOnOverlayClick={false}
         onClose={onBack}
-        className={undefined}
         backButton={<DialogBackButton onBack={onBack} />}
       >
         <Box>

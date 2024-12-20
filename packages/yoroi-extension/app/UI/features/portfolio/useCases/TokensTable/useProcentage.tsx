@@ -36,7 +36,8 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
     const unitPrice = parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
     const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity?.close)));
 
-    return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : totalValue, unitPrice };
+    const tokenValueDisplay = secondaryToken24Activity && secondaryToken24Activity[0] === 500 ? 0 : totalValue;
+    return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : tokenValueDisplay, unitPrice };
   };
 
   const getTokenActivityChange = (tokenId, activityData, isPrimaryToken) => {
@@ -81,9 +82,15 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
           '24h': changePercent24,
           '1W': isPrimaryToken ? ptTokenDataInterval7d?.[167]?.changePercent : changePercent7d,
           '1M': isPrimaryToken ? ptTokenDataInterval1M?.[179]?.changePercent : changePercent30d,
+          isSpecialName: /^[^a-zA-Z]/.test(token.info.name), // Flag for names starting with numbers or weird characters
         };
       })
-      .sort((a, b) => b.percentage - a.percentage);
+      .sort((a, b) => {
+        // Move tokens with special names to the end
+        if (a.isSpecialName && !b.isSpecialName) return 1;
+        if (!a.isSpecialName && b.isSpecialName) return -1;
+        return b.percentage - a.percentage;
+      });
   }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo, ptTokenDataInterval7d, ptTokenDataInterval1M]);
 
   return processedData;

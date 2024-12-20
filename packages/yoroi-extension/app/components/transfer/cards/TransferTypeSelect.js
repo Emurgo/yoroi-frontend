@@ -23,6 +23,10 @@ const messages = defineMessages({
     id: 'wallet.transfer.subInstruction',
     defaultMessage: '!!!Learn more about Byron and Shelley eras and how to claim ADA on our',
   },
+  faqAbbreviation: {
+    id: 'settings.support.faq.abbreviation',
+    defaultMessage: '!!!FAQ',
+  }
 });
 
 @observer
@@ -39,7 +43,7 @@ export default class TransferTypeSelect extends Component<Props> {
         onClick={event => handleExternalLinkClick(event)}
         id="settings:support-faq-link"
       >
-        FAQ
+        {intl.formatMessage(messages.faqAbbreviation)}
       </Link>
     );
 
