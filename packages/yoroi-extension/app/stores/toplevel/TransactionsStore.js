@@ -73,17 +73,15 @@ export default class TransactionsStore extends Store<StoresMap> {
   @observable exportError: ?LocalizableError;
   @observable shouldIncludeTxIds: boolean = false;
 
-  setup(): void {
-    this.actions.profile.updateUnitOfAccount.listen(async () => {
-      const publicDeriver = this.stores.wallets.selected;
-      if (!publicDeriver) {
-        return;
-      }
-      const timestamps = new Set(this.getTxHistoryState(publicDeriver.publicDeriverId).txs.map(
-        tx => tx.date.valueOf()
-      ));
-      await this._updateTransactionPriceData(publicDeriver, timestamps);
-    });
+  @action updateUnitOfAccount: void => Promise<void> = async () => {
+    const publicDeriver = this.stores.wallets.selected;
+    if (!publicDeriver) {
+      return;
+    }
+    const timestamps = new Set(this.getTxHistoryState(publicDeriver.publicDeriverId).txs.map(
+      tx => tx.date.valueOf()
+    ));
+    await this._updateTransactionPriceData(publicDeriver, timestamps);
   }
 
   /** Calculate information about transactions that are still realistically reversible */

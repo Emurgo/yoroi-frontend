@@ -29,7 +29,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       if (this.stores.app.currentRoute === route) {
         return;
       }
-      this.actions.router.goToRoute.trigger({ route });
+      this.stores.app.goToRoute({ route });
     },
   };
 

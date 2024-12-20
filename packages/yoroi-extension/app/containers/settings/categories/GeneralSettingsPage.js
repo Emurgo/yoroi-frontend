@@ -62,6 +62,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
     localStorageApi.unsetPortfolioFiatPair();
     await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
+    await this.props.stores.transactions.updateUnitOfAccount();
   };
 
   render(): Node {

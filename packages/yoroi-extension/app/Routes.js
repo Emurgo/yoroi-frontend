@@ -566,7 +566,7 @@ export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
   const openDialogWrapper = (dialog): void => {
-    portfolioProps.actions.dialogs.open.trigger({ dialog });
+    portfolioProps.stores.uiDialogs.open({ dialog });
   };
 
   return (

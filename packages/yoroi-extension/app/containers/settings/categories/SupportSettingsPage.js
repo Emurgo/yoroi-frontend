@@ -54,14 +54,14 @@ export default class SupportSettingsPage extends Component<StoresProps> {
   };
 
   render(): Node {
-    const { actions } = this.props;
+    const { stores } = this.props;
     return (
       <>
         {this.getDialog()}
         <SupportSettings
           onExternalLinkClick={handleExternalLinkClick}
           onDownloadLogs={this.handleDownloadLogs}
-          onPaperWalletTransfer={() => actions.router.redirect.trigger({ route: ROUTES.TRANSFER.ROOT })}
+          onPaperWalletTransfer={() => stores.app.redirect({ route: ROUTES.TRANSFER.ROOT })}
         />
       </>
     );

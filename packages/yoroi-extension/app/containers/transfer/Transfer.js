@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -12,7 +11,6 @@ import NoWalletMessage from '../wallet/NoWalletMessage';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
-import HorizontalLine from '../../components/widgets/HorizontalLine';
 import type { StoresProps } from '../../stores';
 
 export const WalletTransferPagePromise: void => Promise<any> = () => import('./WalletTransferPage');

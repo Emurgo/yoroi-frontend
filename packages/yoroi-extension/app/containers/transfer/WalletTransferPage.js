@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
@@ -10,13 +9,7 @@ import { intlShape } from 'react-intl';
 
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import YoroiTransferPage from './YoroiTransferPage';
-import { genLookupOrFail, getTokenName, } from '../../stores/stateless/tokenHelpers';
-import { truncateToken } from '../../utils/formatters';
 import type { StoresProps } from '../../stores';
-
-type Props = {|
-  publicDeriver: PublicDeriver<>,
-|};
 
 @observer
 export default class WalletTransferPage extends Component<StoresProps> {

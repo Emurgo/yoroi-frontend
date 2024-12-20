@@ -216,7 +216,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     const handleRewardsWithdrawal = async () => {
       if (!isParticipatingToGovernance) {
-        this.props.actions.dialogs.open.trigger({
+        this.props.stores.uiDialogs.open({
           dialog: GovernanceParticipateDialog,
         });
         return;
