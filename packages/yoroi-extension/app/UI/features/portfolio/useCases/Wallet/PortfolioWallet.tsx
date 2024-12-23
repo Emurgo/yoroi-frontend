@@ -1,11 +1,17 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
+import { ampli } from '../../../../../../ampli/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
-import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { PortfolioListTab, usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from '../TokensTable/StatsTable';
+
+const tabs = {
+  [PortfolioListTab.Wallet]: 'Wallet Token',
+  [PortfolioListTab.Dapps]: 'Dapps Token',
+} as const;
 
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
@@ -15,6 +21,10 @@ const PortfolioWallet = (): JSX.Element => {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(ftAssetList);
+
+  useEffect(() => {
+    ampli.portfolioTokensListPageViewed({ tokens_tab: tabs[PortfolioListTab.Wallet] });
+  }, []);
 
   useEffect(() => {
     if (!keyword || showWelcomeBanner) {
@@ -35,6 +45,18 @@ const PortfolioWallet = (): JSX.Element => {
     } else {
       setTokenList([]);
     }
+
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const sendMetrics = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        ampli.portfolioTokensListSearchActivated({ search_term: lowercaseKeyword });
+      }, 500); // 0.5s requirement
+    };
+
+    if (lowercaseKeyword.length > 0) sendMetrics();
+
+    return () => clearTimeout(timeout);
   }, [keyword]);
 
   return (

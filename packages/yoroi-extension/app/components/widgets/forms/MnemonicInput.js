@@ -84,7 +84,16 @@ export default class MnemonicInput extends Component<Props> {
         error={recoveryPhraseField.error}
         maxVisibleOptions={5}
         noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
-        chipProps={{ sx: { bgcolor: ' #f0f3f5' } }}
+        chipProps={{
+          sx: {
+            bgcolor: 'ds.primary_100',
+            color: 'ds.text_primary_medium',
+            ':hover': {
+              bgcolor: 'ds.primary_200',
+              color: 'ds.text_primary_max',
+            }
+          }
+        }}
       />
     );
   }
