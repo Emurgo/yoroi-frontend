@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './ComplexityLevelForm.scss';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -115,8 +114,14 @@ export default class ComplexityLevel extends Component<Props> {
 
     return (
       <Box maxWidth="930px" margin="0 auto" mt="24px">
-        <Typography component="div" textAlign="center" color="ds.text_gray_medium" mb="16px" variant="h3"
-                    fontWeight={500}>
+        <Typography
+          component="div"
+          textAlign="center"
+          color="ds.text_gray_medium"
+          mb="16px"
+          variant="h3"
+          fontWeight={500}
+        >
           {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
         </Typography>
 
