@@ -40,7 +40,7 @@ const handlers = Object.freeze({
   'get-address': async () => {
     const publicDeriver = await getCashbackWallet();
     if (!publicDeriver) {
-      return { ok: undefined };
+      return { ok: publicDeriver };
     }
     const { address } = (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0];
     const s: string = address;
@@ -72,28 +72,35 @@ const handlers = Object.freeze({
   },
 });
 
-async function getCashbackWallet(): Promise<PublicDeriver<> | null> {
+// return a wallet if either there is a saved cashback wallet or there is only one wallet
+// return null if there is no wallet
+// return undefines if there is no saved cashback wallet but there are multiple wallets
+async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
-  const publicDerivers = await loadWalletsFromStorage(db);
-  const localStorageApi = new LocalStorageApi();
+  const publicDerivers = (await loadWalletsFromStorage(db)).filter(publicDeriver =>
+    !isTrezorTWallet(publicDeriver.getParent())
+  );
+  if (!publicDerivers.length) {
+    return null;
+  }
+
   // try to load saved cashback wallet
+  const localStorageApi = new LocalStorageApi();
   const savedCashbackWalletId = await localStorageApi.getCashbackWalletId();
-  for (const publicDeriver of publicDerivers) {
-    if (
-      publicDeriver.getPublicDeriverId() === savedCashbackWalletId &&
-        !isTrezorTWallet(publicDeriver.getParent())
-    ) {
-      return publicDeriver;
-    }
+  const savedCashbackWallet = publicDerivers.find(publicDeriver =>
+    publicDeriver.getPublicDeriverId() === savedCashbackWalletId
+  );
+  if (savedCashbackWallet) {
+    return savedCashbackWallet;
   }
 
   // if there is one and only wallet use it as the cashback wallet
-  if (publicDerivers.length === 1 && !isTrezorTWallet(publicDerivers[0].getParent())) {
+  if (publicDerivers.length === 1) {
     await localStorageApi.saveCashbackWalletId(publicDerivers[0].getPublicDeriverId());
     return publicDerivers[0];
   }
 
-  return null;
+  return undefined;
 }
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {

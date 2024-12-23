@@ -55,11 +55,11 @@ export function popUpCashbackWalletSelection(): void {
 }
 
 export async function promptCreationOrSelection(): Promise<void> {
-  const address = await getFirstAddress()
-  if (address) {
-    return await popUpCashbackWalletSelection()
+  const address = await getFirstAddress();
+  if (address === null) {
+    return await popUpWalletCreation();
   } else {
-    return await popUpWalletCreation()
+    return await popUpCashbackWalletSelection();
   }
 }
 
