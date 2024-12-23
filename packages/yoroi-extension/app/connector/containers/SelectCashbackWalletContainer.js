@@ -19,7 +19,8 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
 
   onSelectWallet(wallet: WalletState) {
     setCashbackWallet(wallet.publicDeriverId);
-    window.close();
+    // must delay or the message gets lost
+    setTimeout(window.close, 50);
   }
 
   render(): Node {
