@@ -6,11 +6,11 @@ export type ConfigType = {|
   app: AppConfigType,
 |};
 
-export type PoolExplorerConfigType = {|
-    simpleTemplate: string,
+type PoolExplorerConfigType = {|
+  simpleTemplate: string,
 |}
 
-export type AppConfigType = {|
+type AppConfigType = {|
   walletRefreshInterval: number,
   serverStatusRefreshInterval: number,
   logsBufferSize: number,
@@ -30,7 +30,7 @@ export type AppConfigType = {|
   pubKeyMaster: string,
 |}
 
-export type NetworkConfigType = {|
+type NetworkConfigType = {|
   name: Network,
   priceBackendUrl: string,
 |};

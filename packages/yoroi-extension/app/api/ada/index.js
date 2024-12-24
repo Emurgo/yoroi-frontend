@@ -31,7 +31,6 @@ import { createMetadata } from './lib/storage/bridge/metadataUtils';
 import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import { flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
-import type { CoreAddressT } from './lib/storage/database/primitives/enums';
 import { CoreAddressTypes, } from './lib/storage/database/primitives/enums';
 import type { NetworkRow, TokenRow, } from './lib/storage/database/primitives/tables';
 import { TransactionType } from './lib/storage/database/primitives/tables';
@@ -52,13 +51,10 @@ import type {
   Addressing,
   AddressType,
   BaseSingleAddressPath,
-  IDisplayCutoff,
   IGetAllUtxoAddressesResponse,
   IGetAllUtxosResponse,
   IGetSigningKey,
   IGetStakingKey,
-  IHasUtxoChains,
-  IHasUtxoChainsRequest,
   IPublicDeriver,
   UsedStatus,
   Value,
@@ -124,9 +120,8 @@ import type {
   TokenInfoFunc,
   UtxoData,
 } from './lib/state-fetch/types';
-import { getChainAddressesForDisplay, } from './lib/storage/models/utils';
 import type { AddressRowWithPath, } from './lib/storage/bridge/traitUtils';
-import { getAllAddressesForDisplay, getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
+import { getAllAddressesForWallet, } from './lib/storage/bridge/traitUtils';
 import {
   asAddressedUtxo,
   cardanoMinAdaRequiredFromAssets,
@@ -172,23 +167,6 @@ export type AddressDetails = {|
   ...Address, ...Value, ...Addressing, ...UsedStatus, ...AddressType,
 |};
 
-// getAllAddressesForDisplay
-
-export type GetAllAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<>,
-  type: CoreAddressT,
-|};
-export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
-
-// getChainAddressesForDisplay
-
-export type GetChainAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
-  chainsRequest: IHasUtxoChainsRequest,
-  type: CoreAddressT,
-|};
-export type GetChainAddressesForDisplayResponse = Array<AddressDetails>;
-
 // refreshTransactions
 
 export type AdaGetTransactionsRequest = {|
@@ -205,7 +183,7 @@ export type AdaGetTransactionsRequest = {|
 
 // signAndBroadcast
 
-export type SignAndBroadcastRequest = {|
+type SignAndBroadcastRequest = {|
   publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
   signRequest: {
     senderUtxos: Array<CardanoAddressedUtxo>,
@@ -224,10 +202,7 @@ export type SignAndBroadcastRequest = {|
   password: string,
   sendTx: SendFunc,
 |};
-export type SignAndBroadcastResponse = {| txId: string, signedTxHex: string |};
-export type SignAndBroadcastFunc = (
-  request: SignAndBroadcastRequest
-) => Promise<SignAndBroadcastResponse>;
+type SignAndBroadcastResponse = {| txId: string, signedTxHex: string |};
 
 // createTrezorSignTxData
 
@@ -517,43 +492,10 @@ export type GetTransactionRowsToExportFunc = (
 
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
-export const FETCH_TXS_BATCH_SIZE = 20;
+const FETCH_TXS_BATCH_SIZE = 20;
 const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
 
 export default class AdaApi {
-
-  /**
-   * addresses get cutoff if there is a DisplayCutoff set
-   */
-  async getAllAddressesForDisplay(
-    request: GetAllAddressesForDisplayRequest
-  ): Promise<GetAllAddressesForDisplayResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} called`);
-    try {
-      return await getAllAddressesForDisplay(request);
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.getAllAddressesForDisplay)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  /**
-   * for the external chain, we truncate based on cutoff
-   * for the internal chain, we truncate based on the last used
-   */
-  async getChainAddressesForDisplay(
-    request: GetChainAddressesForDisplayRequest
-  ): Promise<GetChainAddressesForDisplayResponse> {
-    Logger.debug(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} called`);
-    try {
-      return await getChainAddressesForDisplay(request);
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.getChainAddressesForDisplay)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
 
   /*
     3 scenarios when this function is invoked:

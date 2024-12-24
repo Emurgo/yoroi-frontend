@@ -482,7 +482,7 @@ const GovernanceSubpages = (stores) => (
   </Switch>
 );
 
-export function wrapSwap(swapProps: StoresProps, children: Node): Node {
+function wrapSwap(swapProps: StoresProps, children: Node): Node {
   // const queryClient = new QueryClient();
 
   const loader = (
@@ -503,7 +503,7 @@ export function wrapSwap(swapProps: StoresProps, children: Node): Node {
   );
 }
 
-export function wrapSettings(settingsProps: StoresProps, children: Node): Node {
+function wrapSettings(settingsProps: StoresProps, children: Node): Node {
   return (
     <Settings {...settingsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -511,7 +511,7 @@ export function wrapSettings(settingsProps: StoresProps, children: Node): Node {
   );
 }
 
-export function wrapAssets(assetsProps: StoresProps, children: Node): Node {
+function wrapAssets(assetsProps: StoresProps, children: Node): Node {
   return (
     <AssetsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -519,7 +519,7 @@ export function wrapAssets(assetsProps: StoresProps, children: Node): Node {
   );
 }
 
-export function wrapNFTs(assetsProps: StoresProps, children: Node): Node {
+function wrapNFTs(assetsProps: StoresProps, children: Node): Node {
   return (
     <NFTsWrapper {...assetsProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -527,7 +527,7 @@ export function wrapNFTs(assetsProps: StoresProps, children: Node): Node {
   );
 }
 
-export function wrapWallet(walletProps: StoresProps, children: Node): Node {
+function wrapWallet(walletProps: StoresProps, children: Node): Node {
   return (
     <Wallet {...walletProps}>
       <Suspense fallback={null}>{children}</Suspense>
@@ -535,12 +535,12 @@ export function wrapWallet(walletProps: StoresProps, children: Node): Node {
   );
 }
 
-export function wrapReceive(receiveProps: StoresProps, children: Node): Node {
+function wrapReceive(receiveProps: StoresProps, children: Node): Node {
   return <Receive {...receiveProps}>{children}</Receive>;
 }
 
 // NEW UI - TODO: to be refactred
-export function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
+function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
   const { stores } = governanceProps;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
@@ -562,7 +562,8 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
     </GovernanceContextProvider>
   );
 }
-export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
+
+function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
   const openDialogWrapper = (dialog): void => {

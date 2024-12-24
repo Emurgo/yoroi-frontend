@@ -1,8 +1,5 @@
 // @flow
 
-import type { WalletChecksum } from '@emurgo/cip4-js';
-import { PublicDeriver } from '../../../app/api/ada/lib/storage/models/PublicDeriver/index';
-import { MultiToken } from '../../../app/api/common/lib/MultiToken';
 import type { IGetAllUtxosResponse } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
 
 // ----- Types used in the dApp <-> Yoroi connection bridge ----- //
@@ -28,7 +25,7 @@ export function asPaginate(input: any): Paginate {
   throw ConnectorError.invalidRequest(`invalid Paginate: ${JSON.stringify(input)}`);
 }
 
-export type PaginateError = {|
+type PaginateError = {|
     maxSize: number,
 |};
 
@@ -74,10 +71,9 @@ export const TxSendErrorCodes = Object.freeze({
   REFUSED: 1,
   FAILURE: 2,
 });
-export type TxSendErrorCode = $Values<typeof TxSendErrorCodes>;
 
-export type TxSendError = {|
-	code: TxSendErrorCode,
+type TxSendError = {|
+	code: $Values<typeof TxSendErrorCodes>,
 	info: string,
 |};
 
@@ -85,10 +81,9 @@ export const TxSignErrorCodes = Object.freeze({
   PROOF_GENERATION: 1,
   USER_DECLINED: 2,
 });
-export type TxSignErrorCode = $Values<typeof TxSignErrorCodes>;
 
-export type TxSignError = {|
-	code: TxSignErrorCode,
+type TxSignError = {|
+	code: $Values<typeof TxSignErrorCodes>,
 	info: string,
 |};
 
@@ -98,10 +93,9 @@ export const DataSignErrorCodes = Object.freeze({
   DATA_SIGN_USER_DECLINED: 3,
   DATA_SIGN_INVALID_FORMAT: 4,
 });
-export type DataSignErrorCode = $Values<typeof DataSignErrorCodes>;
 
-export type DataSignError = {|
-  code: DataSignErrorCode,
+type DataSignError = {|
+  code: $Values<typeof DataSignErrorCodes>,
   info: string
 |};
 
@@ -110,21 +104,13 @@ export const APIErrorCodes = Object.freeze({
   API_INTERNAL_ERROR: -2,
   API_REFUSED: -3,
 });
-export type APIErrorCode = $Values<typeof APIErrorCodes>;
 
-export type APIError = {|
-  code: APIErrorCode,
+type APIError = {|
+  code: $Values<typeof APIErrorCodes>,
   info: string
 |};
 
 // ----- Types used inside the connector only ----- //
-
-export type PublicDeriverCache = {|
-  publicDeriver: PublicDeriver<>,
-  name: string,
-  balance: MultiToken,
-  checksum: void | WalletChecksum,
-|}
 
 export type WalletAuthEntry = {|
   walletId: string,
@@ -146,17 +132,20 @@ export type ConnectingMessage = {|
   appAuthID?: string,
   imgBase64Url: string,
 |};
+
 export type SigningMessage = {|
   publicDeriverId: number,
   sign: PendingSignData,
   tabId: number,
   requesterUrl: string,
 |};
+
 export type ConnectedSites = {|
   sites: Array<string>,
 |};
 
 type RpcUid = number;
+
 export type PendingSignData = {|
   type: 'data',
   uid: RpcUid,
@@ -179,17 +168,17 @@ export type PendingSignData = {|
 // Errors: Yoroi-only
 
 // if thrown within an API call, these will be returned instead of converted into an internal error
-export type AllErrors = TxSendError | TxSignError | APIError | DataSignError | PaginateError;
+type ConnectorApiError = TxSendError | TxSignError | APIError | DataSignError | PaginateError;
 
 export class ConnectorError extends Error {
-  e: AllErrors
+  e: ConnectorApiError
 
-  constructor(e: AllErrors) {
+  constructor(e: ConnectorApiError) {
     super(JSON.stringify(e));
     this.e = e;
   }
 
-  toAPIError(): AllErrors {
+  toAPIError(): ConnectorApiError {
     return this.e;
   }
 

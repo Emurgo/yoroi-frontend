@@ -22,7 +22,7 @@ import { networks } from '../../../ada/lib/storage/database/prepackaged/networks
 
 import type { ConfigType } from '../../../../../config/config-types';
 
-import { environment } from '../../../../environment';
+import environment from '../../../../environment';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;

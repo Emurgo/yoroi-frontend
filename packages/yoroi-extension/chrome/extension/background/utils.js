@@ -1,6 +1,6 @@
 // @flow
 import LocalStorageApi from '../../../app/api/localStorage/index';
-import { environment } from '../../../app/environment';
+import environment from '../../../app/environment';
 import type { IFetcher } from '../../../app/api/ada/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher } from '../../../app/api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../../app/api/ada/lib/state-fetch/batchedFetcher';

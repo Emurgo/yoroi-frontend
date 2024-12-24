@@ -10,7 +10,7 @@ import LocalizableError from '../../i18n/LocalizableError';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import IntroBanner from '../profile/language-selection/IntroBanner';
-import { environment } from '../../environment';
+import environment from '../../environment';
 
 const messages = defineMessages({
   loading: {

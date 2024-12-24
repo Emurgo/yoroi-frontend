@@ -18,7 +18,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
-import { environment } from '../../../environment';
+import environment from '../../../environment';
 import { Box } from '@mui/system';
 import TextField from '../../../components/common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';

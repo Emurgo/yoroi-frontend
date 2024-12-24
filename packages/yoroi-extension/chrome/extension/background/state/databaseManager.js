@@ -1,5 +1,5 @@
 // @flow
-import { environment } from '../../../../app/environment';
+import environment from '../../../../app/environment';
 import { schema } from 'lovefield';
 import { loadLovefieldDB, } from '../../../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../../../app/api/common/migration';

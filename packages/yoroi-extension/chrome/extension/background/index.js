@@ -5,7 +5,7 @@ import { getHandler } from './handlers/yoroi';
 import { init } from './state';
 import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
-import { environment } from '../../../app/environment';
+import environment from '../../../app/environment';
 import axios from 'axios';
 import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import { sanitizeForLog } from '../../../app/coreUtils';

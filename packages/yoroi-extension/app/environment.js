@@ -90,7 +90,7 @@ function getVersion(): string {
 
 const FIREFOX_PRIVACY_POLICY_URL = 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/privacy';
 
-export const environment = ((
+const environment = ((
   {
     ...process.env,
     /** Network used to connect */
