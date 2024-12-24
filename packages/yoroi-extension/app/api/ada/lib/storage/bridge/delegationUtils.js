@@ -8,7 +8,7 @@ import { MultiToken, } from '../../../../common/lib/MultiToken';
 import type { WalletState } from '../../../../../../chrome/extension/background/types';
 import { maybe, fail } from '../../../../../coreUtils';
 
-export type GetDelegatedBalanceRequest = {|
+type GetDelegatedBalanceRequest = {|
   wallet: WalletState,
   rewardBalance: MultiToken,
   stakingAddress: string,
@@ -16,6 +16,7 @@ export type GetDelegatedBalanceRequest = {|
   allRewards: string | null,
   stakeRegistered: ?boolean,
 |};
+
 export type GetDelegatedBalanceResponse = {|
   utxoPart: MultiToken,
   accountPart: MultiToken,
@@ -23,15 +24,19 @@ export type GetDelegatedBalanceResponse = {|
   allRewards: string | null,
   stakeRegistered: ?boolean,
 |};
+
 export type GetDelegatedBalanceFunc = (
   request: GetDelegatedBalanceRequest
 ) => Promise<GetDelegatedBalanceResponse>;
-export type RewardHistoryRequest = string;
-export type RewardHistoryResponse = Array<[
+
+type RewardHistoryRequest = string;
+
+type RewardHistoryResponse = Array<[
   number, // epoch
   MultiToken, // amount
   string, // poolHash
 ]>;
+
 export type RewardHistoryFunc = (
   request: RewardHistoryRequest
 ) => Promise<RewardHistoryResponse>;

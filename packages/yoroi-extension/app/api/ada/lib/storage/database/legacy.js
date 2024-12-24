@@ -13,13 +13,13 @@ import {
  * to migrate to a new format
  */
 
-export type LegacyAddressingInfo = {|
+type LegacyAddressingInfo = {|
   account: number,
   change: number,
   index: number,
 |};
-export type LegacyAdaAmount = {| getCCoin: string, |};
-export type LegacyAdaAddress = {|
+type LegacyAdaAmount = {| getCCoin: string, |};
+type LegacyAdaAddress = {|
   cadAmount: LegacyAdaAmount,
   cadId: string,
   cadIsUsed: boolean,
@@ -42,7 +42,7 @@ type LegacyLocalStorageCryptoAccount = {|
   derivation_scheme: string,
 |}
 
-export type LegacyAdaWallet = {|
+type LegacyAdaWallet = {|
   cwAmount: LegacyAdaAmount,
   cwId: string,
   cwMeta: LegacyAdaWalletMetaParams,
@@ -50,15 +50,15 @@ export type LegacyAdaWallet = {|
   cwPassphraseLU?: string,
   cwHardwareInfo?: LegacyAdaWalletHardwareInfo,
 |};
-export type LegacyAdaWalletMetaParams = {|
+type LegacyAdaWalletMetaParams = {|
   cwName: string,
   cwAssurance: LegacyAdaAssurance,
   // This was never used but is supposed to represent 0 = (bitcoin, ada); 1 = (satoshi, lovelace)
   cwUnit: number,
 |};
-export type LegacyAdaAssurance = 'CWANormal' | 'CWAStrict';
-export type LegacyAdaWalletType = 'CWTWeb' | 'CWTHardware';
-export type LegacyAdaWalletHardwareInfo = {|
+type LegacyAdaAssurance = 'CWANormal' | 'CWAStrict';
+type LegacyAdaWalletType = 'CWTWeb' | 'CWTHardware';
+type LegacyAdaWalletHardwareInfo = {|
   vendor : string,
   model: string,
   deviceId: string,

@@ -46,35 +46,26 @@ export type TxMemoTableUpsert = {|
 
 // upsertTxMemo
 
-export type UpsertTxMemoRequest = {|
+type UpsertTxMemoRequest = {|
   db: lf$Database,
   memo: TxMemoTableInsert | TxMemoTableRow,
 |};
-export type UpsertTxMemoResponse = $ReadOnly<TxMemoTableRow>;
-export type UpsertTxMemoFunc = (
-  request: UpsertTxMemoRequest
-) => Promise<UpsertTxMemoResponse>;
+type UpsertTxMemoResponse = $ReadOnly<TxMemoTableRow>;
 
 // deleteTxMemo
 
-export type DeleteTxMemoRequest = {|
+type DeleteTxMemoRequest = {|
   db: lf$Database,
   key: TxMemoLookupKey,
 |};
-export type DeleteTxMemoResponse = void;
-export type DeleteTxMemoFunc = (
-  request: DeleteTxMemoRequest
-) => Promise<DeleteTxMemoResponse>;
+type DeleteTxMemoResponse = void;
 
 // getAllTxMemo
 
-export type GetAllTxMemoRequest = {|
+type GetAllTxMemoRequest = {|
   db: lf$Database,
 |};
-export type GetAllTxMemoResponse = $ReadOnlyArray<$ReadOnly<TxMemoTableRow>>;
-export type GetAllTxMemoFunc = (
-  request: GetAllTxMemoRequest
-) => Promise<GetAllTxMemoResponse>;
+type GetAllTxMemoResponse = $ReadOnlyArray<$ReadOnly<TxMemoTableRow>>;
 
 export async function upsertTxMemo(
   request: UpsertTxMemoRequest

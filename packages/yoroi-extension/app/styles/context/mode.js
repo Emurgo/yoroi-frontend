@@ -7,7 +7,7 @@ import LocalStorageApi from '../../api/localStorage/index';
 import React, { useEffect } from 'react';
 import { noop } from '../../coreUtils';
 
-export type Modes = 'light' | 'dark';
+type Modes = 'light' | 'dark';
 
 const ColorModeContext = React.createContext();
 

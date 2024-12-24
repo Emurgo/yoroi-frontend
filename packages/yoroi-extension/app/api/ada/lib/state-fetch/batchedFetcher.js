@@ -405,7 +405,7 @@ export function batchCheckAddressesInUse(
   };
 }
 
-export type TimeForTx = {|
+type TimeForTx = {|
   blockHash: string,
   height: number,
   txHash: string,

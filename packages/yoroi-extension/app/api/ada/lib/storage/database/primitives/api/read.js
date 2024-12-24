@@ -352,7 +352,7 @@ export class GetKeyDerivation {
  * A specific number means you only care about the specific index
  * Null indicates querying all derivations at the level
  */
-export type BIP32QueryPath = $ReadOnlyArray<number | null>;
+type BIP32QueryPath = $ReadOnlyArray<number | null>;
 /**
  * Mapping from KeyDerivationId to addressing info
  */
@@ -923,7 +923,7 @@ export class GetTxAndBlock {
   }
 }
 
-export type CertificateForKey = {|
+type CertificateForKey = {|
   ...CertificatePart,
   transaction: $ReadOnly<TransactionRow>,
   block: null | $ReadOnly<BlockRow>,

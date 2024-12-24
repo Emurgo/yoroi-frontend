@@ -171,7 +171,7 @@ export async function findWhitelistedConnection(
   });
 }
 
-export type ConnectParameters = {|
+type ConnectParameters = {|
   url: string,
   requestIdentification?: boolean,
   onlySilent?: boolean,

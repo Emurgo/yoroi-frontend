@@ -14,7 +14,7 @@ import {
   removeAllTransactions,
 } from '../../api/thunk';
 
-export type WarningList = {|
+type WarningList = {|
   publicDeriverId: number,
   dialogs: Array<void => Node>,
 |};

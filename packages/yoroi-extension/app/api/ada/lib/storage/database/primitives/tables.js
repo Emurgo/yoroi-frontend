@@ -7,7 +7,7 @@ import typeof { CertificateKind } from '@emurgo/cardano-serialization-lib-browse
 import type { KeyKindType } from '../../../cardanoCrypto/keys/types';
 import type { CoinTypesT } from '../../../../../../config/numbersConfig';
 
-export type CommonBaseConfig = {|
+type CommonBaseConfig = {|
   /**
    * At what point the config becomes active
    */
@@ -18,7 +18,7 @@ export type CommonBaseConfig = {|
   */
   +ChainNetworkId: string,
 |};
-export type CardanoHaskellByronBaseConfig = {|
+type CardanoHaskellByronBaseConfig = {|
   ...CommonBaseConfig,
   /*
    * Legacy byron addresses contained a network id inside of its attributes
@@ -30,7 +30,7 @@ export type CardanoHaskellByronBaseConfig = {|
   +SlotsPerEpoch: number,
   +SlotDuration: number,
 |};
-export type CardanoHaskellShelleyBaseConfig = {|
+type CardanoHaskellShelleyBaseConfig = {|
   +StartAt: number,
   +SlotsPerEpoch: number,
   +SlotDuration: number,
@@ -46,7 +46,7 @@ export type CardanoHaskellShelleyBaseConfig = {|
   +KeyDeposit: string,
 |};
 
-export type CardanoHaskellConwayBaseConfig = {|
+type CardanoHaskellConwayBaseConfig = {|
   +CoinsPerUtxoByte: string,
 |};
 
@@ -254,7 +254,7 @@ export const TransactionType = Object.freeze({
   CardanoShelley: 1,
 });
 
-export type TransactionInsertBase = {|
+type TransactionInsertBase = {|
   Digest: number,
   Hash: string,
   BlockId: null | number,

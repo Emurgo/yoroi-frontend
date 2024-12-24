@@ -1,4 +1,4 @@
-export interface IChartDataItem {
+interface IChartDataItem {
   label: string;
   value: number;
   changePercent: number;

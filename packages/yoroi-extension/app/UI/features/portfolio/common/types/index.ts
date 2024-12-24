@@ -19,7 +19,7 @@ export type BalanceType = {
   amount: number;
 };
 
-export interface IDetailOverview {
+interface IDetailOverview {
   description: string;
   website: string;
   detailOn: string;
@@ -27,7 +27,7 @@ export interface IDetailOverview {
   fingerprint: string;
 }
 
-export interface IDetailPerformanceItem {
+interface IDetailPerformanceItem {
   value: number | string | null;
 }
 
