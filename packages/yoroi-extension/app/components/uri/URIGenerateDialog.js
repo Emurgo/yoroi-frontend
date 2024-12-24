@@ -43,7 +43,6 @@ const messages = defineMessages({
 type Props = {|
   +onClose: void => void,
   +onGenerate: (address: string, amount: BigNumber) => void,
-  +classicTheme: boolean,
   +walletAddress: string,
   +amount: ?BigNumber,
   +validateAmount: (amountInNaturalUnits: BigNumber, tokenRow: $ReadOnly<TokenRow>) => Promise<[boolean, void | string]>,

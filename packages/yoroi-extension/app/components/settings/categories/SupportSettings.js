@@ -1,12 +1,11 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   faqTitle: {
@@ -53,16 +52,14 @@ type Props = {|
   +onPaperWalletTransfer: void => void,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class SupportSettings extends Component<Props & InjectedProps> {
+export default class SupportSettings extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { onExternalLinkClick, onDownloadLogs, isRevampLayout } = this.props;
+    const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
@@ -108,17 +105,15 @@ class SupportSettings extends Component<Props & InjectedProps> {
 
     return (
       <Box>
-        {isRevampLayout && (
-          <Typography component="h5" variant="h5" mb="24px" color="ds.text_gray_medium" fontWeight={500}>
-            {intl.formatMessage(globalMessages.support)}
-          </Typography>
-        )}
+        <Typography component="h5" variant="h5" mb="24px" color="ds.text_gray_medium" fontWeight={500}>
+          {intl.formatMessage(globalMessages.support)}
+        </Typography>
 
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: isRevampLayout ? '40px' : '20px',
+            gap: '40px',
           }}
         >
           {sections.map(({ title, text }) => {
@@ -126,7 +121,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
               <Box key={title.id}>
                 <Typography
                   component="div"
-                  variant={isRevampLayout ? 'body1' : 'h5'}
+                  variant="body1"
                   color="ds.text_gray_medium"
                   fontWeight={500}
                   mb="8px"
@@ -136,7 +131,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
                 <Typography
                   component="div"
                   color="ds.text_gray_medium"
-                  variant={isRevampLayout ? 'body1' : 'body2'}
+                  variant="body1"
                 >
                   {text}
                 </Typography>
@@ -145,10 +140,10 @@ class SupportSettings extends Component<Props & InjectedProps> {
           })}
         </Box>
         <Button
-          variant={isRevampLayout ? 'contained' : 'primary'}
-          size={isRevampLayout ? 'flat' : 'medium'}
+          variant="contained"
+          size="flat"
           onClick={onDownloadLogs}
-          sx={{ marginTop: isRevampLayout ? '40px' : '20px' }}
+          sx={{ marginTop: '40px' }}
           id="settings:support-downloadLogs-buttons"
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
@@ -172,5 +167,3 @@ class SupportSettings extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(SupportSettings): ComponentType<Props>);

@@ -15,7 +15,6 @@ type Props = {|
   +onCancel: void => void,
   +title: string,
   +backButtonLabel: string,
-  +classicTheme: boolean,
 |};
 
 @observer

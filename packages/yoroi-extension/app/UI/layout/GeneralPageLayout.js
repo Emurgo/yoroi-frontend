@@ -4,13 +4,12 @@ import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
-import { withLayout } from '../../styles/context/layout';
 import { ModalProvider } from '../components/modals/ModalContext';
 import { ModalManager } from '../components/modals/ModalManager';
 import { IntlProvider } from '../context/IntlProvider';
 
 @observer
-class GeneralPageLayout extends React.Component {
+export default class GeneralPageLayout extends React.Component {
   static defaultProps = {
     children: undefined,
   };
@@ -36,5 +35,3 @@ class GeneralPageLayout extends React.Component {
     );
   }
 }
-
-export default withLayout(GeneralPageLayout);

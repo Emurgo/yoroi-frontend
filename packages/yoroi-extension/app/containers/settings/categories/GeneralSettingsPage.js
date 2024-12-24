@@ -93,12 +93,10 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
     const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
     return (
-      <Box sx={{ pb: profileStore.isRevampTheme ? '50px' : '0px' }}>
-        {profileStore.isRevampTheme && (
-          <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
-            {intl.formatMessage(settingsMenuMessages.general)}
-          </Typography>
-        )}
+      <Box sx={{ pb: '50px' }}>
+        <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
+          {intl.formatMessage(settingsMenuMessages.general)}
+        </Typography>
         <GeneralSettings
           onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
           isSubmitting={isSubmittingLocale}

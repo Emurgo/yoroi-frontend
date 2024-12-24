@@ -189,7 +189,6 @@ export default class StakingDashboardPage extends Component<StoresAndActionsProp
             }
             hash={pool[0]}
             moreInfo={moreInfo}
-            classicTheme={this.props.stores.profile.isClassicTheme}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {

@@ -29,7 +29,6 @@ type Props = {|
   +mnemonicLength: number,
   +passwordMatches: string => boolean,
   +includeLengthCheck: boolean,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -111,13 +110,11 @@ export default class YoroiPaperWalletFormPage extends Component<Props> {
           mnemonicValidator={this.props.mnemonicValidator}
           validWords={this.props.validWords}
           mnemonicLength={this.props.mnemonicLength}
-          classicTheme={this.props.classicTheme}
         />
         <PaperPasswordInput
           setForm={(form) => this.setPaperPasswordFrom(form)}
           passwordMatches={this.props.passwordMatches}
           includeLengthCheck={this.props.includeLengthCheck}
-          classicTheme={this.props.classicTheme}
         />
       </BaseTransferPage>
     );

@@ -40,7 +40,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     } = this.props;
     const { stores, actions } = this.props;
     const publicDeriver = stores.wallets.selected;
-    const { profile } = stores;
 
     if (publicDeriver == null)
       throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
@@ -87,7 +86,6 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
           sendMoneyRequest.reset();
         }}
         error={sendMoneyRequest.error}
-        classicTheme={profile.isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={
           addr => addressToDisplayString(addr, getNetworkById(publicDeriver.networkId))

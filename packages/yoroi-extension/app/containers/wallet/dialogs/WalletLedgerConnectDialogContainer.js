@@ -39,7 +39,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   render(): null | Node {
     const { actions, stores } = this.props;
-    const { profile } = this.props.stores;
     const ledgerConnectStore = this.props.stores.substores.ada.ledgerConnect;
     const hwConnectActions = this.props.actions.ada.ledgerConnect;
 
@@ -55,7 +54,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             onExternalLinkClick={handleExternalLinkClick}
             submit={hwConnectActions.submitCheck.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onBack={this.props.onBack}
           />);
         break;
@@ -69,7 +67,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             goBack={hwConnectActions.goBackToCheck.trigger}
             submit={hwConnectActions.submitConnect.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
           />);
         break;
       case ProgressStep.TRANSFER:
@@ -91,7 +88,6 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             onExternalLinkClick={handleExternalLinkClick}
             submit={hwConnectActions.submitSave.trigger}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
           />);
         break;
       default:

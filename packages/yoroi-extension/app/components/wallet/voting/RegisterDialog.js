@@ -13,7 +13,6 @@ import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
-import ProgressStepBlock from './ProgressStepBlock';
 import styles from './RegisterDialog.scss';
 import { Typography } from '@mui/material';
 import Stepper from '../../common/stepper/Stepper';
@@ -31,9 +30,7 @@ type Props = {|
   +progressInfo: ProgressInfo,
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
   +isProcessing: boolean,
-  +isRevamp: boolean,
 |};
 
 @observer
@@ -49,7 +46,7 @@ export default class RegisterDialog extends Component<Props> {
   }
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, cancel, classicTheme, isProcessing } = this.props;
+    const { stepsList, progressInfo, cancel, isProcessing } = this.props;
 
     const dailogActions = [
       {
@@ -70,14 +67,19 @@ export default class RegisterDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         onClose={cancel}
       >
-        {this.props.isRevamp ? (
+        {(
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
-              steps={stepsList.map(step => ({ message: step.message, stepId: String(step.step) }))}
-              setCurrentStep={() => {}}
+              steps={stepsList.map(step => ({
+                message: step.message,
+                stepId: String(step.step)
+              }))}
+              setCurrentStep={() => {
+              }}
             />
-            <Typography component="div"
+            <Typography
+              component="div"
               textAlign="center"
               pt="24px"
               pb="40px"
@@ -87,22 +89,10 @@ export default class RegisterDialog extends Component<Props> {
               {intl.formatMessage(messages.line1)}
             </Typography>
           </>
-        ) : (
-          <>
-            <ProgressStepBlock
-              stepsList={stepsList}
-              progressInfo={progressInfo}
-              classicTheme={classicTheme}
-            />
-            <div className={classnames([styles.lineText, styles.firstItem])}>
-              {intl.formatMessage(messages.line1)}
-            </div>
-          </>
         )}
         <div className={styles.spendingPassword}>
           <SpendingPasswordInput
             setForm={form => this.setSpendingPasswordForm(form)}
-            classicTheme={this.props.classicTheme}
             isSubmitting={isProcessing}
           />
         </div>

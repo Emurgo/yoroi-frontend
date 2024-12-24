@@ -43,8 +43,6 @@ type Props = {|
   +onPasswordSwitchToggle: void => void,
   +isSubmitting: boolean,
   +error: ?LocalizableError,
-  +isClassicTheme: boolean,
-  +isRevampTheme: boolean,
 |};
 
 @observer
@@ -59,17 +57,13 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         currentPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(messages.currentPasswordLabel),
-          placeholder: this.props.isClassicTheme
-            ? this.context.intl.formatMessage(messages.currentPasswordFieldPlaceholder)
-            : '',
+          placeholder: '',
           value: this.props.dialogData.currentPasswordValue,
         },
         walletPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
-          placeholder: this.props.isClassicTheme
-            ? this.context.intl.formatMessage(globalMessages.newPasswordFieldPlaceholder)
-            : '',
+          placeholder: '',
           value: this.props.dialogData.newPasswordValue,
           validators: [
             ({ field, form }) => {
@@ -87,9 +81,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
         repeatPassword: {
           type: 'password',
           label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
-          placeholder: this.props.isClassicTheme
-            ? this.context.intl.formatMessage(globalMessages.repeatPasswordFieldPlaceholder)
-            : '',
+          placeholder: '',
           value: this.props.dialogData.repeatedPasswordValue,
           validators: [
             ({ field, form }) => {
@@ -140,7 +132,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
-    const { onCancel, isSubmitting, dialogData, error, isClassicTheme } = this.props;
+    const { onCancel, isSubmitting, dialogData, error } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);
 
@@ -148,10 +140,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
     const confirmButtonClasses = classnames(['confirmButton']);
 
-    const newPasswordClasses = classnames([
-      'newPassword',
-      isClassicTheme ? styles.newPasswordClassic : '',
-    ]);
+    const newPasswordClasses = classnames(['newPassword']);
 
     const currentPasswordField = form.$('currentPassword');
     const newPasswordField = form.$('walletPassword');

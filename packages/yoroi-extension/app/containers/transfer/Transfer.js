@@ -17,12 +17,13 @@ export const WalletTransferPagePromise: void => Promise<any> = () => import('./W
 const WalletTransferPage = lazy(WalletTransferPagePromise);
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children?: Node,
 |};
 
+type AllProps = {| ...Props, ...StoresAndActionsProps |};
+
 @observer
-class Transfer extends Component<Props> {
+export default class Transfer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -63,4 +64,3 @@ class Transfer extends Component<Props> {
     );
   };
 }
-export default Transfer;

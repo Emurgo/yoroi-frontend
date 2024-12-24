@@ -81,7 +81,6 @@ export default class URILandingDialogContainer extends Component<Props> {
       <URILandingDialog
         onSubmit={this.toggleShowDisclaimer}
         onClose={this.onCancel}
-        classicTheme={this.props.stores.profile.isClassicTheme}
       />
     );
   }

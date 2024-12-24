@@ -45,7 +45,6 @@ const messages = defineMessages({
 type Props = {|
   +onSubmit: {| name: string, password: string |} => PossiblyAsync<void>,
   +onCancel: void => void,
-  +classicTheme: boolean
 |};
 
 type State = {|
@@ -73,8 +72,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     fields: {
       walletName: {
         label: this.context.intl.formatMessage(messages.walletName),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.walletNameHint) : '',
+        placeholder: '',
         value: '',
         validators: [({ field }) => (
           [
@@ -86,8 +84,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
       walletPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.walletPasswordLabel) : '',
+        placeholder: '',
         value: '',
         validators: [({ field, form }) => {
           const repeatPasswordField = form.$('repeatPassword');
@@ -103,8 +100,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
       repeatPassword: {
         type: 'password',
         label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(messages.repeatPasswordFieldPlaceholder) : '',
+        placeholder: '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;

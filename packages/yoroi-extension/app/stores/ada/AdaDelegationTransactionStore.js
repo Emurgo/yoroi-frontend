@@ -202,8 +202,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap, Acti
   };
 
   goToDashboardRoute(): void {
-    const isRevamp = this.stores.profile.isRevampTheme;
-    const route = buildRoute(isRevamp ? ROUTES.STAKING : ROUTES.WALLETS.DELEGATION_DASHBOARD);
+    const route = buildRoute(ROUTES.STAKING);
     this.actions.router.goToRoute.trigger({ route });
   }
 

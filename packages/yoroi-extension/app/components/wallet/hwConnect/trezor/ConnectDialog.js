@@ -19,9 +19,6 @@ import HWErrorBlock from '../common/HWErrorBlock';
 import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
 import { ReactComponent as ConnectErrorImage } from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
 
-import connectLoadGIF from '../../../../assets/images/hardware-wallet/trezor/connect-load.gif';
-import { ReactComponent as ConnectErrorSVG } from '../../../../assets/images/hardware-wallet/trezor/connect-error.inline.svg';
-
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import { StepState } from '../../../widgets/ProgressSteps';
 
@@ -31,8 +28,6 @@ import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography } from '@mui/material';
-
-const connectStartGIF = connectLoadGIF;
 
 const messages = defineMessages({
   connectIntroTextLine1: {
@@ -53,7 +48,6 @@ type Props = {|
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -64,18 +58,9 @@ export default class ConnectDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel, classicTheme } = this.props;
+    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel } = this.props;
 
-    const introBlock = classicTheme ? (
-      <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
-        <span>{intl.formatMessage(messages.connectIntroTextLine1)}</span>
-        <br />
-        <span>{intl.formatMessage(messages.connectIntroTextLine2)}</span>
-        <br />
-        <span>{intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}</span>
-        <br />
-      </div>
-    ) : (
+    const introBlock = (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <Typography component="span" color="ds.text_gray_low">
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
@@ -93,7 +78,7 @@ export default class ConnectDialog extends Component<Props> {
         backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
-            <img src={classicTheme ? connectLoadGIF : connectLoadImage} alt="" />
+            <img src={connectLoadImage} alt="" />
           </div>
         );
         break;
@@ -101,7 +86,7 @@ export default class ConnectDialog extends Component<Props> {
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
-            <img src={classicTheme ? connectStartGIF : connectLoadImage} alt="" />
+            <img src={connectLoadImage} alt="" />
           </div>
         );
         break;
@@ -109,7 +94,7 @@ export default class ConnectDialog extends Component<Props> {
         backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            {classicTheme ? <ConnectErrorSVG /> : <ConnectErrorImage />}
+            <ConnectErrorImage/>
           </div>
         );
         break;
@@ -137,10 +122,12 @@ export default class ConnectDialog extends Component<Props> {
         backButton={backButton}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

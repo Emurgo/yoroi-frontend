@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -9,13 +9,10 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography } from '@mui/material';
-import { withLayout } from '../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../styles/context/layout';
 
 type Props = {|
   +title: string,
   +text: string,
-  +classicTheme: boolean,
   +closeInfo?: {|
     +onClose: void => PossiblyAsync<void>,
     +closeLabel: string,
@@ -23,7 +20,7 @@ type Props = {|
 |};
 
 @observer
-class SuccessPage extends Component<Props & InjectedLayoutProps> {
+export default class SuccessPage extends Component<Props> {
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired
   };
@@ -33,7 +30,7 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
   };
 
   render(): Node {
-    const { title, text, isRevampLayout } = this.props;
+    const { title, text } = this.props;
 
     const actions = this.props.closeInfo == null
       ? undefined
@@ -57,7 +54,7 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
             <div className={styles.successImg} />
             <Typography component="div"
               variant="body1"
-              color={isRevampLayout ? 'primary' : 'secondary.300'}
+              color="primary"
               textAlign="center"
               mt="16px"
               fontWeight={500}
@@ -83,5 +80,3 @@ class SuccessPage extends Component<Props & InjectedLayoutProps> {
     );
   }
 }
-
-export default (withLayout(SuccessPage): ComponentType<Props>);

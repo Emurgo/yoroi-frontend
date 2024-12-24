@@ -44,7 +44,7 @@ export class SuccessPageRevamp extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={closeInfo ? closeInfo.onClose : undefined}
         closeButton={
-          closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} isRevampLayout /> : undefined
+          closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} /> : undefined
         }
       >
         <Box maxWidth="600px">

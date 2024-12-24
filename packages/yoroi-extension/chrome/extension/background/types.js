@@ -34,6 +34,7 @@ export type WalletState = {|
   publicKey: string,
   receiveAddress: BaseSingleAddressPath,
   pathToPublic: Array<number>,
+  // todo: pending removal
   signingKeyUpdateDate: ?string,
   stakingAddressing: Addressing,
   stakingAddress: string,
