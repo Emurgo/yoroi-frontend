@@ -41,7 +41,7 @@ export default class ErrorPage extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.errorLabel)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}

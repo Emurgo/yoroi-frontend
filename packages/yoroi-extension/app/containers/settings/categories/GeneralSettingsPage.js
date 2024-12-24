@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
@@ -14,6 +13,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';
+import type { StoresProps } from '../../../stores';
 
 const currencyLabels = defineMessages({
   USD: {
@@ -51,7 +51,7 @@ const currencyLabels = defineMessages({
 });
 
 @observer
-export default class GeneralSettingsPage extends Component<StoresAndActionsProps> {
+export default class GeneralSettingsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -61,13 +61,15 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
 
     const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
     localStorageApi.unsetPortfolioFiatPair();
-    await this.props.actions.profile.updateUnitOfAccount.trigger(unitOfAccount);
+    await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
+    await this.props.stores.transactions.updateUnitOfAccount();
   };
 
   render(): Node {
     const { intl } = this.context;
-    const profileStore = this.props.stores.profile;
-    const coinPriceStore = this.props.stores.coinPriceStore;
+    const { stores } = this.props;
+    const profileStore = stores.profile;
+    const coinPriceStore = stores.coinPriceStore;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -98,7 +100,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           {intl.formatMessage(settingsMenuMessages.general)}
         </Typography>
         <GeneralSettings
-          onSelectLanguage={this.props.actions.profile.updateLocale.trigger}
+          onSelectLanguage={stores.profile.updateLocale}
           isSubmitting={isSubmittingLocale}
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
@@ -113,7 +115,7 @@ export default class GeneralSettingsPage extends Component<StoresAndActionsProps
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock />
-        <AboutYoroiSettingsBlock wallet={this.props.stores.wallets.selected} />
+        <AboutYoroiSettingsBlock wallet={stores.wallets.selected} />
       </Box>
     );
   }

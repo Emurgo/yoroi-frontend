@@ -6,7 +6,6 @@ import { observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import Dialog from '../../../components/widgets/Dialog';
@@ -30,13 +29,14 @@ import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
 import { Box } from '@mui/system';
 import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   urlTemplate: ?string,
   poolTransition: ?PoolTransition,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 type State = {|
   firstPool: PoolData | void,
@@ -55,12 +55,13 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   @observable notificationElementId: string = '';
 
   cancel: void => void = () => {
-    const selectedWallet = this.props.stores.wallets.selected;
-    this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
+    const { stores } = this.props;
+    const selectedWallet = stores.wallets.selected;
+    stores.delegation.setPoolTransitionConfig(selectedWallet, {
       shouldUpdatePool: false,
       show: 'idle',
     });
-    this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: true });
+    stores.substores.ada.delegationTransaction.reset({ justTransaction: true });
   };
 
   UNSAFE_componentWillMount(): * {
@@ -74,8 +75,9 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   }
 
   async componentWillUnmount() {
-    this.props.actions.ada.delegationTransaction.reset.trigger({ justTransaction: false });
-    this.props.stores.delegation.poolInfoQuery.reset();
+    const { stores } = this.props;
+    stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
+    stores.delegation.poolInfoQuery.reset();
   }
 
   render(): null | Node {
@@ -234,11 +236,12 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         hash={selectedPoolInfo.poolId}
         moreInfo={moreInfo}
         onCopyAddressTooltip={(address, elementId) => {
-          if (!this.props.stores.uiNotifications.isOpen(elementId)) {
+          const { uiNotifications } = this.props.stores;
+          if (!uiNotifications.isOpen(elementId)) {
             runInAction(() => {
               this.notificationElementId = elementId;
             });
-            this.props.actions.notifications.open.trigger({
+            uiNotifications.open({
               id: elementId,
               duration: tooltipNotification.duration,
               message: tooltipNotification.message,
@@ -281,7 +284,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         closeOnOverlayClick={false}
         onClose={this.cancel}
         closeButton={<DialogCloseButton onClose={this.cancel} />}
-        actions={dialogBackButton}
+        dialogActions={dialogBackButton}
       >
         <>
           <center>
@@ -295,11 +298,12 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
   getDialog: void => void | Node = () => {
     const { intl } = this.context;
-    const { delegationTransaction } = this.props.stores.substores.ada;
+    const { stores } = this.props;
+    const { delegationTransaction } = stores.substores.ada;
     const delegationTx = delegationTransaction.createDelegationTx.result;
-    const uiDialogs = this.props.stores.uiDialogs;
+    const uiDialogs = stores.uiDialogs;
 
-    const selectedWallet = this.props.stores.wallets.selected;
+    const selectedWallet = stores.wallets.selected;
     if (selectedWallet == null) {
       return null;
     }
@@ -311,7 +315,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     );
 
     const approximateReward = tokenEntry => {
-      const tokenRow = this.props.stores.tokenInfoStore.tokenInfo
+      const tokenRow = stores.tokenInfoStore.tokenInfo
         .get(tokenEntry.networkId.toString())
         ?.get(tokenEntry.identifier);
       if (tokenRow == null)
@@ -328,15 +332,15 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     };
 
     const showSignDialog =
-      this.props.stores.wallets.sendMoneyRequest.isExecuting ||
-      !this.props.stores.wallets.sendMoneyRequest.wasExecuted ||
-      this.props.stores.wallets.sendMoneyRequest.error != null;
+      stores.wallets.sendMoneyRequest.isExecuting ||
+      !stores.wallets.sendMoneyRequest.wasExecuted ||
+      stores.wallets.sendMoneyRequest.error != null;
 
     const selectedPoolInfo = this._getPoolInfo(selectedWallet);
-    if (this.props.stores.delegation.poolInfoQuery.error != null) {
+    if (stores.delegation.poolInfoQuery.error != null) {
       return undefined;
     }
-    if (this.props.stores.delegation.poolInfoQuery.isExecuting) {
+    if (stores.delegation.poolInfoQuery.isExecuting) {
       return (
         <Dialog
           title={intl.formatMessage(globalMessages.processingLabel)}
@@ -349,8 +353,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         </Dialog>
       );
     }
-    if (this.props.stores.delegation.poolInfoQuery.error != null) {
-      return this._errorDialog(this.props.stores.delegation.poolInfoQuery.error);
+    if (stores.delegation.poolInfoQuery.error != null) {
+      return this._errorDialog(stores.delegation.poolInfoQuery.error);
     }
     if (delegationTransaction.createDelegationTx.isExecuting) {
       return (
@@ -384,20 +388,20 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
           approximateReward={approximateReward(
             delegationTx.totalAmountToDelegate.getDefaultEntry()
           )}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+          isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
           isHardware={selectedWallet.type !== 'mnemonic'}
           onCancel={this.cancel}
           onSubmit={async ({ password }) => {
-            await this.props.actions.ada.delegationTransaction.signTransaction.trigger({
+            await stores.substores.ada.delegationTransaction.signTransaction({
               password,
               wallet: selectedWallet,
               dialog: DelegationSuccessDialog,
             });
           }}
-          error={this.props.stores.wallets.sendMoneyRequest.error}
+          error={stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
-            this.props.stores.explorers.selectedExplorer.get(
+            stores.explorers.selectedExplorer.get(
               selectedWallet.networkId
             ) ??
             (() => {
@@ -410,7 +414,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     if (uiDialogs.isOpen(DelegationSuccessDialog)) {
       return (
         <DelegationSuccessDialog
-          onClose={this.props.actions.ada.delegationTransaction.complete.trigger}
+          onClose={() => stores.substores.ada.delegationTransaction.complete()}
         />
       );
     }

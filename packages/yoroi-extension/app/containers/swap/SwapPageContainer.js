@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -15,12 +14,13 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { ROUTES } from '../../routes-config';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   +children?: Node,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class SwapPageContainer extends Component<AllProps> {
@@ -50,20 +50,24 @@ export default class SwapPageContainer extends Component<AllProps> {
 
   render(): Node {
     const { children } = this.props;
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
 
-    const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
+    const menu = (
+      <SwapMenu
+        onItemClick={route => stores.app.goToRoute({ route })}
+        isActiveItem={this.isActivePage}
+      />
+    );
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         isErrorPage={isErrorPage}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
             title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
             menu={menu}

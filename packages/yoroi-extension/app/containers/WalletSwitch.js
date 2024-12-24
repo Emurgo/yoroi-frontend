@@ -2,16 +2,16 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 
 import TopBarLayout from '../components/layout/TopBarLayout';
 
 import SidebarContainer from './SidebarContainer';
 import BannerContainer from './banners/BannerContainer';
 import NavBar from '../components/topbar/NavBar';
+import type { StoresProps } from '../stores';
 
 @observer
-export default class WalletSwitch extends Component<StoresAndActionsProps> {
+export default class WalletSwitch extends Component<StoresProps> {
 
   componentDidMount() {
     // this is a temporary state as the wallet is switching wallets.
@@ -21,15 +21,15 @@ export default class WalletSwitch extends Component<StoresAndActionsProps> {
   }
 
   render(): Node {
-    const { actions, stores } = this.props;
-    const sidebarContainer = (<SidebarContainer actions={actions} stores={stores} />);
+    const { stores } = this.props;
+    const sidebarContainer = (<SidebarContainer stores={stores} />);
 
     const navbarElement = (
       <NavBar title={undefined} />
     );
     return (
       <TopBarLayout
-        banner={(<BannerContainer actions={actions} stores={stores} />)}
+        banner={(<BannerContainer stores={stores} />)}
         sidebar={sidebarContainer}
         navbar={navbarElement}
         showInContainer

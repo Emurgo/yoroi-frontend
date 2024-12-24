@@ -1,5 +1,5 @@
 // @flow
-import { observable, action } from 'mobx';
+import { action, observable } from 'mobx';
 import ProfileStore from './toplevel/ProfileStore';
 import type { Api } from '../../api/index';
 import UiNotificationsStore from '../../stores/toplevel/UiNotificationsStore';
@@ -8,7 +8,6 @@ import ConnectorCoinPriceStore from './toplevel/ConnectorCoinPriceStore';
 import TokenInfoStore from '../../stores/toplevel/TokenInfoStore';
 import ConnectorStore from './ConnectorStore';
 import ConnectorLoadingStore from './toplevel/ConnectorLoadingStore';
-import type { ActionsMap } from '../actions';
 import type { AdaStoresMap } from './ada/index';
 import setupAdaStores from './ada/index';
 import StateFetchStore from '../../stores/toplevel/StateFetchStore';
@@ -28,15 +27,15 @@ const storeClasses = Object.freeze({
 });
 
 export type StoresMap = {|
-  stateFetchStore: StateFetchStore<StoresMap, ActionsMap>,
+  stateFetchStore: StateFetchStore<StoresMap>,
   profile: ProfileStore,
-  uiDialogs: UiDialogsStore<{||}, ActionsMap>,
-  uiNotifications: UiNotificationsStore<{||}, ActionsMap>,
+  uiDialogs: UiDialogsStore<{||}>,
+  uiNotifications: UiNotificationsStore<{||}>,
   explorers: ExplorerStore,
   coinPriceStore: ConnectorCoinPriceStore,
   loading: ConnectorLoadingStore,
   connector: ConnectorStore,
-  tokenInfoStore: TokenInfoStore<StoresMap, ActionsMap>,
+  tokenInfoStore: TokenInfoStore<StoresMap>,
   substores: {|
     ada: AdaStoresMap,
   |},
@@ -71,14 +70,13 @@ function initializeSubstore<T: {...}>(
 export default (action(
   (
     api: Api,
-    actions: ActionsMap
   ): StoresMap => {
     const storeNames = Object.keys(storeClasses);
     storeNames.forEach(name => {
       if (stores[name]) stores[name].teardown();
     });
     storeNames.forEach(name => {
-      stores[name] = (new storeClasses[name](stores, api, actions): any);
+      stores[name] = (new storeClasses[name](stores, api): any);
     });
     storeNames.forEach(name => {
       if (stores[name]) stores[name].initialize();
@@ -89,7 +87,7 @@ export default (action(
      * Because to make sure all substores are non-null we have to create the object
      * But we only want to actually initialize it if it is the currency in use */
     stores.substores = {
-      ada: setupAdaStores((stores: any), api, actions),
+      ada: setupAdaStores((stores: any), api),
     };
 
     const loadedStores: StoresMap = (stores: any);
@@ -102,4 +100,8 @@ export default (action(
 
     return loadedStores;
   }
-): (Api, ActionsMap) => StoresMap);
+): (Api) => StoresMap);
+
+export type ConnectorStoresProps = {|
+  +stores: StoresMap,
+|};

@@ -9,7 +9,6 @@ import { ROUTES } from '../../routes-config';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import globalMessages from '../../i18n/global-messages';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import WalletTransactionsListRevamp from '../../components/wallet/transactions/WalletTransactionsListRevamp';
 import VerticalFlexContainer from '../../components/layout/VerticalFlexContainer';
 import ExportTransactionDialog from '../../components/wallet/export/ExportTransactionDialog';
@@ -28,9 +27,10 @@ import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { noop } from '../../coreUtils';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletSummaryPage extends Component<StoresAndActionsProps> {
+export default class WalletSummaryPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -38,8 +38,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
 
   render(): Node {
     const { intl } = this.context;
-    const actions = this.props.actions;
-    const { wallets } = this.props.stores;
+    const { stores } = this.props;
     const {
       hasAny,
       hasMoreToLoad,
@@ -49,21 +48,19 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
       isExporting,
       exportError,
       isLoading,
-    } = this.props.stores.transactions;
-    const { selected } = wallets;
+    } = stores.transactions;
+    const { selected } = stores.wallets;
     let walletTransactions = null;
     // Guard against potential null values
     if (selected == null) {
       Logger.error('[WalletSummaryPage::render] Active wallet required');
       return null;
     }
-    noop(this.props.stores.delegation.checkPoolTransition());
-
-    const { exportTransactionsToFile, closeExportTransactionDialog } = actions.transactions;
+    noop(stores.delegation.checkPoolTransition());
 
     const walletId = selected.plate.TextPart;
 
-    const { uiDialogs, profile, memos, uiNotifications } = this.props.stores;
+    const { uiDialogs, profile, memos, uiNotifications } = stores;
 
     const tooltipNotification = {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
@@ -75,7 +72,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
         runInAction(() => {
           this.notificationElementId = elementId;
         });
-        actions.notifications.open.trigger({
+        uiNotifications.open({
           id: elementId,
           duration: tooltipNotification.duration,
           message: tooltipNotification.message,
@@ -90,9 +87,9 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
           <WalletTransactionsListRevamp
             transactions={recent}
             lastSyncBlock={selected.lastSyncInfo.Height}
-            memoMap={this.props.stores.memos.txMemoMap.get(walletId) || new Map()}
+            memoMap={stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(
+              stores.explorers.selectedExplorer.get(
                 selected.networkId
               ) ??
               (() => {
@@ -101,15 +98,15 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
             }
             isLoadingTransactions={isLoadingMore}
             hasMoreToLoad={hasMoreToLoad}
-            onLoadMore={() => actions.transactions.loadMoreTransactions.trigger(selected)}
+            onLoadMore={() => stores.transactions.loadMoreTransactions(selected)}
             assuranceMode={selected.assuranceMode}
             shouldHideBalance={profile.shouldHideBalance}
             onAddMemo={transaction =>
               this.showMemoDialog({
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
-                  actions.memos.selectTransaction.trigger({ tx: transaction });
-                  actions.dialogs.push.trigger({ dialog: AddMemoDialog });
+                  stores.memos.selectTransaction({ tx: transaction });
+                  stores.uiDialogs.push({ dialog: AddMemoDialog });
                 },
               })
             }
@@ -117,26 +114,26 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               this.showMemoDialog({
                 dialog: MemoNoExternalStorageDialog,
                 continuation: () => {
-                  actions.memos.selectTransaction.trigger({ tx: transaction });
-                  actions.dialogs.push.trigger({ dialog: EditMemoDialog });
+                  stores.memos.selectTransaction({ tx: transaction });
+                  stores.uiDialogs.push({ dialog: EditMemoDialog });
                 },
               })
             }
             unitOfAccountSetting={profile.unitOfAccount}
-            getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
-            getTokenInfo={genLookupOrNull(this.props.stores.tokenInfoStore.tokenInfo)}
+            getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
+            getTokenInfo={genLookupOrNull(stores.tokenInfoStore.tokenInfo)}
             addressLookup={genAddressLookup(
               selected.networkId,
               intl,
-              route => this.props.actions.router.goToRoute.trigger({ route }),
-              this.props.stores.addresses.addressSubgroupMap
+              route => stores.app.goToRoute({ route }),
+              stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             addressToDisplayString={addr =>
               addressToDisplayString(addr, getNetworkById(selected.networkId))
             }
-            complexityLevel={this.props.stores.profile.selectedComplexityLevel}
+            complexityLevel={stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
         );
@@ -159,14 +156,14 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
           isActionProcessing={isExporting}
           error={exportError}
           submit={exportRequest =>
-            exportTransactionsToFile.trigger({
+            stores.transactions.exportTransactionsToFile({
               exportRequest,
               publicDeriver: selected,
             })
           }
-          toggleIncludeTxIds={this.props.stores.transactions.toggleIncludeTxIds}
-          shouldIncludeTxIds={this.props.stores.transactions.shouldIncludeTxIds}
-          cancel={closeExportTransactionDialog.trigger}
+          toggleIncludeTxIds={stores.transactions.toggleIncludeTxIds}
+          shouldIncludeTxIds={stores.transactions.shouldIncludeTxIds}
+          cancel={stores.transactions.closeExportTransactionDialog}
         />
       );
     }
@@ -185,12 +182,12 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
           }
           openExportTxToFileDialog={this.openExportTransactionDialog}
           unitOfAccountSetting={profile.unitOfAccount}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          getHistoricalPrice={this.props.stores.coinPriceStore.getHistoricalPrice}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+          getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
           shouldShowEmptyBanner={!isLoading && !hasAny}
           emptyBannerComponent={
             <WalletEmptyBanner
-              onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })}/>
+              onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })}/>
           }
         />
 
@@ -206,9 +203,9 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
               return memos.selectedTransaction;
             })()}
             error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             onSubmit={values => {
-              return actions.memos.saveTxMemo.trigger(values);
+              return stores.memos.saveTxMemo(values);
             }}
             plateTextPart={selected.plate.TextPart}
           />
@@ -216,13 +213,13 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
 
         {uiDialogs.isOpen(MemoNoExternalStorageDialog) ? (
           <MemoNoExternalStorageDialog
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             addExternal={() => {
-              actions.memos.closeMemoDialog.trigger();
-              actions.router.goToRoute.trigger({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+              stores.memos.closeMemoDialog();
+              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
-              this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();
+              stores.uiDialogs.getParam<(void) => void>('continuation')?.();
             }}
           />
         ) : null}
@@ -233,15 +230,15 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
             existingMemo={(() => {
               if (memos.selectedTransaction == null) throw new Error('no selected transaction. Should never happen');
               const txid = memos.selectedTransaction.txid;
-              const memo = this.props.stores.memos.txMemoMap.get(walletId)?.get(txid);
+              const memo = stores.memos.txMemoMap.get(walletId)?.get(txid);
               if (memo == null) throw new Error('Should never happen');
               return memo;
             })()}
             error={memos.error}
-            onCancel={actions.memos.closeMemoDialog.trigger}
+            onCancel={stores.memos.closeMemoDialog}
             onClickDelete={this.openDeleteMemoDialog}
             onSubmit={values => {
-              return actions.memos.updateTxMemo.trigger(values);
+              return stores.memos.updateTxMemo(values);
             }}
             plateTextPart={selected.plate.TextPart}
           />
@@ -255,11 +252,11 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
             })()}
             error={memos.error}
             onCancel={() => {
-              actions.memos.closeMemoDialog.trigger();
+              stores.memos.closeMemoDialog();
             }}
-            onClose={actions.memos.closeMemoDialog.trigger}
+            onClose={stores.memos.closeMemoDialog}
             onDelete={txHash => {
-              return actions.memos.deleteTxMemo.trigger({
+              return stores.memos.deleteTxMemo({
                 publicDeriverId: selected.publicDeriverId,
                 plateTextPart: selected.plate.TextPart,
                 txHash,
@@ -272,8 +269,8 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
   }
 
   openExportTransactionDialog: void => void = () => {
-    const { actions } = this.props;
-    actions.dialogs.push.trigger({ dialog: ExportTransactionDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.push({ dialog: ExportTransactionDialog });
   };
 
   showMemoDialog: ({|
@@ -284,7 +281,7 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
       return request.continuation();
     }
 
-    this.props.actions.dialogs.push.trigger({
+    this.props.stores.uiDialogs.push({
       dialog: request.dialog,
       params: {
         continuation: request.continuation,
@@ -293,8 +290,8 @@ export default class WalletSummaryPage extends Component<StoresAndActionsProps> 
   };
 
   openDeleteMemoDialog: void => void = () => {
-    const { actions } = this.props;
-    actions.dialogs.push.trigger({ dialog: DeleteMemoDialog });
+    const { stores } = this.props;
+    stores.uiDialogs.push({ dialog: DeleteMemoDialog });
   };
 
   readyToExportHistory: (number) => boolean = publicDeriverId => {

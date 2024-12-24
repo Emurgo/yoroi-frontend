@@ -8,35 +8,29 @@ import type {
   Address,
   Addressing,
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { createWallet } from '../../api/thunk';
 
-export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> {
+export default class AdaWalletRestoreStore extends Store<StoresMap> {
   setup(): void {
     super.setup();
     this.reset();
-    const actions = this.actions.walletRestore;
-    actions.transferFromLegacy.listen(this._transferFromLegacy);
-    actions.startRestore.listen(this._restoreToDb);
-    actions.restoreWallet.listen(this._restoreWallet);
-    actions.reset.listen(this.reset);
   }
 
-  _transferFromLegacy: void => Promise<void> = async () => {
+  transferFromLegacy: void => Promise<void> = async () => {
     const phrase = this.stores.walletRestore.recoveryResult?.phrase;
     if (phrase == null) {
       throw new Error(
-        `${nameof(this._transferFromLegacy)} no recovery phrase set. Should never happen`
+        `${nameof(this.transferFromLegacy)} no recovery phrase set. Should never happen`
       );
     }
     const network = this.stores.profile.selectedNetwork;
     if (network == null) {
-      throw new Error(`${nameof(this._transferFromLegacy)} no network selected`);
+      throw new Error(`${nameof(this.transferFromLegacy)} no network selected`);
     }
-    await this.actions.yoroiTransfer.transferFunds.trigger({
+    await this.stores.yoroiTransfer.transferFunds({
       next: async () => {
-        await this._restoreToDb();
+        await this.startWalletRestore();
       },
       network,
       getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
@@ -50,31 +44,31 @@ export default class AdaWalletRestoreStore extends Store<StoresMap, ActionsMap> 
     throw new ApiMethodNotYetImplementedError();
   };
 
-  _restoreToDb: void => Promise<void> = async () => {
+  startWalletRestore: void => Promise<void> = async () => {
     if (
       this.stores.walletRestore.recoveryResult == null ||
       this.stores.walletRestore.walletRestoreMeta == null
     ) {
       throw new Error(
         `${nameof(
-          this._restoreToDb
+          this.startWalletRestore
         )} Cannot submit wallet restoration! No values are available in context!`
       );
     }
     const { phrase } = this.stores.walletRestore.recoveryResult;
     const { walletName, walletPassword } = this.stores.walletRestore.walletRestoreMeta;
 
-    await this._restoreWallet({ walletName, walletPassword, recoveryPhrase: phrase });
+    await this.restoreWallet({ walletName, walletPassword, recoveryPhrase: phrase });
   };
 
-  _restoreWallet: ({|
+  restoreWallet: ({|
     walletName: string,
     walletPassword: string,
     recoveryPhrase: string,
   |}) => Promise<void> = async ({ walletName, walletPassword, recoveryPhrase }) => {
     const { selectedNetwork } = this.stores.profile;
     if (selectedNetwork == null)
-      throw new Error(`${nameof(this._restoreToDb)} no network selected`);
+      throw new Error(`${nameof(this.startWalletRestore)} no network selected`);
 
     const accountIndex = this.stores.walletRestore.selectedAccount;
 

@@ -52,7 +52,7 @@ export default class BaseTransferPage extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.instructionTitle)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={onBack}
         backButton={<DialogBackButton onBack={onBack} />}

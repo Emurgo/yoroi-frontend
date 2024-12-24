@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
-import type { ActionsMap } from './actions';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
@@ -26,7 +25,6 @@ addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
-  +actions: ActionsMap,
   +history: RouterHistory,
 |};
 type State = {|
@@ -102,18 +100,18 @@ class App extends Component<Props, State> {
   }
 
   getContent: void => ?Node = () => {
-    const { stores, actions, history } = this.props;
+    const { stores, history } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
     if (stores.serverConnectionStore.isMaintenance) {
-      return <MaintenancePage stores={stores} actions={actions} />;
+      return <MaintenancePage stores={stores} />;
     }
     return (
       <Router history={history}>
         <div style={{ height: '100%' }}>
           <Support />
-          {Routes(stores, actions)}
+          {Routes(stores)}
         </div>
       </Router>
     );

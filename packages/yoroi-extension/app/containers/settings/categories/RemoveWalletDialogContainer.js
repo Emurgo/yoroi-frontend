@@ -8,15 +8,14 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import { Typography } from '@mui/material';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
   publicDeriverId: number,
 |};
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 const dialogMessages = defineMessages({
   warning2: {
@@ -50,18 +49,18 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
   };
 
   removeWalletRevamp: void => Promise<void> = async () => {
-    const settingsActions = this.props.actions.walletSettings;
+    const { stores } = this.props;
     const selectedWalletId = this.props.publicDeriverId;
-    const walletsNavigation = this.props.stores.profile.walletsNavigation;
+    const walletsNavigation = stores.profile.walletsNavigation;
 
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
       cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
     };
-    await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+    await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
-    settingsActions.removeWallet.trigger({
+    stores.walletSettings.removeWallet({
       publicDeriverId: this.props.publicDeriverId,
     });
   };
@@ -77,13 +76,13 @@ export default class RemoveWalletDialogContainer extends Component<AllProps> {
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
         error={settingsStore.removeWalletRequest.error}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
           onClick: this.removeWalletRevamp,
         }}
         secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.stores.uiDialogs.closeActiveDialog,
         }}
         id="removeWalletDialog"
       >

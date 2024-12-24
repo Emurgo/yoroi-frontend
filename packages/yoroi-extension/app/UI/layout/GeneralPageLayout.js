@@ -19,15 +19,15 @@ export default class GeneralPageLayout extends React.Component {
   };
 
   render() {
-    const { children, actions, navbar, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { children, navbar, stores } = this.props;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const { intl } = this.context;
 
     return (
       <IntlProvider intl={intl}>
         <ModalProvider>
           <ModalManager />
-          <TopBarLayout banner={<BannerContainer actions={actions} stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
+          <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
             {children}
           </TopBarLayout>
         </ModalProvider>

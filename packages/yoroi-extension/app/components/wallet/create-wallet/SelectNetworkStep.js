@@ -109,7 +109,7 @@ function SelectNetworkStep(props: Props & Intl): Node {
         </Stack>
       </Stack>
       <StepController
-        actions={[
+        stepActions={[
           {
             label: intl.formatMessage(globalMessages.backButtonLabel),
             disabled: false,
