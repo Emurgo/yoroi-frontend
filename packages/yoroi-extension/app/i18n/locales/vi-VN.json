@@ -319,6 +319,7 @@
   "settings.support.faq.faqLink": "FAQ trên website Yoroi",
   "settings.support.faq.faqLinkURL": "https://yoroi-wallet.com/faq/",
   "settings.support.faq.title": "Các câu hỏi thường gặp",
+  "settings.support.faq.abbreviation": "FAQ",
   "settings.support.logs.content": "Nếu muốn kiểm tra nhật ký, bạn có thể {downloadLogsLink}. Nhật ký không chứa thông tin nhạy cảm và sẽ rất hữu ích nếu đính kèm chúng vào các báo cáo sự cố để giúp nhóm điều tra sự cố bạn đang gặp phải.",
   "settings.support.logs.downloadLogsButtonLabel": "Tải Logs",
   "settings.support.logs.downloadLogsLink": "tải giao diện ở đây",
