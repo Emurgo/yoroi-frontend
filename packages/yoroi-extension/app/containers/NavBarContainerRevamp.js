@@ -128,6 +128,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores } = this.props;
     const { selected, wallets } = stores.wallets;
     const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+    const shouldHideBalance = this.isBalanceHidden();
 
     if (stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
@@ -161,7 +162,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
             this.checkAndResetGovRoutes();
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
-          shouldHideBalance={this.isBalanceHidden()}
+          shouldHideBalance={shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
