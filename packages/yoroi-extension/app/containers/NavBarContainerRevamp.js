@@ -37,6 +37,10 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     menu: undefined,
   };
 
+  isBalanceHidden: void => boolean = () => {
+    return this.props.stores.profile.shouldHideBalance;
+  };
+
   updateHideBalance: void => Promise<void> = async () => {
     await this.props.stores.profile.updateHideBalance();
   };
@@ -72,6 +76,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
+    const shouldHideBalance = this.isBalanceHidden();
 
     const DropdownHead = () => {
       if (!selected || !selectedWalletName) {
@@ -86,7 +91,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           plate={plate}
           name={selectedWalletName}
           onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={profile.shouldHideBalance}
+          shouldHideBalance={shouldHideBalance}
           rewards={rewards}
           walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -156,7 +161,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
             this.checkAndResetGovRoutes();
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
-          shouldHideBalance={stores.profile.shouldHideBalance}
+          shouldHideBalance={this.isBalanceHidden()}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
