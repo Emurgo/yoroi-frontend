@@ -37,10 +37,6 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     menu: undefined,
   };
 
-  isBalanceHidden: void => boolean = () => {
-    return this.props.stores.profile.shouldHideBalance;
-  };
-
   updateHideBalance: void => Promise<void> = async () => {
     await this.props.stores.profile.updateHideBalance();
   };
@@ -76,7 +72,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
-    const shouldHideBalance = this.isBalanceHidden();
+    const shouldHideBalance = profile.shouldHideBalance;
 
     const DropdownHead = () => {
       if (!selected || !selectedWalletName) {
@@ -128,7 +124,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores } = this.props;
     const { selected, wallets } = stores.wallets;
     const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
-    const shouldHideBalance = this.isBalanceHidden();
+    const shouldHideBalance = stores.profile.shouldHideBalance;
 
     if (stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
