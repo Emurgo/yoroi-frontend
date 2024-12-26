@@ -157,6 +157,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
               backgroundColor: 'ds.primary_500',
             }}
             color="primary"
+            id={amountDisplayId + "-showHideBalance-button"}
           >
             {shouldHideBalance ? (
               <IconWrapper>
