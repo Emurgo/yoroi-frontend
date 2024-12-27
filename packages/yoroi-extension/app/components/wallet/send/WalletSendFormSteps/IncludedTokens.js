@@ -110,7 +110,6 @@ export default class IncludedTokens extends Component<Props> {
                     width: '75%',
                   }}
                 >
-                  {/* <TokenImage/> */}
                   <Box
                     width={30}
                     height={30}
