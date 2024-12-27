@@ -100,7 +100,7 @@ export default class SingleTokenRow extends Component<Props, State> {
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
           sx={{
-            border: this.props.isTokenIncluded(token.info) ? '2px solid' : '2px solid',
+            border: '2px solid',
             borderColor: this.props.isTokenIncluded(token.info) ? 'ds.el_gray_max' : 'transparent',
             '&:hover': { border: '2px solid', borderColor: 'ds.el_gray_max' },
           }}
@@ -112,7 +112,7 @@ export default class SingleTokenRow extends Component<Props, State> {
               marginRight="16px"
               sx={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 justifyContent: 'center',
                 overflow: 'hidden',
                 '> img': {
