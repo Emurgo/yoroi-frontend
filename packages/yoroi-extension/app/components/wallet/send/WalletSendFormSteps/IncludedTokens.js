@@ -62,6 +62,7 @@ export default class IncludedTokens extends Component<Props> {
               width: '100%',
             }}
           >
+            {/* NFTs */}
             {item.name && (
               <>
                 <Box
@@ -97,8 +98,8 @@ export default class IncludedTokens extends Component<Props> {
                 </Box>
               </>
             )}
-
-            {item.label && (
+            {/* Tokens */}
+            {item.label != null && (
               <>
                 <Box
                   sx={{
