@@ -57,5 +57,6 @@ export const darkPalette = {
   bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 15.04%, #2B3E7D 84.96%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
   special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
-  light_shadow_dropdown_menu: `0px 4px 20px 0px #0000007A`, // dropdown shadow
+  light_shadow_dropdown_words: `0px 3px 10px rgba(24, 26, 30, 0.08)`, // dropdown shadow
+  light_shadow_dropdown_menu: `0px 4px 10px rgba(24, 26, 30, 0.16)`,
 };
