@@ -77,7 +77,7 @@ export default class SingleTokenRow extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { token, isValidAmount } = this.props;
-    const isValid = isValidAmount(token.info);
+    const isNotValid = !isValidAmount(token.info);
 
     const numberOfDecimals = this.getNumDecimals();
     let amount = this.props.getTokenAmount(token.info);
@@ -87,22 +87,26 @@ export default class SingleTokenRow extends Component<Props, State> {
 
     const displayAmount = token.amount ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('') : '0';
 
+    const includedBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_min';
+    const activeInputErrorBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_max';
+    const tokenRowBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'transparent';
+    const activeInputBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor: tokenRowBorderColor;
+
+    const hoverNotActiveInputBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'ds.gray_200';
+    const hoverBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor : hoverNotActiveInputBorderColor;
+
     return (
       <div className={styles.component}>
         <Box
           type="button"
           className={classnames(styles.token, {
             [styles.amountWrapper]: true,
-            [styles.amountError]: !isValid && this.props.isTokenIncluded(token.info),
-            [styles.inputFocused]: this.state.isInputFocused && this.props.isTokenIncluded(token.info),
-            [styles.inputSelected]: this.props.isTokenIncluded(token.info),
-            [styles.inputError]: !isValid,
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
           sx={{
             border: '2px solid',
-            borderColor: this.props.isTokenIncluded(token.info) ? 'ds.el_gray_max' : 'transparent',
-            '&:hover': { border: '2px solid', borderColor: 'ds.el_gray_max' },
+            borderColor: activeInputBorderColor,
+            '&:hover': { border: '2px solid', borderColor: hoverBorderColor },
           }}
         >
           <div className={styles.amountTokenName}>
@@ -158,7 +162,9 @@ export default class SingleTokenRow extends Component<Props, State> {
                   <CloseIcon />
                 </IconWrapper>
               </Box>
-              <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
+              <Typography variant="caption1" position="absolute" bottom="-20px" right="16px" color="ds.text_error">
+                {isNotValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
+              </Typography>
             </>
           ) : (
             <Typography variant="body1" color="grayscale.900" className={styles.amount} sx={{ paddingRight: '10px' }}>
