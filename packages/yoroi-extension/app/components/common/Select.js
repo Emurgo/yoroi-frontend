@@ -16,6 +16,7 @@ type Props = {|
   labelProps?: Object,
   helperText?: string,
   options: Array<Object>,
+  maxHeight?: string,
 |};
 
 function Select({
@@ -28,6 +29,7 @@ function Select({
   shrink,
   disabled,
   labelProps,
+  maxHeight,
   ...props
 }: Props): Node {
   const theme = useTheme();
@@ -53,9 +55,6 @@ function Select({
         onChange={e => onChange(e.target.value)}
         onClose={handleClose}
         onOpen={handleOpen}
-        sx={{
-          boxShadow: open ? theme.palette.ds.light_shadow_dropdown_menu : 'unset',
-        }}
         MenuProps={{
           anchorOrigin: {
             vertical: 'bottom',
@@ -64,6 +63,13 @@ function Select({
           transformOrigin: {
             vertical: 'top',
             horizontal: 'left',
+          },
+          sx: {
+            '& .MuiMenu-paper': {
+              maxHeight: maxHeight != null ? maxHeight : '500px',
+              borderRadius: '8px',
+              boxShadow: open ? theme.palette.ds.light_shadow_dropdown_menu : 'unset',
+            },
           },
           ...(menuProps !== null && menuProps),
         }}

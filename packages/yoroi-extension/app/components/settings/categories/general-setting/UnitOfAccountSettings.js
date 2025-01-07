@@ -169,13 +169,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
             {...coinPriceCurrencyId.bind()}
             onChange={this.props.onSelect}
             value={currentValue}
-            menuProps={{
-              sx: {
-                '& .MuiMenu-paper': {
-                  maxHeight: '280px',
-                },
-              },
-            }}
+            maxHeight='280px'
             renderValue={value => (
               <Typography component="div"
                 variant="body1"

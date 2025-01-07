@@ -246,7 +246,7 @@ const ULList = styled(Box)(({ theme, isOpen }) => ({
   outline: '0',
   transition: 'opacity .1s ease',
   borderRadius: 0,
-  boxShadow: isOpen ? theme.palette.ds.light_shadow_dropdown_menu : 'unset',
+  boxShadow: isOpen ? theme.palette.ds.light_shadow_dropdown_words : 'unset',
 }));
 
 const InputWrapper = styled(Box)(
