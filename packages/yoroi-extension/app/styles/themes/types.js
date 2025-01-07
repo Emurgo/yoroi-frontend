@@ -77,5 +77,6 @@ export type DSColorPalette = {|
   web_sidebar_item_active_bg: string,
   mobile_overlay: string,
   mobile_bg_blur: string,
+  light_shadow_dropdown_words: string,
   light_shadow_dropdown_menu: string,
 |};
