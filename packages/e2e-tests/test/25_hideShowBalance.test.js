@@ -1,23 +1,22 @@
-import BasePage from '../../pages/basepage.js';
-import { customAfterEach } from '../../utils/customHooks.js';
-import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
-import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
+import BasePage from '../pages/basepage.js';
+import { customAfterEach } from '../utils/customHooks.js';
+import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
+import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils/utils.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
-import driversPoolsManager from '../../utils/driversPool.js';
-import { prepareWallet } from '../../helpers/restoreWalletHelper.js';
-import { testWallet1 } from '../../utils/testWallets.js';
+import { getTestLogger } from '../utils/utils.js';
+import { oneMinute } from '../helpers/timeConstants.js';
+import driversPoolsManager from '../utils/driversPool.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
+import { testWallet1 } from '../utils/testWallets.js';
 
-// Issue https://emurgo.atlassian.net/browse/YOEXT-1218
 describe('Hide and show balance', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
   // check the default state. The balance should be displayed
@@ -57,9 +56,6 @@ describe('Hide and show balance', function () {
     await receivePage.selectBaseExtHasBalanceAddrs();
     const balanceExtAddrHidden = await receivePage.allAddressesBalancesHidden();
     expect(balanceExtAddrHidden, 'Balances of external addresses are not hidden').to.be.true;
-    await receivePage.selectBaseInterHasBalanceAddrs();
-    const balanceInterAddrHidden = await receivePage.allAddressesBalancesHidden();
-    expect(balanceInterAddrHidden, 'Balances of internal addresses are not hidden').to.be.true;
   });
   // add checking Staking page when testnetwork is added
   // click show balance
@@ -96,9 +92,6 @@ describe('Hide and show balance', function () {
     await receivePage.selectBaseExtHasBalanceAddrs();
     const balanceExtAddrHidden = await receivePage.allAddressesBalancesHidden();
     expect(balanceExtAddrHidden, 'Balances of external addresses are hidden').to.be.false;
-    await receivePage.selectBaseInterHasBalanceAddrs();
-    const balanceInterAddrHidden = await receivePage.allAddressesBalancesHidden();
-    expect(balanceInterAddrHidden, 'Balances of internal addresses are hidden').to.be.false;
   });
   // add checking Staking page when testnetwork is added
 

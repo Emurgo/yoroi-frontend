@@ -72,6 +72,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
+    const shouldHideBalance = profile.shouldHideBalance;
 
     const DropdownHead = () => {
       if (!selected || !selectedWalletName) {
@@ -86,7 +87,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           plate={plate}
           name={selectedWalletName}
           onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={profile.shouldHideBalance}
+          shouldHideBalance={shouldHideBalance}
           rewards={rewards}
           walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -123,6 +124,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const { stores } = this.props;
     const { selected, wallets } = stores.wallets;
     const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+    const shouldHideBalance = stores.profile.shouldHideBalance;
 
     if (stores.uiDialogs.isOpen(WalletListDialog)) {
       const cardanoWallets = [];
@@ -156,7 +158,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
             this.checkAndResetGovRoutes();
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
-          shouldHideBalance={stores.profile.shouldHideBalance}
+          shouldHideBalance={shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}

@@ -326,7 +326,7 @@ class WalletCommonBase extends BasePage {
       this.walletBalanceTextLocator,
       async () => {
         const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-        const balanceStr = rawBalanceText.split(' ')[0];
+        const balanceStr = rawBalanceText.split(' ')[0].trim();
         return balanceStr === balanceReplacer;
       }
     );
@@ -335,7 +335,7 @@ class WalletCommonBase extends BasePage {
       this.walletFiatBalanceTextLocator,
       async () => {
         const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0];
+        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0].trim();
         return fiatBalanceStr === balanceReplacer;
       }
     );
