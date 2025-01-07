@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
 type ModalState = {
@@ -9,6 +10,7 @@ type ModalState = {
   width: string;
   isLoading: boolean;
   modalView: 'transactionReview' | 'walletInfo';
+  unsignedTx: YoroiUnsignedTx;
 };
 type ModalActions = {
   openTxReviewModal: any;
@@ -38,14 +40,12 @@ export const ReviewTxProvider = ({
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const currentWalletInfo = createCurrrentWalletInfo(stores);
-  console.log('[currentWalletInfo]', currentWalletInfo?.ftAssetList);
+  console.log('[currentWalletInfo]', currentWalletInfo?.selectedWallet);
 
   useEffect(() => {
     const { wallets } = stores;
     const { selected, selectedWalletName } = wallets;
     const { plate } = selected;
-
-    console.log('Current Wallet details', { selected, selectedWalletName, plate });
   }, []);
 
   const actions = React.useRef<ModalActions>({
@@ -59,10 +59,10 @@ export const ReviewTxProvider = ({
         content: payload.content,
         height: payload.height,
         width: payload.width,
+        unsignedTx: payload.unsignedTx,
       });
     },
     changeModalView: (payload: any) => {
-      console.log('CHANGE MODAL VIEW ACTIONS', payload);
       dispatch({
         type: 'changeModalView',
         modalView: payload.modalView,
@@ -73,7 +73,14 @@ export const ReviewTxProvider = ({
   }).current;
 
   const context: any = React.useMemo(
-    () => ({ ...state, ftAssetsList: currentWalletInfo?.ftAssetList, currentWalletDetails: stores.wallets, ...actions }),
+    () => ({
+      ...state,
+      ftAssetsList: currentWalletInfo?.ftAssetList,
+      nftAssetList: currentWalletInfo?.nftAssetList,
+      currentWalletDetails: stores.wallets,
+
+      ...actions,
+    }),
     [state, actions]
   );
 
@@ -94,6 +101,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         isOpen: true,
         isLoading: false,
         modalView: action.modalView ?? defaultState.modalView,
+        unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
       };
 
     case 'changeModalView':
@@ -123,4 +131,5 @@ const defaultState: ModalState = Object.freeze({
   width: '648px',
   isLoading: false,
   modalView: 'transactionReview',
+  unsignedTx: '',
 });

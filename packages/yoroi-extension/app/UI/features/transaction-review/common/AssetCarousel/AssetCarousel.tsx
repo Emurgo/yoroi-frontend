@@ -1,12 +1,18 @@
-import { Box } from '@mui/material';
+import { Box, styled } from '@mui/material';
 import React, { useState } from 'react';
 import Carousel from 'react-simply-carousel';
 import { Icon } from '../../../../components';
 
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
 export const AssetCarousel = ({ data }) => {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-
-  console.log('data', data);
 
   return (
     <Box height="40px">
@@ -16,7 +22,6 @@ export const AssetCarousel = ({ data }) => {
         itemsToShow={4}
         itemsToScroll={4}
         forwardBtnProps={{
-          //here you can also pass className, or any other button element attributes
           style: {
             alignSelf: 'center',
             border: 'none',
@@ -26,10 +31,13 @@ export const AssetCarousel = ({ data }) => {
             top: '16px',
             right: '0',
           },
-          children: <Icon.RightArrow />,
+          children: (
+            <IconWrapper>
+              <Icon.RightArrow />
+            </IconWrapper>
+          ),
         }}
         backwardBtnProps={{
-          //here you can also pass className, or any other button element attributes
           style: {
             alignSelf: 'center',
             border: 'none',
@@ -39,7 +47,11 @@ export const AssetCarousel = ({ data }) => {
             top: '16px',
             right: '40px',
           },
-          children: <Icon.LeftArrow />,
+          children: (
+            <IconWrapper>
+              <Icon.LeftArrow />
+            </IconWrapper>
+          ),
         }}
         speed={400}
         easing="linear"

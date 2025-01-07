@@ -35,6 +35,9 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { downloadLogs } from '../../../utils/logging';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { LiquidityPool } from './LiquidityPool';
+import { TransactionSummary } from './TransactionSummary';
+import { unignedTxReviewMock } from './txReviewMock';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -108,6 +111,21 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
     },
     []
   );
+
+  // useEffect(() => {
+  //   const liquidityPool = (
+  //     <LiquidityPool /> // liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
+  //   );
+
+  //   console.log('unignedTxReviewMock', unignedTxReviewMock);
+  //   openTxReviewModal({
+  //     title: 'Transaction confirmation (Swap in progress)',
+  //     modalView: 'transactionReview',
+  //     receiverCustomTitle: liquidityPool ?? undefined,
+  //     details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
+  //     unsignedTx: unignedTxReviewMock, // send if for here just to make it work - later can take it from store inseide review modal manager
+  //   });
+  // }, []);
 
   const swapFormCanContinue =
     selectedPoolCalculation != null &&
@@ -208,11 +226,16 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
         handleInitialStep();
       } else if (orderStep === 1) {
         // await handleSubmitTransaction();
+
+        const liquidityPool = (
+          <LiquidityPool /> // liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
+        );
         openTxReviewModal({
           title: 'Transaction confirmation (Swap in progress)',
           modalView: 'transactionReview',
-          // receiverCustomTitle: liquidityPool ?? undefined,
-          // details: {component: <TransactionSummary orderData={orderData} />, title: strings.swapDetailsTitle},
+          receiverCustomTitle: liquidityPool ?? undefined,
+          details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
+          unsignedTx: unignedTxReviewMock, // send if for here just to make it work - later can take it from store inseide review modal manager
         });
       }
     } catch (error) {
@@ -348,9 +371,10 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       poolProvider,
     };
     const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
-    runInAction(() => {
-      setSignRequest(txSignRequest);
-    });
+    console.log('txSignRequest', txSignRequest),
+      runInAction(() => {
+        setSignRequest(txSignRequest);
+      });
   };
 
   function confirmationButtonMessage() {

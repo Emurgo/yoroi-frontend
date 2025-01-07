@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { Box, Divider } from '@mui/material';
 import Menu from '../../../portfolio/common/components/Menu';
+import { useTxBody } from '../../common/hooks/usetxBody';
 import { mockReviewTX } from '../../common/mockData';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { OverviewTab } from './Overview/OverviewTab';
@@ -22,7 +23,10 @@ export interface SubMenuOption {
 export const ReviewTxSection = () => {
   const theme = useTheme();
 
-  const { title } = useTxReviewModal();
+  const { unsignedTx, details, title } = useTxReviewModal();
+  const txBody = useTxBody({ cbor: undefined, unsignedTx: mockReviewTX });
+  console.log('ReviewTxSection', { txBody });
+  // const formattedTx = useFormattedTx(txBody);
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -61,7 +65,7 @@ export const ReviewTxSection = () => {
 
       {selectedTab === subMenuOptions[0]?.route ? (
         <TabContent>
-          <OverviewTab />
+          <OverviewTab details={details} />
         </TabContent>
       ) : null}
       {selectedTab === subMenuOptions[1]?.route ? (

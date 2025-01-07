@@ -4,6 +4,7 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 import { maybe } from '../../coreUtils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
+import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
 
@@ -82,7 +83,7 @@ const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*:
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
 
-const getAssetWalletAssetList = (stores: any) => {
+const getFTAssetWalletAssetList = (stores: any) => {
   const spendableBalance = stores.transactions.balance;
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   if (spendableBalance == null) return [];
@@ -120,6 +121,35 @@ const getAssetWalletAssetList = (stores: any) => {
         },
       };
     });
+};
+
+const getNFTAssetWalletAssetList = (stores: any) => {
+  const spendableBalance = stores.transactions.balance;
+  const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+
+  const nftsList = (() => {
+    if (spendableBalance == null) return [];
+    return [...spendableBalance.nonDefaultEntries()]
+      .map(entry => ({
+        entry,
+        info: getTokenInfo(entry),
+      }))
+      .filter(item => item.info.IsNFT)
+      .map(token => {
+        const split = token.entry.identifier.split('.');
+        const policyId = split[0];
+        const hexName = split[1] ?? '';
+        const fullName = getTokenStrictName(token.info).name;
+        const name = truncateToken(fullName ?? '-');
+        return {
+          name,
+          id: getTokenIdentifierIfExists(token.info) ?? '-',
+          image: getImageFromTokenMetadata(policyId, hexName, token.info.Metadata),
+        };
+      });
+  })();
+
+  return nftsList;
 };
 
 const dateFormat = 'YYYY-MM-DD';
@@ -174,7 +204,9 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const isHardware: boolean = selectedWallet.isHardware;
 
     // FT Asset List
-    const ftAssetList = getAssetWalletAssetList(stores);
+    const ftAssetList = getFTAssetWalletAssetList(stores);
+    // NFT Asset List
+    const nftAssetList = getNFTAssetWalletAssetList(stores);
 
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
@@ -200,6 +232,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
       ftAssetList: ftAssetList,
+      nftAssetList: nftAssetList,
       explorer: { tokenInfo: explorerTransactionInfo },
     };
   } catch (error) {

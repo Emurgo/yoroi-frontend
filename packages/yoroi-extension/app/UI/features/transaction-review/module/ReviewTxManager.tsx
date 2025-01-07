@@ -9,7 +9,7 @@ import { useTxReviewModal } from './ReviewTxProvider';
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
     width: '530px',
-    backgroundColor: theme.palette.ds.bg_color_max,
+    background: theme.palette.ds.bg_color_contrast_high,
     overflow: 'scroll',
   },
 }));
@@ -23,7 +23,6 @@ export const ReviewTxManager = () => {
   });
 
   const { isOpen, closeTxReviewModal, modalView, changeModalView } = useTxReviewModal();
-  console.log('modalView', modalView);
 
   const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -43,7 +42,7 @@ export const ReviewTxManager = () => {
     }
     return undefined;
   };
-  console.log('modalView', modalView);
+
   return (
     <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'}>
       <TopActions onBack={handleOnBack} />

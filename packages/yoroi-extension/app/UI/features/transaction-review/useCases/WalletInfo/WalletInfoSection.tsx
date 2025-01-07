@@ -62,7 +62,8 @@ const WalletStats = () => {
 };
 
 const WalletAssets = () => {
-  const { ftAssetsList } = useTxReviewModal();
+  const { ftAssetsList, nftAssetList } = useTxReviewModal();
+  console.log('@@@@@@nftAssetList', nftAssetList);
   return (
     <Stack direction="row" gap="16px">
       <WalletAssetsSection data={ftAssetsList} label="Tokens" />
