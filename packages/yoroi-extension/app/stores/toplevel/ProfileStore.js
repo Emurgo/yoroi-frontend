@@ -116,9 +116,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
           stores.wallets.setActiveWallet({
             publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
           });
-        }
-        if (stores.loading.shouldRedirect) {
-          stores.loading.redirect();
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }
         runInAction(() => {
           this.hasRedirected = true;

@@ -21,15 +21,11 @@ type SellAdaParamsType = {|
   amount: string,
 |};
 
-const REDIRECT_REGEX: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
-
 export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   /**
    * null if app not opened from URI Scheme OR URI scheme was invalid
    */
   @observable _uriParams: ?UriParams = null;
-  @observable _shouldRedirect: boolean = false;
-  @observable _redirectUri: string = '';
   sellAdaParams: ?SellAdaParamsType = null;
 
   _originRoute: {|
@@ -69,19 +65,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     });
   }
 
-  @computed get shouldRedirect(): boolean {
-    return this._shouldRedirect;
-  }
-
-  @computed get redirectUri() : string {
-    return this._redirectUri;
-  }
-
   async loadingEnd(): Promise<void> {
-    if (REDIRECT_REGEX.test(this.stores.app.currentRoute)) {
-      this._shouldRedirect = true;
-      this._redirectUri = this.stores.app.currentRoute;
-    }
     // before redirecting, save origin route in case we need to come back to
     // it later (this is the case when user comes from a URI link)
     runInAction(() => {
@@ -119,14 +103,6 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   resetUriParams: void => void = (): void => {
     this._uriParams = null;
     this._originRoute = { route: '', location: '' };
-  }
-
-  @action
-  redirect: void => void = () => {
-    this._shouldRedirect = false;
-    this.stores.app.goToRoute({
-      route: this._redirectUri
-    });
   }
 
   getTabIdKey(): string {

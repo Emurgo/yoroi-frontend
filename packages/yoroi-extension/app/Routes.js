@@ -73,8 +73,6 @@ const WalletSettingsPagePromise = () => import('./containers/settings/categories
 const WalletSettingsPage = React.lazy(WalletSettingsPagePromise);
 const ExternalStorageSettingsPagePromise = () => import('./containers/settings/categories/ExternalStorageSettingsPage');
 const ExternalStorageSettingsPage = React.lazy(ExternalStorageSettingsPagePromise);
-const OAuthDropboxPagePromise = () => import('./containers/settings/categories/OAuthDropboxPage');
-const OAuthDropboxPage = React.lazy(OAuthDropboxPagePromise);
 const TermsOfUseSettingsPagePromise = () => import('./containers/settings/categories/TermsOfUseSettingsPage');
 const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
@@ -152,7 +150,6 @@ export const LazyLoadPromises: Array<() => any> = [
   GeneralSettingsPagePromise,
   WalletSettingsPagePromise,
   ExternalStorageSettingsPagePromise,
-  OAuthDropboxPagePromise,
   TermsOfUseSettingsPagePromise,
   SupportSettingsPagePromise,
   NightlyPagePromise,
@@ -268,11 +265,6 @@ export const Routes = (stores: StoresMap): Node => {
             exact
             path={ROUTES.SEND_FROM_URI.ROOT}
             component={props => <URILandingPage {...props} stores={stores} />}
-          />
-          <Route
-            exact
-            path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-            component={props => <OAuthDropboxPage {...props} stores={stores} />}
           />
           <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} />} />
           <Route

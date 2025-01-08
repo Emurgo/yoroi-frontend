@@ -49,10 +49,6 @@ export const ROUTES = {
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
   },
-  OAUTH_FROM_EXTERNAL: {
-    DROPBOX: '/foo', // TODO: think about this. GET params don't work well with react-router I think
-    // DROPBOX: '/access_token=:token&token_type=:token_type&uid=:uid&account_id=:account_id',
-  },
   // revamp
   STAKING: '/staking',
   ASSETS: {
