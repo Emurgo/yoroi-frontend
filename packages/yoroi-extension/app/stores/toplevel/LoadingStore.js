@@ -21,6 +21,8 @@ type SellAdaParamsType = {|
   amount: string,
 |};
 
+const REDIRECT_REGEX: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
+
 export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   /**
    * null if app not opened from URI Scheme OR URI scheme was invalid
@@ -75,9 +77,19 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     return this._redirectUri;
   }
 
-  async preLoadingScreenEnd(): Promise<void> {
-    await super.preLoadingScreenEnd();
-
+  async loadingEnd(): Promise<void> {
+    if (REDIRECT_REGEX.test(this.stores.app.currentRoute)) {
+      this._shouldRedirect = true;
+      this._redirectUri = this.stores.app.currentRoute;
+    }
+    // before redirecting, save origin route in case we need to come back to
+    // it later (this is the case when user comes from a URI link)
+    runInAction(() => {
+      this._originRoute = {
+        route: this.stores.app.currentRoute,
+        location: window.location.href,
+      };
+    });
     if (this.fromUriScheme) {
       const networkId = networks.CardanoMainnet.NetworkId;
       const cardanoMeta = defaultAssets.filter(
@@ -115,26 +127,6 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     this.stores.app.goToRoute({
       route: this._redirectUri
     });
-  }
-
-  _redirectRegex: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
-
-  postLoadingScreenEnd(): void {
-    super.postLoadingScreenEnd();
-    const { stores } = this;
-    if (this._redirectRegex.test(stores.app.currentRoute)) {
-      this._shouldRedirect = true;
-      this._redirectUri = stores.app.currentRoute;
-    }
-    // before redirecting, save origin route in case we need to come back to
-    // it later (this is the case when user comes from a URI link)
-    runInAction(() => {
-      this._originRoute = {
-        route: stores.app.currentRoute,
-        location: window.location.href,
-      };
-    });
-    stores.app.goToRoute({ route: ROUTES.ROOT });
   }
 
   getTabIdKey(): string {
