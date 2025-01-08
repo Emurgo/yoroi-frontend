@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TransferSendPage from './TransferSendPage';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
@@ -12,9 +11,10 @@ import {
   MultiToken,
 } from '../../api/common/lib/MultiToken';
 import { getDefaultEntryToken } from '../../stores/toplevel/TokenInfoStore';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
   +onClose: void => void,
 |};
 
@@ -26,7 +26,7 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
 
     if (this.props.stores.profile.selectedNetwork == null) {
@@ -39,7 +39,6 @@ export default class WithdrawalTxDialogContainer extends Component<Props> {
     const { createWithdrawalTx } = this.props.stores.substores.ada.delegationTransaction;
     return (
       <TransferSendPage
-        actions={actions}
         stores={stores}
         onClose={{
           trigger: this.props.onClose,

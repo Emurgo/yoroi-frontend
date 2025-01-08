@@ -12,7 +12,6 @@ import { Logger, stringifyError } from '../../utils/logging';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -20,7 +19,7 @@ import { getWallets, subscribe, listenForWalletStateUpdate, setCashbackWallet } 
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
-import { forceNonNull, timeCached } from '../../coreUtils';
+import { forceNonNull, noop, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
@@ -36,7 +35,7 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
  */
-export default class WalletStore extends Store<StoresMap, ActionsMap> {
+export default class WalletStore extends Store<StoresMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable initialSyncingWalletIds: Set<number> = observable.set();
@@ -83,10 +82,6 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   setup(): void {
     super.setup();
-    const { wallets } = this.actions;
-    wallets.unselectWallet.listen(this._unsetActiveWallet);
-    wallets.setActiveWallet.listen(this._setActiveWallet);
-
     this.flagStorage = createFlagStorage();
 
     listenForWalletStateUpdate(async (params) => {
@@ -187,11 +182,11 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.wallets.push(newWallet);
       this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
-      this._setActiveWallet({
+      this.setActiveWallet({
         publicDeriverId: newWallet.publicDeriverId,
       });
-      this.actions.dialogs.closeActiveDialog.trigger();
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+      this.stores.uiDialogs.closeActiveDialog();
+      this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
     });
   };
 
@@ -282,12 +277,12 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== ACTIVE WALLET ==================== //
 
-  @action _setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
+  @action setActiveWallet: ({| publicDeriverId: number |}) => void = ({ publicDeriverId }) => {
     const walletIndex = this.wallets.findIndex(wallet => wallet.publicDeriverId === publicDeriverId);
     if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
     }
-    this.actions.profile.setSelectedNetwork.trigger(
+    this.stores.profile.setSelectedNetwork(
       getNetworkById(this.wallets[walletIndex].networkId)
     );
     const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex)
@@ -297,7 +292,9 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
     this.api.localStorage.setSelectedWalletId(publicDeriverId);
-    subscribe(publicDeriverId, changed);
+    noop(subscribe(publicDeriverId, changed));
+    // Catalyst update // todo: maybe check if network changed
+    noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
   };
 
   getLastSelectedWallet: void => Promise<?WalletState> = async () => {
@@ -305,8 +302,8 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
     return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
   };
 
-  @action _unsetActiveWallet: void => void = () => {
-    this.actions.profile.setSelectedNetwork.trigger(undefined);
+  @action unsetActiveWallet: void => void = () => {
+    this.stores.profile.setSelectedNetwork(undefined);
     this.selectedIndex = null;
     this.selectedWalletName = null;
   };
@@ -315,19 +312,19 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
 
   // =================== NOTIFICATION ==================== //
   showLedgerWalletIntegratedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.LedgerNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.LedgerNotification);
   };
 
   showTrezorTWalletIntegratedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.TrezorTNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.TrezorTNotification);
   };
 
   showWalletCreatedNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletCreatedNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.WalletCreatedNotification);
   };
 
   showWalletRestoredNotification: void => void = (): void => {
-    this.actions.notifications.open.trigger(WalletCreationNotifications.WalletRestoredNotification);
+    this.stores.uiNotifications.open(WalletCreationNotifications.WalletRestoredNotification);
   };
 
   @action
@@ -388,7 +385,7 @@ export default class WalletStore extends Store<StoresMap, ActionsMap> {
         const memo = this.stores.transactionBuilderStore.memo;
         if (memo !== '' && memo !== undefined && request.plateTextPart) {
           try {
-            await this.actions.memos.saveTxMemo.trigger({
+            await this.stores.memos.saveTxMemo({
               publicDeriverId: request.publicDeriverId,
               plateTextPart: request.plateTextPart,
               memo: {

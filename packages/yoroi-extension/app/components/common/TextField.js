@@ -68,6 +68,7 @@ function TextField({
     event.preventDefault();
   };
 
+  // <TODO:CHECK> pending removal cuz always true? the `-light` part is SUS
   const isRevampTheme = appTheme.name === 'revamp-light';
 
   return (

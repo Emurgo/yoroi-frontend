@@ -53,7 +53,6 @@ type Props = {|
   +goBack: void => void,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -64,24 +63,17 @@ export default class ConnectDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel, classicTheme } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      goBack,
+      submit,
+      cancel,
+    } = this.props;
 
-    const introBlock = classicTheme ? (
-      <Typography className={classnames([headerMixin.headerBlock, styles.headerBlock])} color="ds.text_gray_low">
-        <Typography color="ds.text_gray_low" component="span">
-          {intl.formatMessage(messages.connectIntroTextLine1)}
-        </Typography>
-        <br />
-        <Typography color="ds.text_gray_low" component="span">
-          {intl.formatMessage(messages.connectIntroTextLine2)}
-        </Typography>
-        <br />
-        <Typography color="ds.text_gray_low" component="span">
-          {intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}
-        </Typography>
-        <br />
-      </Typography>
-    ) : (
+    const introBlock = (
       <Typography className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
         <Typography color="ds.text_gray_low" component="span">
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
@@ -99,25 +91,23 @@ export default class ConnectDialog extends Component<Props> {
         backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
-            <img src={classicTheme ? connectLoadGIF : connectLoadLedgerGIF} alt="" />
-          </div>
-        );
+            <img src={connectLoadLedgerGIF} alt="" />
+          </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
-            <img src={classicTheme ? connectStartGIF : connectLoadLedgerGIF} alt="" />
-          </div>
-        );
+            <img src={connectLoadLedgerGIF} alt="" />
+          </div>);
         break;
       case StepState.ERROR:
         backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
-            {classicTheme ? <ConnectErrorSVG /> : <ConnectErrorLedgerSVG />}
-          </div>
-        );
+            {<ConnectErrorLedgerSVG/>
+            }
+          </div>);
         break;
       default:
         Logger.error('ledger::ConnectDialog::render: something unexpected happened');
@@ -137,16 +127,18 @@ export default class ConnectDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'ConnectDialog'])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         backButton={backButton}
         closeButton={<DialogCloseButton />}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
@@ -8,7 +8,6 @@ import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexi
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import { withLayout } from '../../../styles/context/layout';
 import { Box, Typography, styled } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
 
@@ -81,14 +80,11 @@ const GradientBox = styled(Box)(({ theme, isSelected }) => ({
 type Props = {|
   +complexityLevel: ?ComplexityLevelType,
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
-  +isSubmitting: boolean,
   +error?: ?LocalizableError,
   +baseTheme?: string,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
-class ComplexityLevel extends Component<Props & InjectedProps> {
+export default class ComplexityLevel extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -99,7 +95,7 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
   render(): Node {
     const { intl } = this.context;
-    const { complexityLevel, isRevampLayout } = this.props;
+    const { complexityLevel } = this.props;
 
     const levels = [
       {
@@ -118,11 +114,16 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
 
     return (
       <Box maxWidth="930px" margin="0 auto" mt="24px">
-        {isRevampLayout && (
-          <Typography component="div" textAlign="center" color="ds.text_gray_medium" mb="16px" variant="h3" fontWeight={500}>
-            {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
-          </Typography>
-        )}
+        <Typography
+          component="div"
+          textAlign="center"
+          color="ds.text_gray_medium"
+          mb="16px"
+          variant="h3"
+          fontWeight={500}
+        >
+          {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
+        </Typography>
 
         <Typography
           component="div"
@@ -191,5 +192,3 @@ class ComplexityLevel extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(ComplexityLevel): ComponentType<Props>);

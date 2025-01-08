@@ -5,12 +5,12 @@ import { observer } from 'mobx-react';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { setCashbackWallet } from '../../api/thunk';
-import type { ConnectorStoresAndActionsProps } from '../../types/injectedProps.types';
+import type { ConnectorStoresProps } from '../stores';
 
 @observer
-export default class SelectCashbackWalletContainer extends Component<ConnectorStoresAndActionsProps> {
+export default class SelectCashbackWalletContainer extends Component<ConnectorStoresProps> {
   componentDidMount() {
-    this.props.actions.connector.refreshWallets.trigger();
+    this.props.stores.connector.refreshWallets();
   }
 
   onCancel() {
@@ -24,7 +24,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
   }
 
   render(): Node {
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
 
     return (
       <ConnectPage
@@ -43,7 +43,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
         shouldHideBalance={stores.profile.shouldHideBalance}
         unitOfAccount={stores.profile.unitOfAccount}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-        onUpdateHideBalance={actions.profile.updateHideBalance.trigger}
+        onUpdateHideBalance={stores.profile.updateHideBalance}
         isSelectingCashbackWallet
       />
     );

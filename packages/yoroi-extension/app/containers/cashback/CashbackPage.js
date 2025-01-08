@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback, Suspense, useRef, useMemo } from 'react';
 import styles from './styles.module.css'
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
+import type { StoresProps } from '../../stores';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -140,7 +140,7 @@ const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalP
     return (
       <Dialog
         title={intl.formatMessage(messages.chooseTitle)}
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(messages.setThis),
             onClick: () => {
@@ -167,7 +167,7 @@ const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalP
   return (
     <Dialog
       title={intl.formatMessage(messages.setCurrentTitle)}
-      actions={[
+      dialogActions={[
         {
           label: intl.formatMessage(messages.no),
           onClick: () => {
@@ -206,7 +206,7 @@ const NotCurrentWalletModal = injectIntl(observer((props: NotCurrentWalletModalP
   );
 }));
 
-type AllProps = {| ...StoresAndActionsProps, intl: $npm$ReactIntl$IntlShape, |};
+type AllProps = {| ...StoresProps, intl: $npm$ReactIntl$IntlShape, |};
 
 type IframeMessageData = {|
   action: string,
@@ -218,7 +218,7 @@ type IframeMessageData = {|
 const canUseSandbox = environment.isDev() || environment.isNightly();
 
 const CashbackPageContainer = observer((props: AllProps) => {
-  const { actions, stores, intl } = props;
+  const {  stores, intl } = props;
   const wallet = stores.wallets.selected;
   if (!wallet) throw Error('no publicDeriver');
 
@@ -374,7 +374,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
 useEffect(() => {
   if (environment.isLight) {
-    actions.router.goToRoute.trigger({
+    stores.app.goToRoute({
       route: ROUTES.MY_WALLETS,
     });
   }
@@ -426,15 +426,14 @@ const abortClaim = useCallback(() => {
   setErrMsg('')
 }, []);
 
-const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+const sidebarContainer = <SidebarContainer stores={stores} />;
 
 return (
   <TopBarLayout
-    banner={<BannerContainer actions={actions} stores={stores} />}
+    banner={<BannerContainer stores={stores} />}
     sidebar={sidebarContainer}
     navbar={
       <NavBarContainerRevamp
-        actions={actions}
         stores={stores}
         title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarCashback) + (
           isBringSandbox ? ' (sandbox)' : ''
@@ -465,7 +464,7 @@ return (
             setPopup(false);
           }}
           onSwitchToCashbackWallet={() => {
-            props.actions.wallets.setActiveWallet.trigger(
+            stores.wallets.setActiveWallet(
               { publicDeriverId: shownCashbackWallet.publicDeriverId }
             );
           }}
@@ -478,7 +477,7 @@ return (
           closeOnOverlayClick
           closeButton={<DialogCloseButton />}
           onClose={abortClaim}
-          actions={[{
+          dialogActions={[{
             label: intl.formatMessage(globalMessages.confirm),
             primary: true,
             disabled: wallet.type === 'mnemonic' && !password,
@@ -562,4 +561,4 @@ return (
 );
 });
 
-export default (injectIntl(CashbackPageContainer): React$ComponentType < StoresAndActionsProps >);
+export default (injectIntl(CashbackPageContainer): React$ComponentType <StoresProps>);

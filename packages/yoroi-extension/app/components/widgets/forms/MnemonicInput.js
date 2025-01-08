@@ -16,7 +16,6 @@ type Props = {|
   +mnemonicValidator: string => boolean,
   +validWords: Array<string>,
   +mnemonicLength: void | number,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -30,8 +29,7 @@ export default class MnemonicInput extends Component<Props> {
     fields: {
       recoveryPhrase: {
         label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(globalMessages.recoveryPhraseInputHint) : '',
+        placeholder: '',
         value: [],
         validators: [({ field }) => {
           const value = join(field.value, ' ');

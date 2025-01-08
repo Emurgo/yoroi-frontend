@@ -15,8 +15,6 @@ import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { RevampSwitch } from '../../../widgets/Switch';
@@ -49,7 +47,7 @@ type Props = {|
 |};
 
 @observer
-class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
+class BringCashbackSettings extends Component<Props> {
   static defaultProps = {
     error: undefined,
     isUseSandbox: false,
@@ -179,7 +177,7 @@ class BringCashbackSettings extends Component<Props & InjectedLayoutProps> {
   }
 }
 
-export default (withLayout(BringCashbackSettings): ComponentType<Props>);
+export default (BringCashbackSettings: ComponentType<Props>);
 
 const WalletIcon = ({ imagePart }: {| imagePart: string |}) => {
   return (

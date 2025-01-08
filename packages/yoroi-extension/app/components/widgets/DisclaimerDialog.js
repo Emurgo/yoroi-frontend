@@ -60,7 +60,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
   return (
     <Dialog
       title={intl.formatMessage(globalMessages.disclaimer)}
-      actions={[
+      dialogActions={[
         {
           label: intl.formatMessage(globalMessages.proceed),
           onClick: props.onProceed,

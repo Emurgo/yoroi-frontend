@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import type { StoresMap } from './stores/index';
-import type { ActionsMap } from './actions/index';
 import { ROUTES } from './routes-config';
 import Helmet from 'react-helmet';
 import { injectIntl } from 'react-intl';
@@ -16,10 +15,10 @@ import SignTxContainer from './containers/SignTxContainer';
 import LoadingPage from '../containers/LoadingPage';
 import SelectCashbackWalletContainer from './containers/SelectCashbackWalletContainer';
 
-type Props = {| stores: StoresMap, actions: ActionsMap, |};
+type Props = {| stores: StoresMap |};
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: Props & Intl) => {
-  const { stores, actions, intl } = props;
+  const { stores, intl } = props;
   const title = intl.formatMessage(
     useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ?
       messages.yoroiConnector : messages.yoroiDappConnector
@@ -29,30 +28,30 @@ export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: P
     <>
       <Helmet><title>Yoroi Connector</title></Helmet>
       {stores.loading.isLoading ? (
-        <LoadingPage stores={stores} actions={actions} />
+        <LoadingPage stores={stores} />
       ) : (
-        wrapPages(getContent(stores, actions))
+        wrapPages(getContent(stores))
       )}
     </>
   );
 }));
 
-const getContent = (stores, actions) => (
+const getContent = (stores) => (
   <Switch>
     <Route
       exact
       path={ROUTES.ROOT}
-      component={props => <ConnectContainer {...props} stores={stores} actions={actions} />}
+      component={props => <ConnectContainer {...props} stores={stores} />}
     />
     <Route
       exact
       path={ROUTES.SIGNIN_TRANSACTION}
-      component={props => <SignTxContainer {...props} stores={stores} actions={actions} />}
+      component={props => <SignTxContainer {...props} stores={stores} />}
     />
     <Route
       exact
       path={ROUTES.SELECT_CASHBACK_WALLET}
-      component={props => <SelectCashbackWalletContainer {...props} stores={stores} actions={actions} />}
+      component={props => <SelectCashbackWalletContainer {...props} stores={stores} />}
     />
   </Switch>
 );

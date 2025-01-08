@@ -9,7 +9,7 @@ import { closeOtherInstances } from '../../utils/tabManager';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 /** Load dependencies before launching the app */
-export default class BaseLoadingStore<TStores, TActions> extends Store<TStores, TActions> {
+export default class BaseLoadingStore<TStores> extends Store<TStores> {
 
   @observable error: ?LocalizableError = null;
   @observable _loading: boolean = true;

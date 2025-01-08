@@ -6,7 +6,6 @@ import { Button } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './UriPromptForm.scss';
 import { ReactComponent as AboutUri }  from '../../../assets/images/uri/about-url.inline.svg';
-import { ReactComponent as AboutUriClassic }  from '../../../assets/images/uri/about-url-classic.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -24,7 +23,6 @@ const messages = defineMessages({
 type Props = {|
   +onAccept: void => void,
   +onSkip: void => void,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -40,7 +38,7 @@ export default class UriPromptForm extends Component<Props> {
       <div className={styles.component}>
         <div className={styles.centeredBox}>
           <span className={styles.aboutSvg}>
-            {this.props.classicTheme ? <AboutUriClassic /> : <AboutUri />}
+            {<AboutUri/>}
           </span>
 
           <div className={styles.explanation}>
