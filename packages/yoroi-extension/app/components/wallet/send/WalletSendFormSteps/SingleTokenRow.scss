@@ -49,17 +49,6 @@
       padding: 8px 12px;
     }
 
-    .error {
-      position: absolute;
-      bottom: -24px;
-      right: 0;
-      color: var(--yoroi-comp-input-error);
-      font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-      font-size: 12px;
-      color: #ff1351;
-      padding: 0;
-    }
-
     .amountTokenName {
       display: flex;
       align-items: center;
@@ -104,16 +93,5 @@
       top: -12px;
       right: -12px;
     }
-
-
-  }
-
-  .amountError {
-    border: 2px solid #ff1351;
-    color: #ff1351;
-  }
-
-  .inputError {
-    border-color: #ff1351 !important;
   }
 }
