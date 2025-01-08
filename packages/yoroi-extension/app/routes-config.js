@@ -6,7 +6,6 @@ export const ROUTES = {
   ROOT: '/',
   PAGE_ERROR: PAGE_ERROR_SUBROUTE,
   NIGHTLY_INFO: '/nightly',
-  MY_WALLETS: '/my-wallets',
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',

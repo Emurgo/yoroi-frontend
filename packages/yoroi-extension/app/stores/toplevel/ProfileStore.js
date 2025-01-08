@@ -113,8 +113,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
             return;
           }
           const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
-          stores.app.goToRoute({
-            route: ROUTES.WALLETS.ROOT,
+          stores.wallets.setActiveWallet({
             publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
           });
         }

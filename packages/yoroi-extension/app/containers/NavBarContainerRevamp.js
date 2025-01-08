@@ -69,8 +69,9 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
     await localStorage.unsetPortfolioFiatPair();
+    this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.stores.app.goToRoute({ route, publicDeriverId: newWalletId });
+    this.props.stores.app.goToRoute({ route });
   };
 
   checkAndResetGovRoutes: void => void = () => {

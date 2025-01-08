@@ -7,7 +7,6 @@ import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
-import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
@@ -89,17 +88,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const selectedWallet = stores.wallets.selectedOrFail;
 
     if (!selectedWallet) {
-      return (
-        <TopBarLayout
-          banner={<BannerContainer stores={stores} />}
-          navbar={<NavBarContainer title="" stores={stores} />}
-          showInContainer
-        >
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </TopBarLayout>
-      );
+      return null;
     }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
 

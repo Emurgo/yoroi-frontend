@@ -85,9 +85,6 @@ const AnalyticsSettingsPage = React.lazy(AnalyticsSettingsPagePromise);
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
 
-const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
-const MyWalletsPage = React.lazy(MyWalletsPagePromise);
-
 const WalletSummaryPagePromise = () => import('./containers/wallet/WalletSummaryPage');
 const WalletSummaryPage = React.lazy(WalletSummaryPagePromise);
 
@@ -159,7 +156,6 @@ export const LazyLoadPromises: Array<() => any> = [
   TermsOfUseSettingsPagePromise,
   SupportSettingsPagePromise,
   NightlyPagePromise,
-  MyWalletsPagePromise,
   WalletSummaryPagePromise,
   WalletSendPagePromise,
   WalletAssetsPagePromise,
@@ -225,11 +221,6 @@ export const Routes = (stores: StoresMap): Node => {
             exact
             path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
             component={props => <OptForAnalyticsPage {...props} stores={stores} />}
-          />
-          <Route
-            exact
-            path={ROUTES.MY_WALLETS}
-            component={props => <MyWalletsPage {...props} stores={stores} />}
           />
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route
@@ -304,8 +295,6 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.PORTFOLIO.ROOT}
             component={props => wrapPortfolio({ ...props, stores }, PortfolioSubpages(stores))}
           />
-
-          <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>
       </Suspense>
     </QueryClientProvider>
