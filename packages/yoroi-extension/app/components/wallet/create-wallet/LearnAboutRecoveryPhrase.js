@@ -78,7 +78,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         </Box>
 
         <StepController
-          actions={[
+          stepActions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
               disabled: false,
@@ -179,7 +179,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         </Link>
 
         <StepController
-          actions={[
+          stepActions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
               disabled: false,

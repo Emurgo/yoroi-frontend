@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { Logger } from '../../../utils/logging';
 import { handleExternalLinkClick } from '../../../utils/routing';
 
@@ -14,15 +13,15 @@ import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+import type { StoresProps } from '../../../stores';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
   +onBack: void => void,
 |};
 
 @observer
-export default class WalletLedgerConnectDialogContainer extends Component<Props> {
+export default class WalletLedgerConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;
@@ -34,14 +33,12 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
 
   cancel: (() => void) = () => {
     this.props.onClose();
-    this.props.actions.ada.ledgerConnect.cancel.trigger();
+    this.props.stores.substores.ada.ledgerConnect.cancel();
   };
 
   render(): null | Node {
-    const { actions, stores } = this.props;
-    const { profile } = this.props.stores;
+    const { stores } = this.props;
     const ledgerConnectStore = this.props.stores.substores.ada.ledgerConnect;
-    const hwConnectActions = this.props.actions.ada.ledgerConnect;
 
     let component = null;
 
@@ -53,9 +50,8 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={hwConnectActions.submitCheck.trigger}
+            submit={ledgerConnectStore.submitCheck}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
             onBack={this.props.onBack}
           />);
         break;
@@ -66,19 +62,17 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={hwConnectActions.goBackToCheck.trigger}
-            submit={hwConnectActions.submitConnect.trigger}
+            goBack={ledgerConnectStore.goBackToCheck}
+            submit={ledgerConnectStore.submitConnect}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
           />);
         break;
       case ProgressStep.TRANSFER:
         component = (
           <UpgradeTxDialogContainer
-            actions={actions}
             stores={stores}
-            onClose={hwConnectActions.finishTransfer.trigger}
-            onSubmit={hwConnectActions.finishTransfer.trigger}
+            onClose={ledgerConnectStore.finishTransfer}
+            onSubmit={ledgerConnectStore.finishTransfer}
           />);
         break;
       case ProgressStep.SAVE:
@@ -89,9 +83,8 @@ export default class WalletLedgerConnectDialogContainer extends Component<Props>
             error={ledgerConnectStore.error}
             defaultWalletName={ledgerConnectStore.defaultWalletName}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={hwConnectActions.submitSave.trigger}
+            submit={ledgerConnectStore.submitSave}
             cancel={this.cancel}
-            classicTheme={profile.isClassicTheme}
           />);
         break;
       default:

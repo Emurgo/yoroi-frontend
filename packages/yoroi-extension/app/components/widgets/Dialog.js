@@ -1,12 +1,11 @@
 /* eslint-disable no-nested-ternary */
 // @flow
-import type { Node, Element, ComponentType } from 'react';
+import type { ComponentType, Element, Node } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
 import { map } from 'lodash';
 import { Modal, Typography, IconButton } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
-import { withLayout } from '../../styles/context/layout';
 import { observer } from 'mobx-react';
 import { ReactComponent as CrossIcon } from '../../assets/images/revamp/icons/cross.inline.svg';
 
@@ -29,7 +28,7 @@ export type StyleFlag = {|
 export type Props = {|
   +title?: string | Node,
   +children?: Node,
-  +actions?: Array<ActionType>,
+  +dialogActions?: Array<ActionType>,
   +closeButton?: Element<any>,
   +withCloseButton?: boolean,
   +backButton?: Node,
@@ -39,20 +38,17 @@ export type Props = {|
   +styleContentOverride?: { ... },
   +onClose?: ?(void) => PossiblyAsync<void>,
   +closeOnOverlayClick?: boolean,
-  +isRevampLayout?: boolean,
   id?: string,
   +styleFlags?: StyleFlag,
   +forceBottomDivider?: boolean,
   +contentHeader?: Node,
 |};
 
-type InjectedProps = {| isRevampLayout: boolean |};
-
-function Dialog(props: Props & InjectedProps): Node {
+function Dialog(props: Props): Node {
   const {
     title,
     children,
-    actions,
+    dialogActions,
     closeOnOverlayClick,
     onClose,
     className,
@@ -60,7 +56,6 @@ function Dialog(props: Props & InjectedProps): Node {
     withCloseButton,
     backButton,
     scrollableContentClass,
-    isRevampLayout,
     id,
     styleFlags,
     forceBottomDivider,
@@ -89,11 +84,11 @@ function Dialog(props: Props & InjectedProps): Node {
     };
   }, [children]);
 
-  const hasActions = actions && actions.length > 0;
+  const hasActions = dialogActions && dialogActions.length > 0;
 
   const hasCloseButton = withCloseButton || closeButton;
 
-  const hasSubmitting = actions != null && actions.filter(action => action.isSubmitting === true).length > 0;
+  const hasSubmitting = dialogActions != null && dialogActions.filter(action => action.isSubmitting === true).length > 0;
 
   return (
     <Modal
@@ -108,7 +103,7 @@ function Dialog(props: Props & InjectedProps): Node {
             }
       }
       sx={{
-        bgcolor: isRevampLayout ? 'ds.special_web_overlay' : 'var(--yoroi-comp-dialog-overlay-background-color)',
+        bgcolor: 'ds.special_web_overlay',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -164,7 +159,7 @@ function Dialog(props: Props & InjectedProps): Node {
         ) : null}
         {hasActions && (
           <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
-            {map(actions, (action, i: number) => {
+            {map(dialogActions, (action, i: number) => {
               const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton
@@ -172,7 +167,7 @@ function Dialog(props: Props & InjectedProps): Node {
                   // $FlowIgnore
                   id={action.id ?? id + '-' + buttonLabel + '-button'}
                   key={i}
-                  {...getBtnVariant(action.danger, action.primary, isRevampLayout)}
+                  {...getBtnVariant(action.danger, action.primary)}
                   loading={action.isSubmitting}
                   onClick={action.onClick}
                   disabled={action.disabled === true || action.isSubmitting === true}
@@ -200,7 +195,7 @@ function Dialog(props: Props & InjectedProps): Node {
 Dialog.defaultProps = {
   title: undefined,
   children: undefined,
-  actions: undefined,
+  dialogActions: undefined,
   closeButton: undefined,
   backButton: undefined,
   className: undefined,
@@ -317,24 +312,22 @@ const ModalFooter = styled(StyledBox)(({ theme, hasDivider }) => ({
 function getBtnVariant(
   danger?: boolean,
   primary?: boolean,
-  isRevampLayout?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',
 |} {
-  if (danger && isRevampLayout) return { variant: 'contained', color: 'error' };
-
-  if (isRevampLayout && primary) {
+  if (danger) {
+    return { variant: 'contained', color: 'error' };
+  }
+  if (primary) {
     return { variant: 'primary' };
   }
-
-  if (isRevampLayout && !primary) {
+  if (!primary) {
     return { variant: 'secondary' };
   }
-
   if (danger === true) return { variant: 'danger' };
   if (primary === true) return { variant: 'primary' };
   return { variant: 'secondary' };
 }
 
-export default (withLayout(observer(Dialog)): ComponentType<Props>);
+export default (observer(Dialog): ComponentType<Props>);

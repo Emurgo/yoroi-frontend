@@ -18,11 +18,10 @@ import environment from '../../../environment';
 import { useRestoreWallet } from './hooks';
 import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
-import type { RestoreModeType } from '../../../actions/common/wallet-restore-actions';
 import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresMap } from '../../../stores';
-import type { ActionsMap } from '../../../actions';
 import { forceNonNull } from '../../../coreUtils';
+import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
 
 const messages: * = defineMessages({
   title: {
@@ -61,7 +60,6 @@ type Intl = {|
 
 type Props = {|
   stores: StoresMap,
-  actions: ActionsMap,
   restoreWallet: ({|
     walletName: string,
     walletPassword: string,
@@ -73,9 +71,13 @@ type Props = {|
 |};
 
 function RestoreWalletPage(props: Props & Intl): Node {
-  const { intl, stores, actions, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { profile, router, wallets: walletsActions } = actions;
-  const { walletRestore, profile: profileData, wallets, tokenInfoStore } = stores;
+  const { intl, stores, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
+  const {
+    walletRestore,
+    profile: profileData,
+    wallets,
+    tokenInfoStore,
+  } = stores;
 
   const [currentStep, setCurrentStep] = useState(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
   const [selectedRestoreMode, setSelectedRestoreMode] = useState<?RestoreModeType>(null);
@@ -90,7 +92,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
       balance: duplicatedWallet.balance,
       shouldHideBalance: profileData.shouldHideBalance,
       tokenInfo: tokenInfoStore.tokenInfo,
-      updateHideBalance: () => profile.updateHideBalance.trigger(),
+      updateHideBalance: () => stores.profile.updateHideBalance(),
     };
   };
 
@@ -104,7 +106,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   };
 
   function handleGoToRoute(route) {
-    router.goToRoute.trigger(route);
+    stores.app.goToRoute(route);
   }
 
   function goToAddWalletScreen() {
@@ -119,7 +121,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
         <SelectWalletTypeStep
           onNext={mode => {
             resetRestoreWalletData();
-            if (!environment.isDev() && !environment.isNightly()) profile.setSelectedNetwork.trigger(networks.CardanoMainnet);
             runInAction(() => {
               setSelectedRestoreMode(mode);
               setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
@@ -160,7 +161,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
           }}
           openDuplicatedWallet={lastDuplicatedWalletId => {
             resetRestoreWalletData();
-            walletsActions.setActiveWallet.trigger({ publicDeriverId: lastDuplicatedWalletId });
+            wallets.setActiveWallet({ publicDeriverId: lastDuplicatedWalletId });
             handleGoToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
           }}
           onSubmit={async enteredRecoveryPhrase => {

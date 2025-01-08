@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import SwitchNetworkDialog from '../../../components/wallet/settings/SwitchNetworkDialog';
@@ -8,7 +8,7 @@ import { networks } from '../../../api/ada/lib/storage/database/prepackaged/netw
 import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
 |};
 
 const networkNames = Object.freeze({
@@ -28,7 +28,7 @@ export default class SwitchNetworkDialogContainer extends Component<Props> {
     return (
       <SwitchNetworkDialog
         onCancel={() => {
-          this.props.actions.dialogs.closeActiveDialog.trigger();
+          this.props.stores.uiDialogs.closeActiveDialog();
         }}
         onApply={async (networkId) => {
           if (networkId !== profileStore.getCurrentNetworkId()) {

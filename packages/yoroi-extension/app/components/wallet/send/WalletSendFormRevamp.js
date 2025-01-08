@@ -54,12 +54,12 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
-import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
+import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
+import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -169,7 +169,6 @@ type Props = {|
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +isClassicTheme: boolean,
   +updateReceiver: (void | string, void | {| handle: string, nameServer: string |}) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -224,8 +223,8 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendActions,
-  +trezorSend: TrezorSendActions,
+  +ledgerSend: LedgerSendStore,
+  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
@@ -401,7 +400,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
-          placeholder: this.props.isClassicTheme ? this.context.intl.formatMessage(messages.receiverHint) : '',
+          placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
@@ -461,7 +460,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams ? formatValue(this.props.uriParams.amount.getDefaultEntry()) : null;
@@ -959,7 +958,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             sendMoney={this.props.sendMoney}
             getTokenInfo={this.props.getTokenInfo}
             getCurrentPrice={this.props.getCurrentPrice}
-            isClassicTheme={this.props.isClassicTheme}
             ledgerSendError={this.props.ledgerSendError}
             trezorSendError={this.props.trezorSendError}
             ledgerSend={this.props.ledgerSend}

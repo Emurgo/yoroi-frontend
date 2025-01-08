@@ -1,28 +1,16 @@
 // @flow
 import { action, observable } from 'mobx';
 
+import type { SignTransactionResponse as LedgerSignTxResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type {
-  SignTransactionResponse as LedgerSignTxResponse
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import Store from '../../base/Store';
 
 import LocalizableError from '../../../i18n/LocalizableError';
 
-import type {
-  SendUsingLedgerParams
-} from '../../../actions/ada/ledger-send-actions';
+import { convertToLocalizableError } from '../../../domain/LedgerLocalizedError';
 
-import {
-  convertToLocalizableError
-} from '../../../domain/LedgerLocalizedError';
-
-import {
-  Logger,
-  stringifyData,
-  stringifyError,
-} from '../../../utils/logging';
+import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
 
 import {
   buildConnectorSignedTransaction,
@@ -33,52 +21,35 @@ import { LedgerConnect } from '../../../utils/hwConnectHandler';
 import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type {
-  Addressing,
-} from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { genAddressingLookup } from '../../stateless/addressStores';
-import type { ActionsMap } from '../../../actions/index';
 import type { StoresMap } from '../../index';
 import {
-  generateRegistrationMetadata,
   generateCip15RegistrationMetadata,
+  generateRegistrationMetadata,
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
 import { transactionHexToBodyHex, transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
+import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+
+export type SendUsingLedgerParams = {|
+  signRequest: ISignRequest<any>,
+|};
 
 /** Note: Handles Ledger Signing */
-export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
+export default class LedgerSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;
   @observable error: ?LocalizableError;
   // =================== VIEW RELATED =================== //
 
-  setup(): void {
-    super.setup();
-    const ledgerSendAction = this.actions.ada.ledgerSend;
-    ledgerSendAction.init.listen(this._init);
-    ledgerSendAction.sendUsingLedgerWallet.listen(this._sendWrapper);
-    ledgerSendAction.sendUsingLedgerKey.listen(
-      // drop the return type
-      async (request) => {
-        await this.stores.wallets.sendAndRefresh({
-          publicDeriverId: undefined,
-          plateTextPart: undefined,
-          broadcastRequest: async () => await this.signAndBroadcast(request),
-          refreshWallet: async () => {}
-        })
-      }
-    );
-    ledgerSendAction.cancel.listen(this._cancel);
-  }
-
   /** setup() is called when stores are being created
     * _init() is called when Confirmation dialog is about to show */
-  _init: void => void = () => {
-    Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this._init)} called`);
+  init: void => void = () => {
+    Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.init)} called`);
   }
 
   _reset(): void {
@@ -93,7 +64,26 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     }
   }
 
-  _sendWrapper: {|
+  sendUsingLedgerKey: {|
+    signRequest: HaskellShelleyTxSignRequest,
+    publicKey: {|
+      key: RustModule.WalletV4.Bip32PublicKey,
+      ...Addressing,
+    |},
+    publicDeriverId: number,
+    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    expectedSerial: string | void,
+    networkId: number,
+  |} => Promise<void> = async (request) => {
+    await this.stores.wallets.sendAndRefresh({
+      publicDeriverId: undefined,
+      plateTextPart: undefined,
+      broadcastRequest: async () => await this.signAndBroadcast(request),
+      refreshWallet: async () => {}
+    })
+  }
+
+  sendUsingLedgerWallet: {|
     params: SendUsingLedgerParams,
     onSuccess?: void => void,
     +wallet: {
@@ -113,29 +103,30 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
         throw new Error('Can’t send another transaction if one transaction is in progress.');
       }
       if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
-        throw new Error(`${nameof(this._sendWrapper)} wrong tx sign request`);
+        throw new Error(`${nameof(this.sendUsingLedgerWallet)} wrong tx sign request`);
       }
       const { signRequest } = request.params;
 
       this._setError(null);
       this._setActionProcessing(true);
 
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      const { stores } = this;
+      await stores.substores.ada.wallets.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest,
             wallet: request.wallet,
           },
         },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+        refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
       });
 
-      this.actions.dialogs.closeActiveDialog.trigger();
-      this.stores.wallets.sendMoneyRequest.reset();
+      this.stores.uiDialogs.closeActiveDialog();
+      stores.wallets.sendMoneyRequest.reset();
       if (request.onSuccess) {
         request.onSuccess();
       } else {
-        this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS });
+        stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
       }
 
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');
@@ -435,9 +426,9 @@ export default class LedgerSendStore extends Store<StoresMap, ActionsMap> {
     }
   };
 
-  _cancel: void => void = () => {
+  cancel: void => void = () => {
     if (!this.isActionProcessing) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+      this.stores.uiDialogs.closeActiveDialog();
       this._reset();
     }
   }

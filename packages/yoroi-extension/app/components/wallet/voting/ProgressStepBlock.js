@@ -12,7 +12,6 @@ import type { StepsList } from './types';
 type Props = {|
   +stepsList: StepsList,
   +progressInfo: ProgressInfo,
-  +classicTheme: boolean
 |};
 
 @observer
@@ -24,7 +23,7 @@ export default class ProgressStepBlock extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, classicTheme } = this.props;
+    const { stepsList, progressInfo } = this.props;
 
     const currentStep = stepsList.findIndex(({ step }) => step === progressInfo.currentStep);
 
@@ -33,7 +32,6 @@ export default class ProgressStepBlock extends Component<Props> {
         stepsList={stepsList.map(({ message }) => intl.formatMessage(message))}
         currentStep={currentStep}
         stepState={progressInfo.stepState}
-        classicTheme={classicTheme}
       />);
   }
 }

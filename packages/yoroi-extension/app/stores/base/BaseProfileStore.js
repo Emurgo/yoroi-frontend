@@ -11,7 +11,6 @@ import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import type { ComplexityLevelType } from '../../types/complexityLevelType';
-import BaseProfileActions from '../../actions/base/base-profile-actions';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
@@ -31,10 +30,9 @@ export default class BaseProfileStore
     TStores: {
       +loading: LoadingStore,
       ...
-    },
-    TActions: { +profile: BaseProfileActions, ... }
+    }
   >
-  extends Store<TStores, TActions>
+  extends Store<TStores>
 {
 
   LANGUAGE_OPTIONS: Array<LanguageType> = [
@@ -154,23 +152,12 @@ export default class BaseProfileStore
 
   setup(): void {
     super.setup();
-    this.actions.profile.updateLocale.listen(this._updateLocale);
-    this.actions.profile.resetLocale.listen(this._resetLocale);
-    this.actions.profile.updateTentativeLocale.listen(this._updateTentativeLocale);
-    this.actions.profile.selectComplexityLevel.listen(this._selectComplexityLevel);
-    this.actions.profile.commitLocaleToStorage.listen(this._acceptLocale);
-    this.actions.profile.updateHideBalance.listen(this._updateHideBalance);
-    this.actions.profile.updateUnitOfAccount.listen(this._updateUnitOfAccount);
-    this.actions.profile.acceptNightly.listen(this._acceptNightly);
-    this.actions.profile.optForAnalytics.listen(this._onOptForAnalytics);
-    this.actions.profile.markRevampAsAnnounced.listen(this._markRevampAsAnnounced);
     this.registerReactions([
       this._setBigNumberFormat,
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
     noop(this.isRevampAnnounced);
-    noop(this.didUserMigratedToRevampTheme);
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',
@@ -291,27 +278,27 @@ export default class BaseProfileStore
   }
 
   @action
-  _markRevampAsAnnounced: void => Promise<void> = async () => {
+  markRevampAsAnnounced: void => Promise<void> = async () => {
     await this.setUserRevampAnnouncementStatusRequest.execute(true);
     await this.getUserRevampAnnouncementStatusRequest.execute();
   };
 
   @action
-  _updateTentativeLocale: ({| locale: string |}) => void = request => {
+  updateTentativeLocale: ({| locale: string |}) => void = request => {
     this.inMemoryLanguage = request.locale;
   };
 
-  _updateLocale: ({| locale: string |}) => Promise<void> = async ({ locale }) => {
+  updateLocale: ({| locale: string |}) => Promise<void> = async ({ locale }) => {
     await this.setProfileLocaleRequest.execute(locale);
     await this.getProfileLocaleRequest.execute(); // eagerly cache
   };
 
-  _resetLocale: void => Promise<void> = async () => {
+  resetLocale: void => Promise<void> = async () => {
     await this.unsetProfileLocaleRequest.execute();
     await this.getProfileLocaleRequest.execute();
   };
 
-  _acceptLocale: void => Promise<void> = async () => {
+  acceptLocale: void => Promise<void> = async () => {
     // commit in-memory language to storage
     await this.setProfileLocaleRequest.execute(
       this.inMemoryLanguage != null ? this.inMemoryLanguage : BaseProfileStore.getDefaultLocale()
@@ -350,55 +337,6 @@ export default class BaseProfileStore
     return THEMES.YOROI_BASE;
   }
 
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isRevampTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isModernTheme(): boolean {
-    return false;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isClassicTheme(): boolean {
-    return false;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get isCurrentThemeSet(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get didUserMigratedToRevampTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  @computed get hasLoadedCurrentTheme(): boolean {
-    return true;
-  }
-
-  /**
-   * <TODO:PENDING_REMOVAL>
-   */
-  hasCustomTheme: void => boolean = (): boolean => {
-    return false;
-  };
-
   // ========== Terms of Use ========== //
 
   @computed get termsOfUse(): string {
@@ -420,7 +358,7 @@ export default class BaseProfileStore
     });
   }
 
-  _acceptTermsOfUse: void => Promise<void> = async () => {
+  acceptTermsOfUse: void => Promise<void> = async () => {
     runInAction(() => {
       this._acceptedTosVersion.version = CURRENT_TOS_VERSION;
     });
@@ -441,7 +379,7 @@ export default class BaseProfileStore
     return !!this.getComplexityLevelRequest.result;
   }
 
-  _selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
+  selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
     level: ComplexityLevelType
   ): Promise<void> => {
     await this.setComplexityLevelRequest.execute(level);
@@ -483,7 +421,7 @@ export default class BaseProfileStore
     return result === true;
   }
 
-  _updateHideBalance: void => Promise<void> = async () => {
+  updateHideBalance: void => Promise<void> = async () => {
     const shouldHideBalance = this.shouldHideBalance;
     await this.setHideBalanceRequest.execute(shouldHideBalance);
     await this.getHideBalanceRequest.execute();
@@ -492,7 +430,7 @@ export default class BaseProfileStore
   // ========== Accept nightly ========== //
 
   @action
-  _acceptNightly: void => void = () => {
+  acceptNightly: void => void = () => {
     this.acceptedNightly = true;
   };
 
@@ -517,7 +455,7 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.result;
   };
 
-  _updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (setting) => {
+  updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (setting) => {
     await this.setUnitOfAccountRequest.execute(setting);
     if (setting.enabled) {
       refreshCurrentCoinPrice();
@@ -537,7 +475,7 @@ export default class BaseProfileStore
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
 
-  _onOptForAnalytics: (boolean) => void = (isAnalyticsAllowed) => {
+  onOptForAnalytics: (boolean) => void = (isAnalyticsAllowed) => {
     this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
     this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
     ampli.client.setOptOut(!isAnalyticsAllowed);

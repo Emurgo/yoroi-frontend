@@ -1,62 +1,44 @@
 // @flow
+import type { Node } from 'react';
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
 import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import WalletWithNavigation from '../../components/wallet/layouts/WalletWithNavigation';
-import NavBarBack from '../../components/topbar/NavBarBack';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import { allCategories, allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
-import { withLayout } from '../../styles/context/layout';
-import type { LayoutComponentMap } from '../../styles/context/layout';
+import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
-import WalletSyncingOverlay from '../../components/wallet/syncingOverlay/WalletSyncingOverlay';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children: Node,
 |};
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
-
-const messages = defineMessages({
-  backButton: {
-    id: 'wallet.nav.backButton',
-    defaultMessage: '!!!Back to my wallets',
-  },
-});
-
 @observer
-class Wallet extends Component<AllProps> {
+export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   componentDidMount() {
     if (!this.props.stores.profile.isRevampAnnounced)
-      this.props.actions.dialogs.open.trigger({ dialog: RevampAnnouncementDialog });
+      this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
   }
 
   checkRoute(): void | string {
-    const isRevamp = this.props.stores.profile.isRevampTheme;
-    const categories = isRevamp ? allSubcategoriesRevamp : allCategories;
-
-    if (isRevamp && this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
+    const categories = allSubcategoriesRevamp;
+    if (this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
       return ROUTES.WALLETS.TRANSACTIONS;
     }
 
@@ -93,26 +75,25 @@ class Wallet extends Component<AllProps> {
   }
 
   navigateToMyWallets: string => void = destination => {
-    this.props.actions.router.goToRoute.trigger({ route: destination });
+    this.props.stores.app.goToRoute({ route: destination });
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     // abort rendering if the page isn't valid for this wallet
     const newRoute = this.checkRoute();
     if (newRoute != null) {
       return <Redirect to={newRoute} />;
     }
     const { intl } = this.context;
-    const selectedWallet = stores.wallets.selected;
+    const selectedWallet = stores.wallets.selectedOrFail;
 
     if (!selectedWallet) {
       return (
         <TopBarLayout
-          banner={<BannerContainer actions={actions} stores={stores} />}
-          navbar={<NavBarContainer title="" actions={actions} stores={stores} />}
+          banner={<BannerContainer stores={stores} />}
+          navbar={<NavBarContainer title="" stores={stores} />}
           showInContainer
-          showAsCard
         >
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -121,17 +102,16 @@ class Wallet extends Component<AllProps> {
       );
     }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-    if (selectedWallet == null) throw new Error(`${nameof(Wallet)} no public deriver`);
 
     const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
-    const publicDeriver = this.props.stores.wallets.selected;
+    const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
       throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
     }
-    const currentPool = this.props.stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
+    const currentPool = stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
@@ -148,77 +128,30 @@ class Wallet extends Component<AllProps> {
             label: intl.formatMessage(category.label),
             route: category.route,
           }))}
-        onItemClick={route => actions.router.goToRoute.trigger({ route })}
-        isActiveItem={route => this.props.stores.app.currentRoute.startsWith(route)}
+        onItemClick={route => stores.app.goToRoute({ route })}
+        isActiveItem={route => stores.app.currentRoute.startsWith(route)}
         locationId="wallet"
       />
     );
 
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const walletClassic = (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainer
-            actions={actions}
-            stores={stores}
-            title={
-              <NavBarBack
-                route={ROUTES.MY_WALLETS}
-                onBackClick={this.navigateToMyWallets}
-                title={intl.formatMessage(messages.backButton)}
-              />
-            }
-          />
-        }
-        showInContainer
-        showAsCard
-      >
-        {warning}
-        <WalletWithNavigation
-          categories={allCategories
-            .filter(c => c.isVisible(visibilityContext))
-            .map(category => ({
-              className: category.className,
-              icon: category.icon,
-              label: category.label,
-              isActive: this.props.stores.app.currentRoute.startsWith(category.route),
-              onClick: () =>
-                this.props.actions.router.goToRoute.trigger({
-                  route: category.route,
-                }),
-            }))}
-        >
-          {this.props.children}
-          {isInitialSyncing && (
-            <WalletSyncingOverlay
-              classicTheme={this.props.stores.profile.isClassicTheme}
-              onClose={() => this.navigateToMyWallets(ROUTES.MY_WALLETS)}
-            />
-          )}
-        </WalletWithNavigation>
-      </TopBarLayout>
-    );
+    const sidebarContainer = <SidebarContainer stores={stores} />;
 
-    const walletRevamp = (
+    return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores}/>}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
-            actions={actions}
             stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)}/>}
             menu={isInitialSyncing ? null : menu}
           />
         }
         showInContainer
-        showAsCard
       >
         {warning}
         {isInitialSyncing ? (
-          <WalletLoadingAnimation />
+          <WalletLoadingAnimation/>
         ) : (
           <>
             {this.props.children}
@@ -227,8 +160,6 @@ class Wallet extends Component<AllProps> {
         )}
       </TopBarLayout>
     );
-
-    return this.props.renderLayoutComponent({ CLASSIC: walletClassic, REVAMP: walletRevamp });
   }
 
   getWarning: (number) => void | Node = publicDeriverId => {
@@ -240,14 +171,15 @@ class Wallet extends Component<AllProps> {
   };
 
   getDialogs: (any, any) => Node = (intl, currentPool) => {
-    const isOpen = this.props.stores.uiDialogs.isOpen;
+    const { stores } = this.props;
+    const isOpen = stores.uiDialogs.isOpen;
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
-    const selectedWallet = this.props.stores.wallets.selected;
-    const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(selectedWallet);
+    const selectedWallet = stores.wallets.selected;
+    const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
 
 
     if (
-      this.props.stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
+      stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
       !isRevampDialogOpen &&
       poolTransitionInfo?.shouldShowTransitionFunnel
     )
@@ -255,16 +187,16 @@ class Wallet extends Component<AllProps> {
         <PoolTransitionDialog
           intl={intl}
           onClose={() => {
-            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
+            stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
           }}
           poolTransition={poolTransitionInfo}
           currentPoolId={currentPool ?? ''}
           onUpdatePool={() => {
-            this.props.stores.delegation.setPoolTransitionConfig(selectedWallet, {
+            stores.delegation.setPoolTransitionConfig(selectedWallet, {
               show: 'idle',
               shouldUpdatePool: true,
             });
-            this.props.actions.router.goToRoute.trigger({
+            stores.app.goToRoute({
               route: ROUTES.STAKING,
             });
           }}
@@ -275,8 +207,8 @@ class Wallet extends Component<AllProps> {
       return (
         <RevampAnnouncementDialog
           onClose={() => {
-            this.props.actions.profile.markRevampAsAnnounced.trigger();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            stores.profile.markRevampAsAnnounced();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
       );
@@ -284,4 +216,3 @@ class Wallet extends Component<AllProps> {
     return null;
   };
 }
-export default (withLayout(Wallet): ComponentType<Props>);

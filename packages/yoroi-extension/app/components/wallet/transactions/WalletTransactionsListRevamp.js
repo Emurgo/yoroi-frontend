@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import moment from 'moment';
-import styles from './WalletTransactionsList.scss';
+import styles from './WalletTransactionsListRevamp.scss';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import type { AssuranceMode } from '../../../types/transactionAssurance.types';
@@ -50,7 +50,7 @@ type Props = {|
   +onCopyAddressTooltip: (string, string) => void,
   +notification: ?Notification,
   +addressToDisplayString: string => string,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> | null,
   +complexityLevel: ?ComplexityLevelType,
   id: string,
 |};

@@ -22,7 +22,6 @@ const messages = defineMessages({
 type Props = {|
   +isLoadingDataForNextScreen: boolean,
   +hasLoadedCurrentLocale: boolean,
-  +hasLoadedCurrentTheme: boolean,
   +error: ?LocalizableError,
   +onExternalLinkClick: MouseEvent => void,
   +downloadLogs: void => void
@@ -40,17 +39,13 @@ export default class Loading extends Component<Props> {
     const {
       isLoadingDataForNextScreen,
       hasLoadedCurrentLocale,
-      hasLoadedCurrentTheme,
       error
     } = this.props;
 
     const componentStyles = classNames([
       styles.component,
     ]);
-    const yoroiLogoStyles = classNames([
-      styles.yoroiLogo,
-      hasLoadedCurrentTheme ? null : styles.hide,
-    ]);
+    const yoroiLogoStyles = classNames([styles.yoroiLogo]);
     const renderError = error != null && hasLoadedCurrentLocale ? (
       <div className={styles.loading}>
         <h1 className={styles.error}>

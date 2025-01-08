@@ -7,10 +7,10 @@ import { intlShape } from 'react-intl';
 import ExportPublicKeyDialog from '../../../components/wallet/settings/ExportPublicKeyDialog';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
 |};
 
 @observer
@@ -26,7 +26,7 @@ export default class ExportWalletDialogContainer extends Component<Props> {
     }
     return (
       <ExportPublicKeyDialog
-        onClose={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onClose={this.props.stores.uiDialogs.closeActiveDialog}
         publicKeyHex={selected.publicKey}
         pathToPublic={selected.pathToPublic}
       />

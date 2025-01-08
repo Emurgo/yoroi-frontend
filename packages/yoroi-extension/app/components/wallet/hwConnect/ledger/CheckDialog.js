@@ -81,7 +81,6 @@ type Props = {|
   +submit: void => void,
   +cancel: void => void,
   +onBack: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -92,11 +91,18 @@ export default class CheckDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel, classicTheme } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      submit,
+      cancel,
+    } = this.props;
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        {!classicTheme && <AboutLedgerSVG />}
+        <AboutLedgerSVG/>
 
         <div className={styles.prerequisiteBlock}>
           <Stack direction="row" alignItems="center">
@@ -146,13 +152,7 @@ export default class CheckDialog extends Component<Props> {
             </ListItem>
           </List>
         </div>
-        {classicTheme && (
-          <div className={styles.hwImageBlock}>
-            <AboutPrerequisiteTrezorSVG />
-          </div>
-        )}
-      </div>
-    );
+      </div>);
 
     const dailogActions = [
       {
@@ -167,15 +167,17 @@ export default class CheckDialog extends Component<Props> {
       <Dialog
         className={classnames([styles.component, 'CheckDialog', styles.ledger])}
         title={intl.formatMessage(globalMessages.ledgerConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

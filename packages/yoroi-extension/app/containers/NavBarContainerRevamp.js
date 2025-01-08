@@ -1,7 +1,6 @@
 // @flow
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { Component } from 'react';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -33,9 +32,9 @@ const NETWORK_BADGES = Object.freeze({
     text: 'sancho',
   },
 });
+import type { StoresProps } from '../stores';
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   title: Node,
   menu?: Node,
   pageBanner?: Node,
@@ -45,7 +44,7 @@ type Props = {|
 const localStorage = new LocalStorageApi();
 
 @observer
-export default class NavBarContainerRevamp extends Component<Props> {
+export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -55,12 +54,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   addNewWallet: void => Promise<void> = async () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
-    this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD });
+    this.props.stores.uiDialogs.closeActiveDialog();
+    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
     await localStorage.unsetPortfolioFiatPair();
   };
 
@@ -71,15 +70,17 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
     await localStorage.unsetPortfolioFiatPair();
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.actions.router.goToRoute.trigger({ route, publicDeriverId: newWalletId });
+    this.props.stores.app.goToRoute({ route, publicDeriverId: newWalletId });
   };
 
   checkAndResetGovRoutes: void => void = () => {
+    const { stores } = this.props;
+    const currentRoute = stores.app.currentRoute;
     if (
-      this.props.stores.app.currentRoute === ROUTES.Governance.FAIL ||
-      this.props.stores.app.currentRoute === ROUTES.Governance.SUBMITTED
+      currentRoute === ROUTES.Governance.FAIL ||
+      currentRoute === ROUTES.Governance.SUBMITTED
     ) {
-      this.props.actions.router.goToRoute.trigger({ route: ROUTES.Governance.ROOT });
+      stores.app.goToRoute({ route: ROUTES.Governance.ROOT });
     }
   };
 
@@ -87,6 +88,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
     const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
+    const shouldHideBalance = profile.shouldHideBalance;
 
     const DropdownHead = () => {
       if (!selected || !selectedWalletName) {
@@ -101,7 +103,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           plate={plate}
           name={selectedWalletName}
           onUpdateHideBalance={this.updateHideBalance}
-          shouldHideBalance={profile.shouldHideBalance}
+          shouldHideBalance={shouldHideBalance}
           rewards={rewards}
           walletAmount={selected.balance}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -110,7 +112,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
             ampli.allWalletsPageViewed();
-            this.props.actions.dialogs.open.trigger({ dialog: WalletListDialog });
+            this.props.stores.uiDialogs.open({ dialog: WalletListDialog });
           }}
         />
       );
@@ -135,7 +137,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
               paddingLeft: '8px',
               paddingRight: '8px',
             }}
-            onClick={() => this.props.actions.dialogs.open.trigger({ dialog: SwitchNetworkDialogContainer })}
+            onClick={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
           >
             {text}
           </button>
@@ -151,7 +153,7 @@ export default class NavBarContainerRevamp extends Component<Props> {
           menu={this.props.menu}
           walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
-            <BuySellAdaButton onBuySellClick={() => this.props.actions.dialogs.open.trigger({ dialog: BuySellDialog })} />
+            <BuySellAdaButton onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })} />
           }
           isErrorPage={isErrorPage}
           pageBanner={pageBanner}
@@ -162,10 +164,12 @@ export default class NavBarContainerRevamp extends Component<Props> {
   }
 
   getDialog: void => Node = () => {
-    const { selected, wallets } = this.props.stores.wallets;
-    const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
+    const { stores } = this.props;
+    const { selected, wallets } = stores.wallets;
+    const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+    const shouldHideBalance = stores.profile.shouldHideBalance;
 
-    if (this.props.stores.uiDialogs.isOpen(WalletListDialog)) {
+    if (stores.uiDialogs.isOpen(WalletListDialog)) {
       return (
         <WalletListDialog
           cardanoWallets={wallets.map(wallet => ({
@@ -183,9 +187,9 @@ export default class NavBarContainerRevamp extends Component<Props> {
           selectedWalletId={selected?.publicDeriverId}
           close={() => {
             this.checkAndResetGovRoutes();
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           }}
-          shouldHideBalance={this.props.stores.profile.shouldHideBalance}
+          shouldHideBalance={shouldHideBalance}
           onUpdateHideBalance={this.updateHideBalance}
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
@@ -193,13 +197,13 @@ export default class NavBarContainerRevamp extends Component<Props> {
           onUpdateWalletListOrder={async (from, to) => {
             await this.props.stores.wallets.reorderWallets(from, to);
           }}
-          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+          unitOfAccountSetting={stores.profile.unitOfAccount}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         />
       );
     }
 
-    if (this.props.stores.uiDialogs.isOpen(BuySellDialog)) {
+    if (stores.uiDialogs.isOpen(BuySellDialog)) {
       if (!selected) {
         return null;
       }
@@ -210,16 +214,20 @@ export default class NavBarContainerRevamp extends Component<Props> {
 
       return (
         <BuySellDialog
-          onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-          onExchangeCallback={() => this.props.actions.router.goToRoute.trigger({ route: ROUTES.EXCHANGE_END })}
-          currentBalanceAda={selected.balance.getDefault().shiftedBy(-numberOfDecimals)}
+          onCancel={this.props.stores.uiDialogs.closeActiveDialog}
+          onExchangeCallback={() =>
+            stores.app.goToRoute({ route: ROUTES.EXCHANGE_END })
+          }
+          currentBalanceAda={
+            selected.balance.getDefault().shiftedBy(-numberOfDecimals)
+          }
           receiveAdaAddress={receiveAdaAddress}
         />
       );
     }
 
     if (this.props.stores.uiDialogs.isOpen(SwitchNetworkDialogContainer)) {
-      return <SwitchNetworkDialogContainer actions={this.props.actions} stores={this.props.stores} />;
+      return <SwitchNetworkDialogContainer stores={this.props.stores} />;
     }
 
     return null;

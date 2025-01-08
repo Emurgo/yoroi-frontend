@@ -21,6 +21,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   dialogTitleVerifyWalletRestoration: {
@@ -70,13 +71,23 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
   generatePlate(title: string, plate: WalletChecksum): Node {
     return (
-      <div key={title}>
-        <h2 className={styles.addressLabel}>{title}</h2>
-        <div className={styles.plateRowDiv}>
+      <Box key={title}>
+        <Typography variant="body1" color="ds.text_gray_medium" mb="10px">
+          {title}
+        </Typography>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="flex-end"
+          sx={{ '& .identicon': { borderRadius: '4px' } }}
+        >
           <WalletAccountIcon iconSeed={plate.ImagePart} />
-          <span className={styles.plateIdSpan}>{plate.TextPart}</span>
-        </div>
-      </div>
+          <Typography color="ds.text_gray_medium" variant="h1" pl="10px" fontSize="35px" fontWeight={500}>
+            {plate.TextPart}
+          </Typography>
+        </Box>
+      </Box>
     );
   }
 
@@ -88,7 +99,9 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   ): Node {
     return (
       <>
-        <h2 className={styles.addressLabel}>{title}</h2>
+        <Typography variant="body1" mb="10px" color="ds.text_gray_medium">
+          {title}
+        </Typography>
         {addresses.map((address, index) => {
           const notificationElementId = `${address}-${index}`;
           return (
@@ -119,14 +132,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      error,
-      isSubmitting,
-      onCancel,
-      onNext,
-      onCopyAddressTooltip,
-      notification,
-    } = this.props;
+    const { error, isSubmitting, onCancel, onNext, onCopyAddressTooltip, notification } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
 
@@ -146,46 +152,40 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     ];
 
     const introMessage = (
-      <div>
-        <span>{intl.formatMessage(messages.walletRestoreVerifyIntroLine1)}</span>
-        <br />
+      <Box>
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {intl.formatMessage(messages.walletRestoreVerifyIntroLine1)}
+        </Typography>
         <ul>
           <li className={styles.smallTopMargin}>
-            <span>
+            <Typography component="span" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine2} />
-            </span>
+            </Typography>
           </li>
           <li className={styles.smallTopMargin}>
-            <span>
+            <Typography component="span" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine3} />
-            </span>
+            </Typography>
           </li>
           <li className={styles.smallTopMargin}>
-            <span>
+            <Typography component="span" variant="body1" color="ds.text_gray_medium">
               <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine4} />
-            </span>
+            </Typography>
           </li>
         </ul>
-      </div>
+      </Box>
     );
 
-    const plateElems = this.props.plates.map(plate =>
-      this.generatePlate(intl.formatMessage(plate.checksumTitle), plate.plate)
-    );
+    const plateElems = this.props.plates.map(plate => this.generatePlate(intl.formatMessage(plate.checksumTitle), plate.plate));
 
     const addressElems = this.props.plates.map(plate =>
-      this.generateAddresses(
-        intl.formatMessage(plate.addressMessage),
-        plate.addresses,
-        onCopyAddressTooltip,
-        notification
-      )
+      this.generateAddresses(intl.formatMessage(plate.addressMessage), plate.addresses, onCopyAddressTooltip, notification)
     );
 
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleVerifyWalletRestoration)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}

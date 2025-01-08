@@ -73,7 +73,7 @@ export default class Switch extends Component<Props> {
         onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
         id="switchNetworkDialog"
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(globalMessages.cancel),
             onClick: onCancel,
