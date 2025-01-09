@@ -18,10 +18,6 @@ export default class URILandingPage extends Component<StoresProps> {
   };
 
   onConfirm: void => void = () => {
-    const firstSelectedWalletId = this.firstSelectedWalletId();
-    if (firstSelectedWalletId) {
-      this.props.stores.wallets.setActiveWallet({ publicDeriverId: firstSelectedWalletId });
-    }
     // this will automatically reroute to the right page if no wallet exists
     this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.SEND });
   };

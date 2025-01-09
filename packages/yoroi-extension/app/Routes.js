@@ -288,6 +288,8 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => wrapPortfolio({ ...props, stores }, PortfolioSubpages(stores))}
           />
         </Switch>
+
+        <Redirect to={ROUTES.ROOT} />
       </Suspense>
     </QueryClientProvider>
   );

@@ -46,11 +46,7 @@ export default class URILandingDialogContainer extends Component<Props> {
         <URIInvalidDialog
           onClose={this.onCancel}
           onSubmit={this.onCancel}
-          address={
-            this.props.stores.loading.uriParams
-              ? this.props.stores.loading.uriParams.address
-              : null
-          }
+          address={this.props.stores.loading.uriParams?.address || null}
         />
       );
     }

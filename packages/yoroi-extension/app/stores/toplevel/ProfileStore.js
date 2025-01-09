@@ -101,21 +101,22 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         await stores.memos.loadFromStorage();
         await stores.tokenInfoStore.refreshTokenInfo();
         await stores.coinPriceStore.loadFromStorage();
-
         await wallets.restoreWalletsFromStorage();
+
+        const firstWallet =
+          wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
+        if (firstWallet == null) {
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+          return;
+        }
+        const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
+        stores.wallets.setActiveWallet({
+          publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
+        });
+
         if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
           stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
-          const firstWallet =
-            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
-          if (firstWallet == null) {
-            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
-            return;
-          }
-          const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
-          stores.wallets.setActiveWallet({
-            publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
-          });
           stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }
         runInAction(() => {
