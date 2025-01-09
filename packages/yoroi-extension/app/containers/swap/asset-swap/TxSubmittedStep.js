@@ -33,7 +33,7 @@ export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSucc
       </Box>
       {!isSuccessful && (
         <Box>
-          <Button variant="tertiary" color="primary">
+          <Button variant="tertiary" color="primary" onClick={onDownloadLogs}>
             {strings.downloadLogFile}
           </Button>
         </Box>

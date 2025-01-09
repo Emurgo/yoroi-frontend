@@ -50,44 +50,6 @@ function resolveValueOrGetter(v: ColumnValueOrGetter, ctx: ColumnContext): strin
   return typeof v === 'function' ? v(ctx) : v;
 }
 
-const orderColumns: Array<Column> = [
-  {
-    name: 'Pair (From / To)',
-    align: 'left',
-    width: '176px',
-  },
-  {
-    name: 'Asset price',
-    width: '150px',
-  },
-  {
-    name: 'Asset amount',
-    width: '166px',
-  },
-  {
-    name: 'Total',
-    width: '150px',
-    openOrdersOnly: true,
-  },
-  {
-    name: 'DEX',
-    align: 'left',
-    leftPadding: '32px',
-    width: '216px',
-    openOrdersOnly: true,
-  },
-  {
-    name: ({ completedOrders }) => (completedOrders ? 'Time executed' : 'Time created'),
-    align: 'left',
-    width: '240px',
-  },
-  {
-    name: 'Transaction ID',
-    align: 'left',
-    width: 'auto',
-  },
-];
-
 export default function SwapOrdersPage(props: StoresProps): Node {
   const { order: orderApi } = useSwap();
   const strings = useStrings();
