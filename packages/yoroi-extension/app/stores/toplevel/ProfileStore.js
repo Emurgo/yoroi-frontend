@@ -1,11 +1,10 @@
 // @flow
-import { action, computed, observable, runInAction } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage'
@@ -14,8 +13,6 @@ import { subscribe } from '../../api/thunk';
 import { noop } from '../../coreUtils';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
-  @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
-
   /**
    * We only want to redirect users once when the app launches
    */
@@ -104,25 +101,23 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         await stores.memos.loadFromStorage();
         await stores.tokenInfoStore.refreshTokenInfo();
         await stores.coinPriceStore.loadFromStorage();
-
         await wallets.restoreWalletsFromStorage();
+
+        const firstWallet =
+          wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
+        if (firstWallet == null) {
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+          return;
+        }
+        const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
+        stores.wallets.setActiveWallet({
+          publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
+        });
+
         if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
           stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
-          const firstWallet =
-            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
-          if (firstWallet == null) {
-            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
-            return;
-          }
-          const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
-          stores.app.goToRoute({
-            route: ROUTES.WALLETS.ROOT,
-            publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
-          });
-        }
-        if (stores.loading.shouldRedirect) {
-          stores.loading.redirect();
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }
         runInAction(() => {
           this.hasRedirected = true;
@@ -164,7 +159,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       this._checkSetupSteps,
     ]);
     this._getUriSchemeAcceptance(); // eagerly cache
-    noop(this._getSortedWalletList());
   }
 
   teardown(): void {
@@ -176,16 +170,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       EXPONENTIAL_AT: (1e9: any),
       FORMAT: this.bigNumberDecimalFormat,
     });
-  };
-
-  // ========== Active API ========== //
-
-  @computed get selectedNetwork(): void | $ReadOnly<NetworkRow> {
-    return this.__selectedNetwork;
-  }
-
-  @action setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
-    this.__selectedNetwork = type;
   };
 
   // ========== Paper Wallets ========== //
@@ -245,24 +229,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         return;
       }
     }
-  };
-
-  // ========== Sort wallets - Revamp ========== //
-  @computed get walletsNavigation(): WalletsNavigation {
-    let { result } = this.getWalletsNavigationRequest;
-    if (result == null) {
-      result = this.getWalletsNavigationRequest.execute().result;
-    }
-    return result ?? { cardano: [] };
-  }
-  _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getWalletsNavigationRequest.execute();
-  };
-
-  updateSortedWalletList: WalletsNavigation => Promise<void>
-    = async (walletsNavigation) => {
-    await this.setWalletsNavigationRequest.execute(walletsNavigation);
-    await this.getWalletsNavigationRequest.execute();
   };
 }
 

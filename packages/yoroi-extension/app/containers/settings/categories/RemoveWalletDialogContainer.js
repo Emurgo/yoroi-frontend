@@ -90,18 +90,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
   };
 
   removeWalletRevamp: void => Promise<void> = async () => {
-    const { stores } = this.props;
-    const selectedWalletId = this.props.publicDeriverId;
-    const walletsNavigation = stores.profile.walletsNavigation;
-
-    const newWalletsNavigation = {
-      ...walletsNavigation,
-      // $FlowFixMe[invalid-computed-prop]
-      cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
-    };
-    await stores.profile.updateSortedWalletList(newWalletsNavigation);
-
-    stores.walletSettings.removeWallet({
+    this.props.stores.walletSettings.removeWallet({
       publicDeriverId: this.props.publicDeriverId,
     });
   };

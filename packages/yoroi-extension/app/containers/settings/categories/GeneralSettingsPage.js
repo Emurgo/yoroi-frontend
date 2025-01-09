@@ -15,6 +15,8 @@ import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';
 import environment from '../../../environment';
+import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
+
 import type { StoresProps } from '../../../stores';
 
 const currencyLabels = defineMessages({
@@ -144,7 +146,22 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
         <ThemeSettingsBlock />
-        <AboutYoroiSettingsBlock wallet={stores.wallets.selected} />
+        <AboutYoroiSettingsBlock
+          wallet={stores.wallets.selected}
+          onSwitchNetwork={() =>
+            stores.uiDialogs.open({
+              dialog: SwitchNetworkDialogContainer,
+            })
+          }
+        />
+        {/* pop up dialogs */}
+        {
+          stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && (
+            <SwitchNetworkDialogContainer
+              stores={stores}
+            />
+          )
+        }
       </Box>
     );
   }

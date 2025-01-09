@@ -34,34 +34,32 @@ export default class BaseLoadingStore<TStores> extends Store<TStores> {
         + stringifyError(e)
       );
     }
-    await Promise
-      .all(this.__blockingLoadingRequests.map(([r]) => r.execute()))
-      .then(async () => {
-        Logger.debug(`[yoroi] closing other instances`);
-        await closeOtherInstances(this.getTabIdKey.bind(this)());
-        Logger.debug(`[yoroi][preLoadingScreenEnd]`);
-        await this.preLoadingScreenEnd.bind(this)();
-        runInAction(() => {
-          this.error = null;
-          this._loading = false;
-          this.postLoadingScreenEnd();
-          Logger.debug(`[yoroi] loading ended`);
-        });
-        return undefined;
-      })
-      .catch((error) => {
-        const failedBlockingLoadingRequestName =
-          this.__blockingLoadingRequests.find(([r]) => r.error != null)?.[1];
-        const errorType = failedBlockingLoadingRequestName || 'unclear';
-        Logger.error(
-          `${nameof(BaseLoadingStore)}::${nameof(this.load)}
+    try {
+      await Promise.all(this.__blockingLoadingRequests.map(([r]) => r.execute()))
+
+      Logger.debug(`[yoroi] closing other instances`);
+      await closeOtherInstances(this.getTabIdKey.bind(this)());
+
+      await this.loadingEnd();
+
+      runInAction(() => {
+        this.error = null;
+        this._loading = false;
+        Logger.debug(`[yoroi] loading ended`);
+      });
+    } catch (error) {
+      const failedBlockingLoadingRequestName =
+        this.__blockingLoadingRequests.find(([r]) => r.error != null)?.[1];
+      const errorType = failedBlockingLoadingRequestName || 'unclear';
+      Logger.error(
+        `${nameof(BaseLoadingStore)}::${nameof(this.load)}
            Unable to load libraries (error type: ${errorType}) `
           + stringifyError(error)
-        );
-        runInAction(() => {
-          this.error = new UnableToLoadError();
-        });
+      );
+      runInAction(() => {
+        this.error = new UnableToLoadError();
       });
+    }
   }
 
   @computed get isLoading(): boolean {
@@ -72,10 +70,7 @@ export default class BaseLoadingStore<TStores> extends Store<TStores> {
     throw new Error(`${nameof(BaseLoadingStore)}::${nameof(this.getTabIdKey)} child needs to override this function`);
   }
 
-  async preLoadingScreenEnd(): Promise<void> {
-    // eslint-disable-line no-empty-function
-  }
-  postLoadingScreenEnd(): void {
-    // eslint-disable-line no-empty-function
+  async loadingEnd(): Promise<void> {
+    throw new Error('should be overridden by subclass');
   }
 }

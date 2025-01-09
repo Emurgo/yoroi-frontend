@@ -38,7 +38,6 @@ export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 export default class WalletStore extends Store<StoresMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
-  @observable initialSyncingWalletIds: Set<number> = observable.set();
   @observable wallets: Array<WalletState> = [];
   @observable selectedIndex: null | number = null;
   // mobx is not smart enough to update the wallet name on the nav bar without this
@@ -103,12 +102,7 @@ export default class WalletStore extends Store<StoresMap> {
           runInAction(() => {
             Object.assign(this.wallets[index], newWalletState);
           });
-          if (this.initialSyncingWalletIds.has(params.publicDeriverId)) {
-            this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
-          }
-          runInAction(() => {
-            this.initialSyncingWalletIds.delete(params.publicDeriverId);
-          });
+          this.stores.addresses.refreshAddressesFromDb(this.wallets[index]);
           await this.stores.transactions.updateNewTransactions(params.newTxs, this.wallets[index]);
         }
       } else if (params.eventType === 'remove') {
@@ -181,7 +175,6 @@ export default class WalletStore extends Store<StoresMap> {
 
     runInAction(() => {
       this.wallets.push(newWallet);
-      this.initialSyncingWalletIds.add(newWallet.publicDeriverId);
       this.setActiveWallet({
         publicDeriverId: newWallet.publicDeriverId,
       });
@@ -224,13 +217,14 @@ export default class WalletStore extends Store<StoresMap> {
 
     runInAction(() => {
       this.wallets.push(wallet);
-      this.initialSyncingWalletIds.add(wallet.publicDeriverId);
     });
   };
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const result = await this.getInitialWallets.execute().promise;
+    const result = await this.getInitialWallets.execute(
+      this.stores.profile.getCurrentNetworkId()
+    ).promise;
     if (result == null || result.length === 0) return;
 
     for (const publicDeriver of result) {
@@ -241,6 +235,15 @@ export default class WalletStore extends Store<StoresMap> {
 
       this.stores.addresses.refreshAddressesFromDb(publicDeriver);
     }
+
+    const orderMap: Map<string, number> = new Map();
+    (await this.api.localStorage.loadWalletListOrder()).forEach((publicKey, index) => {
+      orderMap.set(publicKey, index)
+    });
+    result.sort((w1, w2) => (
+      (orderMap.get(w1.publicKey) ?? Number.MAX_VALUE) -
+        (orderMap.get(w2.publicKey) ?? Number.MAX_VALUE)
+    ));
 
     runInAction(() => {
       this.wallets.push(...result);
@@ -282,28 +285,23 @@ export default class WalletStore extends Store<StoresMap> {
     if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
     }
-    this.stores.profile.setSelectedNetwork(
-      getNetworkById(this.wallets[walletIndex].networkId)
-    );
-    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex)
-      // This flag is used to determine whether to send the active-wallet-open event to Bring's content script.
-      // Don't send it here when we are creating a new wallet because the wallet hasn't been synced.
-      && !this.isInitialSyncing(publicDeriverId);
+    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex);
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
-    this.api.localStorage.setSelectedWalletId(publicDeriverId);
+    noop(this.api.localStorage.setSelectedWalletPublicKey(
+      this.wallets[walletIndex].publicKey
+    ));
     noop(subscribe(publicDeriverId, changed));
     // Catalyst update // todo: maybe check if network changed
     noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
   };
 
   getLastSelectedWallet: void => Promise<?WalletState> = async () => {
-    const walletId: ?number = await this.api.localStorage.getSelectedWalletId();
-    return this.wallets.find(wallet => wallet.publicDeriverId === walletId);
+    const lastSelectedPublicKey: ?string = await this.api.localStorage.getSelectedWalletPublicKey();
+    return this.wallets.find(wallet => wallet.publicKey === lastSelectedPublicKey);
   };
 
   @action unsetActiveWallet: void => void = () => {
-    this.stores.profile.setSelectedNetwork(undefined);
     this.selectedIndex = null;
     this.selectedWalletName = null;
   };
@@ -415,10 +413,6 @@ export default class WalletStore extends Store<StoresMap> {
     return resp;
   };
 
-  isInitialSyncing: (number) => boolean = (publicDeriverId) => {
-    return this.initialSyncingWalletIds.has(publicDeriverId);
-  }
-
   @action onRenameSelectedWallet: (string) => void = (newName) => {
     this.selectedWalletName = newName;
     if (this.selectedIndex != null) {
@@ -453,6 +447,16 @@ export default class WalletStore extends Store<StoresMap> {
   setCashbackWallet(id: number): void {
     setCashbackWallet(id);
     this.getCashbackWalletRequest.patch(() => this.wallets.find(w => w.publicDeriverId === id));
+  }
+
+  async reorderWallets(from: number, to: number): Promise<void> {
+    const selectedWallet = this.selected;
+    runInAction(() => {
+      const [moved] = this.wallets.splice(from, 1);
+      this.wallets.splice(to, 0, moved);
+      this.selectedIndex = this.wallets.indexOf(selectedWallet);
+    });
+    await this.api.localStorage.saveWalletListOrder(this.wallets.map(wallet => wallet.publicKey));
   }
 }
 

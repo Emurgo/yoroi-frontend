@@ -27,12 +27,6 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresProp
   };
 
   async componentDidMount() {
-    // User should not be able to access the route when using Yoroi Light
-    if (environment.isLight) {
-      this.props.stores.app.goToRoute({
-        route: ROUTES.MY_WALLETS,
-      });
-    }
     await this.props.stores.connector.refreshActiveSites();
     await this.props.stores.connector.getConnectorWhitelist();
   }

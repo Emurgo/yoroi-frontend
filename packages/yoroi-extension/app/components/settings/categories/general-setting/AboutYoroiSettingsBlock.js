@@ -18,7 +18,7 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -77,6 +77,10 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.git.branch',
     defaultMessage: '!!!Branch:',
   },
+  switchNetwork: {
+    id: 'settings.general.aboutYoroi.switchNetwork',
+    defaultMessage: '!!!SWITCH NETWORK',
+  },
 });
 
 const basePageComponentPath = 'settings:general';
@@ -130,7 +134,8 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | { isTestnet: boolean, ... }
+  wallet: null | { isTestnet: boolean, ... },
+  onSwitchNetwork: () => void,
 |};
 
 @observer
@@ -185,6 +190,13 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             componentId={basePageComponentPath + '-branchInfo-text'}
           />
         )}
+
+        <Button
+          onClick={this.props.onSwitchNetwork}
+          variant="primary"
+        >
+          {intl.formatMessage(messages.switchNetwork)}
+        </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

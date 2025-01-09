@@ -27,16 +27,18 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
+  CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
+  WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
+  SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
+
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
-  SELECTED_WALLET: 'SELECTED_WALLET',
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
@@ -47,6 +49,8 @@ const storageKeys = {
 
   CASHBACK_WALLET_ID: 'CASHBACK_WALLET_ID',
   SHOWN_DISCLAIMERS: 'SHOWN_DISCLAIMERS',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -127,17 +131,17 @@ export default class LocalStorageApi {
   setUserRevampAnnouncementStatus: boolean => Promise<void> = status =>
     setLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED, status.toString());
 
-  // ========== Select Wallet ========== //
+  // ========== Legacy Select Wallet ========== //
 
   getSelectedWalletId: void => Promise<number | null> = async () => {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
-    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
     if (!id) {
       id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
       if (/^\d+$/.test(id)) {
-        await this.setSelectedWalletId(Number(id));
+        id = null;
       }
     }
+
     if (!id) {
       return null;
     }
@@ -145,9 +149,14 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  setSelectedWalletId: number => Promise<void> = async (id) => {
-    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
+  // ========== Selected Wallet ========== //
+  getSelectedWalletPublicKey: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
   };
+
+  setSelectedWalletPublicKey: string => Promise<void> = async (publicKey) => {
+    await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
+  }
 
   // ========== Legacy Theme ========== //
 
@@ -390,6 +399,30 @@ export default class LocalStorageApi {
   isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
     const val = await this._getShownDisclaimerObject();
     return val[which] === true;
+  }
+
+  loadCurrentNetworkId: () => Promise<?number> = async () => {
+    const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
+    if (raw == null) {
+      return undefined;
+    }
+    return Number(raw);
+  }
+
+  saveCurrentNetworkId: (number) => Promise<void> = async (networkId) => {
+    await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+  }
+
+  loadWalletListOrder: () => Promise<Array<string>> = async () => {
+    const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
+    if (raw == null) {
+      return [];
+    }
+    return JSON.parse(raw);
+  }
+
+  saveWalletListOrder: Array<string> => Promise<void> = async (publicKeyList) => {
+    await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   }
 
   async reset(): Promise<void> {

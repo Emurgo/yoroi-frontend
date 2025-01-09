@@ -13,7 +13,6 @@ import WalletCreateDialogContainer from './dialogs/WalletCreateDialogContainer';
 import WalletCreateDialog from '../../components/wallet/WalletCreateDialog';
 import WalletBackupDialogContainer from './dialogs/WalletBackupDialogContainer';
 import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
-import PickCurrencyDialogContainer from './dialogs/PickCurrencyDialogContainer';
 import WalletRestoreOptionDialogContainer from './dialogs/WalletRestoreOptionDialogContainer';
 import WalletRestoreDialogContainer from './dialogs/WalletRestoreDialogContainer';
 import WalletRestoreOptionDialog from '../../components/wallet/add/option-dialog/WalletRestoreOptionDialog';
@@ -40,12 +39,6 @@ export default class AddWalletPage extends Component<StoresProps> {
   };
 
   openDialogWrapper: any => void = dialog => {
-    // we reset the API when we open a dialog instead of when we close a dialog
-    // this is because on close, asynchronous unmount actions get triggered
-    // so there is no safe time at which we can un-select the API
-    // so instead, the API gets reset before we start any dialog flow
-    this.props.stores.profile.setSelectedNetwork(undefined);
-
     this.props.stores.uiDialogs.open({ dialog });
   };
 
@@ -76,23 +69,7 @@ export default class AddWalletPage extends Component<StoresProps> {
     };
 
     let activeDialog = null;
-    if (uiDialogs.hasOpen && selectedNetwork == null) {
-      activeDialog = (
-        <PickCurrencyDialogContainer
-          onClose={this.onClose}
-          onCardano={() => stores.profile.setSelectedNetwork(networks.CardanoMainnet)}
-          onCardanoPreprodTestnet={() =>
-            stores.profile.setSelectedNetwork(networks.CardanoPreprodTestnet)
-          }
-          onCardanoPreviewTestnet={() =>
-            stores.profile.setSelectedNetwork(networks.CardanoPreviewTestnet)
-          }
-          onCardanoSanchoTestnet={() =>
-            stores.profile.setSelectedNetwork(networks.CardanoSanchoTestnet)
-          }
-        />
-      );
-    } else if (uiDialogs.isOpen(WalletCreateDialog)) {
+    if (uiDialogs.isOpen(WalletCreateDialog)) {
       activeDialog = (
         <WalletCreateDialogContainer
           stores={stores}
