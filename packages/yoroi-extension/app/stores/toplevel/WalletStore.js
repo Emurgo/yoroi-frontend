@@ -285,13 +285,12 @@ export default class WalletStore extends Store<StoresMap> {
     if (walletIndex === -1) {
       throw new Error('unexpected missing wallet id');
     }
-    const changed = (this.selectedIndex != null) && (this.selectedIndex !== walletIndex);
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
     noop(this.api.localStorage.setSelectedWalletPublicKey(
       this.wallets[walletIndex].publicKey
     ));
-    noop(subscribe(publicDeriverId, changed));
+    noop(subscribe(publicDeriverId));
     // Catalyst update // todo: maybe check if network changed
     noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
   };
