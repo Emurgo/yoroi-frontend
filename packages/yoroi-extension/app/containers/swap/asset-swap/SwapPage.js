@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
@@ -37,17 +36,6 @@ import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
 import type { StoresProps } from '../../../stores';
 
-const messages = defineMessages({
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
-
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
 export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;
@@ -61,7 +49,7 @@ type Intl = {|
 function SwapPage(props: StoresProps & Intl): Node {
   const { stores } = props;
   const [openedDialog, setOpenedDialog] = useState('');
-  const { back, sendUsingLedgerNano, sendUsingTrezorT } = useStrings();
+  const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
   const {
@@ -419,7 +407,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
+              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
             </Button>
           </Box>
         )}

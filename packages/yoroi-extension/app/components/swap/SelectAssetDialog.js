@@ -151,7 +151,7 @@ export default function SelectAssetDialog({
                 <>
                   <NoAssetsFound />
                   <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
-                    {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}}
+                    {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}
                   </Typography>
                 </>
               )}
