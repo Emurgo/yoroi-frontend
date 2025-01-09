@@ -20,6 +20,7 @@ import {
   CardanoTxOutputSerializationFormat,
   CardanoTxSigningMode,
   CardanoTxWitnessType,
+  CardanoDRepType,
 } from 'trezor-connect-flow';
 import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
@@ -27,11 +28,10 @@ import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/b
 import { ChainDerivations, } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { range } from 'lodash';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import blake2b from 'blake2b';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe, forceNonNull, hexToBytes } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
 
 // ==================== TREZOR ==================== //
@@ -58,7 +58,17 @@ export function createTrezorSignTxPayload(
     return result;
   })();
 
-  const txBody = signRequest.unsignedTx.build();
+  const tx = signRequest.unsignedTx.build_tx();
+  const txBody = tx.body();
+
+  const tagsState = RustModule.WasmScope(Module =>
+    Module.WalletV4.has_transaction_set_tag(tx.to_bytes()));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
 
   // Inputs
   const trezorInputs = _transformToTrezorInputs(
@@ -104,7 +114,7 @@ export function createTrezorSignTxPayload(
       ...request,
       certificates: formatTrezorCertificates(
         certificates,
-        range(0, certificates.len()).map(_i => stakingKeyPath),
+        (_) => stakingKeyPath,
       )
     };
 
@@ -144,6 +154,12 @@ export function createTrezorSignTxPayload(
         }
       };
   }
+  if (txHasSetTags) {
+    request = {
+      ...request,
+      tagCborSets: true,
+    };
+  }
   return request;
 }
 
@@ -161,23 +177,26 @@ function formatTrezorWithdrawals(
     }))
     .toArray();
 }
+
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  paths: Array<Array<number>>,
+  getPath: (stakeCredential: RustModule.WalletV4.Credential) => Array<number>,
 ): Array<CardanoCertificate> {
   const result = [];
-  for (const [cert, path] of iterateLenGet(certificates).zip(paths)) {
-    if (cert.as_stake_registration() != null) {
+  for (const cert of iterateLenGet(certificates)) {
+    const registrationCert = cert.as_stake_registration();
+    if (registrationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_REGISTRATION,
-        path,
+        path: getPath(registrationCert.stake_credential()),
       });
       continue;
     }
-    if (cert.as_stake_deregistration() != null) {
+    const deregistrationCert = cert.as_stake_deregistration();
+    if (deregistrationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DEREGISTRATION,
-        path,
+        path: getPath(deregistrationCert.stake_credential()),
       });
       continue;
     }
@@ -185,11 +204,49 @@ function formatTrezorCertificates(
     if (delegationCert != null) {
       result.push({
         type: CardanoCertificateType.STAKE_DELEGATION,
+        path: getPath(delegationCert.stake_credential()),
         pool: delegationCert.pool_keyhash().to_hex(),
-        path,
       });
       continue;
     }
+    const voteDelegation = cert.as_vote_delegation();
+    if (voteDelegation != null) {
+      const wasmDrep = voteDelegation.drep();
+      let dRep;
+      switch (wasmDrep.kind()) {
+      case RustModule.WalletV4.DRepKind.KeyHash:
+        dRep = {
+          type: CardanoDRepType.KEY_HASH,
+          keyHash: forceNonNull(voteDelegation.drep().to_key_hash()).to_hex(),
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.ScriptHash:
+        dRep = {
+          type: CardanoDRepType.SCRIPT_HASH,
+          scriptHash: forceNonNull(voteDelegation.drep().to_script_hash()).to_hex(),
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.AlwaysAbstain:
+        dRep = {
+          type: CardanoDRepType.ABSTAIN,
+        };
+        break;
+      case RustModule.WalletV4.DRepKind.AlwaysNoConfidence:
+        dRep = {
+          type: CardanoDRepType.NO_CONFIDENCE,
+        };
+        break;
+      default:
+        throw new Error('Trezor: Unsupported dRep kind: ' + wasmDrep.kind());
+      }
+      result.push({
+        type: CardanoCertificateType.VOTE_DELEGATION,
+        dRep,
+        path: getPath(voteDelegation.stake_credential()),
+      });
+      continue;
+    }
+    // TODO: @trezor/connect-web 9.4.2 hasn't supported dRep (de)registration and update
     throw new Error(`${nameof(formatTrezorCertificates)} Trezor doesn't support this certificate type`);
   }
   return result;
@@ -505,6 +562,16 @@ export function toTrezorSignRequest(
   senderUtxos: Array<CardanoAddressedUtxo>,
 ): $Exact<CardanoSignTransaction> {
 
+  const tagsState = RustModule.WasmScope(Module => Module.WalletV4.has_transaction_set_tag(
+    Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
+  ));
+
+  if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
+    throw new Error('Transaction with mixed sets cannot be signed by Ledger');
+  }
+
+  const txHasSetTags = tagsState === RustModule.WalletV4.TransactionSetsState.AllSetsHaveTag;
+
   const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<CardanoInput> {
@@ -708,37 +775,7 @@ export function toTrezorSignRequest(
       }
       return addressing;
     };
-
-    const result = [];
-    for (const cert of iterateLenGet(certificates)) {
-      const registrationCert = cert.as_stake_registration();
-      if (registrationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_REGISTRATION,
-          path: getPath(registrationCert.stake_credential()),
-        });
-        continue;
-      }
-      const deregistrationCert = cert.as_stake_deregistration();
-      if (deregistrationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_DEREGISTRATION,
-          path: getPath(deregistrationCert.stake_credential()),
-        });
-        continue;
-      }
-      const delegationCert = cert.as_stake_delegation();
-      if (delegationCert != null) {
-        result.push({
-          type: CardanoCertificateType.STAKE_DELEGATION,
-          path: getPath(delegationCert.stake_credential()),
-          pool: delegationCert.pool_keyhash().to_hex(),
-        });
-        continue;
-      }
-      throw new Error(`unsupported certificate type`);
-    }
-    formattedCertificates = result;
+    formattedCertificates = formatTrezorCertificates(certificates, getPath);
   }
 
   let formattedWithdrawals = null;
@@ -848,6 +885,9 @@ export function toTrezorSignRequest(
   }
   if (additionalWitnessRequests.length > 0) {
     result.additionalWitnessRequests = additionalWitnessRequests;
+  }
+  if (txHasSetTags) {
+    result.tagCborSets = true;
   }
 
   return result;

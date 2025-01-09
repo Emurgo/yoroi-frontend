@@ -3,31 +3,31 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import TopBarLayout from '../components/layout/TopBarLayout';
 import BannerContainer from './banners/BannerContainer';
 import SidebarContainer from './SidebarContainer';
 import ExchangeEndPageContent from '../components/buySell/ExchangeEndPage';
+import type { StoresProps } from '../stores';
 
 @observer
-export default class ExchangeEndPage extends Component<StoresAndActionsProps> {
+export default class ExchangeEndPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores}/>}
-        sidebar={<SidebarContainer actions={actions} stores={stores}/>}
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
         showInContainer
       >
         <ExchangeEndPageContent
-          onConfirm={() => actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          onConfirm={() => stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
         />
       </TopBarLayout>
     );

@@ -4,16 +4,15 @@ import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-
 import URILandingDialog from '../../components/uri/URILandingDialog';
 import URIVerifyDialog from '../../components/uri/URIVerifyDialog';
 import URIInvalidDialog from '../../components/uri/URIInvalidDialog';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
   +onClose: void => void,
   +onConfirm: void => void,
   +hasFirstSelectedWallet: boolean,

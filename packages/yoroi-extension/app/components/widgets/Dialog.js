@@ -3,7 +3,7 @@
 import type { ComponentType, Element, Node } from 'react';
 import React, { forwardRef, useEffect, useState } from 'react';
 import { map } from 'lodash';
-import { Button, Modal, Typography } from '@mui/material';
+import { Modal, Typography, IconButton } from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { LoadingButton } from '@mui/lab';
 import { observer } from 'mobx-react';
@@ -28,7 +28,7 @@ export type StyleFlag = {|
 export type Props = {|
   +title?: string | Node,
   +children?: Node,
-  +actions?: Array<ActionType>,
+  +dialogActions?: Array<ActionType>,
   +closeButton?: Element<any>,
   +withCloseButton?: boolean,
   +backButton?: Node,
@@ -48,7 +48,7 @@ function Dialog(props: Props): Node {
   const {
     title,
     children,
-    actions,
+    dialogActions,
     closeOnOverlayClick,
     onClose,
     className,
@@ -84,11 +84,11 @@ function Dialog(props: Props): Node {
     };
   }, [children]);
 
-  const hasActions = actions && actions.length > 0;
+  const hasActions = dialogActions && dialogActions.length > 0;
 
   const hasCloseButton = withCloseButton || closeButton;
 
-  const hasSubmitting = actions != null && actions.filter(action => action.isSubmitting === true).length > 0;
+  const hasSubmitting = dialogActions != null && dialogActions.filter(action => action.isSubmitting === true).length > 0;
 
   return (
     <Modal
@@ -107,6 +107,9 @@ function Dialog(props: Props): Node {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        '& .MuiBackdrop-root': {
+          backgroundColor: 'transparent',
+        },
       }}
       // $FlowIgnore
       id={id + '-dialogWindow-modalWindow'}
@@ -156,7 +159,7 @@ function Dialog(props: Props): Node {
         ) : null}
         {hasActions && (
           <ModalFooter hasDivider={forceBottomDivider || contentHasScroll}>
-            {map(actions, (action, i: number) => {
+            {map(dialogActions, (action, i: number) => {
               const buttonLabel = action.label.toLowerCase().replace(/ /gi, '');
               return (
                 <LoadingButton
@@ -192,7 +195,7 @@ function Dialog(props: Props): Node {
 Dialog.defaultProps = {
   title: undefined,
   children: undefined,
-  actions: undefined,
+  dialogActions: undefined,
   closeButton: undefined,
   backButton: undefined,
   className: undefined,
@@ -238,7 +241,7 @@ export const CloseButton = ({
 // eslint-disable-next-line no-unused-vars
 const StyledBox = forwardRef(({ contentHasScroll, empty, hasDivider, ...props }, ref) => <Box {...props} ref={ref} />);
 
-const SIconBtn = styled(Button)(({ theme, active }) => ({
+const SIconBtn = styled(IconButton)(({ theme, active }) => ({
   backgroundColor: active && theme.palette.ds.gray_200,
   '& svg': {
     '& path': {

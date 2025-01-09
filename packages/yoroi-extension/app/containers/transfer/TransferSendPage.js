@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import { intlShape, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
@@ -25,12 +24,12 @@ import type {
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../stores';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: {|
     +trigger: void => void,
     +label: string,
@@ -49,7 +48,7 @@ type Props = {|
 |};
 
 @observer
-export default class TransferSendPage extends Component<Props> {
+export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -67,14 +66,16 @@ export default class TransferSendPage extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.props.stores.wallets.sendMoneyRequest.reset();
+    const { stores } = this.props;
+    stores.wallets.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
-    this.props.actions.ada.ledgerSend.cancel.trigger();
-    this.props.actions.ada.trezorSend.cancel.trigger();
+    stores.substores.ada.ledgerSend.cancel();
+    stores.substores.ada.trezorSend.cancel();
   }
 
   submit: void => Promise<void> = async () => {
-    const selected = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const selected = stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
@@ -82,30 +83,30 @@ export default class TransferSendPage extends Component<Props> {
     if (signRequest == null) return;
     if (this.spendingPasswordForm == null) {
       if (selected.type === 'trezor') {
-        await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
+        await stores.substores.ada.trezorSend.sendUsingTrezor({
           params: { signRequest },
           wallet: selected,
         });
       }
       if (selected.type === 'ledger') {
-        await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
+        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
           params: { signRequest },
           wallet: selected,
         });
       }
-      if (this.props.stores.wallets.sendMoneyRequest.error == null) {
+      if (stores.wallets.sendMoneyRequest.error == null) {
         this.props.onSubmit.trigger();
       }
     } else {
       this.spendingPasswordForm.submit({
         onSuccess: async (form) => {
           const { walletPassword } = form.values();
-          await this.props.actions.wallets.sendMoney.trigger({
+          await stores.substores.ada.mnemonicSend.sendMoney({
             signRequest,
             password: walletPassword,
             wallet: selected,
           });
-          if (this.props.stores.wallets.sendMoneyRequest.error == null) {
+          if (stores.wallets.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();
           }
         },

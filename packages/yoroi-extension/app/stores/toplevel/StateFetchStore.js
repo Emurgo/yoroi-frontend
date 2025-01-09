@@ -14,9 +14,8 @@ export default class StateFetchStore<
       ...
     },
     ...
-  },
-  ActionsMapType
-> extends Store<StoresMapType, ActionsMapType> {
+  }
+> extends Store<StoresMapType> {
 
   @observable fetcher: IFetcher;
 
@@ -26,10 +25,10 @@ export default class StateFetchStore<
       () => environment.getVersion(),
       () => this.stores.profile.currentLocale,
       () => {
-        if (environment.userAgentInfo.isFirefox()) {
+        if (environment.isFirefox()) {
           return 'firefox';
         }
-        if (environment.userAgentInfo.isChrome()) {
+        if (environment.isChrome()) {
           return 'chrome';
         }
         return '-';

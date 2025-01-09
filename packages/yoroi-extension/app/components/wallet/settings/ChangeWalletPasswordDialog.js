@@ -167,7 +167,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitleChangePassword)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={onCancel}
         className={dialogClasses}

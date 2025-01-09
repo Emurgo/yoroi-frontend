@@ -14,6 +14,7 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import { truncateAddress } from '../../utils/formatters';
 
 import styles from './URIInvalidDialog.scss';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   uriInvalidTitle: {
@@ -71,7 +72,7 @@ export default class URIInvalidDialog extends Component<Props> {
 
     return (
       <Dialog
-        actions={actions}
+        dialogActions={actions}
         className={dialogClasses}
         title={intl.formatMessage(messages.uriInvalidTitle)}
         closeOnOverlayClick={false}
@@ -99,9 +100,12 @@ export default class URIInvalidDialog extends Component<Props> {
               ):
               (
                 <>
-                  <div>{intl.formatMessage(messages.uriInvalidDialogWarningText1)}</div>
-                  <br />
-                  <div>{intl.formatMessage(messages.uriInvalidDialogWarningText2)}</div>
+                  <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+                    {intl.formatMessage(messages.uriInvalidDialogWarningText1)}
+                  </Typography>
+                  <Typography variant="body2" color="ds.text_gray_low">
+                    {intl.formatMessage(messages.uriInvalidDialogWarningText2)}
+                  </Typography>
                 </>
               )
             }

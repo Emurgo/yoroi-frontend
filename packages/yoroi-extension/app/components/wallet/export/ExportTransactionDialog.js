@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { TransactionRowsToExportRequest } from '../../../actions/common/transactions-actions';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -14,6 +13,7 @@ import DateRange from './DateRange';
 import { Box } from '@mui/system';
 import { Moment } from 'moment';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import type { TransactionRowsToExportRequest } from '../../../stores/toplevel/TransactionsStore';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -99,7 +99,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
       <Dialog
         className="ExportTransactionDialog"
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}

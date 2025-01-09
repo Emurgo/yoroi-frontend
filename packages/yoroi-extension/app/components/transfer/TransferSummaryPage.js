@@ -26,6 +26,7 @@ import type {
 } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../stores/stateless/tokenHelpers';
+import { Box, Typography, styled } from '@mui/material';
 
 const messages = defineMessages({
   addressFromLabel: {
@@ -49,6 +50,11 @@ const messages = defineMessages({
     defaultMessage: '!!!This transaction will unregister one or more staking keys, giving you back your {refundAmount} {ticker} from your deposit',
   },
 });
+
+const STypography = styled(Typography)(({ theme }) => ({
+  color: theme.palette.ds.text_gray_medium,
+  fontWeight: 500,
+}));
 
 type Props = {|
   +dialogTitle: string,
@@ -105,7 +111,7 @@ export default class TransferSummaryPage extends Component<Props> {
       <Dialog
         styleOverride={{ '--yoroi-comp-dialog-min-width-md': '680px' }}
         title={this.props.dialogTitle}
-        actions={actions}
+        dialogActions={actions}
         closeButton={<DialogCloseButton />}
         onClose={this.props.onCancel.trigger}
         closeOnOverlayClick={false}
@@ -210,9 +216,9 @@ export default class TransferSummaryPage extends Component<Props> {
     return (
       <>
         <div className={styles.addressLabelWrapper}>
-          <div className={styles.addressLabel}>
+          <STypography variant="body2">
             {intl.formatMessage(messages.addressFromLabel)}
-          </div>
+          </STypography>
           {
             transferTx.senders.map((sender, index) => {
               const addressesClasses = classnames([
@@ -243,9 +249,9 @@ export default class TransferSummaryPage extends Component<Props> {
           }
         </div>
         <div className={styles.addressLabelWrapper}>
-          <div className={styles.addressLabel}>
+          <STypography variant="body2">
             {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
-          </div>
+          </STypography>
           {
             transferTx.receivers.map((receiver, index) => {
               const addressesClasses = classnames([
@@ -342,9 +348,9 @@ export default class TransferSummaryPage extends Component<Props> {
 
         <div className={styles.amountFeesWrapper}>
           <div className={styles.amountWrapper}>
-            <div className={styles.amountLabel}>
+            <STypography variant="body2">
               {intl.formatMessage(messages.recoveredBalanceLabel)}
-            </div>
+            </STypography>
             {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.amount}>
@@ -370,9 +376,9 @@ export default class TransferSummaryPage extends Component<Props> {
           </div>
 
           <div className={styles.feesWrapper}>
-            <div className={styles.feesLabel}>
+            <STypography variant="body2">
               {intl.formatMessage(messages.transactionFeeLabel)}
-            </div>
+            </STypography>
             {unitOfAccountSetting.enabled /* tmp */ && false ? (
               <>
                 <div className={styles.fees}>
@@ -399,9 +405,9 @@ export default class TransferSummaryPage extends Component<Props> {
         </div>
 
         <div className={styles.totalAmountWrapper}>
-          <div className={styles.totalAmountLabel}>
+          <STypography variant="body2">
             {intl.formatMessage(globalMessages.finalBalanceLabel)}
-          </div>
+          </STypography>
           {unitOfAccountSetting.enabled /* tmp */ && false ? (
             <>
               <div className={styles.totalAmount}>
@@ -449,10 +455,10 @@ export default class TransferSummaryPage extends Component<Props> {
   _getTxIdNode: string => Node = (txId) => {
     const { intl } = this.context;
     return (
-      <div className={styles.addressLabelWrapper}>
-        <div className={styles.addressLabel}>
+      <Box mb="20px">
+        <STypography variant="body2">
           {intl.formatMessage(globalMessages.transactionId)}
-        </div>
+        </STypography>
         <ExplorableHashContainer
           selectedExplorer={this.props.selectedExplorer}
           light
@@ -463,7 +469,7 @@ export default class TransferSummaryPage extends Component<Props> {
             <span className={styles.address}>{txId}</span>
           </RawHash>
         </ExplorableHashContainer>
-      </div>
+      </Box>
     );
   }
 }

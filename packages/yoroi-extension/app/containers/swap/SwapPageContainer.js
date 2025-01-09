@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -15,12 +14,14 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { IntlProvider } from './context/intl/IntlProvider.js';
+import { ROUTES } from '../../routes-config';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
   +children?: Node,
 |};
 
-type AllProps = {| ...Props, ...StoresAndActionsProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class SwapPageContainer extends Component<AllProps> {
@@ -40,33 +41,48 @@ export default class SwapPageContainer extends Component<AllProps> {
     return false;
   };
 
+  isErrorPage: void => boolean = () => {
+    const { location } = this.props.stores.router;
+    if (location) {
+      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
+    }
+    return false;
+  };
+
   render(): Node {
     const { children } = this.props;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const { intl } = this.context;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
+    const isErrorPage = this.isErrorPage();
 
-    const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
+    const menu = (
+      <SwapMenu
+        onItemClick={route => stores.app.goToRoute({ route })}
+        isActiveItem={this.isActivePage}
+      />
+    );
 
     return (
-      <IntlProvider intl={intl}>
-        <TopBarLayout
-          banner={<BannerContainer actions={actions} stores={stores} />}
-          sidebar={sidebarContainer}
-          navbar={
-            <NavBarContainerRevamp
-              actions={actions}
-              stores={stores}
-              title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-              menu={menu}
-            />
-          }
-          showInContainer
-          withPadding={false}
-        >
-          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-        </TopBarLayout>
-      </IntlProvider>
+        <IntlProvider intl={intl}>
+          <TopBarLayout
+            banner={<BannerContainer stores={stores} />}
+            sidebar={sidebarContainer}
+            isErrorPage={isErrorPage}
+            navbar={
+              <NavBarContainerRevamp
+                stores={stores}
+                title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+                menu={menu}
+                isErrorPage={isErrorPage}
+              />
+            }
+            showInContainer
+            withPadding={false}
+          >
+            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+          </TopBarLayout>
+        </IntlProvider>
     );
   }
 }

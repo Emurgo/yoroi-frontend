@@ -219,7 +219,11 @@ export function deserializeTransactionCtorData(
     state: serializedData.state,
     errorMsg: serializedData.errorMsg,
     certificates: serializedData.certificates,
-    ttl: serializedData.ttl && new BigNumber(serializedData.ttl),
+    ttl: serializedData.ttl && new BigNumber(
+      typeof serializedData.ttl === 'object'
+        ? { ...serializedData.ttl, _isBigNumber: true }
+        : serializedData.ttl
+    ),
     metadata: serializedData.metadata,
     withdrawals: serializedData.withdrawals.map(({ address, value }) => ({
       address,

@@ -35,8 +35,8 @@ export default class Support extends Component<Props, State> {
   }
 
   getUrl(): string | null {
-    if (!environment.userAgentInfo.isExtension()) return null;
-    const agent = environment.userAgentInfo.isFirefox() ? 'firefox' : 'chrome';
+    if (!environment.isExtension()) return null;
+    const agent = environment.isFirefox() ? 'firefox' : 'chrome';
     return `https://emurgo.github.io/yoroi-support/?source=${agent}&extensionId=${window.location.hostname}`;
   }
 

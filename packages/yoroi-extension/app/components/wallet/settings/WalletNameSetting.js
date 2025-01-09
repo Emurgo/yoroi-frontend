@@ -66,7 +66,7 @@ export default class WalletNameSetting extends Component<Props> {
     } = this.props;
     return (
       <>
-        <Typography component="div" variant="body1" fontWeight={500} mb="16px">
+        <Typography component="div" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
           {intl.formatMessage(messages.title)}
         </Typography>
         <Box sx={{ width: '506px' }}>

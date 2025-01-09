@@ -46,10 +46,11 @@
   .columns {
     width: 100%;
     display: grid;
-    grid-template-columns: 1.1fr 1fr 1fr;
+    grid-template-columns: 200px 200px 200px;
+    margin-top: 24px;
 
     li {
-      padding: 13px 24px;
+      padding: 8px 16px;
       text-align: left;
       display: flex;
       align-items: center;

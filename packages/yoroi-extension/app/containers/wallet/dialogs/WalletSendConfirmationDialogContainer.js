@@ -2,28 +2,26 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import WalletSendConfirmationDialog from '../../../components/wallet/send/WalletSendConfirmationDialog';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import type { StoresProps } from '../../../stores';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
-type DialogProps = {|
+type LocalProps = {|
   +signRequest: ISignRequest<any>,
   +staleTx: boolean,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-|};
-type Props = {|
-  ...StoresAndActionsProps,
-  ...DialogProps,
   +openTransactionSuccessDialog: () => void,
 |};
+
+type Props = {| ...StoresProps, ...LocalProps |};
 
 @observer
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
@@ -38,13 +36,12 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
       unitOfAccountSetting,
       openTransactionSuccessDialog,
     } = this.props;
-    const { stores, actions } = this.props;
+    const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;
 
     if (publicDeriver == null)
       throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
 
-    const { sendMoney } = actions.wallets;
     const { sendMoneyRequest } = stores.wallets;
 
     const totalInput = signRequest.totalInput();
@@ -65,15 +62,15 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
             publicDeriver.networkId
           ) ?? (() => { throw new Error('No explorer for wallet network'); })()
         }
-        getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-        getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+        getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+        getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         amount={totalInput.joinSubtractCopy(fee)}
         receivers={receivers}
         totalAmount={totalInput}
         transactionFee={fee}
         transactionSize={showSize ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})` : null}
         onSubmit={async ({ password }) => {
-          await sendMoney.trigger({
+          await stores.substores.ada.mnemonicSend.sendMoney({
             signRequest,
             password,
             wallet: publicDeriver,
@@ -82,7 +79,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
         }}
         isSubmitting={sendMoneyRequest.isExecuting}
         onCancel={() => {
-          actions.dialogs.closeActiveDialog.trigger();
+          stores.uiDialogs.closeActiveDialog();
           sendMoneyRequest.reset();
         }}
         error={sendMoneyRequest.error}

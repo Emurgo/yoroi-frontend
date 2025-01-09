@@ -4,7 +4,6 @@ import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
-import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
 import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
 import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
@@ -12,8 +11,9 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { adaInLovelaces } from '../../helpers/constants.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
+import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
 
-describe('dApp, getCollateral, error, max limit, not auth,', function () {
+describe('dApp, getCollateral, error, max limit', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
@@ -22,18 +22,21 @@ describe('dApp, getCollateral, error, max limit, not auth,', function () {
   let mockedDApp = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     mockServer = getMockServer({});
-    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    windowManager.init();
-    const dappLogger = getTestLogger('dApp', this.test.parent.title);
-    mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
     logger = getTestLogger(this.test.parent.title);
-  });
-
-  it('Restore a 15-word wallet', async function () {
-    await restoreWallet(webdriver, logger, testWallet1);
+    try {
+      webdriver = await driversPoolsManager.getDriverFromPool();
+      const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+      windowManager = new WindowManager(webdriver, wmLogger);
+      windowManager.init();
+      const dappLogger = getTestLogger('dApp', this.test.parent.title);
+      mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      await preloadDBAndStorage(webdriver, logger, 'testWallet1');
+      await waitTxPage(webdriver, logger);
+    } catch (error) {
+      await collectInfo(this, webdriver, logger);
+      throw new Error(error);
+    }
   });
 
   it('Open a dapp page', async function () {

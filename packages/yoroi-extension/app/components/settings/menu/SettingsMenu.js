@@ -91,13 +91,6 @@ export default class SettingsMenu extends Component<Props> {
       },
     ];
 
-    return (
-      <SubMenu
-        options={settingOptions}
-        onItemClick={onItemClick}
-        isActiveItem={isActiveItem}
-        locationId='settings'
-      />
-    );
+    return <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} locationId="settings" />;
   }
 }

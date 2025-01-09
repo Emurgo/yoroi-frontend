@@ -2,7 +2,6 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import styles from './SingleTokenRow.scss';
-import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import {
   truncateAddressShort,
   formattedAmountToNaturalUnits,
@@ -18,6 +17,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
 import { Box, Typography, styled } from '@mui/material';
+import TokenImage from './TokenImage';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -25,7 +25,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
       fill: theme.palette.ds.gray_max,
     },
     '& rect': {
-      fill: theme.palette.ds.bg_color_max,
+      fill: theme.palette.ds.bg_color_contrast_min,
     },
   },
 }));
@@ -77,7 +77,7 @@ export default class SingleTokenRow extends Component<Props, State> {
   render(): Node {
     const { intl } = this.context;
     const { token, isValidAmount } = this.props;
-    const isValid = isValidAmount(token.info);
+    const isNotValid = !isValidAmount(token.info);
 
     const numberOfDecimals = this.getNumDecimals();
     let amount = this.props.getTokenAmount(token.info);
@@ -87,25 +87,49 @@ export default class SingleTokenRow extends Component<Props, State> {
 
     const displayAmount = token.amount ? splitAmount(new BigNumber(token.amount), numberOfDecimals).join('') : '0';
 
+    const includedBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_min';
+    const activeInputErrorBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_max';
+    const tokenRowBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'transparent';
+    const activeInputBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor: tokenRowBorderColor;
+
+    const hoverNotActiveInputBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'ds.gray_200';
+    const hoverBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor : hoverNotActiveInputBorderColor;
+
     return (
       <div className={styles.component}>
         <Box
           type="button"
           className={classnames(styles.token, {
             [styles.amountWrapper]: true,
-            [styles.amountError]: !isValid && this.props.isTokenIncluded(token.info),
-            [styles.inputFocused]: this.state.isInputFocused && this.props.isTokenIncluded(token.info),
           })}
           onClick={!this.props.isTokenIncluded(token.info) ? () => this.props.onAddToken(token.info) : null}
-          border={this.props.isTokenIncluded(token.info) ? '2px solid' : 'none'}
-          borderColor={this.props.isTokenIncluded(token.info) ? 'grayscale.400' : 'transparent'}
+          sx={{
+            border: '2px solid',
+            borderColor: activeInputBorderColor,
+            '&:hover': { border: '2px solid', borderColor: hoverBorderColor },
+          }}
         >
           <div className={styles.amountTokenName}>
-            <div className={styles.logo}>
-              <NoAssetLogo />
-            </div>
+            <Box
+              width={30}
+              height={30}
+              marginRight="16px"
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                '> img': {
+                  objectFit: 'cover',
+                  display: 'inline-block',
+                  borderRadius: '4px',
+                },
+              }}
+            >
+              <TokenImage image={token.info.Metadata.logo ?? null} name={token.label} width="30px" height="30px" />
+            </Box>
             <Typography component="div" variant="body1" color="primary.600" className={styles.label}>
-              {token.label.startsWith('asset') ? truncateAddressShort(token.label, 14) : token.label}
+              {truncateAddressShort(token.label, token.label.startsWith('asset') ? 14 : 12)}
             </Typography>
           </div>
           <Typography component="div" variant="body1" color="grayscale.900">
@@ -126,16 +150,21 @@ export default class SingleTokenRow extends Component<Props, State> {
                   }}
                   onBlur={() => {
                     this.setState({ isInputFocused: false });
+                    if (!amount) {
+                      this.props.onRemoveToken(token.info);
+                    }
                   }}
                   autoFocus
                 />
               </Box>
-              <button type="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
+              <Box component="button" onClick={() => this.props.onRemoveToken(token.info)} className={styles.close}>
                 <IconWrapper>
                   <CloseIcon />
                 </IconWrapper>
-              </button>
-              <div className={styles.error}>{!isValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}</div>
+              </Box>
+              <Typography variant="caption1" position="absolute" bottom="-20px" right="16px" color="ds.text_error">
+                {isNotValid && intl.formatMessage(messages.notEnoughMoneyToSendError)}
+              </Typography>
             </>
           ) : (
             <Typography variant="body1" color="grayscale.900" className={styles.amount} sx={{ paddingRight: '10px' }}>

@@ -4,11 +4,11 @@ import { Component } from 'react';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { ReactComponent as NoAssetLogo } from '../../../../assets/images/assets-page/asset-no.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import NFTImage from './NFTImage';
+import TokenImage from './TokenImage';
 import { Box, Typography, styled } from '@mui/material';
 import { splitAmount } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
@@ -19,7 +19,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
       fill: theme.palette.ds.el_gray_medium,
     },
     '& rect': {
-      fill: theme.palette.ds.bg_color_max,
+      fill: theme.palette.ds.bg_color_contrast_min,
     },
   },
 }));
@@ -62,6 +62,7 @@ export default class IncludedTokens extends Component<Props> {
               width: '100%',
             }}
           >
+            {/* NFTs */}
             {item.name && (
               <>
                 <Box
@@ -76,6 +77,7 @@ export default class IncludedTokens extends Component<Props> {
                     '> img': {
                       objectFit: 'cover',
                       display: 'inline-block',
+                      borderRadius: '4px',
                     },
                   }}
                 >
@@ -96,8 +98,8 @@ export default class IncludedTokens extends Component<Props> {
                 </Box>
               </>
             )}
-
-            {item.label && (
+            {/* Tokens */}
+            {item.label != null && (
               <>
                 <Box
                   sx={{
@@ -109,7 +111,23 @@ export default class IncludedTokens extends Component<Props> {
                     width: '75%',
                   }}
                 >
-                  <NoAssetLogo />
+                  <Box
+                    width={30}
+                    height={30}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      '> img': {
+                        objectFit: 'cover',
+                        display: 'inline-block',
+                        borderRadius: '4px',
+                      },
+                    }}
+                  >
+                    <TokenImage image={item.info.Metadata.logo ?? null} name={item.label} width="30px" height="30px" />
+                  </Box>
                   <Typography
                     component="div"
                     variant="body1"

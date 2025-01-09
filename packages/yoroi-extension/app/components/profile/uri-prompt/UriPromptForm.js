@@ -51,6 +51,7 @@ export default class UriPromptForm extends Component<Props> {
               variant="secondary"
               onClick={this.props.onSkip}
               sx={{ width: '240px' }}
+              id='uriPrompt-skip-button'
             >
               {intl.formatMessage(globalMessages.skipLabel)}
             </Button>
@@ -60,6 +61,7 @@ export default class UriPromptForm extends Component<Props> {
               variant="primary"
               onClick={this.props.onAccept}
               sx={{ width: '240px' }}
+              id='uriPrompt-allow-button'
             >
               {intl.formatMessage(globalMessages.allowLabel)}
             </Button>

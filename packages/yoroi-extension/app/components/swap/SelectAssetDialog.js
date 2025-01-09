@@ -144,10 +144,18 @@ export default function SelectAssetDialog({
       {(filteredAssets.length === 0 || assetsStillLoading) && (
         <Box py="8px">
           <Box display="flex" flexDirection="column" gap="16px" alignItems="center" justifyContent="center">
-            <Box mt="60px">{assetsStillLoading ? <LoadingSpinner /> : <NoAssetsFound />}</Box>
-            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
-              {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}
-            </Typography>
+            <Box mt="60px">
+              {assetsStillLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <NoAssetsFound />
+                  <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
+                    {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}}
+                  </Typography>
+                </>
+              )}
+            </Box>
           </Box>
         </Box>
       )}

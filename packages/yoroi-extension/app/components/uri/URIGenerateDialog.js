@@ -132,7 +132,7 @@ export default class URIGenerateDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(messages.uriGenerateDialogTitle)}
-        actions={actions}
+        dialogActions={actions}
         className={dialogClasses}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
@@ -141,7 +141,7 @@ export default class URIGenerateDialog extends Component<Props> {
       >
         <div>
           <div className={styles.receiverInput}>
-            <TextField className="receiver" {...receiverField.bind()} disabled />
+            <TextField {...receiverField.bind()} disabled />
           </div>
           <div className={styles.amountField}>
             <NumericInputRP

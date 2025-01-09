@@ -9,9 +9,10 @@ type Props = {|
   txSubmitErrorState: State<?Error>,
   onTryAgain: void => void,
   onSuccess: void => void,
+  onDownloadLogs: void => void,
 |};
 
-export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess }: Props): React$Node {
+export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess, onDownloadLogs }: Props): React$Node {
   const strings = useStrings();
   const isSuccessful = txSubmitErrorState.value == null;
   return (

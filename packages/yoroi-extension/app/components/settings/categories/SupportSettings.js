@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -36,11 +36,20 @@ const messages = defineMessages({
     id: 'settings.support.logs.title',
     defaultMessage: '!!!Logs',
   },
+  paperWallet: {
+    id: 'settings.support.paperWallet.title',
+    defaultMessage: '!!!Paper Wallet',
+  },
+  paperWalletTransfer: {
+    id: 'settings.support.paperWallet.button',
+    defaultMessage: '!!!Transfer from Paper Wallet',
+  },
 });
 
 type Props = {|
   +onExternalLinkClick: MouseEvent => void,
   +onDownloadLogs: void => void,
+  +onPaperWalletTransfer: void => void,
 |};
 
 @observer
@@ -54,23 +63,23 @@ export default class SupportSettings extends Component<Props> {
     const { intl } = this.context;
 
     const faqLink = (
-      <a
+      <Link
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-faq-link"
       >
         {intl.formatMessage(messages.faqLink)}
-      </a>
+      </Link>
     );
 
     const supportRequestLink = (
-      <a
+      <Link
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-requestSupport-link"
       >
         {intl.formatMessage(messages.supportRequestLink)}
-      </a>
+      </Link>
     );
 
     const downloadLogsLink = (
@@ -121,12 +130,6 @@ export default class SupportSettings extends Component<Props> {
                 </Typography>
                 <Typography
                   component="div"
-                  sx={{
-                    '& a': {
-                      color: 'ds.primary_500',
-                      textDecoration: 'none',
-                    },
-                  }}
                   color="ds.text_gray_medium"
                   variant="body1"
                 >
@@ -145,6 +148,21 @@ export default class SupportSettings extends Component<Props> {
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>
+
+        <Box mt="40px">
+          <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
+            {intl.formatMessage(messages.paperWallet)}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={this.props.onPaperWalletTransfer}
+            sx={{
+              fontSize: '0.8rem',
+            }}
+          >
+            {intl.formatMessage(messages.paperWalletTransfer)}
+          </Button>
+        </Box>
       </Box>
     );
   }

@@ -7,8 +7,8 @@ import LocalizableError from '../../i18n/LocalizableError';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
-import styles from './ErrorPage.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +error?: ?LocalizableError,
@@ -41,19 +41,45 @@ export default class ErrorPage extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.errorLabel)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
+        styleFlags={{
+          contentNoTopPadding: true,
+        }}
       >
-        <div className={styles.component}>
-          <div>
-            <div className={styles.body}>
-              <div className={styles.title}>{title}</div>
-              {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
-            </div>
-          </div>
-        </div>
+        <Box
+          sx={{
+            display: 'flex',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            maxWidth: '600px',
+            '& .ModalContent': {
+              paddingTop: 0,
+            },
+          }}
+        >
+          <Box
+            component="div"
+            sx={{
+              color: 'ds.text_gray_medium',
+              display: 'flex',
+              flexDirection: 'column',
+              textAlign: 'center',
+            }}
+          >
+            <Typography variant="body1" sx={{ fontWeight: 500 }} color="ds.text_gray_medium">
+              {title}
+            </Typography>
+            {error && (
+              <Typography variant="body2" color="ds.text_error" paddingTop="16px">
+                {intl.formatMessage(error, error.values)}
+              </Typography>
+            )}
+          </Box>
+        </Box>
       </Dialog>
     );
   }

@@ -8,11 +8,8 @@ import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
-import LegacyExplanation from '../../../components/wallet/restore/LegacyExplanation';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
-import type { RestoreModeType, } from '../../../actions/common/wallet-restore-actions';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
@@ -27,6 +24,8 @@ import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyEx
 import NavPlate from '../../../components/topbar/NavPlate';
 import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
+import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
+import type { StoresProps } from '../../../stores';
 
 const messages = defineMessages({
   walletUpgradeNoop: {
@@ -35,8 +34,7 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
   +mode: RestoreModeType,
   +introMessage?: string,
@@ -44,7 +42,7 @@ type Props = {|
 |};
 
 @observer
-export default class WalletRestoreDialogContainer extends Component<Props> {
+export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -64,11 +62,13 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   componentDidMount() {
-    this.props.actions.walletRestore.reset.trigger();
+    this.props.stores.walletRestore.reset();
+    this.props.stores.substores.ada.walletRestore.reset();
   }
 
   componentWillUnmount() {
-    this.props.actions.walletRestore.reset.trigger();
+    this.props.stores.walletRestore.reset();
+    this.props.stores.substores.ada.walletRestore.reset();
   }
 
   onCancel: void => void = () => {
@@ -79,24 +79,21 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   openToTransactions: (number) => void = publicDeriverId => {
-    this.props.actions.wallets.setActiveWallet.trigger({
+    this.props.stores.wallets.setActiveWallet({
       publicDeriverId,
     });
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.WALLETS.TRANSACTIONS,
     });
   };
 
   render(): null | Node {
-    const walletRestoreActions = this.props.actions.walletRestore;
-    const actions = this.props.actions;
-    const { uiNotifications } = this.props.stores;
-    const { walletRestore } = this.props.stores;
-    const { wallets } = this.props.stores;
+    const { stores } = this.props;
+    const { uiNotifications, walletRestore, wallets } = stores;
     const { restoreRequest } = wallets;
 
     const mode = this.props.mode;
@@ -117,7 +114,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             mnemonicValidator={mnemonic => walletRestore.isValidMnemonic({ mnemonic, mode })}
             validWords={validWords}
             numberOfMnemonics={wordsCount}
-            onSubmit={meta => actions.walletRestore.submitFields.trigger(meta)}
+            onSubmit={meta => stores.walletRestore.submitWalletRestoringFields(meta)}
             onCancel={this.onCancel}
             onBack={this.props.onBack}
             error={restoreRequest.error}
@@ -132,7 +129,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
         }
         const balance = duplicatedWallet.balance;
-        const rewards = this.props.stores.delegation.getRewardBalanceOrZero(
+        const rewards = stores.delegation.getRewardBalanceOrZero(
           duplicatedWallet
         );
 
@@ -150,15 +147,15 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
                 walletAmount={balance}
                 rewards={rewards}
                 onUpdateHideBalance={this.updateHideBalance}
-                shouldHideBalance={this.props.stores.profile.shouldHideBalance}
-                getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
+                shouldHideBalance={stores.profile.shouldHideBalance}
+                getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
                 isRefreshing={false}
               />
             }
             openWallet={() => {
               this.openToTransactions(duplicatedWallet.publicDeriverId);
             }}
-            onCancel={walletRestoreActions.back.trigger}
+            onCancel={walletRestore.back}
           />
         );
       }
@@ -180,21 +177,21 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
           <WalletRestoreVerifyDialog
             plates={walletRestore.recoveryResult?.plates ?? []}
             selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(
+              stores.explorers.selectedExplorer.get(
                 this.getSelectedNetwork().NetworkId
               ) ??
               (() => {
                 throw new Error('No explorer for wallet network');
               })()
             }
-            onNext={actions.walletRestore.verifyMnemonic.trigger}
-            onCancel={walletRestoreActions.back.trigger}
+            onNext={stores.walletRestore.verifyMnemonic}
+            onCancel={walletRestore.back}
             onCopyAddressTooltip={(address, elementId) => {
               if (!uiNotifications.isOpen(elementId)) {
                 runInAction(() => {
                   this.notificationElementId = elementId;
                 });
-                actions.notifications.open.trigger({
+                uiNotifications.open({
                   id: elementId,
                   duration: tooltipNotification.duration,
                   message: tooltipNotification.message,
@@ -204,17 +201,6 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
             isSubmitting={isSubmitting}
             error={error}
-          />
-        );
-      }
-      case RestoreSteps.LEGACY_EXPLANATION: {
-        return (
-          <LegacyExplanation
-            onBack={walletRestoreActions.back.trigger}
-            onClose={this.onCancel}
-            onSkip={walletRestoreActions.startRestore.trigger}
-            onCheck={walletRestoreActions.startCheck.trigger}
-            isSubmitting={restoreRequest.isExecuting}
           />
         );
       }
@@ -229,7 +215,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
   _transferDialogContent(): null | Node {
     const { yoroiTransfer } = this.props.stores;
 
-    const walletRestoreActions = this.props.actions.walletRestore;
+    const walletRestore = this.props.stores.substores.ada.walletRestore;
     const { intl } = this.context;
 
     switch (yoroiTransfer.status) {
@@ -260,7 +246,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             onSubmit={{
               label: intl.formatMessage(globalMessages.nextButtonLabel),
-              trigger: walletRestoreActions.transferFromLegacy.trigger,
+              trigger: walletRestore.transferFromLegacy,
             }}
             isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
             onCancel={{
@@ -296,7 +282,7 @@ export default class WalletRestoreDialogContainer extends Component<Props> {
             text={intl.formatMessage(messages.walletUpgradeNoop)}
             closeInfo={{
               closeLabel: intl.formatMessage(globalMessages.continue),
-              onClose: walletRestoreActions.startRestore.trigger,
+              onClose: walletRestore.startWalletRestore,
             }}
           />
         );

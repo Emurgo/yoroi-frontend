@@ -37,7 +37,7 @@ export default class UriSettingsBlock extends Component<Props> {
           borderColor: false,
         }}
       >
-        <Typography component="div" variant="body1" fontWeight={500} mb="12px">
+        <Typography component="div" variant="body1" fontWeight={500} mb="12px" color="ds.text_gray_medium">
           {intl.formatMessage(globalMessages.uriSchemeLabel)}
         </Typography>
 

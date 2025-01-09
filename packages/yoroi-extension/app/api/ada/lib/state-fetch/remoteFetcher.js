@@ -109,7 +109,7 @@ export const sendTx: ({|
       res: error.response?.data || null,
     }
     Logger.error(`${nameof(RemoteFetcher)}::${nameof(sendTx)} error: ${stringifyError(err)}`);
-    if (error.request.response.includes('Invalid witness')) {
+    if (JSON.stringify(error.response?.data ?? '').includes('InvalidWitnessesUTXOW')) {
       throw new InvalidWitnessError();
     }
     throw new SendTransactionApiError();
@@ -551,34 +551,32 @@ export class RemoteFetcher implements IFetcher {
 
   getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = async (body) => {
     const { BackendService } = body.network.Backend;
-    if (body.utxos.length !== 1) {
-      throw new Error('the RemoteFetcher.getUtxoData expects 1 UTXO');
-    }
-    const { txHash, txIndex } = body.utxos[0];
     if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
-    return axios(
-      `${BackendService}/api/txs/io/${txHash}/o/${txIndex}`,
-      {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        headers: {
-          'yoroi-version': this.getLastLaunchVersion(),
-          'yoroi-locale': this.getCurrentLocale()
+    return Promise.all(body.utxos.map(({ txHash, txIndex }) => {
+      return axios(
+        `${BackendService}/api/txs/io/${txHash}/o/${txIndex}`,
+        {
+          method: 'get',
+          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          headers: {
+            'yoroi-version': this.getLastLaunchVersion(),
+            'yoroi-locale': this.getCurrentLocale()
+          }
         }
-      }
-    ).then(response => [ response.data ])
-      .catch((error) => {
-        if (error.response.status === 404 && error.response.data === 'Transaction not found') {
-          return [ null ];
-        }
-        Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUtxoData)} error: ` + stringifyError(error));
-        throw new GetUtxoDataError();
-      });
+      ).then(response => response.data)
+        .catch((error) => {
+          if (error.response.status === 404 && error.response.data === 'No outputs found') {
+            return null;
+          }
+          Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUtxoData)} error: ` + stringifyError(error));
+          throw new GetUtxoDataError();
+        });
+    }));
   }
 
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => {
     const { BackendService } = body.network.Backend;
-    if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
+    if (BackendService == null) throw new Error(`${nameof(this.getLatestBlockBySlot)} missing backend url`);
     return axios(
       `${BackendService}/api/v2.1/lastBlockBySlot`,
       {

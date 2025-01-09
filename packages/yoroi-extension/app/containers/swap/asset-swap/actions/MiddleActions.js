@@ -5,17 +5,25 @@ import { useSwapForm } from '../../context/swap-form';
 import { useStrings } from '../../common/useStrings';
 
 export const MiddleActions = (): React$Node => {
-  const { clearSwapForm, switchTokens, onChangeLimitPrice } = useSwapForm();
+  const { clearSwapForm, switchTokens, onChangeLimitPrice, buyTokenInfo = {} } = useSwapForm();
   const { clear } = useStrings();
+
+  const handleSwitchTokens = () => {
+    // we have ticker on the buy side, so we can safely switch
+    if (buyTokenInfo?.ticker) {
+      onChangeLimitPrice('');
+      return switchTokens();
+    }
+  };
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between">
       <Box
-        sx={{ cursor: 'pointer', color: 'primary.500' }}
-        onClick={() => {
-          onChangeLimitPrice('');
-          return switchTokens();
+        sx={{
+          cursor: buyTokenInfo?.ticker ? 'pointer' : 'not-allowed',
+          color: buyTokenInfo?.ticker ? 'primary.500' : 'grayscale.400',
         }}
+        onClick={handleSwitchTokens}
       >
         <SwitchIcon />
       </Box>

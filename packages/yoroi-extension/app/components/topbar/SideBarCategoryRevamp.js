@@ -18,7 +18,7 @@ type Props = {|
 
 const ItemWrapper = styled(Box)(({ theme, active }) => ({
   cursor: 'pointer',
-  background: active && theme.palette.ds.special_web_bg_sidebar,
+  background: active !== 'false' && theme.palette.ds.special_web_bg_sidebar,
   paddingTop: '8px',
   paddingBottom: '8px',
   width: '100%',
@@ -48,7 +48,7 @@ export default class SideBarCategoryRevamp extends Component<Props> {
         id={label.id}
         onClick={onClick}
         disabled={active}
-        active={active}
+        active={active.toString()}
       >
         <span className={styles.icon}>
           <SvgElem />

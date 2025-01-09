@@ -10,10 +10,8 @@ import environment from '../../environment';
 
 export default class AdaStateFetchStore<
   TStores: RequiredStores,
-  TActions
 > extends BaseStateFetchStore<
   TStores,
-  TActions,
   IFetcher
 > {
 
@@ -25,10 +23,10 @@ export default class AdaStateFetchStore<
       () => environment.getVersion(),
       () => this.stores.profile.currentLocale,
       () => {
-        if (environment.userAgentInfo.isFirefox()) {
+        if (environment.isFirefox()) {
           return 'firefox';
         }
-        if (environment.userAgentInfo.isChrome()) {
+        if (environment.isChrome()) {
           return 'chrome';
         }
         return '-';

@@ -24,7 +24,6 @@ import { autorun, observable, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
-import type { ActionsMap } from './actions';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
@@ -54,7 +53,6 @@ addLocaleData([
 
 type Props = {|
   +stores: StoresMap,
-  +actions: ActionsMap,
   +history: RouterHistory,
 |};
 type State = {|
@@ -122,11 +120,11 @@ class App extends Component<Props, State> {
   }
 
   getContent: void => ?Node = () => {
-    const { stores, actions, history } = this.props;
+    const { stores, history } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
-    return <Router history={history}>{Routes(stores, actions)}</Router>;
+    return <Router history={history}>{Routes(stores)}</Router>;
   };
 }
 

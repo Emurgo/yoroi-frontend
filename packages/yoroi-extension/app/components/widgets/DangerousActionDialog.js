@@ -68,7 +68,7 @@ export default class DangerousActionDialog extends Component<Props> {
     return (
       <Dialog
         title={this.props.title}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={this.props.onCancel}
         className={dialogClasses}
@@ -94,7 +94,7 @@ export default class DangerousActionDialog extends Component<Props> {
                   />
                 }
                 id={id + '-acknowledgeAction-checkbox'}
-                sx={{ marginLeft: '-0px' }}
+                sx={{ marginLeft: '-0px', color: 'ds.text_gray_medium' }}
               />
             </Box>
             {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}

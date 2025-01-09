@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { CardanoConnectorSignRequest } from '../../../connector/types';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
@@ -30,6 +29,8 @@ import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders'
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
+import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
+import type { StoresProps } from '../../../stores';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -49,7 +50,45 @@ function resolveValueOrGetter(v: ColumnValueOrGetter, ctx: ColumnContext): strin
   return typeof v === 'function' ? v(ctx) : v;
 }
 
-export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
+const orderColumns: Array<Column> = [
+  {
+    name: 'Pair (From / To)',
+    align: 'left',
+    width: '176px',
+  },
+  {
+    name: 'Asset price',
+    width: '150px',
+  },
+  {
+    name: 'Asset amount',
+    width: '166px',
+  },
+  {
+    name: 'Total',
+    width: '150px',
+    openOrdersOnly: true,
+  },
+  {
+    name: 'DEX',
+    align: 'left',
+    leftPadding: '32px',
+    width: '216px',
+    openOrdersOnly: true,
+  },
+  {
+    name: ({ completedOrders }) => (completedOrders ? 'Time executed' : 'Time created'),
+    align: 'left',
+    width: '240px',
+  },
+  {
+    name: 'Transaction ID',
+    align: 'left',
+    width: 'auto',
+  },
+];
+
+export default function SwapOrdersPage(props: StoresProps): Node {
   const { order: orderApi } = useSwap();
   const strings = useStrings();
 
@@ -182,7 +221,16 @@ export default function SwapOrdersPage(props: StoresAndActionsProps): Node {
           collateral: utxoHex,
         },
       });
-      const totalCancelOutput = getTransactionTotalOutputFromCbor(cancelTxCbor, wallet.balance.getDefaults());
+      if (cancelTxCbor == null || !isHex(cancelTxCbor)) {
+        console.error('Failed to receive swap cancel tx from API. Expected cbor hex, got: ', cancelTxCbor);
+        // eslint-disable-next-line no-alert
+        alert('Unfortunately 3rd party API failed to produce cancellation transaction. Please retry later or report the issue and provide logs.');
+        return;
+      }
+      const totalCancelOutput = getTransactionTotalOutputFromCbor(
+        cancelTxCbor,
+        wallet.balance.getDefaults()
+      );
       const formattedCancelValues = createFormattedTokenValues({
         entries: totalCancelOutput.entries().map(e => ({
           id: e.identifier,

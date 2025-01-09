@@ -273,5 +273,6 @@ test('Create Trezor transaction', async () => {
       type: CardanoCertificateType.STAKE_REGISTRATION,
     }],
     signingMode: 0,
+    tagCborSets: true,
   });
 });

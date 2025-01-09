@@ -3,13 +3,12 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import styles from './ComplexityLevelForm.scss';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
 
 const messages = defineMessages({
@@ -49,6 +48,35 @@ const messages = defineMessages({
     defaultMessage: '!!!Choose',
   },
 });
+
+const GradientBox = styled(Box)(({ theme, isSelected }) => ({
+  maxWidth: '294px',
+  maxHeight: '362px',
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  textAlign: 'center',
+  alignSelf: 'stretch',
+  padding: '16px',
+  cursor: isSelected ? 'not-allowed' : 'pointer',
+  backgroundImage: isSelected ? theme.palette.ds.bg_gradient_2 : 'unset',
+  outline: `solid 1px ${isSelected ? 'transparent' : theme.palette.ds.gray_200}`,
+  borderRadius: '8px',
+  '&:hover': {
+    backgroundImage: theme.palette.ds.bg_gradient_1,
+    outlineColor: 'transparent',
+    '&::before': {
+      opacity: 1,
+    },
+  },
+  '&::before': {
+    opacity: 0,
+    transition: 'opacity 300ms linear',
+  }
+}));
+
 type Props = {|
   +complexityLevel: ?ComplexityLevelType,
   +onSubmit: ComplexityLevelType => PossiblyAsync<void>,
@@ -67,7 +95,7 @@ export default class ComplexityLevel extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { complexityLevel, baseTheme } = this.props;
+    const { complexityLevel } = this.props;
 
     const levels = [
       {
@@ -85,8 +113,15 @@ export default class ComplexityLevel extends Component<Props> {
     ];
 
     return (
-      <Box className={styles.component}>
-        <Typography component="div" textAlign="center" color="grayscale.900" mb="16px" variant="h3" fontWeight={500}>
+      <Box maxWidth="930px" margin="0 auto" mt="24px">
+        <Typography
+          component="div"
+          textAlign="center"
+          color="ds.text_gray_medium"
+          mb="16px"
+          variant="h3"
+          fontWeight={500}
+        >
           {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
         </Typography>
 
@@ -94,7 +129,7 @@ export default class ComplexityLevel extends Component<Props> {
           component="div"
           textAlign="center"
           variant="body1"
-          color="grayscale.800"
+          color="ds.text_gray_low"
         >
           {intl.formatMessage(messages.subtitle)}
         </Typography>
@@ -105,10 +140,11 @@ export default class ComplexityLevel extends Component<Props> {
             variant="body1"
             my="1rem"
             mx="auto"
+            color="ds.text_gray_medium"
             sx={{
               textAlign: 'center',
               '& strong': {
-                color: 'primary.500',
+                color: 'ds.text_primary_medium',
                 fontWeight: 500,
                 textTransform: 'uppercase',
               },
@@ -125,83 +161,33 @@ export default class ComplexityLevel extends Component<Props> {
           </Typography>
         )}
 
-        {(
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '24px',
-              mt: '32px',
-              maxWidth: '700px',
-            }}
-          >
-            {levels.map(level => {
+        <Box display="flex" alignItems="center" justifyContent="center" mt="32px">
+          <Box display="flex" flexDirection="row" justifyContent="center" gap="24px">
+          {levels.map(level => {
               const isSelected = level.key === complexityLevel;
-
               return (
-                <Box
+                <GradientBox
                   key={level.key}
-                  sx={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                    textAlign: 'center',
-                    p: '1px',
-                    border: 'solid 1px transparent',
-                    background: theme =>
-                      isSelected
-                        ? baseTheme === 'light-theme'
-                          ? theme.palette.gradients.green
-                          : theme.palette.gradients_2
-                        : baseTheme === 'light-theme'
-                          ? 'linear-gradient( 0deg, var(--yoroi-palette-common-white), var(--yoroi-palette-common-white)), linear-gradient(180deg, #e4e8f7 0%, #c6f7f7 100%)'
-                          : theme.palette.ds.bg_gradient_3,
-                    backgroundClip: 'content-box, border-box',
-                    backgroundOrigin: 'border-box',
-                    borderRadius: '8px',
-                    alignSelf: 'stretch',
-                    cursor: isSelected ? 'not-allowed' : 'pointer',
-                    position: 'relative',
-                    zIndex: 1,
-                    '&::before': {
-                      position: 'absolute',
-                      content: '""',
-                      top: '0px',
-                      right: '0px',
-                      left: '0px',
-                      bottom: '0px',
-                      background: theme => theme.palette.gradients['blue-green-bg'],
-                      borderRadius: '8px',
-                      zIndex: -1,
-                      opacity: 0,
-                      transition: 'opacity 300ms linear',
-                    },
-                    '&:hover::before': {
-                      opacity: 1,
-                    },
-                  }}
+                  isSelected={isSelected}
                   onClick={() => this.props.onSubmit(level.key)}
                 >
-                  <Box sx={{ p: '15px' }}>
-                    <Box sx={{ mb: '16px' }}>{level.image}</Box>
-                    <Box mb="10px">
-                      <Typography component="div" mb="4px" variant="h3" fontWeight={500}>
+                  <Box display="flex" flexDirection="column" alignItems="center">
+                    <Box sx={{ mb: '16px' }} width="180px" height="116px">{level.image}</Box>
+                    <Box>
+                      <Typography component="div" mb="4px" variant="h3" fontWeight={500} color="ds.text_gray_medium">
                         {level.name}
                       </Typography>
-                      <Typography component="div" variant="body2">
+                      <Typography component="div" variant="body2" color="ds.text_gray_medium">
                         {level.description}
                       </Typography>
                     </Box>
                   </Box>
-                </Box>
+                </GradientBox>
               );
-            })}
+              })
+          }
           </Box>
-        )}
+        </Box>
       </Box>
     );
   }

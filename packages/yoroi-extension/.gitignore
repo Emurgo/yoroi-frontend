@@ -48,3 +48,4 @@ Yoroi Shelley Testnet
 scripts/sslOverrides.js
 
 *.d.ts
+app/UI/**/*.d.ts

@@ -24,20 +24,6 @@
   .notFound {
     padding-top: 2rem;
     text-align: center;
-    color: var(--yoroi-palette-gray-600);
-    svg {
-      max-width: 140px;
-      max-height: 140px;
-    }
-    h1 {
-      margin-bottom: 20px;
-      font-size: 1.2rem;
-      font-weight: 500;
-    }
-    p {
-      margin: 1rem 0;
-      font-size: 0.9rem;
-    }
   }
 
   .generatedAddresses {

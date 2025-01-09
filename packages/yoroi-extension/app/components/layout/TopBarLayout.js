@@ -15,6 +15,7 @@ type Props = {|
   +showInContainer?: boolean,
   +withPadding?: boolean, // default: true
   +bgcolor?: string,
+  +isErrorPage?: boolean,
 |};
 
 /** Adds a top bar above the wrapped node */
@@ -29,6 +30,7 @@ function TopBarLayout({
   showInContainer,
   withPadding,
   bgcolor,
+  isErrorPage,
 }: Props) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
@@ -58,14 +60,14 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
-            overflow: 'auto',
+            overflow: 'scroll',
           }}
         >
           {(
             <Box
               sx={{
                 bgcolor: bgcolor || 'ds.bg_color_max',
-                height: '100%',
+                height: !isErrorPage ? '100%' : 'auto',
                 width: '100%',
                 maxWidth: '1872px',
                 mx: 'auto',

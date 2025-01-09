@@ -4,9 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 
-import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
+import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Link } from '@mui/material';
 
 const messages = defineMessages({
   helpLinkYoroiWithTrezor: {
@@ -25,9 +26,8 @@ type Props = {|
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
@@ -36,13 +36,11 @@ export default class HelpLinkBlock extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <a
-          href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)}
-          onClick={event => onExternalLinkClick(event)}
-        >
+        <Link href={intl.formatMessage(messages.helpLinkYoroiWithTrezor)} onClick={event => onExternalLinkClick(event)}>
           {intl.formatMessage(messages.helpLinkYoroiWithTrezorText)}
           <ExternalLinkSVG />
-        </a>
-      </div>);
+        </Link>
+      </div>
+    );
   }
 }

@@ -33,7 +33,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -57,6 +57,7 @@ type Props = {|
   +isHardware: boolean,
   +addressInfo: $ReadOnly<StandardAddress>,
   +complexityLevel: ?ComplexityLevelType,
+  +isAddressBook: boolean,
 |};
 
 @observer
@@ -65,29 +66,26 @@ export default class VerifyAddressDialog extends Component<Props> {
     intl: intlShape.isRequired,
   };
 
-  getLabelStyle: void => string = () => {
-    return styles.label;
-  };
-
   render(): Node {
     const { intl } = this.context;
 
-    const dialogActions = !this.props.isHardware
-      ? []
-      : [
-          {
-            label: intl.formatMessage(messages.verifyAddressButtonLabel),
-            primary: true,
-            isSubmitting: this.props.isActionProcessing,
-            onClick: this.props.verify,
-          },
-        ];
+    const dialogActions =
+      !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
+        ? []
+        : [
+            {
+              label: intl.formatMessage(messages.verifyAddressButtonLabel),
+              primary: true,
+              isSubmitting: this.props.isActionProcessing,
+              onClick: this.props.verify,
+            },
+          ];
 
     return (
       <Dialog
         className={classnames([styles.component, 'VerifyAddressDialog'])}
         title={intl.formatMessage(messages.addressDetailsTitleLabel)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.cancel}
@@ -109,7 +107,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     const notificationId = 'verify-address-notification';
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.addressLabel)}
         </Typography>
         <div className="verificationAddress">
@@ -141,11 +139,19 @@ export default class VerifyAddressDialog extends Component<Props> {
   renderQrCode: void => Node = () => {
     return (
       <>
-        <div align="center">
-          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
-        </div>
-        <br />
-        <br />
+        <Box display="flex" justifyContent="center" marginBottom="16px">
+          <Box
+            padding="16px"
+            width="184px"
+            height="184px"
+            borderRadius="8px"
+            sx={{
+              backgroundColor: 'ds.white_static',
+            }}
+          >
+            <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
+          </Box>
+        </Box>
       </>
     );
   };
@@ -170,7 +176,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     if (stakingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
         </Typography>
         <div className="stakingKey" id="verifyAddressDialog-stakingKeyHash-text">
@@ -206,7 +212,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     if (spendingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.spendingKeyHashLabel)}
         </Typography>
         <div className="spendingKey">
@@ -242,7 +248,7 @@ export default class VerifyAddressDialog extends Component<Props> {
 
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.keyRegistrationPointer)}sdsds
         </Typography>
         <Typography className="keyPointer" variant="body1" color="ds.text_gray_low">
@@ -261,7 +267,7 @@ export default class VerifyAddressDialog extends Component<Props> {
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </Typography>
         <div className={derivationClasses}>
@@ -269,7 +275,7 @@ export default class VerifyAddressDialog extends Component<Props> {
             className={styles.hash}
             id="verifyAddressDialog-derivationPath-text"
             variant="body1"
-            color="ds.text_gray_low"
+            color="ds.text_gray_medium"
           >
             {toDerivationPathString(addressing.path)}
           </Typography>

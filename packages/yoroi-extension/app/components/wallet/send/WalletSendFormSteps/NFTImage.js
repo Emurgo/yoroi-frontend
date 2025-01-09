@@ -1,5 +1,5 @@
 // @flow
-import { Skeleton } from '@mui/material';
+import { Box, Skeleton, styled } from '@mui/material';
 import { Component } from 'react';
 import { ReactComponent as DefaultNFT } from '../../../../assets/images/nft-no.inline.svg';
 import { checkNFTImage } from '../../../../utils/wallet';
@@ -17,6 +17,15 @@ type State = {|
   loading: boolean,
   error: boolean,
 |};
+
+const IconWrapper = styled(Box)(({ theme, width, height }) => ({
+  '& svg': {
+    fill: theme.palette.ds.el_gray_low,
+    width,
+    height,
+  },
+}));
+
 export default class NFTImage extends Component<Props, State> {
   state: State = {
     loading: true,
@@ -41,7 +50,12 @@ export default class NFTImage extends Component<Props, State> {
   render(): Node {
     const { image, name, width, height } = this.props;
     const { loading, error } = this.state;
-    if (image === null || error) return <DefaultNFT />;
+    if (image === null || error)
+      return (
+        <IconWrapper height={height} width={width}>
+          <DefaultNFT />
+        </IconWrapper>
+      );
     const imageUrl = urlResolveForIpfsAndCorsproxy(image);
 
     return loading ? (
@@ -56,7 +70,7 @@ export default class NFTImage extends Component<Props, State> {
         }}
       />
     ) : (
-      <img width={width} src={imageUrl} alt={name} loading="lazy" />
+      <img width={width} height={height} src={imageUrl} alt={name} loading="lazy" />
     );
   }
 }

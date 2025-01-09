@@ -17,7 +17,7 @@ import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
 import connectLoadImage from '../../../../assets/images/hardware-wallet/trezor/connect-load-modern.inline.gif';
-import { ReactComponent as ConnectErrorImage }  from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
+import { ReactComponent as ConnectErrorImage } from '../../../../assets/images/hardware-wallet/trezor/connect-error-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import { StepState } from '../../../widgets/ProgressSteps';
@@ -27,6 +27,7 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Typography } from '@mui/material';
 
 const messages = defineMessages({
   connectIntroTextLine1: {
@@ -51,29 +52,21 @@ type Props = {|
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      progressInfo,
-      isActionProcessing,
-      error,
-      onExternalLinkClick,
-      goBack,
-      submit,
-      cancel,
-    } = this.props;
+    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel } = this.props;
 
     const introBlock = (
       <div className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
-        <span>
+        <Typography component="span" color="ds.text_gray_low">
           {intl.formatMessage(messages.connectIntroTextLine1) + ' '}
           {intl.formatMessage(messages.connectIntroTextLine2) + ' '}
           {intl.formatMessage(globalMessages.hwConnectDialogConnectIntroTextLine3)}
-        </span>
+        </Typography>
       </div>
     );
 
@@ -82,43 +75,48 @@ export default class ConnectDialog extends Component<Props> {
 
     switch (progressInfo.stepState) {
       case StepState.LOAD:
-        backButton = (<DialogBackButton onBack={goBack} />);
+        backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={connectLoadImage} alt="" />
-          </div>);
+          </div>
+        );
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={connectLoadImage} alt="" />
-          </div>);
+          </div>
+        );
         break;
       case StepState.ERROR:
-        backButton = (<DialogBackButton onBack={goBack} />);
+        backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
             <ConnectErrorImage/>
-          </div>);
+          </div>
+        );
         break;
       default:
         Logger.error('trezorConnect::ConnectDialog::render: something unexpected happened');
         break;
     }
 
-    const dailogActions = [{
-      label: intl.formatMessage(globalMessages.connectLabel),
-      primary: true,
-      isSubmitting: isActionProcessing,
-      onClick: submit
-    }];
+    const dailogActions = [
+      {
+        label: intl.formatMessage(globalMessages.connectLabel),
+        primary: true,
+        isSubmitting: isActionProcessing,
+        onClick: submit,
+      },
+    ];
 
     return (
       <Dialog
         className={classnames([styles.component, 'ConnectDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         onClose={cancel}
         backButton={backButton}
@@ -131,6 +129,7 @@ export default class ConnectDialog extends Component<Props> {
           <HWErrorBlock progressInfo={progressInfo} error={error} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 }
