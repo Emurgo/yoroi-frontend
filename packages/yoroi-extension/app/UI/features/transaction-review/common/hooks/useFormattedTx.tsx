@@ -1,50 +1,22 @@
 // import { usePortfolioTokenInfos } from '../../../Portfolio/common/hooks/usePortfolioTokenInfos';
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
-// import { useSelectedWallet } from '../../../WalletManager/common/hooks/useSelectedWallet';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
+import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { useQuery } from 'react-query';
+import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  // const { wallet } = useSelectedWallet();
-
+  const { walletUtxos } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
 
-  // const inputUtxos = useUtxos(inputs, wallet);
-  // const referenceInputUtxos = useUtxos(referenceInputs, wallet);
+  console.log('walletUtxos', walletUtxos);
+  const inputUtxos = useUtxos(inputs, walletUtxos);
 
-  // const inputTokenIds = inputs.flatMap(i => {
-  //   const utxo = inputUtxos.find(utxo => utxo?.tx_hash === i.transaction_id && utxo?.tx_index === i.index);
-  //   return utxo?.assets.map(a => `${a.policyId}.${a.assetId}` as Portfolio.Token.Id) ?? [];
-  // });
+  console.log('=======@@@@@inputUtxos', inputUtxos);
 
-  // const referenceInputTokenIds = referenceInputs.flatMap(i => {
-  //   const utxo = referenceInputUtxos.find(utxo => utxo?.tx_hash === i.transaction_id && utxo?.tx_index === i.index);
-  //   return utxo?.assets.map(a => `${a.policyId}.${a.assetId}` as Portfolio.Token.Id) ?? [];
-  // });
-
-  // const outputTokenIds = outputs.flatMap(o => {
-  //   if (!o.amount.multiasset) return [];
-  //   const policyIds = Object.keys(o.amount.multiasset);
-  //   const tokenIds = policyIds.flatMap(policyId => {
-  //     const assetIds = Object.keys(o.amount.multiasset?.[policyId] ?? {});
-  //     return assetIds.map(assetId => `${policyId}.${assetId}` as Portfolio.Token.Id);
-  //   });
-  //   return tokenIds;
-  // });
-
-  // const mintTokenIds =
-  //   data.mint?.map(([policyId, asset]) => `${policyId}.${Object.keys(asset)[0] ?? ''}` as Portfolio.Token.Id) ?? [];
-
-  // const tokenIds = _.uniq<Portfolio.Token.Id>([...inputTokenIds, ...outputTokenIds, ...mintTokenIds, ...referenceInputTokenIds]);
-  // const portfolioTokenInfos = usePortfolioTokenInfos({ wallet, tokenIds }, { suspense: true });
-
-  // const formattedInputs = useFormattedInputs(wallet, portfolioTokenInfos, inputUtxos);
-  // const formattedReferenceInputs = useFormattedInputs(wallet, portfolioTokenInfos, referenceInputUtxos);
-  // const formattedOutputs = useFormattedOutputs(wallet, outputs, portfolioTokenInfos);
-  // const formattedFee = formatFee(wallet, data);
-  // const formattedCertificates = formatCertificates(data.certs);
-  // const formattedMintData = formatMintData(data.mint, portfolioTokenInfos);
+  const formattedInputs = useFormattedInputs(portfolioTokenInfos, inputUtxos);
 
   // return {
   //   inputs: formattedInputs,
@@ -56,22 +28,18 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   // };
 };
 
-// export const useFormattedInputs = (
-//   wallet: any,
-//   tokenInfosResult: ReturnType<typeof usePortfolioTokenInfos>,
-//   inputUtxos: ReturnType<typeof useUtxos>
-// ) => {
-//   const query = useQuery<FormattedInputs>(
-//     ['useFormattedInputs', inputUtxos],
-//     async () => formatInputs(wallet, tokenInfosResult, inputUtxos),
-//     {
-//       suspense: true,
-//     }
-//   );
+export const useFormattedInputs = (tokenInfosResult, inputUtxos) => {
+  const query = useQuery<any>(
+    ['useFormattedInputs', inputUtxos],
+    async () => formatInputs(wallet, tokenInfosResult, inputUtxos),
+    {
+      suspense: true,
+    }
+  );
 
-//   if (!query.data) throw new Error('invalid formatted inputs');
-//   return query.data;
-// };
+  if (!query.data) throw new Error('invalid formatted inputs');
+  return query.data;
+};
 
 // export const useFormattedOutputs = (
 //   wallet: any,
@@ -90,62 +58,61 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 //   return query.data;
 // };
 
-// const formatInputs = async (
-//   wallet: any,
-//   portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>,
-//   inputUtxos: ReturnType<typeof useUtxos>
-// ): Promise<FormattedInputs> => {
-//   return Promise.all(
-//     inputUtxos.map(async utxo => {
-//       const address = utxo?.receiver;
-//       const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
+const formatInputs = async (
+  portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>,
+  inputUtxos: ReturnType<typeof useUtxos>
+): Promise<FormattedInputs> => {
+  return Promise.all(
+    inputUtxos.map(async utxo => {
+      const address = utxo?.receiver;
+      const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
 
-//       const addressKind = address != null ? await getAddressKind(address) : null;
-//       const rewardAddress =
-//         address != null && addressKind === CredKind.Key ? await deriveAddress(address, wallet.networkManager.chainId) : null;
+      const addressKind = address != null ? await getAddressKind(address) : null;
+      const rewardAddress =
+        address != null && addressKind === CredKind.Key ? await deriveAddress(address, wallet.networkManager.chainId) : null;
 
-//       const primaryAssets =
-//         coin != null
-//           ? [
-//               {
-//                 tokenInfo: wallet.portfolioPrimaryTokenInfo,
-//                 name: wallet.portfolioPrimaryTokenInfo.name,
-//                 label: formatTokenWithText(coin, wallet.portfolioPrimaryTokenInfo),
-//                 quantity: coin,
-//                 isPrimary: true,
-//               },
-//             ]
-//           : [];
+      const primaryAssets =
+        coin != null
+          ? [
+              {
+                tokenInfo: wallet.portfolioPrimaryTokenInfo,
+                name: wallet.portfolioPrimaryTokenInfo.name,
+                label: formatTokenWithText(coin, wallet.portfolioPrimaryTokenInfo),
+                quantity: coin,
+                isPrimary: true,
+              },
+            ]
+          : [];
 
-//       const multiAssets =
-//         utxo?.assets
-//           .map(a => {
-//             const tokenInfo = portfolioTokenInfos.tokenInfos?.get(a.assetId as Portfolio.Token.Id);
-//             if (!tokenInfo) return null;
-//             const quantity = asQuantity(a.amount);
+      const multiAssets =
+        utxo?.assets
+          .map(a => {
+            const tokenInfo = portfolioTokenInfos.tokenInfos?.get(a.assetId as Portfolio.Token.Id);
+            if (!tokenInfo) return null;
+            const quantity = asQuantity(a.amount);
 
-//             return {
-//               tokenInfo,
-//               name: infoExtractName(tokenInfo),
-//               label: formatTokenWithText(quantity, tokenInfo),
-//               quantity: quantity,
-//               isPrimary: false,
-//             };
-//           })
-//           .filter(Boolean) ?? [];
+            return {
+              tokenInfo,
+              name: infoExtractName(tokenInfo),
+              label: formatTokenWithText(quantity, tokenInfo),
+              quantity: quantity,
+              isPrimary: false,
+            };
+          })
+          .filter(Boolean) ?? [];
 
-//       return {
-//         assets: [...primaryAssets, ...multiAssets].filter(isNonNullable),
-//         address,
-//         addressKind: addressKind ?? null,
-//         rewardAddress,
-//         ownAddress: address != null ? isOwnedAddress(wallet, address) : null,
-//         txIndex: utxo.tx_index,
-//         txHash: utxo.tx_hash,
-//       };
-//     })
-//   );
-// };
+      return {
+        assets: [...primaryAssets, ...multiAssets].filter(isNonNullable),
+        address,
+        addressKind: addressKind ?? null,
+        rewardAddress,
+        ownAddress: address != null ? isOwnedAddress(wallet, address) : null,
+        txIndex: utxo.tx_index,
+        txHash: utxo.tx_hash,
+      };
+    })
+  );
+};
 
 // const formatOutputs = async (
 //   wallet: any,
@@ -254,31 +221,36 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 //   }
 // };
 
-export const useUtxos = (inputs: TransactionInputs, wallet: any) => {
-  // const { networkManager } = useSelectedNetwork();
-  // const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, wallet, networkManager.api.utxoData), {
-  //   suspense: true,
-  // });
-  // if (!query.data) throw new Error('invalid formatted inputs');
-  // return query.data;
+export const useUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
+  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos), {
+    suspense: true,
+  });
+  if (!query.data) throw new Error('invalid formatted inputs');
+  return query.data;
 };
 
-// const getAllUtxos = async (inputs: TransactionInputs, wallet: any, getUtxoData: NetworkApi['utxoData']) => {
-//   return Promise.all(inputs.map(input => getUtxo(wallet, input.transaction_id, input.index, getUtxoData))) ?? [];
-// };
+const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any) => {
+  console.log('input', inputs);
+  return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index))) ?? [];
+};
 
-// const getUtxo = async (wallet: any, txHash: string, txIndex: number, getUtxoData: NetworkApi['utxoData']) => {
-//   const internalUtxo = wallet.utxos.find(u => u.tx_hash === txHash && u.tx_index === txIndex);
+const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
+  const internalUtxo = utxos.find(
+    u => u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex
+  );
+  console.log('internalUtxo', internalUtxo);
 
-//   if (!internalUtxo) {
-//     const externalUtxo = await getUtxoData({ txHash, txIndex });
-//     if (externalUtxo == null) throw new Error('useUtxos: utxo not found');
-
-//     return toRawUtxo(externalUtxo, txHash, txIndex);
-//   }
-
-//   return internalUtxo;
-// };
+  const hexAddr = RustModule.WalletV4.Address.from_hex(internalUtxo.address).to_bech32();
+  return {
+    amount: internalUtxo.output?.tokens[0].TokenList.Amount,
+    assets: [],
+    hexAddress: internalUtxo.address,
+    receiver: hexAddr,
+    tx_hash: internalUtxo.output.Transaction.Hash,
+    tx_index: internalUtxo.output.UtxoTransactionOutput.OutputIndex,
+    utxo_id: internalUtxo.output.UtxoTransactionOutput.OutputIndex,
+  };
+};
 
 // function toRawUtxo(utxosData: ApiUtxoData, txHash: string, txIndex: number) {
 //   const { address, amount, assets } = utxosData.output;

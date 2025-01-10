@@ -78,7 +78,7 @@ export const ReviewTxProvider = ({
       ftAssetsList: currentWalletInfo?.ftAssetList,
       nftAssetList: currentWalletInfo?.nftAssetList,
       currentWalletDetails: stores.wallets,
-
+      walletUtxos: currentWalletInfo?.selectedWallet.utxos,
       ...actions,
     }),
     [state, actions]

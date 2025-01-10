@@ -244,6 +244,7 @@ export const unignedTxReviewMock = {
       _ctx: 'global',
     },
     _txBody: { _wasm: { ptr: '60000496c130' } },
+    txBody: { _wasm: { ptr: '600007162340' } },
     _txBuilder: { _wasm: { ptr: '600004971260' } },
     _senderUtxos: [
       {

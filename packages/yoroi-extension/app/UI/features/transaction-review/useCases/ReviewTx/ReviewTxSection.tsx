@@ -5,11 +5,12 @@ import * as React from 'react';
 import { Box, Divider } from '@mui/material';
 import Menu from '../../../portfolio/common/components/Menu';
 import { useTxBody } from '../../common/hooks/usetxBody';
-import { mockReviewTX } from '../../common/mockData';
+import { unignedTxReviewMock } from '../../common/mockData';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { OverviewTab } from './Overview/OverviewTab';
 import { ReferenceInputsTab } from './ReferenceInputs/ReferenceInputsTab';
 import { UTxOsTab } from './UTxOs/UTxOsTab';
+import { useFormattedTx } from '../../common/hooks/useFormattedTx';
 
 const TabContent = styled(Box)({
   flex: 1,
@@ -23,10 +24,11 @@ export interface SubMenuOption {
 export const ReviewTxSection = () => {
   const theme = useTheme();
 
-  const { unsignedTx, details, title } = useTxReviewModal();
-  const txBody = useTxBody({ cbor: undefined, unsignedTx: mockReviewTX });
-  console.log('ReviewTxSection', { txBody });
-  // const formattedTx = useFormattedTx(txBody);
+  const { unsignedTx, walletUtxos, details, title } = useTxReviewModal();
+  // const txBody = useTxBody({ cbor: undefined, unsignedTx: unignedTxReviewMock });
+
+  console.log('FINAL unsignedTx', unsignedTx);
+  const formattedTx = useFormattedTx(unsignedTx.body);
 
   const subMenuOptions: SubMenuOption[] = [
     {

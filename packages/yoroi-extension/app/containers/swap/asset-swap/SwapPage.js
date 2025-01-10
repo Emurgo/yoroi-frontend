@@ -103,6 +103,8 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
+  const [parsedSignRequest, setParsedSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
 
   useEffect(
     () => () => {
@@ -235,7 +237,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
           modalView: 'transactionReview',
           receiverCustomTitle: liquidityPool ?? undefined,
           details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
-          unsignedTx: unignedTxReviewMock, // send if for here just to make it work - later can take it from store inseide review modal manager
+          unsignedTx: parsedSignRequest, // send if for here just to make it work - later can take it from store inside review modal manager
         });
       }
     } catch (error) {
@@ -371,10 +373,18 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       poolProvider,
     };
     const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
-    console.log('txSignRequest', txSignRequest),
-      runInAction(() => {
-        setSignRequest(txSignRequest);
-      });
+    const unsigned = txSignRequest;
+    console.log('txSignRequest', unsigned);
+    const txBodyjson = await unsigned.unsignedTx.build_tx().to_json();
+
+    const parsedUnsignedTx = JSON.parse(txBodyjson);
+
+    console.log('parsedUnsignedTx', parsedUnsignedTx);
+
+    runInAction(() => {
+      setParsedSignRequest(parsedUnsignedTx);
+      setSignRequest(txSignRequest);
+    });
   };
 
   function confirmationButtonMessage() {
