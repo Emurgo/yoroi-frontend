@@ -130,7 +130,7 @@ export default class LocalStorageApi {
   getSelectedWalletId: void => Promise<number | null> = async () => {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
     if (!id) {
-      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
+      id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
       if (!/^\d+$/.test(id)) {
         id = null;
       }
