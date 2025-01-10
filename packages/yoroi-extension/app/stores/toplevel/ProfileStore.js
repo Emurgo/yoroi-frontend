@@ -120,10 +120,8 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         }
         stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
 
-        if (stores.loading.fromUriScheme) {
-          stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
-        } else if (stores.loading.shouldGotoCashback) {
-          stores.app.goToRoute({ route: ROUTES.CASHBACK.ROOT });
+        if (stores.loading.landingRoute) {
+          stores.app.goToRoute({ route: stores.loading.landingRoute });
         } else {
           stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }

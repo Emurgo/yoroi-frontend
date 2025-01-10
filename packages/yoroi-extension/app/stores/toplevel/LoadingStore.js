@@ -51,6 +51,14 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     }
   }
 
+  get landingRoute(): string | null {
+    const route = this._originRoute.route.replace(/\/$/, '');
+    if (route === '') {
+      return null;
+    }
+    return route;
+  }
+
   @computed get fromUriScheme(): boolean {
     return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
   }

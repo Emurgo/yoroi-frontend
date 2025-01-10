@@ -81,6 +81,10 @@ const messages = defineMessages({
     id: 'connector.connect.cashback.trezor.disabled',
     defaultMessage: '!!!Bring cashback service doesn’t support Trezor wallet connection',
   },
+  addWallet: {
+    id: 'connector.connect.cashback.addWallet',
+    defaultMessage: '!!!Add wallet',
+  },
 });
 
 type Props = {|
@@ -372,6 +376,32 @@ export default class ConnectPage extends Component<Props> {
             <div className={styles.infoText}>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
           </div>
         ) : null}
+        {isSelectingCashbackWallet && (
+          <Box sx={{ display: 'flex', gap: '15px', padding: '32px' }}>
+            <Button
+              sx={{ minWidth: 0 }}
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={this.onCancel}
+              id="cancelButton"
+            >
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => {
+                this.onCreateWallet();
+              }}
+              sx={{ minWidth: 0 }}
+              id="addWalletButton"
+            >
+              {intl.formatMessage(messages.addWallet)}
+            </Button>
+          </Box>
+        )}
       </div>
     );
   }
