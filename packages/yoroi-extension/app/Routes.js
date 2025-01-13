@@ -39,6 +39,8 @@ import { GovernanceContextProvider } from './UI/features/governace/module/Govern
 // $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
+import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
+// $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
@@ -52,6 +54,8 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
+import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
@@ -258,7 +262,7 @@ export const Routes = (stores: StoresMap): Node => {
           <Route
             exact
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-            component={props => <ConnectedWebsitesPage {...props} stores={stores} />}
+            component={props => wrapDappCenter({ ...props, stores }, <DappCenterPage stores={stores} />)}
           />
           <Route
             path={ROUTES.WALLETS.ROOT}
@@ -562,6 +566,7 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
     </GovernanceContextProvider>
   );
 }
+
 export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
 
@@ -580,6 +585,27 @@ export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node
           {children}
         </Suspense>
       </PortfolioContextProvider>
+    </CurrencyProvider>
+  );
+}
+
+export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  const openDialogWrapper = (dialog): void => {
+    dappCenterProps.stores.uiDialogs.open({ dialog });
+  };
+
+  return (
+    <CurrencyProvider currency={dappCenterProps.stores.profile.unitOfAccount.currency || 'USD'}>
+      <DappCenterContextProvider
+        currentWallet={currentWalletInfo}
+        openDialogWrapper={openDialogWrapper}
+      >
+        <Suspense fallback={null}>
+          {children}
+        </Suspense>
+      </DappCenterContextProvider>
     </CurrencyProvider>
   );
 }
