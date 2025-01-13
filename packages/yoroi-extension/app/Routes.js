@@ -563,7 +563,7 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
   );
 }
 export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
+  const currentWalletInfo = React.useMemo(() => createCurrrentWalletInfo(portfolioProps.stores), [portfolioProps.stores]);
 
   const openDialogWrapper = (dialog): void => {
     portfolioProps.stores.uiDialogs.open({ dialog });

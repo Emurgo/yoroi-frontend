@@ -37,6 +37,7 @@ export type PortfolioState = {
   };
   accountPair: AccountPair | null;
   walletBalance: WalletBalance | null;
+  walletAdaBalance: number;
   networkId: number | null;
   ftAssetList: any[];
   showWelcomeBanner: boolean;
@@ -55,6 +56,7 @@ export const defaultPortfolioState: PortfolioState = {
   },
   accountPair: null,
   walletBalance: null,
+  walletAdaBalance: 0,
   networkId: null,
   ftAssetList: [],
   primaryTokenInfo: null,

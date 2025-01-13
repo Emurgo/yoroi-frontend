@@ -146,13 +146,13 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
   try {
     const walletCurrentPoolInfo = getStakePoolMeta(stores);
 
-    const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
-    const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
-
+    const selectedWallet /*: WalletState */ = wallets.selected;
+    
     if (selectedWallet == null) {
       throw new Error(`no selected Wallet. Should never happen`);
     }
-
+    
+    const walletAdaBalance /*: MultiToken */ = getWalletTotalAdaBalance(stores, selectedWallet);
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
 

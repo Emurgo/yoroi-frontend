@@ -43,7 +43,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const { unitOfAccount, walletAdaBalance, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
   const localStorageApi = new LocalStorageApi();
 
@@ -94,8 +94,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
       };
 
       if (portfolioStoragePairObj !== undefined) {
+        const fromValue = portfolioStoragePairObj.from.value !== walletBalance.ada ? walletBalance.ada : portfolioStoragePairObj.from.value;
         changeUnitOfAccountPair({
-          from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
+          from: { name: portfolioStoragePairObj.from.name, value: fromValue },
           to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
         });
       } else {
@@ -106,7 +107,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
     };
 
     setFiatPair();
-  }, [totalTokenPrice, walletBalance, showADA]);
+  }, [totalTokenPrice, walletBalance, walletAdaBalance, showADA]);
 
   if (!accountPair) {
     return <LoadingSkeleton />;
@@ -120,7 +121,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {String(accountPair?.from.value)}
+              0000 {String(accountPair?.from.value)}
             </Typography>
           )}
           <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
