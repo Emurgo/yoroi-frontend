@@ -78,14 +78,15 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   }
 
   async loadingEnd(): Promise<void> {
-    // before redirecting, save origin route in case we need to come back to
-    // it later (this is the case when user comes from a URI link)
+    // Save the landing route and go to the route that shows the loading screen
     runInAction(() => {
       this._originRoute = {
         route: this.stores.app.currentRoute,
         location: window.location.href,
       };
     });
+    this.stores.app.goToRoute({ route: ROUTES.ROOT });
+
     if (this.fromUriScheme) {
       const networkId = networks.CardanoMainnet.NetworkId;
       const cardanoMeta = defaultAssets.filter(

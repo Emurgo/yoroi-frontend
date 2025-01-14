@@ -137,7 +137,7 @@ export default class LocalStorageApi {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
     if (!id) {
       id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
-      if (/^\d+$/.test(id)) {
+      if (!/^\d+$/.test(id)) {
         id = null;
       }
     }

@@ -294,9 +294,8 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.PORTFOLIO.ROOT}
             component={props => wrapPortfolio({ ...props, stores }, PortfolioSubpages(stores))}
           />
+          <Redirect to={ROUTES.WALLETS.ROOT} />
         </Switch>
-
-        <Redirect to={ROUTES.ROOT} />
       </Suspense>
     </QueryClientProvider>
   );
