@@ -51,6 +51,14 @@ const messages = defineMessages({
     id: 'buysell.dialog.providerFee',
     defaultMessage: '!!!Provider fee',
   },
+  buyProviderFee: {
+    id: 'buysell.dialog.buyProviderFee',
+    defaultMessage: '!!!2% fee',
+  },
+  sellProviderFee: {
+    id: 'buysell.dialog.sellProviderFee',
+    defaultMessage: '!!!2.5% fee',
+  },
   disclaimer: {
     id: 'buysell.dialog.disclaimer',
     defaultMessage: '!!!Disclaimer',
@@ -121,7 +129,7 @@ const STabItem = styled(Tab)(({ theme }) => ({
     fontWeight: '500',
     lineHeight: '24px',
   },
-}))
+}));
 
 const ProviderRow = styled(Box)({
   display: 'flex',
@@ -407,7 +415,7 @@ export default class BuySellDialog extends Component<Props, State> {
               {providerName}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_medium" className="provider-fee">
-              2% fee
+              {state.isBuying ? intl.formatMessage(messages.buyProviderFee) : intl.formatMessage(messages.sellProviderFee)}
             </Typography>
           </div>
         </ProviderRow>
@@ -497,21 +505,21 @@ export default class BuySellDialog extends Component<Props, State> {
         styleFlags={{ contentNoTopPadding: true }}
       >
         {(environment.isDev() || environment.isNightly()) && (
-            <Tabs
-              value={state.isBuying ? 0 : 1}
-              onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
-              sx={{
-                width: '100%',
-                [`& .${tabsClasses.indicator}`]: {
-                  display: 'none',
-                },
-                boxShadow: 'none',
-              }}
-            >
-              <STabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
-              <STabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
-            </Tabs>
-          )}
+          <Tabs
+            value={state.isBuying ? 0 : 1}
+            onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
+            sx={{
+              width: '100%',
+              [`& .${tabsClasses.indicator}`]: {
+                display: 'none',
+              },
+              boxShadow: 'none',
+            }}
+          >
+            <STabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+            <STabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+          </Tabs>
+        )}
         {this.renderBuySell()}
       </Dialog>
     );
