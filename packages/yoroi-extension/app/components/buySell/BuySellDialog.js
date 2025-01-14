@@ -98,23 +98,30 @@ const MINIMUM_BUY_ADA = new BigNumber('100');
 const MINIMUM_SELL_ADA = new BigNumber('1');
 const EXCHANGE_CALLBACK_URL = 'https://ramp-redirect.yoroiwallet.com/yoroi-extension-exchange-callback.html';
 
-const TabItem = styled(Tab)({
+const STabItem = styled(Tab)(({ theme }) => ({
   position: 'relative',
   borderRadius: '8px',
   textAlign: 'center',
   transition: 'all .5s',
-  padding: '10px 15px',
-  color: '#555555',
+  [`&.${tabClasses.root}`]: {
+    color: theme.palette.ds.text_gray_max,
+    padding: '8px',
+    backgroundColor: 'transparent',
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '24px',
+  },
   height: 'auto',
   margin: '10px 0',
   float: 'none',
-  fontSize: '12px',
-  fontWeight: '500',
   [`&.${tabClasses.selected}, &.${tabClasses.root}:hover`]: {
-    color: '#555555',
-    backgroundColor: '#dce0e9',
+    backgroundColor: theme.palette.ds.gray_200,
+    color: theme.palette.ds.text_gray_max,
+    fontSize: '16px',
+    fontWeight: '500',
+    lineHeight: '24px',
   },
-});
+}))
 
 const ProviderRow = styled(Box)({
   display: 'flex',
@@ -489,8 +496,7 @@ export default class BuySellDialog extends Component<Props, State> {
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
       >
-        {environment.isDev() ||
-          (environment.isNightly() && (
+        {(environment.isDev() || environment.isNightly()) && (
             <Tabs
               value={state.isBuying ? 0 : 1}
               onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
@@ -502,10 +508,10 @@ export default class BuySellDialog extends Component<Props, State> {
                 boxShadow: 'none',
               }}
             >
-              <TabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
-              <TabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+              <STabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
+              <STabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
             </Tabs>
-          ))}
+          )}
         {this.renderBuySell()}
       </Dialog>
     );
