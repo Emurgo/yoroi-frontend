@@ -61,7 +61,6 @@ export const PortfolioContextProvider = ({
   if (selectedWallet === undefined) {
     return <></>;
   }
-
   const [state, dispatch] = React.useReducer(PortfolioReducer, {
     ...defaultPortfolioState,
     ...initialState,
@@ -99,7 +98,7 @@ export const PortfolioContextProvider = ({
       backendServiceZero: backendServiceZero,
       explorer,
     }),
-    [state, actions, ftAssetList]
+    [state, actions, ftAssetList, walletBalance]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;

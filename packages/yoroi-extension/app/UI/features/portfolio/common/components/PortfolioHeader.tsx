@@ -120,7 +120,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {String(accountPair?.from.value)}
+              {showADA ? walletBalance.ada : String(accountPair?.from.value)}
             </Typography>
           )}
           <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
