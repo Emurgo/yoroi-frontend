@@ -36,7 +36,7 @@ const dialogMessages = defineMessages({
   },
   cashbackWarning1: {
     id: 'wallet.settings.delete.warning1.cashback',
-    defaultMessage: '!!!Removing this wallet will not impact its balance, but as it’s connected to Bring, this may disrupt your cashback process. You can also use another wallet for connecting the cashback before removing this wallet.'
+    defaultMessage: '!!!Removing this wallet will not impact its balance, but as it is the rewards wallet, this may disrupt your cashback process. You can also use another wallet for connecting the cashback before removing this wallet.'
   },
   cashbackWarning2: {
     id: 'wallet.settings.delete.warning2.cashback',

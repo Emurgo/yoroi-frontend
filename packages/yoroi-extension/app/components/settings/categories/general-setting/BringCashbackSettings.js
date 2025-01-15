@@ -23,12 +23,12 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 const messages = defineMessages({
   bringCashbackTitle: {
     id: 'settings.cashback.title',
-    defaultMessage: '!!!Bring cashback wallet',
+    defaultMessage: '!!!Cashback rewards wallet',
   },
   note: {
     id: 'settings.cashback.note',
     defaultMessage:
-      '!!!Your connected wallet is the designated wallet for receiving ADA cashback rewards through Bring and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet or select “None” to decline this service.',
+      '!!!Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet or select “None” to decline this service.',
   },
   label: {
     id: 'settings.cashback.label',

@@ -58,7 +58,7 @@ const messages = defineMessages({
   },
   notCurrentText: {
     id: 'cashback.not.current.warning.text',
-    defaultMessage: '!!!Your cashback rewards are currently linked to another wallet. To claim your ADA cashback, either switch to the wallet connected to Bring or change the rewards wallet to the one you\'re using now. You can always access settings at anytime to change your cashback wallet and make claiming rewards relevant for you.',
+    defaultMessage: '!!!Your cashback rewards are currently linked to another wallet. To claim your ADA cashback, either switch to the rewards wallet or change the rewards wallet to the one you\'re using now. You can always access settings at anytime to change your cashback wallet and make claiming rewards relevant for you.',
   },
   currentWalletLabel: {
     id: 'cashback.not.current.warning.current',

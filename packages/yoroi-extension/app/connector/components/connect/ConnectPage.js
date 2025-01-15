@@ -79,7 +79,7 @@ const messages = defineMessages({
   },
   cashbackDisabledTrezor: {
     id: 'connector.connect.cashback.trezor.disabled',
-    defaultMessage: '!!!Bring cashback service doesn’t support Trezor wallet connection',
+    defaultMessage: '!!!Cashback service doesn’t support Trezor wallet connection',
   },
   addWallet: {
     id: 'connector.connect.cashback.addWallet',
