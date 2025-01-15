@@ -9,6 +9,7 @@ import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark
 import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
   label: string,
@@ -40,6 +41,7 @@ export default function SwapInput({
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
   const { name } = useTheme();
+  const strings = useStrings();
 
   const handleChange = e => {
     if (!disabled) {
@@ -170,7 +172,7 @@ export default function SwapInput({
               }}
               disabled={disabled}
             >
-              MAX
+              {strings.max}
             </Typography>
           </Box>
         ) : (
@@ -178,7 +180,7 @@ export default function SwapInput({
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
           <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {quantity || 0} {ticker}
+            {strings.currentBalance} {quantity || 0} {ticker}
           </Typography>
         </Box>
       </Box>
