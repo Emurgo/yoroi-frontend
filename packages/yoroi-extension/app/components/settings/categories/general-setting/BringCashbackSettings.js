@@ -145,7 +145,7 @@ class BringCashbackSettings extends Component<Props> {
                 <Stack direction="row">
                   <WalletIcon imagePart={wallet.plate.ImagePart} />
                   <Typography variant="body1" color="ds.text_gray_medium" mt="2px">
-                    {wallet.name}| {wallet.plate.TextPart}
+                    {wallet.name} | {wallet.plate.TextPart}
                   </Typography>
                 </Stack>
               );
