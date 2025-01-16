@@ -450,13 +450,19 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
 }
 
 export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
+  const { stores } = portfolioProps;
+
+  // Memoize expensive computations if necessary
+  const currentWalletInfo = React.useMemo(() => createCurrrentWalletInfo(stores), [stores]);
+
   return useObserver(() => {
-    const currentWalletInfo = createCurrrentWalletInfo(portfolioProps.stores);
-    const { shouldHideBalance, unitOfAccount } = portfolioProps.stores.profile;
+    const { shouldHideBalance, unitOfAccount } = stores.profile;
 
     const openDialogWrapper = dialog => {
-      portfolioProps.stores.uiDialogs.open({ dialog });
+      stores.uiDialogs.open({ dialog });
     };
+
+    console.log('shouldHideBalance:', shouldHideBalance);
 
     return (
       <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
