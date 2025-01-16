@@ -94,6 +94,7 @@ export const PortfolioContextProvider = ({
       ftAssetList: ftAssetList || [],
       networkId,
       primaryTokenInfo,
+      isHiddenAmount: true,
       openBuyDialog: () => openDialogWrapper(BuySellDialog),
       showWelcomeBanner: ftAssetList.length === 1,
       backendServiceZero: backendServiceZero,

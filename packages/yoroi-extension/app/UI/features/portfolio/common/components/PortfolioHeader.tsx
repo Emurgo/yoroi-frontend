@@ -13,6 +13,7 @@ import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
 import { HeaderPrice } from './HeaderPrice';
 import PnlTag from './PlnTag';
+import { HiddenAmount } from './HiddenAmount';
 
 const IconWrapper: any = styled(IconButton)(({ theme }: any) => ({
   '& svg': {
@@ -43,7 +44,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo, isHiddenAmount } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
   const localStorageApi = new LocalStorageApi();
 
@@ -120,7 +121,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {String(accountPair?.from.value)}
+              <HiddenAmount isHidden={isHiddenAmount}>
+                {String(accountPair?.from.value)}
+              </HiddenAmount>
             </Typography>
           )}
           <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
@@ -207,9 +210,8 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
 
   return (
     <PnlTag variant={variantPnl} withPercentSign={false}>
-      <Typography variant="caption" lineHeight="16px">{`${
-        Number(changeValue) > 0 ? '+' : ''
-      }${changeValue} ${currency}`}</Typography>
+      <Typography variant="caption" lineHeight="16px">{`${Number(changeValue) > 0 ? '+' : ''
+        }${changeValue} ${currency}`}</Typography>
     </PnlTag>
   );
 };
