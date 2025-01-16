@@ -5,6 +5,7 @@ import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/inf
 import Dialog from '../widgets/Dialog';
 import { FormattedMarketPrice, FormattedPrice } from './PriceImpact';
 import { useSwap } from '@yoroi/swap';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
   onContinue: () => void,
@@ -14,29 +15,30 @@ type Props = {|
 export default function LimitOrderWarningDialog({ onContinue, onCancel }: Props): Node {
   const { orderData } = useSwap();
   const limitPrice = orderData.selectedPoolCalculation?.order.limitPrice ?? '0';
+  const strings = useStrings();
   return (
-    <Dialog title="Limit price" onClose={onCancel} withCloseButton closeOnOverlayClick>
+    <Dialog title={strings.limitPrice} onClose={onCancel} withCloseButton closeOnOverlayClick>
       <Box display="flex" maxWidth="648px" mt="8px" mb="24px" flexDirection="column" gap="24px">
         <Box>
           <Typography component="div" variant="body1" color="ds.text_gray_medium">
-            Are you sure you want to proceed this order with the limit price that is 10% or more higher than the market price?
+            {strings.limitPriceContent}
           </Typography>
         </Box>
         <Box display="flex" flexDirection="column" gap="16px">
-          <SummaryRow col1="Your limit price">
+          <SummaryRow col1={strings.yourLimitPrice}>
             <FormattedPrice price={limitPrice ?? '0'} />
           </SummaryRow>
-          <SummaryRow col1="Market price">
+          <SummaryRow col1={strings.marketPrice}>
             <FormattedMarketPrice />
           </SummaryRow>
         </Box>
       </Box>
       <Box maxWidth="648px" display="flex" gap="24px" pt="24px">
         <Button fullWidth variant="secondary" onClick={onCancel}>
-          Back
+          {strings.back}
         </Button>
         <Button fullWidth variant="primary" onClick={onContinue}>
-          Swap
+          {strings.swap}
         </Button>
       </Box>
     </Dialog>
