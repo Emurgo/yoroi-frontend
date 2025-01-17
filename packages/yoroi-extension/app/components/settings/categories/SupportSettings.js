@@ -119,20 +119,10 @@ export default class SupportSettings extends Component<Props> {
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography
-                  component="div"
-                  variant="body1"
-                  color="ds.text_gray_medium"
-                  fontWeight={500}
-                  mb="8px"
-                >
+                <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography
-                  component="div"
-                  color="ds.text_gray_medium"
-                  variant="body1"
-                >
+                <Typography component="div" color="ds.text_gray_medium" variant="body1">
                   {text}
                 </Typography>
               </Box>
@@ -153,13 +143,7 @@ export default class SupportSettings extends Component<Props> {
           <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.paperWallet)}
           </Typography>
-          <Button
-            variant="contained"
-            onClick={this.props.onPaperWalletTransfer}
-            sx={{
-              fontSize: '0.8rem',
-            }}
-          >
+          <Button variant="contained" onClick={this.props.onPaperWalletTransfer}>
             {intl.formatMessage(messages.paperWalletTransfer)}
           </Button>
         </Box>

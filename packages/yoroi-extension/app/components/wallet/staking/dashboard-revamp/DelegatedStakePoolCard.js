@@ -148,11 +148,13 @@ const AvatarWrapper: any = styled(Box)({
   borderRadius: '20px',
   overflow: 'hidden',
 });
-const AvatarImg: any = styled('img')({
+
+const AvatarImg = styled('img')(({ theme }) => ({
   width: '100%',
-  background: 'white',
+  background: theme.palette.ds.primary_100,
   objectFit: 'scale-down',
-});
+}));
+
 const UndelegateButton: any = styled(Button)({
   minWidth: 'auto',
   width: 'unset',
