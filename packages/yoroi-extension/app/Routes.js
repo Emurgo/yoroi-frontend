@@ -256,7 +256,7 @@ export const Routes = (stores: StoresMap): Node => {
           />
           <Route
             path={ROUTES.PORTFOLIO.ROOT}
-            component={props => wrapPortfolio({ ...props, stores }, PortfolioSubpages(stores))}
+            component={props => PortfolioSubpages(stores, props)}
           />
 
           <Redirect to={ROUTES.MY_WALLETS} />
@@ -325,11 +325,21 @@ const SettingsSubpages = stores => (
   </Switch>
 );
 
-const PortfolioSubpages = stores => (
+const PortfolioSubpages = (stores) => (
   <Switch>
-    <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.PORTFOLIO.DAPPS} component={props => <PortfolioDappsPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.PORTFOLIO.DETAILS} component={props => <PortfolioDetailPage {...props} stores={stores} />} />
+    <Route exact
+      path={ROUTES.PORTFOLIO.ROOT}
+      component={props => wrapPortfolio({ stores }, <PortfolioPage {...props} stores={stores} />)}
+    />
+    <Route
+      exact
+      path={ROUTES.PORTFOLIO.DAPPS}
+      component={props => wrapPortfolio({ stores }, <PortfolioDappsPage {...props} stores={stores} />)}
+    />
+    <Route exact
+      path={ROUTES.PORTFOLIO.DETAILS}
+      component={props => wrapPortfolio({ stores }, <PortfolioDetailPage {...props} stores={stores} />)}
+    />
   </Switch>
 );
 
@@ -453,15 +463,13 @@ export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node
   const { stores } = portfolioProps;
 
   return useObserver(() => {
-    // Memoize expensive computations if necessary
-    const currentWalletInfo = createCurrrentWalletInfo(stores);
     const { shouldHideBalance, unitOfAccount } = stores.profile;
+
+    const currentWalletInfo = createCurrrentWalletInfo(stores);
 
     const openDialogWrapper = dialog => {
       stores.uiDialogs.open({ dialog });
     };
-
-    console.log('shouldHideBalance:', shouldHideBalance);
 
     return (
       <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
