@@ -121,7 +121,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              <HiddenAmount isHidden={isHiddenAmount}>{String(accountPair?.from.value)}</HiddenAmount>
+              <HiddenAmount isHidden={isHiddenAmount}>
+                {showADA ? walletBalance.ada : String(accountPair?.from.value)}
+              </HiddenAmount>
             </Typography>
           )}
           <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
