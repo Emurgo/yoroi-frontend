@@ -47,6 +47,7 @@ import {
 import { TxBuilder, SendRequest } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder'
 import blake2b from 'blake2b';
 import { derivePrivateByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
+import type { TxMint } from '@emurgo/yoroi-eutxo-txs/dist/tx-builder';
 
 /**
  * based off what the cardano-wallet team found worked empirically
@@ -59,12 +60,6 @@ export type TxOutput = {|
   amount: MultiToken,
   dataHash?: string,
   data?: string,
-|};
-
-type TxMint = {|
-  policyScript: string, // HEX of the WASM policy script,
-  assetName: string, // HEX
-  amount: string,
 |};
 
 type TxAuxiliaryData = {|
@@ -679,6 +674,7 @@ export async function newAdaUnsignedTxFromUtxo(
       WalletType.Shelley,
       {
         path: changeAdaAddr.addressing.path,
+        // $FlowIgnore
         start: changeAdaAddr.addressing.startLevel,
       }
     );
@@ -701,11 +697,15 @@ export async function newAdaUnsignedTxFromUtxo(
 
   const signRequestChangeAddr = [];
   if (unsignedTx.change) {
+    const spendingKeyInfo = unsignedTx.change.address.spendingKeyInfo;
+    if (spendingKeyInfo == null) {
+      throw new Error('Missing spendingKeyInfo in change address');
+    }
     signRequestChangeAddr.push({
       address: unsignedTx.change.address.hex,
       addressing: {
-        path: unsignedTx.change.address.spendingKeyInfo.path,
-        startLevel: unsignedTx.change.address.spendingKeyInfo.start,
+        path: spendingKeyInfo.path,
+        startLevel: spendingKeyInfo.start,
       },
       values: libValueToMultiToken(
         unsignedTx.change.value,
@@ -716,7 +716,9 @@ export async function newAdaUnsignedTxFromUtxo(
   }
   const utxosMap = new Map(utxos.map(u => [u.utxo_id, u]));
   return {
+    // $FlowIgnore
     senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)),
+    // $FlowIgnore
     txBuilder: unsignedTx.builder.wasm,
     changeAddr: signRequestChangeAddr,
   };
@@ -866,6 +868,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   setRuntime(RustModule.CrossCsl.init);
 
   const defaultNetworkConfig = {
+    networkId,
     linearFee: {
       coefficient: protocolParams.linearFeeCoefficient,
       constant: protocolParams.linearFeeConstant,
@@ -892,6 +895,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
   await txBuilder.addRequiredInputs(
+    // $FlowIgnore
     await Promise.all(
       mustIncludeUtxos.map(async ([utxo, witness]) => {
         let taggedWitness;
@@ -993,6 +997,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
       WalletType.Shelley,
       {
         path: changeAdaAddr.addressing.path,
+        // $FlowIgnore
         start: changeAdaAddr.addressing.startLevel,
       }
     );
@@ -1003,11 +1008,15 @@ async function newAdaUnsignedTxFromUtxoForConnector(
 
   const signRequestChangeAddr = [];
   if (unsignedTx.change) {
+    const spendingKeyInfo = unsignedTx.change.address.spendingKeyInfo;
+    if (spendingKeyInfo == null) {
+      throw new Error('Missing spendingKeyInfo in change address');
+    }
     signRequestChangeAddr.push({
       address: unsignedTx.change.address.hex,
       addressing: {
-        path: unsignedTx.change.address.spendingKeyInfo.path,
-        startLevel: unsignedTx.change.address.spendingKeyInfo.start,
+        path: spendingKeyInfo.path,
+        startLevel: spendingKeyInfo.start,
       },
       values: libValueToMultiToken(
         unsignedTx.change.value,
@@ -1024,7 +1033,9 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     ].map(u => [u.utxo_id, u])
   );
   return {
+    // $FlowIgnore
     senderUtxos: unsignedTx.inputs.asArray().map(u => utxosMap.get(u.tx + u.index)),
+    // $FlowIgnore
     txBuilder: unsignedTx.builder.wasm,
     changeAddr: signRequestChangeAddr,
   };
