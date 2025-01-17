@@ -452,10 +452,9 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
 export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const { stores } = portfolioProps;
 
-  // Memoize expensive computations if necessary
-  const currentWalletInfo = React.useMemo(() => createCurrrentWalletInfo(stores), [stores]);
-
   return useObserver(() => {
+    // Memoize expensive computations if necessary
+    const currentWalletInfo = createCurrrentWalletInfo(stores);
     const { shouldHideBalance, unitOfAccount } = stores.profile;
 
     const openDialogWrapper = dialog => {
