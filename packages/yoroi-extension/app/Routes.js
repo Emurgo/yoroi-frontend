@@ -53,6 +53,7 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
+// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
@@ -256,7 +257,7 @@ export const Routes = (stores: StoresMap): Node => {
           />
           <Route
             path={ROUTES.PORTFOLIO.ROOT}
-            component={props => PortfolioSubpages(stores, props)}
+            component={() => PortfolioSubpages(stores)}
           />
 
           <Redirect to={ROUTES.MY_WALLETS} />
