@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import SwitchNetworkDialog from '../../../components/wallet/settings/SwitchNetworkDialog';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import globalMessages from '../../../i18n/global-messages';
+import { notifyDAppConnectionRemoved } from '../../../api/thunk';
 
 type Props = {|
   ...StoresProps,
@@ -33,6 +34,7 @@ export default class SwitchNetworkDialogContainer extends Component<Props> {
         onApply={async (networkId) => {
           if (networkId !== profileStore.getCurrentNetworkId()) {
             await profileStore.setCurrentNetworkId(networkId);
+            await notifyDAppConnectionRemoved();
             window.location.reload();
           }
         }}

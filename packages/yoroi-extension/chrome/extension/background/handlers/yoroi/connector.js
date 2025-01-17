@@ -437,7 +437,7 @@ export const ConnectWindowRetrieveData: HandlerType<
 });
 
 export const NotifyDAppConnectionRemoved: HandlerType<
-  {| url: string |},
+  {| url: string |} | void,
   void
 > = Object.freeze({
   typeTag: 'notify-dapp-connection-removed',
@@ -446,7 +446,7 @@ export const NotifyDAppConnectionRemoved: HandlerType<
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
-      if (site.url === request.url) {
+      if (request?.url && site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
         break;
       }
