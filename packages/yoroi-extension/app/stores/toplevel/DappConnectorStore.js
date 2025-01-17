@@ -12,7 +12,7 @@ import type { StoresMap } from '../index';
 import { noop } from '../../coreUtils';
 import {
   getConnectedSites,
-  removeWalletFromWhiteList,
+  notifyDAppConnectionRemoved,
 } from '../../api/thunk';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
@@ -68,7 +68,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       whitelist: filter,
     });
     await this.getConnectorWhitelistRequest.execute();
-    await removeWalletFromWhiteList({ url: request.url });
+    await notifyDAppConnectionRemoved({ url: request.url });
   };
 
   refreshActiveSites: void => Promise<void> = async () => {
