@@ -21,8 +21,6 @@ type SetWhitelistFunc = {|
 |} => Promise<void>;
 
 export default class ConnectorStore extends Store<StoresMap> {
-  @observable connectingMessage: ?ConnectingMessage = null;
-  @observable whiteList: Array<WhitelistEntry> = [];
   @observable getConnectorWhitelistRequest: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
