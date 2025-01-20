@@ -43,7 +43,7 @@ const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
   // };
 
   return (
-    <Card sx={{ backgroundColor: 'ds.gray_min' }}>
+    <Card sx={{ backgroundColor: 'ds.bg_color_max' }}>
       <Typography p="24px" pb="0px" fontWeight={500} fontSize="18px">
         {strings.overview}
       </Typography>

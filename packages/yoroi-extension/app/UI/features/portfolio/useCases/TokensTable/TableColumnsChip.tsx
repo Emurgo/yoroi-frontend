@@ -187,7 +187,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography color="ds.text_gray_normal" sx={{ display: 'flex' }}>
+        <Typography color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
           <Typography>{token.info.name}</Typography>
         </Typography>
