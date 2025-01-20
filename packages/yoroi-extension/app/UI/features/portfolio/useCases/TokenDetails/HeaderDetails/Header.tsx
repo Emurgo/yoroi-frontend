@@ -53,6 +53,10 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
     return 0;
   }, [data24h, ptPrice]);
 
+  const ptValue = accountPair?.from.name === primaryTokenInfo.name
+    ? accountPair?.to.value
+    : accountPair?.from.value;
+
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_900">
@@ -80,13 +84,9 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
 
         <Typography color="ds.gray_600">
           <HiddenAmount isHidden={isHiddenAmount}>
-            {isPrimaryToken
-              ? accountPair?.from.name === primaryTokenInfo.name
-                ? accountPair?.to.value
-                : accountPair?.from.value
-              : totaPriceCalc}
+            {isPrimaryToken ? ptValue : totaPriceCalc}
           </HiddenAmount>
-          {isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}
+          <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>
       </Stack>
     </Stack>

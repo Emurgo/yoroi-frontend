@@ -327,21 +327,23 @@ const SettingsSubpages = stores => (
 );
 
 const PortfolioSubpages = (stores) => (
-  <Switch>
-    <Route exact
-      path={ROUTES.PORTFOLIO.ROOT}
-      component={props => wrapPortfolio({ stores }, <PortfolioPage {...props} stores={stores} />)}
-    />
-    <Route
-      exact
-      path={ROUTES.PORTFOLIO.DAPPS}
-      component={props => wrapPortfolio({ stores }, <PortfolioDappsPage {...props} stores={stores} />)}
-    />
-    <Route exact
-      path={ROUTES.PORTFOLIO.DETAILS}
-      component={props => wrapPortfolio({ stores }, <PortfolioDetailPage {...props} stores={stores} />)}
-    />
-  </Switch>
+  wrapPortfolio({ stores },
+    <Switch>
+      <Route exact
+        path={ROUTES.PORTFOLIO.ROOT}
+        component={props => <PortfolioPage {...props} stores={stores} />}
+      />
+      <Route
+        exact
+        path={ROUTES.PORTFOLIO.DAPPS}
+        component={props => <PortfolioDappsPage {...props} stores={stores} />}
+      />
+      <Route exact
+        path={ROUTES.PORTFOLIO.DETAILS}
+        component={props => <PortfolioDetailPage {...props} stores={stores} />}
+      />
+    </Switch>
+  )
 );
 
 const NFTsSubPages = stores => (
