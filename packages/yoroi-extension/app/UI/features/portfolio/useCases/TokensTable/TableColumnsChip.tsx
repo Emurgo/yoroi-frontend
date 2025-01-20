@@ -134,13 +134,13 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
       <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
         <Stack direction="column">
           <Typography color="ds.text_gray_normal">
-            {0} {token.name}
+            {0} {token.info.name}
           </Typography>
-          {token.name === accountPair?.to.name ? (
+          {token.info.name === accountPair?.from.name ? (
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
           ) : (
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-              {0} {accountPair?.to.name || DEFAULT_FIAT_PAIR}
+              {0} {accountPair?.to.name ?? DEFAULT_FIAT_PAIR}
             </Typography>
           )}
         </Stack>
@@ -196,14 +196,14 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
           </HiddenAmount>
           <Typography>{token.info.name}</Typography>
         </Typography>
-        {token.name === accountPair?.to.name ? (
+        {token.info.name === accountPair?.from.name ? (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
             <HiddenAmount isHidden={isHiddenAmount}>
               {totalTokenPrice}
             </HiddenAmount>
-            <span>&nbsp;{totalTicker || DEFAULT_FIAT_PAIR}</span>
+            <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
           </Typography>
         )}
       </Stack>
