@@ -5,5 +5,5 @@ export const HiddenAmount = ({ isHidden = false, children }) => {
     return HIDDEN_AMOUNT;
   }
 
-  return children;
+  return children || null;
 };
