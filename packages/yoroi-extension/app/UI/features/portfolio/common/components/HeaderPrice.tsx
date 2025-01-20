@@ -15,7 +15,7 @@ export const HeaderPrice = ({ isLoading = false }) => {
       <HiddenAmount isHidden={isHiddenAmount}>
         {accountPair?.to.value}
       </HiddenAmount>
-      {accountPair?.to.name}
+      <span>&nbsp;{accountPair?.to.name}</span>
     </Typography>
   );
 };

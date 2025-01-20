@@ -203,7 +203,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
             <HiddenAmount isHidden={isHiddenAmount}>
               {totalTokenPrice}
             </HiddenAmount>
-            {totalTicker || DEFAULT_FIAT_PAIR}
+            <span>&nbsp;{totalTicker || DEFAULT_FIAT_PAIR}</span>
           </Typography>
         )}
       </Stack>
