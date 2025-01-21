@@ -5,11 +5,9 @@ import {
   connectorSignCardanoTx,
   connectorRecordSubmittedCardanoTransaction,
 } from '../../../connector/api';
-import { mergeWitnessSets } from '../../../../../app/api/ada/transactions/utils';
 import {
   transactionHexToHash,
-  transactionHexReplaceWitnessSet,
-  transactionHexToWitnessSet,
+  transactionHexToWitnessSet, transactionHexAddVkeyWitnessesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 import {
   asGetSigningKey,
@@ -49,12 +47,7 @@ export const SignTransaction: HandlerType<
           partialSign: false
         },
       );
-
-      const mergedWitnessSetHex = mergeWitnessSets(
-        transactionHexToWitnessSet(transactionHex),
-        signedWitnessSetHex,
-      );
-      return transactionHexReplaceWitnessSet(transactionHex, mergedWitnessSetHex);
+      return transactionHexAddVkeyWitnessesFromWitnessSetHex(transactionHex, signedWitnessSetHex);
     } catch (error) {
       return { error: error.message };
     }
