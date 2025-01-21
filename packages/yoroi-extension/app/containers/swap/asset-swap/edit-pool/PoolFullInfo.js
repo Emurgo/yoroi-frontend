@@ -57,33 +57,39 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
             <InfoTooltip
               content={
                 <>
-                  <Typography color="inherit">{strings.feesIncluded}</Typography>
-                  <Typography color="inherit">{strings.dexFee}</Typography>
-                  <Typography color="inherit">{strings.frontendFee}</Typography>
+                  <Typography color="inherit" color="ds.text_gray_medium">
+                    {strings.feesIncluded}
+                  </Typography>
+                  <Typography color="inherit" color="ds.text_gray_medium">
+                    {strings.dexFee}
+                  </Typography>
+                  <Typography color="inherit" color="ds.text_gray_medium">
+                    {strings.frontendFee}
+                  </Typography>
                 </>
               }
             />
           )}
         </Box>
-        <Box>{formattedFee}</Box>
+        <Typography color="ds.text_gray_medium">{formattedFee}</Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
           <Typography color="ds.text_gray_low">{strings.minimumAssets}</Typography>
           {withInfo && <InfoTooltip content={strings.minimumAssetsTooltip} />}
         </Box>
-        <Box>
+        <Typography color="ds.text_gray_medium">
           {minReceived} {buyTicker}
-        </Box>
+        </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
           <Typography color="ds.text_gray_low">{strings.lpFee}</Typography>
           {withInfo && <InfoTooltip content={strings.lpFeeTooltip} />}
         </Box>
-        <Box>
+        <Typography color="ds.text_gray_medium">
           {liqFeeQuantity} {sellTokenInfo.ticker}
-        </Box>
+        </Typography>
       </Box>
     </Box>
   );
