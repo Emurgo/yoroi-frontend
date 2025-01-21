@@ -7,7 +7,7 @@ import {
 } from '../../../connector/api';
 import {
   transactionHexToHash,
-  transactionHexToWitnessSet, transactionHexAddVkeyWitnessesFromWitnessSetHex,
+  transactionHexAddVkeyWitnessesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 import {
   asGetSigningKey,
