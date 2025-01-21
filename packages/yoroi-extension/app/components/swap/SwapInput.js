@@ -119,7 +119,7 @@ export default function SwapInput({
           component="input"
           type="text"
           variant="body1"
-          color="grayscale.max"
+          color="ds.text_gray_medium"
           placeholder="0"
           padding="0"
           onChange={handleChange}
@@ -147,7 +147,9 @@ export default function SwapInput({
                 }}
               />
             </Box>
-            <Box width="max-content">{ticker || 'Select asset'}</Box>
+            <Typography color="ds.text_gray_medium" width="max-content">
+              {ticker || 'Select asset'}
+            </Typography>
             <Box display="inline-flex">
               <ChevronDownIcon />
             </Box>

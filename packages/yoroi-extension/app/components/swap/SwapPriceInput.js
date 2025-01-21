@@ -110,9 +110,9 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
         />
         <Box sx={{ justifySelf: 'end' }}>
           <Box height="100%" width="max-content" display="flex" alignItems="center">
-            <Box>{sellTokenInfo?.ticker || '-'}</Box>
+            <Typography color="ds.text_gray_medium">{sellTokenInfo?.ticker || '-'}</Typography>
             <Box>/</Box>
-            <Box>{buyTokenInfo?.ticker || '-'}</Box>
+            <Typography color="ds.text_gray_medium">{buyTokenInfo?.ticker || '-'}</Typography>
           </Box>
         </Box>
       </Box>
