@@ -117,7 +117,7 @@ export const TokenPriceChangeChip = ({
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={deltaVariantPnl} withIcon>
-        <Typography fontSize="13px">{Math.abs(Number(priceChangeProcent))}</Typography>
+        <Typography fontSize="12px">{Math.abs(Number(priceChangeProcent))}</Typography>
       </PnlTag>
     </Box>
   );
