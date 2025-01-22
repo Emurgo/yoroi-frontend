@@ -5,13 +5,8 @@ import { ampli } from '../../../../../../ampli/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
-import { PortfolioListTab, usePortfolio } from '../../module/PortfolioContextProvider';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from '../TokensTable/StatsTable';
-
-const tabs = {
-  [PortfolioListTab.Wallet]: 'Wallet Token',
-  [PortfolioListTab.Dapps]: 'Dapps Token',
-} as const;
 
 const PortfolioWallet = (): JSX.Element => {
   const theme = useTheme();
@@ -21,10 +16,6 @@ const PortfolioWallet = (): JSX.Element => {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(ftAssetList);
-
-  useEffect(() => {
-    ampli.portfolioTokensListPageViewed({ tokens_tab: tabs[PortfolioListTab.Wallet] });
-  }, []);
 
   useEffect(() => {
     if (!keyword || showWelcomeBanner) {

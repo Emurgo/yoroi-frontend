@@ -1,12 +1,10 @@
 import { Box, Divider, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import React, { useEffect } from 'react';
-import { ampli } from '../../../../../../ampli';
+import React from 'react';
 import { BackButton, Card } from '../../../../components';
 import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { PortfolioDetailsTab } from '../../module/PortfolioContextProvider';
 import { TokenChartInterval } from './ChartDetails/TokenChartInterval';
 import HeaderSection from './HeaderDetails/Header';
 import OverviewPerformance from './OverviewPerformanceDetails/OverviewPerformance';
@@ -29,10 +27,6 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-
-  useEffect(() => {
-    ampli.portfolioTokenDetails({ token_details_tab: PortfolioDetailsTab.Overview });
-  }, []);
 
   return (
     <Box sx={{ width: '100%' }}>
