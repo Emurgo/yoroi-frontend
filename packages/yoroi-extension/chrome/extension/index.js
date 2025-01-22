@@ -25,7 +25,7 @@ configure({ enforceActions: 'always' });
 BigNumber.DEBUG = true;
 
 // Entry point into our application
-const initializeYoroi: void => Promise < void> = async () => {
+const initializeYoroi: void => Promise<void> = async () => {
 
   const api = await setupApi();
   const router = new RouterStore();
