@@ -98,7 +98,7 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
     } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
       const TAB = 'Overview';
-      ampli.portfolioTokenDetails({ tokens_tab: TAB });
+      ampli.portfolioTokenDetails({ token_details_tab: TAB });
     }
   });
 };
