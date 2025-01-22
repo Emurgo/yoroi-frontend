@@ -327,7 +327,7 @@ const SettingsSubpages = stores => (
 );
 
 const PortfolioSubpages = (stores) => (
-  wrapPortfolio({ stores },
+  WrapPortfolio({ stores },
     <Switch>
       <Route exact
         path={ROUTES.PORTFOLIO.ROOT}
@@ -462,7 +462,7 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
   );
 }
 
-export function wrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
+export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const { stores } = portfolioProps;
 
   return useObserver(() => {
