@@ -15,6 +15,7 @@ import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
 import { ampli } from '../../ampli/index';
 import { ROUTES } from '../../app/routes-config';
+import { pathToRegexp } from 'path-to-regexp';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -24,7 +25,7 @@ configure({ enforceActions: 'always' });
 BigNumber.DEBUG = true;
 
 // Entry point into our application
-const initializeYoroi: void => Promise<void> = async () => {
+const initializeYoroi: void => Promise < void> = async () => {
 
   const api = await setupApi();
   const router = new RouterStore();
@@ -81,7 +82,7 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.settingsPageViewed();
     } else if (
       pathname === ROUTES.REVAMP.CATALYST_VOTING ||
-        pathname === ROUTES.WALLETS.CATALYST_VOTING
+      pathname === ROUTES.WALLETS.CATALYST_VOTING
     ) {
       ampli.votingPageViewed();
     } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
@@ -95,6 +96,9 @@ const initializeYoroi: void => Promise<void> = async () => {
     } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
       const TAB = 'Wallet Token';
       ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
+    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
+      const TAB = 'Overview';
+      ampli.portfolioTokenDetails({ tokens_tab: TAB });
     }
   });
 };
