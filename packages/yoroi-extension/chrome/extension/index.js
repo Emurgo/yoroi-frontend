@@ -92,6 +92,9 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.walletPageViewed();
     } else if (pathname === ROUTES.Governance.ROOT) {
       ampli.governanceDashboardPageViewed();
+    } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
+      const TAB = 'Wallet Token';
+      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
     }
   });
 };
