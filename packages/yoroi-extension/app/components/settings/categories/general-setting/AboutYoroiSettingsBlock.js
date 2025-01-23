@@ -198,7 +198,8 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
 
         <Button
           onClick={this.props.onSwitchNetwork}
-          variant="primary"
+          variant="secondary"
+          style={{ width: '200px' }}
         >
           {intl.formatMessage(messages.switchNetwork)}
         </Button>
