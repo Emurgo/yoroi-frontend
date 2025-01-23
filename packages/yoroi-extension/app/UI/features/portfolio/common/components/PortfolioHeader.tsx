@@ -12,6 +12,7 @@ import { DEFAULT_FIAT_PAIR } from '../helpers/constants';
 import { formatPriceChange, priceChange } from '../helpers/priceChange';
 import { useStrings } from '../hooks/useStrings';
 import { HeaderPrice } from './HeaderPrice';
+import { HiddenAmount } from './HiddenAmount';
 import PnlTag from './PlnTag';
 
 const IconWrapper: any = styled(IconButton)(({ theme }: any) => ({
@@ -43,7 +44,7 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo, isHiddenAmount } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
   const localStorageApi = new LocalStorageApi();
 
@@ -120,7 +121,9 @@ const PortfolioHeader = ({ walletBalance, setKeyword, isLoading, tooltipTitle }:
             <Skeleton width="146px" height="24px" />
           ) : (
             <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-              {String(accountPair?.from.value)}
+              <HiddenAmount isHidden={isHiddenAmount}>
+                {showADA ? walletBalance.ada : String(accountPair?.from.value)}
+              </HiddenAmount>
             </Typography>
           )}
           <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />

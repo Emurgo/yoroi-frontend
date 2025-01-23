@@ -10,6 +10,7 @@ import { useStrings } from '../../../common/hooks/useStrings';
 import { usePortfolio } from '../../../module/PortfolioContextProvider';
 import { usePortfolioTokenActivity } from '../../../module/PortfolioTokenActivityProvider';
 import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
+import { HiddenAmount } from '../../../common/components/HiddenAmount';
 
 interface Props {
   tokenInfo: TokenInfoType;
@@ -18,7 +19,7 @@ interface Props {
 const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
   const theme: any = useTheme();
   const strings = useStrings();
-  const { unitOfAccount, walletBalance, accountPair, primaryTokenInfo } = usePortfolio();
+  const { unitOfAccount, walletBalance, accountPair, primaryTokenInfo, isHiddenAmount } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const tokenTotalAmount = isPrimaryToken ? walletBalance?.ada : tokenInfo.formatedAmount;
   if (tokenInfo.quantity === null) {
@@ -52,6 +53,10 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
     return 0;
   }, [data24h, ptPrice]);
 
+  const ptValue = accountPair?.from.name === primaryTokenInfo.name
+    ? accountPair?.to.value
+    : accountPair?.from.value;
+
   return (
     <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
       <Typography fontWeight="500" color="ds.gray_900">
@@ -61,7 +66,9 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
       <Stack direction="column" spacing={theme.spacing(0.5)}>
         <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-start">
           <Typography variant="h2" fontWeight="500" color="ds.gray_max">
-            {tokenTotalAmount}
+            <HiddenAmount isHidden={isHiddenAmount}>
+              {tokenTotalAmount}
+            </HiddenAmount>
           </Typography>
           <Typography
             variant="body2"
@@ -76,12 +83,10 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
         </Stack>
 
         <Typography color="ds.gray_600">
-          {isPrimaryToken
-            ? accountPair?.from.name === primaryTokenInfo.name
-              ? accountPair?.to.value
-              : accountPair?.from.value
-            : totaPriceCalc}{' '}
-          {isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}
+          <HiddenAmount isHidden={isHiddenAmount}>
+            {isPrimaryToken ? ptValue : totaPriceCalc}
+          </HiddenAmount>
+          <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>
       </Stack>
     </Stack>
