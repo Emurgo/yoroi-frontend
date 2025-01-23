@@ -903,6 +903,7 @@ async function newAdaUnsignedTxFromUtxoForConnector(
   const txBuilder = await TxBuilder.new(defaultNetworkConfig, utxoSet);
 
   await txBuilder.addRequiredInputs(
+    // $FlowIgnore
     await Promise.all(
       mustIncludeUtxos.map(async ([utxo, witness]) => {
         let taggedWitness;
