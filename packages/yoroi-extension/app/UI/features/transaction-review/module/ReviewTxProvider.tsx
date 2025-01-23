@@ -71,7 +71,7 @@ export const ReviewTxProvider = ({
     startLoadingTxReview: () => dispatch({ type: 'startLoading' }),
     stopLoadingTxReview: () => dispatch({ type: 'stopLoading' }),
   }).current;
-
+  console.log('currentWalletInfo?.selectedWallet', currentWalletInfo?.selectedWallet);
   const context: any = React.useMemo(
     () => ({
       ...state,
@@ -79,6 +79,9 @@ export const ReviewTxProvider = ({
       nftAssetList: currentWalletInfo?.nftAssetList,
       currentWalletDetails: stores.wallets,
       walletUtxos: currentWalletInfo?.selectedWallet.utxos,
+      networkId: currentWalletInfo?.networkId,
+      primaryTokenInfo: currentWalletInfo?.primaryTokenInfo,
+      walletAddresses: currentWalletInfo?.walletAddresses,
       ...actions,
     }),
     [state, actions]

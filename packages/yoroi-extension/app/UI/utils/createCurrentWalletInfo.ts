@@ -2,6 +2,7 @@ import BigNumber from 'bignumber.js';
 import moment from 'moment';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { maybe } from '../../coreUtils';
+import { allAddressSubgroups, applyAddressFilter } from '../../stores/stateless/addressStores';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
 import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
@@ -212,6 +213,12 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const selectedExplorer = explorers.selectedExplorer.get(networkId);
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
+    const addressTypeStore = getTypeStore(stores);
+
+    const walletAddresses = applyAddressFilter({
+      addressFilter: stores.addresses.addressFilter,
+      addresses: addressTypeStore.request.all,
+    });
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -233,6 +240,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       },
       ftAssetList: ftAssetList,
       nftAssetList: nftAssetList,
+      walletAddresses,
       explorer: { tokenInfo: explorerTransactionInfo },
     };
   } catch (error) {
@@ -277,4 +285,19 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   }
 
   return null;
+};
+
+const getTypeStore = stores => {
+  for (const addressStore of allAddressSubgroups) {
+    if (!addressStore.isRelated()) {
+      continue;
+    }
+
+    const request = stores.addresses.addressSubgroupMap.get(addressStore.class);
+    if (request == null) throw new Error('Should never happen');
+    return {
+      request,
+      meta: addressStore,
+    };
+  }
 };

@@ -1,23 +1,28 @@
 // import { usePortfolioTokenInfos } from '../../../Portfolio/common/hooks/usePortfolioTokenInfos';
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
-import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
-import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { CredKind } from '@emurgo/cross-csl-core';
+import { isNonNullable } from '@yoroi/common';
+import { Portfolio } from '@yoroi/types';
 import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { deriveRewardAddressFromAddress } from '../../../../utils/common';
+import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
+import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
-export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  const { walletUtxos } = useTxReviewModal();
+export const useFormattedTx = (data: TransactionBody, ftAssetsList: any, networkId, primaryTokenInfo): FormattedTx => {
+  const { walletUtxos, walletAddresses } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
 
-  console.log('walletUtxos', walletUtxos);
+  console.log('ftAssetsList', ftAssetsList);
   const inputUtxos = useUtxos(inputs, walletUtxos);
+  const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
 
-  console.log('=======@@@@@inputUtxos', inputUtxos);
+  const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
 
-  const formattedInputs = useFormattedInputs(portfolioTokenInfos, inputUtxos);
-
+  console.log('=======@@@@@formattedInputs', formattedInputs);
   // return {
   //   inputs: formattedInputs,
   //   outputs: formattedOutputs,
@@ -28,10 +33,10 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   // };
 };
 
-export const useFormattedInputs = (tokenInfosResult, inputUtxos) => {
+export const useFormattedInputs = (inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses) => {
   const query = useQuery<any>(
     ['useFormattedInputs', inputUtxos],
-    async () => formatInputs(wallet, tokenInfosResult, inputUtxos),
+    async () => formatInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses),
     {
       suspense: true,
     }
@@ -58,28 +63,22 @@ export const useFormattedInputs = (tokenInfosResult, inputUtxos) => {
 //   return query.data;
 // };
 
-const formatInputs = async (
-  portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>,
-  inputUtxos: ReturnType<typeof useUtxos>
-): Promise<FormattedInputs> => {
+const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
+  console.log('inputUtxos', inputUtxos);
   return Promise.all(
     inputUtxos.map(async utxo => {
       const address = utxo?.receiver;
       const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
 
       const addressKind = address != null ? await getAddressKind(address) : null;
-      const rewardAddress =
-        address != null && addressKind === CredKind.Key ? await deriveAddress(address, wallet.networkManager.chainId) : null;
+      const rewardAddress = address != null && addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
 
       const primaryAssets =
         coin != null
           ? [
               {
-                tokenInfo: wallet.portfolioPrimaryTokenInfo,
-                name: wallet.portfolioPrimaryTokenInfo.name,
-                label: formatTokenWithText(coin, wallet.portfolioPrimaryTokenInfo),
+                tokenInfo: primaryTokenInfo,
                 quantity: coin,
-                isPrimary: true,
               },
             ]
           : [];
@@ -87,16 +86,13 @@ const formatInputs = async (
       const multiAssets =
         utxo?.assets
           .map(a => {
-            const tokenInfo = portfolioTokenInfos.tokenInfos?.get(a.assetId as Portfolio.Token.Id);
+            const tokenInfo = ftAssetsList.get(a?.assetId as Portfolio.Token.Id);
             if (!tokenInfo) return null;
             const quantity = asQuantity(a.amount);
 
             return {
               tokenInfo,
-              name: infoExtractName(tokenInfo),
-              label: formatTokenWithText(quantity, tokenInfo),
               quantity: quantity,
-              isPrimary: false,
             };
           })
           .filter(Boolean) ?? [];
@@ -106,7 +102,8 @@ const formatInputs = async (
         address,
         addressKind: addressKind ?? null,
         rewardAddress,
-        ownAddress: address != null ? isOwnedAddress(wallet, address) : null,
+        // ownAddress: false,
+        ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
         txIndex: utxo.tx_index,
         txHash: utxo.tx_hash,
       };
@@ -168,7 +165,7 @@ const formatInputs = async (
 //   );
 // };
 
-// export const formatFee = (wallet: any, data: TransactionBody): FormattedFee => {
+// export const formatFee = (wallet: any, data: TransactionBody): any => {
 //   const fee = asQuantity(data?.fee ?? '0');
 
 //   return {
@@ -201,25 +198,23 @@ const formatInputs = async (
 //   ) ?? []) as Array<[Portfolio.Token.Info, string]>;
 // };
 
-// const deriveAddress = async (address: string, chainId: number) => {
-//   try {
-//     return await deriveRewardAddressFromAddress(address, chainId);
-//   } catch {
-//     return null;
-//   }
-// };
+const deriveAddress = async (address: string, chainId: number) => {
+  try {
+    return await deriveRewardAddressFromAddress(address, chainId);
+  } catch {
+    return null;
+  }
+};
 
-// const getAddressKind = async (addressBech32: string): Promise<CredKind | null> => {
-//   const { csl, release } = wrappedCsl();
-
-//   try {
-//     const address = await csl.Address.fromBech32(addressBech32);
-//     const addressKind = await (await address.paymentCred())?.kind();
-//     return addressKind ?? null;
-//   } finally {
-//     release();
-//   }
-// };
+const getAddressKind = async (addressBech32: string): Promise<any> => {
+  try {
+    const address = await RustModule.WalletV4.Address.fromBech32(addressBech32).to_bech32();
+    const addressKind = await (await address.paymentCred())?.kind();
+    return addressKind ?? null;
+  } catch {
+    return null;
+  }
+};
 
 export const useUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
   const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos), {
@@ -230,7 +225,6 @@ export const useUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
 };
 
 const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any) => {
-  console.log('input', inputs);
   return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index))) ?? [];
 };
 
@@ -244,11 +238,10 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
   return {
     amount: internalUtxo.output?.tokens[0].TokenList.Amount,
     assets: [],
-    hexAddress: internalUtxo.address,
     receiver: hexAddr,
     tx_hash: internalUtxo.output.Transaction.Hash,
     tx_index: internalUtxo.output.UtxoTransactionOutput.OutputIndex,
-    utxo_id: internalUtxo.output.UtxoTransactionOutput.OutputIndex,
+    utxo_id: `${internalUtxo.output.Transaction.Hash}:${internalUtxo.output.UtxoTransactionOutput.OutputIndex}`,
   };
 };
 
@@ -272,6 +265,6 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
 //   };
 // }
 
-// const isOwnedAddress = (wallet: any, bech32Address: string) => {
-//   return wallet.internalAddresses.includes(bech32Address) || wallet.externalAddresses.includes(bech32Address);
-// };
+const isOwnedAddress = (walletAddresses: any, bech32Address: string) => {
+  return walletAddresses.filter(a => a.address === bech32Address);
+};
