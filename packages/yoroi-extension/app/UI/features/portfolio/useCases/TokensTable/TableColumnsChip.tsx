@@ -38,7 +38,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
         />
       </Box>
       <Stack direction="column">
-        <Typography fontWeight="500" color="ds.text_gray_normal">
+        <Typography fontWeight="500" color="ds.text_gray_medium">
           {token.info.name}
         </Typography>
         <Typography variant="body2" color="ds.text_gray_low">
