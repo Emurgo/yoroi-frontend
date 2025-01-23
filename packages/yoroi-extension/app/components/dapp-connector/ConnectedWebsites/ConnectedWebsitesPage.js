@@ -62,10 +62,10 @@ export default class ConnectedWebsitesPage extends Component<Props> {
         <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">
           <NoDappsConnected />
           <Box textAlign="center">
-            <Typography variant="h5" fontWeight={500} mb="8px">
+            <Typography variant="h5" fontWeight={500} mb="8px" color="ds.text_gray_medium">
               {intl.formatMessage(messages.noWebsitesConnected)}
             </Typography>
-            <Typography variant="body1" color="grayscale.600">
+            <Typography variant="body1" color="ds.text_gray_low">
               {intl.formatMessage(connectorMessages.messageReadOnly)}
             </Typography>
           </Box>
