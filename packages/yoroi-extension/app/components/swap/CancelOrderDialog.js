@@ -1,21 +1,22 @@
 //@flow
-import { Box, Button, Typography } from '@mui/material';
-import Dialog from '../widgets/Dialog';
-import AssetPair from '../common/assets/AssetPair';
-import TextField from '../common/TextField';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
-import LoadingSpinner from '../widgets/LoadingSpinner';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../connector/types';
+import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { FormattedTokenValue } from '../../containers/swap/orders/util';
+import type LocalizableError from '../../i18n/LocalizableError';
+import { Box, Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { stringifyError } from '../../utils/logging';
 import { InfoTooltip } from '../widgets/InfoTooltip';
-import AddCollateralPage from '../../connector/components/signin/AddCollateralPage';
-import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../connector/types';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
-import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type LocalizableError from '../../i18n/LocalizableError';
-import type { FormattedTokenValue } from '../../containers/swap/orders/util';
+import Dialog from '../widgets/Dialog';
+import AssetPair from '../common/assets/AssetPair';
+import TextField from '../common/TextField';
+import LoadingSpinner from '../widgets/LoadingSpinner';
+import AddCollateralPage from '../../connector/components/signin/AddCollateralPage';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
   order: any,
@@ -51,12 +52,13 @@ export default function CancelSwapOrderDialog({
   walletType,
   hwWalletError,
 }: Props): React$Node {
+  const strings = useStrings();
   const [password, setPassword] = useState('');
   const [isIncorrectPassword, setIncorrectPassword] = useState(false);
   const isLoading = transactionParams == null || isSubmitting;
   if (reorgTxData != null) {
     return (
-      <Dialog title="Cancel order" onClose={onDialogClose} withCloseButton closeOnOverlayClick>
+      <Dialog title={strings.cancelOrderTitle} onClose={onDialogClose} withCloseButton closeOnOverlayClick>
         <AddCollateralPage
           txData={reorgTxData}
           onCancel={onDialogClose}
@@ -74,7 +76,7 @@ export default function CancelSwapOrderDialog({
   const dialogHeight = isPasswordWallet ? '496px' : '388px';
   return (
     <Dialog
-      title="Cancel order"
+      title={strings.cancelOrderTitle}
       onClose={onDialogClose}
       withCloseButton
       closeOnOverlayClick
@@ -83,18 +85,18 @@ export default function CancelSwapOrderDialog({
       <Box display="flex" flexDirection="column" gap="12px">
         <Box>
           <Typography component="div" variant="body1" color="ds.text_gray_medium">
-            Are you sure you want to cancel this order?
+            {strings.cancelOrderContent}
           </Typography>
         </Box>
         <AssetPair from={order.from.token} to={order.to.token} defaultTokenInfo={defaultTokenInfo} />
         <Box display="flex" flexDirection="column" gap="8px">
-          <SummaryRow col1="Asset price">
+          <SummaryRow col1={strings.assetPrice}>
             {order.price} {order.from.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Asset amount">
+          <SummaryRow col1={strings.assetAmount}>
             {order.amount} {order.to.token.ticker}
           </SummaryRow>
-          <SummaryRow col1="Total returned" info="The amount returned to your wallet after cancelling the order">
+          <SummaryRow col1={strings.totalReturned} info={strings.totalReturnedTooltip}>
             {transactionParams ? (
               transactionParams.returnValues.map((v, index) => (
                 <Box key={v.ticker}>
@@ -105,7 +107,7 @@ export default function CancelSwapOrderDialog({
               <LoadingSpinner small />
             )}
           </SummaryRow>
-          <SummaryRow col1="Cancellation fee">
+          <SummaryRow col1={strings.cancellationFee}>
             {transactionParams ? transactionParams.formattedFee : <LoadingSpinner small />}
           </SummaryRow>
         </Box>
@@ -114,21 +116,23 @@ export default function CancelSwapOrderDialog({
             <TextField
               className="walletPassword"
               value={password}
-              label="Password"
+              label={strings.password}
               type="password"
               onChange={e => {
                 setIncorrectPassword(false);
                 setPassword(e.target.value);
               }}
-              error={isIncorrectPassword && 'Incorrect password!'}
+              error={isIncorrectPassword && strings.passwordIncorrect}
               disabled={isLoading}
             />
           </Box>
-        ) : <Box paddingTop="12px" />}
+        ) : (
+          <Box paddingTop="12px" />
+        )}
       </Box>
       <Box display="flex" gap="24px">
         <Button fullWidth variant="secondary" onClick={onDialogClose}>
-          Back
+          {strings.back}
         </Button>
         <Button
           fullWidth
@@ -147,7 +151,7 @@ export default function CancelSwapOrderDialog({
           }}
           disabled={isLoading || (isPasswordWallet && password.length === 0)}
         >
-          {isLoading ? <LoadingSpinner small light /> : 'Cancel order'}
+          {isLoading ? <LoadingSpinner small light /> : strings.cancelOrderTitle}
         </Button>
       </Box>
     </Dialog>

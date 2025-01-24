@@ -1,51 +1,40 @@
 // @flow
 import type { Node } from 'react';
-import { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
-import { CreateSwapOrder } from './CreateSwapOrder';
+import type { PriceImpact } from '../../../components/swap/types';
+import type { State } from '../context/swap-form/types';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
+import BigNumber from 'bignumber.js';
+import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
+import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
+import LoadingOverlay from '../../../components/swap/LoadingOverlay';
+import useSwapForm from '../context/swap-form/useSwapForm';
+import globalMessages from '../../../i18n/global-messages';
+import { useEffect, useState } from 'react';
+import { Box, Button } from '@mui/material';
+import { CreateSwapOrder } from './CreateSwapOrder';
 import { useSwap } from '@yoroi/swap';
 import { runInAction } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import BigNumber from 'bignumber.js';
-import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
 import { ROUTES } from '../../../routes-config';
-import type { PriceImpact } from '../../../components/swap/types';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
-import type { State } from '../context/swap-form/types';
 import { StateWrap } from '../context/swap-form/types';
-import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 import { observer } from 'mobx-react';
-import useSwapForm from '../context/swap-form/useSwapForm';
-import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
-import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, injectIntl } from 'react-intl';
+import { injectIntl } from 'react-intl';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
+import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
 import type { StoresProps } from '../../../stores';
-
-const messages = defineMessages({
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
-
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -60,6 +49,7 @@ type Intl = {|
 function SwapPage(props: StoresProps & Intl): Node {
   const { stores } = props;
   const [openedDialog, setOpenedDialog] = useState('');
+  const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
   const {
@@ -119,9 +109,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     buyQuantity.error == null &&
     isValidTickers;
 
-  const confirmationCanContinue =
-    (isHardwareWallet || userPasswordState?.value !== '')
-    && signRequest != null;
+  const confirmationCanContinue = (isHardwareWallet || userPasswordState?.value !== '') && signRequest != null;
 
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
@@ -270,8 +258,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     const baseBroadcastRequest = { wallet, signRequest };
     const broadcastRequest = isHardwareWallet
       ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password },
-    };
+      : { normal: { ...baseBroadcastRequest, password } };
     try {
       const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
       // $FlowIgnore[incompatible-call]
@@ -352,14 +339,9 @@ function SwapPage(props: StoresProps & Intl): Node {
   };
 
   function confirmationButtonMessage() {
-    if (walletType === 'ledger') return messages.sendUsingLedgerNano;
-    if (walletType === 'trezor') return messages.sendUsingTrezorT;
-    return globalMessages.confirm;
-  }
-
-  function intl(msg): string {
-    // noinspection JSUnresolvedFunction
-    return props.intl.formatMessage(msg);
+    if (walletType === 'ledger') return sendUsingLedgerNano;
+    if (walletType === 'trezor') return sendUsingTrezorT;
+    return props.intl.formatMessage(globalMessages.confirm);
   }
 
   return (
@@ -416,7 +398,7 @@ function SwapPage(props: StoresProps & Intl): Node {
           >
             {orderStep === 1 && (
               <Button onClick={processBackToStart} sx={{ minWidth: '128px', minHeight: '48px' }} variant="secondary">
-                Back
+                {back}
               </Button>
             )}
             <Button
@@ -425,7 +407,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
+              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
             </Button>
           </Box>
         )}

@@ -39,11 +39,11 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         </Typography>
       </Stack>
 
-      <TokenOverviewSection label={strings.description} value={tokenInfo.info.metadata.description} />
+      <TokenOverviewSection label={strings.description} value={tokenInfo?.info.metadata?.description} />
 
       <TokenOverviewSection
         label={strings.website}
-        value={isPrimary ? 'https://cardano.org/' : tokenInfo.info.metadata.website}
+        value={isPrimary ? 'https://cardano.org/' : tokenInfo?.info.metadata?.website}
         isExternalLink
       />
 

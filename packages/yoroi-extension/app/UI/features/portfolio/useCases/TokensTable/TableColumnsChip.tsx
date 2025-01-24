@@ -10,6 +10,7 @@ import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/co
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { HiddenAmount } from '../../common/components/HiddenAmount';
 
 export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   const theme = useTheme();
@@ -89,8 +90,8 @@ export const TokenPriceChangeChip = ({
       ? deltaPtTokenDataInterval < 0
         ? 'danger'
         : deltaPtTokenDataInterval > 0
-        ? 'success'
-        : 'neutral'
+          ? 'success'
+          : 'neutral'
       : variantPnl;
 
   if (noDataToDisplay || changePercent === undefined) {
@@ -125,7 +126,7 @@ export const TokenPriceChangeChip = ({
 
 export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const theme = useTheme();
-  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
+  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner, isHiddenAmount } = usePortfolio();
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
@@ -133,13 +134,13 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
       <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
         <Stack direction="column">
           <Typography color="ds.text_gray_normal">
-            {0} {token.name}
+            {0} {token.info.name}
           </Typography>
-          {token.name === accountPair?.to.name ? (
+          {token.info.name === accountPair?.from.name ? (
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
           ) : (
             <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-              {0} {accountPair?.to.name || DEFAULT_FIAT_PAIR}
+              {0} {accountPair?.to.name ?? DEFAULT_FIAT_PAIR}
             </Typography>
           )}
         </Stack>
@@ -171,31 +172,38 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
 
   if (ptPrice === null) return `... ${currency}`;
 
-  const totaPrice =
+  const totalPrice =
     ptPrice &&
     atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPrice ?? 1)
       .times(showingAda ? 1 : new BigNumber(ptPrice))
       .toFormat(decimals);
 
-  const totalTicker = isPrimary && showingAda ? accountPair?.to.name : accountPair?.from.name;
+  const primaryAda = isPrimary && showingAda;
+
+  const totalTicker = primaryAda ? accountPair?.to.name : accountPair?.from.name;
   const totalTokenPrice =
-    isPrimary && showingAda
+    primaryAda
       ? ''
-      : `${isPrimary ? totaPrice : tokenPrice !== undefined ? totaPrice : '-'} ${totalTicker || DEFAULT_FIAT_PAIR}`;
+      : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography color="ds.text_gray_normal" sx={{ display: 'flex' }}>
-          <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+        <Typography columnGap="3px" color="ds.text_gray_normal" sx={{ display: 'flex' }}>
+          <HiddenAmount isHidden={isHiddenAmount}>
+            <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+          </HiddenAmount>
           <Typography>{token.info.name}</Typography>
         </Typography>
-        {token.name === accountPair?.to.name ? (
+        {token.info.name === accountPair?.from.name ? (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
-            {totalTokenPrice}
+            <HiddenAmount isHidden={isHiddenAmount}>
+              {totalTokenPrice}
+            </HiddenAmount>
+            <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
           </Typography>
         )}
       </Stack>

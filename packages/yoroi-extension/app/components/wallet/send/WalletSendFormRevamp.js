@@ -836,10 +836,17 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   size="small"
                   sx={{
                     '&.MuiButton-sizeSmall': {
-                      lineHeight: '17px',
-                      padding: '8px',
+                      padding: '8px 4px',
                       backgroundColor: 'ds.gray_100',
                       color: 'ds.text_gray_low',
+                      minWidth: '48px',
+                      height: '30px',
+                      ':hover': {
+                        backgroundColor: 'ds.gray_200',
+                      },
+                      ':active': {
+                        backgroundColor: 'ds.gray_300',
+                      },
                     },
                   }}
                   disabled={maxSendableAmount.isExecuting}
@@ -862,7 +869,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }
                   }}
                 >
-                  {maxSendableAmount.isExecuting ? <LoadingSpinner small /> : intl.formatMessage(messages.max)}
+                  {
+                    maxSendableAmount.isExecuting
+                      ? <LoadingSpinner small />
+                      : <Typography variant='body2' fontWeight={500} >
+                          {intl.formatMessage(messages.max)}
+                        </Typography>
+                  }
                 </Button>
               </Box>
               {showFiat && (

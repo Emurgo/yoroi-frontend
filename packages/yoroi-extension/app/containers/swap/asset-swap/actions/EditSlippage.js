@@ -2,6 +2,7 @@
 import { Box, Typography, styled } from '@mui/material';
 import { ReactComponent as EditIcon } from '../../../../assets/images/revamp/icons/edit.inline.svg';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
+import { useStrings } from '../../common/useStrings';
 
 type EditSlippageProps = {|
   setOpenedDialog: (dialog: string) => void,
@@ -9,6 +10,7 @@ type EditSlippageProps = {|
 |};
 
 export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippageProps): React$Node => {
+  const { slippageTolerance, slippageToleranceTooltip } = useStrings();
   return (
     <Box
       sx={{
@@ -19,13 +21,9 @@ export const EditSlippage = ({ setOpenedDialog, slippageValue }: EditSlippagePro
     >
       <Box display="flex" gap="8px" alignItems="center">
         <Typography component="div" variant="body1" color="ds.text_gray_medium">
-          Slippage tolerance
+          {slippageTolerance}
         </Typography>
-        <InfoTooltip
-          content={
-            'Slippage tolerance is set as a percentage of the total swap value. Your transactions will not be executed if the price moves by more than this amount'
-          }
-        />
+        <InfoTooltip content={slippageToleranceTooltip} />
       </Box>
       <IconWrapper onClick={setOpenedDialog} sx={{ cursor: 'pointer', display: 'flex', gap: '4px', alignItems: 'center' }}>
         <Typography component="div" variant="body1" color="ds.text_gray_medium">

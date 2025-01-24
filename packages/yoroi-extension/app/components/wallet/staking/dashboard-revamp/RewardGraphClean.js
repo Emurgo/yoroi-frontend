@@ -24,7 +24,7 @@ const RewardGraphClean = (props: Props): any => {
 
   const formatYAxis = value => (!hideYAxis ? value : '∗∗∗ ');
   const GraphTooltip = ({ active, payload, label }: {| active: boolean, payload: ?[any], label: string |}) => {
-    if (active && payload != null) {
+    if (active && payload != null && payload.length !== 0) {
       const { poolName } = payload[0].payload;
       const values = [[epochTitle, label], [primaryBarLabel, payload[0].value], poolName ? [stakepoolNameTitle, poolName] : []];
       return (
