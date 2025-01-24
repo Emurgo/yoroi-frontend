@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import classnames from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ExplorableHash.scss';
-import { Box, Link, Tooltip, Typography } from '@mui/material';
+import { Link, Tooltip, Typography } from '@mui/material';
 
 const messages = defineMessages({
   websiteTip: {
