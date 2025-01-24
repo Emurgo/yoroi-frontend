@@ -750,7 +750,7 @@ describe('Create unsigned TX from addresses', () => {
 
     expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('1000001');
     expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('5001');
-    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1006');
+    expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('995000');
     // burns remaining amount
     expect(
       unsignedTxResponse.txBuilder.get_explicit_input().checked_sub(

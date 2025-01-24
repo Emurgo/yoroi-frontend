@@ -190,7 +190,7 @@ test('Create Trezor transaction', async () => {
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
       RustModule.WalletV4.Address.from_hex(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe')),
-      RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('5326134'))
+      RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('6323634'))
     )
   );
   const certs = RustModule.WalletV4.Certificates.new();
@@ -207,7 +207,7 @@ test('Create Trezor transaction', async () => {
     RustModule.WalletV4.StakeRegistration.new(stakeCredential)
   ));
   txBuilder.set_certs(certs);
-  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('1000'));
+  txBuilder.set_fee(RustModule.WalletV4.BigNum.from_str('2000'));
   txBuilder.set_ttl(500);
 
   const baseConfig = network.BaseConfig
@@ -235,7 +235,7 @@ test('Create Trezor transaction', async () => {
     Number.parseInt(ChainNetworkId, 10),
   );
   expect(response).toStrictEqual({
-    fee: '1000',
+    fee: '2000',
     ttl: '500',
     networkId: 1,
     protocolMagic: 764824073,
@@ -260,7 +260,7 @@ test('Create Trezor transaction', async () => {
     }],
     outputs: [{
       address: 'Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe',
-      amount: `5326134`
+      amount: `6323634`
     }],
     certificates: [{
       path: [

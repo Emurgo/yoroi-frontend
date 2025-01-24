@@ -32,8 +32,8 @@ export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   return vote.action === 'abstain'
     ? { kind: 'abstain' }
     : vote.action === 'no-confidence'
-    ? { kind: 'no-confidence' }
-    : { kind: 'delegate', drepID: vote.drepID };
+      ? { kind: 'no-confidence' }
+      : { kind: 'delegate', drepID: vote.drepID };
 };
 
 const getStakePoolMeta = (stores: any) => {
@@ -96,9 +96,8 @@ const getAssetWalletAssetList = (stores: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
       const tokenId = getTokenIdentifierIfExists(token.info) ?? '-';
-      const tokenLogo = `data:image/png;base64,${
-        token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
-      }`;
+      const tokenLogo = `data:image/png;base64,${token.info.Metadata.policyId === '' ? cardanoAdaBase64Logo : token.info.Metadata.logo
+        }`;
 
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
       const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
@@ -114,7 +113,9 @@ const getAssetWalletAssetList = (stores: any) => {
           name: tokenName,
           policyId: token.info.Metadata.policyId,
           fingerprint: tokenId,
-          metadata: extractMetadataInfo({ metadata: token.info.Metadata?.assetMintMetadata?.[0] || null }),
+          metadata: extractMetadataInfo({
+            metadata: token.info.Metadata?.assetMintMetadata?.length > 0 ? token.info.Metadata?.assetMintMetadata[0] || null : null
+          }),
           numberOfDecimals,
           image: tokenLogo,
         },
