@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import { CurrentWalletType } from '../../../types/currrentWallet';
 import {
-  AccountPair,
-  CurrencyType,
   DappCenterReducer,
   defaultDappCenterActions,
   defaultDappCenterState,
@@ -31,7 +29,7 @@ export const DappCenterContextProvider = ({
   currentWallet,
   openDialogWrapper,
 }: DappCenterProviderProps) => {
-  const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo, backendServiceZero, explorer } = currentWallet;
+  const { ftAssetList, selectedWallet, networkId } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -47,14 +45,8 @@ export const DappCenterContextProvider = ({
     () => ({
       ...state,
       ...actions,
-      walletBalance,
-      ftAssetList: ftAssetList || [],
       networkId,
-      primaryTokenInfo,
       openBuyDialog: () => openDialogWrapper(BuySellDialog),
-      showWelcomeBanner: ftAssetList.length === 1,
-      backendServiceZero: backendServiceZero,
-      explorer,
     }),
     [state, actions, ftAssetList]
   );

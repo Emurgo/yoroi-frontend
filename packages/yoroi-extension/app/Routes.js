@@ -262,7 +262,7 @@ export const Routes = (stores: StoresMap): Node => {
           <Route
             exact
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-            component={props => wrapDappCenter({ ...props, stores }, <DappCenterPage stores={stores} />)}
+            component={props => <ConnectedWebsitesPage {...props} stores={stores} />}
           />
           <Route
             path={ROUTES.WALLETS.ROOT}
@@ -597,15 +597,13 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
   };
 
   return (
-    <CurrencyProvider currency={dappCenterProps.stores.profile.unitOfAccount.currency || 'USD'}>
-      <DappCenterContextProvider
-        currentWallet={currentWalletInfo}
-        openDialogWrapper={openDialogWrapper}
-      >
-        <Suspense fallback={null}>
-          {children}
-        </Suspense>
-      </DappCenterContextProvider>
-    </CurrencyProvider>
+    <DappCenterContextProvider
+      currentWallet={currentWalletInfo}
+      openDialogWrapper={openDialogWrapper}
+    >
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
+    </DappCenterContextProvider>
   );
 }
