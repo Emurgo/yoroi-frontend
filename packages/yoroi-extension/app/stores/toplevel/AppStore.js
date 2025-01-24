@@ -2,7 +2,6 @@
 import { computed } from 'mobx';
 import Store from '../base/Store';
 import { buildRoute } from '../../utils/routing';
-import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
 
 export default class AppStore extends Store<StoresMap> {

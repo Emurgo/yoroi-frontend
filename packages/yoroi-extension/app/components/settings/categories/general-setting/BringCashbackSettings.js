@@ -50,7 +50,6 @@ type Props = {|
 class BringCashbackSettings extends Component<Props> {
   static defaultProps = {
     error: undefined,
-    isUseSandbox: false,
   };
 
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {

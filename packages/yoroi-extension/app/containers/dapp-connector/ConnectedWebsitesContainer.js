@@ -9,8 +9,6 @@ import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
-import environment from '../../environment';
-import { ROUTES } from '../../routes-config';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { connectorMessages } from '../../i18n/global-messages';

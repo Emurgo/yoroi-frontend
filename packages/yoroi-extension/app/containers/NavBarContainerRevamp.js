@@ -17,6 +17,7 @@ import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
+import type { StoresProps } from '../stores';
 
 const NETWORK_BADGES = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
@@ -32,7 +33,6 @@ const NETWORK_BADGES = Object.freeze({
     text: 'sancho',
   },
 });
-import type { StoresProps } from '../stores';
 
 type LocalProps = {|
   title: Node,

@@ -43,7 +43,6 @@ const handlers = Object.freeze({
       return { ok: publicDeriver };
     }
     const { address } = (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0];
-    const s: string = address;
     return { ok: address };
   },
 

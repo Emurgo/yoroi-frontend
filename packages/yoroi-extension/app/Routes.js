@@ -212,7 +212,6 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
             component={props => <OptForAnalyticsPage {...props} stores={stores} />}
           />
-          <Route exact path={ROUTES.MY_WALLETS} component={props => <MyWalletsPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
@@ -241,11 +240,6 @@ export const Routes = (stores: StoresMap): Node => {
           <Route path={ROUTES.SWAP.ROOT} component={props => wrapSwap({ ...props, stores }, SwapSubpages(stores))} />
           <Route path={ROUTES.TRANSFER.ROOT} component={props => <Transfer {...props} stores={stores} />} />
           <Route exact path={ROUTES.SEND_FROM_URI.ROOT} component={props => <URILandingPage {...props} stores={stores} />} />
-          <Route
-            exact
-            path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-            component={props => <OAuthDropboxPage {...props} stores={stores} />}
-          />
           <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} />} />
           <Route exact path={ROUTES.REVAMP.CATALYST_VOTING} component={props => <VotingPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.EXCHANGE_END} component={props => <ExchangeEndPage {...props} stores={stores} />} />
