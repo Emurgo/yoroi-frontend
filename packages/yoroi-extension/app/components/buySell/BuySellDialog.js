@@ -21,6 +21,7 @@ import adaPng from '../../assets/images/ada.png';
 import banxaPng from '../../assets/images/banxa.png';
 import encryptusPng from '../../assets/images/encryptus.png';
 import environment from '../../environment';
+import BuySellDisclaimerDialog from './DisclaimerDialog';
 
 declare var chrome;
 
@@ -57,15 +58,6 @@ const messages = defineMessages({
     id: 'buysell.dialog.sellProviderFee',
     defaultMessage: '!!!2.5% fee',
   },
-  // disclaimer: {
-  //   id: 'buysell.dialog.disclaimer',
-  //   defaultMessage: '!!!Disclaimer',
-  // },
-  // disclaimerText: {
-  //   id: 'buysell.dialog.disclaimerText',
-  //   defaultMessage:
-  //     '!!!Yoroi Wallet utilizes third-party web3 on-and-off ramp solutions for direct Fiat-ADA exchanges. By clicking "Proceed," you acknowledge that you will be redirected to our partner\'s website, where you may need to accept their terms and conditions.  Please note, the third party web3 solution may have limitations based on your location and financial institution.',
-  // },
   proceed: {
     id: 'buysell.dialog.proceed',
     defaultMessage: 'PROCEED',
@@ -93,6 +85,7 @@ type Props = {|
 
 type State = {|
   +isBuying: boolean,
+  +showDisclaimer: boolean,
   +inputError: null | 'lessThanBuyMinimum' | 'notEnoughBalance' | 'lessThanSellMinimum',
   // 'longLoading' is not really an error but is an temporary state
   +urlGenerationError: null | 'longLoading' | 'timeout' | 'failed' | 'aborted',
@@ -168,27 +161,6 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-const Disclaimer = styled(Box)(({ theme }) => ({
-  color: 'var(--grayscale-contrast-900, #242838)',
-  fontFeatureSettings: `'clig' off, 'liga' off`,
-  fontFamily: 'Rubik',
-  fontSize: '16px',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  lineHeight: '24px',
-  marginBottom: '140px',
-  '& header': {
-    fontWeight: 500,
-    '& svg': {
-      verticalAlign: 'text-bottom',
-      marginRight: '8px',
-    },
-  },
-  borderRadius: 'var(--corner-radius-8, 8px)',
-  background: theme.palette.ds.sys_yellow_100,
-  padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
-}));
-
 const ErrorPopoutContent = styled(Box)({
   height: '428px',
   width: '343px',
@@ -233,6 +205,7 @@ state: State = {
   urlGenerationError: null,
   amountAda: '',
   isSubmitting: false,
+  showDisclaimer: true
 };
 
 urlGenerationTimeout: null | TimeoutID = null;
@@ -354,6 +327,18 @@ onChangeAmount: (SyntheticInputEvent < HTMLInputElement >) => void = event => {
   this.setState({ amountAda: value, inputError });
 };
 
+setDisclaimerAccepted: () => Node = () => {
+  this.setState({ showDisclaimer: false });
+}
+
+renderDisclaimerDialog: () => Node = () => {
+  const { intl } = this.context;
+  const { onCancel } = this.props;
+  return (
+    <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} intl={intl} />
+  )
+}
+
 renderBuySell(): Node {
   const { intl } = this.context;
   const { state, props } = this;
@@ -425,6 +410,12 @@ render(): Node {
   const { intl } = this.context;
   const { state, props } = this;
   const { urlGenerationError } = state;
+
+
+  // TODO: add texts
+  // if (showDisclaimer) {
+  //   return this.renderDisclaimerDialog();
+  // }
 
   if (urlGenerationError === 'longLoading') {
     const abortUrlGeneration = () => {
