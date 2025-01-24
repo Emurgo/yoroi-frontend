@@ -181,12 +181,8 @@ export function PriceImpactAlert({ onContinue, onCancel }: {| onContinue: () => 
         </Button>
         <Button
           fullWidth
-          variant="primary"
+          variant="destructive"
           onClick={onContinue}
-          sx={{
-            backgroundColor: 'magenta.500',
-            '&:hover': { backgroundColor: 'magenta.600' },
-          }}
         >
           {strings.continue}
         </Button>

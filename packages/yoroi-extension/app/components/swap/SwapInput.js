@@ -1,5 +1,5 @@
 // @flow
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, styled } from '@mui/material';
 import type { Node } from 'react';
 import { useEffect, useState } from 'react';
 import adaTokenImage from '../../assets/images/ada.inline.svg';
@@ -24,6 +24,14 @@ type Props = {|
   focusState: State<boolean>,
   error: string | null,
 |};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 export default function SwapInput({
   label,
@@ -151,7 +159,9 @@ export default function SwapInput({
               {ticker || 'Select asset'}
             </Typography>
             <Box display="inline-flex">
-              <ChevronDownIcon />
+              <IconWrapper>
+                <ChevronDownIcon />
+              </IconWrapper>
             </Box>
           </Box>
         </Box>

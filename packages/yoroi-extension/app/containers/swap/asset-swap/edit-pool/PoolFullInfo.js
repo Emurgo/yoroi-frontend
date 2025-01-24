@@ -45,7 +45,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
             <Typography color="ds.text_gray_low">{strings.minAda}</Typography>
             {withInfo && <InfoTooltip content={strings.adaDepositTooltip} />}
           </Box>
-          <Box>
+          <Box color="ds.text_gray_medium">
             {deposit} {ptTicker}
           </Box>
         </Box>
@@ -57,13 +57,13 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
             <InfoTooltip
               content={
                 <>
-                  <Typography color="inherit" color="ds.text_gray_medium">
+                  <Typography color="ds.text_gray_medium">
                     {strings.feesIncluded}
                   </Typography>
-                  <Typography color="inherit" color="ds.text_gray_medium">
+                  <Typography color="ds.text_gray_medium">
                     {strings.dexFee}
                   </Typography>
-                  <Typography color="inherit" color="ds.text_gray_medium">
+                  <Typography color="ds.text_gray_medium">
                     {strings.frontendFee}
                   </Typography>
                 </>

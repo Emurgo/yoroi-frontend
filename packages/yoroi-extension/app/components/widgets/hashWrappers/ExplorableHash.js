@@ -6,7 +6,7 @@ import type { Node } from 'react';
 import classnames from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ExplorableHash.scss';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Link, Tooltip, Typography } from '@mui/material';
 
 const messages = defineMessages({
   websiteTip: {
@@ -52,32 +52,12 @@ export default class ExplorableHash extends Component<Props> {
         placement={this.props.placementTooltip}
       >
         {this.props.primary ? (
-          <Box
-            component="a"
+          <Link
             href={this.props.url}
             onClick={event => onExternalLinkClick(event)}
-            sx={{
-              borderRadius: '2px',
-              color: 'transparent',
-              '&:hover': {
-                color: 'primary.600',
-              },
-              '&:active': {
-                color: 'primary.700',
-              },
-              '&:focus': {
-                color: 'primary.600',
-                outlineWidth: '2px',
-                outlineStyle: 'solid',
-                outlineColor: theme => theme.palette.ds.sys_yellow_500,
-              },
-              '&:disabled': {
-                color: 'primary.300',
-              },
-            }}
           >
             {this.props.children}
-          </Box>
+          </Link>
         ) : (
           <a className={styles.url} href={this.props.url} onClick={event => onExternalLinkClick(event)}>
             <span className={addressClass}>{this.props.children}</span>

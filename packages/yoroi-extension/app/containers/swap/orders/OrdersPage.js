@@ -421,8 +421,8 @@ const OrderRow = ({
       </Box>
       <Box textAlign="left">{txHashToRenderedTimestamp(order.txId)}</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId}>
-          <Typography variant="body1" color="ds.text_primary_medium">
+        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId} primary>
+          <Typography variant="body1">
             {truncateAddressShort(order.txId)}
           </Typography>
         </ExplorableHashContainer>
