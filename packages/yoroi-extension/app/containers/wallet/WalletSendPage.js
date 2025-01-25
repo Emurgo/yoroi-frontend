@@ -59,6 +59,13 @@ export default class WalletSendPage extends Component<StoresProps> {
     ampli.sendInitiated();
   }
 
+  componentWillUnmount() {
+    const { stores } = this.props;
+    stores.wallets.sendMoneyRequest.reset();
+    stores.substores.ada.ledgerSend.cancel();
+    stores.substores.ada.trezorSend.cancel();
+  }
+
   @action
   toggleShowMemo: void => void = () => {
     this.showMemo = !this.showMemo;
@@ -91,6 +98,31 @@ export default class WalletSendPage extends Component<StoresProps> {
     });
     return info.Metadata.numberOfDecimals;
   }
+
+  onSubmit: ({| password: string |}) => Promise<void> = async ({ password }) => {
+    const signRequest = this.props.stores.transactionBuilderStore.tentativeTx;
+    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
+      throw new Error('Unexpected missing active signing request');
+    }
+
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
+      throw new Error('unexpectedly missing wallet')
+    }
+
+    ampli.sendSummarySubmitted({
+      asset_count: signRequest.totalInput().nonDefaultEntries().length,
+    });
+    
+    await this.props.stores.substores.ada.wallets.adaSendAndRefresh({
+      wallet,
+      signRequest,
+      password,
+      callback: async () => {
+        this.openTransactionSuccessDialog();
+      },
+    });
+  };
 
   render(): Node {
     const { stores } = this.props;
@@ -136,7 +168,7 @@ export default class WalletSendPage extends Component<StoresProps> {
           selectedToken={transactionBuilderStore.selectedToken}
           defaultToken={defaultToken}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          onSubmit={transactionBuilderStore.updateTentativeTx}
+          onConfirmAmount={transactionBuilderStore.updateTentativeTx}
           totalInput={transactionBuilderStore.totalInput}
           hasAnyPending={stores.transactions.hasAnyPending}
           shouldSendAll={transactionBuilderStore.shouldSendAll}
@@ -168,19 +200,16 @@ export default class WalletSendPage extends Component<StoresProps> {
           openDialog={this.openDialog}
           closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
           isOpen={uiDialogs.isOpen}
-          openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
           unitOfAccountSetting={stores.profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
           maxSendableAmount={transactionBuilderStore.maxSendableAmount}
           signRequest={transactionBuilderStore.tentativeTx}
           staleTx={transactionBuilderStore.txMismatch}
-          sendMoneyRequest={stores.wallets.sendMoneyRequest}
-          sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
+          isSending={stores.wallets.sendMoneyRequest.isExecuting}
           ledgerSendError={stores.substores.ada.ledgerSend.error || null}
           trezorSendError={stores.substores.ada.trezorSend.error || null}
-          ledgerSend={stores.substores.ada.ledgerSend}
-          trezorSend={stores.substores.ada.trezorSend}
+          onSubmit={this.onSubmit.bind(this)}
         />
         {this.renderDialog()}
       </>

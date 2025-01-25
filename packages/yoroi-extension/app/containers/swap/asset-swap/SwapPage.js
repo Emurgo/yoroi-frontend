@@ -255,14 +255,13 @@ function SwapPage(props: StoresProps & Intl): Node {
     setOpenedDialog('loadingOverlay');
     const password = userPasswordState?.value;
 
-    const baseBroadcastRequest = { wallet, signRequest };
-    const broadcastRequest = isHardwareWallet
-      ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password } };
     try {
-      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
-      // $FlowIgnore[incompatible-call]
-      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      await stores.substores.ada.wallets.adaSendAndRefresh({
+        wallet,
+        signRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
       setOrderStepValue(2);
       try {
         ampli.swapOrderSubmitted({

@@ -10,13 +10,9 @@ import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/u
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
-import { ampli } from '../../../../../ampli/index';
-import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
 import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from '../../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import LedgerSendStore from '../../../../stores/ada/send/LedgerSendStore';
-import TrezorSendStore from '../../../../stores/ada/send/TrezorSendStore';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -36,67 +32,16 @@ type Props = {|
   +onUpdateStep: (step: number) => void,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: SendMoneyRequest,
-  +sendMoney: (params: {|
-    password: string,
-    +wallet: {
-      publicDeriverId: number,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-    signRequest: ISignRequest<any>,
-    onSuccess?: void => void,
-  |}) => Promise<void>,
+  +isSending: boolean,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendStore,
-  +trezorSend: TrezorSendStore,
   selectedExplorer: Map<number, SelectedExplorer>,
   +selectedWallet: WalletState,
+  +onSubmit: ({| password: string |}) => Promise<void>,
 |};
 
 @observer
 export default class WalletSendPreviewStepContainer extends Component<Props> {
-  componentWillUnmount() {
-    this.props.sendMoneyRequest.reset();
-    this.props.ledgerSend.cancel();
-    this.props.trezorSend.cancel();
-  }
-
-  onSubmit: ({| password: string |}) => Promise<void> = async ({ password }) => {
-    const { signRequest, openTransactionSuccessDialog } = this.props;
-    const { ledgerSend, trezorSend, sendMoney, selectedWallet } = this.props;
-
-    if (signRequest == null) throw new Error('Unexpected missing active signing request');
-
-    ampli.sendSummarySubmitted({
-      asset_count: signRequest.totalInput().nonDefaultEntries().length,
-    });
-
-    if (selectedWallet.type === 'ledger') {
-      await ledgerSend.sendUsingLedgerWallet({
-        params: { signRequest },
-        onSuccess: openTransactionSuccessDialog,
-        wallet: selectedWallet,
-     });
-    } else if (selectedWallet.type === 'trezor') {
-      await trezorSend.sendUsingTrezor({
-        params: { signRequest },
-        onSuccess: openTransactionSuccessDialog,
-        wallet: selectedWallet,
-      });
-    } else {
-      // walletType === 'mnemonic'
-      await sendMoney({
-        signRequest,
-        password,
-        wallet: selectedWallet,
-        onSuccess: openTransactionSuccessDialog,
-      });
-    }
-  };
-
   render(): Node {
     const {
       signRequest,
@@ -104,9 +49,10 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       onUpdateStep,
       selectedWallet,
       selectedExplorer,
-      sendMoneyRequest,
+      isSending,
       getTokenInfo,
       getCurrentPrice,
+      onSubmit,
     } = this.props;
 
     if (selectedWallet == null)
@@ -150,8 +96,8 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
             ? `${fullSize}/${MAX_TX_BYTES} (Biggest output: ${maxOutput}/${MAX_VALUE_BYTES})`
             : null
         }
-        onSubmit={this.onSubmit}
-        isSubmitting={sendMoneyRequest.isExecuting}
+        onSubmit={onSubmit}
+        isSubmitting={isSending}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={addr => addressToDisplayString(addr, network)}
         selectedNetwork={network}

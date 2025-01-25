@@ -304,48 +304,15 @@ export default class VotingStore extends Store<StoresMap> {
     password?: string,
     wallet: WalletState,
   |}) => Promise<void> = async request => {
-    const result = this.createVotingRegTx.result;
-    if (result == null) {
+    const signRequest = this.createVotingRegTx.result;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    if (request.wallet.type === 'ledger') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          ledger: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-    if (request.wallet.type === 'trezor') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          trezor: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-    }
     await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          wallet: request.wallet,
-          password: request.password,
-          signRequest: result,
-        },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+      wallet: request.wallet,
+      signRequest,
+      password: request.password,
+      callback: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
   };
 

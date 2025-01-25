@@ -54,7 +54,6 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
@@ -167,7 +166,7 @@ type Props = {|
   +selectedWallet: WalletState,
   +selectedExplorer: Map<number, SelectedExplorer>,
   +hasAnyPending: boolean,
-  +onSubmit: void => void,
+  +onConfirmAmount: void => void,
   +totalInput: ?MultiToken,
   +updateReceiver: (void | string, void | {| handle: string, nameServer: string |}) => void,
   +updateAmount: (?BigNumber) => void,
@@ -209,22 +208,10 @@ type Props = {|
   +calculateMaxAmount: void => Promise<void>,
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
-  +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: SendMoneyRequest,
-  +sendMoney: (params: {|
-    password: string,
-    +wallet: {
-      publicDeriverId: number,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-    signRequest: ISignRequest<any>,
-    onSuccess?: void => void,
-  |}) => Promise<void>,
+  +isSending: boolean,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendStore,
-  +trezorSend: TrezorSendStore,
+  +onSubmit: ({| password: string |}) => Promise<void>,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
@@ -963,20 +950,17 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             staleTx={this.props.staleTx}
             isDefaultIncluded={this.props.isDefaultIncluded}
             unitOfAccountSetting={this.props.unitOfAccountSetting}
-            openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
             minAda={this.props.minAda}
             plannedTxInfoMap={this.props.plannedTxInfoMap}
             onUpdateStep={this.onUpdateStep.bind(this)}
-            sendMoneyRequest={this.props.sendMoneyRequest}
-            sendMoney={this.props.sendMoney}
+            isSending={this.props.isSending}
             getTokenInfo={this.props.getTokenInfo}
             getCurrentPrice={this.props.getCurrentPrice}
             ledgerSendError={this.props.ledgerSendError}
             trezorSendError={this.props.trezorSendError}
-            ledgerSend={this.props.ledgerSend}
-            trezorSend={this.props.trezorSend}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
+            onSubmit={this.props.onSubmit}
           />
         );
       default:
@@ -1025,7 +1009,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               variant="primary"
               size="medium"
               onClick={() => {
-                this.props.onSubmit();
+                this.props.onConfirmAmount();
                 this.onUpdateStep(SEND_FORM_STEP.PREVIEW);
               }}
               disabled={!this.props.fee || this.props.hasAnyPending || invalidMemo || maxSendableAmount.isExecuting}

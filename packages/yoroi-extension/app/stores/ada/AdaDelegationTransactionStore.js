@@ -133,52 +133,19 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     password?: string,
     dialog?: any,
   |}) => Promise<void> = async request => {
-    const result = this.createDelegationTx.result;
-    if (result == null) {
+    const signRequest = this.createDelegationTx.result?.signTxRequest;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    const refreshWallet = () => {
-      this.stores.delegation.disablePoolTransitionState(request.wallet);
-      return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
-    };
     try {
-      if (request.wallet.type === 'ledger') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
-          broadcastRequest: {
-            ledger: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      if (request.wallet.type === 'trezor') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
-          broadcastRequest: {
-            trezor: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-      }
       await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            wallet: request.wallet,
-            password: request.password,
-            signRequest: result.signTxRequest,
-          },
+        wallet: request.wallet,
+        signRequest,
+        password: request.password,
+        callback: () => {
+          this.stores.delegation.disablePoolTransitionState(request.wallet);
+          return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
         },
-        refreshWallet,
       });
     } catch (error) {
       runInAction(() => {
