@@ -23,7 +23,6 @@ import { generateGraphData } from '../../../utils/graph';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
@@ -309,7 +308,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
               // note: purposely don't await since the next dialog will properly render the spinner
               noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
               this.props.stores.uiDialogs.open({
-                // dialog: WithdrawalTxDialogContainer,
                 dialog: WithdrawRewardsDialog,
               });
             }}
@@ -320,15 +318,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />
-        ) : null}
-        {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
-          <WithdrawalTxDialogContainer
-            stores={stores}
-            onClose={() => {
-              stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-              this.props.stores.uiDialogs.closeActiveDialog();
-            }}
-          />
         ) : null}
         {uiDialogs.isOpen(WithdrawRewardsDialog) ? (
           <WithdrawRewardsDialog

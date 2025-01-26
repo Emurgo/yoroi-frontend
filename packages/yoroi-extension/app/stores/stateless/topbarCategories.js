@@ -68,14 +68,6 @@ function registerCategory(category: TopbarCategory): TopbarCategory {
   return category;
 }
 
-export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
-  className: 'stakeDashboard',
-  route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-  icon: dashboardIcon,
-  label: messages.delegationDashboard,
-  // every wallet is Cardano Shelley wallet now
-  isVisible: _request => true,
-});
 export const SUMMARY: TopbarCategory = registerCategory({
   className: 'summary',
   route: ROUTES.WALLETS.TRANSACTIONS,
