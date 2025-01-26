@@ -25,6 +25,8 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { ROUTES } from '../../routes-config';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -66,49 +68,43 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
   }
 
   componentWillUnmount() {
-    const { stores } = this.props;
-    stores.wallets.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
-    stores.substores.ada.ledgerSend.cancel();
-    stores.substores.ada.trezorSend.cancel();
+  }
+
+  signAndBroadcast: (?string) => Promise<void>  = async (password) => {
+    const { stores } = this.props;
+    const wallet = stores.wallets.selected;
+    if (wallet == null) {
+      throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
+    }
+
+    const signRequest = this.props.transactionRequest.result;
+    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
+      throw new Error('Unexpected missing active signing request');
+    }
+
+    await this.props.stores.substores.ada.wallets.adaSendAndRefresh({
+      wallet,
+      signRequest,
+      password,
+      callback: async () => {},
+    });
+    if (stores.wallets.sendMoneyRequest.error == null) {
+      this.props.onSubmit.trigger();
+    }
+    stores.uiDialogs.closeActiveDialog();
+    stores.wallets.sendMoneyRequest.reset();
+    stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
   }
 
   submit: void => Promise<void> = async () => {
-    const { stores } = this.props;
-    const selected = stores.wallets.selected;
-    if (selected == null) {
-      throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
-    }
-    const signRequest = this.props.transactionRequest.result;
-    if (signRequest == null) return;
     if (this.spendingPasswordForm == null) {
-      if (selected.type === 'trezor') {
-        await stores.substores.ada.trezorSend.sendUsingTrezor({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (selected.type === 'ledger') {
-        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (stores.wallets.sendMoneyRequest.error == null) {
-        this.props.onSubmit.trigger();
-      }
+      await this.signAndBroadcast();
     } else {
       this.spendingPasswordForm.submit({
         onSuccess: async (form) => {
           const { walletPassword } = form.values();
-          await stores.substores.ada.mnemonicSend.sendMoney({
-            signRequest,
-            password: walletPassword,
-            wallet: selected,
-          });
-          if (stores.wallets.sendMoneyRequest.error == null) {
-            this.props.onSubmit.trigger();
-          }
+          await this.signAndBroadcast(walletPassword);
         },
         onError: () => {}
       });

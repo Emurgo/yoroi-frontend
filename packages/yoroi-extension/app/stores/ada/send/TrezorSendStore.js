@@ -7,7 +7,6 @@ import { wrapWithFrame } from '../../lib/TrezorWrapper';
 import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
 import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
 import LocalizableError from '../../../i18n/LocalizableError';
-import { ROUTES } from '../../../routes-config';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { StoresMap } from '../../index';
 import {
@@ -42,61 +41,6 @@ export default class TrezorSendStore extends Store<StoresMap> {
   reset: void => void = () => {
     this._setActionProcessing(false);
     this._setError(null);
-  }
-
-  sendUsingTrezor: {|
-    params: SendUsingTrezorParams,
-    onSuccess?: void => void,
-    +wallet: {
-      publicDeriverId: number,
-      stakingAddressing: Addressing,
-      publicKey: string,
-      pathToPublic: Array<number>,
-      networkId: number,
-      hardwareWalletDeviceId: ?string,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-  |} => Promise<void> = async (request) => {
-    try {
-      if (this.isActionProcessing) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Can’t send another transaction if one transaction is in progress.');
-      }
-      if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
-        throw new Error(`${nameof(this.sendUsingTrezor)} wrong tx sign request`);
-      }
-      const { signRequest } = request.params;
-
-      this._setError(null);
-      this._setActionProcessing(true);
-
-      const { stores } = this;
-      await stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          trezor: {
-            signRequest,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-
-      this.stores.uiDialogs.closeActiveDialog();
-      stores.wallets.sendMoneyRequest.reset();
-      if (request.onSuccess) {
-        request.onSuccess();
-      } else {
-        stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
-      }
-      this.reset();
-
-      Logger.info('SUCCESS: ADA sent using Trezor SignTx');
-    } catch (e) {
-      this._setError(e);
-    } finally {
-      this._setActionProcessing(false);
-    }
   }
 
   signAndBroadcastFromWallet: {|
