@@ -7,7 +7,6 @@ import { Box, Typography, styled } from '@mui/material';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
-import { ReactComponent as InfoIcon } from '../../assets/images/info-icon-revamp.inline.svg';
 import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
@@ -152,14 +151,6 @@ const ProviderRow = styled(Box)({
     textAlign: 'left',
   },
 });
-
-const IconWrapper = styled(Box)(({ theme }) => ({
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_medium,
-    },
-  },
-}));
 
 const ErrorPopoutContent = styled(Box)({
   height: '428px',
@@ -327,7 +318,7 @@ onChangeAmount: (SyntheticInputEvent < HTMLInputElement >) => void = event => {
   this.setState({ amountAda: value, inputError });
 };
 
-setDisclaimerAccepted: () => Node = () => {
+setDisclaimerAccepted: () => void = () => {
   this.setState({ showDisclaimer: false });
 }
 

@@ -56,9 +56,9 @@ const messages = defineMessages({
 
 type Props = {|
   onClose: void => void,
-    onAccept: void => void,
-      intl: $npm$ReactIntl$IntlFormat
-        |};
+  onAccept: void => void,
+  intl: $npm$ReactIntl$IntlFormat
+|};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
@@ -69,11 +69,12 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
     async function checkAcceptanceStatus() {
       const accepted = await localStorageApi.getBuySellDisclaimer();
 
-      if (accepted == "true") {
+      if (accepted === 'true') {
         handleAccepted();
       }
     }
 
+    // eslint-disable-next-line no-floating-promise/no-floating-promise
     checkAcceptanceStatus();
   }, [])
 
@@ -82,12 +83,12 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
   }
 
   const handleAccepted = () => {
-    localStorageApi.setBuySellDisclaimer("true");
+    localStorageApi.setBuySellDisclaimer('true');
     onAccept();
   }
 
   const handleClose = () => {
-    localStorageApi.setBuySellDisclaimer("false");
+    localStorageApi.setBuySellDisclaimer('false');
     onClose();
   }
 
@@ -107,7 +108,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
       onClose={handleClose}
       closeButton={<DialogCloseButton onClose={handleClose} />}
       dialogActions={actions}
-      styleContentOverride={{paddingTop: 0}}
+      styleContentOverride={{ paddingTop: 0 }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
         <Typography component="div" variant="body1">
@@ -122,15 +123,15 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              flexFlow: "column"
+              flexFlow: 'column'
             }}
           >
             {[messages.note1, messages.note2, messages.note3, messages.note4].map((message, i) => (
               <Box sx={{
-                display: "flex",
-                flexFlow: "row nowrap",
-                alignItems: "flex-start",
-                justifyContent: "flex-start"
+                display: 'flex',
+                flexFlow: 'row nowrap',
+                alignItems: 'flex-start',
+                justifyContent: 'flex-start'
               }}>
                 <Typography component="div" variant="body1" color="grayscale.900">
                   {i}.&nbsp;
@@ -147,7 +148,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
               <Checkbox
                 checked={disclaimerAccepted}
                 onChange={toggleDisclaimerAcceptance}
-                sx={{marginRight: "8px"}}
+                sx={{ marginRight: '8px' }}
               />
             }
             sx={{ margin: '0px' }}
