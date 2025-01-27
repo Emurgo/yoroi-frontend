@@ -62,10 +62,10 @@ export default class ConnectedWebsitesPage extends Component<Props> {
         <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">
           <NoDappsConnected />
           <Box textAlign="center">
-            <Typography component="div" variant="h5" fontWeight={500} mb="8px">
+            <Typography variant="h5" fontWeight={500} mb="8px" color="ds.text_gray_medium">
               {intl.formatMessage(messages.noWebsitesConnected)}
             </Typography>
-            <Typography component="div" variant="body1" color="grayscale.600">
+            <Typography variant="body1" color="ds.text_gray_low">
               {intl.formatMessage(connectorMessages.messageReadOnly)}
             </Typography>
           </Box>
@@ -74,20 +74,13 @@ export default class ConnectedWebsitesPage extends Component<Props> {
     );
 
     const { whitelistEntries, wallets } = this.props;
-    if (
-      whitelistEntries == null ||
-      whitelistEntries.length === 0 ||
-      wallets == null ||
-      wallets.length === 0
-    ) {
+    if (whitelistEntries == null || whitelistEntries.length === 0 || wallets == null || wallets.length === 0) {
       return genNoResult();
     }
 
     const cardanoNodes = whitelistEntries
       .map(({ url, publicDeriverId, image }, entryIndex) => {
-        const wallet = wallets.find(
-          cacheEntry => cacheEntry.publicDeriverId === publicDeriverId
-        );
+        const wallet = wallets.find(cacheEntry => cacheEntry.publicDeriverId === publicDeriverId);
 
         if (wallet == null) return null;
 
@@ -116,7 +109,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
     return (
       <Box>
         <Box mb="15px">
-          <Typography component="div" fontWeight={500} variant="h5">
+          <Typography fontWeight={500} variant="h5" color="ds.text_gray_medium">
             {intl.formatMessage(messages.connectedDapps, { dappsCount: cardanoNodes.length })}
           </Typography>
         </Box>
@@ -133,10 +126,10 @@ export default class ConnectedWebsitesPage extends Component<Props> {
           }}
         >
           <Box width="100%">
-            <Typography component="div" variant="body2">{intl.formatMessage(messages.walletsLabel)}</Typography>
+            <Typography variant="body2">{intl.formatMessage(messages.walletsLabel)}</Typography>
           </Box>
           <Box width="100%">
-            <Typography component="div" variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
+            <Typography variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
           </Box>
         </Box>
         <Box mt="16px">{cardanoNodes}</Box>

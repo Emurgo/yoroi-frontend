@@ -5,12 +5,12 @@ import BigNumber from 'bignumber.js';
 import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
+import { HiddenAmount } from '../../common/components/HiddenAmount';
 import PnlTag from '../../common/components/PlnTag';
 import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/constants';
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { HiddenAmount } from '../../common/components/HiddenAmount';
 
 export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   const theme = useTheme();
@@ -38,7 +38,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
         />
       </Box>
       <Stack direction="column">
-        <Typography fontWeight="500" color="ds.text_gray_normal">
+        <Typography fontWeight="500" color="ds.text_gray_medium">
           {token.info.name}
         </Typography>
         <Typography variant="body2" color="ds.text_gray_low">
@@ -90,8 +90,8 @@ export const TokenPriceChangeChip = ({
       ? deltaPtTokenDataInterval < 0
         ? 'danger'
         : deltaPtTokenDataInterval > 0
-          ? 'success'
-          : 'neutral'
+        ? 'success'
+        : 'neutral'
       : variantPnl;
 
   if (noDataToDisplay || changePercent === undefined) {
@@ -118,7 +118,7 @@ export const TokenPriceChangeChip = ({
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={deltaVariantPnl} withIcon>
-        <Typography fontSize="13px">{Math.abs(Number(priceChangeProcent))}</Typography>
+        <Typography fontSize="12px">{Math.abs(Number(priceChangeProcent))}</Typography>
       </PnlTag>
     </Box>
   );
@@ -182,15 +182,12 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
   const primaryAda = isPrimary && showingAda;
 
   const totalTicker = primaryAda ? accountPair?.to.name : accountPair?.from.name;
-  const totalTokenPrice =
-    primaryAda
-      ? ''
-      : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
+  const totalTokenPrice = primaryAda ? '' : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
 
   return (
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography columnGap="3px" color="ds.text_gray_normal" sx={{ display: 'flex' }}>
+        <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <HiddenAmount isHidden={isHiddenAmount}>
             <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
           </HiddenAmount>
@@ -200,9 +197,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
-            <HiddenAmount isHidden={isHiddenAmount}>
-              {totalTokenPrice}
-            </HiddenAmount>
+            <HiddenAmount isHidden={isHiddenAmount}>{totalTokenPrice}</HiddenAmount>
             <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
           </Typography>
         )}

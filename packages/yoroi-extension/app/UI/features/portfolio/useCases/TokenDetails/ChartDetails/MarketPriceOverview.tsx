@@ -47,7 +47,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
       gap="16px"
       sx={{ p: !isPrimaryToken && theme.spacing(3) }}
     >
-      <Typography fontWeight="500" color="ds.gray_max">
+      <Typography fontWeight="500" color="ds.text_gray_medium">
         {strings.marketPrice}
       </Typography>
 
@@ -92,7 +92,7 @@ const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptA
   if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
-    <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
+    <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.text_gray_medium">
       <Typography fontWeight="500">{formatPriceChange(isPrimaryToken ? ptPrice : ptUnitPrice, 4)}</Typography>
       <Typography variant="caption" mt="2px">
         &nbsp;{unitOfAccount}

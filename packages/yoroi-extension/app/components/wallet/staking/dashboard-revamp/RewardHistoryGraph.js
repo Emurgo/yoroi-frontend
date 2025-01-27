@@ -170,10 +170,11 @@ function RewardHistoryGraph({
           width: '100%',
         }}
       >
-        <Typography component="div" variant="body1" fontWeight={500}>
+        <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {title}
         </Typography>
         <Button
+          variant="tertiary"
           color="primary"
           size="medium"
           onClick={onOpenRewardList}
@@ -182,7 +183,7 @@ function RewardHistoryGraph({
           {title}
         </Button>
       </Box>
-      {rewardsGraphData.error && (
+      {(rewardsGraphData.error && !rewardsGraphData.items) && (
         <div>
           <center>
             <InvalidURIImg />

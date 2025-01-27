@@ -21,6 +21,13 @@ const getGeneralBgColor = (variant: string, disabled: boolean, theme: any) => {
   return 'transparent';
 };
 
+const getGeneralColor = (variant: string, disabled: boolean, theme: any) => {
+  if (variant == 'contained') {
+    return theme.palette.ds.gray_min;
+  }
+  return disabled ? theme.palette.ds.text_gray_min : theme.palette.ds.text_primary_medium;
+};
+
 // Styling for the period buttons
 const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any; disabled: boolean; variant: string }) => ({
   fontWeight: 500,
@@ -30,8 +37,7 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
   padding: '6px !important',
   minWidth: '36px',
   backgroundColor: getGeneralBgColor(variant, disabled, theme),
-  color: 'ds.gray_min',
-
+  color: getGeneralColor(variant, disabled, theme),
   '&.MuiButton-contained': {
     color: 'ds.gray_min',
   },
@@ -120,7 +126,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseUp}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.ds.gray_300}/>
                   <YAxis
                     domain={['auto', 'auto']}
                     axisLine={false}

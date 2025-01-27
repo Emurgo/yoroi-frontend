@@ -94,7 +94,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               gridTemplateColumns: '1fr auto',
               justifyContent: 'start',
               position: 'relative',
-              bgcolor: readonly ? 'ds.bg_color_max' : 'ds.bg_color_max',
+              bgcolor: readonly ? 'ds.bg_color_contrast_min' : 'ds.bg_color_max',
               columnGap: '6px',
               rowGap: '8px',
               ...(!inputFocused &&
@@ -136,7 +136,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
               color="ds.text_gray_medium"
               placeholder="0"
               onChange={handleSlippageChange}
-              bgcolor={readonly ? 'ds.bg_color_max' : 'ds.bg_color_max'}
+              bgcolor={readonly ? 'ds.bg_color_contrast_min' : 'ds.bg_color_max'}
               readOnly={readonly}
               value={selectedSlippage}
             />

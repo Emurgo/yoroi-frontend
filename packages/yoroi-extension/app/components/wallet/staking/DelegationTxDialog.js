@@ -131,18 +131,17 @@ export default class DelegationTxDialog extends Component<Props> {
     const { intl } = this.context;
 
     const spendingPasswordForm = this.props.isHardware ? undefined : (
-      <SpendingPasswordInput
-        setForm={form => this.setSpendingPasswordForm(form)}
-        isSubmitting={this.props.isSubmitting}
-      />
+      <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={this.props.isSubmitting} />
     );
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
-          <br />
-          {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+          <Typography variant="body1" color="ds.text_gray_max">
+            {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
+            <br />
+            {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
+          </Typography>
         </WarningBox>
       </div>
     );
@@ -170,7 +169,7 @@ export default class DelegationTxDialog extends Component<Props> {
         ]}
         closeOnOverlayClick={false}
         onClose={!this.props.isSubmitting ? this.props.onCancel : null}
-        closeButton={<DialogCloseButton/>}
+        closeButton={<DialogCloseButton />}
       >
         {this.props.staleTx && staleTxWarning}
         <Box
@@ -181,14 +180,16 @@ export default class DelegationTxDialog extends Component<Props> {
             borderRadius: '8px',
           }}
         >
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            mb: '8px'
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              mb: '8px',
+            }}
+          >
             <IconWrapper>
-              <InfoIcon/>
+              <InfoIcon />
             </IconWrapper>
             <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
               {intl.formatMessage(messages.delegationTips)}
@@ -217,18 +218,20 @@ export default class DelegationTxDialog extends Component<Props> {
           <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
             {intl.formatMessage(globalMessages.stakePoolChecksumAndName)}
           </Typography>
-          <Box sx={{
-            display: 'flex',
-            gap: '8px',
-            alignItems: 'center'
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center',
+            }}
+          >
             <Box>
               <Box
                 sx={{
                   width: '24px',
                   height: '24px',
                   borderRadius: '50%',
-                  display: 'inline-block'
+                  display: 'inline-block',
                 }}
                 component="img"
                 src={avatarGenerated}
@@ -251,7 +254,7 @@ export default class DelegationTxDialog extends Component<Props> {
                 '& > div > p': { p: '2px 3px' },
                 px: '2px',
                 ml: '-3px',
-                mt: '-2px'
+                mt: '-2px',
               }}
             >
               <CopyAddress text={this.props.poolHash}>
@@ -296,7 +299,7 @@ export default class DelegationTxDialog extends Component<Props> {
                 placement="top"
               >
                 <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
-                  <InfoIcon/>
+                  <InfoIcon />
                 </IconWrapper>
               </Tooltip>
             </Box>
@@ -317,7 +320,7 @@ export default class DelegationTxDialog extends Component<Props> {
                 }
               >
                 <IconWrapper component="span" sx={{ cursor: 'pointer' }}>
-                  <InfoIcon/>
+                  <InfoIcon />
                 </IconWrapper>
               </Tooltip>
             </Box>
