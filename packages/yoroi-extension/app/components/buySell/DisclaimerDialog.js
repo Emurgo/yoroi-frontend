@@ -11,12 +11,12 @@ import LocalStorageApi from '../../api/localStorage/index';
 const messages = defineMessages({
   title: {
     id: 'buySell.disclaimer.title',
-    defaultMessage: '!!!Discover a new yoroi',
+    defaultMessage: '!!!Disclaimer',
   },
   description: {
     id: 'buySell.disclaimer.description',
     defaultMessage:
-      '!!!test',
+      '!!!By clicking "Proceed," you acknowledge that you will be redirected to a third-party service provider offering Web3 on-and-off ramp solutions for fiat-to-ADA exchanges. You may be required to agree to the terms, conditions, and privacy policies of the third-party provider to complete the transaction. Yoroi Wallet does not control, endorse, or assume responsibility for the content, security, policies, or services provided by the third party.',
   },
   pleaseNote: {
     id: 'buySell.disclaimer.pleaseNote',
@@ -26,27 +26,27 @@ const messages = defineMessages({
   note1: {
     id: 'buySell.disclaimer.note1',
     defaultMessage:
-      '!!!1',
+      '!!!Yoroi Wallet is not liable for any losses, delays, or errors that may occur while using the third-party service.',
   },
   note2: {
     id: 'buySell.disclaimer.note2',
     defaultMessage:
-      '!!!2',
+      "!!!Transactions may be subject to restrictions based on your geographic location, applicable laws, financial institution policies, or the service provider's limitations.",
   },
   note3: {
     id: 'buySell.disclaimer.note3',
     defaultMessage:
-      '!!!3',
+      "!!!Ensure you review and understand the third party's terms, as your interactions are solely governed by their agreements.",
   },
   note4: {
     id: 'buySell.disclaimer.note4',
     defaultMessage:
-      '!!!4',
+      '!!!Yoroi Wallet does not collect or store any personal or financial data submitted through the third-party platform.',
   },
   checkboxLabel: {
     id: 'buySell.disclaimer.checkboxLabel',
     defaultMessage:
-      '!!!test',
+      '!!!I understand this disclaimer',
   },
   proceed: {
     id: 'buySell.actions.proceed',
@@ -56,9 +56,9 @@ const messages = defineMessages({
 
 type Props = {|
   onClose: void => void,
-  onAccept: void => void,
-  intl: $npm$ReactIntl$IntlFormat
-|};
+    onAccept: void => void,
+      intl: $npm$ReactIntl$IntlFormat
+        |};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
@@ -107,15 +107,10 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
       onClose={handleClose}
       closeButton={<DialogCloseButton onClose={handleClose} />}
       dialogActions={actions}
+      styleContentOverride={{paddingTop: 0}}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
-        <Typography component="div"
-          variant="body1"
-          sx={{
-            textAlign: 'center',
-            fontWeight: 500,
-          }}
-        >
+        <Typography component="div" variant="body1">
           {intl.formatMessage(messages.description)}
         </Typography>
 
@@ -123,27 +118,28 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
           <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
             {intl.formatMessage(messages.pleaseNote)}
           </Typography>
-
           <Box
             sx={{
               display: 'flex',
-              gap: '16px',
               alignItems: 'center',
+              flexFlow: "column"
             }}
           >
-            <Box
-              sx={{
-                listStyle: 'inside',
-                color: 'grayscale.900',
-                width: '100%',
-              }}
-            >
-              {[messages.note1, messages.note2, messages.note3, messages.note4].map((message, i) => (
-                <Typography component="li" variant="body1" color="grayscale.900">
-                  {i}. {intl.formatMessage(message)}
+            {[messages.note1, messages.note2, messages.note3, messages.note4].map((message, i) => (
+              <Box sx={{
+                display: "flex",
+                flexFlow: "row nowrap",
+                alignItems: "flex-start",
+                justifyContent: "flex-start"
+              }}>
+                <Typography component="div" variant="body1" color="grayscale.900">
+                  {i}.&nbsp;
                 </Typography>
-              ))}
-            </Box>
+                <Typography component="div" variant="body1" color="grayscale.900">
+                  {intl.formatMessage(message)}
+                </Typography>
+              </Box>
+            ))}
           </Box>
           <FormControlLabel
             label={intl.formatMessage(messages.checkboxLabel)}
@@ -151,6 +147,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
               <Checkbox
                 checked={disclaimerAccepted}
                 onChange={toggleDisclaimerAcceptance}
+                sx={{marginRight: "8px"}}
               />
             }
             sx={{ margin: '0px' }}

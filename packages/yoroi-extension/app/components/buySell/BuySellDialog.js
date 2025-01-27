@@ -409,13 +409,11 @@ renderBuySell(): Node {
 render(): Node {
   const { intl } = this.context;
   const { state, props } = this;
-  const { urlGenerationError } = state;
+  const { urlGenerationError, showDisclaimer } = state;
 
-
-  // TODO: add texts
-  // if (showDisclaimer) {
-  //   return this.renderDisclaimerDialog();
-  // }
+  if (showDisclaimer) {
+    return this.renderDisclaimerDialog();
+  }
 
   if (urlGenerationError === 'longLoading') {
     const abortUrlGeneration = () => {
