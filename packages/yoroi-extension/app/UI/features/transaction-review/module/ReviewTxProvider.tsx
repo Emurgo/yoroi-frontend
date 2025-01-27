@@ -60,6 +60,7 @@ export const ReviewTxProvider = ({
         height: payload.height,
         width: payload.width,
         unsignedTx: payload.unsignedTx,
+        receiverCustomTitle: payload.receiverCustomTitle,
       });
     },
     changeModalView: (payload: any) => {
@@ -82,6 +83,7 @@ export const ReviewTxProvider = ({
       networkId: currentWalletInfo?.networkId,
       primaryTokenInfo: currentWalletInfo?.primaryTokenInfo,
       walletAddresses: currentWalletInfo?.walletAddresses,
+      stakingAddress: currentWalletInfo?.stakingAddress,
       ...actions,
     }),
     [state, actions]

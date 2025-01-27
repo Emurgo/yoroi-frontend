@@ -10,27 +10,29 @@ import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
-export const useFormattedTx = (data: TransactionBody, ftAssetsList: any, networkId, primaryTokenInfo): FormattedTx => {
-  const { walletUtxos, walletAddresses } = useTxReviewModal();
+export const useFormattedTx = (data: TransactionBody): FormattedTx => {
+  const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, stakingAddress, networkId } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
+  console.log('XXXXXX', outputs);
   const referenceInputs = data?.reference_inputs ?? [];
 
-  console.log('ftAssetsList', ftAssetsList);
   const inputUtxos = useUtxos(inputs, walletUtxos);
+
+  const formattedFee = formatFee(primaryTokenInfo, data);
+
   const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
 
   const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
-
-  console.log('=======@@@@@formattedInputs', formattedInputs);
-  // return {
-  //   inputs: formattedInputs,
-  //   outputs: formattedOutputs,
-  //   fee: formattedFee,
-  //   certificates: formattedCertificates,
-  //   mint: formattedMintData,
-  //   referenceInputs: formattedReferenceInputs,
-  // };
+  const formattedOutputs = useFormattedOutputs(outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses);
+  return {
+    inputs: formattedInputs,
+    outputs: formattedOutputs,
+    fee: formattedFee,
+    // certificates: formattedCertificates,
+    // mint: formattedMintData,
+    // referenceInputs: formattedReferenceInputs,
+  };
 };
 
 export const useFormattedInputs = (inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses) => {
@@ -46,25 +48,20 @@ export const useFormattedInputs = (inputUtxos, ftAssetsList, networkId, primaryT
   return query.data;
 };
 
-// export const useFormattedOutputs = (
-//   wallet: any,
-//   outputs: TransactionOutputs,
-//   portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>
-// ) => {
-//   const query = useQuery<FormattedOutputs>(
-//     ['useFormattedOutputs', outputs],
-//     () => formatOutputs(wallet, outputs, portfolioTokenInfos),
-//     {
-//       suspense: true,
-//     }
-//   );
+export const useFormattedOutputs = (outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses) => {
+  const query = useQuery<any>(
+    ['useFormattedOutputs', outputs],
+    () => formatOutputs(outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses),
+    {
+      suspense: true,
+    }
+  );
 
-//   if (!query.data) throw new Error('invalid formatted outputs');
-//   return query.data;
-// };
+  if (!query.data) throw new Error('invalid formatted outputs');
+  return query.data;
+};
 
 const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
-  console.log('inputUtxos', inputUtxos);
   return Promise.all(
     inputUtxos.map(async utxo => {
       const address = utxo?.receiver;
@@ -111,92 +108,59 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
   );
 };
 
-// const formatOutputs = async (
-//   wallet: any,
-//   outputs: TransactionOutputs,
-//   portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>
-// ): Promise<FormattedOutputs> => {
-//   return Promise.all(
-//     outputs.map(async output => {
-//       const address = output.address;
-//       const coin = asQuantity(output.amount.coin);
+const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
+  console.log('walletAddresses', walletAddresses);
+  console.log('outputs', outputs);
 
-//       const addressKind = await getAddressKind(address);
-//       const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, wallet.networkManager.chainId) : null;
+  return Promise.all(
+    outputs.map(async output => {
+      const address = output.address;
+      const coin = asQuantity(output.amount.coin);
+      const addressKind = await getAddressKind(address);
+      const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
+      const primaryAssets = [
+        {
+          tokenInfo: primaryTokenInfo,
+          quantity: coin,
+        },
+      ];
 
-//       const primaryAssets = [
-//         {
-//           tokenInfo: wallet.portfolioPrimaryTokenInfo,
-//           name: wallet.portfolioPrimaryTokenInfo.name,
-//           label: formatTokenWithText(coin, wallet.portfolioPrimaryTokenInfo),
-//           quantity: coin,
-//           isPrimary: true,
-//         },
-//       ];
+      const multiAssets = output.amount?.multiasset
+        ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
+            return Object.entries(assets).map(([assetId, amount]) => {
+              const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
+              if (primaryTokenInfo == null) return null;
+              const quantity = asQuantity(amount);
 
-//       const multiAssets = output.amount.multiasset
-//         ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
-//             return Object.entries(assets).map(([assetId, amount]) => {
-//               const tokenInfo = portfolioTokenInfos.tokenInfos?.get(`${policyId}.${assetId}`);
-//               if (tokenInfo == null) return null;
-//               const quantity = asQuantity(amount);
+              return {
+                tokenInfo,
+                quantity,
+              };
+            });
+          })
+        : [];
 
-//               return {
-//                 tokenInfo,
-//                 name: infoExtractName(tokenInfo),
-//                 label: formatTokenWithText(quantity, tokenInfo),
-//                 quantity,
-//                 isPrimary: false,
-//               };
-//             });
-//           })
-//         : [];
+      const assets = [...primaryAssets, ...multiAssets].filter(isNonNullable);
 
-//       const assets = [...primaryAssets, ...multiAssets].filter(isNonNullable);
+      return {
+        assets,
+        address,
+        addressKind,
+        rewardAddress,
+        ownAddress: isOwnedAddress(walletAddresses, address),
+      };
+    })
+  );
+};
 
-//       return {
-//         assets,
-//         address,
-//         addressKind,
-//         rewardAddress,
-//         ownAddress: isOwnedAddress(wallet, address),
-//       };
-//     })
-//   );
-// };
+export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => {
+  const fee = asQuantity(data?.fee ?? '0');
 
-// export const formatFee = (wallet: any, data: TransactionBody): any => {
-//   const fee = asQuantity(data?.fee ?? '0');
-
-//   return {
-//     tokenInfo: wallet.portfolioPrimaryTokenInfo,
-//     name: wallet.portfolioPrimaryTokenInfo.name,
-//     label: formatTokenWithText(fee, wallet.portfolioPrimaryTokenInfo),
-//     quantity: fee,
-//     isPrimary: true,
-//   };
-// };
-
-// const formatCertificates = (certificates: TransactionBody['certs']) => {
-//   return (
-//     certificates?.map(cert => {
-//       const [type, certificate] = Object.entries(cert)[0];
-//       return ({ type, value: certificate } as unknown) as FormattedCertificate;
-//     }) ?? null
-//   );
-// };
-
-// const formatMintData = (
-//   mintData: TransactionBody['mint'] | null,
-//   portfolioTokenInfos: ReturnType<typeof usePortfolioTokenInfos>
-// ) => {
-//   if (mintData == null) return null;
-//   return (mintData?.flatMap(([policyId, tokens]) =>
-//     Object.entries(tokens)
-//       .map(([assetNameHex, count]) => [portfolioTokenInfos.tokenInfos?.get(`${policyId}.${assetNameHex}`), count])
-//       .filter(([tokenInfo]) => tokenInfo != null)
-//   ) ?? []) as Array<[Portfolio.Token.Info, string]>;
-// };
+  return {
+    tokenInfo: primaryTokenInfo,
+    quantity: fee,
+  };
+};
 
 const deriveAddress = async (address: string, chainId: number) => {
   try {
@@ -208,8 +172,9 @@ const deriveAddress = async (address: string, chainId: number) => {
 
 const getAddressKind = async (addressBech32: string): Promise<any> => {
   try {
-    const address = await RustModule.WalletV4.Address.fromBech32(addressBech32).to_bech32();
-    const addressKind = await (await address.paymentCred())?.kind();
+    const address = await RustModule.WalletV4.Address.from_bech32(addressBech32);
+    const addressKind = address.payment_cred().kind();
+
     return addressKind ?? null;
   } catch {
     return null;
@@ -245,26 +210,6 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
   };
 };
 
-// function toRawUtxo(utxosData: ApiUtxoData, txHash: string, txIndex: number) {
-//   const { address, amount, assets } = utxosData.output;
-
-//   const mappedAssets = assets.map(asset => ({
-//     amount: asset.amount,
-//     assetId: asset.assetId,
-//     policyId: asset.policyId,
-//     name: asset.name,
-//   }));
-
-//   return {
-//     amount: amount,
-//     receiver: address,
-//     tx_hash: txHash,
-//     tx_index: txIndex,
-//     utxo_id: `${txHash}:${txIndex}`,
-//     assets: mappedAssets,
-//   };
-// }
-
-const isOwnedAddress = (walletAddresses: any, bech32Address: string) => {
-  return walletAddresses.filter(a => a.address === bech32Address);
+const isOwnedAddress = (walletAddresses: any[], bech32Address: string): boolean => {
+  return walletAddresses.some(a => a.address === bech32Address);
 };

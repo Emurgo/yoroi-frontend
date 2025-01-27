@@ -1,20 +1,18 @@
-import { wrappedCsl } from './wrappedCsl';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const deriveRewardAddressFromAddress = async (address: string, chainId: number): Promise<string> => {
-  const { csl, release } = wrappedCsl();
-
+  console.log('1chainIdchainIdchainId', chainId);
   try {
-    const result = await csl.Address.fromBech32(address)
-      .then(address => csl.BaseAddress.fromAddress(address))
-      .then(baseAddress => baseAddress?.stakeCred() ?? invalid('invalid base address'))
-      .then(stakeCredential => csl.RewardAddress.new(chainId, stakeCredential))
-      .then(rewardAddress => rewardAddress.toAddress())
-      .then(rewardAddrAsAddress => rewardAddrAsAddress.toBech32(undefined))
-      .catch(error => error);
+    const from_bech32 = await RustModule.WalletV4.Address.from_bech32(address);
+    const baseAddress = RustModule.WalletV4.BaseAddress.from_address(from_bech32);
+    const stakeCred = baseAddress?.stake_cred();
+    const stakeCredential = RustModule.WalletV4.RewardAddress.new(1, stakeCred);
+    const rewardAddress = stakeCredential.to_address();
+    const rewardAddrAsAddress = rewardAddress.to_bech32();
 
-    if (typeof result !== 'string') throw new Error('Its not possible to derive reward address');
-    return result;
-  } finally {
-    release();
+    if (typeof rewardAddrAsAddress !== 'string') throw new Error('Its not possible to derive reward address');
+    return rewardAddrAsAddress;
+  } catch (error) {
+    throw new Error('Its not possible to derive reward address');
   }
 };

@@ -22,10 +22,10 @@ export interface SubMenuOption {
 export const ReviewTxSection = () => {
   const theme = useTheme();
 
-  const { unsignedTx, networkId, details, ftAssetsList, primaryTokenInfo } = useTxReviewModal();
+  const { unsignedTx, networkId, details, ftAssetsList, primaryTokenInfo, receiverCustomTitle } = useTxReviewModal();
   // const txBody = useTxBody({ cbor: undefined, unsignedTx: unignedTxReviewMock });
-  // console.log('FINAL unsignedTx', unsignedTx);
-  const formattedTx = useFormattedTx(unsignedTx.body, ftAssetsList, networkId, primaryTokenInfo);
+  const formattedTx = useFormattedTx(unsignedTx.body);
+  console.log('FINAL unsignedTx', formattedTx);
 
   const subMenuOptions: SubMenuOption[] = [
     {
@@ -64,7 +64,7 @@ export const ReviewTxSection = () => {
 
       {selectedTab === subMenuOptions[0]?.route ? (
         <TabContent>
-          <OverviewTab details={details} />
+          <OverviewTab receiverCustomTitle={receiverCustomTitle} tx={formattedTx} />
         </TabContent>
       ) : null}
       {selectedTab === subMenuOptions[1]?.route ? (

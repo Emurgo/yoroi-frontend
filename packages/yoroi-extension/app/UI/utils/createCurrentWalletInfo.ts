@@ -187,6 +187,8 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
 
+    console.log('networkIdnetworkId', networkId);
+
     // Backend services
     const { Backend } = getNetworkById(networkId);
     const { BackendService, BackendServiceZero } = Backend;

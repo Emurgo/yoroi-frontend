@@ -22,9 +22,12 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
   },
 }));
 
-export const OverviewTab = () => {
+export const OverviewTab = ({ receiverCustomTitle, tx }) => {
   const { currentWalletDetails, changeModalView } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
+
+  const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
+  const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
 
   const { plate } = selected;
 
@@ -53,12 +56,12 @@ export const OverviewTab = () => {
       <Stack direction="column" gap="8px">
         <InfoInline label="Wallet" value={waletInfoDsiplay} />
         {/* <InfoInline label="Connected to" value="dapp" /> */}
-        <InfoInline label="Fee" value="-0.2323232 ADA" />
+        <InfoInline label="Fee" value={`${tx.fee.quantity} ADA`} />
       </Stack>
 
       <Divider sx={{ margin: '24px 0px' }} />
 
-      <MyWalletSection />
+      <MyWalletSection tx={tx} notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} />
 
       <Divider sx={{ margin: '24px 0px' }} />
       <OperationsSection />
@@ -79,7 +82,8 @@ const InfoInline = ({ label, value }) => {
   );
 };
 
-const MyWalletSection = () => {
+const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
+  // console.log('notOwnedOutputs', ownedOutputs, notOwnedOutputs);
   return (
     <Box>
       <Collapsible
