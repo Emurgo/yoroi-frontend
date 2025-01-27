@@ -65,7 +65,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
 
       <Stack direction="column" spacing={theme.spacing(0.5)}>
         <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-start">
-          <Typography variant="h2" fontWeight="500" color="ds.gray_max">
+          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
             <HiddenAmount isHidden={isHiddenAmount}>
               {tokenTotalAmount}
             </HiddenAmount>
@@ -73,7 +73,7 @@ const HeaderSection = ({ tokenInfo }: Props): JSX.Element => {
           <Typography
             variant="body2"
             fontWeight="500"
-            color="ds.gray_max"
+            color="ds.text_gray_medium"
             sx={{
               paddingTop: `${theme.spacing(1.3)}`,
             }}

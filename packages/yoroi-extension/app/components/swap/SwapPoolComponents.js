@@ -33,7 +33,7 @@ export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: st
       <Box display="inline-flex">
         <SwapPoolIcon provider={provider} />
       </Box>
-      <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
+      <Typography component="div" variant="body1" color="ds.text_primary_medium" fontWeight={500}>
         {provider} {isAutoPool ? strings.auto : null}
       </Typography>
     </Box>

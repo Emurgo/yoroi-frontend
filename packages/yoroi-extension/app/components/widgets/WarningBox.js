@@ -23,11 +23,11 @@ export default class WarningBox extends Component<Props> {
     const { intl } = this.context;
     const { children } = this.props;
     return (
-      <Box sx={{ backgroundColor: 'ds.sys_magenta_100' }} className={styles.component}>
+      <Box sx={{ backgroundColor: 'ds.sys_yellow_100', borderRadius: '8px', mb: '24px', p: '24px' }} className={styles.component}>
         {/* Warning header  */}
         <div className={styles.header}>
           <div className={styles.headerIcon} />
-          <Typography color="ds.text_gray_max" className={styles.headerText}>
+          <Typography color="ds.sys_orange_500" className={styles.headerText}>
             {intl.formatMessage(globalMessages.attentionHeaderText)}
           </Typography>
         </div>

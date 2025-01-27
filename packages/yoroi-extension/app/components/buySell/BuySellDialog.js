@@ -356,11 +356,11 @@ renderBuySell(): Node {
               <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
                 <div style={{ marginBottom: '8px', color: '#000', display: 'flex', alignItems: 'center' }}>
                   <img style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
-                  <Typography variant="body2" color="ds.text_gray_medium">
+                  <Typography variant="body2" color="ds.text_gray_max">
                     ADA
                   </Typography>
                 </div>
-                <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
+                <Box color="ds.text_gray_low" sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
                   {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
                 </Box>
               </div>
@@ -457,7 +457,6 @@ render(): Node {
       closeOnOverlayClick={false}
       onClose={props.onCancel}
       closeButton={<DialogCloseButton />}
-      forceBottomDivider
       dialogActions={[
         {
           label: intl.formatMessage(messages.proceed),
