@@ -57,7 +57,7 @@ export const LightButton: any = {
       props: { variant: 'destructive' },
       style: {
         backgroundColor: ltDs.sys_magenta_500,
-        color: ltDs.white_static,
+        color: ltDs.gray_min,
         ':hover': { backgroundColor: ltDs.sys_magenta_600 },
         ':active': { backgroundColor: ltDs.sys_magenta_700 },
         ':focus': {
@@ -66,14 +66,14 @@ export const LightButton: any = {
           outlineColor: ltDs.sys_yellow_500,
         },
         '&.Mui-disabled': {
-          color: ltDs.white_static,
+          color: ltDs.gray_min,
           backgroundColor: ltDs.sys_magenta_300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: ltDs.white_static },
-        '& .MuiButton-startIcon svg': { fill: ltDs.white_static },
-        '& .MuiButton-startIcon svg path': { fill: ltDs.white_static },
+        '& .MuiLoadingButton-loadingIndicator': { color: ltDs.gray_min },
+        '& .MuiButton-startIcon svg': { fill: ltDs.gray_min },
+        '& .MuiButton-startIcon svg path': { fill: ltDs.gray_min },
       },
     },
     {
@@ -124,7 +124,7 @@ export const DarkButton: any = {
       props: { variant: 'destructive' },
       style: {
         backgroundColor: dtDs.sys_magenta_500,
-        color: dtDs.white_static,
+        color: dtDs.gray_min,
         ':hover': { backgroundColor: dtDs.sys_magenta_600 },
         ':active': { backgroundColor: dtDs.sys_magenta_700 },
         ':focus': {
@@ -133,14 +133,14 @@ export const DarkButton: any = {
           outlineColor: dtDs.sys_yellow_500,
         },
         '&.Mui-disabled': {
-          color: dtDs.white_static,
+          color: dtDs.gray_min,
           backgroundColor: dtDs.sys_magenta_300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: dtDs.white_static },
-        '& .MuiButton-startIcon svg': { fill: dtDs.white_static },
-        '& .MuiButton-startIcon svg path': { fill: dtDs.white_static },
+        '& .MuiLoadingButton-loadingIndicator': { color: dtDs.gray_min },
+        '& .MuiButton-startIcon svg': { fill: dtDs.gray_min },
+        '& .MuiButton-startIcon svg path': { fill: dtDs.gray_min },
       },
     },
   ],

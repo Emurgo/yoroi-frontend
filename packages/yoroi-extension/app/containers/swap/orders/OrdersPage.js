@@ -12,7 +12,7 @@ import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -58,11 +58,11 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     {
       name: strings.ordersPair,
       align: 'left',
-      width: '176px',
+      width: 'auto',
     },
     {
       name: strings.assetPrice,
-      width: '150px',
+      width: 'auto',
     },
     {
       name: strings.assetAmount,
@@ -70,20 +70,20 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     },
     {
       name: strings.total,
-      width: '150px',
+      width: 'auto',
       openOrdersOnly: true,
     },
     {
       name: strings.dex,
       align: 'left',
       leftPadding: '32px',
-      width: '216px',
+      width: 'auto',
       openOrdersOnly: true,
     },
     {
       name: ({ completedOrders }) => (completedOrders ? strings.timeExecuted : strings.timeCreated),
       align: 'left',
-      width: '240px',
+      width: 'auto',
     },
     {
       name: strings.txId,
@@ -186,13 +186,12 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       if (cancelTxCbor == null || !isHex(cancelTxCbor)) {
         console.error('Failed to receive swap cancel tx from API. Expected cbor hex, got: ', cancelTxCbor);
         // eslint-disable-next-line no-alert
-        alert('Unfortunately 3rd party API failed to produce cancellation transaction. Please retry later or report the issue and provide logs.');
+        alert(
+          'Unfortunately 3rd party API failed to produce cancellation transaction. Please retry later or report the issue and provide logs.'
+        );
         return;
       }
-      const totalCancelOutput = getTransactionTotalOutputFromCbor(
-        cancelTxCbor,
-        wallet.balance.getDefaults()
-      );
+      const totalCancelOutput = getTransactionTotalOutputFromCbor(cancelTxCbor, wallet.balance.getDefaults());
       const formattedCancelValues = createFormattedTokenValues({
         entries: totalCancelOutput.entries().map(e => ({
           id: e.identifier,
@@ -422,8 +421,10 @@ const OrderRow = ({
       </Box>
       <Box textAlign="left">{txHashToRenderedTimestamp(order.txId)}</Box>
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId}>
-          <span>{truncateAddressShort(order.txId)}</span>
+        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txId} primary>
+          <Typography variant="body1">
+            {truncateAddressShort(order.txId)}
+          </Typography>
         </ExplorableHashContainer>
         {maybe(handleCancel, f => (
           <Box>

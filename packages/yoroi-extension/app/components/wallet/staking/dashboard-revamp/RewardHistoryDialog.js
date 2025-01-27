@@ -63,7 +63,7 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
           {intl.formatMessage(globalMessages.rewardsListLabel)} ({rewardList.length})
         </Typography>
         <Box>
-          {graphData.rewardsGraphData.error && (
+          {(graphData.rewardsGraphData.error && !graphData.rewardsGraphData.items) && (
             <div>
               <center>
                 <InvalidURIImg />

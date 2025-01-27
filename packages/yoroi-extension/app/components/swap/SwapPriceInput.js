@@ -49,7 +49,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           gridTemplateColumns: '1fr auto',
           justifyContent: 'start',
           position: 'relative',
-          bgcolor: isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max',
+          bgcolor: isReadonly ? 'ds.bg_color_contrast_min' : 'ds.bg_color_max',
           columnGap: '6px',
           rowGap: '8px',
           ...(!isReadonly && {
@@ -70,6 +70,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
             px: '4px',
             bgcolor: 'ds.bg_color_max',
             borderRadius: '10px',
+            color: 'ds.text_gray_medium',
           }}
         >
           {isMarketOrder ? strings.marketPrice : strings.limitPrice}
@@ -87,7 +88,7 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
           variant="body1"
           color="ds.text_gray_medium"
           placeholder="0"
-          bgcolor={isReadonly ? 'ds.bg_color_max' : 'ds.bg_color_max'}
+          bgcolor={isReadonly ? 'ds.bg_color_contrast_min' : 'ds.bg_color_max'}
           readOnly={isReadonly}
           value={isValidTickers ? valueToDisplay : NO_PRICE_VALUE_PLACEHOLDER}
           onChange={event => {
@@ -110,9 +111,9 @@ function SwapPriceInput({ priceImpactState }: Props): Node {
         />
         <Box sx={{ justifySelf: 'end' }}>
           <Box height="100%" width="max-content" display="flex" alignItems="center">
-            <Box>{sellTokenInfo?.ticker || '-'}</Box>
+            <Typography color="ds.text_gray_max">{sellTokenInfo?.ticker || '-'}</Typography>
             <Box>/</Box>
-            <Box>{buyTokenInfo?.ticker || '-'}</Box>
+            <Typography color="ds.text_gray_max">{buyTokenInfo?.ticker || '-'}</Typography>
           </Box>
         </Box>
       </Box>
