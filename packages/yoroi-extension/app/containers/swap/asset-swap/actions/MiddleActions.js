@@ -2,9 +2,11 @@
 import { Box, Button } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../../assets/images/revamp/icons/switch.inline.svg';
 import { useSwapForm } from '../../context/swap-form';
+import { useStrings } from '../../common/useStrings';
 
 export const MiddleActions = (): React$Node => {
   const { clearSwapForm, switchTokens, onChangeLimitPrice, buyTokenInfo = {} } = useSwapForm();
+  const { clear } = useStrings();
 
   const handleSwitchTokens = () => {
     // we have ticker on the buy side, so we can safely switch
@@ -27,7 +29,7 @@ export const MiddleActions = (): React$Node => {
       </Box>
       <Box>
         <Button onClick={() => clearSwapForm()} variant="tertiary" color="primary">
-          Clear
+          {clear}
         </Button>
       </Box>
     </Box>

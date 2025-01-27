@@ -7,6 +7,7 @@ import { Quantities } from '../../../../utils/quantities';
 import { useSwapFeeDisplay } from '../../hooks';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
+import { useStrings } from '../../common/useStrings';
 
 type Props = {|
   +defaultTokenInfo: RemoteTokenInfo,
@@ -16,6 +17,7 @@ type Props = {|
 
 export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAda }: Props): React$Node {
   const { orderData } = useSwap();
+  const strings = useStrings();
   const { buyTokenInfo, sellTokenInfo } = useSwapForm();
   const { formattedFee } = useSwapFeeDisplay(defaultTokenInfo);
 
@@ -40,10 +42,8 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       {showMinAda && (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-            <Typography color="ds.text_gray_low">Min ADA</Typography>
-            {withInfo && (
-              <InfoTooltip content={'A small ADA deposit that will be returned when your order is processed or canceled'} />
-            )}
+            <Typography color="ds.text_gray_low">{strings.minAda}</Typography>
+            {withInfo && <InfoTooltip content={strings.adaDepositTooltip} />}
           </Box>
           <Box>
             {deposit} {ptTicker}
@@ -52,14 +52,14 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       )}
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_low">Fees</Typography>
+          <Typography color="ds.text_gray_low">{strings.fees}</Typography>
           {withInfo && (
             <InfoTooltip
               content={
                 <>
-                  <Typography color="inherit">Fees included:</Typography>
-                  <Typography color="inherit">• DEX fee</Typography>
-                  <Typography color="inherit">• Frontend fee</Typography>
+                  <Typography color="inherit">{strings.feesIncluded}</Typography>
+                  <Typography color="inherit">{strings.dexFee}</Typography>
+                  <Typography color="inherit">{strings.frontendFee}</Typography>
                 </>
               }
             />
@@ -69,8 +69,8 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_low">Minimum assets received</Typography>
-          {withInfo && <InfoTooltip content={'The minimum amount you are guaranteed to receive in case of price slippage'} />}
+          <Typography color="ds.text_gray_low">{strings.minimumAssets}</Typography>
+          {withInfo && <InfoTooltip content={strings.minimumAssetsTooltip} />}
         </Box>
         <Box>
           {minReceived} {buyTicker}
@@ -78,14 +78,8 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">
-          <Typography color="ds.text_gray_low">Liquidity provider fee</Typography>
-          {withInfo && (
-            <InfoTooltip
-              content={
-                'A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network'
-              }
-            />
-          )}
+          <Typography color="ds.text_gray_low">{strings.lpFee}</Typography>
+          {withInfo && <InfoTooltip content={strings.lpFeeTooltip} />}
         </Box>
         <Box>
           {liqFeeQuantity} {sellTokenInfo.ticker}

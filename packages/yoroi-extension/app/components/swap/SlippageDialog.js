@@ -3,6 +3,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { useState } from 'react';
 import Tabs from '../common/tabs/Tabs';
 import Dialog from '../widgets/Dialog';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -13,6 +14,7 @@ type Props = {|
 |};
 
 export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValue }: Props): React$Node {
+  const strings = useStrings();
   const [selectedSlippage, setSelectedSlippage] = useState(slippageValue);
   const [inputFocused, setInputFocused] = useState(false);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(slippageValue));
@@ -42,7 +44,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
   // <TODO:CHECK_INTL>
   return (
     <Dialog
-      title="Slippage tolerance"
+      title={strings.slippageTolerance}
       onClose={onClose}
       withCloseButton
       closeOnOverlayClick
@@ -52,13 +54,12 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
       <Box sx={{ margin: '0 auto', flex: 1 }}>
         <Box sx={{ bg: 'ds.bg_color_max' }}>
           <Typography component="div" variant="body1" color="ds.text_gray_medium">
-            Default Slippage Tolerance
+            {strings.defaultSlippageTolerance}
           </Typography>
         </Box>
         <Box pb="16px" pt="8px">
           <Typography component="div" variant="body2" color="ds.text_gray_low">
-            Slippage tolerance is set as a percentage of the total swap value. Your transactions will not be executed if the price
-            moves by more than this amount.
+            {strings.slippageToleranceTooltip}
           </Typography>
         </Box>
         <Box display="flex" justifyContent="flex-start" mb="32px">
@@ -73,7 +74,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
                 },
               }))
               .concat({
-                label: 'Manual',
+                label: strings.manual,
                 isActive: isManualSlippage,
                 onClick: () => {
                   setIsManualSlippage(true);
@@ -119,7 +120,7 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
                 color: 'ds.text_gray_medium',
               }}
             >
-              Slippage tolerance
+              {strings.slippageTolerance}
             </Box>
 
             <Typography
@@ -143,13 +144,12 @@ export default function SlippageDialog({ onSetNewSlippage, onClose, slippageValu
         </Box>
         <Box my="24px" p="16px" pt="12px" bgcolor="ds.sys_yellow_100" borderRadius="8px">
           <Typography component="div" variant="body1" color="grayscale.max">
-            When the slippage tolerance is set really high, it allows the transaction to still complete despite large price
-            swings. This can open the door to front-running and sandwich attacks.
+            {strings.slippageToleranceHigh}
           </Typography>
         </Box>
         <Box pt="12px">
           <Button disabled={selectedSlippage.trim().length === 0} fullWidth onClick={handleSlippageApply} variant="contained">
-            Apply
+            {strings.apply}
           </Button>
         </Box>
       </Box>

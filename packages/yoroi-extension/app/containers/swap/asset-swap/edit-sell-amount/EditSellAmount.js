@@ -5,6 +5,7 @@ import { useSwapForm } from '../../context/swap-form';
 import SwapInput from '../../../../components/swap/SwapInput';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
 import { Box } from '@mui/material';
+import { useStrings } from '../../common/useStrings';
 
 type Props = {|
   onAssetSelect(): void,
@@ -21,6 +22,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo, getTok
     onChangeSellQuantity,
     sellFocusState,
   } = useSwapForm();
+  const strings = useStrings();
   const { tokenId } = orderData.amounts.sell;
 
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
@@ -29,7 +31,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo, getTok
     <Box>
       <SwapInput
         key={tokenId}
-        label="Swap from"
+        label={strings.swapFromLabel}
         disabled={!isValidTickers}
         handleAmountChange={onChangeSellQuantity}
         value={sellDisplayValue}

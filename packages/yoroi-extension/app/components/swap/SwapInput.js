@@ -9,6 +9,7 @@ import defaultTokenDarkImage from '../../assets/images/revamp/asset-default-dark
 import type { AssetAmount } from './types';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import type { State } from '../../containers/swap/context/swap-form/types';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
   label: string,
@@ -40,6 +41,7 @@ export default function SwapInput({
   const [remoteTokenLogo, setRemoteTokenLogo] = useState<?string>(null);
   const { id, amount: quantity = undefined, ticker } = tokenInfo || {};
   const { name } = useTheme();
+  const strings = useStrings();
 
   const handleChange = e => {
     if (!disabled) {
@@ -85,8 +87,8 @@ export default function SwapInput({
           position: 'relative',
           bgcolor: 'ds.bg_color_max',
           columnGap: '6px',
-          rowGap: '8px',
-          maxHeight: '95px',
+          rowGap: '6px',
+          maxHeight: '80px',
           '&:hover': {
             borderColor: !error && 'grayscale.max',
           },
@@ -119,12 +121,13 @@ export default function SwapInput({
           variant="body1"
           color="grayscale.max"
           placeholder="0"
+          padding="0"
           onChange={handleChange}
           value={disabled ? '' : value}
           onFocus={() => focusState.update(true)}
           onBlur={() => focusState.update(false)}
         />
-        <Box sx={{ justifySelf: 'end', cursor: 'pointer' }} onClick={onAssetSelect}>
+        <Box sx={{ justifySelf: 'end', cursor: 'pointer', maxHeight: '24px' }} onClick={onAssetSelect}>
           <Box height="100%" width="min-content" display="flex" gap="8px" alignItems="center">
             <Box
               width="24px"
@@ -154,14 +157,22 @@ export default function SwapInput({
           <Box>
             <Typography
               component="button"
-              variant="caption"
+              variant="caption1"
               fontWeight={500}
+              maxHeight="18px"
+              maxWidth="34px"
               sx={{
-                p: '4px 8px',
-                bgcolor: 'grayscale.50',
-                borderRadius: '8px',
+                p: '2px 4px',
+                bgcolor: 'ds.gray_50',
+                borderRadius: '4px',
                 ':disabled': {
                   cursor: 'not-allowed',
+                },
+                ':hover': {
+                  bgcolor: 'ds.gray_100',
+                },
+                ':active': {
+                  bgcolor: 'ds.gray_200',
                 },
                 color: 'ds.text_gray_medium',
               }}
@@ -170,15 +181,15 @@ export default function SwapInput({
               }}
               disabled={disabled}
             >
-              MAX
+              {strings.max}
             </Typography>
           </Box>
         ) : (
-          <Box minHeight="31px" />
+          <Box minHeight="18px" />
         )}
         <Box sx={{ justifySelf: 'end', alignSelf: 'end' }}>
-          <Typography component="div" variant="caption" color="grayscale.600">
-            Current balance: {quantity || 0} {ticker}
+          <Typography component="div" variant="caption1" color="ds.text_gray_low">
+            {strings.currentBalance} {quantity || 0} {ticker}
           </Typography>
         </Box>
       </Box>
