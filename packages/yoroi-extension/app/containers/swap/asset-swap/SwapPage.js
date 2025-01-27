@@ -73,9 +73,9 @@ function SwapPage(props: StoresProps & Intl): Node {
   const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise < RemoteTokenInfo > } = ids =>
+  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
     stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise < RemoteTokenInfo > = id =>
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
     getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const isMarketOrder = orderType === 'market';
@@ -85,12 +85,12 @@ function SwapPage(props: StoresProps & Intl): Node {
 
   const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
-  const [disclaimerStatus, setDisclaimerStatus] = useState <? boolean > (null);
-  const [selectedWalletAddress, setSelectedWalletAddress] = useState <? string > (null);
+  const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
-  const [signRequest, setSignRequest] = useState <? HaskellShelleyTxSignRequest > (null);
-  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState < string > (''));
-  const txSubmitErrorState = StateWrap(useState <? Error > (null));
+  const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
+  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
+  const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
   useEffect(
@@ -307,7 +307,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     }
   }
 
-  const onRemoteOrderDataResolved: any => Promise < void> = async ({ contractAddress, datum, datumHash }) => {
+  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum, datumHash }) => {
     // creating tx
     if (selectedPoolCalculation == null) {
       throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction');
@@ -447,4 +447,4 @@ function SwapPage(props: StoresProps & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(SwapPage)): React$ComponentType < StoresProps >);
+export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresProps>);
