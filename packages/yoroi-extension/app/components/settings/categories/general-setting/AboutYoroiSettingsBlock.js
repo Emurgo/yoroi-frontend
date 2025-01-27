@@ -198,7 +198,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
 
         <Button
           onClick={this.props.onSwitchNetwork}
-          variant="secondary"
+          variant={wallet?.isTestnet ? 'primary' : 'secondary'}
           style={{ width: '200px' }}
         >
           {intl.formatMessage(messages.switchNetwork)}

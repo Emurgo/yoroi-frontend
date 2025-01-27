@@ -1014,15 +1014,15 @@ const globalMessages: * = defineMessages({
   },
   preprod: {
     id: 'networkName.preprod',
-    defaultMessage: '!!!Preproduction testnet',
+    defaultMessage: '!!!Preprod',
   },
   preview: {
     id: 'networkName.preview',
-    defaultMessage: '!!!Preview testnet',
+    defaultMessage: '!!!Preview',
   },
   sancho: {
     id: 'networkName.sancho',
-    defaultMessage: '!!!Sancho testnet',
+    defaultMessage: '!!!Sancho',
   },
 });
 export default globalMessages;

@@ -4,7 +4,6 @@ import { observable, computed } from 'mobx';
 import Request from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
-  ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
 } from '../../../chrome/extension/connector/types';

@@ -17,22 +17,22 @@ import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
+import type { StoresProps } from '../stores';
 
 const NETWORK_BADGES = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
     color: 'rgba(236, 186, 9, 1)',
-    text: 'preprod',
+    text: 'Preprod',
   },
   [networks.CardanoPreviewTestnet.NetworkId]: {
     color: 'rgba(143, 201, 246, 1)',
-    text: 'preview',
+    text: 'Preview',
   },
   [networks.CardanoSanchoTestnet.NetworkId]: {
     color: 'rgba(147, 245, 225, 1)',
-    text: 'sancho',
+    text: 'Sancho',
   },
 });
-import type { StoresProps } from '../stores';
 
 type LocalProps = {|
   title: Node,

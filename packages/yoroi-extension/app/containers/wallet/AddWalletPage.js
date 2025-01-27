@@ -5,7 +5,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { Box } from '@mui/material';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
