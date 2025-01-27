@@ -43,8 +43,8 @@ const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
   // };
 
   return (
-    <Card sx={{ backgroundColor: 'ds.gray_min' }}>
-      <Typography p="24px" pb="0px" fontWeight={500} fontSize="18px">
+    <Card sx={{ backgroundColor: 'ds.bg_color_max' }}>
+      <Typography p="24px" pb="0px" fontWeight={500} fontSize="18px" color="ds.text_gray_medium">
         {strings.overview}
       </Typography>
       {/* <Box sx={{ marginTop: `${theme.spacing(2)}`, backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>

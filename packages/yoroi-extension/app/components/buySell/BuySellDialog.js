@@ -170,7 +170,7 @@ const Disclaimer = styled(Box)(({ theme }) => ({
   fontStyle: 'normal',
   fontWeight: 400,
   lineHeight: '24px',
-  marginBottom: '140px',
+  marginBottom: '0px',
   '& header': {
     fontWeight: 500,
     '& svg': {
@@ -179,7 +179,7 @@ const Disclaimer = styled(Box)(({ theme }) => ({
     },
   },
   borderRadius: 'var(--corner-radius-8, 8px)',
-  background: theme.palette.ds.sys_yellow_100,
+  background: theme.palette.ds.bg_gradient_1,
   padding: 'var(--spacing-12, 12px) var(--spacing-16, 16px) var(--spacing-16, 16px) var(--spacing-16, 16px)',
 }));
 
@@ -374,11 +374,11 @@ export default class BuySellDialog extends Component<Props, State> {
                 <div style={{ position: 'relative' /* so that the balance line can align on the right side */ }}>
                   <div style={{ marginBottom: '8px', color: '#000', display: 'flex', alignItems: 'center' }}>
                     <img style={{ marginRight: '8px', borderRadius: '4px', verticalAlign: 'bottom' }} src={adaPng} alt="" />
-                    <Typography variant="body2" color="ds.text_gray_medium">
+                    <Typography variant="body2" color="ds.text_gray_max">
                       ADA
                     </Typography>
                   </div>
-                  <Box sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
+                  <Box color="ds.text_gray_low" sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
                     {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
                   </Box>
                 </div>
@@ -483,7 +483,6 @@ export default class BuySellDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         onClose={props.onCancel}
         closeButton={<DialogCloseButton />}
-        forceBottomDivider
         dialogActions={[
           {
             label: intl.formatMessage(globalMessages.proceed),

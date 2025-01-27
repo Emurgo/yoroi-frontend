@@ -1,7 +1,8 @@
 //@flow
-import { Box } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import adaTokenImage from '../../../assets/images/ada.inline.svg';
 import defaultTokenImage from '../../../assets/images/revamp/token-default.inline.svg';
+import defaultTokenDarkImage from '../../../assets/images/revamp/asset-default-dark.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import type { AssetAmount } from '../../swap/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
@@ -20,6 +21,8 @@ function tokenImgSrc(token, defaultTokenInfo): string {
 }
 
 function tokenImg(token, defaultTokenInfo): React$Node {
+  const theme = useTheme();
+  const defaultImage = theme.name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
   return (
     <Box
       width="24px"
@@ -35,7 +38,7 @@ function tokenImg(token, defaultTokenInfo): React$Node {
         src={tokenImgSrc(token, defaultTokenInfo)}
         alt=""
         onError={e => {
-          e.target.src = defaultTokenImage;
+          e.target.src = defaultImage;
         }}
       />
     </Box>

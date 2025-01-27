@@ -115,7 +115,9 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             }}
           >
             <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-              <ChevronDownIcon />
+              <IconWrapper>
+                <ChevronDownIcon />
+              </IconWrapper>
             </Box>
           </Box>
         </Box>
