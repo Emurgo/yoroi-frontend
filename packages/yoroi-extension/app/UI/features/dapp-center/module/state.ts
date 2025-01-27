@@ -1,6 +1,3 @@
-import { produce } from 'immer';
-import { WalletBalance } from '../../../types/currrentWallet';
-
 export type CurrencyType = 'ADA' | 'USD' | 'BRL' | 'ETH' | 'BTC' | 'KRW' | 'CNY' | 'EUR' | 'JPY' | 'none' | null;
 export type AccountPair = {
   from: { name: string; value: string };
@@ -43,6 +40,6 @@ export const defaultDappCenterActions: DappCenterActions = {
 };
 
 // Reducer function
-export const DappCenterReducer = (state: DappCenterState, action: DappCenterAction): DappCenterState => {
+export const DappCenterReducer = (state: DappCenterState): DappCenterState => {
   return state;
 };
