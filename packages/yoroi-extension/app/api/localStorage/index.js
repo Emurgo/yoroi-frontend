@@ -33,6 +33,7 @@ const storageKeys = {
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -104,6 +105,13 @@ export default class LocalStorageApi {
   setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
   unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+
+  // ========== Buy/Sell Disclaimer ========== //
+  getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+
+  setBuySellDisclaimer: string => Promise<void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
+
+  unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
   // ========== Theme Migration ========== //
 
