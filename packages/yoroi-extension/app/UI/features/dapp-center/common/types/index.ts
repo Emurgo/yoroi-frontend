@@ -1,4 +1,3 @@
-import { IChartData } from './chart';
 
 export interface ITabButtonProps {
   id: string | number;
@@ -43,7 +42,6 @@ export type TokenType = {
   totalAmountFiat: number;
   overview: IDetailOverview;
   performance: IDetailPerformanceItem[];
-  chartData: IChartData;
 };
 
 export type LiquidityItemType = {

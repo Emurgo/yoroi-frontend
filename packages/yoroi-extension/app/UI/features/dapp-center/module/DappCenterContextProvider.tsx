@@ -2,8 +2,6 @@ import * as React from 'react';
 
 import { CurrentWalletType } from '../../../types/currrentWallet';
 import {
-  AccountPair,
-  CurrencyType,
   DappCenterReducer,
   defaultDappCenterActions,
   defaultDappCenterState,
