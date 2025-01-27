@@ -4,6 +4,7 @@ import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import type { StoresProps } from '../../../stores';
 import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
@@ -34,7 +35,6 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
-import type { StoresProps } from '../../../stores';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -73,9 +73,9 @@ function SwapPage(props: StoresProps & Intl): Node {
   const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(
     network.NetworkId
   );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+  const getTokenInfoBatch: Array<string> => { [string]: Promise < RemoteTokenInfo > } = ids =>
     stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
+  const getTokenInfo: string => Promise < RemoteTokenInfo > = id =>
     getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const isMarketOrder = orderType === 'market';
@@ -85,12 +85,12 @@ function SwapPage(props: StoresProps & Intl): Node {
 
   const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
-  const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
-  const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
+  const [disclaimerStatus, setDisclaimerStatus] = useState <? boolean > (null);
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState <? string > (null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
-  const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
-  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
-  const txSubmitErrorState = StateWrap(useState<?Error>(null));
+  const [signRequest, setSignRequest] = useState <? HaskellShelleyTxSignRequest > (null);
+  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState < string > (''));
+  const txSubmitErrorState = StateWrap(useState <? Error > (null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
 
   useEffect(
@@ -307,7 +307,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     }
   }
 
-  const onRemoteOrderDataResolved: any => Promise<void> = async ({ contractAddress, datum, datumHash }) => {
+  const onRemoteOrderDataResolved: any => Promise < void> = async ({ contractAddress, datum, datumHash }) => {
     // creating tx
     if (selectedPoolCalculation == null) {
       throw new Error('Incorrect state. Pool calculations are not available to prepare the transaction');
@@ -447,4 +447,4 @@ function SwapPage(props: StoresProps & Intl): Node {
   );
 }
 
-export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresProps>);
+export default (injectIntl(observer(SwapPage)): React$ComponentType < StoresProps >);

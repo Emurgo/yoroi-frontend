@@ -56,9 +56,9 @@ const messages = defineMessages({
 
 type Props = {|
   onClose: void => void,
-  onAccept: void => void,
-  intl: $npm$ReactIntl$IntlFormat
-|};
+    onAccept: void => void,
+      intl: $npm$ReactIntl$IntlFormat
+        |};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
@@ -108,6 +108,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
       closeButton={<DialogCloseButton onClose={handleClose} />}
       dialogActions={actions}
       styleContentOverride={{ paddingTop: 0 }}
+      styleOverride={{ maxWidth: '648px' }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
         <Typography component="div" variant="body1">
@@ -133,7 +134,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
                 justifyContent: 'flex-start'
               }}>
                 <Typography component="div" variant="body1" color="grayscale.900">
-                  {i}.&nbsp;
+                  {i + 1}.&nbsp;
                 </Typography>
                 <Typography component="div" variant="body1" color="grayscale.900">
                   {intl.formatMessage(message)}
