@@ -4,6 +4,7 @@ import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import type { StoresProps } from '../../../stores';
 import ConfirmSwapTransaction from './ConfirmSwapTransaction';
 import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
@@ -34,7 +35,6 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
-import type { StoresProps } from '../../../stores';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
