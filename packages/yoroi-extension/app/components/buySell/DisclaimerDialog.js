@@ -104,7 +104,6 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
   return (
     <Dialog
       title={intl.formatMessage(messages.title)}
-      // className={styles.dialog}
       onClose={handleClose}
       closeButton={<DialogCloseButton onClose={handleClose} />}
       dialogActions={actions}
