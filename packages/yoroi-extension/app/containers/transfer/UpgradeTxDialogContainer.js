@@ -45,23 +45,6 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     intl: intlShape.isRequired,
   };
 
-  submit: {|
-    signRequest: HaskellShelleyTxSignRequest,
-    publicKey: {|
-      key: RustModule.WalletV4.Bip32PublicKey,
-      ...Addressing,
-    |},
-    publicDeriverId: number,
-    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    expectedSerial: string | void,
-    networkId: number,
-  |} => Promise<void> = async (request) => {
-    await this.props.stores.substores.ada.ledgerSend.sendUsingLedgerKey({
-      ...request,
-    });
-    this.props.onSubmit();
-  }
-
   render(): Node {
     const { transferRequest } = this.props.stores.substores.ada.yoroiTransfer;
 
@@ -156,8 +139,6 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
       </div>
     );
 
-    const expectedSerial = selected.hardwareWalletDeviceId || '';
-
     return (
       <TransferSummaryPage
         header={header}
@@ -168,16 +149,13 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
         transferTx={transferTx}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
-          trigger: async () => await this.submit({
-            publicDeriverId: selected.publicDeriverId,
-            addressingMap: genAddressingLookup(
-              selected.networkId,
-              this.props.stores.addresses.addressSubgroupMap
-            ),
-            ...tentativeTx,
-            expectedSerial,
-            networkId: selected.networkId,
-          }),
+          trigger: async () => {
+            await this.props.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
+              signRequest: tentativeTx.signRequest,
+              wallet: selected,
+            });
+            this.props.onSubmit();
+          },
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
         isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}

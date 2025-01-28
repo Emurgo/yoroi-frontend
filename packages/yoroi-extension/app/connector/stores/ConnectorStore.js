@@ -1171,7 +1171,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       rawTxHex,
       ledgerSignResult.witnesses,
       publicKeyInfo,
-    );
+    ).txHex;
   }
 
   /**

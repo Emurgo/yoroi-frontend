@@ -83,7 +83,7 @@ import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
 import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
-import { createLedgerSignTxPayload, toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
+import { toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -256,6 +256,8 @@ export type CreateHWSignTxDataRequestFromRawTx = {|
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
   senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners?: Array<string>,
+  ledgerSupportsCip36?: boolean,
+  catalystData?: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
 // createUnsignedTx
@@ -773,36 +775,6 @@ export default class AdaApi {
     }
   }
 
-  createLedgerSignTxData(
-    request: CreateLedgerSignTxDataRequest
-  ): CreateLedgerSignTxDataResponse {
-    try {
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
-
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
-      const ledgerSignTxPayload = createLedgerSignTxPayload({
-        signRequest: request.signRequest,
-        byronNetworkMagic: config.ByronNetworkId,
-        networkId: Number.parseInt(config.ChainNetworkId, 10),
-        addressingMap: request.addressingMap,
-        cip36: request.cip36,
-      });
-
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
-      return {
-        ledgerSignTxPayload
-      };
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
-
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
   createHwSignTxDataFromRawTx(
     hw: 'ledger' | 'trezor',
     request: CreateHWSignTxDataRequestFromRawTx
@@ -827,6 +799,8 @@ export default class AdaApi {
           addressMap,
           request.senderUtxos,
           request.additionalRequiredSigners ?? [],
+          request.ledgerSupportsCip36,
+          request.catalystData,
         );
 
         Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(ledgerSignTxPayload));

@@ -220,6 +220,7 @@ export default class LedgerConnectStore
   }
 
   _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
+    debugger
     this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
     const accountPath = this.getPath();
     try {

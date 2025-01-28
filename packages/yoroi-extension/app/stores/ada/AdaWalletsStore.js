@@ -146,8 +146,9 @@ export default class AdaWalletsStore extends Store<StoresMap> {
   |}) => Promise<{| signedTxHex: string |}> = async request => {
     if (request.signRequest.ledger) {
       const { wallet, transactionHex } = request.signRequest.ledger;
-      return this.stores.substores.ada.ledgerSend
+      const { signedTxHex } = await this.stores.substores.ada.ledgerSend
         .signRawTxFromWallet({ rawTxHex: transactionHex, wallet });
+      return { signedTxHex };
     }
     if (request.signRequest.trezor) {
       const { wallet, transactionHex } = request.signRequest.trezor;

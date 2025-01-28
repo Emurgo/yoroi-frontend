@@ -4,8 +4,8 @@ import '../../lib/test-config.forTests';
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
-  createLedgerSignTxPayload,
-  buildSignedTransaction,
+  toLedgerSignRequest,
+  buildConnectorSignedTransaction,
   toLedgerAddressParameters,
 } from './ledgerTx';
 import {
@@ -20,6 +20,7 @@ import {
   TransactionSigningMode,
   TxOutputDestinationType,
   CredentialParamsType,
+  TxOutputFormat,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { DeviceOwnedAddress, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
@@ -260,7 +261,7 @@ test('Create Ledger transaction', async () => {
         RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver),
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
-          1
+          utxo.tx_index,
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
@@ -269,7 +270,7 @@ test('Create Ledger transaction', async () => {
         keyHash,
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
-          1
+          utxo.tx_index,
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
@@ -316,39 +317,23 @@ test('Create Ledger transaction', async () => {
       ],
     },
   };
-  const signRequest = new HaskellShelleyTxSignRequest({
-    unsignedTx: txBuilder,
-    changeAddr: [],
-    senderUtxos,
-    metadata: undefined,
-    networkSettingSnapshot: {
-      ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
-      PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
-      KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
-      NetworkId: network.NetworkId,
-    },
-    neededStakingKeyHashes: {
-      neededHashes: new Set([stakeCredential.to_hex()]),
-      wits: new Set() // not needed for this test, but something should be here
-    },
-  });
 
   const rewardAddressString = RustModule.WalletV4.RewardAddress.new(
     Number.parseInt(baseConfig.ChainNetworkId, 10),
     stakeCredential
   ).to_address().to_hex();
-  const response = await createLedgerSignTxPayload({
-    signRequest,
-    byronNetworkMagic: ByronNetworkId,
-    networkId: Number.parseInt(ChainNetworkId, 10),
-    addressingMap: (address) => {
+  const response = await toLedgerSignRequest(
+    txBuilder.build().to_hex(),
+    Number.parseInt(ChainNetworkId, 10),
+    ByronNetworkId,
+    (address) => {
       if (address === rewardAddressString) {
-        return stakingKeyInfo.addressing;
+        return stakingKeyInfo.addressing.path;
       }
       return undefined;
     },
-    cip36: true,
-  });
+    senderUtxos,
+  );
 
   expect(response).toStrictEqual(({
     options: {
@@ -405,6 +390,7 @@ test('Create Ledger transaction', async () => {
         outputIndex: 1,
       }],
       outputs: [{
+        format: TxOutputFormat.ARRAY_LEGACY,
         destination: {
           params: {
             addressHex: '82d818582183581c891ac9abaac999b097c81ea3c0450b0fbb693d0bd232bebc0f4a391fa0001af2ff7e21',
@@ -431,15 +417,21 @@ test('Create Ledger transaction', async () => {
         },
         type: CertificateType.STAKE_REGISTRATION,
       }],
-      auxiliaryData: undefined,
+      auxiliaryData: null,
       validityIntervalStart: null,
+      collateralInputs: null,
+      collateralOutput: undefined,
+      includeNetworkId: false,
+      mint: null,
+      referenceInputs: null,
+      requiredSigners: null,
+      totalCollateral: null,
     },
     additionalWitnessPaths: [],
   }: SignTransactionRequest));
 
-  buildSignedTransaction(
-    txBuilder.build_tx(),
-    signRequest.senderUtxos,
+  buildConnectorSignedTransaction(
+    txBuilder.build_tx().to_hex(),
     [
       // this witnesses doesn't belong to the transaction / key. Just used to test wit generation
       {
