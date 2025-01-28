@@ -40,6 +40,8 @@ import { GovernanceContextProvider } from './UI/features/governace/module/Govern
 // $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
+import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
+// $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
@@ -55,6 +57,8 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
+// import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 
@@ -487,4 +491,23 @@ export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node
       </CurrencyProvider>
     );
   });
+}
+
+export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  const openDialogWrapper = (dialog): void => {
+    dappCenterProps.stores.uiDialogs.open({ dialog });
+  };
+
+  return (
+    <DappCenterContextProvider
+      currentWallet={currentWalletInfo}
+      openDialogWrapper={openDialogWrapper}
+    >
+      <Suspense fallback={null}>
+        {children}
+      </Suspense>
+    </DappCenterContextProvider>
+  );
 }
