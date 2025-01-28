@@ -178,8 +178,10 @@ const NotCurrentWalletModal = injectIntl(
           },
         ]}
       >
-        <Typography sx={{ fontSize: '16px', lineHeight: '24px' }}>{intl.formatMessage(messages.switchText)}</Typography>
-        <Typography sx={{ fontSize: '12px', fontHeight: '16px', lineHeight: '16px' }}>
+        <Typography sx={{ fontSize: '16px', lineHeight: '24px' }} color="ds.text_gray_medium">
+          {intl.formatMessage(messages.switchText)}
+        </Typography>
+        <Typography sx={{ fontSize: '12px', fontHeight: '16px', lineHeight: '16px' }} color="ds.text_gray_medium">
           {intl.formatMessage(messages.currentWalletLabel)}
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'row', overflow: 'hidden' }}>
@@ -193,6 +195,7 @@ const NotCurrentWalletModal = injectIntl(
               marginBottom: 'auto',
               marginLeft: '1em',
             }}
+            color="ds.text_gray_medium"
           >
             {props.shownCashbackWallet.plate.TextPart}
           </Typography>
