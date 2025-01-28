@@ -111,7 +111,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
       styleOverride={{ maxWidth: '648px' }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
-        <Typography component="div" variant="body1">
+        <Typography component="div" variant="body1" color="ds.text_gray_medium">
           {intl.formatMessage(messages.description)}
         </Typography>
 
@@ -151,7 +151,10 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
                 sx={{ marginRight: '8px' }}
               />
             }
-            sx={{ margin: '0px' }}
+            sx={{
+              margin: '0px',
+              color: 'ds.text_gray_medium',
+            }}
           />
         </Stack>
       </Box>
