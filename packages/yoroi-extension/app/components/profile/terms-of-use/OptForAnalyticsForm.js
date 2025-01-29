@@ -1,11 +1,12 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './OptForAnalyticsForm.scss';
+import tosStyles from './TermsOfUseText.scss';
 import { LoadingButton } from '@mui/lab';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
@@ -14,6 +15,9 @@ import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
 import { Box, Button, Link, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
+import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
+import ReactMarkdown from 'react-markdown';
+
 
 const messages = defineMessages({
   title: {
@@ -70,12 +74,13 @@ const messages = defineMessages({
 type Props = {|
   onOpt: boolean => void,
     variant: 'startup' | 'settings',
-      isOptedIn: boolean,
-        onPrivacyNoticeClick: () => void
+    isOptedIn: boolean,
+    privacyNotice: string
 |};
 
 type State = {|
   isSubmitting: boolean,
+  showPrivacyNotice: boolean
 |};
 
 @observer
@@ -84,16 +89,52 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     intl: intlShape.isRequired,
   };
 
-  state: State = { isSubmitting: false };
+  state: State = { isSubmitting: false, showPrivacyNotice: false };
 
   onOpt: boolean => void = isOptIn => {
     this.setState({ isSubmitting: true });
     this.props.onOpt(isOptIn);
   };
 
+  togglePrivacyNotice: () => void = () => {
+    this.setState(prevState => ({ showPrivacyNotice: !prevState.showPrivacyNotice }));
+  };
+
+  renderPrivacyNotice(): Node {
+    const { intl } = this.context;
+    const privacyNotice = this.props.privacyNotice;
+    return (
+      <>
+        <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
+          <Box width="648px">
+            <div className={tosStyles.terms}>
+              <ReactMarkdown source={privacyNotice} escapeHtml={false} />
+            </div>
+          </Box>
+        </Box>
+        <Button
+          sx={{
+            color: 'grayscale.900',
+            position: 'absolute',
+            top: '24px',
+            left: '24px',
+          }}
+          startIcon={<BackIcon />}
+          onClick={this.togglePrivacyNotice}
+        >
+          {intl.formatMessage(globalMessages.backButtonLabel)}
+        </Button>
+      </>
+    );
+  }
+
   render(): Node {
     const { intl } = this.context;
-    const { variant, isOptedIn, onPrivacyNoticeClick } = this.props;
+    const { variant, isOptedIn } = this.props;
+
+    if (this.state.showPrivacyNotice) {
+      return this.renderPrivacyNotice();
+    }
 
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
@@ -141,10 +182,10 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                     alignItems: 'flex-start',
                     justifyContent: 'flex-start',
                     gap: '8px',
-                    width: isStartupScreen ? "496px" : undefined
+                    width: isStartupScreen ? '496px' : undefined
                   }}
                 >
-                  <Box sx={{ flexShrink: 0, mt: "3px" }}>
+                  <Box sx={{ flexShrink: 0, mt: '3px' }}>
                     <Icon />
                   </Box>
                   <Typography component="div" color="ds.text_gray_medium">
@@ -174,22 +215,22 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 labelPlacement="start"
                 sx={{
                   marginLeft: '0px',
-                  marginTop: '40px',
+                  my: '40px',
                   color: 'ds.text_gray_medium',
                 }}
               />
             ) : (
               <Box sx={{
-                display: "flex",
-                gap: "16px",
-                width: "343px",
-                my: "32px"
+                display: 'flex',
+                gap: '16px',
+                width: '343px',
+                my: '32px'
               }}>
-                <Button sx={{ width: "163px" }} variant='secondary' size='medium' onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
+                <Button sx={{ width: '163px' }} variant='secondary' size='medium' onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
                   {intl.formatMessage(globalMessages.refuseLabel)}
                 </Button>
                 <LoadingButton
-                  sx={{ width: "163px" }}
+                  sx={{ width: '163px' }}
                   variant="primary"
                   size='medium'
                   onClick={() => this.onOpt(true)}
@@ -208,17 +249,28 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 justifyContent: isStartupScreen ? 'center' : 'flex-start',
               }}
             >
-              {isFirefox ? <Link
-                sx={{ '&:hover': { cursor: "pointer" } }}
-                target="_blank"
-                rel="noreferrer"
-                href={environment.externalPrivacyPolicyURL()}
-              >
-                {intl.formatMessage(messages.privacyNotice)}
-              </Link> : <Link sx={{ '&:hover': { cursor: "pointer" } }} onClick={onPrivacyNoticeClick}>
-                {intl.formatMessage(messages.privacyNotice)}
-              </Link>
-              }
+              {isFirefox ? (
+                <Link
+                  sx={{ '&:hover': { cursor: 'pointer' } }}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={environment.externalPrivacyPolicyURL()}
+                >
+                  {intl.formatMessage(messages.privacyNotice)}
+                </Link> 
+              ) : (
+                <Box sx={{ 
+                    color: 'ds.text_primary_medium', 
+                    '&:hover': { 
+                      cursor: 'pointer',
+                      textDecoration: 'underline'
+                    }
+                  }}
+                  onClick={this.togglePrivacyNotice}
+                >
+                  {intl.formatMessage(messages.privacyNotice)}
+                </Box>
+              )}
             </Box>
           </div>
         </Box>
