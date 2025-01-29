@@ -1098,6 +1098,10 @@ export const connectorMessages: * = defineMessages({
     id: 'wallet.navigation.receive',
     defaultMessage: '!!!Receive',
   },
+  transactions: {
+    id: 'wallet.navigation.transactions',
+    defaultMessage: '!!!Transactions',
+  },
   assetsSent: {
     id: 'connector.assetsSent',
     defaultMessage: '!!!{quantity} assets sent',

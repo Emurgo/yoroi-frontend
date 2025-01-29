@@ -23,6 +23,14 @@ import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 
 const messages = defineMessages({
+  transactionType: {
+    id: 'wallet.summary.page.type',
+    defaultMessage: '!!!Transaction type',
+  },
+  transactionStatus: {
+    id: 'wallet.summary.page.status',
+    defaultMessage: '!!!Status',
+  },
   pendingOutgoingConfirmationLabel: {
     id: 'wallet.summary.page.pendingOutgoingConfirmationLabel',
     defaultMessage: '!!!Outgoing pending confirmation',
@@ -184,7 +192,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
           }}
         >
           <Typography variant="h2" as="p" fontSize="18px" sx={{ fontWeight: 500, color: 'ds.text_gray_medium' }}>
-            {intl.formatMessage({ id: 'wallet.navigation.transactions' })}
+            {intl.formatMessage(globalMessages.transactions)}
           </Typography>
           {!isLoadingTransactions && (
             <Button
@@ -226,12 +234,12 @@ export default class WalletSummaryRevamp extends Component<Props> {
           >
             <Grid item xs={4}>
               <Typography variant="body2" color="ds.text_gray_low">
-                {intl.formatMessage({ id: 'wallet.summary.page.type' })}
+                {intl.formatMessage(messages.transactionType)}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'left' }}>
               <Typography variant="body2" color="ds.text_gray_low">
-                {intl.formatMessage({ id: 'wallet.summary.page.status' })}
+                {intl.formatMessage(messages.transactionStatus)}
               </Typography>
             </Grid>
             <Grid item xs={2} sx={{ textAlign: 'right' }} color="ds.text_gray_low">
