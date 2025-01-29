@@ -19,7 +19,8 @@ import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info.i
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import { InfoTooltip } from '../../widgets/InfoTooltip';
 
 type AddressStoreSubset = {
   +isActiveStore: boolean,
@@ -43,20 +44,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
 
   genTooltip: AddressStoreSubset => Node = store => {
     const { intl } = this.context;
-    return (
-      <Tooltip
-        placement="top-start"
-        title={
-          <Typography component="div" variant="body3">
-            {intl.formatMessage(addressGroupsTooltip[store.name.group])}
-          </Typography>
-        }
-      >
-        <div>
-          <InfoIcon />
-        </div>
-      </Tooltip>
-    );
+    return <InfoTooltip content={intl.formatMessage(addressGroupsTooltip[store.name.group])}/>
   };
 
   createAccordionForGroup: ($PropertyType<Props, 'addressStores'>) => Node = stores => {
