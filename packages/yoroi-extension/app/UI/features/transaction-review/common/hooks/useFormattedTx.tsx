@@ -14,7 +14,6 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, stakingAddress, networkId } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
-  console.log('XXXXXX', outputs);
   const referenceInputs = data?.reference_inputs ?? [];
 
   const inputUtxos = useUtxos(inputs, walletUtxos);
@@ -31,7 +30,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
     fee: formattedFee,
     // certificates: formattedCertificates,
     // mint: formattedMintData,
-    // referenceInputs: formattedReferenceInputs,
+    referenceInputs: referenceInputs,
   };
 };
 
@@ -99,7 +98,6 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
         address,
         addressKind: addressKind ?? null,
         rewardAddress,
-        // ownAddress: false,
         ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
         txIndex: utxo.tx_index,
         txHash: utxo.tx_hash,
@@ -109,9 +107,6 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
 };
 
 const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
-  console.log('walletAddresses', walletAddresses);
-  console.log('outputs', outputs);
-
   return Promise.all(
     outputs.map(async output => {
       const address = output.address;
@@ -124,21 +119,25 @@ const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInf
           quantity: coin,
         },
       ];
+      console.log('formatOutputs', outputs);
+      const multiAssets =
+        output.amount?.multiasset !== null
+          ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
+              return Object.entries(assets).map(([assetId, amount]) => {
+                const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
+                if (tokenInfo === undefined) {
+                  return null;
+                }
+                if (primaryTokenInfo == null) return null;
+                const quantity = asQuantity(amount);
 
-      const multiAssets = output.amount?.multiasset
-        ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
-            return Object.entries(assets).map(([assetId, amount]) => {
-              const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
-              if (primaryTokenInfo == null) return null;
-              const quantity = asQuantity(amount);
-
-              return {
-                tokenInfo,
-                quantity,
-              };
-            });
-          })
-        : [];
+                return {
+                  tokenInfo,
+                  quantity,
+                };
+              });
+            })
+          : [];
 
       const assets = [...primaryAssets, ...multiAssets].filter(isNonNullable);
 
@@ -147,7 +146,8 @@ const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInf
         address,
         addressKind,
         rewardAddress,
-        ownAddress: isOwnedAddress(walletAddresses, address),
+        ownAddress: address,
+        // ownAddress: isOwnedAddress(walletAddresses, address), TODO - investigate this
       };
     })
   );

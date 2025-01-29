@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { Box, Divider, Stack, styled } from '@mui/material';
 import WalletAccountIcon from '../../../../../../components/topbar/WalletAccountIcon';
-import { truncateAddressShort } from '../../../../../../utils/formatters';
+import { truncateAddress } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { TokenItem } from '../../../common/TokenItem';
@@ -50,6 +50,7 @@ export const OverviewTab = ({ receiverCustomTitle, tx }) => {
       </Box>
     </Stack>
   );
+  console.log('111INPUTS INFO', { receiverCustomTitle, ownedOutputs, notOwnedOutputs, tx });
 
   return (
     <Stack sx={{ padding: '24px' }}>
@@ -63,8 +64,12 @@ export const OverviewTab = ({ receiverCustomTitle, tx }) => {
 
       <MyWalletSection tx={tx} notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} />
 
-      <Divider sx={{ margin: '24px 0px' }} />
-      <OperationsSection />
+      {receiverCustomTitle !== null && (
+        <ExternalPartySection receiverCustomTitle={receiverCustomTitle} output={notOwnedOutputs[0]} />
+      )}
+
+      {/* <Divider sx={{ margin: '24px 0px' }} /> */}
+      {/* <OperationsSection /> */}
     </Stack>
   );
 };
@@ -83,7 +88,6 @@ const InfoInline = ({ label, value }) => {
 };
 
 const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
-  // console.log('notOwnedOutputs', ownedOutputs, notOwnedOutputs);
   return (
     <Box>
       <Collapsible
@@ -92,15 +96,27 @@ const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
         content={
           <Stack gap="12px">
             <CopyableText value="stake1u9g90x2xqtp4chel0gadzjvjfentxmhskj9k2094zaqe6sqws75rv">
-              <Typography>{truncateAddressShort('stake1u9g90x2xqtp4chel0gadzjvjfentxmhskj9k2094zaqe6sqws75rv')}</Typography>
+              <Typography>{truncateAddress('stake1u9g90x2xqtp4chel0gadzjvjfentxmhskj9k2094zaqe6sqws75rv')}</Typography>
             </CopyableText>
-            <MyWalletTokens />
+            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} />
           </Stack>
         }
       />
     </Box>
   );
 };
+
+const ExternalPartySection = ({ receiverCustomTitle, output }) => {
+  return (
+    <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
+      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+        To:
+      </Typography>
+      {receiverCustomTitle}
+    </Stack>
+  );
+};
+
 const OperationsSection = () => {
   return (
     <Box>
@@ -117,10 +133,12 @@ const OperationsSection = () => {
   );
 };
 
-const MyWalletTokens = () => {
+const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs }) => {
+  const totalPrimaryTokenSpent = '-4.33434 ADA';
+  const notPrimaryTokenSent = [];
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
-      <Stack direction="row" alignItems="center" gap="32px">
+      <Stack direction="row" alignItems="center" justifyContent="space-between" width="100%">
         <Stack direction="row" alignItems="center" gap="4px">
           <IconWrapper>
             <Icon.Send />
@@ -128,12 +146,11 @@ const MyWalletTokens = () => {
           <Typography fontWeight="500">Send</Typography>
         </Stack>
         <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px' }}>
-          <Typography color="ds.white_static">-0.22323232 ADA</Typography>
+          <Typography color="ds.white_static">{totalPrimaryTokenSpent}</Typography>
         </Box>
       </Stack>
-      {['-10 Token 1', '-50 Token 2', '-100 Token 3', '-1 NFT 1', "-10 Token 1'"].map(item => (
-        <TokenItem label={item} isPrimaryToken={false} />
-      ))}
+
+      {notPrimaryTokenSent.length > 0 && notPrimaryTokenSent.map(item => <TokenItem label={item} isPrimaryToken={false} />)}
     </Stack>
   );
 };

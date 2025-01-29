@@ -2,7 +2,6 @@ import { Divider, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
-import { mockReviewTX } from '../../../common/mockData'; // Adjust this path as necessary
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
 
 // TODO Define the type for an individual asset
@@ -34,12 +33,13 @@ interface OutputProps {
   output: InputData;
 }
 
-export const UTxOsTab: React.FC = () => {
+export const UTxOsTab: React.FC = ({ tx }) => {
+  console.log('tx', tx);
   return (
-    <Stack direction="column" sx={{ padding: '24px' }}>
-      <Inputs inputs={mockReviewTX.inputs} />
-      <FeeDisplay fee={mockReviewTX.fee.label} />
-      <Outputs outputs={mockReviewTX.outputs} />
+    <Stack direction="column" sx={{ padding: '24px', width: '300px', flexWrap: 'wrap' }}>
+      <Inputs inputs={tx.inputs} />
+      <FeeDisplay fee={tx.fee.quantity} />
+      <Outputs outputs={tx.outputs} />
     </Stack>
   );
 };
@@ -67,6 +67,7 @@ export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
 };
 
 const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
+  console.log('outputs', outputs);
   return (
     <Stack>
       <Collapsible
@@ -78,8 +79,8 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
         }
         content={
           <Stack gap="8px">
-            {outputs.map(output => (
-              <Output key={`${output.address}-${output.txHash}-${output.txIndex}`} output={output} />
+            {outputs.map((output, index) => (
+              <Output key={`${output.address}-${index}`} output={output} />
             ))}
           </Stack>
         }
@@ -91,17 +92,15 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
 const Input: React.FC<InputProps> = ({ input }) => {
   const strings = useStrings();
 
-  console.log('INPUT', strings);
-
   const renderAssets = () => {
     if (!input.assets.length) return null;
-
     return input.assets.map(asset => (
       <TokenItem
-        key={asset.tokenInfo.id} // Ensure this is a unique identifier
+        key={asset.tokenInfo.id}
         tokenInfo={asset.tokenInfo}
         label={asset.label}
         isPrimaryToken={asset.isPrimary}
+        quantity={asset.quantity}
       />
     ));
   };
@@ -110,16 +109,28 @@ const Input: React.FC<InputProps> = ({ input }) => {
     <Stack direction="column" gap="8px" mt="16px">
       <Stack direction="row" alignItems="center" gap="8px">
         <Icon.Indicator />
-        <Typography fontWeight="500" variant="h5">
+        <Typography fontWeight="500" variant="h5" color="ds.text_gray_medium">
           Your Address
         </Typography>
       </Stack>
 
       <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word', maxWidth: '450px' }} variant="body1">
+        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="450px">
           {input.address}
         </Typography>
         <CopyButton textToCopy={input.address} strings={strings} />
+      </Stack>
+
+      <Stack direction="row" gap="8px" alignItems="flex-start">
+        <Stack direction="row" gap="8px" alignItems="flex-start">
+          <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="420px">
+            {input.txHash}
+          </Typography>
+          <Typography sx={{}} variant="body1" fontWeight={500}>
+            {`#${input.txIndex}`}
+          </Typography>
+        </Stack>
+        <CopyButton textToCopy={input.txHash} strings={strings} />
       </Stack>
 
       {input.assets.length > 0 && (
@@ -127,26 +138,23 @@ const Input: React.FC<InputProps> = ({ input }) => {
           {renderAssets()}
         </Stack>
       )}
-
-      <Stack direction="row" gap="8px" alignItems="flex-end">
-        <Typography sx={{ wordWrap: 'break-word', maxWidth: '450px' }} variant="body1">
-          {input.txHash} {`#${input.txIndex}`}
-        </Typography>
-      </Stack>
     </Stack>
   );
 };
 
 const Output: React.FC<OutputProps> = ({ output }) => {
+  const strings = useStrings();
+  const isOwnAdddress = output.ownAddress;
   const renderAssets = () => {
     if (!output.assets.length) return null;
 
     return output.assets.map(asset => (
       <TokenItem
-        key={asset.tokenInfo.id} // Ensure this is a unique identifier
+        key={asset.tokenInfo.id}
         tokenInfo={asset.tokenInfo}
         label={asset.label}
         isPrimaryToken={asset.isPrimary}
+        quantity={asset.quantity}
         isSent={false}
       />
     ));
@@ -157,28 +165,20 @@ const Output: React.FC<OutputProps> = ({ output }) => {
       <Stack direction="row" alignItems="center" gap="8px">
         <Icon.Indicator />
         <Typography fontWeight="500" variant="h5">
-          Your Address
+          {isOwnAdddress ? 'Your Address' : 'Foreign address'}
         </Typography>
       </Stack>
 
       <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word', maxWidth: '450px' }} variant="body1">
-          {output.address}
+        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" maxWidth="450px">
+          {output.ownAddress}
         </Typography>
-        <CopyButton textToCopy={output.address} />
+        <CopyButton textToCopy={output.ownAddress} strings={strings} />
       </Stack>
 
       {output.assets.length > 0 && (
         <Stack direction="row" gap="8px" justifyContent="flex-end">
           {renderAssets()}
-        </Stack>
-      )}
-
-      {output?.txIndex && (
-        <Stack direction="row" gap="8px" alignItems="flex-end">
-          <Typography sx={{ wordWrap: 'break-word', maxWidth: '450px' }} variant="body1">
-            {output.txHash} {`#${output.txIndex}`}
-          </Typography>
         </Stack>
       )}
     </Stack>

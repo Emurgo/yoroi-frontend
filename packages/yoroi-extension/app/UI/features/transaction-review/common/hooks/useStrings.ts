@@ -17,7 +17,6 @@ export const messages = Object.freeze(
 
 export const useStrings = () => {
   const { intl } = useIntl();
-  console.log('useStrings intlintl', intl);
   return React.useRef({
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
     copied: intl.formatMessage(messages.copied),

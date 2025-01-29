@@ -1,11 +1,11 @@
 import { styled, useTheme } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
 import * as React from 'react';
 
 import { Box, Divider } from '@mui/material';
 import Menu from '../../../portfolio/common/components/Menu';
 import { useFormattedTx } from '../../common/hooks/useFormattedTx';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { MetadataTab } from './Metadata/MetadataTab';
 import { OverviewTab } from './Overview/OverviewTab';
 import { ReferenceInputsTab } from './ReferenceInputs/ReferenceInputsTab';
 import { UTxOsTab } from './UTxOs/UTxOsTab';
@@ -17,6 +17,7 @@ const TabContent = styled(Box)({
 export interface SubMenuOption {
   label: string;
   route: string;
+  showTab?: boolean;
 }
 
 export const ReviewTxSection = () => {
@@ -25,24 +26,30 @@ export const ReviewTxSection = () => {
   const { unsignedTx, networkId, details, ftAssetsList, primaryTokenInfo, receiverCustomTitle } = useTxReviewModal();
   // const txBody = useTxBody({ cbor: undefined, unsignedTx: unignedTxReviewMock });
   const formattedTx = useFormattedTx(unsignedTx.body);
+  const formattedMetadata = useFormattedMetadata({ body: unsignedTx.body, unsignedTx });
+
   console.log('FINAL unsignedTx', formattedTx);
 
   const subMenuOptions: SubMenuOption[] = [
     {
       label: 'Overview',
       route: 'overview',
+      showTab: true,
     },
     {
       label: 'UTxOs',
       route: 'UTxOs',
+      showTab: true,
     },
     {
       label: 'Metadata',
       route: 'metadata',
+      showTab: true,
     },
     {
       label: 'Reference inputs',
       route: 'referenceInputs',
+      showTab: formattedTx.referenceInputs.length !== null,
     },
   ];
   const [selectedTab, setSelectedTab] = React.useState(subMenuOptions[0]?.route);
@@ -62,24 +69,24 @@ export const ReviewTxSection = () => {
         <Divider />
       </Box>
 
-      {selectedTab === subMenuOptions[0]?.route ? (
+      {selectedTab === subMenuOptions[0]?.showTab ? (
         <TabContent>
           <OverviewTab receiverCustomTitle={receiverCustomTitle} tx={formattedTx} />
         </TabContent>
       ) : null}
-      {selectedTab === subMenuOptions[1]?.route ? (
+      {selectedTab === subMenuOptions[1]?.showTab ? (
         <TabContent>
-          <UTxOsTab />
+          <UTxOsTab tx={formattedTx} />
         </TabContent>
       ) : null}
-      {selectedTab === subMenuOptions[2]?.route ? (
+      {selectedTab === subMenuOptions[2]?.showTab ? (
         <TabContent>
-          <Typography>Metadata here - TODO</Typography>
+          <MetadataTab hash={formattedMetadata?.hash ?? null} metadata={formattedMetadata?.metadata ?? null} />
         </TabContent>
       ) : null}
-      {selectedTab === subMenuOptions[3]?.route ? (
+      {selectedTab === subMenuOptions[3]?.showTab ? (
         <TabContent>
-          <ReferenceInputsTab referenceInputs={mockReviewTX.referenceInputs} />
+          <ReferenceInputsTab referenceInputs={formattedTx.referenceInputs} />
         </TabContent>
       ) : null}
     </Box>

@@ -38,6 +38,7 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import { LiquidityPool } from './LiquidityPool';
 import { TransactionSummary } from './TransactionSummary';
 import { unignedTxReviewMock } from './txReviewMock';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 
 const messages = defineMessages({
   sendUsingLedgerNano: {
@@ -76,6 +77,7 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       amounts: { sell, buy },
       limitPrice: orderLimitPrice,
     },
+
     frontendFeeTiersChanged,
   } = useSwap();
   const { sellTokenInfo, buyTokenInfo, resetSwapForm, sellQuantity, buyQuantity } = useSwapForm();
@@ -232,10 +234,13 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
         const liquidityPool = (
           <LiquidityPool /> // liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
         );
+
+        const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
+
         openTxReviewModal({
           title: 'Transaction confirmation (Swap in progress)',
           modalView: 'transactionReview',
-          receiverCustomTitle: liquidityPool ?? undefined,
+          receiverCustomTitle: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
           details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
           unsignedTx: parsedSignRequest, // send if for here just to make it work - later can take it from store inside review modal manager
         });

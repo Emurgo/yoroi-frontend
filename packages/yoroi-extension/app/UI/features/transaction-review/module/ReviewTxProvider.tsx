@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
@@ -34,14 +35,14 @@ export const ReviewTxProvider = ({
   children,
   initialState,
   stores,
+  intl,
 }: {
   children: React.ReactNode;
   initialState?: ModalState;
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const currentWalletInfo = createCurrrentWalletInfo(stores);
-  console.log('[currentWalletInfo]', currentWalletInfo?.selectedWallet);
-
+  console.log('intlintlintl', intl);
   useEffect(() => {
     const { wallets } = stores;
     const { selected, selectedWalletName } = wallets;
@@ -53,6 +54,7 @@ export const ReviewTxProvider = ({
       dispatch({ type: 'close' });
     },
     openTxReviewModal: (payload: any) => {
+      console.log('payload', payload);
       dispatch({
         type: 'open',
         title: payload.title,
@@ -72,7 +74,6 @@ export const ReviewTxProvider = ({
     startLoadingTxReview: () => dispatch({ type: 'startLoading' }),
     stopLoadingTxReview: () => dispatch({ type: 'stopLoading' }),
   }).current;
-  console.log('currentWalletInfo?.selectedWallet', currentWalletInfo?.selectedWallet);
   const context: any = React.useMemo(
     () => ({
       ...state,
@@ -89,7 +90,11 @@ export const ReviewTxProvider = ({
     [state, actions]
   );
 
-  return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
+  return (
+    <ModalContext.Provider value={context}>
+      <IntlProvider intl={intl}>{children}</IntlProvider>
+    </ModalContext.Provider>
+  );
 };
 
 type ModalAction = any;
@@ -107,6 +112,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         isLoading: false,
         modalView: action.modalView ?? defaultState.modalView,
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
+        receiverCustomTitle: action.receiverCustomTitle,
       };
 
     case 'changeModalView':
