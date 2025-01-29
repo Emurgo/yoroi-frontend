@@ -15,11 +15,10 @@ import {
   AddressSubgroup,
 } from '../../../types/AddressFilterTypes';
 import Accordion from '../../widgets/Accordion';
-import { ReactComponent as InfoIcon } from '../../../assets/images/revamp/info.inline.svg';
 
 import type { AddressTypeName, AddressFilterKind } from '../../../types/AddressFilterTypes';
 import classNames from 'classnames';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { InfoTooltip } from '../../widgets/InfoTooltip';
 
 type AddressStoreSubset = {
