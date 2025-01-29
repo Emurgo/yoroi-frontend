@@ -11,7 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
 
@@ -27,11 +27,11 @@ const messages = defineMessages({
   },
   line1: {
     id: 'profile.analytics.line1',
-    defaultMessage: '!!!Anonymous analytics data',
+    defaultMessage: '!!!Provide anonymous analytics about visited extension pages, browser version, selected language, time of analytical events',
   },
   line2: {
     id: 'profile.analytics.line2',
-    defaultMessage: '!!!You can always opt-out via Settings',
+    defaultMessage: '!!!You can always opt-out via Settings and it won’t impact your experience',
   },
   line3: {
     id: 'profile.analytics.line3',
@@ -44,10 +44,6 @@ const messages = defineMessages({
   line5: {
     id: 'profile.analytics.line5',
     defaultMessage: '!!!We <strong>do not</strong> sell data',
-  },
-  learnMore: {
-    id: 'profile.analytics.learnMore',
-    defaultMessage: '!!!Learn more about user insights',
   },
   privacyNotice: {
     id: 'profile.analytics.seePrivacyNotice',
@@ -73,8 +69,9 @@ const messages = defineMessages({
 
 type Props = {|
   onOpt: boolean => void,
-  variant: 'startup' | 'settings',
-  isOptedIn: boolean,
+    variant: 'startup' | 'settings',
+      isOptedIn: boolean,
+        onPrivacyNoticeClick: () => void
 |};
 
 type State = {|
@@ -96,7 +93,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { variant, isOptedIn } = this.props;
+    const { variant, isOptedIn, onPrivacyNoticeClick } = this.props;
 
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
@@ -106,7 +103,6 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const analyticsDetails = [
       [YesIcon, messages.line1],
       [YesIcon, messages.line2],
-      (isFirefox ? [YesIcon, messages.rejectionImpact] : null),
       [NoIcon, messages.line3],
       [NoIcon, messages.line4],
       [NoIcon, messages.line5],
@@ -114,140 +110,118 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
 
     return (
       <>
-      <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
-        <div className={variant === 'startup' ? styles.centeredBox : ''}>
-          {isSettingsScreen && (
-            <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500}>
-              {intl.formatMessage(messages.title)}
-            </Typography>
-          )}
+        <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
+          <div className={variant === 'startup' ? styles.centeredBox : ''}>
+            {isSettingsScreen && (
+              <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+                {intl.formatMessage(messages.title)}
+              </Typography>
+            )}
 
-          {isSettingsScreen ? (
-            <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
-          ) : (
-            <div className={styles.illustration}>
-              <AnalyticsIllustration />
-            </div>
-          )}
-
-          {isStartupScreen && (
-            <Typography component="div" variant="h5" fontWeight={500} mt="16px">
-              {intl.formatMessage(messages.title)}
-            </Typography>
-          )}
-
-          <Box my="16px">
-            {analyticsDetails.map(([Icon, msg]) => (
-              <Box
-                key={msg.id}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  gap: '8px',
-                }}
-              >
-                <Icon />
-                <Typography component="div" color="ds.text_gray_medium">
-                  <FormattedHTMLMessage {...msg} />
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-
-        </div>
-      </Box>
-
-      {isFirefox ? (
-        <Box className={styles.component}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isStartupScreen ? 'center' : 'flex-start',
-              marginTop: '15px',
-              fontSize: '0.8rem',
-            }}
-          >
-            {intl.formatMessage(messages.collectedData)}
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isStartupScreen ? 'center' : 'flex-start',
-              marginTop: '15px',
-            }}
-          >
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href={environment.externalPrivacyPolicyURL()}
-            >
-              {intl.formatMessage(messages.privacyNotice)}
-            </Link>
-          </Box>
-        </Box>
-      ) : null}
-
-      <Box mt={isStartupScreen ? '16px' : '0px'} className={styles.component}>
-        <div className={variant === 'startup' ? styles.centeredBox : ''}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: isStartupScreen ? 'center' : 'flex-start',
-            }}
-          >
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/7594394140303-What-s-user-insights-"
-            >
-              {intl.formatMessage(messages.learnMore)}
-            </Link>
-          </Box>
-
-          {isSettingsScreen ? (
-            <FormControlLabel
-              label={intl.formatMessage(messages.allow)}
-              control={
-                <Box ml="8px">
-                  <RevampSwitch
-                    checked={isOptedIn}
-                    onChange={event => this.onOpt(event.target.checked)}
-                  />
-                </Box>
-              }
-              labelPlacement="start"
-              sx={{
-                marginLeft: '0px',
-                marginTop: '40px',
-                color: 'ds.text_gray_medium',
-              }}
-            />
-          ) : (
-            <>
-              <div className={styles.skip}>
-                <button type="button" onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
-                  {intl.formatMessage(globalMessages.skipLabel)}
-                </button>
+            {isSettingsScreen ? (
+              <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
+            ) : (
+              <div className={styles.illustration}>
+                <AnalyticsIllustration />
               </div>
-              <div className={styles.accept}>
+            )}
+
+            {isStartupScreen && (
+              <Typography component="div" variant="h5" textAlign="center" fontWeight={500} mt="16px">
+                {intl.formatMessage(messages.title)}
+              </Typography>
+            )}
+
+            <Box my="16px">
+              {analyticsDetails.map(([Icon, msg]) => (
+                <Box
+                  key={msg.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    gap: '8px',
+                    width: isStartupScreen ? "496px" : undefined
+                  }}
+                >
+                  <Box sx={{ flexShrink: 0, mt: "3px" }}>
+                    <Icon />
+                  </Box>
+                  <Typography component="div" color="ds.text_gray_medium">
+                    <FormattedHTMLMessage {...msg} />
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+          </div>
+        </Box>
+
+        <Box className={styles.component}>
+          <div className={variant === 'startup' ? styles.centeredBox : ''}>
+
+            {isSettingsScreen ? (
+              <FormControlLabel
+                label={intl.formatMessage(messages.allow)}
+                control={
+                  <Box ml="8px">
+                    <RevampSwitch
+                      checked={isOptedIn}
+                      onChange={event => this.onOpt(event.target.checked)}
+                    />
+                  </Box>
+                }
+                labelPlacement="start"
+                sx={{
+                  marginLeft: '0px',
+                  marginTop: '40px',
+                  color: 'ds.text_gray_medium',
+                }}
+              />
+            ) : (
+              <Box sx={{
+                display: "flex",
+                gap: "16px",
+                width: "343px",
+                my: "32px"
+              }}>
+                <Button sx={{ width: "163px" }} variant='secondary' size='medium' onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
+                  {intl.formatMessage(globalMessages.refuseLabel)}
+                </Button>
                 <LoadingButton
+                  sx={{ width: "163px" }}
                   variant="primary"
+                  size='medium'
                   onClick={() => this.onOpt(true)}
                   loading={this.state.isSubmitting}
                   id="startupAnalytics-accept-button"
                 >
                   {intl.formatMessage(messages.accept)}
                 </LoadingButton>
-              </div>
-            </>
-          )}
-        </div>
-      </Box>
+              </Box>
+            )}
+
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: isStartupScreen ? 'center' : 'flex-start',
+              }}
+            >
+              {isFirefox ? <Link
+                sx={{ '&:hover': { cursor: "pointer" } }}
+                target="_blank"
+                rel="noreferrer"
+                href={environment.externalPrivacyPolicyURL()}
+              >
+                {intl.formatMessage(messages.privacyNotice)}
+              </Link> : <Link sx={{ '&:hover': { cursor: "pointer" } }} onClick={onPrivacyNoticeClick}>
+                {intl.formatMessage(messages.privacyNotice)}
+              </Link>
+              }
+            </Box>
+          </div>
+        </Box>
       </>
     );
   }
