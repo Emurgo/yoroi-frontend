@@ -82,7 +82,7 @@ import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto
 import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
-import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
+import { toTrezorSignRequest, } from './transactions/shelley/trezorTx';
 import { toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
@@ -748,33 +748,6 @@ export default class AdaApi {
     }
   }
 
-  createTrezorSignTxData(request: {|
-    signRequest: HaskellShelleyTxSignRequest,
-    network: $ReadOnly<NetworkRow>,
-  |}): CreateTrezorSignTxDataResponse {
-    try {
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
-
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
-      const trezorSignTxPayload = createTrezorSignTxPayload(
-        request.signRequest,
-        config.ByronNetworkId,
-        Number.parseInt(config.ChainNetworkId, 10),
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
-      return {
-        trezorSignTxPayload,
-      };
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
   createHwSignTxDataFromRawTx(
     hw: 'ledger' | 'trezor',
     request: CreateHWSignTxDataRequestFromRawTx
@@ -814,6 +787,7 @@ export default class AdaApi {
           protocolMagic,
           addressMap,
           request.senderUtxos,
+          request.catalystData,
         );
         Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(trezorSignTxPayload));
         return { hw, result: { trezorSignTxPayload } };

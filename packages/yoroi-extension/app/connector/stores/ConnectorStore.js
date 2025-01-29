@@ -1082,7 +1082,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses);
+    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses).txHex;
   }
 
   async ledgerSignTx(

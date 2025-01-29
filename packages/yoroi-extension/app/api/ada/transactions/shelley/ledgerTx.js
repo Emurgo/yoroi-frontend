@@ -45,7 +45,6 @@ import {
   iterateLenGetMap,
   maybe
 } from '../../../../coreUtils';
-import { mergeWitnessSets } from '../utils';
 import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
 
 // ==================== LEDGER ==================== //
