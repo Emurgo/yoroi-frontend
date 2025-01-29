@@ -84,6 +84,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
 
     const startDateIsCorrect = startDate !== null && startDate.isValid() && startDate.isSameOrBefore(endDate);
     const endDateIsCorrect = endDate !== null && endDate.isValid();
+    const parentLocationId = 'exportTransactionsDialog';
 
     const dialogActions = [
       {
@@ -103,7 +104,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        id="exportTransactionsDialog"
+        id={parentLocationId}
       >
         <Box width="600px">
           {infoBlock}
@@ -115,7 +116,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
             setEndDate={date => {
               this.setState({ endDate: date });
             }}
-            initialId="exportTransactionsDialog"
+            initialId={parentLocationId}
           />
 
           {(
@@ -129,11 +130,11 @@ export default class ExportTransactionDialog extends Component<Props, State> {
               }}
               control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds}/>}
               label={intl.formatMessage(messages.includeTxIds)}
-              id="exportTransactionsDialog-includeTxIds-checkbox"
+              id={`${parentLocationId}-includeTxIds-checkbox`}
             />
           )}
 
-          {error && <ErrorBlock error={error} />}
+          {error && <ErrorBlock error={error} parentId={parentLocationId} />}
         </Box>
       </Dialog>
     );
