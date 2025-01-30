@@ -38,8 +38,8 @@ class ExportTransactionsModal extends BasePage {
     method: 'id',
   };
   exportErrorMessageLocator = {
-    locator: '.ErrorBlock_component',
-    method: 'css',
+    locator: 'exportTransactionsDialog-errorMessage-text',
+    method: 'id',
   };
   // locators only for headless ubuntu
   exportUbuntuPenIconButtonLocator = {

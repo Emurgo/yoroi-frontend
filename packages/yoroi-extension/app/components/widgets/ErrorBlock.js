@@ -11,6 +11,7 @@ import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +error: ?LocalizableError,
+  parentId?: string,
 |};
 
 @observer
@@ -21,7 +22,9 @@ export default class ErrorBlock extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { error } = this.props;
+    const { error, parentId } = this.props;
+
+    const localId = parentId ?? 'somewhere';
 
     let errorText = '';
     try {
@@ -31,8 +34,8 @@ export default class ErrorBlock extends Component<Props> {
     }
 
     return (
-      <Box mt="10px" textAlign="center">
-        <Typography variant="body2" color="ds.text_error">{errorText}</Typography>
+      <Box mt="10px" textAlign="center" id={localId + '-errorMessage-box'}>
+        <Typography variant="body2" color="ds.text_error" id={localId + '-errorMessage-text'}>{errorText}</Typography>
       </Box>
     );
   }

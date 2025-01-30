@@ -590,6 +590,10 @@ const globalMessages: * = defineMessages({
     id: 'profile.uriPrompt.form.skipLabel',
     defaultMessage: '!!!Skip',
   },
+  refuseLabel: {
+    id: 'profile.uriPrompt.form.refuseLabel',
+    defaultMessage: '!!!Refuse',
+  },
   checkLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
     defaultMessage: '!!!CHECK',

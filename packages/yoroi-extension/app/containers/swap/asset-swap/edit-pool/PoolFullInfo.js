@@ -57,13 +57,13 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
             <InfoTooltip
               content={
                 <>
-                  <Typography color="ds.text_gray_medium">
+                  <Typography variant="body2" color="ds.gray_min">
                     {strings.feesIncluded}
                   </Typography>
-                  <Typography color="ds.text_gray_medium">
+                  <Typography variant="body2" color="ds.gray_min">
                     {strings.dexFee}
                   </Typography>
-                  <Typography color="ds.text_gray_medium">
+                  <Typography variant="body2" color="ds.gray_min">
                     {strings.frontendFee}
                   </Typography>
                 </>
