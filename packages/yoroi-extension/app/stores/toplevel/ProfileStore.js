@@ -30,11 +30,13 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     },
   };
 
+  _isFirefox: boolean = environment.isFirefox();
+
   /** Linear list of steps that need to be completed before app start */
   @observable
   SETUP_STEPS: Array<{| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |}> = [
     // Firefox policy requires this to be the first
-    ...(environment.isFirefox() ? [this._analyticsStep] : []),
+    ...(this._isFirefox ? [this._analyticsStep] : []),
     {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
@@ -57,7 +59,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         ampli.createWalletTermsPageViewed();
       },
     },
-    ...(environment.isFirefox() ? [] : [this._analyticsStep]),
+    ...(this._isFirefox ? [] : [this._analyticsStep]),
     {
       isDone: () => this.isComplexityLevelSelected,
       action: async () => {

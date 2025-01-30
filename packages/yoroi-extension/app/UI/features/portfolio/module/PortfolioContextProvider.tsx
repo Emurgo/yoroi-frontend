@@ -45,6 +45,7 @@ type PortfolioProviderProps = {
   };
   currentWallet: CurrentWalletType;
   openDialogWrapper: (dialog: React.ReactNode) => void;
+  shouldHideBalance: boolean;
 };
 
 export const PortfolioContextProvider = ({
@@ -56,8 +57,10 @@ export const PortfolioContextProvider = ({
   },
   currentWallet,
   openDialogWrapper,
+  shouldHideBalance,
 }: PortfolioProviderProps) => {
   const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo, backendServiceZero, explorer } = currentWallet;
+
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -94,6 +97,7 @@ export const PortfolioContextProvider = ({
       ftAssetList: ftAssetList || [],
       networkId,
       primaryTokenInfo,
+      isHiddenAmount: shouldHideBalance,
       openBuyDialog: () => openDialogWrapper(BuySellDialog),
       showWelcomeBanner: ftAssetList.length === 1,
       backendServiceZero: backendServiceZero,

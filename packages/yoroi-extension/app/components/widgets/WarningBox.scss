@@ -50,20 +50,10 @@
 
 :global(.YoroiClassic) {
   .component {
-    .headerIcon {
-      background-image: url(../../assets/images/attention-classic.inline.svg);
-    }
-
+   
     .headerText {
       font-weight: bold;
     }
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
-  .component {
-    .headerIcon {
-      background-image: url(../../assets/images/attention-modern.inline.svg);
-    }
-  }
-}

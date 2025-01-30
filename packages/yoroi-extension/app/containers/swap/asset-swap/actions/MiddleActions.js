@@ -1,10 +1,20 @@
 // @flow
-import { Box, Button } from '@mui/material';
+import { Box, Button, styled } from '@mui/material';
 import { ReactComponent as SwitchIcon } from '../../../../assets/images/revamp/icons/switch.inline.svg';
+import { useStrings } from '../../common/useStrings';
 import { useSwapForm } from '../../context/swap-form';
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_primary_medium,
+    },
+  },
+}));
 
 export const MiddleActions = (): React$Node => {
   const { clearSwapForm, switchTokens, onChangeLimitPrice, buyTokenInfo = {} } = useSwapForm();
+  const { clear } = useStrings();
 
   const handleSwitchTokens = () => {
     // we have ticker on the buy side, so we can safely switch
@@ -23,11 +33,13 @@ export const MiddleActions = (): React$Node => {
         }}
         onClick={handleSwitchTokens}
       >
-        <SwitchIcon />
+        <IconWrapper>
+          <SwitchIcon />
+        </IconWrapper>
       </Box>
       <Box>
         <Button onClick={() => clearSwapForm()} variant="tertiary" color="primary">
-          Clear
+          {clear}
         </Button>
       </Box>
     </Box>
