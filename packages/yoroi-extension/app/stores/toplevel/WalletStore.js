@@ -166,21 +166,28 @@ export default class WalletStore extends Store<StoresMap> {
 
   @action
   _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
-    this.showWalletCreatedNotification();
+    if (this.stores.loading.isFromCashback) {
+      setCashbackWallet(newWallet.publicDeriverId);
+      setTimeout(() => {
+        window.close();
+      }, 50);
+    } else {
+      this.showWalletCreatedNotification();
 
-    this.registerObserversForNewWallet({
-      publicDeriver: newWallet,
-      lastSyncInfo: newWallet.lastSyncInfo,
-    });
-
-    runInAction(() => {
-      this.wallets.push(newWallet);
-      this.setActiveWallet({
-        publicDeriverId: newWallet.publicDeriverId,
+      this.registerObserversForNewWallet({
+        publicDeriver: newWallet,
+        lastSyncInfo: newWallet.lastSyncInfo,
       });
-      this.stores.uiDialogs.closeActiveDialog();
-      this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
-    });
+
+      runInAction(() => {
+        this.wallets.push(newWallet);
+        this.setActiveWallet({
+          publicDeriverId: newWallet.publicDeriverId,
+        });
+        this.stores.uiDialogs.closeActiveDialog();
+        this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+      });
+    }
   };
 
   // =================== PUBLIC API ==================== //

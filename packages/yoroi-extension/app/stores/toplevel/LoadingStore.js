@@ -120,4 +120,8 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   getTabIdKey(): string {
     return TabIdKeys.Primary;
   }
+
+  isFromCashback(): boolean {
+    return /\?from=cashback$/.test(this._originRoute.location);
+  }
 }

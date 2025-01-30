@@ -177,8 +177,10 @@ export default class ConnectPage extends Component<Props> {
   };
 
   onCreateWallet: void => void = () => {
+    const { isSelectingCashbackWallet = false } = this.props;
+    const urlHash = isSelectingCashbackWallet ? '?from=cashback' : '';
     window.chrome.tabs.create({
-      url: `${window.location.origin}/main_window.html#/wallets/add`,
+      url: `${window.location.origin}/main_window.html#/wallets/add${urlHash}`,
     });
 
     this.props.onCancel();
