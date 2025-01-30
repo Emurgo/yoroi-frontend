@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Box, FormControlLabel, Typography } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
-import LocalStorageApi from '../../../../../api/localStorage'
-
+import LocalStorageApi from '../../../../../api/localStorage';
+// import { ampli } from '../../../../../../ampli';
 const NotificationsSettings = ({ intl }) => {
   const strings = useStrings(intl);
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(false)
@@ -24,6 +24,9 @@ const NotificationsSettings = ({ intl }) => {
   const handleNotificationsChange = (event) => {
     setNotificationsEnabled(prev => !prev);
     lsApi.setNotificationsSetting(String(event.target.checked));
+
+    // TODO: pull amplitude metrics
+    // ampli.settingsInAppNotificationsStatusUpdated()
   }
 
   return (
