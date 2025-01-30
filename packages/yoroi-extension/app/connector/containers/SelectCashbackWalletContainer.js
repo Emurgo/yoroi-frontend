@@ -13,7 +13,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
     this.props.stores.connector.refreshWallets();
   }
 
-  onSelectWallet(wallet: WalletState) {
+  onSelectWallet(wallet: { +publicDeriverId: number, ... }) {
     setCashbackWallet(wallet.publicDeriverId);
     // must delay or the message gets lost
     setTimeout(window.close, 50);
@@ -26,7 +26,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
       <ConnectPage
         selectedWallet={{ index: -1, deriver: undefined, checksum: undefined }} // placeholder
         onConnect={async () => {}} // placeholder
-        onCancel={() => this.onSelectWallet(-1)}
+        onCancel={() => this.onSelectWallet({ publicDeriverId: -1 })}
         isAppAuth={false} // na
         hidePasswordForm={() => {}} // placeholder
         loading={stores.connector.loadingWallets}
