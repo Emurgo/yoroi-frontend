@@ -63,9 +63,11 @@ const handlers = Object.freeze({
   },
 
   'set-cashback-wallet': async (id: number) => {
-    const localStorageApi = new LocalStorageApi();
-    await localStorageApi.saveCashbackWalletId(id);
-
+    // -1 is used when the user cancels the wallet selection. Bring expects a wallet change callback to be invoked.
+    if (id !== -1) {
+      const localStorageApi = new LocalStorageApi();
+      await localStorageApi.saveCashbackWalletId(id);
+    }
     notifyAllTabsCashbackWalletChange()
     return { ok: undefined };
   },
