@@ -57,8 +57,6 @@ import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedA
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
-import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
-import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 
 const messages = defineMessages({
   receiverLabel: {

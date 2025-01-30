@@ -10,7 +10,7 @@ import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils'
 import type {
   TransferTx,
 } from '../../types/TransferTypes';
-import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
+import { genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';

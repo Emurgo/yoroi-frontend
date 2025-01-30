@@ -29,12 +29,9 @@ import {
   TxOutputFormat,
   TxRequiredSignerType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
 import type { LedgerNanoCatalystRegistrationTxSignData } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import { ChainDerivations, } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import {
   bytesToHex,

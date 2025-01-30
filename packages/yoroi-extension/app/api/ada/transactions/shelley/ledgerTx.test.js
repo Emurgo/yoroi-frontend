@@ -1,7 +1,6 @@
 // @flow
 
 import '../../lib/test-config.forTests';
-import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import {
   toLedgerSignRequest,
@@ -13,7 +12,6 @@ import {
   getCardanoSpendingKeyHash,
   normalizeToAddress,
 } from '../../lib/storage/bridge/utils';
-import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import {
   AddressType,
   CertificateType,

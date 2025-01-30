@@ -1,6 +1,5 @@
-// // @flow
+// @flow
 import type { CardanoAddressedUtxo, } from '../types';
-import { verifyFromDerivationRoot } from '../../lib/storage/models/utils';
 import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
   CardanoAddressParameters,
@@ -22,37 +21,12 @@ import {
   CardanoTxWitnessType,
   CardanoDRepType,
 } from 'trezor-connect-flow';
-import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
-import type {
-  HaskellShelleyTxSignRequest,
-  TrezorTCatalystRegistrationTxSignData,
-} from './HaskellShelleyTxSignRequest';
-import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import { ChainDerivations, } from '../../../../config/numbersConfig';
-
+import type { TrezorTCatalystRegistrationTxSignData } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
-import blake2b from 'blake2b';
-import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, iterateLenGet, iterateLenGetMap, maybe, forceNonNull, hexToBytes } from '../../../../coreUtils';
+import { bytesToHex, iterateLenGet, iterateLenGetMap, forceNonNull, hexToBytes } from '../../../../coreUtils';
 import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
 
 // ==================== TREZOR ==================== //
-
-function formatTrezorWithdrawals(
-  withdrawals: RustModule.WalletV4.Withdrawals,
-  paths: Array<Array<number>>,
-): Array<CardanoWithdrawal> {
-  return iterateLenGetMap(withdrawals)
-    .values()
-    .nonNull()
-    .zip(paths)
-    .map(([withdrawalAmount, path]) => ({
-      amount: withdrawalAmount.to_str(),
-      path,
-    }))
-    .toArray();
-}
 
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,

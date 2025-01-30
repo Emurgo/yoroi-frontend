@@ -1,11 +1,9 @@
 // @flow
 
 import '../../lib/test-config.forTests';
-import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toTrezorSignRequest, toTrezorAddressParameters } from './trezorTx';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
-import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage/bridge/utils';
 import {
   CardanoCertificateType,
@@ -209,7 +207,7 @@ test('Create Trezor transaction', async () => {
 
   const response = toTrezorSignRequest(
     txBuilder.build().to_hex(),
-    Number.parseInt(baseConfig.ChainNetworkId, 10),
+    Number.parseInt(ChainNetworkId, 10),
     ByronNetworkId,
     _address => [2147483692, 2147485463, 2147483648, 2, 0],
     senderUtxos,
