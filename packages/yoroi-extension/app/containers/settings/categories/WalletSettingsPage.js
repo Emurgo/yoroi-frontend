@@ -18,6 +18,7 @@ import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWall
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+// $FlowIgnore: suppressing this error
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
 
 @observer
