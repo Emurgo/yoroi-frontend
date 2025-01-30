@@ -10,7 +10,6 @@ import type {
   CardanoSignedTxWitness,
   CardanoSignTransaction,
   CardanoToken,
-  CardanoWithdrawal,
 } from 'trezor-connect-flow/index';
 import {
   CardanoAddressType,
