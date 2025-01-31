@@ -99,8 +99,6 @@ const initializeYoroi: void => Promise<void> = async () => {
     } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
       const TAB = 'Overview';
       ampli.portfolioTokenDetails({ token_details_tab: TAB });
-    } else if (pathname === ROUTES.STAKING) {
-      ampli.stakingCenterPageViewed();
     }
   });
 };
