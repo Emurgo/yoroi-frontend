@@ -5,7 +5,7 @@ declare var chrome;
 // instead of directly calling the background with chrome.runtime.sendMessage, so that this lib can also
 // be used in the web page process.
 const callbacks: Map<number, (Object) => void> = new Map();
-let uid = 0;
+let uid_counter = 0;
 
 window.addEventListener('message', (event) => {
   if (event.data.type === 'bring_rpc_response') {
@@ -18,6 +18,7 @@ window.addEventListener('message', (event) => {
 });
 
 function callBackground(functionName: string, params: any): Promise<any> {
+  const uid = uid_counter++;
   return new Promise((resolve, reject) => {
     callbacks.set(uid, (msg) => {
       if (msg.return.err) {
@@ -34,7 +35,6 @@ function callBackground(functionName: string, params: any): Promise<any> {
       function: functionName,
       params,
     });
-    uid += 1;
   });
 }
 
