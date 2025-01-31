@@ -479,6 +479,17 @@ export type SettingsInAppNotificationsStatusUpdatedProperties = {|
    */
   status?: "enabled" | "disabled",
 |};
+export type StakingCenterDelegationSubmittedProperties = {|
+  /**
+   * The amount of ADA that the user will be exchanging.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  ada_amount?: number,
+  staking_pool?: string,
+|};
 export type SwapAssetFromChangedProperties = {|
   /**
    * Displaying the asset that the user chose to trade with.
@@ -986,6 +997,9 @@ declare export class DappPopupSignTransactionSubmitted mixins BaseEvent {
     event_properties?: DappPopupSignTransactionSubmittedProperties
   ): this;
 }
+declare export class ExchangePageViewed mixins BaseEvent {
+  event_type: string;
+}
 declare export class ExchangeSubmitted mixins BaseEvent {
   event_properties: ExchangeSubmittedProperties;
   event_type: string;
@@ -1175,6 +1189,13 @@ declare export class SettingsPageViewed mixins BaseEvent {
 declare export class StakingCenterDelegationInitiated mixins BaseEvent {
   event_type: string;
 }
+declare export class StakingCenterDelegationSubmitted mixins BaseEvent {
+  event_properties?: StakingCenterDelegationSubmittedProperties;
+  event_type: string;
+  constructor(
+    event_properties?: StakingCenterDelegationSubmittedProperties
+  ): this;
+}
 declare export class StakingCenterPageViewed mixins BaseEvent {
   event_type: string;
 }
@@ -1230,6 +1251,12 @@ declare export class TransactionsPageViewed mixins BaseEvent {
   event_type: string;
 }
 declare export class VotingPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class WalletPageBuyBannerClicked mixins BaseEvent {
+  event_type: string;
+}
+declare export class WalletPageExchangeClicked mixins BaseEvent {
   event_type: string;
 }
 declare export class WalletPageViewed mixins BaseEvent {
@@ -1600,6 +1627,18 @@ declare export class Ampli {
    */
   dappPopupSignTransactionSubmitted(
     properties?: DappPopupSignTransactionSubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Exchange Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Page%20Viewed)
+   *
+   * This event tracks when a user loads the default state of the first step of the fiat on/off ramp on the new Banxa flow. That screen shows input ADA Amount, with the BUY ADA option selected by default.
+   * @param options Amplitude event options.
+   */
+  exchangePageViewed(
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -2181,6 +2220,20 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Staking Center Delegation Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Submitted)
+   *
+   * Event indicating that a user has submitted a delegation in the staking center.
+   * @param properties The event's properties (e.g. ada_amount)
+   * @param options Amplitude event options.
+   */
+  stakingCenterDelegationSubmitted(
+    properties?: StakingCenterDelegationSubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Staking Center Page Viewed
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Page%20Viewed)
@@ -2369,6 +2422,32 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   votingPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Wallet Page Buy Banner Clicked
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Buy%20Banner%20Clicked)
+   *
+   * This event tracks when a user clicks on "Buy Button" on the Wallet Page’s BUY ADA banner.
+   *
+   * This banner only appears for **new users** or those **users that has 0 ADA** Balance.
+   * @param options Amplitude event options.
+   */
+  walletPageBuyBannerClicked(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Wallet Page Exchange Clicked
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Exchange%20Clicked)
+   *
+   * This event tracks when a user clicks on "Buy" on the Wallet Page.
+   * @param options Amplitude event options.
+   */
+  walletPageExchangeClicked(
     options?: EventOptions
   ): PromiseResult<any>;
 

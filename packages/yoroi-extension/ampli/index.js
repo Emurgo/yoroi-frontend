@@ -240,6 +240,13 @@ var DappPopupSignTransactionSubmitted = /** @class */ (function () {
     return DappPopupSignTransactionSubmitted;
 }());
 export { DappPopupSignTransactionSubmitted };
+var ExchangePageViewed = /** @class */ (function () {
+    function ExchangePageViewed() {
+        this.event_type = 'Exchange Page Viewed';
+    }
+    return ExchangePageViewed;
+}());
+export { ExchangePageViewed };
 var ExchangeSubmitted = /** @class */ (function () {
     function ExchangeSubmitted(event_properties) {
         this.event_properties = event_properties;
@@ -587,6 +594,15 @@ var StakingCenterDelegationInitiated = /** @class */ (function () {
     return StakingCenterDelegationInitiated;
 }());
 export { StakingCenterDelegationInitiated };
+var StakingCenterDelegationSubmitted = /** @class */ (function () {
+    function StakingCenterDelegationSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Staking Center Delegation Submitted';
+        this.event_properties = event_properties;
+    }
+    return StakingCenterDelegationSubmitted;
+}());
+export { StakingCenterDelegationSubmitted };
 var StakingCenterPageViewed = /** @class */ (function () {
     function StakingCenterPageViewed() {
         this.event_type = 'Staking Center Page Viewed';
@@ -696,6 +712,20 @@ var VotingPageViewed = /** @class */ (function () {
     return VotingPageViewed;
 }());
 export { VotingPageViewed };
+var WalletPageBuyBannerClicked = /** @class */ (function () {
+    function WalletPageBuyBannerClicked() {
+        this.event_type = 'Wallet Page Buy Banner Clicked';
+    }
+    return WalletPageBuyBannerClicked;
+}());
+export { WalletPageBuyBannerClicked };
+var WalletPageExchangeClicked = /** @class */ (function () {
+    function WalletPageExchangeClicked() {
+        this.event_type = 'Wallet Page Exchange Clicked';
+    }
+    return WalletPageExchangeClicked;
+}());
+export { WalletPageExchangeClicked };
 var WalletPageViewed = /** @class */ (function () {
     function WalletPageViewed() {
         this.event_type = 'Wallet Page Viewed';
@@ -1126,6 +1156,18 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.dappPopupSignTransactionSubmitted = function (properties, options) {
         return this.track(new DappPopupSignTransactionSubmitted(properties), options);
+    };
+    /**
+     * Exchange Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Page%20Viewed)
+     *
+     * This event tracks when a user loads the default state of the first step of the fiat on/off ramp on the new Banxa flow. That screen shows input ADA Amount, with the BUY ADA option selected by default.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.exchangePageViewed = function (options) {
+        return this.track(new ExchangePageViewed(), options);
     };
     /**
      * Exchange Submitted
@@ -1684,6 +1726,19 @@ var Ampli = /** @class */ (function () {
         return this.track(new StakingCenterDelegationInitiated(), options);
     };
     /**
+     * Staking Center Delegation Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Submitted)
+     *
+     * Event indicating that a user has submitted a delegation in the staking center.
+     *
+     * @param properties The event's properties (e.g. ada_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.stakingCenterDelegationSubmitted = function (properties, options) {
+        return this.track(new StakingCenterDelegationSubmitted(properties), options);
+    };
+    /**
      * Staking Center Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Page%20Viewed)
@@ -1865,6 +1920,32 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.votingPageViewed = function (options) {
         return this.track(new VotingPageViewed(), options);
+    };
+    /**
+     * Wallet Page Buy Banner Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Buy%20Banner%20Clicked)
+     *
+     * This event tracks when a user clicks on "Buy Button" on the Wallet Page’s BUY ADA banner.
+     *
+     * This banner only appears for **new users** or those **users that has 0 ADA** Balance.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.walletPageBuyBannerClicked = function (options) {
+        return this.track(new WalletPageBuyBannerClicked(), options);
+    };
+    /**
+     * Wallet Page Exchange Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Exchange%20Clicked)
+     *
+     * This event tracks when a user clicks on "Buy" on the Wallet Page.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.walletPageExchangeClicked = function (options) {
+        return this.track(new WalletPageExchangeClicked(), options);
     };
     /**
      * Wallet Page Viewed
