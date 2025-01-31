@@ -25,6 +25,7 @@ import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../stores';
+import { ampli } from '../../../ampli/index'
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
@@ -170,7 +171,10 @@ export default class AddWalletPage extends Component<StoresProps> {
     const addWalletPageComponent = (
       <>
         <AddWalletPageRevamp
-          onHardwareConnect={() => this.openDialogWrapper(WalletConnectHWOptionDialog)}
+          onHardwareConnect={() => {
+            this.openDialogWrapper(WalletConnectHWOptionDialog);
+            ampli.connectWalletCheckPageViewed();
+          }}
           onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
           onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}
           goToCurrentWallet={() => goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
