@@ -64,7 +64,10 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
                 height: 'unset',
               },
             }}
-            onClick={onBuySellClick}
+            onClick={() => {
+              onBuySellClick();
+              //Wallet Page Buy Banner Clicked
+            }}
           >
             <Typography
               component="div"
