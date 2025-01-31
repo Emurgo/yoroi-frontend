@@ -8,7 +8,7 @@
  * To update run 'ampli pull extension'
  *
  * Required dependencies: @amplitude/analytics-browser@^1.3.0
- * Tracking Plan Version: 7
+ * Tracking Plan Version: 8
  * Build: 1.0.0
  * Runtime: browser:typescript-ampli-v2
  *
@@ -36,23 +36,16 @@ export var ApiKey = {
  * Default Amplitude configuration options. Contains tracking plan information.
  */
 export var DefaultConfiguration = __assign({ plan: {
-        version: '7',
+        version: '8',
         branch: 'main',
         source: 'extension',
-        versionId: 'a0985241-d0c0-4bda-bc6d-271830af0067'
+        versionId: 'cffa4fa2-03a3-4eda-9943-1feccac54d56'
     } }, {
     ingestionMetadata: {
         sourceName: 'browser-typescript-ampli',
         sourceVersion: '2.0.0'
     }
 });
-var ToDeleteGovernanceAbstainPageViewed = /** @class */ (function () {
-    function ToDeleteGovernanceAbstainPageViewed() {
-        this.event_type = '(to delete)Governance Abstain Page Viewed';
-    }
-    return ToDeleteGovernanceAbstainPageViewed;
-}());
-export { ToDeleteGovernanceAbstainPageViewed };
 var AllWalletsPageViewed = /** @class */ (function () {
     function AllWalletsPageViewed() {
         this.event_type = 'All Wallets Page Viewed';
@@ -67,13 +60,6 @@ var AssetsPageViewed = /** @class */ (function () {
     return AssetsPageViewed;
 }());
 export { AssetsPageViewed };
-var BuyAdaInputAmount = /** @class */ (function () {
-    function BuyAdaInputAmount() {
-        this.event_type = 'Buy Ada Input Amount';
-    }
-    return BuyAdaInputAmount;
-}());
-export { BuyAdaInputAmount };
 var BuyAdaSuccessRedirect = /** @class */ (function () {
     function BuyAdaSuccessRedirect() {
         this.event_type = 'Buy Ada Success Redirect';
@@ -246,12 +232,30 @@ var DappPopupSignTransactionPageViewed = /** @class */ (function () {
 }());
 export { DappPopupSignTransactionPageViewed };
 var DappPopupSignTransactionSubmitted = /** @class */ (function () {
-    function DappPopupSignTransactionSubmitted() {
+    function DappPopupSignTransactionSubmitted(event_properties) {
+        this.event_properties = event_properties;
         this.event_type = 'Dapp Popup Sign Transaction Submitted';
+        this.event_properties = event_properties;
     }
     return DappPopupSignTransactionSubmitted;
 }());
 export { DappPopupSignTransactionSubmitted };
+var ExchangePageViewed = /** @class */ (function () {
+    function ExchangePageViewed() {
+        this.event_type = 'Exchange Page Viewed';
+    }
+    return ExchangePageViewed;
+}());
+export { ExchangePageViewed };
+var ExchangeSubmitted = /** @class */ (function () {
+    function ExchangeSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Exchange Submitted';
+        this.event_properties = event_properties;
+    }
+    return ExchangeSubmitted;
+}());
+export { ExchangeSubmitted };
 var GovernanceChooseDrepPageViewed = /** @class */ (function () {
     function GovernanceChooseDrepPageViewed() {
         this.event_type = 'Governance Choose Drep Page Viewed';
@@ -284,6 +288,31 @@ var GovernanceTransactionSuccessPageViewed = /** @class */ (function () {
     return GovernanceTransactionSuccessPageViewed;
 }());
 export { GovernanceTransactionSuccessPageViewed };
+var InAppNotificationClosed = /** @class */ (function () {
+    function InAppNotificationClosed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'In App Notification Closed';
+        this.event_properties = event_properties;
+    }
+    return InAppNotificationClosed;
+}());
+export { InAppNotificationClosed };
+var InAppNotificationOpened = /** @class */ (function () {
+    function InAppNotificationOpened(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'In App Notification Opened';
+        this.event_properties = event_properties;
+    }
+    return InAppNotificationOpened;
+}());
+export { InAppNotificationOpened };
+var InAppNotificationViewed = /** @class */ (function () {
+    function InAppNotificationViewed() {
+        this.event_type = 'In App Notification Viewed';
+    }
+    return InAppNotificationViewed;
+}());
+export { InAppNotificationViewed };
 var NetworkSelected = /** @class */ (function () {
     function NetworkSelected(event_properties) {
         this.event_properties = event_properties;
@@ -542,6 +571,15 @@ var SendSummarySubmitted = /** @class */ (function () {
     return SendSummarySubmitted;
 }());
 export { SendSummarySubmitted };
+var SettingsInAppNotificationsStatusUpdated = /** @class */ (function () {
+    function SettingsInAppNotificationsStatusUpdated(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Settings In App Notifications Status Updated';
+        this.event_properties = event_properties;
+    }
+    return SettingsInAppNotificationsStatusUpdated;
+}());
+export { SettingsInAppNotificationsStatusUpdated };
 var SettingsPageViewed = /** @class */ (function () {
     function SettingsPageViewed() {
         this.event_type = 'Settings Page Viewed';
@@ -556,6 +594,15 @@ var StakingCenterDelegationInitiated = /** @class */ (function () {
     return StakingCenterDelegationInitiated;
 }());
 export { StakingCenterDelegationInitiated };
+var StakingCenterDelegationSubmitted = /** @class */ (function () {
+    function StakingCenterDelegationSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Staking Center Delegation Submitted';
+        this.event_properties = event_properties;
+    }
+    return StakingCenterDelegationSubmitted;
+}());
+export { StakingCenterDelegationSubmitted };
 var StakingCenterPageViewed = /** @class */ (function () {
     function StakingCenterPageViewed() {
         this.event_type = 'Staking Center Page Viewed';
@@ -665,6 +712,20 @@ var VotingPageViewed = /** @class */ (function () {
     return VotingPageViewed;
 }());
 export { VotingPageViewed };
+var WalletPageBuyBannerClicked = /** @class */ (function () {
+    function WalletPageBuyBannerClicked() {
+        this.event_type = 'Wallet Page Buy Banner Clicked';
+    }
+    return WalletPageBuyBannerClicked;
+}());
+export { WalletPageBuyBannerClicked };
+var WalletPageExchangeClicked = /** @class */ (function () {
+    function WalletPageExchangeClicked() {
+        this.event_type = 'Wallet Page Exchange Clicked';
+    }
+    return WalletPageExchangeClicked;
+}());
+export { WalletPageExchangeClicked };
 var WalletPageViewed = /** @class */ (function () {
     function WalletPageViewed() {
         this.event_type = 'Wallet Page Viewed';
@@ -770,18 +831,6 @@ var Ampli = /** @class */ (function () {
         return this.amplitude.track(event, undefined, options);
     };
     /**
-     * (to delete)Governance Abstain Page Viewed
-     *
-     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/(to%20delete)Governance%20Abstain%20Page%20Viewed)
-     *
-     * This event tracks when a user selects abstain governance status and the confirm transaction page is displayed
-     *
-     * @param options Amplitude event options.
-     */
-    Ampli.prototype.toDeleteGovernanceAbstainPageViewed = function (options) {
-        return this.track(new ToDeleteGovernanceAbstainPageViewed(), options);
-    };
-    /**
      * All Wallets Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/All%20Wallets%20Page%20Viewed)
@@ -805,18 +854,6 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.assetsPageViewed = function (options) {
         return this.track(new AssetsPageViewed(), options);
-    };
-    /**
-     * Buy Ada Input Amount
-     *
-     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Input%20Amount)
-     *
-     * Event to track when a user starts the buy flow and must input amount of ADA to buy
-     *
-     * @param options Amplitude event options.
-     */
-    Ampli.prototype.buyAdaInputAmount = function (options) {
-        return this.track(new BuyAdaInputAmount(), options);
     };
     /**
      * Buy Ada Success Redirect
@@ -862,7 +899,7 @@ var Ampli = /** @class */ (function () {
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Submitted)
      *
-     * This Event to track when a user submits a transaction to claim ADA.
+     * This Event to track when a user submits a transaction to claim ADA staking rewards.
      *
      * @param properties The event's properties (e.g. reward_amount)
      * @param options Amplitude event options.
@@ -1114,10 +1151,36 @@ var Ampli = /** @class */ (function () {
      *
      * This event tracks the submission of a sign transaction request within the Dapp Connector screen. It's a Popup on extension and a full screen in Mobile.
      *
+     * @param properties The event's properties (e.g. total_ada_value)
      * @param options Amplitude event options.
      */
-    Ampli.prototype.dappPopupSignTransactionSubmitted = function (options) {
-        return this.track(new DappPopupSignTransactionSubmitted(), options);
+    Ampli.prototype.dappPopupSignTransactionSubmitted = function (properties, options) {
+        return this.track(new DappPopupSignTransactionSubmitted(properties), options);
+    };
+    /**
+     * Exchange Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Page%20Viewed)
+     *
+     * This event tracks when a user loads the default state of the first step of the fiat on/off ramp on the new Banxa flow. That screen shows input ADA Amount, with the BUY ADA option selected by default.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.exchangePageViewed = function (options) {
+        return this.track(new ExchangePageViewed(), options);
+    };
+    /**
+     * Exchange Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Submitted)
+     *
+     * This event tracks when a user clicks on "Proceed" in the Exchange page.
+     *
+     * @param properties The event's properties (e.g. ada_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.exchangeSubmitted = function (properties, options) {
+        return this.track(new ExchangeSubmitted(properties), options);
     };
     /**
      * Governance Choose Drep Page Viewed
@@ -1168,6 +1231,54 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.governanceTransactionSuccessPageViewed = function (properties, options) {
         return this.track(new GovernanceTransactionSuccessPageViewed(properties), options);
+    };
+    /**
+     * In App Notification Closed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Closed)
+     *
+     * This event tracks when a user has manually closed a notification (not through the timer):
+     *
+     * * click on cross on extension
+     *
+     * * swipe on mobile
+     *
+     * @param properties The event's properties (e.g. type)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.inAppNotificationClosed = function (properties, options) {
+        return this.track(new InAppNotificationClosed(properties), options);
+    };
+    /**
+     * In App Notification Opened
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Opened)
+     *
+     * This event tracks when a user opens an in app notification:
+     *
+     * * click on extension
+     *
+     * * tap on mobile
+     *
+     * Type property indicates what type of in app notification it is - triggered by receiving a tx or because staking rewards are received.
+     *
+     * @param properties The event's properties (e.g. type)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.inAppNotificationOpened = function (properties, options) {
+        return this.track(new InAppNotificationOpened(properties), options);
+    };
+    /**
+     * In App Notification Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Viewed)
+     *
+     * This event tracks when an in app notification is displayed to the user.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.inAppNotificationViewed = function (options) {
+        return this.track(new InAppNotificationViewed(), options);
     };
     /**
      * Network Selected
@@ -1578,6 +1689,19 @@ var Ampli = /** @class */ (function () {
         return this.track(new SendSummarySubmitted(properties), options);
     };
     /**
+     * Settings In App Notifications Status Updated
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Settings%20In%20App%20Notifications%20Status%20Updated)
+     *
+     * This event tracks when a user edits the in app notification setting by disabling or enabling in app notifications.
+     *
+     * @param properties The event's properties (e.g. status)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.settingsInAppNotificationsStatusUpdated = function (properties, options) {
+        return this.track(new SettingsInAppNotificationsStatusUpdated(properties), options);
+    };
+    /**
      * Settings Page Viewed
      *
      * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Settings%20Page%20Viewed)
@@ -1600,6 +1724,19 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.stakingCenterDelegationInitiated = function (options) {
         return this.track(new StakingCenterDelegationInitiated(), options);
+    };
+    /**
+     * Staking Center Delegation Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Submitted)
+     *
+     * Event indicating that a user has submitted a delegation in the staking center.
+     *
+     * @param properties The event's properties (e.g. ada_amount)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.stakingCenterDelegationSubmitted = function (properties, options) {
+        return this.track(new StakingCenterDelegationSubmitted(properties), options);
     };
     /**
      * Staking Center Page Viewed
@@ -1783,6 +1920,32 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.votingPageViewed = function (options) {
         return this.track(new VotingPageViewed(), options);
+    };
+    /**
+     * Wallet Page Buy Banner Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Buy%20Banner%20Clicked)
+     *
+     * This event tracks when a user clicks on "Buy Button" on the Wallet Page’s BUY ADA banner.
+     *
+     * This banner only appears for **new users** or those **users that has 0 ADA** Balance.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.walletPageBuyBannerClicked = function (options) {
+        return this.track(new WalletPageBuyBannerClicked(), options);
+    };
+    /**
+     * Wallet Page Exchange Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Exchange%20Clicked)
+     *
+     * This event tracks when a user clicks on "Buy" on the Wallet Page.
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.walletPageExchangeClicked = function (options) {
+        return this.track(new WalletPageExchangeClicked(), options);
     };
     /**
      * Wallet Page Viewed
