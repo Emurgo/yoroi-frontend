@@ -203,7 +203,7 @@ export default class BuySellDialog extends Component<Props, State> {
   urlGenerationTimeout: null | TimeoutID = null;
 
   componentDidMount() {
-    // Exchange Page Viewed
+    ampli.exchangePageViewed();
   }
 
   onSubmit: () => Promise < void> = async () => {

@@ -7,6 +7,7 @@ import { ReactComponent as CoverBg } from '../../assets/images/transaction/walle
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
+import { ampli } from '../../../ampli/index';
 
 type Props = {|
   onBuySellClick: () => void,
@@ -66,7 +67,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
             }}
             onClick={() => {
               onBuySellClick();
-              //Wallet Page Buy Banner Clicked
+              ampli.walletPageBuyBannerClicked();
             }}
           >
             <Typography

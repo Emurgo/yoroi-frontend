@@ -400,6 +400,10 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               wallet: selectedWallet,
               dialog: DelegationSuccessDialog,
             });
+            ampli.stakingCenterDelegationSubmitted({
+              ada_amount: delegationTx.totalAmountToDelegate.getDefault().toNumber(),
+              staking_pool: selectedPoolId,
+            });
           }}
           error={stores.wallets.sendMoneyRequest.error}
           selectedExplorer={
