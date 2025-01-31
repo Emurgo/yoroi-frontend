@@ -58,6 +58,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             cancel={this.cancel}
             onBack={this.props.onBack}
           />);
+        break;
       case ProgressStep.CONNECT:
         component = (
           <ConnectDialog

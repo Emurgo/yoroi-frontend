@@ -143,7 +143,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               stakepoolSelectedAction={async poolId => {
                 this.setState({ selectedPoolId: poolId });
                 await this.props.stores.delegation.createDelegationTransaction(poolId);
-                ampli.stakingCenterDelegationInitiated;
+                ampli.stakingCenterDelegationInitiated();
               }}
             />
           </Box>
