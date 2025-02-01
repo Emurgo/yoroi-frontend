@@ -8,7 +8,7 @@ import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import type { TransferTx } from '../../types/TransferTypes';
-import { allAddressSubgroups } from '../../stores/stateless/addressStores';
+import { genAddressLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
