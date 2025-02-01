@@ -32,14 +32,12 @@ export default class TrezorSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;
-  @observable error: ?LocalizableError;
   // =================== VIEW RELATED =================== //
 
   // =================== API RELATED =================== //
 
   reset: void => void = () => {
     this._setActionProcessing(false);
-    this._setError(null);
   }
 
   signAndBroadcastFromWallet: {|
@@ -220,9 +218,5 @@ export default class TrezorSendStore extends Store<StoresMap> {
 
   @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
-  }
-
-  @action _setError: (?LocalizableError) => void = (error) => {
-    this.error = error;
   }
 }

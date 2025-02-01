@@ -204,8 +204,6 @@ export default class WalletSendPage extends Component<StoresProps> {
           signRequest={transactionBuilderStore.tentativeTx}
           staleTx={transactionBuilderStore.txMismatch}
           isSending={stores.wallets.sendMoneyRequest.isExecuting}
-          ledgerSendError={stores.substores.ada.ledgerSend.error || null}
-          trezorSendError={stores.substores.ada.trezorSend.error || null}
           onSubmit={this.onSubmit.bind(this)}
         />
         {this.renderDialog()}

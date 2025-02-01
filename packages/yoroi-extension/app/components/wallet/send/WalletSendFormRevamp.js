@@ -207,8 +207,6 @@ type Props = {|
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +isSending: boolean,
-  +ledgerSendError: null | LocalizableError,
-  +trezorSendError: null | LocalizableError,
   +onSubmit: ({| password: string |}) => Promise<void>,
 |};
 
@@ -954,8 +952,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             isSending={this.props.isSending}
             getTokenInfo={this.props.getTokenInfo}
             getCurrentPrice={this.props.getCurrentPrice}
-            ledgerSendError={this.props.ledgerSendError}
-            trezorSendError={this.props.trezorSendError}
             selectedExplorer={this.props.selectedExplorer}
             selectedWallet={this.props.selectedWallet}
             onSubmit={this.props.onSubmit}

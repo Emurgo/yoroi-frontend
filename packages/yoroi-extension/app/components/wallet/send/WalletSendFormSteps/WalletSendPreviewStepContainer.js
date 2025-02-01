@@ -33,8 +33,6 @@ type Props = {|
   +getCurrentPrice: (from: string, to: string) => ?string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +isSending: boolean,
-  +ledgerSendError: null | LocalizableError,
-  +trezorSendError: null | LocalizableError,
   selectedExplorer: Map<number, SelectedExplorer>,
   +selectedWallet: WalletState,
   +onSubmit: ({| password: string |}) => Promise<void>,
@@ -105,8 +103,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         plannedTxInfoMap={this.props.plannedTxInfoMap}
         minAda={this.props.minAda}
         walletType={selectedWallet.type}
-        ledgerSendError={this.props.ledgerSendError}
-        trezorSendError={this.props.trezorSendError}
         onUpdateStep={onUpdateStep}
       />
     );

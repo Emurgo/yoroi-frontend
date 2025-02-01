@@ -42,7 +42,6 @@ export default class LedgerSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;
-  @observable error: ?LocalizableError;
   // =================== VIEW RELATED =================== //
 
   /** setup() is called when stores are being created
@@ -53,7 +52,6 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
   _reset(): void {
     this._setActionProcessing(false);
-    this._setError(null);
   }
 
   _preSendValidation: void => void = () => {
@@ -289,9 +287,5 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
   @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
-  }
-
-  @action _setError: ?LocalizableError => void = (error) => {
-    this.error = error;
   }
 }

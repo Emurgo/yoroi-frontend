@@ -7,7 +7,7 @@ import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountTy
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type LocalizableError from '../../../../i18n/LocalizableError';
+import LocalizableError from '../../../../i18n/LocalizableError';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
@@ -62,14 +62,12 @@ type Props = {|
   |}>,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +walletType: 'trezor' | 'ledger' | 'mnemonic',
-  +ledgerSendError: ?LocalizableError,
-  +trezorSendError: ?LocalizableError,
   +onUpdateStep: (step: number) => void,
 |};
 
 type State = {|
   passwordError: string | null,
-  txError: string | null,
+  txError: Error | null,
 |};
 
 const messages = defineMessages({
@@ -152,30 +150,30 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     }
   );
 
+  async _signAndBroadcastTx(password: string): Promise<void> {
+    try {
+      await this.props.onSubmit({ password });
+    } catch (error) {
+      if (error instanceof IncorrectWalletPasswordError) {
+        this.setState({ passwordError: this.context.intl.formatMessage(error, error.values) });
+      } else {
+        this.setState({ txError: error });
+      }
+    }
+  }
+
   submit(): void {
     if (this.props.walletType === 'mnemonic') {
       this.form.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-          const transactionData = {
-            password: walletPassword,
-          };
-          try {
-            await this.props.onSubmit(transactionData);
-          } catch (error) {
-            const errorMessage = this.context.intl.formatMessage(error, error.values);
-            if (error instanceof IncorrectWalletPasswordError) {
-              this.setState({ passwordError: errorMessage });
-            } else {
-              this.setState({ txError: errorMessage });
-            }
-          }
+          this._signAndBroadcastTx(walletPassword);
         },
         onError: () => {},
       });
     } else {
       // hw wallets are not using passwords
-      this.props.onSubmit({ password: '' });
+      this._signAndBroadcastTx('');
     }
   }
 
@@ -385,47 +383,34 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
   };
 
   renderError(): Node {
-    const { walletType } = this.props;
+    const { txError } = this.state;
+    if (txError == null) {
+      return null;
+    }
+
     const { intl } = this.context;
-    if (walletType === 'mnemonic') {
-      const { txError } = this.state;
-      if (txError !== null) {
-        return this.renderErrorBanner(
-          'Transaction error',
-          <div>
-            The transaction cannot be done due to technical reasons. Try again or
-            <Link
-              className={styles.faq}
-              href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
-              target="_blank"
-              rel="noreferrer"
-              sx={{
-                color: 'ds.text-primary-medium',
-                marginLeft: '4px',
-              }}
-            >
-              Ask our support team
-            </Link>
-          </div>
-        );
-      }
-      return null;
+
+    if (txError instanceof LocalizableError) {
+      return this.renderErrorBanner('Transaction error', intl.formatMessage(txError, txError.values));
     }
-    if (walletType === 'trezor') {
-      const { trezorSendError } = this.props;
-      if (trezorSendError !== null) {
-        return this.renderErrorBanner('Transaction error', intl.formatMessage(trezorSendError));
-      }
-      return null;
-    }
-    if (walletType === 'ledger') {
-      const { ledgerSendError } = this.props;
-      if (ledgerSendError !== null) {
-        return this.renderErrorBanner('Transaction error', intl.formatMessage(ledgerSendError));
-      }
-      return null;
-    }
-    throw new Error('unexpected wallet type');
+    return this.renderErrorBanner(
+      'Transaction error',
+      <div>
+        The transaction cannot be done due to technical reasons. Try again or
+        <Link
+          className={styles.faq}
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+          target="_blank"
+          rel="noreferrer"
+          sx={{
+            color: 'ds.text-primary-medium',
+            marginLeft: '4px',
+          }}
+        >
+          Ask our support team
+        </Link>
+      </div>
+    );
   }
 
   render(): Node {
