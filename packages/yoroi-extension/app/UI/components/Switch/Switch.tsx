@@ -2,8 +2,8 @@ import * as React from 'react';
 import styled from '@emotion/styled';
 import { Switch as MuiSwitch } from '@mui/material';
 
-const height = 24;
-const width = 44;
+const height = 31;
+const width = 51;
 
 export const Switch: any = styled((props: any) => (
   <MuiSwitch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
@@ -13,7 +13,7 @@ export const Switch: any = styled((props: any) => (
   padding: 0,
   '& .MuiSwitch-switchBase': {
     padding: 0,
-    margin: 2,
+    margin: 3,
     transitionDuration: '300ms',
     '&.Mui-checked': {
       transform: 'translateX(20px)',
@@ -39,6 +39,8 @@ export const Switch: any = styled((props: any) => (
   },
   '& .MuiSwitch-thumb': {
     boxSizing: 'border-box',
+    width: '25px',
+    height: '25px'
   },
   '& .MuiSwitch-track': {
     borderRadius: height / 2,
