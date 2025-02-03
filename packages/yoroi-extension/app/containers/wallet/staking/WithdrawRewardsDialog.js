@@ -29,6 +29,7 @@ import Dialog from '../../../components/widgets/Dialog';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import HorizintallyCenteredLayout from '../../../components/layout/HorizintallyCenteredLayout';
 import type { StoresProps } from '../../../stores';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -112,6 +113,9 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
         onError: () => {},
       });
     }
+    ampli.claimAdaTransactionSubmitted({
+      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber()
+    });
   };
 
   getTotalBalance: (

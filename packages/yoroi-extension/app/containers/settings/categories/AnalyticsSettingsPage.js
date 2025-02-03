@@ -1,11 +1,11 @@
 // @flow
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresProps } from '../../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape  } from 'react-intl';
 import OptForAnalyticsForm from '../../../components/profile/terms-of-use/OptForAnalyticsForm';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresProps } from '../../../stores';
 
 @observer
 export default class AnalyticsSettingsPage extends Component<StoresProps> {
@@ -19,6 +19,7 @@ export default class AnalyticsSettingsPage extends Component<StoresProps> {
         onOpt={this.props.stores.profile.onOptForAnalytics}
         variant="settings"
         isOptedIn={this.props.stores.profile.analyticsOption}
+        privacyNotice={this.props.stores.profile.privacyNotice}
       />
     );
   }

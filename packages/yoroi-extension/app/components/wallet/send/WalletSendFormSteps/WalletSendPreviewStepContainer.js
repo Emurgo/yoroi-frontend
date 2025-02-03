@@ -71,6 +71,7 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
     if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
     ampli.sendSummarySubmitted({
+      ada_amount: signRequest.totalInput().getDefault().toNumber(),
       asset_count: signRequest.totalInput().nonDefaultEntries().length,
     });
 
