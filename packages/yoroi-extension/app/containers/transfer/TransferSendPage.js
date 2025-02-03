@@ -87,7 +87,9 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
       wallet,
       signRequest,
       password,
-      callback: async () => {},
+      callback: async () => {
+        stores.uiDialogs.closeActiveDialog();
+      },
     });
     if (stores.wallets.sendMoneyRequest.error == null) {
       this.props.onSubmit.trigger();
