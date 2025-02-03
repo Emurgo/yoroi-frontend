@@ -3,17 +3,18 @@ import { Box, FormControlLabel, Typography } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
 import LocalStorageApi from '../../../../../api/localStorage';
-// import { ampli } from '../../../../../../ampli';
+import { ampli } from '../../../../../../ampli';
+
 const NotificationsSettings = ({ intl }) => {
   const strings = useStrings(intl);
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true)
 
   const lsApi = new LocalStorageApi();
 
   React.useEffect(() => {
     async function getNotifStatus() {
       const notifEnabled = await lsApi.getNotificationsSetting();
-      if (notifEnabled === "true") {
+      if (notifEnabled === "true" && !notificationsEnabled) {
         setNotificationsEnabled(true);
       }
     }
@@ -25,8 +26,9 @@ const NotificationsSettings = ({ intl }) => {
     setNotificationsEnabled(prev => !prev);
     lsApi.setNotificationsSetting(String(event.target.checked));
 
-    // TODO: pull amplitude metrics
-    // ampli.settingsInAppNotificationsStatusUpdated()
+    ampli.settingsInAppNotificationsStatusUpdated({
+      status: event.target.checked ? "enabled" : "disabled"
+    })
   }
 
   return (
