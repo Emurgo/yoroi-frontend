@@ -94,7 +94,9 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
       wallet,
       signRequest,
       password,
-      callback: async () => {},
+      callback: async () => {
+        stores.uiDialogs.closeActiveDialog();
+      },
     });
   }
 
