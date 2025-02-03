@@ -254,6 +254,7 @@ export type CreateHWSignTxDataRequestFromRawTx = {|
   txBodyHex: string,
   network: $ReadOnly<NetworkRow>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners?: Array<string>,
   ledgerSupportsCip36?: boolean,
@@ -770,6 +771,7 @@ export default class AdaApi {
           Number(config.ChainNetworkId),
           protocolMagic,
           addressMap,
+          request.changeAddrs ?? [],
           request.senderUtxos,
           request.additionalRequiredSigners ?? [],
           request.ledgerSupportsCip36,
@@ -786,6 +788,7 @@ export default class AdaApi {
           Number(config.ChainNetworkId),
           protocolMagic,
           addressMap,
+          request.changeAddrs ?? [],
           request.senderUtxos,
           request.catalystData,
         );

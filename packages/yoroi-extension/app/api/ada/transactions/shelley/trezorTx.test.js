@@ -210,6 +210,7 @@ test('Create Trezor transaction', async () => {
     Number.parseInt(ChainNetworkId, 10),
     ByronNetworkId,
     _address => [2147483692, 2147485463, 2147483648, 2, 0],
+    [],
     senderUtxos,
   );
   expect(response).toStrictEqual({

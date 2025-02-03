@@ -20,6 +20,7 @@ import {
   CardanoTxWitnessType,
   CardanoDRepType,
 } from 'trezor-connect-flow';
+import type { Addressing, Address, Value } from '../../lib/storage/models/PublicDeriver/interfaces';
 import type { TrezorTCatalystRegistrationTxSignData } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { bytesToHex, iterateLenGet, iterateLenGetMap, forceNonNull, hexToBytes } from '../../../../coreUtils';
@@ -208,6 +209,9 @@ export function toTrezorSignRequest(
   networkId: number,
   protocolMagic: number,
   ownAddressMap: AddressMap,
+  // when sending money, `ownAddressMap` doesn't contain the change address, so we need to
+  // pass it in explicitly
+  changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<CardanoAddressedUtxo>,
   catalystData?: TrezorTCatalystRegistrationTxSignData,
 ): $Exact<CardanoSignTransaction> {
@@ -293,7 +297,8 @@ export function toTrezorSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownAddressMap(paymentAddress);
+      const ownPaymentPath = ownAddressMap(paymentAddress) ||
+        changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(

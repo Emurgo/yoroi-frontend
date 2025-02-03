@@ -20,7 +20,7 @@ import type {
   HaskellShelleyTxSignRequest,
   LedgerNanoCatalystRegistrationTxSignData,
 } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { Addressing, } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, Address, Value } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { genAddressingLookup } from '../../stateless/addressStores';
 import type { StoresMap } from '../../index';
 import {
@@ -79,7 +79,8 @@ export default class LedgerSendStore extends Store<StoresMap> {
       const { signedTxHex, txId, metadata } = await this.signRawTxFromWallet({
         rawTxHex: request.signRequest.self().build_tx().to_hex(),
         wallet: request.wallet,
-        catalystData: request.signRequest.ledgerNanoCatalystRegistrationTxSignData
+        catalystData: request.signRequest.ledgerNanoCatalystRegistrationTxSignData,
+        changeAddrs: request.signRequest.changeAddr,
       });
 
       if (metadata) {
@@ -108,6 +109,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       hardwareWalletDeviceId: ?string,
       ...
     },
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     catalystData?: LedgerNanoCatalystRegistrationTxSignData,
   |} => Promise<{|
     signedTxHex: string,
@@ -136,6 +138,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
         rawTxHex: request.rawTxHex,
         publicKey: publicKeyInfo,
         addressingMap,
+        changeAddrs: request.changeAddrs,
         expectedSerial,
         networkId: request.wallet.networkId,
         catalystData: request.catalystData,
@@ -154,6 +157,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       ...Addressing,
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkId: number,
     expectedSerial: string | void,
     catalystData?: LedgerNanoCatalystRegistrationTxSignData,
@@ -195,6 +199,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
         senderUtxos: addressedUtxos,
         ledgerSupportsCip36,
         catalystData: request.catalystData,
+        changeAddrs: request.changeAddrs,
       });
 
       const ledgerSignTxPayload = response.hw === 'ledger' ? response.result.ledgerSignTxPayload

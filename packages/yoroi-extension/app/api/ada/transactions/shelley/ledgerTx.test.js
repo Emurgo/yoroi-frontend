@@ -330,6 +330,7 @@ test('Create Ledger transaction', async () => {
       }
       return undefined;
     },
+    [],
     senderUtxos,
   );
 

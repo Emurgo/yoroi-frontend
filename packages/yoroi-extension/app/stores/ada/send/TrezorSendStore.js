@@ -15,7 +15,7 @@ import type { StoresMap } from '../../index';
 import { buildConnectorSignedTransaction } from '../../../api/ada/transactions/shelley/trezorTx';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { generateRegistrationMetadata } from '../../../api/ada/lib/cardanoCrypto/catalyst';
-import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, Address, Value } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
 import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -57,7 +57,8 @@ export default class TrezorSendStore extends Store<StoresMap> {
       const { signedTxHex, txId, metadata } = await this.signRawTxFromWallet({
         rawTxHex: request.signRequest.self().build_tx().to_hex(),
         wallet: request.wallet,
-        catalystData: request.signRequest.trezorTCatalystRegistrationTxSignData
+        catalystData: request.signRequest.trezorTCatalystRegistrationTxSignData,
+        changeAddrs: request.signRequest.changeAddr, 
       });
 
       if (metadata) {
@@ -86,6 +87,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
       stakingAddressing: Addressing,
       ...
     },
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     catalystData?: TrezorTCatalystRegistrationTxSignData,
   |} => Promise<{|
     signedTxHex: string,
@@ -105,6 +107,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
       return this.signRawTx({
         rawTxHex,
         addressingMap,
+        changeAddrs: request.changeAddrs,
         networkId: wallet.networkId,
         catalystData,
       });
@@ -118,6 +121,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
   signRawTx: {|
     rawTxHex: string,
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkId: number,
     catalystData?: TrezorTCatalystRegistrationTxSignData,
   |} => Promise<{|
@@ -138,6 +142,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
         addressingMap: request.addressingMap,
         senderUtxos: addressedUtxos,
         catalystData: request.catalystData,
+        changeAddrs: request.changeAddrs,
       });
 
       const trezorSignTxPayload = response.hw === 'trezor' ? response.result.trezorSignTxPayload

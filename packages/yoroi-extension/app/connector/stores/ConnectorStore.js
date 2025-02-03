@@ -1034,6 +1034,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
       );
     } catch (e) {
@@ -1113,6 +1114,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
         additionalRequiredSigners,
       );

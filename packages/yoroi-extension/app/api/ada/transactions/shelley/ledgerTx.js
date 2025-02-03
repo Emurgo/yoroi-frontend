@@ -29,7 +29,7 @@ import {
   TxOutputFormat,
   TxRequiredSignerType,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type { Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing, Address, Value } from '../../lib/storage/models/PublicDeriver/interfaces';
 import type { LedgerNanoCatalystRegistrationTxSignData } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
@@ -462,6 +462,9 @@ export function toLedgerSignRequest(
   networkId: number,
   protocolMagic: number,
   ownAddressMap: AddressMap,
+  // when sending money, `ownAddressMap` doesn't contain the change address, so we need to
+  // pass it in explicitly
+  changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners: Array<string> = [],
   ledgerSupportsCip36?: boolean,
@@ -541,7 +544,8 @@ export function toLedgerSignRequest(
         networkId,
         baseAddr.payment_cred()
       ).to_address().to_hex();
-      const ownPaymentPath = ownAddressMap(paymentAddress);
+      const ownPaymentPath = ownAddressMap(paymentAddress) ||
+        changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
         const stakeAddr = RustModule.WalletV4.RewardAddress.new(
