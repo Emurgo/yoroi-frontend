@@ -735,10 +735,9 @@ export function toLedgerSignRequest(
     };
   }
 
+  // note: we know that `catelystData` is only used for voting in the extension and there
+  // should be no other auxiliary data in this scenario so we just overwrite the auxiliary data
   if (catalystData) {
-    if (formattedAuxiliaryData) {
-      throw new Error('unexpected catalyst signing data');
-    }
     const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } = catalystData;
 
     if (ledgerSupportsCip36) {
