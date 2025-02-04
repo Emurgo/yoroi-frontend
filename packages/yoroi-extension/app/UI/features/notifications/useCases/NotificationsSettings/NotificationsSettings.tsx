@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Box, FormControlLabel, Typography } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
-import LocalStorageApi from '../../../../../api/localStorage'
+import LocalStorageApi from '../../../../../api/localStorage';
+import { ampli } from '../../../../../../ampli';
 
 const NotificationsSettings = ({ intl }) => {
   const strings = useStrings(intl);
@@ -45,6 +46,9 @@ const NotificationsSettings = ({ intl }) => {
     const enabled = event.target.checked;
     setNotificationsEnabled(enabled);
     setNotificationsSetting(enabled);
+    ampli.settingsInAppNotificationsStatusUpdated({
+      status: event.target.checked ? "enabled" : "disabled"
+    })
   }
 
   return (
