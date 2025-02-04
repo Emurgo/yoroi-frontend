@@ -805,7 +805,7 @@ export function toLedgerSignRequest(
   }
 
   let signingMode = TransactionSigningMode.ORDINARY_TRANSACTION;
-  if (formattedCollateral) {
+  if (formattedCollateral || formattedReferenceInputs) {
     signingMode = TransactionSigningMode.PLUTUS_TRANSACTION;
   }
 

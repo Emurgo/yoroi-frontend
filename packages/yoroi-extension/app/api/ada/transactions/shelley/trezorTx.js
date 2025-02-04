@@ -538,7 +538,6 @@ export function toTrezorSignRequest(
   }
   if (formattedCollateral) {
     result.collateralInputs = formattedCollateral;
-    result.signingMode = CardanoTxSigningMode.PLUTUS_TRANSACTION;
   }
   if (requiredSigners) {
     result.requiredSigners = formattedRequiredSigners;
@@ -569,6 +568,9 @@ export function toTrezorSignRequest(
     result.tagCborSets = true;
   }
 
+  if (formattedCollateral || referenceInputs) {
+    result.signingMode = CardanoTxSigningMode.PLUTUS_TRANSACTION;
+  }
   return result;
 }
 
