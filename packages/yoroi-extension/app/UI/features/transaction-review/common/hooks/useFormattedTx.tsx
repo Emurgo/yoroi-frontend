@@ -119,7 +119,6 @@ const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInf
           quantity: coin,
         },
       ];
-      console.log('formatOutputs', outputs);
       const multiAssets =
         output.amount?.multiasset !== null
           ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
@@ -197,7 +196,6 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
   const internalUtxo = utxos.find(
     u => u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex
   );
-  console.log('internalUtxo', internalUtxo);
 
   const hexAddr = RustModule.WalletV4.Address.from_hex(internalUtxo.address).to_bech32();
   return {

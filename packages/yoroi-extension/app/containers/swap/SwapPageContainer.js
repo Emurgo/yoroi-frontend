@@ -84,10 +84,12 @@ class SwapPageContainer extends Component<AllProps> {
         withPadding={false}
         intl={this.context.intl}
       >
-        <ReviewTxProvider stores={stores} intl={this.context.intl}>
-          <ReviewTxModal />
-          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-        </ReviewTxProvider>
+        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+          <ReviewTxProvider stores={stores} intl={this.context.intl}>
+            <ReviewTxModal />
+            {children}
+          </ReviewTxProvider>
+        </SwapFormProvider>
       </TopBarLayout>
     );
   }

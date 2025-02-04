@@ -138,7 +138,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   const [isCopied, setCopy] = useState(false);
   const below1400 = useMediaQuery('(max-width:1400px)');
   const below1250 = useMediaQuery('(max-width:1250px)');
-
+  console.log('nftInfo.metadata', nftInfo.metadata);
   const onCopyMetadata = async () => {
     if (nftInfo?.metadata == null) return;
 

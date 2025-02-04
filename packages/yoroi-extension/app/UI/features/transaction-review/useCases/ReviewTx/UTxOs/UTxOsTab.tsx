@@ -34,9 +34,8 @@ interface OutputProps {
 }
 
 export const UTxOsTab: React.FC = ({ tx }) => {
-  console.log('tx', tx);
   return (
-    <Stack direction="column" sx={{ padding: '24px', width: '300px', flexWrap: 'wrap' }}>
+    <Stack direction="column" sx={{ padding: '24px', direction: 'collumn' }}>
       <Inputs inputs={tx.inputs} />
       <FeeDisplay fee={tx.fee.quantity} />
       <Outputs outputs={tx.outputs} />

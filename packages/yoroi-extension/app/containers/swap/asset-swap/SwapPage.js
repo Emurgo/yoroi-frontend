@@ -8,7 +8,7 @@ import TxSubmittedStep from './TxSubmittedStep';
 import LimitOrderWarningDialog from '../../../components/swap/LimitOrderWarningDialog';
 import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { useSwap } from '@yoroi/swap';
-import { runInAction } from 'mobx';
+import { runInAction, useObserver } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import BigNumber from 'bignumber.js';
 import SwapDisclaimerDialog from '../../../components/swap/SwapDisclaimerDialog';
@@ -107,7 +107,8 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
   const [parsedSignRequest, setParsedSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
-
+  console.log('userPasswordState', userPasswordState?.value);
+  console.log('txSubmitErrorState', txSubmitErrorState);
   useEffect(
     () => () => {
       // UNMOUNT
@@ -231,17 +232,27 @@ function SwapPage(props: StoresAndActionsProps & Intl): Node {
       } else if (orderStep === 1) {
         // await handleSubmitTransaction();
 
-        const liquidityPool = (
-          <LiquidityPool /> // liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
-        );
-
         const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
-
+        const isPasswordError = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
         openTxReviewModal({
           title: 'Transaction confirmation (Swap in progress)',
           modalView: 'transactionReview',
           receiverCustomTitle: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
-          details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
+          inputState: {
+            value: userPasswordState?.value,
+            error: txSubmitErrorState.value instanceof IncorrectWalletPasswordError,
+            submit: () => {
+              console.log('isPasswordErrorisPasswordError', txSubmitErrorState);
+              // if (isPasswordError !== undefined) {
+              // }
+              // handleSubmitTransaction();
+            },
+            onChange: e => {
+              console.log('-------2323232onChange', e.target.value);
+              txSubmitErrorState.update(null);
+              userPasswordState?.update(e.target.value);
+            },
+          },
           unsignedTx: parsedSignRequest, // send if for here just to make it work - later can take it from store inside review modal manager
         });
       }

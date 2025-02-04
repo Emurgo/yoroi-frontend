@@ -1,8 +1,10 @@
 import * as React from 'react';
 
 import { Drawer, styled } from '@mui/material';
+import { BottomActions } from '../common/BottomActions/BottomActions';
 import { TopActions } from '../common/TopActionSection/TopActions';
 import { ReviewTxSection } from '../useCases/ReviewTx/ReviewTxSection';
+import { SubmitInput } from '../useCases/SubmitTx/SubmitInput';
 import { WalletInfoSection } from '../useCases/WalletInfo/WalletInfoSection';
 import { useTxReviewModal } from './ReviewTxProvider';
 
@@ -10,7 +12,6 @@ const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
     width: '530px',
     background: theme.palette.ds.bg_color_contrast_high,
-    overflow: 'scroll',
   },
 }));
 
@@ -35,9 +36,12 @@ export const ReviewTxManager = () => {
     setState({ ...state, [anchor]: open });
     closeTxReviewModal();
   };
-
+  console.log('modalView', modalView);
   const handleOnBack = () => {
     if (modalView === 'walletInfo') {
+      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+    }
+    if (modalView === 'submitTx') {
       return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
     }
     return undefined;
@@ -48,6 +52,8 @@ export const ReviewTxManager = () => {
       <TopActions onBack={handleOnBack} />
       {modalView === 'transactionReview' && <ReviewTxSection />}
       {modalView === 'walletInfo' && <WalletInfoSection />}
+      {modalView === 'submitTx' && <SubmitInput />}
+      <BottomActions />
     </StyledDrawer>
   );
 };

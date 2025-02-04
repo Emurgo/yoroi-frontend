@@ -45,8 +45,7 @@ export const ReviewTxProvider = ({
   console.log('intlintlintl', intl);
   useEffect(() => {
     const { wallets } = stores;
-    const { selected, selectedWalletName } = wallets;
-    const { plate } = selected;
+    const { selected } = wallets;
   }, []);
 
   const actions = React.useRef<ModalActions>({
@@ -54,7 +53,6 @@ export const ReviewTxProvider = ({
       dispatch({ type: 'close' });
     },
     openTxReviewModal: (payload: any) => {
-      console.log('payload', payload);
       dispatch({
         type: 'open',
         title: payload.title,
@@ -63,6 +61,7 @@ export const ReviewTxProvider = ({
         width: payload.width,
         unsignedTx: payload.unsignedTx,
         receiverCustomTitle: payload.receiverCustomTitle,
+        inputState: payload.inputState,
       });
     },
     changeModalView: (payload: any) => {
@@ -113,11 +112,10 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         modalView: action.modalView ?? defaultState.modalView,
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
         receiverCustomTitle: action.receiverCustomTitle,
+        inputState: action.inputState,
       };
 
     case 'changeModalView':
-      console.log('CHANGE MODAL VIEW REDUCER', action);
-
       return { ...state, modalView: action.modalView, title: action.title };
 
     case 'close':

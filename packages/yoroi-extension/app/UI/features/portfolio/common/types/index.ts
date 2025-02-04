@@ -10,6 +10,7 @@ export interface SubMenuOption {
   label: string;
   route: string;
   className?: string;
+  showTab?: boolean;
 }
 
 export type BalanceType = {

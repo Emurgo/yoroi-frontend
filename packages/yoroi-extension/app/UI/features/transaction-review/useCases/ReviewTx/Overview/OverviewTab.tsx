@@ -50,7 +50,6 @@ export const OverviewTab = ({ receiverCustomTitle, tx }) => {
       </Box>
     </Stack>
   );
-  console.log('111INPUTS INFO', { receiverCustomTitle, ownedOutputs, notOwnedOutputs, tx });
 
   return (
     <Stack sx={{ padding: '24px' }}>

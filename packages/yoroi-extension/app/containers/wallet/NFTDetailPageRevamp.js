@@ -43,6 +43,7 @@ class NFTDetailPageRevamp extends Component<AllProps> {
             }))
             .filter(item => item.info.IsNFT)
             .map(token => {
+              console.log('token.info.Metadata', token.info.Metadata);
               const split = token.entry.identifier.split('.');
               const policyId = split[0];
               const assetNameHex = split[1] ?? '';

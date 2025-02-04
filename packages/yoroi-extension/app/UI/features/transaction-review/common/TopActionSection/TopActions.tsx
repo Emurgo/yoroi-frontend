@@ -6,6 +6,7 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 const StyledStack = styled(Stack)(() => ({}));
 const StyledButton = styled(IconButton)(({ theme }: any) => ({
   position: 'absolute',
+
   top: '20px',
   '& svg': {
     '& path': {
@@ -17,7 +18,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 export const TopActions = ({ onBack }: { onBack?: () => void }) => {
   const { closeTxReviewModal, title, modalView } = useTxReviewModal();
   console.log('title', title, modalView);
-  const showOnBackIcon = modalView === 'walletInfo';
+  const showOnBackIcon = modalView === 'walletInfo' || modalView === 'submitTx';
 
   const getModalTitle = () => {
     if (modalView === 'transactionConfiramtion') {
@@ -25,6 +26,9 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
     }
     if (modalView === 'walletInfo') {
       return 'Wallet Details';
+    }
+    if (modalView === 'submitTx') {
+      return 'Submit Transaction';
     }
     return 'Transaction Review';
   };

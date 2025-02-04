@@ -1,55 +1,62 @@
-import { MetadataJsonSchema } from '@emurgo/cross-csl-core';
 import { useQuery } from 'react-query';
 
-import { wrappedCsl } from '../../../../yoroi-wallets/cardano/wrappedCsl';
-import { FormattedMetadata, TransactionBody } from '../types';
+import { TransactionBody } from '../types';
 
-export const formatMetadata = async (
-  unsignedTx: any,
-  cbor: string | null,
-  txBody: TransactionBody
-): Promise<FormattedMetadata> => {
-  const { csl, release } = wrappedCsl();
-
+export const formatMetadata = async (unsignedTx: any, cbor: string | null, txBody: TransactionBody): Promise<any> => {
   try {
     const hash = txBody.auxiliary_data_hash ?? null;
-    let metadata = null;
-    let generalTransactionMetadata = null;
+    const decodedMetadata = await unsignedTx.auxiliary_data.metadata;
+    const parsedMetadata = parseMetadata222(decodedMetadata);
+    // const msg = [parseMsg(JSON.parse(decodedMetadata)?.msg ?? [''])];
 
-    if (unsignedTx != null && unsignedTx.unsignedTx.auxiliaryData && hash != null) {
-      generalTransactionMetadata = await unsignedTx.unsignedTx.auxiliaryData?.metadata();
-    } else if (cbor != null && hash != null) {
-      const tx = await csl.Transaction.fromHex(cbor);
-      const auxiliaryData = await tx.auxiliaryData();
-      generalTransactionMetadata = await auxiliaryData?.metadata();
-    }
-
-    const metadata674 = await generalTransactionMetadata?.get(await csl.BigNum.fromStr('674'));
-    if (metadata674) {
-      const decodedMetadata = await csl.decodeMetadatumToJsonStr(metadata674, MetadataJsonSchema.BasicConversions);
-      const msg = [parseMsg(JSON.parse(decodedMetadata)?.msg ?? [''])];
-      metadata = { msg };
-    }
+    // console.log('JSON.parse(decodedMetadata)', JSON.parse(decodedMetadata['674']));
 
     return {
       hash,
-      metadata,
+      metadata: parsedMetadata,
     };
-  } finally {
-    release();
+  } catch {
+    console.error('Error parsing metadata');
   }
 };
 
-const parseMsg = (msg: Array<string>) => {
-  if (msg.length > 1) {
-    const message = msg.join('');
-    try {
-      return JSON.parse(message);
-    } catch {
-      return message;
-    }
+const parseMetadata222 = (metadata: Record<string, string>) => {
+  try {
+    const parsed = JSON.parse(metadata['674']);
+    const mapArray = parsed.map[0]; // Extract "map" array
+    const key = mapArray.k.string; // Extract the key (e.g., "msg")
+
+    const rawList = mapArray.v.list.map((item: any) => item.string); // Extract list of strings
+
+    let jsonString = rawList.join(''); // Merge into a single string
+    jsonString = jsonString.replace(/\\/g, ''); // Remove extra escape characters
+
+    let jsonFragments = jsonString.match(/\{.*?\}/g) || []; // Extract JSON objects
+
+    const list = jsonFragments
+      .map(fragment => {
+        try {
+          return JSON.parse(fragment);
+        } catch (e) {
+          console.error('Error parsing JSON fragment:', fragment, e);
+          return null;
+        }
+      })
+      .filter(Boolean);
+
+    const mergedObject = list.reduce((acc, obj) => ({ ...acc, ...obj }), {});
+
+    Object.keys(mergedObject).forEach(key => {
+      if (mergedObject[key] === '') {
+        mergedObject[key] = '.';
+      }
+    });
+
+    return { [key]: [mergedObject] }; // Return properly structured output
+  } catch (error) {
+    console.error('Error parsing metadata:', error);
+    return {};
   }
-  return msg[0];
 };
 
 export const useFormattedMetadata = ({
