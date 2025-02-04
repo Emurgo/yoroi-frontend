@@ -7,25 +7,45 @@ import { ampli } from '../../../../../../ampli';
 
 const NotificationsSettings = ({ intl }) => {
   const strings = useStrings(intl);
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true)
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+  const [selectedWalletId, setSelectedWalletId] = React.useState("");
 
   const lsApi = new LocalStorageApi();
 
-  React.useEffect(() => {
-    async function getNotifStatus() {
-      const notifEnabled = await lsApi.getNotificationsSetting();
-      if (notifEnabled === "true" && !notificationsEnabled) {
-        setNotificationsEnabled(true);
-      }
+  async function getNotificationsSetting(checkCurrentWallet: boolean = false) {
+    const notifSettingsStr = await lsApi.getNotificationsSetting();
+    const notifSettings = JSON.parse(notifSettingsStr || "{}");
+
+    if (checkCurrentWallet) {
+      const selectedWalletId = await lsApi.getSelectedWalletId();
+      setSelectedWalletId(selectedWalletId);
+
+      return notifSettings[selectedWalletId] !== undefined ? notifSettings[selectedWalletId] : true;
     }
 
-    getNotifStatus();
+    return notifSettings;
+  }
+
+  async function setNotificationsSetting(enabled: boolean) {
+    const notifSettings = await getNotificationsSetting();
+    lsApi.setNotificationsSetting(JSON.stringify({ ...notifSettings, [selectedWalletId]: enabled }));
+  }
+
+  // get initial state from localstorage
+  React.useEffect(() => {
+    async function initialNotifStatus() {
+      const notifEnabled = await getNotificationsSetting(true);
+      setNotificationsEnabled(notifEnabled);
+    }
+
+    initialNotifStatus();
   }, [])
 
-  const handleNotificationsChange = (event) => {
-    setNotificationsEnabled(prev => !prev);
-    lsApi.setNotificationsSetting(String(event.target.checked));
-
+  // handle checkbox change event
+  const handleNotificationsChange = async (event) => {
+    const enabled = event.target.checked;
+    setNotificationsEnabled(enabled);
+    setNotificationsSetting(enabled);
     ampli.settingsInAppNotificationsStatusUpdated({
       status: event.target.checked ? "enabled" : "disabled"
     })
