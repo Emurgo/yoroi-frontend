@@ -10,6 +10,7 @@ import Context from './context';
 import { defaultSwapFormState } from './DefaultSwapFormState';
 import type { SwapFormAction, SwapFormState } from './types';
 import { StateWrap, SwapFormActionTypeValues } from './types';
+import { useStrings } from '../../common/useStrings';
 // const PRECISION = 14;
 
 type Props = {|
@@ -36,6 +37,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
   const { quantity: sellQuantity, tokenId: sellTokenId } = orderData.amounts.sell;
   const { quantity: buyQuantity, tokenId: buyTokenId } = orderData.amounts.buy;
   const { priceDenomination } = orderData.tokens;
+  const strings = useStrings();
 
   const swapFormReducer = (state: SwapFormState, action: SwapFormAction) => {
     const draft = { ...state };
@@ -207,7 +209,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       const remainingQuantity = Quantities.diff(availableQuantity, quantity);
 
       if (Quantities.isGreaterThan(quantity, availableQuantity)) {
-        actions.sellAmountErrorChanged('Not enough balance');
+        actions.sellAmountErrorChanged(strings.notEnoughBalance);
         return;
       }
       if (calculation?.cost) {
@@ -217,7 +219,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
         const isSellingFeeToken = sellTokenInfo.id === feeTokenId;
 
         if (isSellingFeeToken && Quantities.isGreaterThan(totalFee, remainingQuantity)) {
-          actions.sellAmountErrorChanged('Not enough balance, please consider the fees');
+          actions.sellAmountErrorChanged(strings.notEnoughBalanceFees);
         }
       }
     }

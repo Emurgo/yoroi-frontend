@@ -8,7 +8,7 @@
   "Language": "TypeScript",
   "SDK": "@amplitude/analytics-browser@^1.0",
   "Branch": "main",
-  "Version": "7.0.0",
-  "VersionId": "a0985241-d0c0-4bda-bc6d-271830af0067",
+  "Version": "8.0.0",
+  "VersionId": "cffa4fa2-03a3-4eda-9943-1feccac54d56",
   "Path": "./ampli"
 }

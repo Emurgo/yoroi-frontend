@@ -10,6 +10,20 @@ import {
   defaultPortfolioState,
 } from './state';
 
+export const PortfolioDetailsTab = {
+  Performance: 'Performance',
+  Overview: 'Overview',
+  Transactions: 'Transactions',
+} as const;
+export type PortfolioDetailsTab = typeof PortfolioDetailsTab[keyof typeof PortfolioDetailsTab];
+
+export const PortfolioListTab = {
+  Wallet: 'Wallet',
+  Dapps: 'Dapps',
+} as const;
+
+export type PortfolioListTab = typeof PortfolioListTab[keyof typeof PortfolioListTab];
+
 import BuySellDialog from '../../../../components/buySell/BuySellDialog';
 import { DEFAULT_FIAT_PAIR } from '../common/helpers/constants';
 
@@ -31,6 +45,7 @@ type PortfolioProviderProps = {
   };
   currentWallet: CurrentWalletType;
   openDialogWrapper: (dialog: React.ReactNode) => void;
+  shouldHideBalance: boolean;
 };
 
 export const PortfolioContextProvider = ({
@@ -42,8 +57,10 @@ export const PortfolioContextProvider = ({
   },
   currentWallet,
   openDialogWrapper,
+  shouldHideBalance,
 }: PortfolioProviderProps) => {
   const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo, backendServiceZero, explorer } = currentWallet;
+
   if (selectedWallet === undefined) {
     return <></>;
   }
@@ -80,6 +97,7 @@ export const PortfolioContextProvider = ({
       ftAssetList: ftAssetList || [],
       networkId,
       primaryTokenInfo,
+      isHiddenAmount: shouldHideBalance,
       openBuyDialog: () => openDialogWrapper(BuySellDialog),
       showWelcomeBanner: ftAssetList.length === 1,
       backendServiceZero: backendServiceZero,

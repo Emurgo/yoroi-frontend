@@ -58,25 +58,25 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
-  _init(): void;
+  init(): void;
 
   teardown(): void;
 
   _reset(): void;
 
-  _cancel(): void;
+  cancel(): void;
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  _submitCheck(): void;
+  submitCheck(): void;
   // =================== CHECK =================== //
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  _goBackToCheck(): void;
+  goBackToCheck(): void;
 
   /** CONNECT dialog submit (Connect button) */
-  _submitConnect(): Promise<void>;
+  submitConnect(): Promise<void>;
 
   _goToConnectError(): void;
 
@@ -94,7 +94,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveLoad(): void;
 
   /** SAVE dialog submit (Save button) */
-  _submitSave(walletName: string): Promise<void>;
+  submitSave(walletName: string): Promise<void>;
 
   _goToSaveError(): void;
 

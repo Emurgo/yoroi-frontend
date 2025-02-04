@@ -27,21 +27,18 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
   // Fetch data based on the selected interval
 
   const ptActivity = useCurrencyPairing().ptActivity;
-  const { changeValue, changePercent } = priceChange(ptActivity.open, ptActivity.close);
+  const { changeValue, changePercent } = priceChange(ptActivity.open, ptActivity?.close);
 
   const {
     tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
-  const deltaPriceChange =
-    !isPrimaryToken &&
-    !isEmpty(data24h) &&
-    data24h[tokenInfo?.info?.id][1].price.close - data24h[tokenInfo?.info?.id][1].price.open;
+  const deltaPriceChange = !isPrimaryToken && !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price?.change;
 
   const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : !isEmpty(data24h) && deltaPriceChange;
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
-    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price.close;
+    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price?.close - data24h[tokenInfo?.info?.id][1].price?.open;
   return (
     <Stack
       direction="row"
@@ -50,7 +47,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
       gap="16px"
       sx={{ p: !isPrimaryToken && theme.spacing(3) }}
     >
-      <Typography fontWeight="500" color="ds.gray_max">
+      <Typography fontWeight="500" color="ds.text_gray_medium">
         {strings.marketPrice}
       </Typography>
 
@@ -80,18 +77,22 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
 };
 
 const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity, detailInfo, isDragging }) => {
-  const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+  const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
 
-  const sPrice = secondaryTokenActivity && secondaryTokenActivity[1].price.close;
+  const sPrice = secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
 
   const ptPrice = isDragging ? detailInfo.value : ptActivity.close;
 
   const ptUnitPrice = sPrice * ptPrice;
 
+  if (!isPrimaryToken && isNaN(ptUnitPrice)) {
+    return <Typography variant="caption">-</Typography>;
+  }
+
   if (tokenPrice == null) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
-    <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.gray_max">
+    <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.text_gray_medium">
       <Typography fontWeight="500">{formatPriceChange(isPrimaryToken ? ptPrice : ptUnitPrice, 4)}</Typography>
       <Typography variant="caption" mt="2px">
         &nbsp;{unitOfAccount}
@@ -102,6 +103,8 @@ const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptA
 
 const PriceChangeChip = ({ value }: { value: number }) => {
   const theme: any = useTheme();
+  const valueToDisplay = value >= 0 ? formatNumber(value) : formatNumber(-1 * value);
+
   return (
     <>
       <Chip
@@ -114,7 +117,7 @@ const PriceChangeChip = ({ value }: { value: number }) => {
               <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
             ) : null}
             {/* @ts-ignore */}
-            <Typography variant="caption1">{value >= 0 ? formatNumber(value) : formatNumber(-1 * value)}%</Typography>
+            <Typography variant="caption1">{valueToDisplay === 'NaN' ? '-' : valueToDisplay}%</Typography>
           </Stack>
         }
       />
@@ -129,7 +132,7 @@ const PriceValueChip = ({ value, unitOfAccount }: { value: number; unitOfAccount
         label={
           <Typography variant="caption">
             {value > 0 && '+'}
-            {formatNumber(value)} {unitOfAccount}
+            {formatNumber(value) === 'NaN' ? '-' : formatNumber(value)} {unitOfAccount}
           </Typography>
         }
       />

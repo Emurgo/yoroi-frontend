@@ -24,6 +24,7 @@ import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
+import { useStrings } from '../common/useStrings';
 
 const GradientBox = styled(Box)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_3,
@@ -41,19 +42,6 @@ type Props = {|
   getFormattedPairingValue: (amount: string) => string,
   onError: () => void,
 |};
-
-const priceStrings = {
-  market: {
-    label: 'Market price',
-    info:
-      'Market price is the best price available on the market among several DEXes that lets you buy or sell an asset instantly',
-  },
-  limit: {
-    label: 'Limit price',
-    info:
-      "Limit price in a DEX is a specific pre-set price at which you can trade an asset. Unlike market orders, which execute immediately at the current market price, limit orders are set to execute only when the market reaches the trader's specified price.",
-  },
-};
 
 export default function ConfirmSwapTransaction({
   slippageValue,
@@ -79,6 +67,18 @@ export default function ConfirmSwapTransaction({
   const isAutoPool = pool?.poolId === bestPool?.poolId;
 
   const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
+
+  const strings = useStrings();
+  const priceStrings = {
+    market: {
+      label: strings.marketPrice,
+      info: strings.marketPriceTooltip,
+    },
+    limit: {
+      label: strings.limitPrice,
+      info: strings.limitPriceTooltip,
+    },
+  };
 
   const { createOrderData } = useSwapCreateOrder({
     onSuccess: data => {
@@ -124,14 +124,14 @@ export default function ConfirmSwapTransaction({
     <Box width="100%" mx="auto" maxWidth="506px" display="flex" flexDirection="column" gap="24px">
       <Box textAlign="center">
         <Typography component="div" variant="h4" fontWeight={500} color="ds.text_gray_medium">
-          Confirm swap transaction
+          {strings.confirmSwapTx}
         </Typography>
       </Box>
       <Box display="flex" gap="16px" flexDirection="column">
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="ds.text_gray_low">
-              Swap from
+              {strings.swapFromLabel}
             </Typography>
           </Box>
           <Box>
@@ -147,7 +147,7 @@ export default function ConfirmSwapTransaction({
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="ds.text_gray_low">
-              Swap to
+              {strings.swapToLabel}
             </Typography>
           </Box>
           <Box>
@@ -168,19 +168,15 @@ export default function ConfirmSwapTransaction({
       <PriceImpactBanner priceImpactState={priceImpactState} />
 
       <Box display="flex" flexDirection="column" gap="8px">
-        <SummaryRow col1="DEX">
+        <SummaryRow col1={strings.dexLabel}>
           <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
         </SummaryRow>
-        <SummaryRow col1="Slippage tolerance">{slippageValue}%</SummaryRow>
+        <SummaryRow col1={strings.slippageTolerance}>{slippageValue}%</SummaryRow>
         <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
         <SummaryRow col1={priceStrings[orderData.type].label} withInfo infoText={priceStrings[orderData.type].info}>
           {orderData.type === 'market' ? <FormattedMarketPrice /> : <FormattedLimitPrice />}
         </SummaryRow>
-        <SummaryRow
-          col1="Price impact"
-          withInfo
-          infoText="Price impact is a difference between the actual market price and your price due to trade size."
-        >
+        <SummaryRow col1={strings.priceImpact} withInfo infoText={strings.priceImpactTooltip}>
           <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
             {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
             <PriceImpactPercent />
@@ -196,7 +192,7 @@ export default function ConfirmSwapTransaction({
       </Box>
       <GradientBox p="16px" borderRadius="8px" color="common.white">
         <Box display="flex" justifyContent="space-between">
-          <Typography color="ds.white_static">Total</Typography>
+          <Typography color="ds.white_static">{strings.total}</Typography>
           <Box>
             <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
               {formattedNonPtAmount ?? formattedPtAmount}
@@ -223,13 +219,13 @@ export default function ConfirmSwapTransaction({
           <TextField
             className="walletPassword"
             value={userPasswordState.value}
-            label="Password"
+            label={strings.password}
             type="password"
             onChange={e => {
               txSubmitErrorState.update(null);
               userPasswordState.update(e.target.value);
             }}
-            error={isIncorrectPassword && 'Incorrect password!'}
+            error={isIncorrectPassword && strings.passwordIncorrect}
           />
         </Box>
       )} */}

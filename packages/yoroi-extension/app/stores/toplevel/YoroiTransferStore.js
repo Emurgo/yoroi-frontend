@@ -12,73 +12,48 @@ import config from '../../config';
 import { SendTransactionApiError } from '../../api/common/errors';
 import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
+export default class YoroiTransferStore extends Store<StoresMap> {
 
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
 
-  // eslint-disable-next-line no-restricted-syntax
-  _asyncErrorWrapper: (<PT, RT>(
-      func: (PT) => Promise<RT>
-    ) => (PT) => Promise<RT>) = <PT, RT>(
-      func: PT=>Promise<RT>
-    ): (PT => Promise<RT>) => (async (payload) => {
-      try {
-        return await func(payload);
-      } catch (error) {
-        Logger.error(`${nameof(YoroiTransferStore)} ${stringifyError(error)}`);
-        runInAction(() => {
-          this.status = TransferStatus.ERROR;
-          this.error = localizedError(error);
-        });
-        throw error;
-      }
-    });
-  // eslint-disable-next-line no-restricted-syntax
-  _errorWrapper: (<PT, RT>(
-    func: (PT) => RT
-  ) => (PT) => RT) = <PT, RT>(
-    func: PT=>RT
-  ): (PT => RT) => ((payload) => {
-    try {
-      return func(payload);
-    } catch (error) {
+  _wrapError: (<R>(
+    func: () => R
+  ) => R) = <R>(
+    func: () => R
+  ): R => {
+    const handleError = (error: Error) => {
       Logger.error(`${nameof(YoroiTransferStore)} ${stringifyError(error)}`);
       runInAction(() => {
         this.status = TransferStatus.ERROR;
         this.error = localizedError(error);
       });
       throw error;
+    };
+    try {
+      const r = func();
+      if (r instanceof Promise) {
+        // $FlowIgnore[incompatible-return]
+        return r.catch(handleError);
+      }
+      return r;
+    } catch (error) {
+      handleError(error)
+      throw error;
     }
-  });
-
-  setup(): void {
-    super.setup();
-    const actions = this.actions.yoroiTransfer;
-    actions.startTransferFunds.listen(this._startTransferFunds);
-    actions.setupTransferFundsWithPaperMnemonic.listen(
-      this._errorWrapper(this._setupTransferFundsWithPaperMnemonic)
-    );
-    actions.checkAddresses.listen(
-      this._asyncErrorWrapper(this.checkAddresses)
-    );
-    actions.backToUninitialized.listen(this._backToUninitialized);
-    actions.transferFunds.listen(this._asyncErrorWrapper(this._transferFunds));
-    actions.cancelTransferFunds.listen(this.reset);
-  }
+  };
 
   teardown(): void {
     super.teardown();
     this.reset();
   }
 
-  _startTransferFunds: void => void = () => {
+  startTransferFunds: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
   }
 
@@ -100,22 +75,24 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   }
 
   // <TODO:PENDING_REMOVAL> paper
-  _setupTransferFundsWithPaperMnemonic: {|
+  setupTransferFundsWithPaperMnemonic: {|
     recoveryPhrase: string,
     paperPassword: string,
   |} => void = (payload) => {
-    const result = unscramblePaperAdaMnemonic(
-      payload.recoveryPhrase,
-      config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-      payload.paperPassword
-    );
-    const recoveryPhrase = result[0];
-    if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this._setupTransferFundsWithPaperMnemonic)} paper wallet failed`);
-    }
-    this.setupTransferFundsWithMnemonic({
-      recoveryPhrase,
-    });
+    this._wrapError<void>(() => {
+      const result = unscramblePaperAdaMnemonic(
+        payload.recoveryPhrase,
+        config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+        payload.paperPassword
+      );
+      const recoveryPhrase = result[0];
+      if (recoveryPhrase == null) {
+        throw new Error(`${nameof(this.setupTransferFundsWithPaperMnemonic)} paper wallet failed`);
+      }
+      this.setupTransferFundsWithMnemonic({
+        recoveryPhrase,
+      });
+    })
   }
 
   setupTransferFundsWithMnemonic: {|
@@ -151,20 +128,22 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   |} => Promise<void> = async (
     payload
   ): Promise<void> => {
-    this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
-    const transferTx = await this.generateTransferTx({
-      recoveryPhrase: this.recoveryPhrase,
-      updateStatusCallback: () => this._updateStatus(TransferStatus.GENERATING_TX),
-      getDestinationAddress: payload.getDestinationAddress,
-    });
-    runInAction(() => {
-      this.transferTx = transferTx;
-    });
+    return this._wrapError<Promise<void>>(async () => {
+      this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
+      const transferTx = await this.generateTransferTx({
+        recoveryPhrase: this.recoveryPhrase,
+        updateStatusCallback: () => this._updateStatus(TransferStatus.GENERATING_TX),
+        getDestinationAddress: payload.getDestinationAddress,
+      });
+      runInAction(() => {
+        this.transferTx = transferTx;
+      });
 
-    this._updateStatus(TransferStatus.READY_TO_TRANSFER);
+      this._updateStatus(TransferStatus.READY_TO_TRANSFER);
+    });
   }
 
-  _backToUninitialized: void => void = () => {
+  backToUninitialized: void => void = () => {
     this._updateStatus(TransferStatus.UNINITIALIZED);
   }
 
@@ -175,7 +154,7 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
   }
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
-  _transferFunds: {|
+  transferFunds: {|
     next: void => Promise<void>,
     network: $ReadOnly<NetworkRow>,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
@@ -188,74 +167,76 @@ export default class YoroiTransferStore extends Store<StoresMap, ActionsMap> {
     runInAction(() => {
       this.error = null;
     });
-    const oldTx: TransferTx = (() => {
-      const tx = this.transferTx;
-      if (tx == null) {
-        throw new NoTransferTxError();
-      }
-      return tx;
-    })();
-
-    const getTransferTx = async (): Promise<TransferTx> => {
-      if (!payload.rebuildTx) {
-        return oldTx;
-      }
-      const newTx = await this.generateTransferTx({
-        recoveryPhrase: this.recoveryPhrase,
-        updateStatusCallback: () => {},
-        getDestinationAddress: payload.getDestinationAddress,
-      });
-      if (this._isWalletChanged(oldTx, newTx)) {
-        this._handleWalletChanged(newTx);
-      }
-      return newTx;
-    };
-
-    const { next } = payload;
-
-    try {
-      await this.stores.wallets.sendAndRefresh({
-        publicDeriverId: undefined,
-        plateTextPart: undefined,
-        broadcastRequest: async () => {
-          const transferTx = await getTransferTx();
-          if (transferTx.id == null || transferTx.encodedTx == null) {
-            throw new Error(`${nameof(YoroiTransferStore)} transaction not signed`);
-          }
-          const { id, encodedTx } = transferTx;
-          try {
-            const txId = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
-              network: payload.network,
-              id,
-              encodedTx,
-            });
-            return txId;
-          } catch (error) {
-            if (error instanceof SendTransactionApiError) {
-              /* See if the error is due to wallet change since last recovery.
-                This should be very rare because the window is short.
-              */
-              await getTransferTx(); // will update the tx if something changed
-            }
-
-            throw new TransferFundsError();
-          }
-        },
-        refreshWallet: async () => {
-          const selected = this.stores.wallets.selected;
-          if (selected == null) return;
-          await this.stores.wallets.refreshWalletFromRemote(selected.publicDeriverId);
+    return this._wrapError<Promise<void>>(async () => {
+      const oldTx: TransferTx = (() => {
+        const tx = this.transferTx;
+        if (tx == null) {
+          throw new NoTransferTxError();
         }
-      });
-    } catch (e) {
-      Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this._transferFunds)} ${stringifyError(e)}`);
-      runInAction(() => { this.error = e; });
-    }
-    if (this.error == null) {
-      this._updateStatus(TransferStatus.SUCCESS);
-      await next();
-      this.reset();
-    }
+        return tx;
+      })();
+
+      const getTransferTx = async (): Promise<TransferTx> => {
+        if (!payload.rebuildTx) {
+          return oldTx;
+        }
+        const newTx = await this.generateTransferTx({
+          recoveryPhrase: this.recoveryPhrase,
+          updateStatusCallback: () => {},
+          getDestinationAddress: payload.getDestinationAddress,
+        });
+        if (this._isWalletChanged(oldTx, newTx)) {
+          this._handleWalletChanged(newTx);
+        }
+        return newTx;
+      };
+
+      const { next } = payload;
+
+      try {
+        await this.stores.wallets.sendAndRefresh({
+          publicDeriverId: undefined,
+          plateTextPart: undefined,
+          broadcastRequest: async () => {
+            const transferTx = await getTransferTx();
+            if (transferTx.id == null || transferTx.encodedTx == null) {
+              throw new Error(`${nameof(YoroiTransferStore)} transaction not signed`);
+            }
+            const { id, encodedTx } = transferTx;
+            try {
+              const txId = await this.stores.substores.ada.stateFetchStore.fetcher.sendTx({
+                network: payload.network,
+                id,
+                encodedTx,
+              });
+              return txId;
+            } catch (error) {
+              if (error instanceof SendTransactionApiError) {
+                /* See if the error is due to wallet change since last recovery.
+                  This should be very rare because the window is short.
+                */
+                await getTransferTx(); // will update the tx if something changed
+              }
+
+              throw new TransferFundsError();
+            }
+          },
+          refreshWallet: async () => {
+            const selected = this.stores.wallets.selected;
+            if (selected == null) return;
+            await this.stores.wallets.refreshWalletFromRemote(selected.publicDeriverId);
+          }
+        });
+      } catch (e) {
+        Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this.transferFunds)} ${stringifyError(e)}`);
+        runInAction(() => { this.error = e; });
+      }
+      if (this.error == null) {
+        this._updateStatus(TransferStatus.SUCCESS);
+        await next();
+        this.reset();
+      }
+    })
   }
 
   _isWalletChanged(transferTx1: TransferTx, transferTx2: TransferTx): boolean {

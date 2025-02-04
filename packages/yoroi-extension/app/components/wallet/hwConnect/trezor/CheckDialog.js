@@ -16,14 +16,14 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import { ReactComponent as ExternalLinkSVG }  from '../../../../assets/images/link-external.inline.svg';
-import { ReactComponent as AboutPrerequisiteIconSVG }  from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
-import { ReactComponent as AboutPrerequisiteTrezorSVG }  from '../../../../assets/images/hardware-wallet/trezor/check.inline.svg';
-import { ReactComponent as AboutTrezorSvg }  from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
+import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/link-external.inline.svg';
+import { ReactComponent as AboutPrerequisiteIconSVG } from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
+import { ReactComponent as AboutTrezorSvg } from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../common/CheckDialog.scss';
+import { Link, Box, styled, Stack, Typography } from '@mui/material';
 
 const messages = defineMessages({
   aboutPrerequisite1Part1Text: {
@@ -60,87 +60,88 @@ type Props = {|
   +submit: void => void,
   +cancel: void => void,
   +onBack: void => void,
-  +classicTheme: boolean,
 |};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 @observer
 export default class CheckDialog extends Component<Props> {
-
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
+  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+    intl: intlShape.isRequired,
   };
 
   render(): Node {
     const { intl } = this.context;
-    const {
-      progressInfo,
-      isActionProcessing,
-      error,
-      onExternalLinkClick,
-      submit,
-      cancel,
-      classicTheme,
-    } = this.props;
+    const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        {!classicTheme && <AboutTrezorSvg />}
+        <AboutTrezorSvg/>
 
         <div className={styles.prerequisiteBlock}>
-          <div>
-            <AboutPrerequisiteIconSVG />
-            <span className={styles.prerequisiteHeaderText}>
+          <Stack direction="row" gap="8px">
+            <IconWrapper>
+              <AboutPrerequisiteIconSVG />
+            </IconWrapper>
+            <Typography className={styles.prerequisiteHeaderText} color="ds.text_gray_low">
               {intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisiteHeader)}
-            </span>
-          </div>
-          <ul>
-            <li key="1">
-              <a
-                href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)}
-                onClick={event => onExternalLinkClick(event)}
-              >
-                {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
-                <ExternalLinkSVG />
-              </a>
-              {intl.formatMessage(messages.aboutPrerequisite1Part2)}
-            </li>
-            <li key="2">{intl.formatMessage(messages.aboutPrerequisite2)}</li>
-            <li key="3">{intl.formatMessage(messages.aboutPrerequisite3)}</li>
-            <li key="4">{intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisite4)}</li>
-            <li key="5">{intl.formatMessage(messages.aboutPrerequisite5)}</li>
-          </ul>
+            </Typography>
+          </Stack>
+          <Stack>
+            <Stack direction="row" alignItems="center" gap="8px">
+              <Typography color="ds.text_gray_low">
+                &#x2022; {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
+              </Typography>
+              <Link href={intl.formatMessage(messages.aboutPrerequisite1Part1Link)} onClick={event => onExternalLinkClick(event)}>
+                <IconWrapper>
+                  <ExternalLinkSVG />
+                </IconWrapper>
+              </Link>
+              <Typography color="ds.text_gray_low">{intl.formatMessage(messages.aboutPrerequisite1Part2)}</Typography>
+            </Stack>
+            <Typography color="ds.text_gray_low"> &#x2022; {intl.formatMessage(messages.aboutPrerequisite2)}</Typography>
+            <Typography color="ds.text_gray_low">&#x2022; {intl.formatMessage(messages.aboutPrerequisite3)}</Typography>
+            <Typography color="ds.text_gray_low">
+              &#x2022; {intl.formatMessage(globalMessages.hwConnectDialogAboutPrerequisite4)}
+            </Typography>
+            <Typography color="ds.text_gray_low">&#x2022; {intl.formatMessage(messages.aboutPrerequisite5)}</Typography>
+          </Stack>
         </div>
+      </div>
+    );
 
-        {classicTheme && (
-          <div className={styles.hwImageBlock}>
-            <AboutPrerequisiteTrezorSVG />
-          </div>
-        )}
-      </div>);
-
-    const dailogActions = [{
-      label: intl.formatMessage(globalMessages.nextButtonLabel),
-      primary: true,
-      onClick: submit,
-      isSubmitting: isActionProcessing,
-    }];
+    const dailogActions = [
+      {
+        label: intl.formatMessage(globalMessages.nextButtonLabel),
+        primary: true,
+        onClick: submit,
+        isSubmitting: isActionProcessing,
+      },
+    ];
 
     return (
       <Dialog
         className={classnames([styles.component, 'CheckDialog'])}
         title={intl.formatMessage(globalMessages.trezorConnectAllDialogTitle)}
-        actions={dailogActions}
+        dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        <ProgressStepBlock progressInfo={progressInfo} classicTheme={classicTheme} />
+        <ProgressStepBlock progressInfo={progressInfo} />
         {middleBlock}
         {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} classicTheme={classicTheme} />
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
         }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

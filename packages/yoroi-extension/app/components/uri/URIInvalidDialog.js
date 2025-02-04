@@ -72,7 +72,7 @@ export default class URIInvalidDialog extends Component<Props> {
 
     return (
       <Dialog
-        actions={actions}
+        dialogActions={actions}
         className={dialogClasses}
         title={intl.formatMessage(messages.uriInvalidTitle)}
         closeOnOverlayClick={false}

@@ -7,8 +7,6 @@ import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import { translations } from '../../app/i18n/translations';
-import actions from '../../app/actions/index';
-import { Action } from '../../app/actions/lib/Action';
 import App from '../../app/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
@@ -17,6 +15,7 @@ import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
 import { ampli } from '../../ampli/index';
 import { ROUTES } from '../../app/routes-config';
+import { pathToRegexp } from 'path-to-regexp';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -32,18 +31,16 @@ const initializeYoroi: void => Promise<void> = async () => {
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = await createStores(api, actions, router);
+  const stores = await createStores(api, router);
 
   Logger.debug(`[yoroi] stores created`);
 
   window.yoroi = {
     api,
-    actions,
     translations,
     stores,
     reset: action(async () => {
-      Action.resetAllActions();
-      await createStores(api, actions, router);
+      await createStores(api, router);
     })
   };
 
@@ -64,7 +61,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   }
 
   render(
-    <App stores={stores} actions={actions} history={history} />,
+    <App stores={stores} history={history} />,
     root
   );
 
@@ -85,7 +82,7 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.settingsPageViewed();
     } else if (
       pathname === ROUTES.REVAMP.CATALYST_VOTING ||
-        pathname === ROUTES.WALLETS.CATALYST_VOTING
+      pathname === ROUTES.WALLETS.CATALYST_VOTING
     ) {
       ampli.votingPageViewed();
     } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
@@ -96,6 +93,12 @@ const initializeYoroi: void => Promise<void> = async () => {
       ampli.walletPageViewed();
     } else if (pathname === ROUTES.Governance.ROOT) {
       ampli.governanceDashboardPageViewed();
+    } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
+      const TAB = 'Wallet Token';
+      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
+    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
+      const TAB = 'Overview';
+      ampli.portfolioTokenDetails({ token_details_tab: TAB });
     }
   });
 };

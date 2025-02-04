@@ -2,28 +2,19 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
 import environment from '../../environment';
-import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
-const messages = defineMessages({
-  title: {
-    id: 'profile.languageSelect.title',
-    defaultMessage: '!!!Language Select',
-  },
-});
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class LanguageSelectionPage extends Component<StoresAndActionsProps> {
+export default class LanguageSelectionPage extends Component<StoresProps> {
 
   static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
@@ -36,32 +27,26 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
     if (profileStore.isCurrentLocaleSet) {
       const prevLang = profileStore.currentLocale;
       // tentatively set language to their previous selection
-      this.props.actions.profile.updateTentativeLocale.trigger({ locale: prevLang });
+      this.props.stores.profile.updateTentativeLocale({ locale: prevLang });
     }
 
-    await this.props.actions.profile.resetLocale.trigger();
+    await this.props.stores.profile.resetLocale();
   }
 
   onSelectLanguage: {| locale: string |} => void = (values) => {
-    this.props.actions.profile.updateTentativeLocale.trigger(values);
+    this.props.stores.profile.updateTentativeLocale(values);
   };
 
   onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
     // Important! The order of triggering these two events must not be exchanged!
-    await this.props.actions.profile.acceptTermsOfUse.trigger();
-    await this.props.actions.profile.commitLocaleToStorage.trigger();
+    const { stores } = this.props;
+    await stores.profile.acceptTermsOfUse();
+    await stores.profile.acceptLocale();
   };
 
-  renderByron(props: StoresAndActionsProps): Node {
-    const topBarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
-    );
+  renderByron(props: StoresProps): Node {
     const { selected } = this.props.stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
-    const topBar = props.stores.profile.isClassicTheme ? (
-      <TopBar
-        title={topBarTitle}
-      />) : undefined;
     const displayedBanner = props.stores
       .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
@@ -71,7 +56,6 @@ export default class LanguageSelectionPage extends Component<StoresAndActionsPro
       />;
     return (
       <TopBarLayout
-        topbar={topBar}
         languageSelectionBackground
         banner={displayedBanner}
       >

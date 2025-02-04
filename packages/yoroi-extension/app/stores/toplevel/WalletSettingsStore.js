@@ -5,12 +5,10 @@ import { find, } from 'lodash';
 import Store from '../base/Store';
 import type { RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import {
   removeWalletFromDb,
   changeSigningKeyPassword,
-  renamePublicDeriver,
   renameConceptualWallet,
   resyncWallet,
   removeAllTransactions,
@@ -21,7 +19,7 @@ export type WarningList = {|
   dialogs: Array<void => Node>,
 |};
 
-export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
+export default class WalletSettingsStore extends Store<StoresMap> {
 
   @observable renameModelRequest: Request<(() => Promise<void>) => Promise<void>>
     = new Request(async (func) => { await func(); });
@@ -48,38 +46,25 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
   }
 
-  setup(): void {
-    super.setup();
-    const a = this.actions.walletSettings;
-    a.startEditingWalletField.listen(this._startEditingWalletField);
-    a.stopEditingWalletField.listen(this._stopEditingWalletField);
-    a.cancelEditingWalletField.listen(this._cancelEditingWalletField);
-    a.renamePublicDeriver.listen(this._renamePublicDeriver);
-    a.renameConceptualWallet.listen(this._renameConceptualWallet);
-    a.updateSigningPassword.listen(this._changeSigningPassword);
-    a.resyncHistory.listen(this._resyncHistory);
-    a.removeWallet.listen(this._removeWallet);
-  }
-
-  @action _startEditingWalletField: {| field: string |} => void = (
+  @action startEditingWalletField: {| field: string |} => void = (
     { field }
   ) => {
     this.walletFieldBeingEdited = field;
   };
 
-  @action _stopEditingWalletField: void => void = () => {
+  @action stopEditingWalletField: void => void = () => {
     if (this.walletFieldBeingEdited != null) {
       this.lastUpdatedWalletField = this.walletFieldBeingEdited;
     }
     this.walletFieldBeingEdited = null;
   };
 
-  @action _cancelEditingWalletField: void => void = () => {
+  @action cancelEditingWalletField: void => void = () => {
     this.lastUpdatedWalletField = null;
     this.walletFieldBeingEdited = null;
   };
 
-  @action _changeSigningPassword: {|
+  @action updateSigningPassword: {|
     publicDeriverId: number,
     oldPassword: string,
     newPassword: string
@@ -87,22 +72,11 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     await this.changeSigningKeyRequest.execute(async () => {
       await changeSigningKeyPassword(request);
     });
-    this.actions.dialogs.closeActiveDialog.trigger();
+    this.stores.uiDialogs.closeActiveDialog();
     this.changeSigningKeyRequest.reset();
   };
 
-  @action _renamePublicDeriver: {|
-    publicDeriverId: number,
-    newName: string
-  |} => Promise<void> = async (request) => {
-    // update the meta-parameters in the internal wallet representation
-    await this.renameModelRequest.execute(async () => {
-      await renamePublicDeriver(request);
-    });
-    //fixme: update memory directly?
-  };
-
-   _renameConceptualWallet: {|
+   renameConceptualWallet: {|
     conceptualWalletId: number,
     newName: string
   |} => Promise<void> = async (request) => {
@@ -113,7 +87,7 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     });
   };
 
-  @action _resyncHistory: {|
+  @action resyncHistory: {|
     publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.clearHistory.reset();
@@ -129,31 +103,32 @@ export default class WalletSettingsStore extends Store<StoresMap, ActionsMap> {
     }).promise;
   };
 
-  @action _removeWallet: {|
+  @action removeWallet: {|
     publicDeriverId: number,
   |} => Promise<void> = async (request) => {
     this.removeWalletRequest.reset();
-    this.actions.wallets.unselectWallet.trigger(); // deselect before deleting
+    const { stores } = this;
+    stores.wallets.unsetActiveWallet(); // deselect before deleting
 
     // Remove this wallet from wallet sort list
-    const walletsNavigation = this.stores.profile.walletsNavigation
+    const walletsNavigation = stores.profile.walletsNavigation
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
       'cardano': walletsNavigation.cardano.filter(
         walletId => walletId !== request.publicDeriverId)
     }
-    await this.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+    await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
     // ==================== Disconnect related dApps ====================
-    await this.actions.connector.getConnectorWhitelist.trigger();
-    const connectorWhitelist = this.stores.connector.currentConnectorWhitelist;
+    await this.stores.connector.getConnectorWhitelist();
+    const connectorWhitelist = stores.connector.currentConnectorWhitelist;
     const connectedDapps = connectorWhitelist.filter(
       dapp => dapp.publicDeriverId === request.publicDeriverId
     );
 
     for (const dapp of connectedDapps) {
-      await this.actions.connector.removeWalletFromWhitelist.trigger({
+      await this.stores.connector.removeWalletFromWhitelist1({
         url: dapp.url,
       });
     }

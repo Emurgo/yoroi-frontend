@@ -1,13 +1,10 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
+import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { LayoutComponentMap } from '../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
-import { withLayout } from '../../styles/context/layout';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -16,23 +13,23 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
+<<<<<<< HEAD
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
+=======
+import type { StoresProps } from '../../stores';
+>>>>>>> develop
 
 type Props = {|
-  ...StoresAndActionsProps,
   +children?: Node,
 |};
 
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
-
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
-class SwapPageContainer extends Component<AllProps> {
+export default class SwapPageContainer extends Component<AllProps> {
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -59,24 +56,25 @@ class SwapPageContainer extends Component<AllProps> {
 
   render(): Node {
     const { children } = this.props;
-    const { actions, stores } = this.props;
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
+    const { stores } = this.props;
+    const { intl } = this.context;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
 
-    const menu = <SwapMenu onItemClick={route => actions.router.goToRoute.trigger({ route })} isActiveItem={this.isActivePage} />;
+    const menu = (
+      <SwapMenu
+        onItemClick={route => stores.app.goToRoute({ route })}
+        isActiveItem={this.isActivePage}
+      />
+    );
 
     return (
-      <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
-        sidebar={sidebarContainer}
-        isErrorPage={isErrorPage}
-        navbar={
-          <NavBarContainerRevamp
-            actions={actions}
-            stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-            menu={menu}
+        <IntlProvider intl={intl}>
+          <TopBarLayout
+            banner={<BannerContainer stores={stores} />}
+            sidebar={sidebarContainer}
             isErrorPage={isErrorPage}
+<<<<<<< HEAD
           />
         }
         showInContainer
@@ -91,7 +89,22 @@ class SwapPageContainer extends Component<AllProps> {
           </ReviewTxProvider>
         </SwapFormProvider>
       </TopBarLayout>
+=======
+            navbar={
+              <NavBarContainerRevamp
+                stores={stores}
+                title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+                menu={menu}
+                isErrorPage={isErrorPage}
+              />
+            }
+            showInContainer
+            withPadding={false}
+          >
+            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+          </TopBarLayout>
+        </IntlProvider>
+>>>>>>> develop
     );
   }
 }
-export default (withLayout(SwapPageContainer): ComponentType<Props>);

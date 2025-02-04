@@ -51,7 +51,7 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
       >
         <CloseButton
           onClose={onClose}
-          closeButton={<DialogCloseButton isRevampLayout />}
+          closeButton={<DialogCloseButton />}
           sx={{
             right: '4px',
             top: '4px',

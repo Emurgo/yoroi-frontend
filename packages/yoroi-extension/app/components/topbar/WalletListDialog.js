@@ -185,7 +185,7 @@ export default class WalletListDialog extends Component<Props, State> {
         closeOnOverlayClick
         closeButton={<DialogCloseButton />}
         onClose={this.props.close}
-        actions={[
+        dialogActions={[
           {
             id: 'changeWalletDialog-addWallet-button',
             onClick: onAddWallet,

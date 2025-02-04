@@ -40,11 +40,11 @@ export class SuccessPageRevamp extends Component<Props> {
     return (
       <Dialog
         title={title}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         onClose={closeInfo ? closeInfo.onClose : undefined}
         closeButton={
-          closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} isRevampLayout /> : undefined
+          closeInfo ? <DialogCloseButton onClose={closeInfo.onClose} /> : undefined
         }
       >
         <Box maxWidth="600px">

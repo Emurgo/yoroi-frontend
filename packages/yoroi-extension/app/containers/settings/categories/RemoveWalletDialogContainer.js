@@ -1,5 +1,5 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -8,21 +8,14 @@ import { defineMessages, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
-import type { LayoutComponentMap } from '../../../styles/context/layout';
-import { withLayout } from '../../../styles/context/layout';
 import { Typography } from '@mui/material';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriverId: number,
 |};
-type InjectedLayoutProps = {|
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 const dialogMessages = defineMessages({
   warning2: {
@@ -38,7 +31,7 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-class RemoveWalletDialogContainer extends Component<AllProps> {
+export default class RemoveWalletDialogContainer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -56,18 +49,18 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
   };
 
   removeWalletRevamp: void => Promise<void> = async () => {
-    const settingsActions = this.props.actions.walletSettings;
+    const { stores } = this.props;
     const selectedWalletId = this.props.publicDeriverId;
-    const walletsNavigation = this.props.stores.profile.walletsNavigation;
+    const walletsNavigation = stores.profile.walletsNavigation;
 
     const newWalletsNavigation = {
       ...walletsNavigation,
       // $FlowFixMe[invalid-computed-prop]
       cardano: walletsNavigation.cardano.filter(walletId => walletId !== selectedWalletId),
     };
-    await this.props.actions.profile.updateSortedWalletList.trigger(newWalletsNavigation);
+    await stores.profile.updateSortedWalletList(newWalletsNavigation);
 
-    settingsActions.removeWallet.trigger({
+    stores.walletSettings.removeWallet({
       publicDeriverId: this.props.publicDeriverId,
     });
   };
@@ -75,9 +68,7 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
   render(): Node {
     const { intl } = this.context;
     const settingsStore = this.props.stores.walletSettings;
-    const settingsActions = this.props.actions.walletSettings;
-
-    const DangerousActionDialogClassic = (
+    return (
       <DangerousActionDialog
         title={intl.formatMessage(messages.titleLabel)}
         checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
@@ -85,39 +76,13 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         toggleCheck={this.toggleCheck}
         isSubmitting={settingsStore.removeWalletRequest.isExecuting}
         error={settingsStore.removeWalletRequest.error}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
-        primaryButton={{
-          label: intl.formatMessage(globalMessages.remove),
-          onClick: () => {
-            settingsActions.removeWallet.trigger({
-              publicDeriverId: this.props.publicDeriverId,
-            });
-          },
-        }}
-        secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
-        }}
-        id="removeWalletDialog"
-      >
-        <Typography color="ds.text_gray_medium">{intl.formatMessage(messages.removeExplanation)}</Typography>
-        <Typography color="ds.text_gray_medium"> {intl.formatMessage(dialogMessages.warning2)}</Typography>
-      </DangerousActionDialog>
-    );
-    const DangerousActionDialogRevamp = (
-      <DangerousActionDialog
-        title={intl.formatMessage(messages.titleLabel)}
-        checkboxAcknowledge={intl.formatMessage(dialogMessages.accept)}
-        isChecked={this.isChecked}
-        toggleCheck={this.toggleCheck}
-        isSubmitting={settingsStore.removeWalletRequest.isExecuting}
-        error={settingsStore.removeWalletRequest.error}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         primaryButton={{
           label: intl.formatMessage(globalMessages.remove),
           onClick: this.removeWalletRevamp,
         }}
         secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.stores.uiDialogs.closeActiveDialog,
         }}
         id="removeWalletDialog"
       >
@@ -130,11 +95,5 @@ class RemoveWalletDialogContainer extends Component<AllProps> {
         </Typography>
       </DangerousActionDialog>
     );
-
-    return this.props.renderLayoutComponent({
-      CLASSIC: DangerousActionDialogClassic,
-      REVAMP: DangerousActionDialogRevamp,
-    });
   }
 }
-export default (withLayout(RemoveWalletDialogContainer): ComponentType<Props>);

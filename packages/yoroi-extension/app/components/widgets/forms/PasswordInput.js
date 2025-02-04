@@ -9,10 +9,10 @@ import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import TextField from '../../common/TextField';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { Box, Typography } from '@mui/material';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
-  +classicTheme: boolean,
   +disabled: boolean,
   +passwordMatches: string => boolean,
   +fieldName: string,
@@ -52,9 +52,7 @@ export default class PasswordInput extends Component<Props> {
         type: 'password',
         onChange: this.props.onChange,
         label: this.props.placeholder,
-        placeholder: this.props.classicTheme
-          ? this.props.placeholder
-          : '',
+        placeholder: '',
         value: (this.props.initValues) || '',
         validators: [({ field }) => {
           return [
@@ -93,8 +91,10 @@ export default class PasswordInput extends Component<Props> {
     const passwordField = form.$(this.props.fieldName);
 
     return (
-      <div>
-        {this.props.disclaimer}
+      <Box>
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {this.props.disclaimer}
+        </Typography>
         <TextField
           className={this.props.fieldName}
           {...passwordField.bind()}
@@ -102,7 +102,7 @@ export default class PasswordInput extends Component<Props> {
           error={passwordField.error}
           done={this.props.done}
         />
-      </div>
+      </Box>
     );
   }
 }

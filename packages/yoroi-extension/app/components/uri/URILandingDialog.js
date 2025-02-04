@@ -36,7 +36,6 @@ const messages = defineMessages({
 type Props = {|
   +onSubmit: void => void,
   +onClose: void => void,
-  +classicTheme: boolean,
 |};
 
 @observer
@@ -51,7 +50,7 @@ export default class URILandingDialog extends Component<Props> {
   };
 
   render(): Node {
-    const { onClose, classicTheme } = this.props;
+    const { onClose } = this.props;
     const { intl } = this.context;
 
     const dialogClasses = classnames([
@@ -68,7 +67,7 @@ export default class URILandingDialog extends Component<Props> {
         onClose={onClose}
       >
         <div>
-          {!classicTheme && <span className={styles.urlImage}><PerformTxImg /></span>}
+          <span className={styles.urlImage}><PerformTxImg/></span>
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriLandingDialogWarningLine1)}
             <ul>

@@ -1,43 +1,36 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../../types/injectedProps.types';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
 import Dialog from '../../../../components/widgets/Dialog';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import ErrorBlock from '../../../../components/widgets/ErrorBlock';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
+import type { StoresProps } from '../../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   +stepsList: StepsList,
   +submit: void => PossiblyAsync<void>,
   +cancel: void => void,
   +goBack: void => void,
   +onError: Error => void,
-  +classicTheme: boolean,
 |};
 
-type InjectedLayoutProps = {|
-  +isRevampLayout: boolean,
-|};
-
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
-class RegisterDialogContainer extends Component<AllProps> {
+export default class RegisterDialogContainer extends Component<AllProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { submit, cancel, onError, classicTheme, stepsList } = this.props;
+    const { submit, cancel, onError, stepsList, stores } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
@@ -52,9 +45,7 @@ class RegisterDialogContainer extends Component<AllProps> {
         progressInfo={votingStore.progressInfo}
         submit={async (walletPassword: string) => {
           try {
-            await this.props.actions.ada.voting.createTransaction.trigger(
-              walletPassword
-            );
+            await stores.substores.ada.votingStore.createTransaction(walletPassword);
             await submit();
           } catch (error) {
             onError(error);
@@ -62,8 +53,6 @@ class RegisterDialogContainer extends Component<AllProps> {
         }}
         isProcessing={votingStore.isActionProcessing}
         cancel={cancel}
-        classicTheme={classicTheme}
-        isRevamp={this.props.isRevampLayout}
       />
     );
   }
@@ -83,7 +72,7 @@ class RegisterDialogContainer extends Component<AllProps> {
         closeOnOverlayClick={false}
         onClose={this.props.cancel}
         closeButton={<DialogCloseButton onClose={this.props.cancel} />}
-        actions={dialogBackButton}
+        dialogActions={dialogBackButton}
       >
         <>
           <ErrorBlock error={error} />
@@ -92,5 +81,3 @@ class RegisterDialogContainer extends Component<AllProps> {
     );
   };
 }
-
-export default (withLayout(RegisterDialogContainer): ComponentType<Props>);

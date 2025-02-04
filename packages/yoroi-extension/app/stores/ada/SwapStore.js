@@ -1,7 +1,6 @@
 // @flow
 
 import Store from '../base/Store';
-import type { ActionsMap } from '../../actions';
 import type { StoresMap } from '../index';
 import { action, computed, observable } from 'mobx';
 import type { StorageField } from '../../api/localStorage';
@@ -38,7 +37,7 @@ const FRONTEND_FEE_ADDRESS_MAINNET =
 const FRONTEND_FEE_ADDRESS_PREPROD =
   'addr_test1qrgpjmyy8zk9nuza24a0f4e7mgp9gd6h3uayp0rqnjnkl54v4dlyj0kwfs0x4e38a7047lymzp37tx0y42glslcdtzhqzp57km';
 
-export default class SwapStore extends Store<StoresMap, ActionsMap> {
+export default class SwapStore extends Store<StoresMap> {
   @observable orderStep: number = 0;
 
   swapDisclaimerAcceptanceFlag: StorageField<boolean> = createStorageFlag(

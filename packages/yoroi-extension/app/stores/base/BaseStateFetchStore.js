@@ -12,9 +12,8 @@ export type RequiredStores = {
 export default class BaseStateFetchStore
   <
     TStores: RequiredStores,
-    TActions,
     IFetcher
-  > extends Store<TStores, TActions> {
+  > extends Store<TStores> {
 
   @observable fetcher: IFetcher;
 

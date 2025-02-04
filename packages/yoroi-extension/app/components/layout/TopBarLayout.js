@@ -2,8 +2,6 @@
 import { Box } from '@mui/system';
 import { observer } from 'mobx-react';
 import type { Node, ComponentType } from 'react';
-import { withLayout } from '../../styles/context/layout';
-import { THEMES } from '../../styles/themes';
 import styles from './TopBarLayout.scss';
 
 type Props = {|
@@ -15,16 +13,11 @@ type Props = {|
   +notification?: ?Node,
   +languageSelectionBackground?: boolean,
   +showInContainer?: boolean,
-  +showAsCard?: boolean,
-  +asModern?: boolean,
   +withPadding?: boolean, // default: true
   +bgcolor?: string,
   +isErrorPage?: boolean,
 |};
 
-type InjectedProps = {| isRevampLayout: boolean, currentTheme: string |};
-
-type AllProps = {| ...Props, ...InjectedProps |};
 /** Adds a top bar above the wrapped node */
 function TopBarLayout({
   banner,
@@ -35,17 +28,10 @@ function TopBarLayout({
   notification,
   languageSelectionBackground,
   showInContainer,
-  showAsCard,
-  currentTheme,
-  isRevampLayout,
-  asModern,
   withPadding,
   bgcolor,
   isErrorPage,
-}: AllProps) {
-  const isModern = currentTheme === THEMES.YOROI_MODERN;
-  const isRevamp = isRevampLayout && asModern !== true && !isModern;
-
+}: Props) {
   const getContentUnderBanner: void => Node = () => {
     const topbarComponent = <Box sx={{ zIndex: 2 }}>{topbar}</Box>;
     const navbarComponent = <Box sx={{ zIndex: 2 }}>{navbar}</Box>;
@@ -63,8 +49,8 @@ function TopBarLayout({
               height: '7px',
               display: 'block',
             },
-            boxShadow: !isRevamp && showAsCard === true && '0 2px 12px 0 rgba(0, 0, 0, 0.06)',
-            borderRadius: !isRevamp && showAsCard === true && '8px',
+            boxShadow: false,
+            borderRadius: false,
             ...(showInContainer === true && {
               bgcolor: 'ds.bg_color_max',
               width: '100%',
@@ -77,7 +63,7 @@ function TopBarLayout({
             overflow: 'scroll',
           }}
         >
-          {isRevamp ? (
+          {(
             <Box
               sx={{
                 bgcolor: bgcolor || 'ds.bg_color_max',
@@ -107,39 +93,13 @@ function TopBarLayout({
                 </Box>
               </Box>
             </Box>
-          ) : (
-            <Box
-              sx={{
-                height: '100%',
-                minHeight: '200px',
-              }}
-            >
-              {children}
-            </Box>
           )}
         </Box>
       </>
     );
 
     if (showInContainer === true) {
-      const boxProperties = {
-        height: '100%',
-        minHeight: '200px',
-        backgroundColor: isRevamp ? 'ds.bg_color_max' : 'var(--yoroi-palette-gray-50)',
-        maxWidth: '1295px',
-        paddingLeft: '40px',
-        paddingRight: '40px',
-        width: '100%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        maxHeight: 'calc(100vh - 110px)',
-        overflow: isRevamp ? 'unset' : 'hidden',
-        pb: isRevamp ? '0px' : '100px',
-      };
-
-      return isRevamp ? (
+      return (
         <Box
           sx={{
             maxWidth: '100%',
@@ -153,8 +113,6 @@ function TopBarLayout({
         >
           {content}
         </Box>
-      ) : (
-        <Box sx={boxProperties}>{content}</Box>
       );
     }
     return content;
@@ -166,7 +124,7 @@ function TopBarLayout({
     <Box
       sx={{
         backgroundColor: 'ds.bg_color_max',
-        boxShadow: isModern ? '0 0 70px 0 rgba(0, 0, 0, 0.75)' : 'none',
+        boxShadow: 'none',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -193,7 +151,7 @@ function TopBarLayout({
             display: 'flex',
             flexDirection: 'column',
             position: 'relative',
-            backgroundColor: isRevamp ? 'ds.bg_color_max' : 'var(--yoroi-palette-gray-50)',
+            backgroundColor: 'ds.bg_color_max',
           }}
         >
           {banner}
@@ -204,7 +162,7 @@ function TopBarLayout({
   );
 }
 
-export default (withLayout(observer(TopBarLayout)): ComponentType<Props>);
+export default (observer(TopBarLayout): ComponentType<Props>);
 
 TopBarLayout.defaultProps = {
   banner: undefined,
@@ -215,8 +173,6 @@ TopBarLayout.defaultProps = {
   notification: undefined,
   languageSelectionBackground: false,
   showInContainer: false,
-  showAsCard: false,
-  asModern: false,
   withPadding: true,
   bgcolor: undefined,
 };

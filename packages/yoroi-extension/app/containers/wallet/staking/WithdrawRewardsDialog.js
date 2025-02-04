@@ -2,7 +2,6 @@
 
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import { Box, Typography } from '@mui/material';
@@ -29,6 +28,8 @@ import Warning from '../../../components/common/Warning';
 import Dialog from '../../../components/widgets/Dialog';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import HorizintallyCenteredLayout from '../../../components/layout/HorizintallyCenteredLayout';
+import type { StoresProps } from '../../../stores';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -54,13 +55,12 @@ const messages = defineMessages({
   },
 });
 
-type Props = {|
-  ...StoresAndActionsProps,
+type LocalProps = {|
   +onClose: void => void,
 |};
 
 @observer
-export default class WithdrawRewardsDialog extends Component<Props> {
+export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, ...LocalProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -73,27 +73,29 @@ export default class WithdrawRewardsDialog extends Component<Props> {
   }
 
   componentWillUnmount() {
-    this.props.stores.wallets.sendMoneyRequest.reset();
-    this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
-    this.props.actions.ada.ledgerSend.cancel.trigger();
-    this.props.actions.ada.trezorSend.cancel.trigger();
+    const { stores } = this.props;
+    stores.wallets.sendMoneyRequest.reset();
+    stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
+    stores.substores.ada.ledgerSend.cancel();
+    stores.substores.ada.trezorSend.cancel();
   }
 
   submit: void => Promise<void> = async () => {
-    const selected = this.props.stores.wallets.selected;
+    const { stores } = this.props;
+    const selected = stores.wallets.selected;
     if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
-    const signRequest = this.props.stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
+    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
     if (this.spendingPasswordForm == null) {
       if (selected.type === 'trezor') {
-        await this.props.actions.ada.trezorSend.sendUsingTrezor.trigger({
+        await stores.substores.ada.trezorSend.sendUsingTrezor({
           params: { signRequest },
           wallet: selected,
         });
       }
       if (selected.type === 'ledger') {
-        await this.props.actions.ada.ledgerSend.sendUsingLedgerWallet.trigger({
+        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
           params: { signRequest },
           wallet: selected,
         });
@@ -102,7 +104,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-          await this.props.actions.wallets.sendMoney.trigger({
+          await stores.substores.ada.mnemonicSend.sendMoney({
             signRequest,
             password: walletPassword,
             wallet: selected,
@@ -111,6 +113,9 @@ export default class WithdrawRewardsDialog extends Component<Props> {
         onError: () => {},
       });
     }
+    ampli.claimAdaTransactionSubmitted({
+      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber()
+    });
   };
 
   getTotalBalance: (
@@ -162,7 +167,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     const formatValue = genFormatTokenAmount(genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo));
 
     if (createWithdrawalTx.error != null)
-      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} classicTheme={false} />;
+      return <YoroiTransferErrorPage error={createWithdrawalTx.error} onCancel={this.props.onClose} />;
 
     const tentativeTx = createWithdrawalTx.result;
     if (!tentativeTx)
@@ -197,7 +202,6 @@ export default class WithdrawRewardsDialog extends Component<Props> {
       publicDeriver.type !== 'mnemonic' ? undefined : (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
-          classicTheme={false}
           isSubmitting={isSubmitting}
         />
       );
@@ -210,7 +214,7 @@ export default class WithdrawRewardsDialog extends Component<Props> {
     return (
       <Dialog
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={[
+        dialogActions={[
           {
             label: intl.formatMessage(globalMessages.cancel),
             onClick: this.props.onClose,

@@ -1,6 +1,6 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
@@ -15,8 +15,6 @@ import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
@@ -65,7 +63,7 @@ type Props = {|
 |};
 
 @observer
-class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
+export default class UnitOfAccountSettings extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -77,13 +75,13 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: this.context.intl.formatMessage(this.props.isRevampLayout ? messages.revampInputLabel : messages.label),
+        label: this.context.intl.formatMessage(messages.revampInputLabel),
       },
     },
   });
 
   render(): Node {
-    const { currencies, error, currentValue, lastUpdatedTimestamp, isRevampLayout } = this.props;
+    const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
@@ -139,40 +137,28 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
       <Box
         sx={{
           b: '20px',
-          mt: isRevampLayout ? '13px' : '0px',
-          pt: !isRevampLayout && '30px',
-          borderTop: !isRevampLayout && '1px solid',
-          borderColor: !isRevampLayout && 'var(--yoroi-palette-gray-200)',
+          mt: '13px',
+          pt: false,
+          borderTop: false,
+          borderColor: false,
         }}
         className={componentClassNames}
       >
         {dialog}
         <Typography
           component="h2"
-          variant={isRevampLayout ? 'body1' : 'h5'}
+          variant="body1"
           fontWeight={500}
-          mb={isRevampLayout ? '16px' : '12px'}
+          mb="16px"
           color="ds.text_gray_medium"
         >
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </Typography>
 
-        {!isRevampLayout && (
-          <>
-            <Typography component="div" className="text">
-              <FormattedHTMLMessage {...messages.note} />
-            </Typography>
-
-            <Typography component="div" className="text">
-              <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
-            </Typography>
-          </>
-        )}
-
         <Box
           sx={{
-            width: isRevampLayout ? '506px' : '100%',
-            marginTop: isRevampLayout ? '0px' : '40px',
+            width: '506px',
+            marginTop: '0px',
           }}
         >
           <GlobalStyledScrollbar />
@@ -183,18 +169,11 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
             {...coinPriceCurrencyId.bind()}
             onChange={this.props.onSelect}
             value={currentValue}
-            menuProps={{
-              sx: {
-                '& .MuiMenu-paper': {
-                  maxHeight: '280px',
-                },
-              },
-            }}
+            maxHeight='280px'
             renderValue={value => (
-              <Typography
-                component="div"
-                variant={isRevampLayout ? 'body1' : 'body2'}
-                fontWeight={isRevampLayout ? '400' : '300'}
+              <Typography component="div"
+                variant="body1"
+                fontWeight="400"
                 color="ds.text_gray_medium"
               >
                 {/* $FlowFixMe[prop-missing] */}
@@ -205,7 +184,7 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
             {currencies.map(option => optionRenderer(option))}
           </Select>
 
-          {isRevampLayout && (
+          {(
             <>
               <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
                 <FormattedHTMLMessage {...messages.noteRevamp} />
@@ -230,5 +209,3 @@ class UnitOfAccountSettings extends Component<Props & InjectedLayoutProps> {
     );
   }
 }
-
-export default (withLayout(UnitOfAccountSettings): ComponentType<Props>);
