@@ -51,6 +51,8 @@ export const darkPalette = {
   sys_orange_500: '#FAB357',
   sys_orange_100: '#291802',
 
+  static_green: '#08C29D',
+
   bg_gradient_1:
     'linear-gradient(195deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.10) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
   bg_gradient_2: 'linear-gradient(206deg, rgba(11, 153, 125, 0.48) -10.43%, rgba(8, 194, 157, 0.08) 100%)',

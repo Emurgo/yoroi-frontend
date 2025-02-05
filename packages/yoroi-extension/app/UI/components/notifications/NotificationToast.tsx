@@ -1,4 +1,4 @@
-import { IconButton, styled, Box, Typography } from '@mui/material';
+import { IconButton, styled, Box, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Icon } from '../icons/index';
@@ -35,8 +35,62 @@ const SNotificationContainer = styled(Box)(({ theme }) => ({
   boxShadow: theme.palette["ds"].light_shadow_notification,
 }));
 
+type IconProps = {
+  type: NotificationTypes
+}
+
+
+const IconContainer = ({ children, ...props }) => (
+  <Box {...props} sx={{
+    borderRadius: "50%",
+    width: "40px",
+    height: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }} >
+    {children}
+  </Box>
+)
+
+const NotificationIcon = ({ type }: IconProps) => {
+  const theme = useTheme();
+
+  console.log("theme", theme.palette["ds"], theme.palette)
+
+  switch (type) {
+    case NotificationTypes.Rewards:
+      return (
+        <IconContainer bgcolor="ds.secondary_100">
+          <Icon.Staking fill={theme.palette["ds"].static_green} />
+        </IconContainer>
+      )
+    case NotificationTypes.Income:
+      return (
+        <IconContainer bgcolor="ds.secondary_100">
+          <Icon.Receive fill={theme.palette["ds"].static_green} />
+        </IconContainer>
+      )
+    case NotificationTypes.Outcome:
+      return (
+        <IconContainer bgcolor="ds.primary_100">
+          <Icon.Send fill={theme.palette["ds"].primary_600} />
+        </IconContainer>
+      )
+    case NotificationTypes.Cancelled:
+      return (
+        <IconContainer bgcolor="ds.sys_magenta_100">
+          <Icon.Cancel fill={theme.palette["ds"].sys_magenta_500} />
+        </IconContainer>
+      )
+    default:
+      return null;
+  }
+}
+
 export default function NotificationToast({ onClick, onClose, text, type }: Props) {
   const strings = useStrings();
+  const theme = useTheme();
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -55,9 +109,7 @@ export default function NotificationToast({ onClick, onClose, text, type }: Prop
     <Box id="notif-toast" sx={{ position: 'fixed', top: 10, right: 10, zIndex: 9999 }}>
       <SNotificationContainer onClick={handleClick}>
         <Box px="16px" flexShrink={0} sx={{ cursor: 'pointer', alignSelf: 'center' }}>
-          <Box borderRadius="50%" bgcolor="ds.secondary_100" width="40px" height="40px" display="flex" alignItems="center" justifyContent="center">
-            {type === NotificationTypes.Rewards ? <Icon.Staking fill='#08C29D' /> : <Icon.ChipArrowDown fill='#08C29D' />}
-          </Box>
+          <NotificationIcon type={type} />
         </Box>
         <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
           <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{text}</Typography>
@@ -65,7 +117,7 @@ export default function NotificationToast({ onClick, onClose, text, type }: Prop
         </Box>
         <Box px="12px" flexShrink={0}>
           <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
-            <Icon.CloseIcon fill='#6B7384' />
+            <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
           </IconWrapper>
         </Box>
       </SNotificationContainer>
