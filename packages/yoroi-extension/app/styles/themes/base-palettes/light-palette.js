@@ -58,4 +58,5 @@ export const lightPalette = {
   special_web_bg_sidebar: '#1F232ECC',
   light_shadow_dropdown_words: `0px 3px 10px rgba(24, 26, 30, 0.08)`,
   light_shadow_dropdown_menu: `0px 4px 10px rgba(24, 26, 30, 0.16)`,
+  light_shadow_notification: `-1px 8px 20px 0px rgba(138, 146, 163, 0.1)`,
 };
