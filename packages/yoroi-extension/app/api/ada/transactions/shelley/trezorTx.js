@@ -583,6 +583,9 @@ export function buildConnectorSignedTransaction(
   const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
   if (metadata) {
     fixedTx.set_auxiliary_data(metadata.to_bytes());
+    const body = fixedTx.body();
+    body.set_auxiliary_data_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
+    fixedTx.set_body(body.to_bytes());
   }
 
   for (const witness of witnesses) {

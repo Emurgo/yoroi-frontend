@@ -859,6 +859,9 @@ export function buildConnectorSignedTransaction(
   const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
   if (metadata) {
     fixedTx.set_auxiliary_data(metadata.to_bytes());
+    const body = fixedTx.body();
+    body.set_auxiliary_data_hash(RustModule.WalletV4.hash_auxiliary_data(metadata));
+    fixedTx.set_body(body.to_bytes());
   }
   const keyLevel = publicKey.addressing.startLevel + publicKey.addressing.path.length - 1;
 
@@ -883,7 +886,7 @@ export function buildConnectorSignedTransaction(
 
     fixedTx.add_vkey_witness(vkeyWit);
   }
-
+  debugger
   const txHex = fixedTx.to_hex();
   return { txHex, txId: transactionHexToHash(txHex)};
 }
