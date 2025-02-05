@@ -1,12 +1,9 @@
 // @flow
 import { action, observable } from 'mobx';
-
 import Store from '../../base/Store';
-
 import { wrapWithFrame } from '../../lib/TrezorWrapper';
 import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
 import { convertToLocalizableError } from '../../../domain/TrezorLocalizedError';
-import LocalizableError from '../../../i18n/LocalizableError';
 import type {
   HaskellShelleyTxSignRequest,
   TrezorTCatalystRegistrationTxSignData,

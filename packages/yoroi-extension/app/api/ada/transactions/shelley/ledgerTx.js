@@ -886,7 +886,6 @@ export function buildConnectorSignedTransaction(
 
     fixedTx.add_vkey_witness(vkeyWit);
   }
-  debugger
   const txHex = fixedTx.to_hex();
   return { txHex, txId: transactionHexToHash(txHex)};
 }

@@ -1,19 +1,11 @@
 // @flow
 import { action, observable } from 'mobx';
-
 import type { SignTransactionResponse as LedgerSignTxResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-
 import Store from '../../base/Store';
-
-import LocalizableError from '../../../i18n/LocalizableError';
-
 import { convertToLocalizableError } from '../../../domain/LedgerLocalizedError';
-
 import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
-
 import { buildConnectorSignedTransaction } from '../../../api/ada/transactions/shelley/ledgerTx';
-
 import { LedgerConnect } from '../../../utils/hwConnectHandler';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 import type {

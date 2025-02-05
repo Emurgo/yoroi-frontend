@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletSendPreviewStep from './WalletSendPreviewStep';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
-import LocalizableError from '../../../../i18n/LocalizableError';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { addressToDisplayString } from '../../../../api/ada/lib/storage/bridge/utils';
 import type { ISignRequest } from '../../../../api/common/lib/transactions/ISignRequest';
