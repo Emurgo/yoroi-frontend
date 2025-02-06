@@ -116,6 +116,8 @@ function listenToBackgroundServiceWorker() {
                             }
                         }, location.origin);
                     }
+                } else {
+                    connected = true;
                 }
             }
             window.postMessage({
@@ -128,7 +130,6 @@ function listenToBackgroundServiceWorker() {
             disconnectWallet(connectedProtocolHolder[0]);
         }
     });
-    connected = true;
 }
 
 const ATTEMPT_COUNT = 2;
@@ -150,6 +151,7 @@ async function sendMessageToBackground(message) {
 }
 
 async function handleConnectorConnectRequest(event, protocol) {
+    console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
     const requestIdentification = event.data.requestIdentification;
     if ((cardanoApiInjected && !requestIdentification) && connected) {
         // we can skip communication - API injected + hasn't been disconnected
