@@ -23,7 +23,7 @@ export const ReviewTxManager = () => {
     right: false,
   });
 
-  const { isOpen, closeTxReviewModal, modalView, changeModalView } = useTxReviewModal();
+  const { isOpen, closeTxReviewModal, modalView, changeModalView, setInputError, changePasswordInputValue } = useTxReviewModal();
 
   const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -42,6 +42,8 @@ export const ReviewTxManager = () => {
       return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
     }
     if (modalView === 'submitTx') {
+      setInputError({ type: 'setInputError', inputError: false });
+      changePasswordInputValue({ type: 'passswordInput', passswordInput: '' });
       return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
     }
     return undefined;

@@ -1390,30 +1390,33 @@
   resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-11.5.0.tgz"
   integrity sha512-qchOJ9NYDUz10tzs5r5QhP9hK0p+ZOlRiBwPdTAxqAYLw/8emYBkQQLaS8T1DF6EkeudyrgS00ym5Trw1fo4iA==
 
-"@emurgo/cardano-serialization-lib-browser@13.1.0":
-  version "13.1.0"
-  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-13.1.0.tgz"
-  integrity sha512-ysHnLqSZS8akOtKHbmBtfhDacQv/GfQ+dBs/HbHMiV+sxb/0sDB/5bgD3JddY5kpa34zkwFi3aR+nzpZjwKS6w==
-
-"@emurgo/cardano-serialization-lib-nodejs-gc@12.1.1":
-  version "12.1.1"
-  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-nodejs-gc/-/cardano-serialization-lib-nodejs-gc-12.1.1.tgz"
-  integrity sha512-PRay6ceSQhH8OsOOUG4QwPU6u1wXFDMoxcHv4KENnIjLk8pKb0ggLr6S1GZ603YJRi9KLh+pw97yL08a8ZG0PA==
+"@emurgo/cardano-serialization-lib-browser@13.2.1":
+  version "13.2.1"
+  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-13.2.1.tgz"
+  integrity sha512-7RfX1gI16Vj2DgCp/ZoXqyLAakWo6+X95ku/rYGbVzuS/1etrlSiJmdbmdm+eYmszMlGQjrtOJQeVLXoj4L/Ag==
 
 "@emurgo/cardano-serialization-lib-nodejs@11.5.0":
   version "11.5.0"
   resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-11.5.0.tgz"
   integrity sha512-IlVABlRgo9XaTR1NunwZpWcxnfEv04ba2l1vkUz4S1W7Jt36F4CtffP+jPeqBZGnAe+fnUwo0XjIJC3ZTNToNQ==
 
-"@emurgo/cardano-serialization-lib-nodejs@13.1.0":
-  version "13.1.0"
-  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-13.1.0.tgz"
-  integrity sha512-KBIBGEOjTWmilQ3VHTydtMgGSiJkVK14b5N+DwBp2kkO1IqwJyzFQOWDMkQGgEFuJ1Y4Yu05xyxph1JY9/m65w==
+"@emurgo/cardano-serialization-lib-nodejs@13.2.1":
+  version "13.2.1"
+  resolved "https://registry.npmjs.org/@emurgo/cardano-serialization-lib-nodejs/-/cardano-serialization-lib-nodejs-13.2.1.tgz"
+  integrity sha512-0g2O3YHnoQbkHj5M8FB7ftnljXQ9M3zmKxZnwCbYGr1Pw4FkBA0BRh0+GHPlTxyemcpP2yyuW439I9Ds9drFhA==
 
 "@emurgo/cip14-js@^3.0.1":
   version "3.0.1"
   resolved "https://registry.npmjs.org/@emurgo/cip14-js/-/cip14-js-3.0.1.tgz"
   integrity sha512-u0XobeajNSlmeGBmY3ntA+NE/Vns7hKP0xrFzWyAO7YubETOifTjUddJN4gpvXE4S08DPUcNBVe3sx1m5GPIOg==
+  dependencies:
+    bech32 "2.0.0"
+    blake2b "2.1.3"
+
+"@emurgo/cip14-js@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/@emurgo/cip14-js/-/cip14-js-2.0.0.tgz"
+  integrity sha512-EvjgTs4NCqH1j0wxXqWCj31P7NmTzl3aR+9am0OLSsf3NA9GsdKH5QNyXJrvSZILM4yWzlZNum3y8S5PfdM1aA==
   dependencies:
     bech32 "2.0.0"
     blake2b "2.1.3"
@@ -1427,58 +1430,53 @@
     buffer-crc32 "0.2.13"
     fnv-plus "1.3.1"
 
-"@emurgo/cross-csl-browser@6.1.0":
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/@emurgo/cross-csl-browser/-/cross-csl-browser-6.1.0.tgz"
-  integrity sha512-ZSWivgrkFBa7rJxO0hdhN9AnclTBdavGB68FcqKVMaQhEowYLo7kULYcZatiwSGuWvkBIFdd7hAlIDu8VT4F0A==
+"@emurgo/cross-csl-browser@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.npmjs.org/@emurgo/cross-csl-browser/-/cross-csl-browser-6.2.1.tgz"
+  integrity sha512-PFNHKv3Kt/fJAUMUuwhjjumQhjVDROnX9WhfCbau6FY69oDNLALCGhrPmRaL7vhUUrrnOoqhptVAk3Zt8rOOcA==
   dependencies:
-    "@emurgo/cardano-serialization-lib-browser" "13.1.0"
-    "@emurgo/cross-csl-core" "6.1.0"
+    "@emurgo/cardano-serialization-lib-browser" "13.2.1"
+    "@emurgo/cross-csl-core" "6.2.1"
 
-"@emurgo/cross-csl-core@^6.1.0", "@emurgo/cross-csl-core@6.1.0":
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/@emurgo/cross-csl-core/-/cross-csl-core-6.1.0.tgz"
-  integrity sha512-eM6jyhiYkLhie0AKyRpvM1bFpvm3hnbwrbJKy/AB47fZUqbqn/BAIQScQ3tXce0Z9qQ24QLQLBLdqU5u3mL80A==
+"@emurgo/cross-csl-core@^6.1.0", "@emurgo/cross-csl-core@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.npmjs.org/@emurgo/cross-csl-core/-/cross-csl-core-6.2.1.tgz"
+  integrity sha512-oQBBuwWE36I94/9/DY/HUUm3r6725mLqulb8By9C70iAvdgoewDUIIUvBigQhxIuHav8/fbaioJTQIOaj0sVvw==
 
-"@emurgo/cross-csl-core@5.1.2":
-  version "5.1.2"
-  resolved "https://registry.npmjs.org/@emurgo/cross-csl-core/-/cross-csl-core-5.1.2.tgz"
-  integrity sha512-+zR8DR/UEql/S5BBnA6sbEGKVRow7NHI896K8UDt5+W3J3cZVAZEsbm9faaH+DehpqvensVNHwxooxk30wEOpg==
-
-"@emurgo/cross-csl-nodejs@6.1.0":
-  version "6.1.0"
-  resolved "https://registry.npmjs.org/@emurgo/cross-csl-nodejs/-/cross-csl-nodejs-6.1.0.tgz"
-  integrity sha512-xcfAJNT+u4mUF9YEfLOl2m7tfOG/85AFQazuSh8nMVtfdqC8npkuGCSk/CtSB1wLfXG0Nd+e+S4vZfU4JCoVlQ==
+"@emurgo/cross-csl-nodejs@6.2.1":
+  version "6.2.1"
+  resolved "https://registry.npmjs.org/@emurgo/cross-csl-nodejs/-/cross-csl-nodejs-6.2.1.tgz"
+  integrity sha512-mL+s/qlI2qYEjX/ihgrVqh1xWLZti0nuzgJ83Iii+RMjGcFgrvWEFSxVnEFQzomFDEP+4wOAphrO4CaI6rQmgA==
   dependencies:
-    "@emurgo/cardano-serialization-lib-nodejs" "13.1.0"
-    "@emurgo/cardano-serialization-lib-nodejs-gc" "12.1.1"
-    "@emurgo/cross-csl-core" "6.1.0"
+    "@emurgo/cardano-serialization-lib-nodejs" "13.2.1"
+    "@emurgo/cross-csl-core" "6.2.1"
 
-"@emurgo/yoroi-eutxo-txs@0.0.4":
-  version "0.0.4"
-  resolved "https://registry.npmjs.org/@emurgo/yoroi-eutxo-txs/-/yoroi-eutxo-txs-0.0.4.tgz"
-  integrity sha512-sARWPXdxl+b0pMq4xafUzF30ToOEbwybs74Pcrj6sCuLsV01QZnzXS5zR9p6Q/V2xy+w+I2Y8fz7AhClQUV72A==
+"@emurgo/yoroi-eutxo-txs@0.0.5":
+  version "0.0.5"
+  resolved "https://registry.npmjs.org/@emurgo/yoroi-eutxo-txs/-/yoroi-eutxo-txs-0.0.5.tgz"
+  integrity sha512-yhJOkRs3aiWIp0HrWv2HnNC3fnXecVt3zlHAY5KZmfTDY9JdR31WcDDrOB7U0zGHzshCCoUn2W8AkZCIEaO58Q==
   dependencies:
     "@cardano-foundation/ledgerjs-hw-app-cardano" "7.1.3"
-    "@emurgo/cross-csl-core" "6.1.0"
+    "@emurgo/cross-csl-core" "6.2.1"
     axios "^0.27.2"
     bech32 "^2.0.0"
     bignumber.js "^9.1.0"
     bip39 "^3.0.4"
     hash-wasm "^4.9.0"
 
-"@emurgo/yoroi-lib@1.2.3":
-  version "1.2.3"
-  resolved "https://registry.npmjs.org/@emurgo/yoroi-lib/-/yoroi-lib-1.2.3.tgz"
-  integrity sha512-dvrn11mUQDwK9olJ9+gs6h/IHLIvNum1g3CLGktUWTkhnEyY3Bl7YswGUlVvWw4KKrTouHjyBe4QucgluRpjZw==
+"@emurgo/yoroi-lib@2.2.6":
+  version "2.2.6"
+  resolved "https://registry.npmjs.org/@emurgo/yoroi-lib/-/yoroi-lib-2.2.6.tgz"
+  integrity sha512-MUAyaoWu/C9feJn42QUIwWAZMRBl5YCWEsqeP6Zs4FVw02E4b6Rb7AR22rsMJCZBFm540V0U5ZcyllU9r1H41w==
   dependencies:
     "@cardano-foundation/ledgerjs-hw-app-cardano" "^7.1.3"
-    "@emurgo/cross-csl-core" "5.1.2"
+    "@emurgo/cross-csl-core" "6.2.1"
     "@noble/hashes" "^1.3.2"
     axios "^1.7.5"
     axios-cache-interceptor "^1.5.3"
     bech32 "^2.0.0"
     bignumber.js "^9.0.1"
+    blake2b "2.1.4"
     easy-crc "1.1.0"
 
 "@eslint-community/eslint-utils@^4.2.0", "@eslint-community/eslint-utils@^4.4.0":
@@ -3556,84 +3554,84 @@
     "@types/yargs-parser" "*"
 
 "@typescript-eslint/eslint-plugin@^8.4.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.18.0.tgz"
-  integrity sha512-NR2yS7qUqCL7AIxdJUQf2MKKNDVNaig/dEB0GBLU7D+ZdHgK1NoH/3wsgO3OnPVipn51tG3MAwaODEGil70WEw==
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.21.0.tgz"
+  integrity sha512-eTH+UOR4I7WbdQnG4Z48ebIA6Bgi7WO8HvFEneeYBxG8qCOYgTOFPSg6ek9ITIDvGjDQzWHcoWHCDO2biByNzA==
   dependencies:
     "@eslint-community/regexpp" "^4.10.0"
-    "@typescript-eslint/scope-manager" "8.18.0"
-    "@typescript-eslint/type-utils" "8.18.0"
-    "@typescript-eslint/utils" "8.18.0"
-    "@typescript-eslint/visitor-keys" "8.18.0"
+    "@typescript-eslint/scope-manager" "8.21.0"
+    "@typescript-eslint/type-utils" "8.21.0"
+    "@typescript-eslint/utils" "8.21.0"
+    "@typescript-eslint/visitor-keys" "8.21.0"
     graphemer "^1.4.0"
     ignore "^5.3.1"
     natural-compare "^1.4.0"
-    ts-api-utils "^1.3.0"
+    ts-api-utils "^2.0.0"
 
 "@typescript-eslint/parser@^8.4.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.18.0.tgz"
-  integrity sha512-hgUZ3kTEpVzKaK3uNibExUYm6SKKOmTU2BOxBSvOYwtJEPdVQ70kZJpPjstlnhCHcuc2WGfSbpKlb/69ttyN5Q==
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-8.21.0.tgz"
+  integrity sha512-Wy+/sdEH9kI3w9civgACwabHbKl+qIOu0uFZ9IMKzX3Jpv9og0ZBJrZExGrPpFAY7rWsXuxs5e7CPPP17A4eYA==
   dependencies:
-    "@typescript-eslint/scope-manager" "8.18.0"
-    "@typescript-eslint/types" "8.18.0"
-    "@typescript-eslint/typescript-estree" "8.18.0"
-    "@typescript-eslint/visitor-keys" "8.18.0"
+    "@typescript-eslint/scope-manager" "8.21.0"
+    "@typescript-eslint/types" "8.21.0"
+    "@typescript-eslint/typescript-estree" "8.21.0"
+    "@typescript-eslint/visitor-keys" "8.21.0"
     debug "^4.3.4"
 
-"@typescript-eslint/scope-manager@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.18.0.tgz"
-  integrity sha512-PNGcHop0jkK2WVYGotk/hxj+UFLhXtGPiGtiaWgVBVP1jhMoMCHlTyJA+hEj4rszoSdLTK3fN4oOatrL0Cp+Xw==
+"@typescript-eslint/scope-manager@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/scope-manager/-/scope-manager-8.21.0.tgz"
+  integrity sha512-G3IBKz0/0IPfdeGRMbp+4rbjfSSdnGkXsM/pFZA8zM9t9klXDnB/YnKOBQ0GoPmoROa4bCq2NeHgJa5ydsQ4mA==
   dependencies:
-    "@typescript-eslint/types" "8.18.0"
-    "@typescript-eslint/visitor-keys" "8.18.0"
+    "@typescript-eslint/types" "8.21.0"
+    "@typescript-eslint/visitor-keys" "8.21.0"
 
-"@typescript-eslint/type-utils@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-8.18.0.tgz"
-  integrity sha512-er224jRepVAVLnMF2Q7MZJCq5CsdH2oqjP4dT7K6ij09Kyd+R21r7UVJrF0buMVdZS5QRhDzpvzAxHxabQadow==
+"@typescript-eslint/type-utils@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/type-utils/-/type-utils-8.21.0.tgz"
+  integrity sha512-95OsL6J2BtzoBxHicoXHxgk3z+9P3BEcQTpBKriqiYzLKnM2DeSqs+sndMKdamU8FosiadQFT3D+BSL9EKnAJQ==
   dependencies:
-    "@typescript-eslint/typescript-estree" "8.18.0"
-    "@typescript-eslint/utils" "8.18.0"
+    "@typescript-eslint/typescript-estree" "8.21.0"
+    "@typescript-eslint/utils" "8.21.0"
     debug "^4.3.4"
-    ts-api-utils "^1.3.0"
+    ts-api-utils "^2.0.0"
 
-"@typescript-eslint/types@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.18.0.tgz"
-  integrity sha512-FNYxgyTCAnFwTrzpBGq+zrnoTO4x0c1CKYY5MuUTzpScqmY5fmsh2o3+57lqdI3NZucBDCzDgdEbIaNfAjAHQA==
+"@typescript-eslint/types@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/types/-/types-8.21.0.tgz"
+  integrity sha512-PAL6LUuQwotLW2a8VsySDBwYMm129vFm4tMVlylzdoTybTHaAi0oBp7Ac6LhSrHHOdLM3efH+nAR6hAWoMF89A==
 
-"@typescript-eslint/typescript-estree@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.18.0.tgz"
-  integrity sha512-rqQgFRu6yPkauz+ms3nQpohwejS8bvgbPyIDq13cgEDbkXt4LH4OkDMT0/fN1RUtzG8e8AKJyDBoocuQh8qNeg==
+"@typescript-eslint/typescript-estree@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/typescript-estree/-/typescript-estree-8.21.0.tgz"
+  integrity sha512-x+aeKh/AjAArSauz0GiQZsjT8ciadNMHdkUSwBB9Z6PrKc/4knM4g3UfHml6oDJmKC88a6//cdxnO/+P2LkMcg==
   dependencies:
-    "@typescript-eslint/types" "8.18.0"
-    "@typescript-eslint/visitor-keys" "8.18.0"
+    "@typescript-eslint/types" "8.21.0"
+    "@typescript-eslint/visitor-keys" "8.21.0"
     debug "^4.3.4"
     fast-glob "^3.3.2"
     is-glob "^4.0.3"
     minimatch "^9.0.4"
     semver "^7.6.0"
-    ts-api-utils "^1.3.0"
+    ts-api-utils "^2.0.0"
 
-"@typescript-eslint/utils@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.18.0.tgz"
-  integrity sha512-p6GLdY383i7h5b0Qrfbix3Vc3+J2k6QWw6UMUeY5JGfm3C5LbZ4QIZzJNoNOfgyRe0uuYKjvVOsO/jD4SJO+xg==
+"@typescript-eslint/utils@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/utils/-/utils-8.21.0.tgz"
+  integrity sha512-xcXBfcq0Kaxgj7dwejMbFyq7IOHgpNMtVuDveK7w3ZGwG9owKzhALVwKpTF2yrZmEwl9SWdetf3fxNzJQaVuxw==
   dependencies:
     "@eslint-community/eslint-utils" "^4.4.0"
-    "@typescript-eslint/scope-manager" "8.18.0"
-    "@typescript-eslint/types" "8.18.0"
-    "@typescript-eslint/typescript-estree" "8.18.0"
+    "@typescript-eslint/scope-manager" "8.21.0"
+    "@typescript-eslint/types" "8.21.0"
+    "@typescript-eslint/typescript-estree" "8.21.0"
 
-"@typescript-eslint/visitor-keys@8.18.0":
-  version "8.18.0"
-  resolved "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.18.0.tgz"
-  integrity sha512-pCh/qEA8Lb1wVIqNvBke8UaRjJ6wrAWkJO5yyIbs8Yx6TNGYyfNjOo61tLv+WwLvoLPp4BQ8B7AHKijl8NGUfw==
+"@typescript-eslint/visitor-keys@8.21.0":
+  version "8.21.0"
+  resolved "https://registry.npmjs.org/@typescript-eslint/visitor-keys/-/visitor-keys-8.21.0.tgz"
+  integrity sha512-BkLMNpdV6prozk8LlyK/SOoWLmUFi+ZD+pcqti9ILCbVvHGk1ui1g4jJOc2WDLaeExz2qWwojxlPce5PljcT3w==
   dependencies:
-    "@typescript-eslint/types" "8.18.0"
+    "@typescript-eslint/types" "8.21.0"
     eslint-visitor-keys "^4.2.0"
 
 "@ungap/structured-clone@^1.2.0":
@@ -8913,9 +8911,9 @@ is-ci@^2.0.0:
     ci-info "^2.0.0"
 
 is-core-module@^2.13.0, is-core-module@^2.15.1, is-core-module@^2.5.0:
-  version "2.15.1"
-  resolved "https://registry.npmjs.org/is-core-module/-/is-core-module-2.15.1.tgz"
-  integrity sha512-z0vtXSwucUJtANQWldhbtbt7BnL0vxiFjIdDLAatwhDYty2bad6s+rijD6Ri4YuYJubLzIJLUidCh09e1djEVQ==
+  version "2.16.1"
+  resolved "https://registry.npmjs.org/is-core-module/-/is-core-module-2.16.1.tgz"
+  integrity sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==
   dependencies:
     hasown "^2.0.2"
 
@@ -14097,10 +14095,10 @@ trough@^1.0.0:
   resolved "https://registry.npmjs.org/true-case-path/-/true-case-path-2.2.1.tgz"
   integrity sha512-0z3j8R7MCjy10kc/g+qg7Ln3alJTodw9aDuVWZa3uiWqfuBMKeAeP2ocWcxoyM3D73yz3Jt/Pu4qPr4wHSdB/Q==
 
-ts-api-utils@^1.3.0:
-  version "1.4.3"
-  resolved "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-1.4.3.tgz"
-  integrity sha512-i3eMG77UTMD0hZhgRS562pv83RC6ukSAC2GMNWc+9dieh/+jDM5u5YG+NHX6VNDRHQcHwmsTHctP9LhbC3WxVw==
+ts-api-utils@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/ts-api-utils/-/ts-api-utils-2.0.0.tgz"
+  integrity sha512-xCt/TOAc+EOHS1XPnijD3/yzpH6qg2xppZO1YDqGoVsNXfQfzHpOdNuXwrwOU8u4ITXJyDCTyt8w5g1sZv9ynQ==
 
 ts-expect@^1.1.0:
   version "1.3.0"

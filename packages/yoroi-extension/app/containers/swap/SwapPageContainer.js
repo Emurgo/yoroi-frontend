@@ -15,12 +15,9 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
-<<<<<<< HEAD
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
-=======
 import type { StoresProps } from '../../stores';
->>>>>>> develop
 
 type Props = {|
   +children?: Node,
@@ -61,50 +58,33 @@ export default class SwapPageContainer extends Component<AllProps> {
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
 
-    const menu = (
-      <SwapMenu
-        onItemClick={route => stores.app.goToRoute({ route })}
-        isActiveItem={this.isActivePage}
-      />
-    );
+    const menu = <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />;
 
     return (
-        <IntlProvider intl={intl}>
-          <TopBarLayout
-            banner={<BannerContainer stores={stores} />}
-            sidebar={sidebarContainer}
-            isErrorPage={isErrorPage}
-<<<<<<< HEAD
-          />
-        }
-        showInContainer
-        showAsCard
-        withPadding={false}
-        intl={this.context.intl}
-      >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-          <ReviewTxProvider stores={stores} intl={this.context.intl}>
-            <ReviewTxModal />
-            {children}
-          </ReviewTxProvider>
-        </SwapFormProvider>
-      </TopBarLayout>
-=======
-            navbar={
-              <NavBarContainerRevamp
-                stores={stores}
-                title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-                menu={menu}
-                isErrorPage={isErrorPage}
-              />
-            }
-            showInContainer
-            withPadding={false}
-          >
-            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-          </TopBarLayout>
-        </IntlProvider>
->>>>>>> develop
+      <IntlProvider intl={intl}>
+        <TopBarLayout
+          banner={<BannerContainer stores={stores} />}
+          sidebar={sidebarContainer}
+          isErrorPage={isErrorPage}
+          navbar={
+            <NavBarContainerRevamp
+              stores={stores}
+              title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+              menu={menu}
+              isErrorPage={isErrorPage}
+            />
+          }
+          showInContainer
+          withPadding={false}
+        >
+          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+            <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxModal />
+              {children}
+            </ReviewTxProvider>
+          </SwapFormProvider>{' '}
+        </TopBarLayout>
+      </IntlProvider>
     );
   }
 }

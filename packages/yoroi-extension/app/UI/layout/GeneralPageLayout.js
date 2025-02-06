@@ -28,7 +28,6 @@ export default class GeneralPageLayout extends React.Component {
 
     return (
       <IntlProvider intl={intl}>
-<<<<<<< HEAD
         <ReviewTxProvider stores={stores}>
           <ModalProvider>
             <ModalManager />
@@ -42,14 +41,6 @@ export default class GeneralPageLayout extends React.Component {
             </TopBarLayout>
           </ModalProvider>
         </ReviewTxProvider>
-=======
-        <ModalProvider>
-          <ModalManager />
-          <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
-            {children}
-          </TopBarLayout>
-        </ModalProvider>
->>>>>>> develop
       </IntlProvider>
     );
   }

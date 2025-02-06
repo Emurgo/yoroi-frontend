@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { getPrivateStakingKey } from '../../../../api/thunk';
 import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
@@ -16,6 +17,8 @@ type ModalState = {
 type ModalActions = {
   openTxReviewModal: any;
   changeModalView: any;
+  changePasswordInputValue: any;
+  setInputError: any;
   closeTxReviewModal: () => void;
   startLoadingTxReview: () => void;
   stopLoadingTxReview: () => void;
@@ -42,11 +45,14 @@ export const ReviewTxProvider = ({
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const currentWalletInfo = createCurrrentWalletInfo(stores);
-  console.log('intlintlintl', intl);
-  useEffect(() => {
-    const { wallets } = stores;
-    const { selected } = wallets;
-  }, []);
+
+  const checkUserPassword = async (password: string): Promise<any> => {
+    try {
+      await getPrivateStakingKey({ publicDeriverId: currentWalletInfo?.walletId, password });
+    } catch (error) {
+      return error;
+    }
+  };
 
   const actions = React.useRef<ModalActions>({
     closeTxReviewModal: () => {
@@ -62,12 +68,25 @@ export const ReviewTxProvider = ({
         unsignedTx: payload.unsignedTx,
         receiverCustomTitle: payload.receiverCustomTitle,
         inputState: payload.inputState,
+        submitTx: payload.submitTx,
       });
     },
     changeModalView: (payload: any) => {
       dispatch({
         type: 'changeModalView',
         modalView: payload.modalView,
+      });
+    },
+    changePasswordInputValue: (payload: any) => {
+      dispatch({
+        type: 'changeInputValue',
+        passswordInput: payload.passswordInput,
+      });
+    },
+    setInputError: (payload: any) => {
+      dispatch({
+        type: 'setInputError',
+        inputError: payload.inputError,
       });
     },
     startLoadingTxReview: () => dispatch({ type: 'startLoading' }),
@@ -84,6 +103,7 @@ export const ReviewTxProvider = ({
       primaryTokenInfo: currentWalletInfo?.primaryTokenInfo,
       walletAddresses: currentWalletInfo?.walletAddresses,
       stakingAddress: currentWalletInfo?.stakingAddress,
+      checkUserPassword,
       ...actions,
     }),
     [state, actions]
@@ -113,10 +133,17 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
         receiverCustomTitle: action.receiverCustomTitle,
         inputState: action.inputState,
+        submitTx: action.submitTx,
       };
 
     case 'changeModalView':
       return { ...state, modalView: action.modalView, title: action.title };
+
+    case 'changeInputValue':
+      return { ...state, passswordInput: action.passswordInput };
+
+    case 'setInputError':
+      return { ...state, inputError: action.inputError };
 
     case 'close':
       return { ...defaultState, isOpen: false };
@@ -141,4 +168,6 @@ const defaultState: ModalState = Object.freeze({
   isLoading: false,
   modalView: 'transactionReview',
   unsignedTx: '',
+  passwordInputValue: '',
+  inputError: null,
 });

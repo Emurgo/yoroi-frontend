@@ -3,13 +3,20 @@ import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 
 export const BottomActions = () => {
-  const { closeTxReviewModal, changeModalView, modalView, inputState } = useTxReviewModal();
+  const { closeTxReviewModal, changeModalView, modalView, submitTx, passswordInput } = useTxReviewModal();
+
+  console.log('BottomActions', passswordInput);
 
   if (modalView === 'submitTx') {
     return (
       <Stack direction="row" justifyContent="space-between" p="24px">
-        {/* @ts-ignore */}
-        <Button variant="primary" sx={{ width: '100%' }} onClick={inputState.submit}>
+        <Button
+          //  @ts-ignore
+          variant="primary"
+          sx={{ width: '100%' }}
+          onClick={() => submitTx(passswordInput)}
+          disabled={passswordInput === undefined}
+        >
           Submit
         </Button>
       </Stack>
@@ -19,7 +26,7 @@ export const BottomActions = () => {
   return (
     <Box
       borderTop="1px solid"
-      borderColor="ds.bg_color_contrast_medium"
+      borderColor="ds.gray_200"
       position="absolute"
       bottom={0}
       width="100%"

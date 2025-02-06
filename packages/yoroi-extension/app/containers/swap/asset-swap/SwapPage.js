@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, useCallback } from 'react';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
@@ -14,11 +14,11 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 import useSwapForm from '../context/swap-form/useSwapForm';
 import globalMessages from '../../../i18n/global-messages';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { CreateSwapOrder } from './CreateSwapOrder';
 import { useSwap } from '@yoroi/swap';
-import { runInAction, useObserver } from 'mobx';
+import { runInAction } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { ROUTES } from '../../../routes-config';
 import { PriceImpactAlert } from '../../../components/swap/PriceImpact';
@@ -40,21 +40,8 @@ import { LiquidityPool } from './LiquidityPool';
 import { TransactionSummary } from './TransactionSummary';
 import { unignedTxReviewMock } from './txReviewMock';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
+import { useObserver } from 'mobx-react-lite';
 
-<<<<<<< HEAD
-const messages = defineMessages({
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
-
-=======
->>>>>>> develop
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
 export const LIMIT_PRICE_WARNING_THRESHOLD = 0.1;
@@ -71,7 +58,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal } = useTxReviewModal();
+  const { openTxReviewModal, setInputError, unsignedTx, closeTxReviewModal, checkUserPassword } = useTxReviewModal();
 
   const {
     slippage,
@@ -92,20 +79,10 @@ function SwapPage(props: StoresProps & Intl): Node {
   const walletType: string = wallet.type;
   const isHardwareWallet = wallet.isHardware;
   const network = getNetworkById(wallet.networkId);
-<<<<<<< HEAD
-  const defaultTokenInfo = props.stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
   const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
-    props.stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
-=======
-  const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
     stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    getTokenInfoBatch([id])[id].then(res => res ?? {});
->>>>>>> develop
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -123,8 +100,11 @@ function SwapPage(props: StoresProps & Intl): Node {
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
   const [parsedSignRequest, setParsedSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
-  console.log('userPasswordState', userPasswordState?.value);
-  console.log('txSubmitErrorState', txSubmitErrorState);
+
+  // useEffect(() => {
+  //   userPasswordState?.update(passwordInputValue);
+  // }, [passwordInputValue, userPasswordState?.value]);
+
   useEffect(
     () => () => {
       // UNMOUNT
@@ -132,21 +112,6 @@ function SwapPage(props: StoresProps & Intl): Node {
     },
     []
   );
-
-  // useEffect(() => {
-  //   const liquidityPool = (
-  //     <LiquidityPool /> // liquidityPoolIcon={poolIcon} liquidityPoolName={poolProviderFormatted} poolUrl={poolUrl} />
-  //   );
-
-  //   console.log('unignedTxReviewMock', unignedTxReviewMock);
-  //   openTxReviewModal({
-  //     title: 'Transaction confirmation (Swap in progress)',
-  //     modalView: 'transactionReview',
-  //     receiverCustomTitle: liquidityPool ?? undefined,
-  //     details: { component: <TransactionSummary /> }, //orderData={orderData} />, title: strings.swapDetailsTitle },
-  //     unsignedTx: unignedTxReviewMock, // send if for here just to make it work - later can take it from store inseide review modal manager
-  //   });
-  // }, []);
 
   const swapFormCanContinue =
     selectedPoolCalculation != null &&
@@ -156,13 +121,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     buyQuantity.error == null &&
     isValidTickers;
 
-<<<<<<< HEAD
-  // const confirmationCanContinue = (isHardwareWallet || userPasswordState?.value !== '') && signRequest != null;
   const confirmationCanContinue = true;
-=======
-  const confirmationCanContinue = (isHardwareWallet || userPasswordState?.value !== '') && signRequest != null;
->>>>>>> develop
-
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
   const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
@@ -245,42 +204,27 @@ function SwapPage(props: StoresProps & Intl): Node {
     return `${val} ${currency}`;
   };
 
-  async function processSwapOrder() {
+  const processSwapOrder = async () => {
     try {
       if (orderStep === 0) {
         handleInitialStep();
       } else if (orderStep === 1) {
-        // await handleSubmitTransaction();
-
         const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
-        const isPasswordError = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
+
         openTxReviewModal({
           title: 'Transaction confirmation (Swap in progress)',
           modalView: 'transactionReview',
           receiverCustomTitle: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
-          inputState: {
-            value: userPasswordState?.value,
-            error: txSubmitErrorState.value instanceof IncorrectWalletPasswordError,
-            submit: () => {
-              console.log('isPasswordErrorisPasswordError', txSubmitErrorState);
-              // if (isPasswordError !== undefined) {
-              // }
-              // handleSubmitTransaction();
-            },
-            onChange: e => {
-              console.log('-------2323232onChange', e.target.value);
-              txSubmitErrorState.update(null);
-              userPasswordState?.update(e.target.value);
-            },
+          submitTx: pasword => {
+            handleSubmitTransaction(pasword);
           },
-          unsignedTx: parsedSignRequest, // send if for here just to make it work - later can take it from store inside review modal manager
+          unsignedTx: parsedSignRequest, // Ensure it stays in sync with the store
         });
       }
     } catch (error) {
       console.error('Error handling next step', error);
-      // Handle error appropriately
     }
-  }
+  };
 
   function processBackToStart() {
     runInAction(() => {
@@ -323,59 +267,65 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
+  const handleSubmitTransaction = async passswordInput => {
+    if (signRequest == null) return;
+    validateSignRequestAndUserPassword(passswordInput);
+    const response = await checkUserPassword(passswordInput);
 
-  async function handleSubmitTransaction() {
-    if (openedDialog !== '' || signRequest == null) return;
+    if (response?.name === 'WrongPassphraseError') {
+      console.log('WrongPassphraseError', response);
+      setInputError({ type: 'setInputError', inputError: true });
+    } else {
+      setOpenedDialog('loadingOverlay');
 
-    validateSignRequestAndUserPassword();
-    setOpenedDialog('loadingOverlay');
-    const password = userPasswordState?.value;
-
-    const baseBroadcastRequest = { wallet, signRequest };
-    const broadcastRequest = isHardwareWallet
-      ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password } };
-    try {
-      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
-      // $FlowIgnore[incompatible-call]
-      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
-      setOrderStepValue(2);
+      const baseBroadcastRequest = { wallet, signRequest };
+      const broadcastRequest = isHardwareWallet
+        ? { [walletType]: baseBroadcastRequest }
+        : { normal: { ...baseBroadcastRequest, passswordInput } };
       try {
-        ampli.swapOrderSubmitted({
-          ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-          from_amount: sellQuantity.displayValue,
-          to_amount: buyQuantity.displayValue,
-          pool_source: selectedPoolCalculation?.pool.provider,
-          order_type: orderType,
-          slippage_tolerance: Number(slippageValue),
-          swap_fees: Number(formattedFeeQuantity),
-        });
+        const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
+        // $FlowIgnore[incompatible-call]
+        await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+        setOrderStepValue(2);
+        try {
+          ampli.swapOrderSubmitted({
+            ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+            from_amount: sellQuantity.displayValue,
+            to_amount: buyQuantity.displayValue,
+            pool_source: selectedPoolCalculation?.pool.provider,
+            order_type: orderType,
+            slippage_tolerance: Number(slippageValue),
+            swap_fees: Number(formattedFeeQuantity),
+          });
+        } catch (e) {
+          console.error('analytics fail', e);
+        }
+        resetSwapForm();
       } catch (e) {
-        console.error('analytics fail', e);
+        handleTransactionError(e);
+      } finally {
+        setOpenedDialog('');
       }
-      resetSwapForm();
-    } catch (e) {
-      handleTransactionError(e);
-    } finally {
-      setOpenedDialog('');
     }
-  }
+  };
 
-  function validateSignRequestAndUserPassword() {
+  const validateSignRequestAndUserPassword = password => {
     if (signRequest == null) {
       throw new Error('Incorrect state! Order transaction is not prepared properly');
     }
     if (!isHardwareWallet) {
-      if (userPasswordState?.value === '') {
+      if (password === '') {
         throw new Error('Incorrect state! User password is required');
       }
     }
-  }
+  };
 
   function handleTransactionError(e) {
     const isPasswordError = e instanceof IncorrectWalletPasswordError;
     runInAction(() => {
       txSubmitErrorState.update(e);
+      console.log('SWAPP ERROROOR', e);
+      closeTxReviewModal();
       setOrderStepValue(isPasswordError ? 1 : 2);
     });
     if (!isPasswordError) {
@@ -408,19 +358,12 @@ function SwapPage(props: StoresProps & Intl): Node {
       ptFees,
       poolProvider,
     };
-<<<<<<< HEAD
-    const txSignRequest: HaskellShelleyTxSignRequest = await props.stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     const unsigned = txSignRequest;
-    console.log('txSignRequest', unsigned);
     const txBodyjson = await unsigned.unsignedTx.build_tx().to_json();
 
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
-    console.log('parsedUnsignedTx', parsedUnsignedTx);
-
-=======
-    const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
->>>>>>> develop
     runInAction(() => {
       setParsedSignRequest(parsedUnsignedTx);
       setSignRequest(txSignRequest);
@@ -496,12 +439,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               variant="primary"
               disabled={!isSwapEnabled || isButtonLoader}
             >
-<<<<<<< HEAD
-              {(isButtonLoader && <LoadingSpinner small color={3} />) ||
-                (orderStep === 0 ? 'Swap' : intl(confirmationButtonMessage()))}
-=======
               {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
->>>>>>> develop
             </Button>
           </Box>
         )}
