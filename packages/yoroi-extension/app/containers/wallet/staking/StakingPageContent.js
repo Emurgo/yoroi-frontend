@@ -29,6 +29,7 @@ import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDia
 import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import type { StoresProps } from '../../../stores';
+import { ampli } from '../../../../ampli/index';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -222,6 +223,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         return;
       }
       this.createWithdrawalTx(false) // shouldDeregister=false
+      ampli.claimAdaPageViewed();
     };
 
     return (
