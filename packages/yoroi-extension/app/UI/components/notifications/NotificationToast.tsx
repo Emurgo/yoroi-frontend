@@ -88,9 +88,16 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-export default function NotificationToast({ onClick, onClose, text, type }: Props) {
+export default function NotificationToast({ onClick, onClose, type }: Props) {
   const strings = useStrings();
   const theme = useTheme();
+
+  const notificationTexts = {
+    [NotificationTypes.Rewards]: strings.clickToView,
+    [NotificationTypes.Income]: strings.tokensReceived,
+    [NotificationTypes.Outcome]: strings.tokensSent,
+    [NotificationTypes.Cancelled]: strings.txFailed,
+  }
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -112,7 +119,7 @@ export default function NotificationToast({ onClick, onClose, text, type }: Prop
           <NotificationIcon type={type} />
         </Box>
         <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{text}</Typography>
+          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[type]}</Typography>
           <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
         </Box>
         <Box px="12px" flexShrink={0}>
