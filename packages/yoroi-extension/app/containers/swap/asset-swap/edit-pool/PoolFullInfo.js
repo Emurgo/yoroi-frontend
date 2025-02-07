@@ -71,7 +71,7 @@ export default function SwapPoolFullInfo({ defaultTokenInfo, withInfo, showMinAd
             />
           )}
         </Box>
-        <Typography color="ds.text_gray_medium">{formattedFee}</Typography>
+        <Typography color="ds.text_gray_medium">{formattedFee}ssss</Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box color="grayscale.600" display="flex" alignItems="center" gap="8px">

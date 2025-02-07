@@ -19,6 +19,8 @@ type ModalActions = {
   changeModalView: any;
   changePasswordInputValue: any;
   setInputError: any;
+  chooseDrepId: any;
+  setUnsignedTx: any;
   closeTxReviewModal: () => void;
   startLoadingTxReview: () => void;
   stopLoadingTxReview: () => void;
@@ -65,10 +67,12 @@ export const ReviewTxProvider = ({
         content: payload.content,
         height: payload.height,
         width: payload.width,
+        modalView: payload.modalView,
         unsignedTx: payload.unsignedTx,
         receiverCustomTitle: payload.receiverCustomTitle,
-        inputState: payload.inputState,
         submitTx: payload.submitTx,
+        createUnsignedTx: payload.createUnsignedTx,
+        operationFee: payload.operationFee,
       });
     },
     changeModalView: (payload: any) => {
@@ -83,14 +87,26 @@ export const ReviewTxProvider = ({
         passswordInput: payload.passswordInput,
       });
     },
+    chooseDrepId: (payload: any) => {
+      dispatch({
+        type: 'chooseDrepId',
+        drepId: payload.drepId,
+      });
+    },
     setInputError: (payload: any) => {
       dispatch({
         type: 'setInputError',
         inputError: payload.inputError,
       });
     },
-    startLoadingTxReview: () => dispatch({ type: 'startLoading' }),
-    stopLoadingTxReview: () => dispatch({ type: 'stopLoading' }),
+    setUnsignedTx: (payload: any) => {
+      dispatch({
+        type: 'setUnsignedTx',
+        unsignedTx: payload.unsignedTx,
+      });
+    },
+    startLoadingTxReview: () => dispatch({ type: 'startLoading', isLoading: true }),
+    stopLoadingTxReview: () => dispatch({ type: 'stopLoading', isLoading: false }),
   }).current;
   const context: any = React.useMemo(
     () => ({
@@ -103,6 +119,7 @@ export const ReviewTxProvider = ({
       primaryTokenInfo: currentWalletInfo?.primaryTokenInfo,
       walletAddresses: currentWalletInfo?.walletAddresses,
       stakingAddress: currentWalletInfo?.stakingAddress,
+      primaryBalance: currentWalletInfo?.walletBalance.ada,
       checkUserPassword,
       ...actions,
     }),
@@ -132,8 +149,9 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         modalView: action.modalView ?? defaultState.modalView,
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
         receiverCustomTitle: action.receiverCustomTitle,
-        inputState: action.inputState,
+        operationFee: action.operationFee,
         submitTx: action.submitTx,
+        createUnsignedTx: action.createUnsignedTx,
       };
 
     case 'changeModalView':
@@ -142,8 +160,14 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
     case 'changeInputValue':
       return { ...state, passswordInput: action.passswordInput };
 
+    case 'chooseDrepId':
+      return { ...state, drepId: action.drepId };
+
     case 'setInputError':
       return { ...state, inputError: action.inputError };
+
+    case 'setUnsignedTx':
+      return { ...state, unsignedTx: action.unsignedTx };
 
     case 'close':
       return { ...defaultState, isOpen: false };
@@ -167,7 +191,8 @@ const defaultState: ModalState = Object.freeze({
   width: '648px',
   isLoading: false,
   modalView: 'transactionReview',
-  unsignedTx: '',
-  passwordInputValue: '',
+  unsignedTx: null,
+  passswordInput: '',
   inputError: null,
+  drepId: '',
 });

@@ -214,21 +214,6 @@ export default function ConfirmSwapTransaction({
           </Typography>
         </Box>
       </GradientBox>
-      {/* {userPasswordState != null && (
-        <Box>
-          <TextField
-            className="walletPassword"
-            value={userPasswordState.value}
-            label={strings.password}
-            type="password"
-            onChange={e => {
-              txSubmitErrorState.update(null);
-              userPasswordState.update(e.target.value);
-            }}
-            error={isIncorrectPassword && strings.passwordIncorrect}
-          />
-        </Box>
-      )} */}
     </Box>
   );
 }

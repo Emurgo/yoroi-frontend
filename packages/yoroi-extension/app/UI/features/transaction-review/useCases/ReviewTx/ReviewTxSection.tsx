@@ -26,8 +26,7 @@ export interface SubMenuOption {
 export const ReviewTxSection = () => {
   const theme = useTheme();
 
-  const { unsignedTx, networkId, details, ftAssetsList, primaryTokenInfo, receiverCustomTitle } = useTxReviewModal();
-  // const txBody = useTxBody({ cbor: undefined, unsignedTx: unignedTxReviewMock });
+  const { unsignedTx, receiverCustomTitle } = useTxReviewModal();
   const formattedTx = useFormattedTx(unsignedTx.body);
   const formattedMetadata = useFormattedMetadata({ txBody: unsignedTx.body, unsignedTx });
 
@@ -45,7 +44,7 @@ export const ReviewTxSection = () => {
     {
       label: 'Metadata',
       route: 'metadata',
-      showTab: true,
+      showTab: formattedMetadata !== undefined,
     },
     {
       label: 'Reference inputs',

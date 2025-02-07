@@ -6,6 +6,7 @@ import WalletAccountIcon from '../../../../../../components/topbar/WalletAccount
 import { truncateAddress } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
+import { useOperations } from '../../../common/operations';
 import { TokenItem } from '../../../common/TokenItem';
 import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
@@ -22,19 +23,29 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
   },
 }));
 
-export const OverviewTab = ({ receiverCustomTitle, tx }) => {
-  const { currentWalletDetails, changeModalView } = useTxReviewModal();
+export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
+  const { currentWalletDetails, changeModalView, stakingAddress, operationFee } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
 
   const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
   const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
+  const operations = useOperations(tx.certificates);
 
   const { plate } = selected;
 
   const currentWalletIcon = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={8} scalePx={4} />;
 
   const waletInfoDsiplay = (
-    <Stack direction="row" alignItems="center" gap="8px">
+    <Stack
+      direction="row"
+      alignItems="center"
+      gap="8px"
+      sx={{
+        '& canvas': {
+          borderRadius: '4px',
+        },
+      }}
+    >
       {currentWalletIcon}
       <Box
         component="button"
@@ -56,19 +67,24 @@ export const OverviewTab = ({ receiverCustomTitle, tx }) => {
       <Stack direction="column" gap="8px">
         <InfoInline label="Wallet" value={waletInfoDsiplay} />
         {/* <InfoInline label="Connected to" value="dapp" /> */}
-        <InfoInline label="Fee" value={`${tx.fee.quantity} ADA`} />
+        <InfoInline label="Fee" value={`-${tx.fee.quantity / 1000000} ADA`} />
       </Stack>
 
       <Divider sx={{ margin: '24px 0px' }} />
 
-      <MyWalletSection tx={tx} notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} />
+      <MyWalletSection
+        tx={tx}
+        notOwnedOutputs={notOwnedOutputs}
+        ownedOutputs={ownedOutputs}
+        stakingAddress={stakingAddress}
+        operationFee={operationFee}
+      />
 
       {receiverCustomTitle !== null && (
         <ExternalPartySection receiverCustomTitle={receiverCustomTitle} output={notOwnedOutputs[0]} />
       )}
 
-      {/* <Divider sx={{ margin: '24px 0px' }} /> */}
-      {/* <OperationsSection /> */}
+      <OperationsSection operations={operations} />
     </Stack>
   );
 };
@@ -86,7 +102,7 @@ const InfoInline = ({ label, value }) => {
   );
 };
 
-const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
+const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx, stakingAddress, operationFee }) => {
   return (
     <Box>
       <Collapsible
@@ -94,10 +110,10 @@ const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
         title="Your Wallet"
         content={
           <Stack gap="12px">
-            <CopyableText value="stake1u9g90x2xqtp4chel0gadzjvjfentxmhskj9k2094zaqe6sqws75rv">
-              <Typography>{truncateAddress('stake1u9g90x2xqtp4chel0gadzjvjfentxmhskj9k2094zaqe6sqws75rv')}</Typography>
+            <CopyableText value={stakingAddress}>
+              <Typography>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
-            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} />
+            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} operationFee={operationFee} />
           </Stack>
         }
       />
@@ -105,7 +121,7 @@ const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx }) => {
   );
 };
 
-const ExternalPartySection = ({ receiverCustomTitle, output }) => {
+const ExternalPartySection = ({ receiverCustomTitle }) => {
   return (
     <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
       <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -116,24 +132,33 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
   );
 };
 
-const OperationsSection = () => {
+const OperationsSection = ({ operations }) => {
+  const componentsNotDuplicated = operations.components
+    .filter(component => !component.duplicated)
+    .map(({ component }) => component);
   return (
     <Box>
+      <Divider sx={{ margin: '24px 0px' }} />
+
       <Collapsible
         expanded={true}
         title="Operations"
         content={
-          <Stack gap="12px">
-            <Typography>Select no confidance</Typography>
-          </Stack>
+          <Box>
+            {[...componentsNotDuplicated].map((operation, index) => {
+              if (index === 0) return operation;
+
+              return <>{operation}</>;
+            })}
+          </Box>
         }
       />
     </Box>
   );
 };
 
-const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs }) => {
-  const totalPrimaryTokenSpent = '-4.33434 ADA';
+const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee }) => {
+  // const totalPrimaryTokenSpent = '-4.33434 ADA';
   const notPrimaryTokenSent = [];
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
@@ -145,7 +170,7 @@ const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs }) => {
           <Typography fontWeight="500">Send</Typography>
         </Stack>
         <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px' }}>
-          <Typography color="ds.white_static">{totalPrimaryTokenSpent}</Typography>
+          <Typography color="ds.white_static">{operationFee?.total}</Typography>
         </Box>
       </Stack>
 

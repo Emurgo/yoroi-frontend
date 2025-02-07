@@ -55,6 +55,7 @@ interface Props {
 }
 
 export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
+  console.log('tokenInfo', tokenInfo);
   const isPrimaryToken: boolean = tokenInfo.id === '-';
 
   const chartHeight = isPrimaryToken ? 153 : 257;
@@ -126,7 +127,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseUp}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.ds.gray_300}/>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={theme.palette.ds.gray_300} />
                   <YAxis
                     domain={['auto', 'auto']}
                     axisLine={false}

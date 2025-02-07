@@ -18,6 +18,7 @@ import { ROUTES } from '../../routes-config';
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 import type { StoresProps } from '../../stores';
+import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 
 type Props = {|
   +children?: Node,
@@ -77,12 +78,14 @@ export default class SwapPageContainer extends Component<AllProps> {
           showInContainer
           withPadding={false}
         >
-          <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-            <ReviewTxProvider stores={stores} intl={this.context.intl}>
-              <ReviewTxModal />
-              {children}
-            </ReviewTxProvider>
-          </SwapFormProvider>{' '}
+          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                <ReviewTxModal />
+                {children}
+              </ReviewTxProvider>
+            </SwapFormProvider>
+          </CurrencyProvider>
         </TopBarLayout>
       </IntlProvider>
     );

@@ -62,7 +62,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     wallet: WalletState,
     poolRequest?: string,
     drepCredential?: string,
-  |}) => Promise<void> = async request => {
+  |}) => Promise<any> = async request => {
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
     const absSlotNumber = new BigNumber(
@@ -83,12 +83,14 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
       absSlotNumber,
       protocolParameters,
     }).promise;
+    console.log('delegationTxPromise', delegationTxPromise);
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
 
     this.markStale(false);
+    return delegationTxPromise;
   };
 
   @action

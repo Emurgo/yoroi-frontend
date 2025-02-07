@@ -8,7 +8,7 @@ import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader'
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
-import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
+import { FormattedCertificate, FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, stakingAddress, networkId } = useTxReviewModal();
@@ -21,6 +21,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const formattedFee = formatFee(primaryTokenInfo, data);
 
   const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
+  const formattedCertificates = formatCertificates(data?.certs);
 
   const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
   const formattedOutputs = useFormattedOutputs(outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses);
@@ -28,7 +29,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
     inputs: formattedInputs,
     outputs: formattedOutputs,
     fee: formattedFee,
-    // certificates: formattedCertificates,
+    certificates: formattedCertificates,
     // mint: formattedMintData,
     referenceInputs: referenceInputs,
   };
@@ -210,4 +211,13 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
 
 const isOwnedAddress = (walletAddresses: any[], bech32Address: string): boolean => {
   return walletAddresses.some(a => a.address === bech32Address);
+};
+
+const formatCertificates = (certificates: TransactionBody['certs']) => {
+  return (
+    certificates?.map(cert => {
+      const [type, certificate] = Object.entries(cert)[0];
+      return ({ type, value: certificate } as unknown) as FormattedCertificate;
+    }) ?? null
+  );
 };

@@ -28,15 +28,11 @@ export default class GeneralPageLayout extends React.Component {
 
     return (
       <IntlProvider intl={intl}>
-        <ReviewTxProvider stores={stores}>
+        <ReviewTxProvider stores={stores} intl={intl}>
           <ModalProvider>
             <ModalManager />
             <ReviewTxManager />
-            <TopBarLayout
-              banner={<BannerContainer actions={actions} stores={stores} />}
-              sidebar={sidebarContainer}
-              navbar={navbar}
-            >
+            <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
               {children}
             </TopBarLayout>
           </ModalProvider>

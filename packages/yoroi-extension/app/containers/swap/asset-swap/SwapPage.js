@@ -89,7 +89,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const priceImpactState: PriceImpact | null =
     impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
-  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
+  const { formattedFeeQuantity, formattedPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
 
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
@@ -218,6 +218,9 @@ function SwapPage(props: StoresProps & Intl): Node {
           submitTx: pasword => {
             handleSubmitTransaction(pasword);
           },
+          operationFee: {
+            total: formattedPtAmount,
+          },
           unsignedTx: parsedSignRequest, // Ensure it stays in sync with the store
         });
       }
@@ -281,7 +284,7 @@ function SwapPage(props: StoresProps & Intl): Node {
       const baseBroadcastRequest = { wallet, signRequest };
       const broadcastRequest = isHardwareWallet
         ? { [walletType]: baseBroadcastRequest }
-        : { normal: { ...baseBroadcastRequest, passswordInput } };
+        : { normal: { ...baseBroadcastRequest, password: passswordInput } };
       try {
         const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
         // $FlowIgnore[incompatible-call]
@@ -305,6 +308,7 @@ function SwapPage(props: StoresProps & Intl): Node {
         handleTransactionError(e);
       } finally {
         setOpenedDialog('');
+        closeTxReviewModal();
       }
     }
   };

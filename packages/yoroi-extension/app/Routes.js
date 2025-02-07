@@ -259,10 +259,7 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
-          <Route
-            path={ROUTES.PORTFOLIO.ROOT}
-            component={() => PortfolioSubpages(stores)}
-          />
+          <Route path={ROUTES.PORTFOLIO.ROOT} component={() => PortfolioSubpages(stores)} />
 
           <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>
@@ -330,25 +327,15 @@ const SettingsSubpages = stores => (
   </Switch>
 );
 
-const PortfolioSubpages = (stores) => (
-  WrapPortfolio({ stores },
+const PortfolioSubpages = stores =>
+  WrapPortfolio(
+    { stores },
     <Switch>
-      <Route exact
-        path={ROUTES.PORTFOLIO.ROOT}
-        component={props => <PortfolioPage {...props} stores={stores} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PORTFOLIO.DAPPS}
-        component={props => <PortfolioDappsPage {...props} stores={stores} />}
-      />
-      <Route exact
-        path={ROUTES.PORTFOLIO.DETAILS}
-        component={props => <PortfolioDetailPage {...props} stores={stores} />}
-      />
+      <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} stores={stores} />} />
+      <Route exact path={ROUTES.PORTFOLIO.DAPPS} component={props => <PortfolioDappsPage {...props} stores={stores} />} />
+      <Route exact path={ROUTES.PORTFOLIO.DETAILS} component={props => <PortfolioDetailPage {...props} stores={stores} />} />
     </Switch>
-  )
-);
+  );
 
 const NFTsSubPages = stores => (
   <Switch>
@@ -445,24 +432,27 @@ export function wrapReceive(receiveProps: StoresProps, children: Node): Node {
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
   const { stores } = governanceProps;
+  const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
   return (
-    <GovernanceContextProvider
-      currentWallet={currentWalletInfo}
-      createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
-      signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
-      txDelegationResult={delegationTxResult}
-      txDelegationError={delegationTxError}
-      tokenInfo={stores.tokenInfoStore.tokenInfo}
-      triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
-      getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
-      ampli={ampli}
-    >
-      <Suspense fallback={null}>{children}</Suspense>;
-    </GovernanceContextProvider>
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <GovernanceContextProvider
+        currentWallet={currentWalletInfo}
+        createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+        signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+        txDelegationResult={delegationTxResult}
+        txDelegationError={delegationTxError}
+        tokenInfo={stores.tokenInfoStore.tokenInfo}
+        triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+        getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
+        ampli={ampli}
+      >
+        <Suspense fallback={null}>{children}</Suspense>;
+      </GovernanceContextProvider>
+    </CurrencyProvider>
   );
 }
 
@@ -501,13 +491,8 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
   };
 
   return (
-    <DappCenterContextProvider
-      currentWallet={currentWalletInfo}
-      openDialogWrapper={openDialogWrapper}
-    >
-      <Suspense fallback={null}>
-        {children}
-      </Suspense>
+    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
+      <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
   );
 }

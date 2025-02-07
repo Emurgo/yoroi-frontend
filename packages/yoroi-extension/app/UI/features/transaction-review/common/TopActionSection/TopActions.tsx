@@ -30,6 +30,12 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
     if (modalView === 'submitTx') {
       return 'Submit Transaction';
     }
+    if (modalView === 'chooseDrepId') {
+      return 'Choose your Drep';
+    }
+    if (modalView === 'operations') {
+      return 'Operations';
+    }
     return 'Transaction Review';
   };
   return (

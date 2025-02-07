@@ -3,12 +3,9 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
-import { useModal } from '../../../../components/modals/ModalContext';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
-import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
 import { BECOME_DREP_LINK, DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK } from '../../common/constants';
@@ -44,13 +41,26 @@ export const GovernanceStatusSelection = () => {
     triggerBuySellAdaDialog,
     submitedTransactions,
     governanceVote,
+    signDelegationTransaction,
+    selectedWallet,
   } = useGovernance();
+
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stopLoadingTxReview,
+    changePasswordInputValue,
+    setInputError,
+    checkUserPassword,
+    drepId,
+    setUnsignedTx,
+  } = useTxReviewModal();
+
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { openModal, closeModal, startLoading } = useModal();
-  const { openTxReviewModal } = useTxReviewModal();
+  // const { openModal, closeModal, startLoading } = useModal();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
@@ -60,24 +70,49 @@ export const GovernanceStatusSelection = () => {
     if (!governanceManager) {
       return;
     }
-    openModal({
-      title: String(strings.chooseDrep).toUpperCase(),
-      content: (
-        <GovernanceProvider manager={governanceManager}>
-          <ChooseDRepModal onSubmit={onSubmit} />
-        </GovernanceProvider>
-      ),
-      width: '648px',
-      height: '304px',
-      isLoading: loadingUnsignTx,
-    });
+    // onSubmit(drepID, 'defaultDrepCredential');
+    // openModal({
+    //   title: String(strings.chooseDrep).toUpperCase(),
+    //   content: (
+    //     <GovernanceProvider manager={governanceManager}>
+    //       <ChooseDRepModal onSubmit={onSubmit} />
+    //     </GovernanceProvider>
+    //   ),
+    //   width: '648px',
+    //   height: '304px',
+    //   isLoading: loadingUnsignTx,
+    // });
+
+    // openTxReviewModal({
+    //   title: 'CHOOSE YOUR DREP',
+    //   modalView: 'chooseDrepId',
+    //   onConfirm: onSubmit,
+    //   submitTx: password => {
+    //     signGovernanceTx(password);
+    //   },
+    // });
   };
 
   const handleDelegate = async () => {
-    openDRepIdModal((drepID, drepCredential) => {
-      const vote: Vote = { kind: 'delegate', drepID };
-      governanceVoteChanged(vote);
-      createUnsignTx(drepCredential);
+    const vote: Vote = { kind: 'delegate', drepID: drepId };
+    governanceVoteChanged(vote);
+    openTxReviewModal({
+      title: 'CHOOSE YOUR DREP',
+      modalView: 'chooseDrepId',
+      createUnsignedTx: async () => {
+        try {
+          startLoadingTxReview();
+          const txSignRequest: any = await createDrepDelegationTransaction('delegate');
+          const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
+          const parsedUnsignedTx = JSON.parse(txBodyjson);
+          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: parsedUnsignedTx });
+        } finally {
+          stopLoadingTxReview();
+        }
+      },
+      submitTx: password => {
+        signGovernanceTx(password);
+      },
     });
   };
 
@@ -96,23 +131,61 @@ export const GovernanceStatusSelection = () => {
   const createUnsignTx = async kind => {
     try {
       setLoadingUnsignTx(true);
-      startLoading();
+
       setTimeout(async () => {
-        await createDrepDelegationTransaction(kind);
+        const txSignRequest: any = await createDrepDelegationTransaction(kind);
+
+        const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
+
+        const parsedUnsignedTx = JSON.parse(txBodyjson);
         openTxReviewModal({
           title: 'Transaction Review',
           modalView: 'transactionReview',
+          unsignedTx: parsedUnsignedTx,
+          operationFee: {
+            total: `${parsedUnsignedTx.body.fee / 1000000} ADA`,
+          },
+          submitTx: password => {
+            signGovernanceTx(password);
+          },
         });
-        // navigateTo.delegationForm(); // TODO add condition for production
         setLoadingUnsignTx(false);
         setError(null);
       }, 200);
     } catch (e) {
       setError('Error trying to Vote. Please try again later');
-      closeModal();
       setLoadingUnsignTx(false);
     }
   };
+
+  const signGovernanceTx = async password => {
+    try {
+      const response = await checkUserPassword(password);
+
+      if (response?.name === 'WrongPassphraseError') {
+        console.log('WrongPassphraseError', response);
+        setInputError({ type: 'setInputError', inputError: true });
+      } else {
+        startLoadingTxReview();
+        await signDelegationTransaction({
+          password,
+          wallet: selectedWallet,
+          dialog: null,
+        });
+        stopLoadingTxReview();
+
+        navigateTo.transactionSubmited();
+        // setPassword('');
+        changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
+      }
+    } catch (error) {
+      console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
+      stopLoadingTxReview();
+
+      navigateTo.transactionFail();
+    }
+  };
+
   // noinspection JSIncompatibleTypesComparison
   const statusDelegating = governanceStatus.status === 'delegate';
   const optionsList = [
@@ -120,10 +193,7 @@ export const GovernanceStatusSelection = () => {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
       titleHover: statusDelegating ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
-      descriptionHover:
-        statusDelegating
-          ? `Current DRep selection: ${governanceStatus.drep}`
-          : strings.designatingSomeoneElse,
+      descriptionHover: statusDelegating ? `Current DRep selection: ${governanceStatus.drep}` : strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
       selected: statusDelegating,
       onClick: handleDelegate,

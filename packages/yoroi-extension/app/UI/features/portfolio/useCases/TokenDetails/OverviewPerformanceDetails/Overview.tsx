@@ -24,7 +24,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
           height="32px"
           sx={{
             backgroundColor: theme.palette.ds.bg_color_max,
-            borderRadius: `8px`,
+            borderRadius: '16px',
           }}
           component="img"
           src={tokenInfo.info.image || tokenPng}
