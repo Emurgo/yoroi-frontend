@@ -1,20 +1,21 @@
-import { IconButton, styled, Box, Typography, useTheme } from '@mui/material';
 import React from 'react';
+import { keyframes } from '@emotion/react'
+import { IconButton, styled, Box, Typography, useTheme } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Icon } from '../icons/index';
+import { NotificationTypes } from '../../types/notifications';
 
-enum NotificationTypes {
-  Income = "Income",
-  Cancelled = "Cancelled",
-  Outcome = "Outcome",
-  Rewards = "Rewards"
+const NOTIFICATION_TIMEOUT = 3000; // 3s
+
+export type NotificationProps = {
+  id: string;
+  type: NotificationTypes;
+  onClick(id: string): void;
+  onClose(id: string): void;
 }
 
-interface Props {
-  text: string;
-  type: NotificationTypes;
-  onClick(): void;
-  onClose(): void;
+type IconProps = {
+  type: NotificationTypes
 }
 
 const IconWrapper = styled(IconButton)(({ theme }: any) => ({
@@ -25,7 +26,28 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
   },
 }));
 
-const SNotificationContainer = styled(Box)(({ theme }) => ({
+const fadeIn = keyframes`
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+`;
+const fadeOut = keyframes`
+  from {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  } 
+`;
+
+const SNotificationContainer: any = styled(Box)(({ theme, closing }: any) => ({
   display: 'flex',
   borderRadius: '8px',
   width: '446px',
@@ -33,11 +55,10 @@ const SNotificationContainer = styled(Box)(({ theme }) => ({
   paddingBottom: '16px',
   backgroundColor: theme.palette["ds"].bg_color_contrast_high,
   boxShadow: theme.palette["ds"].light_shadow_notification,
+  animation: `${closing ? fadeOut : fadeIn} 200ms ease-in-out forwards`
 }));
 
-type IconProps = {
-  type: NotificationTypes
-}
+
 
 
 const IconContainer = ({ children, ...props }) => (
@@ -55,9 +76,6 @@ const IconContainer = ({ children, ...props }) => (
 
 const NotificationIcon = ({ type }: IconProps) => {
   const theme = useTheme();
-
-  console.log("theme", theme.palette["ds"], theme.palette)
-
   switch (type) {
     case NotificationTypes.Rewards:
       return (
@@ -88,12 +106,22 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-export default function NotificationToast({ onClick, onClose, type }: Props) {
+export default function NotificationToast({ onClick, onClose, id, type }: NotificationProps) {
   const strings = useStrings();
   const theme = useTheme();
+  const [closing, setClosing] = React.useState(false);
+
+  React.useEffect(() => {
+    const timo = setTimeout(handleClose, NOTIFICATION_TIMEOUT)
+
+    return () => {
+      // avoids old timeouts if close was clicked
+      clearTimeout(timo);
+    }
+  }, [])
 
   const notificationTexts = {
-    [NotificationTypes.Rewards]: strings.clickToView,
+    [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
     [NotificationTypes.Income]: strings.tokensReceived,
     [NotificationTypes.Outcome]: strings.tokensSent,
     [NotificationTypes.Cancelled]: strings.txFailed,
@@ -102,32 +130,36 @@ export default function NotificationToast({ onClick, onClose, type }: Props) {
   const handleClick = (e) => {
     e.preventDefault();
     console.log("clicked");
-    onClick();
+    onClick(id);
   }
 
   const handleClose = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onClose();
-    console.log("closed");
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+
+    setClosing(false);
+
+    setTimeout(() => onClose(id), 300);
   }
 
   return (
-    <Box id="notif-toast" sx={{ position: 'fixed', top: 10, right: 10, zIndex: 9999 }}>
-      <SNotificationContainer onClick={handleClick}>
-        <Box px="16px" flexShrink={0} sx={{ cursor: 'pointer', alignSelf: 'center' }}>
-          <NotificationIcon type={type} />
-        </Box>
-        <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[type]}</Typography>
-          <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
-        </Box>
-        <Box px="12px" flexShrink={0}>
-          <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
-            <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
-          </IconWrapper>
-        </Box>
-      </SNotificationContainer>
-    </Box>
+
+    <SNotificationContainer closing={closing} onClick={handleClick}>
+      <Box px="16px" flexShrink={0} sx={{ cursor: 'pointer', alignSelf: 'center' }}>
+        <NotificationIcon type={type} />
+      </Box>
+      <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
+        <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[type]}</Typography>
+        <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
+      </Box>
+      <Box px="12px" flexShrink={0}>
+        <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
+          <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
+        </IconWrapper>
+      </Box>
+    </SNotificationContainer>
+
   );
 };
