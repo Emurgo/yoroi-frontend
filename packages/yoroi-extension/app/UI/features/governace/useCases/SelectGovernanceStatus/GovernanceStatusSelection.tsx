@@ -52,7 +52,7 @@ export const GovernanceStatusSelection = () => {
     changePasswordInputValue,
     setInputError,
     checkUserPassword,
-    drepId,
+    drepCredentialHex,
     setUnsignedTx,
   } = useTxReviewModal();
 
@@ -66,43 +66,20 @@ export const GovernanceStatusSelection = () => {
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
-  const openDRepIdModal = (onSubmit: (drepID: string, drepCredential: string) => void) => {
+  const handleDelegate = async () => {
     if (!governanceManager) {
       return;
     }
-    // onSubmit(drepID, 'defaultDrepCredential');
-    // openModal({
-    //   title: String(strings.chooseDrep).toUpperCase(),
-    //   content: (
-    //     <GovernanceProvider manager={governanceManager}>
-    //       <ChooseDRepModal onSubmit={onSubmit} />
-    //     </GovernanceProvider>
-    //   ),
-    //   width: '648px',
-    //   height: '304px',
-    //   isLoading: loadingUnsignTx,
-    // });
 
-    // openTxReviewModal({
-    //   title: 'CHOOSE YOUR DREP',
-    //   modalView: 'chooseDrepId',
-    //   onConfirm: onSubmit,
-    //   submitTx: password => {
-    //     signGovernanceTx(password);
-    //   },
-    // });
-  };
-
-  const handleDelegate = async () => {
-    const vote: Vote = { kind: 'delegate', drepID: drepId };
+    const vote: Vote = { kind: 'delegate', drepID: drepCredentialHex };
     governanceVoteChanged(vote);
     openTxReviewModal({
       title: 'CHOOSE YOUR DREP',
       modalView: 'chooseDrepId',
-      createUnsignedTx: async () => {
+      createUnsignedTx: async value => {
         try {
           startLoadingTxReview();
-          const txSignRequest: any = await createDrepDelegationTransaction('delegate');
+          const txSignRequest: any = await createDrepDelegationTransaction(value);
           const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
           const parsedUnsignedTx = JSON.parse(txBodyjson);
           setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: parsedUnsignedTx });

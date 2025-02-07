@@ -19,7 +19,6 @@ type ModalActions = {
   changeModalView: any;
   changePasswordInputValue: any;
   setInputError: any;
-  chooseDrepId: any;
   setUnsignedTx: any;
   closeTxReviewModal: () => void;
   startLoadingTxReview: () => void;
@@ -87,12 +86,7 @@ export const ReviewTxProvider = ({
         passswordInput: payload.passswordInput,
       });
     },
-    chooseDrepId: (payload: any) => {
-      dispatch({
-        type: 'chooseDrepId',
-        drepId: payload.drepId,
-      });
-    },
+
     setInputError: (payload: any) => {
       dispatch({
         type: 'setInputError',
@@ -160,9 +154,6 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
     case 'changeInputValue':
       return { ...state, passswordInput: action.passswordInput };
 
-    case 'chooseDrepId':
-      return { ...state, drepId: action.drepId };
-
     case 'setInputError':
       return { ...state, inputError: action.inputError };
 
@@ -194,5 +185,4 @@ const defaultState: ModalState = Object.freeze({
   unsignedTx: null,
   passswordInput: '',
   inputError: null,
-  drepId: '',
 });

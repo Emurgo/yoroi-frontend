@@ -113,7 +113,7 @@ const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx, stakingAddress, op
             <CopyableText value={stakingAddress}>
               <Typography>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
-            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} operationFee={operationFee} />
+            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} operationFee={operationFee} tx={tx} />
           </Stack>
         }
       />
@@ -157,7 +157,8 @@ const OperationsSection = ({ operations }) => {
   );
 };
 
-const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee }) => {
+const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee, tx }) => {
+  console.log('tx', tx);
   // const totalPrimaryTokenSpent = '-4.33434 ADA';
   const notPrimaryTokenSent = [];
   return (
@@ -170,7 +171,7 @@ const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee }) => {
           <Typography fontWeight="500">Send</Typography>
         </Stack>
         <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px' }}>
-          <Typography color="ds.white_static">{operationFee?.total}</Typography>
+          <Typography color="ds.white_static">{operationFee?.total || `${tx.fee.quantity / 1000000} ADA`}</Typography>
         </Box>
       </Stack>
 

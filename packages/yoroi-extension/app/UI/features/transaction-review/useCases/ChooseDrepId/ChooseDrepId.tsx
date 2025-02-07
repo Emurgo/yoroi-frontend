@@ -8,17 +8,19 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 export const ChooseDrepId = () => {
   const { chooseDrepId, drepId, isLoading, changeModalView, createUnsignedTx } = useTxReviewModal();
   const [error, setError] = React.useState(false);
+  const [drepIdInput, setDrepId] = React.useState('');
 
   useEffect(() => {
     setError(false);
   }, [drepId]);
 
   const confirmDRep = async () => {
-    const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepId);
+    const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepIdInput);
+
     if (dRepCredentialHex == null) {
       setError(true);
     } else {
-      await createUnsignedTx();
+      await createUnsignedTx(dRepCredentialHex);
       changeModalView({ modalView: 'operations', title: 'Operations' });
     }
   };
@@ -37,8 +39,7 @@ export const ChooseDrepId = () => {
             onChange={event => {
               //   dRepIdChanged(event.target.value);
               //   governanceVoteChanged({ kind: 'delegate', drepID: event.target.value });
-              //   setDrepId(event.target.value);
-              chooseDrepId({ type: 'chooseDrepId', drepId: event.target.value });
+              setDrepId(event.target.value);
             }}
             value={drepId}
             error={error}
@@ -54,7 +55,7 @@ export const ChooseDrepId = () => {
           onClick={() => {
             confirmDRep();
           }}
-          disabled={drepId === undefined || drepId.length === 0}
+          disabled={drepIdInput === undefined || drepIdInput.length === 0}
           loading={isLoading}
         >
           Confirm

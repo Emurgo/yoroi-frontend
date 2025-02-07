@@ -71,11 +71,11 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
                 component: (
                   <VoteDelegationOperation
                     key={index}
-                    // hash={hash}
+                    hash={hash}
                     // type={type}
                     // showWarning={isFirstElementDuplicated}
                     // strike={isNotFirstElementDuplicated}
-                    label="VoteDelegationOperation - in progress"
+                    label="Delegate voting to"
                   />
                 ),
                 duplicated: isNotFirstElementDuplicated,
@@ -180,10 +180,17 @@ export const NoConfidenceOperation = ({ label }: { label: string }) => {
     </Stack>
   );
 };
-export const VoteDelegationOperation = ({ label }: { label: string }) => {
+export const VoteDelegationOperation = ({ label, hash }: { label: string; hash?: string }) => {
+  // const label = formatDrepHash(hash, type)  TODO format it when package is available in NPM
+
   return (
-    <Stack gap="12px">
-      <Typography color="ds.text_gray_low">{label}</Typography>
+    <Stack gap="12px" direction="row" justifyContent="space-between" alignItems="flex-start" minWidth="450px">
+      <Typography color="ds.text_gray_low" minWidth="200px" sx={{ wordWrap: 'break-word' }}>
+        {label}
+      </Typography>
+      <Typography color="ds.text_gray_medium" minWidth="230px" sx={{ wordWrap: 'break-word' }} textAlign="right">
+        {hash}
+      </Typography>
     </Stack>
   );
 };
