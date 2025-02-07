@@ -70,9 +70,8 @@ describe('dApp, cancel connection', function () {
     expect(connectionSate).to.be.false;
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(function (done) {
