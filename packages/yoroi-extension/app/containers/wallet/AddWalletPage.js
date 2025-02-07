@@ -64,7 +64,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.trezorConnect.init();
-      ampli.connectWalletConnectPageViewed();
+      ampli.connectWalletCheckPageViewed();
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
@@ -75,7 +75,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.ledgerConnect.init();
-      ampli.connectWalletConnectPageViewed();
+      ampli.connectWalletCheckPageViewed();
     };
 
     let activeDialog = null;
