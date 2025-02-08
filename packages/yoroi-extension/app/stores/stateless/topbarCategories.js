@@ -138,7 +138,7 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
   {
     className: 'summary',
     route: ROUTES.WALLETS.TRANSACTIONS,
-    label: messages.transactions,
+    label: globalMessages.transactions,
     isVisible: _request => true,
   },
   {
