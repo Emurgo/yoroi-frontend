@@ -25,7 +25,7 @@ export class MockDAppWebpage {
 
   async requestAccess() {
     this.logger.info(`MockDApp::requestAccess Requesting the access without authentication`);
-    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable()`;
+    const scriptString = `window.accessRequestPromise = window.cardano.yoroi.enable()`;
     await this.driver.executeScript(scriptString);
   }
 
@@ -169,12 +169,12 @@ export class MockDAppWebpage {
       window.accessRequestPromise
         .then(
           // eslint-disable-next-line promise/always-return
-          api => {
-            window.api = api;
+          onSuccess => {
+            window.api = onSuccess;
             callback({ success: true, retValue: null, errMsg: null });
           },
-          error => {
-            callback({ success: false, retValue: null, errMsg: error });
+          onReject => {
+            callback({ success: false, retValue: null, errMsg: onReject });
           }
         )
         .catch(error => {
