@@ -60,9 +60,13 @@ export default class ConnectorStore extends Store<StoresMap> {
   removeWalletFromWhitelist1: (
     request: {| url: string |}
   ) => Promise<void> = async request => {
-    const filter = this.currentConnectorWhitelist.filter(
-      e => e.url !== request.url
+    const currentNetworkWalletIdSet = new Set(
+      this.stores.wallets.wallets.map(w => w.publicDeriverId)
     );
+
+    const filter = this.currentConnectorWhitelist.filter(e => !(
+      e.url === request.url && currentNetworkWalletIdSet.has(e.publicDeriverId)
+    ));
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
