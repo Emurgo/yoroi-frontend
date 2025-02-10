@@ -71,6 +71,7 @@ export const GovernanceStatusSelection = () => {
     }
 
     const vote: Vote = { kind: 'delegate', drepID: drepCredentialHex };
+    console.log('vote', vote);
     governanceVoteChanged(vote);
     openTxReviewModal({
       title: 'CHOOSE YOUR DREP',
@@ -78,6 +79,7 @@ export const GovernanceStatusSelection = () => {
       createUnsignedTx: async value => {
         try {
           startLoadingTxReview();
+          console.log('@@@@@@@@@@@value', value);
           const txSignRequest: any = await createDrepDelegationTransaction(value);
           const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
           const parsedUnsignedTx = JSON.parse(txBodyjson);
@@ -87,6 +89,7 @@ export const GovernanceStatusSelection = () => {
         }
       },
       submitTx: password => {
+        console.log('submitTx password', password);
         signGovernanceTx(password);
       },
     });
@@ -143,6 +146,11 @@ export const GovernanceStatusSelection = () => {
         setInputError({ type: 'setInputError', inputError: true });
       } else {
         startLoadingTxReview();
+        console.log('TESTTSTS signGovernanceTx ', {
+          password,
+          wallet: selectedWallet,
+          dialog: null,
+        });
         await signDelegationTransaction({
           password,
           wallet: selectedWallet,

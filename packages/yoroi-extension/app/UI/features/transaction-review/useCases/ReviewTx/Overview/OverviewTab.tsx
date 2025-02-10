@@ -60,7 +60,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
       </Box>
     </Stack>
   );
-  console.log('operations', operations);
+
   return (
     <Stack sx={{ padding: '24px' }}>
       <Stack direction="column" gap="8px">

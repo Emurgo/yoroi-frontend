@@ -68,7 +68,6 @@ export const useFormattedMetadata = ({
   cbor: string | null;
   txBody: TransactionBody;
 }) => {
-  console.log('unsignedTx.auxiliary_data.metadata', unsignedTx?.auxiliary_data?.metadata);
   const query = useQuery({
     queryFn: () => formatMetadata(unsignedTx, txBody),
     queryKey: ['useFormattedMetadata', cbor, unsignedTx, txBody],

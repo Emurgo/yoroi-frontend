@@ -1,7 +1,6 @@
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const deriveRewardAddressFromAddress = async (address: string, chainId: number): Promise<string> => {
-  console.log('1chainIdchainIdchainId', chainId);
   try {
     const from_bech32 = await RustModule.WalletV4.Address.from_bech32(address);
     const baseAddress = RustModule.WalletV4.BaseAddress.from_address(from_bech32);
