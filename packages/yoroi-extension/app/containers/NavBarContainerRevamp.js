@@ -28,10 +28,6 @@ const NETWORK_BADGES = Object.freeze({
     color: 'rgba(143, 201, 246, 1)',
     text: 'Preview',
   },
-  [networks.CardanoSanchoTestnet.NetworkId]: {
-    color: 'rgba(147, 245, 225, 1)',
-    text: 'Sancho',
-  },
 });
 
 type LocalProps = {|

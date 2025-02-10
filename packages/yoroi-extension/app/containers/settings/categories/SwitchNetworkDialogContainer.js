@@ -16,7 +16,6 @@ const networkNames = Object.freeze({
   CardanoMainnet: globalMessages.mainnet,
   CardanoPreprodTestnet: globalMessages.preprod,
   CardanoPreviewTestnet: globalMessages.preview,
-  CardanoSanchoTestnet: globalMessages.sancho,
 });
 // type assertion to ensure we have all names:
 (networks: {| [$Keys<typeof networkNames>]: any |});

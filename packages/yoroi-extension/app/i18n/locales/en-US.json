@@ -234,7 +234,6 @@
   "networkName.mainnet": "Mainnet",
   "networkName.preprod": "Preprod",
   "networkName.preview": "Preview",
-  "networkName.sancho": "Sancho",
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
   "notprod.label.message": "WARNING: this is a non-production build. If something unusual occurs, double-check Yoroi's installation.",
   "profile.analytics.accept": "Accept",

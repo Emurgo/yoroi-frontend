@@ -1024,10 +1024,6 @@ const globalMessages: * = defineMessages({
     id: 'networkName.preview',
     defaultMessage: '!!!Preview',
   },
-  sancho: {
-    id: 'networkName.sancho',
-    defaultMessage: '!!!Sancho',
-  },
 });
 export default globalMessages;
 
