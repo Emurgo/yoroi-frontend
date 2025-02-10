@@ -169,12 +169,9 @@ export class MockDAppWebpage {
       window.accessRequestPromise
         .then(
           // eslint-disable-next-line promise/always-return
-          onSuccess => {
-            window.api = onSuccess;
+          result => {
+            window.api = result;
             callback({ success: true, retValue: null, errMsg: null });
-          },
-          onReject => {
-            callback({ success: false, retValue: null, errMsg: onReject });
           }
         )
         .catch(error => {
