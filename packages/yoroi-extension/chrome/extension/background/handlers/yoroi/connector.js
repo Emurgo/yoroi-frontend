@@ -446,7 +446,7 @@ export const NotifyDAppConnectionRemoved: HandlerType<
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
-      if (!request || url === request.url) {
+      if (!request || site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
         break;
       }
