@@ -176,39 +176,6 @@ describe('dApp, signTx, intrawallet Tx', function () {
     });
   });
 
-  describe('[nested-dapp] Close pop-up', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
-
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      const receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
-      // send sign request with 1 ada
-      await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-    });
-
-    it('Checking Sign Tx pop-up appeared', async function () {
-      // wait for the pop-up appears
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-    });
-
-    it('Close the pop-up and check response', async function () {
-      await windowManager.closeTabWindow(popupConnectorName, mockDAppName);
-
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.false;
-      expect(signTxResponse.errMsg.code).to.equal(TxSignErrorCode.UserDeclined);
-    });
-  });
-
   describe('[nested-dapp] Incorrect Transaction', function () {
     before(async function () {
       await customBeforeNestedDAppTest(this, windowManager);

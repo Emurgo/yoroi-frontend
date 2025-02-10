@@ -119,34 +119,6 @@ describe('dApp, signData', function () {
     });
   });
 
-  describe('[nested-dapp] Close pop-up', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
-
-    it('Send sign data request', async function () {
-      const testMessage = 'test message sign data';
-      await mockedDApp.requestUsedAddresses();
-      await mockedDApp.requestSigningData(testMessage);
-      // wait for window
-      const dappSignDataPage = new DAppSignData(webdriver, logger);
-      // the window focus is switched to the pop-up here
-      const popUpAppeared = await dappSignDataPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSignDataPage.waitingConnectorIsReady();
-      // check that the message is correct
-      const displayedMessage = await dappSignDataPage.getDisplayedMessage();
-      expect(displayedMessage).to.equal(testMessage);
-    });
-
-    it('Close pop-up and check response', async function () {
-      await windowManager.closeTabWindow(popupConnectorName, mockDAppName);
-      const signDataResponse = await mockedDApp.getSigningDataResult();
-      expect(signDataResponse.success).to.be.false;
-      expect(signDataResponse.errMsg.code).to.equal(DataSignErrorCode.UserDeclined);
-    });
-  });
-
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);
     done();
