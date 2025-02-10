@@ -92,11 +92,14 @@ export default class ConnectContainer extends Component<
     }
 
     const { publicDeriverId } = deriver;
-    const result = stores.connector.currentConnectorWhitelist;
 
-    // Removing any previous whitelisted connections for the same url
-    const whitelist = (result.length ? [...result] : []).filter(
-      e => e.url !== url
+    const currentNetworkWalletIdSet = new Set(
+      stores.connector.wallets.map(w => w.publicDeriverId)
+    );
+    // Removing any previous whitelisted connections for the same url, but keep
+    // the connection of wallets in other networks
+    const whitelist = stores.connector.currentConnectorWhitelist.filter(
+      e => !(e.url === url && currentNetworkWalletIdSet.has(e.publicDeriverId))
     );
 
     whitelist.push({
