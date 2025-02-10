@@ -2,8 +2,6 @@
 import { Box, Typography, styled } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
-import { IncorrectWalletPasswordError } from '../../../api/common/errors';
-import TextField from '../../../components/common/TextField';
 import {
   FormattedActualPrice,
   FormattedLimitPrice,
@@ -21,7 +19,6 @@ import { useSwapFeeDisplay } from '../hooks';
 import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
-import type { State } from '../context/swap-form/types';
 import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
@@ -34,8 +31,6 @@ type Props = {|
   slippageValue: string,
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
-  userPasswordState: ?State<string>,
-  txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
@@ -47,8 +42,6 @@ export default function ConfirmSwapTransaction({
   slippageValue,
   walletAddress,
   priceImpactState,
-  userPasswordState,
-  txSubmitErrorState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
   getTokenInfo,
@@ -65,8 +58,6 @@ export default function ConfirmSwapTransaction({
 
   const isMarketOrder = orderData.type === 'market';
   const isAutoPool = pool?.poolId === bestPool?.poolId;
-
-  const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
 
   const strings = useStrings();
   const priceStrings = {

@@ -60,7 +60,6 @@ export const GovernanceStatusSelection = () => {
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  // const { openModal, closeModal, startLoading } = useModal();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
@@ -152,10 +151,10 @@ export const GovernanceStatusSelection = () => {
         stopLoadingTxReview();
 
         navigateTo.transactionSubmited();
-        // setPassword('');
         changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
       }
     } catch (error) {
+      console.log('errorerror', error);
       console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
       stopLoadingTxReview();
 

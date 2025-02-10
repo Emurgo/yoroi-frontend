@@ -7,6 +7,7 @@ import { Tooltip } from '../Tooltip';
 interface Props {
   textToCopy: string;
   disabled?: boolean;
+  strings?: any;
 }
 
 const IconWrapper = styled(IconButton)(({ theme }: any) => ({

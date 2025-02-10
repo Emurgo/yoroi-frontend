@@ -15,24 +15,28 @@ export type Operations = {
 };
 
 export const useOperations = (certificates: FormattedTx['certificates']) => {
-  const operationCount = {} as OperationsCount;
+  const operationCount: any = {};
 
   if (certificates === null)
     return {
-      components: [] as Operations['components'],
+      components: [],
       totalFee: Quantities.zero,
     };
 
-  const certificatesTypes = certificates.map(cert => cert.type);
-  certificatesTypes.forEach(cert => updateOperationsCount(cert, operationCount));
+  const certificatesTypes = certificates.map((cert: { type: CertificateType }) => cert.type);
+  certificatesTypes.forEach((cert: CertificateType) => updateOperationsCount(cert, operationCount));
 
-  return certificates.reduce<Operations>(
-    (acc, certificate, index) => {
+  return certificates.reduce(
+    (
+      acc: { components: any; totalFee: any },
+      certificate: { type: string | number; value: { drep: any } },
+      index: React.Key | null | undefined
+    ) => {
       const fistElementIndex = certificatesTypes.indexOf(certificate.type);
       const isFistElement = fistElementIndex === index;
       const isNotFirstElementDuplicated = operationCount[certificate.type] > 1 && !isFistElement;
-      const isFirstElementDuplicated = operationCount[certificate.type] > 1 && isFistElement;
-
+      // const isFirstElementDuplicated = operationCount[certificate.type] > 1 && isFistElement;
+      //
       switch (certificate.type) {
         case CertificateType.VoteDelegation: {
           const drep = certificate.value.drep;
@@ -63,7 +67,6 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
             };
 
           const hash = ('KeyHash' in drep ? drep.KeyHash : drep.ScriptHash) ?? '';
-          const type = 'KeyHash' in drep ? 'key' : 'script';
           return {
             components: [
               ...acc.components,
@@ -135,9 +138,7 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
             components: [
               ...acc.components,
               {
-                component: (
-                  <DrepUpdateOperation key={index} showWarning={isFirstElementDuplicated} strike={isNotFirstElementDuplicated} />
-                ),
+                component: <DrepUpdateOperation key={index} label="In Progress" />,
                 duplicated: isNotFirstElementDuplicated,
                 type: CertificateType.DRepUpdate,
               },
@@ -202,6 +203,13 @@ export const DrepRegistrationOperation = ({ label }: { label: string }) => {
   );
 };
 export const DrepDeregistrationOperation = ({ label }: { label: string }) => {
+  return (
+    <Stack gap="12px">
+      <Typography color="ds.text_gray_low">{label}</Typography>
+    </Stack>
+  );
+};
+export const DrepUpdateOperation = ({ label }: { label: string }) => {
   return (
     <Stack gap="12px">
       <Typography color="ds.text_gray_low">{label}</Typography>

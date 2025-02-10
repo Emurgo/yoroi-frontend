@@ -12,7 +12,7 @@ type ModalState = {
   width: string;
   isLoading: boolean;
   modalView: 'transactionReview' | 'walletInfo';
-  unsignedTx: YoroiUnsignedTx;
+  unsignedTx: YoroiUnsignedTx | null;
 };
 type ModalActions = {
   openTxReviewModal: any;
@@ -43,6 +43,8 @@ export const ReviewTxProvider = ({
 }: {
   children: React.ReactNode;
   initialState?: ModalState;
+  stores: any;
+  intl: any;
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const currentWalletInfo = createCurrrentWalletInfo(stores);

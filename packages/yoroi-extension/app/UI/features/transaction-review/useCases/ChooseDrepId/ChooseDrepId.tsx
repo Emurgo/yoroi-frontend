@@ -6,7 +6,7 @@ import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 
 export const ChooseDrepId = () => {
-  const { chooseDrepId, drepId, isLoading, changeModalView, createUnsignedTx } = useTxReviewModal();
+  const { drepId, isLoading, changeModalView, createUnsignedTx } = useTxReviewModal();
   const [error, setError] = React.useState(false);
   const [drepIdInput, setDrepId] = React.useState('');
 

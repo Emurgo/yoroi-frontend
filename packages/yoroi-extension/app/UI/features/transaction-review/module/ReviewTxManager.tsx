@@ -38,7 +38,7 @@ export const ReviewTxManager = () => {
     setState({ ...state, [anchor]: open });
     closeTxReviewModal();
   };
-  console.log('modalView', modalView);
+
   const handleOnBack = () => {
     if (modalView === 'walletInfo') {
       return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });

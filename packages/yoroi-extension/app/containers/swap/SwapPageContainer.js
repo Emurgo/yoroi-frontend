@@ -15,9 +15,13 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
+
+// $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 import type { StoresProps } from '../../stores';
+// $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 
 type Props = {|

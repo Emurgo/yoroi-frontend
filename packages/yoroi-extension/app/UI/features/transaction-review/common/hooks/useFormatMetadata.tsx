@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 
 import { TransactionBody } from '../types';
 
-export const formatMetadata = async (unsignedTx: any, cbor: string | null, txBody: TransactionBody): Promise<any> => {
+export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): Promise<any> => {
   try {
     const hash = txBody.auxiliary_data_hash ?? null;
     const decodedMetadata = await unsignedTx.auxiliary_data.metadata;
@@ -22,14 +22,14 @@ export const formatMetadata = async (unsignedTx: any, cbor: string | null, txBod
 
 const parseMetadata222 = (metadata: Record<string, string>) => {
   try {
-    const parsed = JSON.parse(metadata['674']);
-    const mapArray = parsed.map[0]; // Extract "map" array
-    const key = mapArray.k.string; // Extract the key (e.g., "msg")
+    const parsed = metadata['674'] ? JSON.parse(metadata['674']) : {};
+    const mapArray = parsed.map[0];
+    const key = mapArray.k.string;
 
-    const rawList = mapArray.v.list.map((item: any) => item.string); // Extract list of strings
+    const rawList = mapArray.v.list.map((item: any) => item.string);
 
-    let jsonString = rawList.join(''); // Merge into a single string
-    jsonString = jsonString.replace(/\\/g, ''); // Remove extra escape characters
+    let jsonString = rawList.join('');
+    jsonString = jsonString.replace(/\\/g, ''); //
 
     let jsonFragments = jsonString.match(/\{.*?\}/g) || []; // Extract JSON objects
 
@@ -68,11 +68,13 @@ export const useFormattedMetadata = ({
   cbor: string | null;
   txBody: TransactionBody;
 }) => {
+  console.log('unsignedTx.auxiliary_data.metadata', unsignedTx?.auxiliary_data?.metadata);
   const query = useQuery({
-    queryFn: () => formatMetadata(unsignedTx, cbor, txBody),
+    queryFn: () => formatMetadata(unsignedTx, txBody),
     queryKey: ['useFormattedMetadata', cbor, unsignedTx, txBody],
     useErrorBoundary: true,
     suspense: true,
+    enabled: unsignedTx?.auxiliary_data?.metadata !== undefined,
   });
 
   return query?.data;

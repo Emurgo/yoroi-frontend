@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Carousel from 'react-simply-carousel';
 import { Icon } from '../../../../components';
 
-const IconWrapper = styled(Box)(({ theme }) => ({
+const IconWrapper: any = styled(Box)(({ theme }: { theme: any }) => ({
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,

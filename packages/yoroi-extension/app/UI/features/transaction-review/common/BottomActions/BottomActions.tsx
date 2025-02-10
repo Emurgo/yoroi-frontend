@@ -6,8 +6,6 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 export const BottomActions = () => {
   const { closeTxReviewModal, changeModalView, modalView, submitTx, passswordInput, isLoading } = useTxReviewModal();
 
-  console.log('BottomActions passswordInput', passswordInput);
-
   if (modalView === 'submitTx') {
     return (
       <Stack direction="row" justifyContent="space-between" p="24px">

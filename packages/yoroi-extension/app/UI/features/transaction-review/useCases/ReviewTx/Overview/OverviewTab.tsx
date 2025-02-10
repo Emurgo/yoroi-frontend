@@ -7,7 +7,6 @@ import { truncateAddress } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { useOperations } from '../../../common/operations';
-import { TokenItem } from '../../../common/TokenItem';
 import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
 export interface SubMenuOption {
@@ -27,8 +26,8 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   const { currentWalletDetails, changeModalView, stakingAddress, operationFee } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
 
-  const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
-  const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
+  // const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
+  // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
   const operations = useOperations(tx.certificates);
 
   const { plate } = selected;
@@ -61,7 +60,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
       </Box>
     </Stack>
   );
-
+  console.log('operations', operations);
   return (
     <Stack sx={{ padding: '24px' }}>
       <Stack direction="column" gap="8px">
@@ -72,19 +71,11 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 
       <Divider sx={{ margin: '24px 0px' }} />
 
-      <MyWalletSection
-        tx={tx}
-        notOwnedOutputs={notOwnedOutputs}
-        ownedOutputs={ownedOutputs}
-        stakingAddress={stakingAddress}
-        operationFee={operationFee}
-      />
+      <MyWalletSection tx={tx} stakingAddress={stakingAddress} operationFee={operationFee} />
 
-      {receiverCustomTitle !== null && (
-        <ExternalPartySection receiverCustomTitle={receiverCustomTitle} output={notOwnedOutputs[0]} />
-      )}
+      {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
 
-      <OperationsSection operations={operations} />
+      {operations.components.length > 0 && <OperationsSection operations={operations} />}
     </Stack>
   );
 };
@@ -102,7 +93,7 @@ const InfoInline = ({ label, value }) => {
   );
 };
 
-const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx, stakingAddress, operationFee }) => {
+const MyWalletSection = ({ tx, stakingAddress, operationFee }) => {
   return (
     <Box>
       <Collapsible
@@ -113,7 +104,7 @@ const MyWalletSection = ({ notOwnedOutputs, ownedOutputs, tx, stakingAddress, op
             <CopyableText value={stakingAddress}>
               <Typography>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
-            <MyWalletTokens notOwnedOutputs={notOwnedOutputs} ownedOutputs={ownedOutputs} operationFee={operationFee} tx={tx} />
+            <MyWalletTokens operationFee={operationFee} tx={tx} />
           </Stack>
         }
       />
@@ -157,10 +148,8 @@ const OperationsSection = ({ operations }) => {
   );
 };
 
-const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee, tx }) => {
-  console.log('tx', tx);
-  // const totalPrimaryTokenSpent = '-4.33434 ADA';
-  const notPrimaryTokenSent = [];
+const MyWalletTokens = ({ operationFee, tx }) => {
+  // const notPrimaryTokenSent = [];
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
       <Stack direction="row" alignItems="center" justifyContent="space-between" width="100%">
@@ -175,7 +164,7 @@ const MyWalletTokens = ({ notOwnedOutputs, ownedOutputs, operationFee, tx }) => 
         </Box>
       </Stack>
 
-      {notPrimaryTokenSent.length > 0 && notPrimaryTokenSent.map(item => <TokenItem label={item} isPrimaryToken={false} />)}
+      {/* {notPrimaryTokenSent.length > 0 && notPrimaryTokenSent.map(item => <TokenItem label={item} isPrimaryToken={false} />)} */}
     </Stack>
   );
 };

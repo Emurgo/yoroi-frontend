@@ -2,13 +2,12 @@
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
 import { CredKind } from '@emurgo/cross-csl-core';
 import { isNonNullable } from '@yoroi/common';
-import { Portfolio } from '@yoroi/types';
 import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
-import { FormattedCertificate, FormattedTx, TransactionBody, TransactionInputs } from '../types';
+import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, stakingAddress, networkId } = useTxReviewModal();
@@ -24,14 +23,19 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const formattedCertificates = formatCertificates(data?.certs);
 
   const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
-  const formattedOutputs = useFormattedOutputs(outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses);
+  const formattedOutputs = useFormattedOutputs(
+    outputs,
+    stakingAddress,
+    networkId
+    //  primaryTokenInfo, walletAddresses
+  );
   return {
     inputs: formattedInputs,
     outputs: formattedOutputs,
     fee: formattedFee,
     certificates: formattedCertificates,
     // mint: formattedMintData,
-    referenceInputs: referenceInputs,
+    referenceInputs: referenceInputUtxos,
   };
 };
 
@@ -48,14 +52,10 @@ export const useFormattedInputs = (inputUtxos, ftAssetsList, networkId, primaryT
   return query.data;
 };
 
-export const useFormattedOutputs = (outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses) => {
-  const query = useQuery<any>(
-    ['useFormattedOutputs', outputs],
-    () => formatOutputs(outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses),
-    {
-      suspense: true,
-    }
-  );
+export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo) => {
+  const query = useQuery<any>(['useFormattedOutputs', outputs], () => formatOutputs(outputs, networkId, primaryTokenInfo), {
+    suspense: true,
+  });
 
   if (!query.data) throw new Error('invalid formatted outputs');
   return query.data;
@@ -82,8 +82,8 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
 
       const multiAssets =
         utxo?.assets
-          .map(a => {
-            const tokenInfo = ftAssetsList.get(a?.assetId as Portfolio.Token.Id);
+          .map((a: any) => {
+            const tokenInfo = ftAssetsList.get(a?.assetId);
             if (!tokenInfo) return null;
             const quantity = asQuantity(a.amount);
 
@@ -107,7 +107,7 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
   );
 };
 
-const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
+const formatOutputs = async (outputs, networkId, primaryTokenInfo): Promise<any> => {
   return Promise.all(
     outputs.map(async output => {
       const address = output.address;
@@ -122,14 +122,14 @@ const formatOutputs = async (outputs, stakingAddress, networkId, primaryTokenInf
       ];
       const multiAssets =
         output.amount?.multiasset !== null
-          ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]) => {
+          ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
               return Object.entries(assets).map(([assetId, amount]) => {
                 const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
                 if (tokenInfo === undefined) {
                   return null;
                 }
                 if (primaryTokenInfo == null) return null;
-                const quantity = asQuantity(amount);
+                const quantity = asQuantity(String(amount));
 
                 return {
                   tokenInfo,
@@ -216,8 +216,10 @@ const isOwnedAddress = (walletAddresses: any[], bech32Address: string): boolean 
 const formatCertificates = (certificates: TransactionBody['certs']) => {
   return (
     certificates?.map(cert => {
-      const [type, certificate] = Object.entries(cert)[0];
-      return ({ type, value: certificate } as unknown) as FormattedCertificate;
+      const entry = Object.entries(cert)[0];
+      if (!entry) return null;
+      const [type, certificate] = entry;
+      return { type, value: certificate };
     }) ?? null
   );
 };

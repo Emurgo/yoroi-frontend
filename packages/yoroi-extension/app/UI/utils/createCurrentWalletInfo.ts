@@ -190,8 +190,6 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
 
-    console.log('networkIdnetworkId', networkId);
-
     // Backend services
     const { Backend } = getNetworkById(networkId);
     const { BackendService, BackendServiceZero } = Backend;
@@ -222,7 +220,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const walletAddresses = applyAddressFilter({
       addressFilter: stores.addresses.addressFilter,
-      addresses: addressTypeStore.request.all,
+      addresses: addressTypeStore?.request.all,
     });
 
     return {
@@ -292,7 +290,7 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   return null;
 };
 
-const getTypeStore = stores => {
+const getTypeStore = (stores): any => {
   for (const addressStore of allAddressSubgroups) {
     if (!addressStore.isRelated()) {
       continue;

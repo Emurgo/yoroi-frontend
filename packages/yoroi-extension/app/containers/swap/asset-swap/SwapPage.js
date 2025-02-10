@@ -1,5 +1,5 @@
 // @flow
-import type { Node, useCallback } from 'react';
+import type { Node } from 'react';
 import type { PriceImpact } from '../../../components/swap/types';
 import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
@@ -14,7 +14,7 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import LoadingOverlay from '../../../components/swap/LoadingOverlay';
 import useSwapForm from '../context/swap-form/useSwapForm';
 import globalMessages from '../../../i18n/global-messages';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { CreateSwapOrder } from './CreateSwapOrder';
 import { useSwap } from '@yoroi/swap';
@@ -35,12 +35,9 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
+// $FlowIgnore: suppressing this error
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
-import { LiquidityPool } from './LiquidityPool';
-import { TransactionSummary } from './TransactionSummary';
-import { unignedTxReviewMock } from './txReviewMock';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import { useObserver } from 'mobx-react-lite';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -58,7 +55,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal, setInputError, unsignedTx, closeTxReviewModal, checkUserPassword } = useTxReviewModal();
+  const { openTxReviewModal, setInputError, closeTxReviewModal, checkUserPassword } = useTxReviewModal();
 
   const {
     slippage,
@@ -401,8 +398,6 @@ function SwapPage(props: StoresProps & Intl): Node {
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
               onRemoteOrderDataResolved={onRemoteOrderDataResolved}
-              userPasswordState={userPasswordState}
-              txSubmitErrorState={txSubmitErrorState}
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}

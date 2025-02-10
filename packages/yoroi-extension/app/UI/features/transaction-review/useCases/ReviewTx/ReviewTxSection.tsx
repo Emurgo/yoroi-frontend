@@ -28,7 +28,7 @@ export const ReviewTxSection = () => {
 
   const { unsignedTx, receiverCustomTitle } = useTxReviewModal();
   const formattedTx = useFormattedTx(unsignedTx?.body);
-  const formattedMetadata = useFormattedMetadata({ txBody: unsignedTx?.body, unsignedTx });
+  const formattedMetadata = useFormattedMetadata({ txBody: unsignedTx?.body, unsignedTx, cbor: null });
 
   const subMenuOptions: SubMenuOption[] = [
     {

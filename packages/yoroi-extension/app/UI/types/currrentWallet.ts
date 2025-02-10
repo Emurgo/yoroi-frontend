@@ -44,4 +44,5 @@ export type CurrentWalletType = {
   ftAssetList: any[];
   nftAssetList: any[];
   explorer: { tokenInfo: { name: string; baseUrl: string } };
+  walletAddresses: string;
 };

@@ -33,7 +33,7 @@ interface OutputProps {
   output: InputData;
 }
 
-export const UTxOsTab: React.FC = ({ tx }) => {
+export const UTxOsTab: any = ({ tx }) => {
   return (
     <Stack direction="column" sx={{ padding: '24px', direction: 'collumn' }}>
       <Inputs inputs={tx.inputs} />
@@ -88,19 +88,13 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
   );
 };
 
-const Input: React.FC<InputProps> = ({ input }) => {
+const Input: React.FC<InputProps> = ({ input }: any) => {
   const strings = useStrings();
 
   const renderAssets = () => {
     if (!input.assets.length) return null;
     return input.assets.map(asset => (
-      <TokenItem
-        key={asset.tokenInfo.id}
-        tokenInfo={asset.tokenInfo}
-        label={asset.label}
-        isPrimaryToken={asset.isPrimary}
-        quantity={asset.quantity}
-      />
+      <TokenItem key={asset.tokenInfo.id} tokenInfo={asset.tokenInfo} quantity={asset.quantity} />
     ));
   };
 
@@ -141,21 +135,14 @@ const Input: React.FC<InputProps> = ({ input }) => {
   );
 };
 
-const Output: React.FC<OutputProps> = ({ output }) => {
+const Output: React.FC<OutputProps> = ({ output }: any) => {
   const strings = useStrings();
   const isOwnAdddress = output.ownAddress;
   const renderAssets = () => {
     if (!output.assets.length) return null;
 
     return output.assets.map(asset => (
-      <TokenItem
-        key={asset.tokenInfo.id}
-        tokenInfo={asset.tokenInfo}
-        label={asset.label}
-        isPrimaryToken={asset.isPrimary}
-        quantity={asset.quantity}
-        isSent={false}
-      />
+      <TokenItem key={asset.tokenInfo.id} tokenInfo={asset.tokenInfo} quantity={asset.quantity} isSent={false} />
     ));
   };
 

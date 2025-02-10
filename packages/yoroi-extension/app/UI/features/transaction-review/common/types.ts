@@ -57,9 +57,9 @@ export type FormattedTx = {
   inputs: FormattedInputs;
   outputs: FormattedOutputs;
   fee: FormattedFee;
-  certificates: FormattedCertificate[] | null;
-  mint: Array<[Portfolio.Token.Info, string]> | null;
-  referenceInputs: FormattedInputs;
+  certificates: FormattedCertificate[] | any;
+  // mint: Array<[Portfolio.Token.Info, string]> | null;
+  referenceInputs: any;
 };
 
 export type FormattedMetadata = {

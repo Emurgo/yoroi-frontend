@@ -47,7 +47,7 @@ export const Quantities = {
   parseFromText: (text: string, denomination: number, format: any, precision = denomination): [string, Balance.Quantity] => {
     const { decimalSeparator } = format;
     const invalid = new RegExp(`[^0-9${decimalSeparator}]`, 'g');
-    const sanitized = text === '' ? '' : text.replaceAll(invalid, '');
+    const sanitized = text === '' ? '' : text.split(invalid).join('');
 
     if (sanitized === '') return ['', Quantities.zero];
     if (sanitized.startsWith(decimalSeparator)) return [`0${decimalSeparator}`, Quantities.zero];
