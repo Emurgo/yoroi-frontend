@@ -111,30 +111,6 @@ export const VOTING: TopbarCategory = registerCategory({
   label: messages.voting,
   isVisible: _request => true,
 });
-export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
-  className: 'stakeSimulator',
-  route: ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE,
-  icon: delegationListIcon,
-  label: messages.delegationList,
-  isVisible: request => request.networkId === networks.CardanoMainnet.NetworkId,
-});
-
-export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
-  className: 'cardanoStake',
-  route: ROUTES.WALLETS.CARDANO_DELEGATION,
-  icon: undefined,
-  label: messages.delegationById,
-  isVisible: request => {
-    const { networkId } = request;
-    return (
-      (environment.isTest() ||
-        networkId === networks.CardanoPreprodTestnet.NetworkId ||
-        networkId === networks.CardanoPreviewTestnet.NetworkId
-      )
-    );
-  },
-  isHiddenButAllowed: true,
-});
 
 /** Revamp Wallet categoriess */
 export const allSubcategoriesRevamp: Array<TopbarCategory> = [
@@ -157,9 +133,17 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     isVisible: _request => true,
   },
   {
-    className: CARDANO_DELEGATION.className,
-    route: CARDANO_DELEGATION.route,
-    label: CARDANO_DELEGATION.label,
-    isVisible: CARDANO_DELEGATION.isVisible,
+    className: 'cardanoStake',
+    route: ROUTES.WALLETS.CARDANO_DELEGATION,
+    label: messages.delegationById,
+    isVisible: request => {
+      const { networkId } = request;
+      return (
+        (environment.isTest() ||
+         networkId === networks.CardanoPreprodTestnet.NetworkId ||
+         networkId === networks.CardanoPreviewTestnet.NetworkId
+        )
+      );
+    },
   },
 ];
