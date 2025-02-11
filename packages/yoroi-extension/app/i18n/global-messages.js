@@ -751,6 +751,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
   },
+  transactions: {
+    id: 'wallet.navigation.transactions',
+    defaultMessage: '!!!Transactions',
+  },
   trezorTitle: {
     id: 'wallet.add.optionDialog.connect.hw.trezor.title',
     defaultMessage: '!!!Trezor Hardware Wallet',
@@ -1101,10 +1105,6 @@ export const connectorMessages: * = defineMessages({
   receive: {
     id: 'wallet.navigation.receive',
     defaultMessage: '!!!Receive',
-  },
-  transactions: {
-    id: 'wallet.navigation.transactions',
-    defaultMessage: '!!!Transactions',
   },
   assetsSent: {
     id: 'connector.assetsSent',
