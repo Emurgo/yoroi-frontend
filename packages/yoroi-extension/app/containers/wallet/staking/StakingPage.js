@@ -13,6 +13,9 @@ import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { PoolTransitionBanner } from './PoolTransitionBanner';
 import type { StoresProps } from '../../../stores';
+import { ReviewTxProvider } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { ReviewTxModal } from '../../../UI/features/transaction-review/useCases/ReviewTx';
+import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
@@ -37,11 +40,7 @@ class StakingPage extends Component<StoresProps> {
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={
-              <NavBarTitle
-                title={this.context.intl.formatMessage(globalMessages.stakingDashboard)}
-              />
-            }
+            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
             pageBanner={
               <PoolTransitionBanner
                 intl={this.context.intl}
@@ -53,7 +52,12 @@ class StakingPage extends Component<StoresProps> {
         showInContainer
       >
         <Suspense fallback={null}>
-          <StakingPageContent stores={this.props.stores} />
+          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+            <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxModal />
+              <StakingPageContent stores={this.props.stores} />
+            </ReviewTxProvider>
+          </CurrencyProvider>
         </Suspense>
       </TopBarLayout>
     );

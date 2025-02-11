@@ -24,7 +24,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, tokenInfo, 
       }}
     >
       <Box sx={{ padding: '4px 12px', backgroundColor: backgroundColor, borderRadius: '8px', color: textColor }}>
-        <Typography color="ds.white_static">{`${quantity.shiftedBy(-primaryTokenInfo.decimals)} ${tokenInfo.name}`}</Typography>
+        <Typography color={textColor}>{`${quantity.shiftedBy(-primaryTokenInfo.decimals)} ${tokenInfo.name}`}</Typography>
       </Box>
     </Box>
   );

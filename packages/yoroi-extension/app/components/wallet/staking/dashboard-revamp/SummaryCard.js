@@ -20,6 +20,7 @@ import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitiv
 import type { GraphData } from '../dashboard/StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
 import { maybe } from '../../../../coreUtils';
+import { WithdrawButton } from './WithdrawButton';
 
 type Props = {|
   +onOverviewClick: Function,
@@ -68,6 +69,8 @@ function SummaryCard({
   unitOfAccount,
   graphData,
   intl,
+  govStatusFetched,
+  stores,
 }: Props & Intl): Node {
   const formatTokenEntry: TokenEntry => Node = tokenEntry => {
     const tokenInfo = getTokenInfo(tokenEntry);
@@ -116,7 +119,7 @@ function SummaryCard({
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
-        <Button
+        {/* <Button
           variant="primary"
           sx={{
             '&.MuiButton-sizeMedium': {
@@ -128,7 +131,13 @@ function SummaryCard({
           disabled={!withdrawRewards}
         >
           {intl.formatMessage(globalMessages.withdrawLabel)}
-        </Button>
+        </Button> */}
+        <WithdrawButton
+          label={intl.formatMessage(globalMessages.withdrawLabel)}
+          // withdrawRewards={withdrawRewards}
+          govStatusFetched={govStatusFetched}
+          stores={stores}
+        />
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>

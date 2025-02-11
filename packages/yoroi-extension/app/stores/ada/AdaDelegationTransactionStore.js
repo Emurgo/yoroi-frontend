@@ -96,7 +96,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @action
   createWithdrawalTxForWallet: ({|
     wallet: WalletState,
-  |}) => Promise<void> = async request => {
+  |}) => any = async request => {
     this.createWithdrawalTx.reset();
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
@@ -127,6 +127,8 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     }).promise;
 
     if (unsignedTx == null) throw new Error(`Should never happen`);
+
+    return unsignedTx;
   };
 
   @action

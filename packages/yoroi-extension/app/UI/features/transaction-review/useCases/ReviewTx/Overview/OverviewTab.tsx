@@ -23,15 +23,13 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
 }));
 
 export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
-  const { currentWalletDetails, changeModalView, stakingAddress, operationFee } = useTxReviewModal();
+  const { currentWalletDetails, changeModalView, stakingAddress, operationFee, operations } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
-
   // const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
   // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
-  const operations = useOperations(tx.certificates);
+  const operationsCerts = useOperations(tx.certificates);
 
   const { plate } = selected;
-
   const currentWalletIcon = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={8} scalePx={4} />;
 
   const waletInfoDsiplay = (
@@ -75,7 +73,9 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 
       {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
 
-      {operations.components.length > 0 && <OperationsSection operations={operations} />}
+      {(operationsCerts.components.length > 0 || operations.components?.length > 0) && (
+        <OperationsSection operations={operationsCerts.components.length > 0 ? operationsCerts : operations} />
+      )}
     </Stack>
   );
 };
@@ -124,9 +124,12 @@ const ExternalPartySection = ({ receiverCustomTitle }) => {
 };
 
 const OperationsSection = ({ operations }) => {
+  console.log('operations', operations);
   const componentsNotDuplicated = operations.components
     .filter(component => !component.duplicated)
     .map(({ component }) => component);
+
+  console.log('componentsNotDuplicated', componentsNotDuplicated);
   return (
     <Box>
       <Divider sx={{ margin: '24px 0px' }} />

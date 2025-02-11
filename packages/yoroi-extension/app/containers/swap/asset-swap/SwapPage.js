@@ -209,7 +209,7 @@ function SwapPage(props: StoresProps & Intl): Node {
         const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
 
         openTxReviewModal({
-          title: 'Transaction confirmation (Swap in progress)',
+          title: 'Transaction confirmation',
           modalView: 'transactionReview',
           receiverCustomTitle: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
           submitTx: pasword => {

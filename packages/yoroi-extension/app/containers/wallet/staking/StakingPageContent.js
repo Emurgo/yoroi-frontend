@@ -35,7 +35,7 @@ import { ampli } from '../../../../ampli/index';
 declare var CONFIG: ConfigType;
 
 type State = {|
-  govStatusFetched: boolean;
+  govStatusFetched: boolean,
 |};
 
 @observer
@@ -57,14 +57,17 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     if (wallet == null) {
       throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
     }
-    this.props.stores.delegation.checkGovernanceStatus(wallet).then(() => {
-      this.setState({
-        govStatusFetched: true,
+    this.props.stores.delegation
+      .checkGovernanceStatus(wallet)
+      .then(() => {
+        this.setState({
+          govStatusFetched: true,
+        });
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to fetch governance status', e);
       });
-      return null;
-    }).catch(e => {
-      console.error('Failed to fetch governance status', e);
-    });
     if (this.props.stores.delegation.getPoolTransitionConfig(wallet).shouldUpdatePool) {
       const poolTransitionInfo = this.props.stores.delegation.getPoolTransitionInfo(wallet);
       if (poolTransitionInfo?.suggestedPool) {
@@ -73,7 +76,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     }
   }
 
-  getEpochLengthInDays: ({ publicDeriverId: number, ...}) => ?number = publicDeriver => {
+  getEpochLengthInDays: ({ publicDeriverId: number, ... }) => ?number = publicDeriver => {
     const timeCalcRequests = this.props.stores.substores.ada.time.getTimeCalcRequests(publicDeriver);
     const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
     const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
@@ -90,9 +93,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     });
   };
 
-  getStakePoolMeta: ({ publicDeriverId: number, networkId: number, ... }) => Node = (
-    publicDeriver
-  ) => {
+  getStakePoolMeta: ({ publicDeriverId: number, networkId: number, ... }) => Node = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const currentPool = delegationStore.getDelegatedPoolId(publicDeriver.publicDeriverId);
     if (currentPool == null) return null;
@@ -204,9 +205,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     const errorIfPresent = maybe(delegationRequests.error, error => ({ error }));
 
-    const showRewardAmount =
-      errorIfPresent == null &&
-        stores.delegation.isExecutedDelegatedBalance(wallet.publicDeriverId);
+    const showRewardAmount = errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(wallet.publicDeriverId);
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(wallet.publicDeriverId);
     const currentlyDelegating = stores.delegation.isCurrentlyDelegating(wallet.publicDeriverId);
@@ -222,7 +221,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         });
         return;
       }
-      this.createWithdrawalTx(false) // shouldDeregister=false
+      this.createWithdrawalTx(false); // shouldDeregister=false
       ampli.claimAdaPageViewed();
     };
 
@@ -235,12 +234,14 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
+              stores={stores}
+              govStatusFetched={this.state.govStatusFetched}
               onOverviewClick={() =>
                 stores.uiDialogs.open({
                   dialog: OverviewModal,
                 })
               }
-              withdrawRewards={isStakeRegistered && this.state.govStatusFetched ? handleRewardsWithdrawal : undefined}
+              // withdrawRewards={isStakeRegistered && this.state.govStatusFetched ? handleRewardsWithdrawal : undefined}
               unitOfAccount={this.toUnitOfAccount}
               getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={stores.profile.shouldHideBalance}

@@ -74,6 +74,7 @@ export const ReviewTxProvider = ({
         submitTx: payload.submitTx,
         createUnsignedTx: payload.createUnsignedTx,
         operationFee: payload.operationFee,
+        operations: payload.operations,
       });
     },
     changeModalView: (payload: any) => {
@@ -148,6 +149,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         operationFee: action.operationFee,
         submitTx: action.submitTx,
         createUnsignedTx: action.createUnsignedTx,
+        operations: action.operations,
       };
 
     case 'changeModalView':
