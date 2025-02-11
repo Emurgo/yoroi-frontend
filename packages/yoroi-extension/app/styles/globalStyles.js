@@ -280,6 +280,56 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
           '--yoroi-dashboard-graph-tooltip-background': 'rgba(56, 57, 61, 0.7)',
         }
       : null),
+
+      /* Toastify styles for notifications */
+      ...{
+          "--toastify-color-light": "#fff",
+          "--toastify-color-dark": "#121212",
+          "--toastify-color-info": "#3498db",
+          "--toastify-color-success": "#07bc0c",
+          "--toastify-color-warning": "#f1c40f",
+          "--toastify-color-error": "hsl(6, 78%, 57%)",
+          "--toastify-color-transparent": "rgba(255, 255, 255, 0.7)",
+      
+          "--toastify-icon-color-info": "var(--toastify-color-info)",
+          "--toastify-icon-color-success": "var(--toastify-color-success)",
+          "--toastify-icon-color-warning": "var(--toastify-color-warning)",
+          "--toastify-icon-color-error": "var(--toastify-color-error)",
+      
+          "--toastify-container-width": "fit-content",
+          "--toastify-toast-width": "446px",
+          "--toastify-toast-offset": "16px",
+          "--toastify-toast-top": "max(var(--toastify-toast-offset), env(safe-area-inset-top))",
+          "--toastify-toast-right": "max(var(--toastify-toast-offset), env(safe-area-inset-right))",
+          "--toastify-toast-left": "max(var(--toastify-toast-offset), env(safe-area-inset-left))",
+          "--toastify-toast-bottom": "max(var(--toastify-toast-offset), env(safe-area-inset-bottom))",
+          "--toastify-toast-background": "#fff",
+          "--toastify-toast-padding": "16px",
+          "--toastify-toast-min-height": "80px",
+          "--toastify-toast-max-height": "104x",
+          "--toastify-toast-bd-radius": "8px",
+          "--toastify-toast-shadow": "-1px 8px 20px 0px rgba(138, 146, 163, 0.1)",
+          "--toastify-font-family": "sans-serif",
+          "--toastify-z-index": "9999",
+          "--toastify-text-color-light": "#757575",
+          "--toastify-text-color-dark": "#fff",
+      
+          /* Used only for colored theme */
+          "--toastify-text-color-info": "#fff",
+          "--toastify-text-color-success": "#fff",
+          "--toastify-text-color-warning": "#fff",
+          "--toastify-text-color-error": "#fff",
+      
+          "--toastify-spinner-color": "#616161",
+          "--toastify-spinner-color-empty-area": "#e0e0e0",
+          "--toastify-color-progress-light": "linear-gradient(to right, #4cd964, #5ac8fa, #007aff, #34aadc, #5856d6, #ff2d55)",
+          "--toastify-color-progress-dark": "#bb86fc",
+          "--toastify-color-progress-info": "var(--toastify-color-info)",
+          "--toastify-color-progress-success": "var(--toastify-color-success)",
+          "--toastify-color-progress-warning": "var(--toastify-color-warning)",
+          "--toastify-color-progress-error": "var(--toastify-color-error)",
+          "--toastify-color-progress-bgo": "0.2",
+        }
   };
 }
 

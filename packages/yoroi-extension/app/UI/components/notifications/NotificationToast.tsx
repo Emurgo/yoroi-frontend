@@ -1,19 +1,19 @@
+import type { ReactElement } from 'react';
 import React from 'react';
-import { keyframes } from '@emotion/react'
-import { IconButton, styled, Box, Typography, useTheme } from '@mui/material';
-import { useStrings } from '../../common/hooks/useStrings';
+import { IconButton, styled, Box, useTheme } from '@mui/material';
 import { Icon } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
+import { FadeInOut } from './NotificationsContainer';
+import { toast } from 'react-toastify';
 
 const NOTIFICATION_TIMEOUT = 3000; // 3s
 
 export type NotificationProps = {
-  id: string;
+  title: ReactElement;
   type: NotificationTypes;
-  onClick(id: string): void;
-  onClose(id: string): void;
+  onClick(): void;
+  onClose(): void;
 }
-
 type IconProps = {
   type: NotificationTypes
 }
@@ -26,40 +26,18 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
   },
 }));
 
-const fadeIn = keyframes`
-  from {
-    transform: translateY(-100%);
-    opacity: 0;
+export const CloseNotificationButton = ({ closeToast }) => {
+  const theme = useTheme()
+  const handleClose = () => {
+    closeToast("closed");
   }
-  to {
-    transform: translateY(0%);
-    opacity: 1;
-  }
-`;
-const fadeOut = keyframes`
-  from {
-    transform: translateY(0%);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-100%);
-    opacity: 0;
-  } 
-`;
 
-const SNotificationContainer: any = styled(Box)(({ theme, closing }: any) => ({
-  display: 'flex',
-  borderRadius: '8px',
-  width: '446px',
-  paddingTop: '16px',
-  paddingBottom: '16px',
-  backgroundColor: theme.palette["ds"].bg_color_contrast_high,
-  boxShadow: theme.palette["ds"].light_shadow_notification,
-  animation: `${closing ? fadeOut : fadeIn} 200ms ease-in-out forwards`
-}));
-
-
-
+  return (
+    <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
+      <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
+    </IconWrapper>
+  )
+}
 
 const IconContainer = ({ children, ...props }) => (
   <Box {...props} sx={{
@@ -106,60 +84,11 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-export default function NotificationToast({ onClick, onClose, id, type }: NotificationProps) {
-  const strings = useStrings();
-  const theme = useTheme();
-  const [closing, setClosing] = React.useState(false);
-
-  React.useEffect(() => {
-    const timo = setTimeout(handleClose, NOTIFICATION_TIMEOUT)
-
-    return () => {
-      // avoids old timeouts if close was clicked
-      clearTimeout(timo);
-    }
-  }, [])
-
-  const notificationTexts = {
-    [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
-    [NotificationTypes.Income]: strings.tokensReceived,
-    [NotificationTypes.Outcome]: strings.tokensSent,
-    [NotificationTypes.Cancelled]: strings.txFailed,
-  }
-
-  const handleClick = (e) => {
-    e.preventDefault();
-    console.log("clicked");
-    onClick(id);
-  }
-
-  const handleClose = (e) => {
-    if (e) {
-      e.stopPropagation();
-      e.preventDefault();
-    }
-
-    setClosing(false);
-
-    setTimeout(() => onClose(id), 300);
-  }
-
-  return (
-
-    <SNotificationContainer closing={closing} onClick={handleClick}>
-      <Box px="16px" flexShrink={0} sx={{ cursor: 'pointer', alignSelf: 'center' }}>
-        <NotificationIcon type={type} />
-      </Box>
-      <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-        <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[type]}</Typography>
-        <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
-      </Box>
-      <Box px="12px" flexShrink={0}>
-        <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
-          <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
-        </IconWrapper>
-      </Box>
-    </SNotificationContainer>
-
-  );
-};
+export function createToast({ title, type }: NotificationProps) {
+  return toast(title, {
+    autoClose: NOTIFICATION_TIMEOUT,
+    icon: () => <NotificationIcon type={type} />,
+    transition: FadeInOut,
+    closeOnClick: true
+  });
+}

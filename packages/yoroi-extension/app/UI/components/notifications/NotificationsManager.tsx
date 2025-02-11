@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, Button } from "@mui/material";
-import NotificationToast, { NotificationProps } from "./NotificationToast";
+import { Box, Button, Typography } from "@mui/material";
+import { CloseNotificationButton, createToast } from "./NotificationToast";
 import { NotificationTypes } from '../../types/notifications';
 import { environment } from '../../../environment';
+import { toast, ToastContainer } from 'react-toastify'
+import { useStrings } from '../../common/hooks/useStrings';
+import NotificationsContainer from './NotificationsContainer';
 
 function getRandomNotification(clickFunction, closeFunction) {
-  console.log("create random click");
   const notifTypes = [
     NotificationTypes.Rewards,
     NotificationTypes.Cancelled,
@@ -17,55 +19,64 @@ function getRandomNotification(clickFunction, closeFunction) {
   const notifType: any = notifTypes[randomIdx] || notifTypes[0];
 
   return {
-    id: String(Math.random()),
     type: notifType,
     onClick: clickFunction,
     onClose: closeFunction
   };
 }
 
-export default function NotificationsContainer() {
-  const [notifications, setNotifications] = React.useState<NotificationProps[]>([]);
-  console.log("ntf", notifications)
-
-  const handleNotificationClose = (notifId: string) => {
-    console.log("closed", notifId);
-    console.log([...notifications]);
-    setNotifications(prev => prev.filter(n => n.id === notifId))
+export default function NotificationsManager() {
+  const [toastQueue, setToastQueue] = React.useState<any>([]);
+  const strings = useStrings();
+  const notificationTexts = {
+    [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
+    [NotificationTypes.Income]: strings.tokensReceived,
+    [NotificationTypes.Outcome]: strings.tokensSent,
+    [NotificationTypes.Cancelled]: strings.txFailed,
   }
 
-  const handleNotificationClick = (notifId: string) => {
-    console.log("clicked", notifId);
-    setNotifications(prev => prev.filter(n => n.id === notifId))
-  }
+
+  const showToast = () => {
+    const notif = getRandomNotification(console.log, console.log);
+
+    // Remove the oldest toast if more than 3 exist
+    if (toastQueue.length >= 3) {
+      toast.dismiss(toastQueue[0]);
+      setToastQueue((prev) => prev.slice(1));
+    }
+
+    const id = createToast({
+      ...notif, title: (
+        <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
+          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[notif.type]}</Typography>
+          <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
+        </Box>
+      )
+    });
+
+    setToastQueue((prev) => [...prev, id]);
+  };
 
 
   return (
     <>
-      <Box sx={{
-        position: 'fixed',
-        display: 'flex',
-        flexFlow: 'column-reverse',
-        top: 10,
-        right: 10,
-        zIndex: 9999,
-        gap: '10px'
-      }}>
-        {notifications.slice(0, 3).map((notif) =>
-          <NotificationToast {...notif} />
-        )}
-      </Box>
+      <NotificationsContainer />
+      <ToastContainer
+        position="top-right"
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        pauseOnHover={true}
+        limit={3}
+        closeButton={(props) => <CloseNotificationButton {...props} />}
+      />
       {environment.isDev() && (
-        <Box sx={{ position: 'fixed', top: 10, left: 100, zIndex: 9999 }}>
+        <Box sx={{ position: 'fixed', bottom: 10, left: 100, zIndex: 9999 }}>
           <Button
             variant='contained'
-            onClick={() => {
-              const notif = getRandomNotification(
-                handleNotificationClick,
-                handleNotificationClose
-              )
-              setNotifications(prev => [...prev, notif])
-            }}
+            onClick={showToast}
           >
             Create toast notification
           </Button>
