@@ -3,6 +3,7 @@ import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
+import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
 // TODO Define the type for an individual asset
 interface Asset {
@@ -66,7 +67,6 @@ export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
 };
 
 const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
-  console.log('outputs', outputs);
   return (
     <Stack>
       <Collapsible
@@ -90,7 +90,6 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
 
 const Input: React.FC<InputProps> = ({ input }: any) => {
   const strings = useStrings();
-
   const renderAssets = () => {
     if (!input.assets.length) return null;
     return input.assets.map(asset => (
@@ -138,6 +137,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
 const Output: React.FC<OutputProps> = ({ output }: any) => {
   const strings = useStrings();
   const isOwnAdddress = output.ownAddress;
+
   const renderAssets = () => {
     if (!output.assets.length) return null;
 
@@ -172,6 +172,8 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
 };
 
 const FeeDisplay = ({ fee }) => {
+  const { primaryTokenInfo } = useTxReviewModal();
+
   return (
     <Stack direction="column" my="24px">
       <Divider />
@@ -179,7 +181,9 @@ const FeeDisplay = ({ fee }) => {
         <Typography variant="body1" fontWeight="500">
           Fee
         </Typography>
-        <Typography variant="body1">{`-${fee}`}</Typography>
+        <Typography variant="body1">
+          {`-${fee.shiftedBy(-primaryTokenInfo.decimals)}`} {primaryTokenInfo.name}
+        </Typography>
       </Stack>
       <Divider />
     </Stack>

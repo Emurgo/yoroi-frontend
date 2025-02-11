@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import React from 'react';
+import { useTxReviewModal } from '../module/ReviewTxProvider';
 
 interface TokenItemProps {
   isSent?: boolean;
@@ -9,6 +10,7 @@ interface TokenItemProps {
 
 export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, tokenInfo, quantity }: any) => {
   const backgroundColor = isSent ? 'ds.primary_500' : 'ds.secondary_300';
+  const { primaryTokenInfo } = useTxReviewModal();
 
   const textColor = isSent ? 'ds.white_static' : 'ds.text_gray_max';
 
@@ -22,7 +24,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, tokenInfo, 
       }}
     >
       <Box sx={{ padding: '4px 12px', backgroundColor: backgroundColor, borderRadius: '8px', color: textColor }}>
-        <Typography color="ds.white_static">{`${quantity} ${tokenInfo.name}`}</Typography>
+        <Typography color="ds.white_static">{`${quantity.shiftedBy(-primaryTokenInfo.decimals)} ${tokenInfo.name}`}</Typography>
       </Box>
     </Box>
   );

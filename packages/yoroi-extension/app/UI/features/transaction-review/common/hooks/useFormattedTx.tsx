@@ -2,6 +2,7 @@
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
 import { CredKind } from '@emurgo/cross-csl-core';
 import { isNonNullable } from '@yoroi/common';
+import BigNumber from 'bignumber.js';
 import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
@@ -10,7 +11,7 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, stakingAddress, networkId } = useTxReviewModal();
+  const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, networkId } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
@@ -23,12 +24,8 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const formattedCertificates = formatCertificates(data?.certs);
 
   const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
-  const formattedOutputs = useFormattedOutputs(
-    outputs,
-    stakingAddress,
-    networkId
-    //  primaryTokenInfo, walletAddresses
-  );
+  const formattedOutputs = useFormattedOutputs(outputs, networkId, primaryTokenInfo);
+
   return {
     inputs: formattedInputs,
     outputs: formattedOutputs,
@@ -93,7 +90,6 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
             };
           })
           .filter(Boolean) ?? [];
-
       return {
         assets: [...primaryAssets, ...multiAssets].filter(isNonNullable),
         address,
@@ -107,39 +103,61 @@ const formatInputs = async (inputUtxos, ftAssetsList, networkId, primaryTokenInf
   );
 };
 
-const formatOutputs = async (outputs, networkId, primaryTokenInfo): Promise<any> => {
+type Output = {
+  address: string;
+  amount: {
+    coin: BigNumber;
+    multiasset: any;
+  };
+  plutus_data: any;
+  script_ref: any;
+};
+
+const sumAmountsByAddress = (outputs: Output[]) => {
+  return outputs.reduce((acc, output) => {
+    if (acc[output.address]) {
+      acc[output.address] = acc[output.address].plus(output.amount.coin);
+    } else {
+      acc[output.address] = new BigNumber(output.amount.coin);
+    }
+    return acc;
+  }, {});
+};
+
+const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenInfo: any): Promise<any> => {
+  const summedOutputs = sumAmountsByAddress(outputs);
+
   return Promise.all(
-    outputs.map(async output => {
-      const address = output.address;
-      const coin = asQuantity(output.amount.coin);
+    Object.entries(summedOutputs).map(async ([address, totalCoin]) => {
+      const coin: any = totalCoin;
       const addressKind = await getAddressKind(address);
       const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
+
       const primaryAssets = [
         {
           tokenInfo: primaryTokenInfo,
-          quantity: coin,
+          quantity: asQuantity(coin.toString()),
         },
       ];
-      const multiAssets =
-        output.amount?.multiasset !== null
-          ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
-              return Object.entries(assets).map(([assetId, amount]) => {
-                const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
-                if (tokenInfo === undefined) {
-                  return null;
-                }
-                if (primaryTokenInfo == null) return null;
-                const quantity = asQuantity(String(amount));
 
-                return {
-                  tokenInfo,
-                  quantity,
-                };
-              });
-            })
-          : [];
+      const multiAssets = outputs
+        .filter(output => output.address === address && output.amount.multiasset !== null)
+        .flatMap(output =>
+          Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
+            return Object.entries(assets).map(([assetId, amount]) => {
+              const tokenInfo = primaryTokenInfo.tokenInfos?.get(`${policyId}.${assetId}`);
+              if (tokenInfo === undefined || primaryTokenInfo == null) return null;
 
-      const assets = [...primaryAssets, ...multiAssets].filter(isNonNullable);
+              return {
+                tokenInfo,
+                quantity: asQuantity(new BigNumber(String(amount)).toString()),
+              };
+            });
+          })
+        )
+        .filter(isNonNullable);
+
+      const assets = [...primaryAssets, ...multiAssets];
 
       return {
         assets,
@@ -147,7 +165,6 @@ const formatOutputs = async (outputs, networkId, primaryTokenInfo): Promise<any>
         addressKind,
         rewardAddress,
         ownAddress: address,
-        // ownAddress: isOwnedAddress(walletAddresses, address), TODO - investigate this
       };
     })
   );
