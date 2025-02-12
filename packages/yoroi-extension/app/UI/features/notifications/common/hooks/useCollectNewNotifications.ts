@@ -1,6 +1,6 @@
-import {useNotificationManager} from "@yoroi/notifications";
-import * as React from "react";
-import {Notifications} from '@yoroi/types'
+import { useNotificationManager } from '@yoroi/notifications';
+import * as React from 'react';
+import { Notifications } from '@yoroi/types'
 
 
 type UseCollectNewNotificationsParams = {
@@ -8,10 +8,10 @@ type UseCollectNewNotificationsParams = {
   walletId: string;
 }
 
-export const useCollectNewNotifications = ({enabled, walletId}: UseCollectNewNotificationsParams) => {
+export const useCollectNewNotifications = ({ enabled, walletId }: UseCollectNewNotificationsParams) => {
   const manager = useNotificationManager()
   const selectedWalletId = walletId;
-  const [events, setEvents] = React.useState<Notifications.Event[]>([])
+  const [events, setEvents] = React.useState<Array<Notifications.Event>>([])
 
   React.useEffect(() => {
     if (!enabled) return
@@ -20,10 +20,6 @@ export const useCollectNewNotifications = ({enabled, walletId}: UseCollectNewNot
     }
 
     const subscription = manager.newEvents$.subscribe((event) => {
-      if (event.trigger === Notifications.Trigger.RewardsUpdated && event.metadata.walletId === selectedWalletId) {
-        pushEvent(event)
-      }
-
       if (event.trigger === Notifications.Trigger.TransactionReceived && event.metadata.walletId === selectedWalletId) {
         pushEvent(event)
       }
@@ -37,5 +33,5 @@ export const useCollectNewNotifications = ({enabled, walletId}: UseCollectNewNot
     setEvents((e) => e.filter((ev) => ev.id !== id))
   }
 
-  return {events, removeEvent}
+  return { events, removeEvent };
 }
