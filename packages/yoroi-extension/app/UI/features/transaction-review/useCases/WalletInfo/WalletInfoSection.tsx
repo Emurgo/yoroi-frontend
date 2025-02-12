@@ -90,7 +90,6 @@ const WalletStats = () => {
 
 const WalletAssets = () => {
   const { ftAssetsList, nftAssetList } = useTxReviewModal();
-  console.log('ftAssetsList', { ftAssetsList, nftAssetList });
 
   const formatedNftAssetList = nftAssetList.map(nft => ({
     ...nft,
