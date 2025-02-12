@@ -261,10 +261,10 @@ jobs:
       - name: setup-chromedriver
         uses: nanasess/setup-chromedriver@v2.3.0
   
-      - name: Run Xvfb
+      - name: Run ChromeDriver and Xvfb
         run: |
           export DISPLAY=:99
-          chromedriver --url-base=/wd/hub &
+          chromedriver --port=9515 &
           sudo Xvfb -ac :99 -screen 0 1600x1200x24 > /dev/null 2>&1 &
 
       - name: Install Firefox Developer Edition

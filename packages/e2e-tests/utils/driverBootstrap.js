@@ -19,6 +19,7 @@ import {
   isDapp,
   isFirefox,
   isHeadless,
+  isGARun,
 } from './utils.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 
@@ -79,6 +80,9 @@ const getChromeBuilder = () => {
   }
   if (isDapp()) {
     chromeOpts.setChromeBinaryPath(chromeBin);
+    if (isGARun()) {
+      chromeOpts.usingServer('http://localhost:9515')
+    }
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
