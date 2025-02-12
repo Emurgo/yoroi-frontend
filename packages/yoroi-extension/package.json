@@ -173,7 +173,7 @@
     "@yoroi/explorers": "^1.0.2",
     "@yoroi/portfolio": "1.0.3",
     "@yoroi/resolver": "2.0.2",
-    "@yoroi/staking": "^1.5.1",
+    "@yoroi/staking": "^1.6.0",
     "@yoroi/swap": "1.5.2",
     "@yoroi/types": "1.5.8",
     "assert": "2.1.0",

@@ -15,3 +15,7 @@ export const deriveRewardAddressFromAddress = async (address: string, chainId: n
     throw new Error('Its not possible to derive reward address');
   }
 };
+
+export function addressHexToBech32(hex: string): string {
+  return RustModule.WasmScope(Module => Module.WalletV4.Address.from_hex(hex).to_bech32());
+}

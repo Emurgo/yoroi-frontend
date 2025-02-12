@@ -2,6 +2,7 @@ import React from 'react';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
+import { addressHexToBech32 } from '../../../utils/common';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
 type ModalState = {
@@ -115,7 +116,7 @@ export const ReviewTxProvider = ({
       networkId: currentWalletInfo?.networkId,
       primaryTokenInfo: currentWalletInfo?.primaryTokenInfo,
       walletAddresses: currentWalletInfo?.walletAddresses,
-      stakingAddress: currentWalletInfo?.stakingAddress,
+      stakingAddress: addressHexToBech32(currentWalletInfo?.stakingAddress || ''),
       primaryBalance: currentWalletInfo?.walletBalance.ada,
       checkUserPassword,
       ...actions,
