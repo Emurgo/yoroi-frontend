@@ -109,7 +109,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
       return (
         <>
-          {!isCurrentlyDelegating ? (
+          {(!selectedWallet.isTestnet && !isCurrentlyDelegating) ? (
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
@@ -129,24 +129,26 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
             />
           ) : null}
 
-          <Box sx={{ iframe: { minHeight: '60vh' } }}>
-            {this.getDialog()}
-            <SeizaFetcher
-              urlTemplate={urlTemplate}
-              locale={locale}
-              bias={stakingListBias}
-              totalAda={totalAda}
-              poolList={poolList}
-              setFirstPool={pool => {
-                this.setState({ firstPool: pool });
-              }}
-              stakepoolSelectedAction={async poolId => {
-                this.setState({ selectedPoolId: poolId });
-                await this.props.stores.delegation.createDelegationTransaction(poolId);
-                ampli.stakingCenterDelegationInitiated();
-              }}
-            />
-          </Box>
+          {!selectedWallet.isTestnet && (
+            <Box sx={{ iframe: { minHeight: '60vh' } }}>
+              {this.getDialog()}
+              <SeizaFetcher
+                urlTemplate={urlTemplate}
+                locale={locale}
+                bias={stakingListBias}
+                totalAda={totalAda}
+                poolList={poolList}
+                setFirstPool={pool => {
+                  this.setState({ firstPool: pool });
+                }}
+                stakepoolSelectedAction={async poolId => {
+                  this.setState({ selectedPoolId: poolId });
+                  await this.props.stores.delegation.createDelegationTransaction(poolId);
+                  ampli.stakingCenterDelegationInitiated();
+                }}
+              />
+            </Box>
+          )}
         </>
       );
     }
