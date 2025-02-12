@@ -12,7 +12,7 @@ export const ChooseDrepId = () => {
 
   useEffect(() => {
     setError(false);
-  }, [drepId]);
+  }, [drepIdInput]);
 
   const confirmDRep = async () => {
     const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepIdInput);
