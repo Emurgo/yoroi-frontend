@@ -80,14 +80,16 @@ const getChromeBuilder = () => {
   }
   if (isDapp()) {
     chromeOpts.setChromeBinaryPath(chromeBin);
-    if (isGARun()) {
-      chromeOpts.usingServer('http://localhost:9515')
-    }
   }
-  return new Builder()
+  const builder = new Builder()
     .forBrowser(TargetBrowser.Chrome)
     .setLoggingPrefs(prefs)
     .setChromeOptions(chromeOpts);
+  if (isGARun()) {
+    const chromeService = new chrome.ServiceBuilder().setPort(9515);
+    builder.setChromeService(chromeService);
+  }
+  return builder;
 };
 
 const __getFFOptions = () => {
