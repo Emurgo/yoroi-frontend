@@ -1,11 +1,11 @@
 import React from 'react';
-import { Box, Button, Typography } from "@mui/material";
-import { CloseNotificationButton, createToast } from "./NotificationToast";
+import { Box, Button } from "@mui/material";
+import { NotificationCloseButton, createToast } from "./NotificationToast";
 import { NotificationTypes } from '../../types/notifications';
 import { environment } from '../../../environment';
 import { toast, ToastContainer } from 'react-toastify'
 import { useStrings } from '../../common/hooks/useStrings';
-import NotificationsContainer from './NotificationsContainer';
+import NotificationsStyles from './NotificationsStyles';
 
 function getRandomNotification(clickFunction, closeFunction) {
   const notifTypes = [
@@ -25,16 +25,15 @@ function getRandomNotification(clickFunction, closeFunction) {
   };
 }
 
-export default function NotificationsManager() {
+export default function NotificationsManager({ intl = undefined }) {
   const [toastQueue, setToastQueue] = React.useState<any>([]);
-  const strings = useStrings();
+  const strings = useStrings(intl);
   const notificationTexts = {
     [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
     [NotificationTypes.Income]: strings.tokensReceived,
     [NotificationTypes.Outcome]: strings.tokensSent,
     [NotificationTypes.Cancelled]: strings.txFailed,
   }
-
 
   const showToast = () => {
     const notif = getRandomNotification(console.log, console.log);
@@ -46,21 +45,25 @@ export default function NotificationsManager() {
     }
 
     const id = createToast({
-      ...notif, title: (
-        <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[notif.type]}</Typography>
-          <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
-        </Box>
-      )
+      ...notif,
+      title: notificationTexts[notif.type],
+      subtitle: strings.clickToView
     });
 
     setToastQueue((prev) => [...prev, id]);
   };
 
+  const handleToastChanges = (data) => {
+    console.log(data)
+  }
+
+  React.useEffect(() => {
+    toast.onChange(handleToastChanges)
+  }, [])
 
   return (
     <>
-      <NotificationsContainer />
+      <NotificationsStyles />
       <ToastContainer
         position="top-right"
         hideProgressBar={true}
@@ -70,7 +73,7 @@ export default function NotificationsManager() {
         pauseOnFocusLoss={false}
         pauseOnHover={true}
         limit={3}
-        closeButton={(props) => <CloseNotificationButton {...props} />}
+        closeButton={(props) => <NotificationCloseButton {...props} />}
       />
       {environment.isDev() && (
         <Box sx={{ position: 'fixed', bottom: 10, left: 100, zIndex: 9999 }}>

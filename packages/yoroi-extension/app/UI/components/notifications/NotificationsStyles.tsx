@@ -7,7 +7,7 @@ export const FadeInOut = cssTransition({
   exit: 'Toastify__toast--fade-out-top'
 })
 
-export default function NotificationsContainer() {
+export default function NotificationsStyles() {
   return (
     <Global styles={css`
 .Toastify__toast-container {

@@ -1,18 +1,16 @@
-import type { ReactElement } from 'react';
 import React from 'react';
-import { IconButton, styled, Box, useTheme } from '@mui/material';
+import { IconButton, styled, Box, useTheme, Typography } from '@mui/material';
 import { Icon } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
-import { FadeInOut } from './NotificationsContainer';
+import { FadeInOut } from './NotificationsStyles';
 import { toast } from 'react-toastify';
 
 const NOTIFICATION_TIMEOUT = 3000; // 3s
 
 export type NotificationProps = {
-  title: ReactElement;
+  title: string;
+  subtitle: string;
   type: NotificationTypes;
-  onClick(): void;
-  onClose(): void;
 }
 type IconProps = {
   type: NotificationTypes
@@ -26,7 +24,7 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
   },
 }));
 
-export const CloseNotificationButton = ({ closeToast }) => {
+export const NotificationCloseButton = ({ closeToast }) => {
   const theme = useTheme()
   const handleClose = () => {
     closeToast("closed");
@@ -84,11 +82,20 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-export function createToast({ title, type }: NotificationProps) {
-  return toast(title, {
+const NotificationBody = ({ title, subtitle }) => {
+  return (
+    <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
+      <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{title}</Typography>
+      <Typography component="div" variant='body2' color="ds.text_gray_low">{subtitle}</Typography>
+    </Box>
+  )
+}
+
+export function createToast({ title, subtitle, type }: NotificationProps) {
+  return toast(<NotificationBody title={title} subtitle={subtitle} />, {
     autoClose: NOTIFICATION_TIMEOUT,
     icon: () => <NotificationIcon type={type} />,
     transition: FadeInOut,
-    closeOnClick: true
+    closeOnClick: true,
   });
 }
