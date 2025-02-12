@@ -214,16 +214,16 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
 
-    const handleRewardsWithdrawal = async () => {
-      if (!isParticipatingToGovernance) {
-        this.props.stores.uiDialogs.open({
-          dialog: GovernanceParticipateDialog,
-        });
-        return;
-      }
-      this.createWithdrawalTx(false); // shouldDeregister=false
-      ampli.claimAdaPageViewed();
-    };
+    // const handleRewardsWithdrawal = async () => {
+    //   if (!isParticipatingToGovernance) {
+    //     this.props.stores.uiDialogs.open({
+    //       dialog: GovernanceParticipateDialog,
+    //     });
+    //     return;
+    //   }
+    //   this.createWithdrawalTx(false); // shouldDeregister=false
+    //   ampli.claimAdaPageViewed();
+    // };
 
     return (
       <Box>

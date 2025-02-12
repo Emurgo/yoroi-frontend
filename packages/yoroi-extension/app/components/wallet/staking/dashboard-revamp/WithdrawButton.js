@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
@@ -29,9 +29,9 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores }) => 
   };
 
   const createWithdrawalTx = async () => {
-    const wallet = stores.wallets.selectedOrFail;
+    const walletSelect = stores.wallets.selectedOrFail;
     stores.substores.ada.delegationTransaction.setShouldDeregister(false);
-    const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet });
+    const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
     // stores.uiDialogs.open({
     //   dialog: WithdrawRewardsDialog,
     // });
@@ -45,7 +45,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores }) => 
     openTxReviewModal({
       title: 'Transaction review',
       modalView: 'transactionReview',
-      submitTx: pasword => {},
+      submitTx: () => {},
       operationFee: {
         total: 2222222,
       },

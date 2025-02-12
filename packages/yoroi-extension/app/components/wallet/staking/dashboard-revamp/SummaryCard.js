@@ -32,6 +32,8 @@ type Props = {|
   +shouldHideBalance: boolean,
   +graphData: GraphData,
   +withdrawRewards: void | (void => Promise<void>),
+  +govStatusFetched: boolean,
+  +stores: any,
 |};
 
 type Intl = {|
