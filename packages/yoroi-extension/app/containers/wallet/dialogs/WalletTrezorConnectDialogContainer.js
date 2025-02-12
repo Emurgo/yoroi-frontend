@@ -64,7 +64,10 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={trezorConnectStore.goBackToCheck}
+            goBack={()=>{
+              trezorConnectStore.goBackToCheck();
+              ampli.connectWalletCheckPageViewed();
+            }}
             submit={trezorConnectStore.submitConnect}
             cancel={this.cancel}
           />);

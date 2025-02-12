@@ -328,7 +328,7 @@ export const messages = Object.freeze(
       id: 'swap.startDoingSwaps',
       defaultMessage: '!!!Start doing the swap operations to see your open orders here',
     },
-    ordersPairs: {
+    ordersPair: {
       id: 'swap.ordersPair',
       defaultMessage: '!!!Pair (From / To)',
     },
@@ -463,7 +463,7 @@ export const useStrings = () => {
     noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
     noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
     startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
-    ordersPairs: intl.formatMessage(messages.ordersPairs),
+    ordersPair: intl.formatMessage(messages.ordersPair),
     ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
     swapDisclamerCheckbox: intl.formatMessage(messages.swapDisclamerCheckbox),

@@ -23,7 +23,6 @@ type LocalProps = {|
 
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;
     if (selectedNetwork === undefined) {
@@ -66,7 +65,10 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={ledgerConnectStore.goBackToCheck}
+            goBack={()=> {
+              ledgerConnectStore.goBackToCheck();
+              ampli.connectWalletCheckPageViewed();
+            }}
             submit={ledgerConnectStore.submitConnect}
             cancel={this.cancel}
           />);

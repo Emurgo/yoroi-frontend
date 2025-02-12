@@ -156,7 +156,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() => {
-                if (stores.router.location.pathname.startsWith(ROUTES.WALLETS)) {
+                if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
                   ampli.walletPageExchangeClicked();
                 }
                 this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
