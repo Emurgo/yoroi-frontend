@@ -11,6 +11,7 @@ import { ampli } from '../../../ampli/index';
 
 type Props = {|
   onBuySellClick: () => void,
+  isTestnet: boolean,
 |};
 
 type Intl = {|
@@ -26,9 +27,21 @@ const messages = defineMessages({
     id: 'wallet.emptyWalletMessageSubtitle',
     defaultMessage: '!!!Top up your wallet safely using our trusted partners',
   },
+  welcomeMessageTestnet: {
+    id: 'wallet.emptyWalletMessage.testnet',
+    defaultMessage: '!!!Learn Cardano with test ADA ⭐',
+  },
+  welcomeMessageSubtitleTestnet: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnet',
+    defaultMessage: '!!!Get started with Cardano\'s test currency, TADA. It\'s your key to testing a new world of possibilities.',
+  },
+  goToFaucetButton: {
+    id: 'wallet.emptyWalletMessage.goToFaucet',
+    defaultMessage: '!!!GO TO TADA FAUCET',
+  },
 });
 
-function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
+function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): Node {
   return (
     <Box>
       <Box
@@ -48,10 +61,10 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
         </Box>
         <Box>
           <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
-            {intl.formatMessage(messages.welcomeMessage)}
+            {intl.formatMessage(isTestnet? messages.welcomeMessageTestnet : messages.welcomeMessage)}
           </Typography>
-          <Typography component="div" variant="body1" color="ds.gray_max" maxWidth="600px" mb="24px">
-            {intl.formatMessage(messages.welcomeMessageSubtitle)}
+          <Typography component="div" variant="body1" color="ds.gray_max" mb="24px">
+            {intl.formatMessage(isTestnet? messages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>
         <Stack direction="row" gap="16px">
@@ -66,8 +79,12 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
               },
             }}
             onClick={() => {
-              onBuySellClick();
-              ampli.walletPageBuyBannerClicked();
+              if (isTestnet) {
+                window.open('https://docs.cardano.org/cardano-testnets/tools/faucet', '_blank');
+              } else {
+                onBuySellClick();
+                ampli.walletPageBuyBannerClicked();
+              }
             }}
           >
             <Typography
@@ -78,7 +95,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
                 lineHeight: '19px',
               }}
             >
-              {intl.formatMessage(globalMessages.buyAda)}
+              {intl.formatMessage(isTestnet? messages.goToFaucetButton: globalMessages.buyAda)}
             </Typography>
           </Button>
         </Stack>
