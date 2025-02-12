@@ -6,7 +6,7 @@ const displayLimit = 3
 export const NotificationUIHandler = () => {
   // TODO: check if notifications are enabled
   const enabled = true;
-  // TODO: Pass correct wallet ID
+  // TODO: Pass correct active wallet ID
   const walletId = '';
 
   const { events, removeEvent } = useCollectNewNotifications({ enabled, walletId });

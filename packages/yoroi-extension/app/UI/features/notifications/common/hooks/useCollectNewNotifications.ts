@@ -10,7 +10,6 @@ type UseCollectNewNotificationsParams = {
 
 export const useCollectNewNotifications = ({ enabled, walletId }: UseCollectNewNotificationsParams) => {
   const manager = useNotificationManager()
-  const selectedWalletId = walletId;
   const [events, setEvents] = React.useState<Array<Notifications.Event>>([])
 
   React.useEffect(() => {
@@ -20,14 +19,14 @@ export const useCollectNewNotifications = ({ enabled, walletId }: UseCollectNewN
     }
 
     const subscription = manager.newEvents$.subscribe((event) => {
-      if (event.trigger === Notifications.Trigger.TransactionReceived && event.metadata.walletId === selectedWalletId) {
+      if (event.trigger === Notifications.Trigger.TransactionReceived && event.metadata.walletId === walletId) {
         pushEvent(event)
       }
     })
     return () => {
       subscription.unsubscribe()
     }
-  }, [manager, setEvents, selectedWalletId, enabled])
+  }, [manager, setEvents, walletId, enabled])
 
   const removeEvent = (id: number) => {
     setEvents((e) => e.filter((ev) => ev.id !== id))
