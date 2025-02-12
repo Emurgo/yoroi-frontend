@@ -25,41 +25,53 @@ export const mountLocalStorage = ({ path }: Props): App.Storage => {
     throw new Error('Not implemented');
   }
 
+  async function setItem<U>(key: string, value: U, stringify: (data: U) => string = JSON.stringify): Promise<void> {
+    localStorage.setItem(withPath(key), stringify(value));
+  }
+
+  async function multiSet<U>(_tuples: ReadonlyArray<[string, U]>, _stringify: (data: U) => string = JSON.stringify): Promise<void> {
+    throw new Error('Not implemented');
+  }
+
+  async function removeItem(key: string): Promise<void> {
+    localStorage.removeItem(withPath(key));
+  }
+
+  async function removeFolder(folderName: string): Promise<void> {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(path) && withoutPath(key).startsWith(folderName)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+
+  async function multiRemove(keys: ReadonlyArray<string>): Promise<void> {
+    keys.forEach((key) => localStorage.removeItem(withPath(key)));
+  }
+
+  async function getAllKeys(): Promise<ReadonlyArray<any>> {
+    return Object.keys(localStorage)
+      .filter((key) => key.startsWith(path))
+      .map(withoutPath);
+  }
+
+  async function clear(): Promise<void> {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith(path)) localStorage.removeItem(key);
+    });
+  }
+
   return {
     join: (folderName: string) => mountLocalStorage({ path: `${path}${folderName}` }),
 
     getItem,
     multiGet,
-    setItem: async <T>(key: string, value: T, stringify: (data: T) => string = JSON.stringify) => {
-      localStorage.setItem(withPath(key), stringify(value));
-    },
-    multiSet: async <T>(tuples: ReadonlyArray<[string, T]>, stringify: (data: T) => string = JSON.stringify) => {
-      tuples.forEach(([key, value]) => {
-        localStorage.setItem(withPath(key), stringify(value));
-      });
-    },
-    removeItem: async (key: string) => {
-      localStorage.removeItem(withPath(key));
-    },
-    removeFolder: async (folderName: string) => {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith(path) && withoutPath(key).startsWith(folderName)) {
-          localStorage.removeItem(key);
-        }
-      });
-    },
-    multiRemove: async (keys: ReadonlyArray<string>) => {
-      keys.forEach((key) => localStorage.removeItem(withPath(key)));
-    },
-    getAllKeys: async (): Promise<ReadonlyArray<any>> => {
-      return Object.keys(localStorage)
-        .filter((key) => key.startsWith(path))
-        .map(withoutPath);
-    },
-    clear: async () => {
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith(path)) localStorage.removeItem(key);
-      });
-    },
+    setItem,
+    multiSet,
+    removeItem,
+    removeFolder,
+    multiRemove,
+    getAllKeys,
+    clear,
   };
 };
