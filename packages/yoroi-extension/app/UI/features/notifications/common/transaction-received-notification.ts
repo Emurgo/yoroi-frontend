@@ -11,7 +11,7 @@ export const useTransactionReceivedNotifications = ({enabled}: {enabled: boolean
     const subscriptionBeginDate = new Date()
     const notifications: Array<Notifications.TransactionReceivedEvent> = [];
     // TODO: listen for new transactions
-    // When you get a new transaction, populate `transactionReceivedSubject`
+    // When you get a new transaction, populate `transactionReceivedSubject` with data created by `createTransactionReceivedNotification`
     // Note transaction confirmation date must be bigger than `subscriptionBeginDate`
     notifications.forEach(notification => transactionReceivedSubject.next(notification));
   },[enabled])

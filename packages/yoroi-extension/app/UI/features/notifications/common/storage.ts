@@ -1,4 +1,4 @@
-import {App} from '@yoroi/types';
+import { App } from '@yoroi/types';
 
 type Props = {
   path: string;
