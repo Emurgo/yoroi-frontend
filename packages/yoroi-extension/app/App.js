@@ -19,6 +19,8 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
+import { NotificationProvider } from '@yoroi/notifications';
+import { notificationManager } from './UI/features/notifications/common/manager';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -92,7 +94,9 @@ class App extends Component<Props, State> {
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
           <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
+            <NotificationProvider manager={notificationManager}>
+              {this.getContent()}
+            </NotificationProvider>
           </IntlProvider>
         </ColorModeProvider>
       </div>
