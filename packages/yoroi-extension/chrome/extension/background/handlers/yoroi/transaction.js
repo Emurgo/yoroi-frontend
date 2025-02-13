@@ -7,7 +7,7 @@ import {
 } from '../../../connector/api';
 import {
   transactionHexToHash,
-  transactionHexAddVkeyWitnessesFromWitnessSetHex,
+  transactionHexAddSignaturesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 import {
   asGetSigningKey,
@@ -47,7 +47,7 @@ export const SignTransaction: HandlerType<
           partialSign: false
         },
       );
-      return transactionHexAddVkeyWitnessesFromWitnessSetHex(transactionHex, signedWitnessSetHex);
+      return transactionHexAddSignaturesFromWitnessSetHex(transactionHex, signedWitnessSetHex);
     } catch (error) {
       return { error: error.message };
     }
