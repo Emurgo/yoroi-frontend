@@ -21,7 +21,7 @@ export const MetadataTab = ({ hash, metadata }) => {
           <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
             Metadata
           </Typography>
-          <CopyButton textToCopy={metadata} strings={strings} />
+          <CopyButton textToCopy={JSON.stringify(metadata, null, 2)} strings={strings} />
         </Stack>
 
         <Box
