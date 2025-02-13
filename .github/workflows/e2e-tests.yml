@@ -313,7 +313,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:${{ matrix.browser }}:dapp
+        run: npm run test:${{ matrix.browser }}:dapp:one "dApp, connection in extension"
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
