@@ -26,7 +26,7 @@ export const WalletInfoSection = () => {
             },
           }}
         >
-          <WalletAccountIcon iconSeed={plate.ImagePart} size={20} />
+          <WalletAccountIcon iconSeed={plate.ImagePart} size={8} scalePx={15} />
         </Box>
         <Typography variant="h5" mt="8px" fontWeight={500}>
           {selectedWalletName}
