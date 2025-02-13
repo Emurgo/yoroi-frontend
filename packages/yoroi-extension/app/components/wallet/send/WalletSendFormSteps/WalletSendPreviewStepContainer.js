@@ -70,8 +70,10 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
 
     if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
+    const amount = signRequest.totalInput();
+    const { numberOfDecimals } = this.props.getTokenInfo(amount.getDefaultEntry()).Metadata;
     ampli.sendSummarySubmitted({
-      ada_amount: signRequest.totalInput().getDefault().toNumber(),
+      ada_amount: amount.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
       asset_count: signRequest.totalInput().nonDefaultEntries().length,
     });
 
