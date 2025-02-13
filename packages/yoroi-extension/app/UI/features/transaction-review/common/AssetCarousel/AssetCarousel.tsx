@@ -1,6 +1,8 @@
-import { Box, styled } from '@mui/material';
+import { Box, styled, useTheme } from '@mui/material';
 import React, { useState } from 'react';
 import Carousel from 'react-simply-carousel';
+import defaultTokenDarkImage from '../../../../../assets/images/revamp/asset-default-dark.inline.svg';
+import defaultTokenImage from '../../../../../assets/images/revamp/asset-default.inline.svg';
 import { Icon } from '../../../../components';
 
 const IconWrapper: any = styled(Box)(({ theme }: { theme: any }) => ({
@@ -13,6 +15,9 @@ const IconWrapper: any = styled(Box)(({ theme }: { theme: any }) => ({
 
 export const AssetCarousel = ({ data }) => {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const { name }: any = useTheme();
+
+  const defaultImage = name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
 
   return (
     <Box height="40px">
@@ -69,7 +74,14 @@ export const AssetCarousel = ({ data }) => {
               }}
             >
               <Box zIndex={1}>
-                <img width="48px" height="48px" src={token.info.image} />
+                <img
+                  width="48px"
+                  height="48px"
+                  src={token.info.image}
+                  onError={(e: any) => {
+                    e.target.src = defaultImage;
+                  }}
+                />
               </Box>
               <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%' }} />
             </Box>
