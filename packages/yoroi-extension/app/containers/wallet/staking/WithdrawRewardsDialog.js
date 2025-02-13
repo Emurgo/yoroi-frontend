@@ -113,8 +113,15 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
         onError: () => {},
       });
     }
+
+    const { numberOfDecimals } = genLookupOrFail(stores.tokenInfoStore.tokenInfo)({
+      identifier: selected.defaultTokenId,
+      networkId: selected.networkId,
+    }).Metadata;
+
     ampli.claimAdaTransactionSubmitted({
-      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber()
+      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount
+        .shiftedBy(-numberOfDecimals).toNumber()
     });
   };
 
