@@ -47,7 +47,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores }) => 
       modalView: 'transactionReview',
       submitTx: () => {},
       operationFee: {
-        total: 2222222,
+        total: parsedUnsignedTx.body.fee / 1000000,
       },
       operations: {
         components: [{ component: <OperationsDetails />, duplicated: false }],

@@ -4,7 +4,16 @@ import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 
 export const BottomActions = () => {
-  const { closeTxReviewModal, changeModalView, modalView, submitTx, passswordInput, isLoading } = useTxReviewModal();
+  const {
+    closeTxReviewModal,
+    changeModalView,
+    modalView,
+    submitTx,
+    passswordInput,
+    isLoading,
+    checkUserPassword,
+    setInputError,
+  } = useTxReviewModal();
 
   if (modalView === 'submitTx') {
     return (
@@ -13,7 +22,15 @@ export const BottomActions = () => {
           //  @ts-ignore
           variant="primary"
           sx={{ width: '100%' }}
-          onClick={() => submitTx(passswordInput)}
+          onClick={async () => {
+            const response = await checkUserPassword(passswordInput);
+            if (response?.name === 'WrongPassphraseError') {
+              console.log('WrongPassphraseError', response);
+              setInputError({ type: 'setInputError', inputError: true });
+            } else {
+              submitTx(passswordInput);
+            }
+          }}
           disabled={passswordInput === undefined || passswordInput.length === 0}
           loading={isLoading}
         >

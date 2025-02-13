@@ -50,8 +50,6 @@ export const GovernanceStatusSelection = () => {
     startLoadingTxReview,
     stopLoadingTxReview,
     changePasswordInputValue,
-    setInputError,
-    checkUserPassword,
     drepCredentialHex,
     setUnsignedTx,
   } = useTxReviewModal();
@@ -79,7 +77,6 @@ export const GovernanceStatusSelection = () => {
       createUnsignedTx: async value => {
         try {
           startLoadingTxReview();
-          console.log('@@@@@@@@@@@value', value);
           const txSignRequest: any = await createDrepDelegationTransaction(value);
           const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
           const parsedUnsignedTx = JSON.parse(txBodyjson);
@@ -89,7 +86,6 @@ export const GovernanceStatusSelection = () => {
         }
       },
       submitTx: password => {
-        console.log('submitTx password', password);
         signGovernanceTx(password);
       },
     });
@@ -139,28 +135,21 @@ export const GovernanceStatusSelection = () => {
 
   const signGovernanceTx = async password => {
     try {
-      const response = await checkUserPassword(password);
+      startLoadingTxReview();
+      console.log('TESTTSTS signGovernanceTx ', {
+        password,
+        wallet: selectedWallet,
+        dialog: null,
+      });
+      await signDelegationTransaction({
+        password,
+        wallet: selectedWallet,
+        dialog: null,
+      });
+      stopLoadingTxReview();
 
-      if (response?.name === 'WrongPassphraseError') {
-        console.log('WrongPassphraseError', response);
-        setInputError({ type: 'setInputError', inputError: true });
-      } else {
-        startLoadingTxReview();
-        console.log('TESTTSTS signGovernanceTx ', {
-          password,
-          wallet: selectedWallet,
-          dialog: null,
-        });
-        await signDelegationTransaction({
-          password,
-          wallet: selectedWallet,
-          dialog: null,
-        });
-        stopLoadingTxReview();
-
-        navigateTo.transactionSubmited();
-        changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
-      }
+      navigateTo.transactionSubmited();
+      changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
     } catch (error) {
       console.log('errorerror', error);
       console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);

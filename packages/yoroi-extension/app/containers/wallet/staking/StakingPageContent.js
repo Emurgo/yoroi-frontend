@@ -119,9 +119,10 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     return (
       <DelegatedStakePoolCard
+        stores={this.props.stores}
         poolTransition={delegationStore.getPoolTransitionInfo(publicDeriver)}
         delegatedPool={delegatedPool}
-        undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
+        // undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
           if (poolId != null) {
             return this.props.stores.delegation.createDelegationTransaction(poolId);

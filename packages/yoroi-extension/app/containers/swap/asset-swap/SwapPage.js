@@ -55,7 +55,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal, setInputError, closeTxReviewModal, checkUserPassword } = useTxReviewModal();
+  const { openTxReviewModal, closeTxReviewModal } = useTxReviewModal();
 
   const {
     slippage,
@@ -270,43 +270,37 @@ function SwapPage(props: StoresProps & Intl): Node {
   const handleSubmitTransaction = async passswordInput => {
     if (signRequest == null) return;
     validateSignRequestAndUserPassword(passswordInput);
-    const response = await checkUserPassword(passswordInput);
 
-    if (response?.name === 'WrongPassphraseError') {
-      console.log('WrongPassphraseError', response);
-      setInputError({ type: 'setInputError', inputError: true });
-    } else {
-      setOpenedDialog('loadingOverlay');
+    setOpenedDialog('loadingOverlay');
 
-      const baseBroadcastRequest = { wallet, signRequest };
-      const broadcastRequest = isHardwareWallet
-        ? { [walletType]: baseBroadcastRequest }
-        : { normal: { ...baseBroadcastRequest, password: passswordInput } };
+    const baseBroadcastRequest = { wallet, signRequest };
+    const broadcastRequest = isHardwareWallet
+      ? { [walletType]: baseBroadcastRequest }
+      : { normal: { ...baseBroadcastRequest, password: passswordInput } };
+    try {
+      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
+      // $FlowIgnore[incompatible-call]
+      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      setOrderStepValue(2);
       try {
-        const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
-        // $FlowIgnore[incompatible-call]
-        await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
-        setOrderStepValue(2);
-        try {
-          ampli.swapOrderSubmitted({
-            ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-            from_amount: sellQuantity.displayValue,
-            to_amount: buyQuantity.displayValue,
-            pool_source: selectedPoolCalculation?.pool.provider,
-            order_type: orderType,
-            slippage_tolerance: Number(slippageValue),
-            swap_fees: Number(formattedFeeQuantity),
-          });
-        } catch (e) {
-          console.error('analytics fail', e);
-        }
-        resetSwapForm();
+        ampli.swapOrderSubmitted({
+          ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
+          from_amount: sellQuantity.displayValue,
+          to_amount: buyQuantity.displayValue,
+          pool_source: selectedPoolCalculation?.pool.provider,
+          order_type: orderType,
+          slippage_tolerance: Number(slippageValue),
+          swap_fees: Number(formattedFeeQuantity),
+        });
       } catch (e) {
-        handleTransactionError(e);
-      } finally {
-        setOpenedDialog('');
-        closeTxReviewModal();
+        console.error('analytics fail', e);
       }
+      resetSwapForm();
+    } catch (e) {
+      handleTransactionError(e);
+    } finally {
+      setOpenedDialog('');
+      closeTxReviewModal();
     }
   };
 
