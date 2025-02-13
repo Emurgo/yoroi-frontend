@@ -46,7 +46,7 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
               components: [
                 ...acc.components,
                 {
-                  component: <AbstainOperation key={index} label="Select Always Abstain" />,
+                  component: <AbstainOperation key={index} label="Select abstain" />,
                   duplicated: isNotFirstElementDuplicated,
                   type: CertificateType.VoteDelegation,
                 },
@@ -58,7 +58,7 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
               components: [
                 ...acc.components,
                 {
-                  component: <NoConfidenceOperation label="Select no confidance" />,
+                  component: <NoConfidenceOperation label="Select no confidence" />,
                   duplicated: isNotFirstElementDuplicated,
                   type: CertificateType.VoteDelegation,
                 },
