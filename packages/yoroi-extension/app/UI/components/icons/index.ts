@@ -1,4 +1,12 @@
+import { Assets } from './Assets';
+import { AssetsFilled } from './AssetsFilled';
+import { Bio } from './Bio';
+import { Bug } from './Bug';
+import { BurguerMenu } from './BurguerMenu';
+import { BuyCoins } from './BuyCoins';
 import { Cancel } from './Cancel';
+import { CheckmarkFilled } from './CheckmarkFilled';
+import { CheckmarkOutlined } from './CheckmarkOutlined';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
 import { ChipArrowDown } from './ChipArrowDown';
@@ -16,6 +24,15 @@ import { VisibilityOn } from './VisibilityOn';
 import { Receive } from './Receive';
 
 export const Icon = {
+  Assets,
+  AssetsFilled,
+  Bio,
+  Bug,
+  BurguerMenu,
+  BuyCoins,
+  Cancel,
+  CheckmarkFilled,
+  CheckmarkOutlined,
   CloseIcon,
   VisibilityOn,
   VisibilityOff,
@@ -24,7 +41,6 @@ export const Icon = {
   ChipArrowUp,
   ChipArrowDown,
   Send,
-  Cancel,
   Staking,
   Expand,
   ChevronDown,
