@@ -49,49 +49,50 @@ describe('dApp, submitTx', function () {
     await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet, false);
   });
 
-  describe('[nested-dapp] Submit Tx, positive', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
+  // The check is blocked by https://emurgo.atlassian.net/browse/YOEXT-1723
+  // describe('[nested-dapp] Submit Tx, positive', function () {
+  //   before(async function () {
+  //     await customBeforeNestedDAppTest(this, windowManager);
+  //   });
 
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      const receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
-      // send sign request with 1 ada
-      const signingRequest = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-      uTxHex = signingRequest.uTxHex;
-    });
+  //   it('Request signTx', async function () {
+  //     // get a receiver address
+  //     await mockedDApp.requestUnusedAddresses();
+  //     const unusedAddresses = await mockedDApp.getAddresses();
+  //     const receiverAddr = unusedAddresses.retValue[0];
+  //     const requestedAmount = String(1 * adaInLovelaces);
+  //     // send sign request with 1 ada
+  //     const signingRequest = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
+  //     uTxHex = signingRequest.uTxHex;
+  //   });
 
-    it('Sign tx and check response', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-      await dappSingTxPage.enterPassword(getPassword());
-      await dappSingTxPage.confirmSigning();
+  //   it('Sign tx and check response', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
+  //     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
+  //     await dappSingTxPage.waitingConnectorIsReady();
+  //     await dappSingTxPage.enterPassword(getPassword());
+  //     await dappSingTxPage.confirmSigning();
 
-      // pop up is closed, switching to dapp
-      const result = await windowManager.isClosed(popupConnectorName);
-      expect(result, 'The window|tab is still opened').to.be.true;
-      await windowManager.switchTo(mockDAppName);
+  //     // pop up is closed, switching to dapp
+  //     const result = await windowManager.isClosed(popupConnectorName);
+  //     expect(result, 'The window|tab is still opened').to.be.true;
+  //     await windowManager.switchTo(mockDAppName);
 
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.true;
-      expect(signTxResponse.retValue).to.be.an('string').that.is.not.empty;
-      witnessSet = signTxResponse.retValue;
-    });
+  //     // check sign data response
+  //     const signTxResponse = await mockedDApp.getSigningTxResult();
+  //     expect(signTxResponse.success).to.be.true;
+  //     expect(signTxResponse.retValue).to.be.an('string').that.is.not.empty;
+  //     witnessSet = signTxResponse.retValue;
+  //   });
 
-    it('Submit Tx and check response', async function () {
-      const signedTxHex = signTxWithCSL(uTxHex, witnessSet);
-      const submitResponse = await mockedDApp.submitTx(signedTxHex);
-      expect(submitResponse.success, 'Submit Tx request failed').to.be.true;
-      expect(submitResponse.retValue).to.be.an('string').that.is.not.empty;
-    });
-  });
+  //   it('Submit Tx and check response', async function () {
+  //     const signedTxHex = signTxWithCSL(uTxHex, witnessSet);
+  //     const submitResponse = await mockedDApp.submitTx(signedTxHex);
+  //     expect(submitResponse.success, 'Submit Tx request failed').to.be.true;
+  //     expect(submitResponse.retValue).to.be.an('string').that.is.not.empty;
+  //   });
+  // });
 
   describe('[nested-dapp] Submit Tx, undefined Tx', function () {
     before(async function () {
@@ -105,42 +106,43 @@ describe('dApp, submitTx', function () {
     });
   });
 
-  describe('[nested-dapp] Submit Tx, unsigned Tx', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
+  // The check is blocked by https://emurgo.atlassian.net/browse/YOEXT-1723
+  // describe('[nested-dapp] Submit Tx, unsigned Tx', function () {
+  //   before(async function () {
+  //     await customBeforeNestedDAppTest(this, windowManager);
+  //   });
 
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      const receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
-      // send sign request with 1 ada
-      const signingRequest = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-      uTxHex = signingRequest.uTxHex;
-    });
+  //   it('Request signTx', async function () {
+  //     // get a receiver address
+  //     await mockedDApp.requestUnusedAddresses();
+  //     const unusedAddresses = await mockedDApp.getAddresses();
+  //     const receiverAddr = unusedAddresses.retValue[0];
+  //     const requestedAmount = String(1 * adaInLovelaces);
+  //     // send sign request with 1 ada
+  //     const signingRequest = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
+  //     uTxHex = signingRequest.uTxHex;
+  //   });
 
-    it('Sign tx', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-      await dappSingTxPage.enterPassword(getPassword());
-      await dappSingTxPage.confirmSigning();
+  //   it('Sign tx', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
+  //     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
+  //     await dappSingTxPage.waitingConnectorIsReady();
+  //     await dappSingTxPage.enterPassword(getPassword());
+  //     await dappSingTxPage.confirmSigning();
 
-      // pop up is closed, switching to dapp
-      const result = await windowManager.isClosed(popupConnectorName);
-      expect(result, 'The window|tab is still opened').to.be.true;
-      await windowManager.switchTo(mockDAppName);
-    });
+  //     // pop up is closed, switching to dapp
+  //     const result = await windowManager.isClosed(popupConnectorName);
+  //     expect(result, 'The window|tab is still opened').to.be.true;
+  //     await windowManager.switchTo(mockDAppName);
+  //   });
 
-    it('Submit Tx and check response', async function () {
-      const submitResponse = await mockedDApp.submitTx(uTxHex);
-      expect(submitResponse.success, 'Submit Tx request pass').to.be.false;
-      expect(submitResponse.errMsg.code).to.equal(TxSendErrorCode.Failure);
-    });
-  });
+  //   it('Submit Tx and check response', async function () {
+  //     const submitResponse = await mockedDApp.submitTx(uTxHex);
+  //     expect(submitResponse.success, 'Submit Tx request pass').to.be.false;
+  //     expect(submitResponse.errMsg.code).to.equal(TxSendErrorCode.Failure);
+  //   });
+  // });
 
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);

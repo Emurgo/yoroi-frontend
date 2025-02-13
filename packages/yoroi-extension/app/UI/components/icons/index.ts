@@ -11,6 +11,7 @@ import { Expand } from './Expand';
 import { Indicator } from './Indicator';
 import { Info } from './Info';
 import { LeftArrow } from './LeftArrow';
+import { Receive } from './Receive';
 import { RightArrow } from './RightArrow';
 import { Search } from './Search';
 import { Send } from './Send';
@@ -40,4 +41,5 @@ export const Icon = {
   Back,
   LeftArrow,
   RightArrow,
+  Receive,
 };
