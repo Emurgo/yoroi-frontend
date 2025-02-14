@@ -4,7 +4,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, stores }) => {
-  const { openTxReviewModal } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview } = useTxReviewModal();
 
   if (poolTransition?.shouldShowTransitionFunnel) {
     return (
@@ -26,7 +26,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     openTxReviewModal({
       title: 'Transaction review',
       modalView: 'transactionReview',
-      submitTx: () => submitTx(),
+      submitTx: passswordInput => submitTx(passswordInput),
       operationFee: {
         total: parsedUnsignedTx.body.fee / 1000000,
       },
@@ -37,7 +37,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     });
   };
 
-  const submitTx = async () => {
+  const submitTx = async passswordInput => {
     const selected = stores.wallets.selected;
     // if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
@@ -58,6 +58,21 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
         });
       }
     } else {
+      try {
+        startLoadingTxReview();
+        console.log('passswordInput', passswordInput);
+        await stores.substores.ada.mnemonicSend.sendMoney({
+          signRequest,
+          password: passswordInput,
+          wallet: selected,
+        });
+        console.log('=============success');
+        stopLoadingTxReview();
+      } catch (error) {
+        console.log('error', error);
+        stopLoadingTxReview();
+      }
+
       //   this.spendingPasswordForm.submit({
       //     onSuccess: async form => {
       //       const { walletPassword } = form.values();
