@@ -19,7 +19,7 @@ import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 
-const NETWORK_BADGES = Object.freeze({
+export const NETWORK_BADGES: {| [number]: {| color: string, text: string |}|} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
     color: 'rgba(236, 186, 9, 1)',
     text: 'Preprod',
