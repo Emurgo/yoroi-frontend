@@ -11,13 +11,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Get current branch
-      id: get-branch
-      run: |
-        BRANCH_NAME=${GITHUB_REF#refs/heads/}
-        echo "Current branch: $BRANCH_NAME"
-        echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-
     - name: Read .nvmrc
       id: nvm
       run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
@@ -90,7 +83,7 @@ jobs:
         git config --global user.name "github-actions[bot]" # needs clarification
         git config --global user.email "github-actions[bot]@users.noreply.github.com" # needs clarification
         git add package.json
-        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }}"
+        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
