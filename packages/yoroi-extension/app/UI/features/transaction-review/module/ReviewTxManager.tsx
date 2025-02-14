@@ -4,6 +4,7 @@ import { Drawer, styled } from '@mui/material';
 import { BottomActions } from '../common/BottomActions/BottomActions';
 import { TopActions } from '../common/TopActionSection/TopActions';
 import { ChooseDrepId } from '../useCases/ChooseDrepId/ChooseDrepId';
+import { ExtraDetails } from '../useCases/ExtraDetails/ExtraDetails';
 import { Operations } from '../useCases/Operations/Operations';
 import { ReviewTxSection } from '../useCases/ReviewTx/ReviewTxSection';
 import { SubmitInput } from '../useCases/SubmitTx/SubmitInput';
@@ -43,6 +44,9 @@ export const ReviewTxManager = () => {
     if (modalView === 'walletInfo') {
       return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
     }
+    if (modalView === 'extraDetails') {
+      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+    }
     if (modalView === 'submitTx') {
       setInputError({ type: 'setInputError', inputError: false });
       changePasswordInputValue({ type: 'passswordInput', passswordInput: '' });
@@ -59,6 +63,7 @@ export const ReviewTxManager = () => {
       {modalView === 'submitTx' && <SubmitInput />}
       {modalView === 'chooseDrepId' && <ChooseDrepId />}
       {modalView === 'operations' && <Operations />}
+      {modalView === 'extraDetails' && <ExtraDetails />}
       <BottomActions />
     </StyledDrawer>
   );

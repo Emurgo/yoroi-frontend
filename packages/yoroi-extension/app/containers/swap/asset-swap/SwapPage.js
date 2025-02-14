@@ -38,6 +38,7 @@ import { downloadLogs } from '../../../utils/logging';
 // $FlowIgnore: suppressing this error
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
+import { SwapTxInfo } from './SwapTxInfo';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -55,7 +56,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal, closeTxReviewModal } = useTxReviewModal();
+  const { openTxReviewModal, closeTxReviewModal, changeModalView } = useTxReviewModal();
 
   const {
     slippage,
@@ -217,6 +218,18 @@ function SwapPage(props: StoresProps & Intl): Node {
           },
           operationFee: {
             total: formattedPtAmount,
+          },
+          extraOverviewDetails: {
+            title: 'Swap Details',
+            onClick: () => changeModalView({ modalView: 'extraDetails' }),
+            component: (
+              <SwapTxInfo
+                defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
+                priceImpactState={priceImpactState}
+                slippageValue={slippageValue}
+              />
+            ),
           },
           unsignedTx: parsedSignRequest, // Ensure it stays in sync with the store
         });

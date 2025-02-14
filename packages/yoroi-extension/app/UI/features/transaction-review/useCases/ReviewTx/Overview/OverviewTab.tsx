@@ -23,7 +23,14 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
 }));
 
 export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
-  const { currentWalletDetails, changeModalView, stakingAddress, operationFee, operations } = useTxReviewModal();
+  const {
+    currentWalletDetails,
+    changeModalView,
+    stakingAddress,
+    operationFee,
+    operations,
+    extraOverviewDetails,
+  } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
   // const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
   // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
@@ -71,7 +78,9 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 
       <MyWalletSection tx={tx} stakingAddress={stakingAddress} operationFee={operationFee} />
 
-      {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
+      {receiverCustomTitle == null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
+
+      {extraOverviewDetails && <WalletExtraDetails extraDetails={extraOverviewDetails} />}
 
       {(operationsCerts?.components.length > 0 || operations?.components.length > 0) && (
         <OperationsSection operations={operationsCerts?.components.length > 0 ? operationsCerts : operations} />
@@ -168,5 +177,15 @@ const MyWalletTokens = ({ operationFee, tx }) => {
 
       {/* {notPrimaryTokenSent.length > 0 && notPrimaryTokenSent.map(item => <TokenItem label={item} isPrimaryToken={false} />)} */}
     </Stack>
+  );
+};
+
+const WalletExtraDetails = ({ extraDetails }) => {
+  return (
+    <Box component="button" width="100%" mt="24px" onClick={extraDetails.onClick}>
+      <Typography fontWeight="500" color="ds.text_primary_medium" textAlign="right">
+        {extraDetails.title}
+      </Typography>
+    </Box>
   );
 };

@@ -16,8 +16,8 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 }));
 
 export const TopActions = ({ onBack }: { onBack?: () => void }) => {
-  const { closeTxReviewModal, modalView } = useTxReviewModal();
-  const showOnBackIcon = modalView === 'walletInfo' || modalView === 'submitTx';
+  const { closeTxReviewModal, modalView, extraOverviewDetails } = useTxReviewModal();
+  const showOnBackIcon = modalView === 'walletInfo' || modalView === 'submitTx' || modalView === 'extraDetails';
 
   const getModalTitle = () => {
     if (modalView === 'transactionConfiramtion') {
@@ -34,6 +34,9 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
     }
     if (modalView === 'operations') {
       return 'Operations';
+    }
+    if (modalView === 'extraDetails') {
+      return extraOverviewDetails.title;
     }
     return 'Transaction Review';
   };

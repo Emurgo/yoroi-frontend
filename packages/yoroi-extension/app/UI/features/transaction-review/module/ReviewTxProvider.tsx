@@ -76,6 +76,7 @@ export const ReviewTxProvider = ({
         createUnsignedTx: payload.createUnsignedTx,
         operationFee: payload.operationFee,
         operations: payload.operations,
+        extraOverviewDetails: payload.extraOverviewDetails,
       });
     },
     changeModalView: (payload: any) => {
@@ -151,6 +152,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         submitTx: action.submitTx,
         createUnsignedTx: action.createUnsignedTx,
         operations: action.operations,
+        extraOverviewDetails: action.extraOverviewDetails,
       };
 
     case 'changeModalView':
@@ -166,7 +168,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
       return { ...state, unsignedTx: action.unsignedTx };
 
     case 'close':
-      return { ...defaultState, isOpen: false };
+      return { ...defaultState, isOpen: false, extraDetails: null, receiverCustomTitle: null, operations: null };
 
     case 'stopLoading':
       return { ...state, isLoading: false };
@@ -190,4 +192,5 @@ const defaultState: ModalState = Object.freeze({
   unsignedTx: null,
   passswordInput: '',
   inputError: null,
+  extraDetails: null,
 });

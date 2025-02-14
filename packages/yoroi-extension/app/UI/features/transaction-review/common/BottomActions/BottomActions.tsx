@@ -40,7 +40,7 @@ export const BottomActions = () => {
     );
   }
 
-  if (modalView === 'transactionReview') {
+  if (modalView === 'transactionReview' || modalView === 'extraDetails') {
     return (
       <Box
         borderTop="1px solid"
