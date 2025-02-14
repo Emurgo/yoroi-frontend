@@ -82,7 +82,7 @@ jobs:
       run: |
         git config --global user.name "github-actions[bot]" # needs clarification
         git config --global user.email "github-actions[bot]@users.noreply.github.com" # needs clarification
-        git add package.json
+        git add package*.json
         git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
         git push
       env:
