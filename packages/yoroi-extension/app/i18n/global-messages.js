@@ -1024,6 +1024,10 @@ const globalMessages: * = defineMessages({
     id: 'networkName.preview',
     defaultMessage: '!!!Preview',
   },
+  goToFaucetButton: {
+    id: 'wallet.emptyWalletMessage.goToFaucet',
+    defaultMessage: '!!!GO TO TADA FAUCET',
+  },
 });
 export default globalMessages;
 

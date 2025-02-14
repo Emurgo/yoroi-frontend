@@ -8,6 +8,7 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import { ampli } from '../../../ampli/index';
+import links from '../../links';
 
 type Props = {|
   onBuySellClick: () => void,
@@ -34,10 +35,6 @@ const messages = defineMessages({
   welcomeMessageSubtitleTestnet: {
     id: 'wallet.emptyWalletMessageSubtitle.testnet',
     defaultMessage: '!!!Get started with Cardano\'s test currency, TADA. It\'s your key to testing a new world of possibilities.',
-  },
-  goToFaucetButton: {
-    id: 'wallet.emptyWalletMessage.goToFaucet',
-    defaultMessage: '!!!GO TO TADA FAUCET',
   },
 });
 
@@ -80,7 +77,7 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
             }}
             onClick={() => {
               if (isTestnet) {
-                window.open('https://docs.cardano.org/cardano-testnets/tools/faucet', '_blank');
+                window.open(links.testnetFaucet, '_blank');
               } else {
                 onBuySellClick();
                 ampli.walletPageBuyBannerClicked();
@@ -95,7 +92,7 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
                 lineHeight: '19px',
               }}
             >
-              {intl.formatMessage(isTestnet? messages.goToFaucetButton: globalMessages.buyAda)}
+              {intl.formatMessage(isTestnet? globalMessages.goToFaucetButton: globalMessages.buyAda)}
             </Typography>
           </Button>
         </Stack>
