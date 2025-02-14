@@ -18,6 +18,7 @@ import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
+import links from '../links';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |}|} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
@@ -141,6 +142,8 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     }
 
+    const isTestnet = this.props.stores.profile.currentNetworkId !== networks.CardanoMainnet.NetworkId;
+
     return (
       <>
         {this.getDialog()}
@@ -151,11 +154,16 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() => {
-                if (stores.router.location.pathname.startsWith(ROUTES.WALLETS)) {
-                  ampli.walletPageExchangeClicked();
+                if (isTestnet) {
+                  window.open(links.testnetFaucet, '_blank');
+                } else {
+                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS)) {
+                    ampli.walletPageExchangeClicked();
+                  }
+                  this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
                 }
-                this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
               }}
+              isTestnet={isTestnet}
             />
           }
           isErrorPage={isErrorPage}
