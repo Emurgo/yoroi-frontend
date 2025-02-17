@@ -13,7 +13,18 @@ export const BottomActions = () => {
     isLoading,
     checkUserPassword,
     setInputError,
+    walletType,
   } = useTxReviewModal();
+
+  const handleSubmitText = () => {
+    if (walletType === 'trezor') {
+      return 'Confirm using Trezor';
+    }
+    if (walletType === 'ledger') {
+      return 'Confirm using Ledger';
+    }
+    return 'Submit';
+  };
 
   if (modalView === 'submitTx') {
     return (
@@ -31,10 +42,14 @@ export const BottomActions = () => {
               submitTx(passswordInput);
             }
           }}
-          disabled={passswordInput === undefined || passswordInput.length === 0}
+          disabled={
+            walletType === 'trezor' || walletType === 'ledger'
+              ? false
+              : passswordInput === undefined || passswordInput.length === 0
+          }
           loading={isLoading}
         >
-          Submit
+          {handleSubmitText()}
         </LoadingButton>
       </Stack>
     );

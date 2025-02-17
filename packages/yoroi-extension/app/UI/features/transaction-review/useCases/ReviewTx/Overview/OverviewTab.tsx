@@ -137,7 +137,6 @@ const OperationsSection = ({ operations }) => {
     .filter(component => !component.duplicated)
     .map(({ component }) => component);
 
-  console.log('componentsNotDuplicated', componentsNotDuplicated);
   return (
     <Box>
       <Divider sx={{ margin: '24px 0px' }} />

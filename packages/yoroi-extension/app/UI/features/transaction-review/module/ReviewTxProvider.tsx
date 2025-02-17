@@ -120,6 +120,7 @@ export const ReviewTxProvider = ({
       stakingAddress: addressHexToBech32(currentWalletInfo?.stakingAddress || ''),
       primaryBalance: currentWalletInfo?.walletBalance.ada,
       checkUserPassword,
+      walletType: currentWalletInfo?.walletType,
       ...actions,
     }),
     [state, actions]

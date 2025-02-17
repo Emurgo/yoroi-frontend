@@ -45,4 +45,5 @@ export type CurrentWalletType = {
   nftAssetList: any[];
   explorer: { tokenInfo: { name: string; baseUrl: string } };
   walletAddresses: string;
+  walletType: 'ledger' | 'trezor';
 };
