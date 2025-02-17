@@ -12,8 +12,15 @@ import { ChevronUp } from './ChevronUp';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
 import { CloseIcon } from './CloseIcon';
+import { Coins } from './Coins';
 import { Copied } from './Copied';
+import { CopySuccess } from './CopySuccess';
 import { Copy } from './Copy';
+import { CrossCircle } from './CrossCircle';
+import { Cross } from './Cross';
+import { DappConnector } from './DappConnector';
+import { Delete } from './Delete';
+import { Device } from './Device';
 import { Expand } from './Expand';
 import { Search } from './Search';
 import { Send } from './Send';
@@ -34,10 +41,15 @@ export const Icon = {
   CheckmarkFilled,
   CheckmarkOutlined,
   CloseIcon,
-  VisibilityOn,
-  VisibilityOff,
-  Copy,
+  Coins,
   Copied,
+  CopySuccess,
+  Copy,
+  CrossCircle,
+  Cross,
+  DappConnector,
+  Delete,
+  Device,
   ChipArrowUp,
   ChipArrowDown,
   Send,
@@ -47,5 +59,7 @@ export const Icon = {
   ChevronUp,
   Search,
   Switch,
+  VisibilityOn,
+  VisibilityOff,
   Receive
 };
