@@ -21,13 +21,31 @@ import { Cross } from './Cross';
 import { DappConnector } from './DappConnector';
 import { Delete } from './Delete';
 import { Device } from './Device';
+import { Drag } from './Drag';
+import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
+import { Explore } from './Explore';
+import { Export } from './Export';
+import { Eye } from './Eye';
+import { EyeOff } from './EyeOff';
+import { Image } from './Image';
+import { InfoCircle } from './InfoCircle';
 import { Search } from './Search';
 import { Send } from './Send';
 import { Staking } from './Staking';
+import { Support } from './Support';
 import { Switch } from './Switch';
+import { Table } from './Table';
+import { TermsOfUse } from './TermsOfUse';
+import { ThumbUp } from './ThumbUp';
+import { Tick } from './Tick';
+import { Tokens } from './Tokens';
+import { Updates } from './Updates';
 import { VisibilityOff } from './VisibilityOff';
 import { VisibilityOn } from './VisibilityOn';
+import { Voting } from './Voting';
+import { Wallet } from './Wallet';
+import { Wallets } from './Wallets';
 import { Receive } from './Receive';
 
 export const Icon = {
@@ -40,6 +58,10 @@ export const Icon = {
   Cancel,
   CheckmarkFilled,
   CheckmarkOutlined,
+  ChevronDown,
+  ChevronUp,
+  ChipArrowDown,
+  ChipArrowUp,
   CloseIcon,
   Coins,
   Copied,
@@ -50,16 +72,30 @@ export const Icon = {
   DappConnector,
   Delete,
   Device,
-  ChipArrowUp,
-  ChipArrowDown,
+  Drag,
+  ExclamationCircle,
+  Expand,
+  Explore,
+  Export,
+  Eye,
+  EyeOff,
+  Image,
+  InfoCircle,
+  Search,
   Send,
   Staking,
-  Expand,
-  ChevronDown,
-  ChevronUp,
-  Search,
+  Support,
   Switch,
-  VisibilityOn,
+  Table,
+  TermsOfUse,
+  ThumbUp,
+  Tick,
+  Tokens,
+  Updates,
   VisibilityOff,
-  Receive
+  VisibilityOn,
+  Voting,
+  Wallet,
+  Wallets,
+  Receive,
 };
