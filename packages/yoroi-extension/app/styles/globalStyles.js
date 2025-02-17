@@ -284,7 +284,7 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
       /* Toastify styles for notifications */
       ...{
           '--toastify-color-light': '#fff',
-          '--toastify-color-dark': '#121212',
+          '--toastify-color-dark': '#15171F',
           '--toastify-color-info': '#3498db',
           '--toastify-color-success': '#07bc0c',
           '--toastify-color-warning': '#f1c40f',

@@ -6,6 +6,7 @@ import { environment } from '../../../environment';
 import { toast, ToastContainer } from 'react-toastify'
 import { useStrings } from '../../common/hooks/useStrings';
 import NotificationsStyles from './NotificationsStyles';
+import LocalStorageApi from '../../../api/localStorage';
 
 function getRandomNotification(clickFunction, closeFunction) {
   const notifTypes = [
@@ -26,6 +27,7 @@ function getRandomNotification(clickFunction, closeFunction) {
 }
 
 export default function NotificationsManager({ intl = undefined }) {
+  const lsApi = new LocalStorageApi();
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings(intl);
   const notificationTexts = {
@@ -35,8 +37,9 @@ export default function NotificationsManager({ intl = undefined }) {
     [NotificationTypes.Cancelled]: strings.txFailed,
   }
 
-  const showToast = () => {
+  const showToast = async () => {
     const notif = getRandomNotification(console.log, console.log);
+    const theme = await lsApi.getUserThemeMode();
 
     // Remove the oldest toast if more than 3 exist
     if (toastQueue.length >= 3) {
@@ -47,7 +50,8 @@ export default function NotificationsManager({ intl = undefined }) {
     const id = createToast({
       ...notif,
       title: notificationTexts[notif.type],
-      subtitle: strings.clickToView
+      subtitle: strings.clickToView,
+      theme
     });
 
     setToastQueue((prev) => [...prev, id]);

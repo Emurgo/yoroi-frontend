@@ -1,9 +1,9 @@
 import React from 'react';
-import { IconButton, styled, Box, useTheme, Typography } from '@mui/material';
+import { Box, useTheme, Typography } from '@mui/material';
 import { Icon } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
 import { FadeInOut } from './NotificationsStyles';
-import { toast } from 'react-toastify';
+import { Theme, toast } from 'react-toastify';
 
 const NOTIFICATION_TIMEOUT = 3000; // 3s
 
@@ -11,18 +11,11 @@ export type NotificationProps = {
   title: string;
   subtitle: string;
   type: NotificationTypes;
+  theme: Theme;
 }
 type IconProps = {
   type: NotificationTypes
 }
-
-const IconWrapper = styled(IconButton)(({ theme }: any) => ({
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_medium,
-    },
-  },
-}));
 
 export const NotificationCloseButton = ({ closeToast }) => {
   const theme = useTheme()
@@ -31,9 +24,9 @@ export const NotificationCloseButton = ({ closeToast }) => {
   }
 
   return (
-    <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
+    <Box onClick={handleClose} sx={{ padding: 0 }}>
       <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
-    </IconWrapper>
+    </Box>
   )
 }
 
@@ -91,10 +84,11 @@ const NotificationBody = ({ title, subtitle }) => {
   )
 }
 
-export function createToast({ title, subtitle, type }: NotificationProps) {
+export function createToast({ title, subtitle, type, theme = "light" }: NotificationProps) {
   return toast(<NotificationBody title={title} subtitle={subtitle} />, {
     autoClose: NOTIFICATION_TIMEOUT,
     icon: () => <NotificationIcon type={type} />,
+    theme,
     transition: FadeInOut,
     closeOnClick: true,
   });
