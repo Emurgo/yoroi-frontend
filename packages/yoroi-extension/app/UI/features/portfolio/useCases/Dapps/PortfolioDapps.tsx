@@ -19,9 +19,10 @@ interface Props {
     liquidityList: LiquidityItemType[];
     orderList: OrderItemType[];
   };
+  stores: any;
 }
 
-const PortfolioDapps = ({ data }: Props) => {
+const PortfolioDapps = ({ data, stores }: Props) => {
   const theme: any = useTheme();
   const strings = useStrings();
   const [keyword, setKeyword] = useState<string>('');
@@ -94,6 +95,7 @@ const PortfolioDapps = ({ data }: Props) => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
+        stores={stores}
         walletBalance={{ ada: '0' }}
         setKeyword={setKeyword}
         isLoading={isLoading}

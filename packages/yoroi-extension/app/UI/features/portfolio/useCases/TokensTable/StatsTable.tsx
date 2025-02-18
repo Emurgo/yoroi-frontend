@@ -32,9 +32,10 @@ const STableCell = styled(TableCell)(() => ({
 interface Props {
   data: TokenType[];
   isLoading: boolean;
+  stores: any;
 }
 
-const StatsTable = ({ data }: Props): JSX.Element => {
+const StatsTable = ({ data, stores }: Props): JSX.Element => {
   const theme: any = useTheme();
   const { showWelcomeBanner } = usePortfolio();
   const navigateTo = useNavigateTo();
@@ -126,7 +127,7 @@ const StatsTable = ({ data }: Props): JSX.Element => {
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} />
+            <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} stores={stores} />
           </STableCell>
         </STableRow>
       ))}
