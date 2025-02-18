@@ -5,7 +5,7 @@ import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import { addLocaleData } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { locales, translations } from './i18n/translations';
@@ -19,6 +19,9 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
+import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider'
+import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
+import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -91,9 +94,14 @@ class App extends Component<Props, State> {
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
+          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+            <IntlContextProvider>
+              <NotificationsProvider>
+                <NotificationsManager />
+                {this.getContent()}
+              </NotificationsProvider>
+            </IntlContextProvider>
+          </IntlProviderWrapper>
         </ColorModeProvider>
       </div>
     );

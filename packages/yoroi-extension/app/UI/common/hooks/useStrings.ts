@@ -27,15 +27,14 @@ export const messages = Object.freeze(
   })
 );
 
-export const useStrings = (intl) => {
-  const { intl: contextIntl } = useIntl();
-  const i = intl || contextIntl;
+export const useStrings = () => {
+  const { intl } = useIntl();
 
   return React.useRef({
-    clickToView: i.formatMessage(messages.clickToView),
-    tokensReceived: i.formatMessage(messages.tokensReceived),
-    txFailed: i.formatMessage(messages.txFailed),
-    tokensSent: i.formatMessage(messages.tokensSent),
-    stakingRewardsReceived: i.formatMessage(messages.stakingRewardsReceived),
+    clickToView: intl.formatMessage(messages.clickToView),
+    tokensReceived: intl.formatMessage(messages.tokensReceived),
+    txFailed: intl.formatMessage(messages.txFailed),
+    tokensSent: intl.formatMessage(messages.tokensSent),
+    stakingRewardsReceived: intl.formatMessage(messages.stakingRewardsReceived),
   }).current;
 };
