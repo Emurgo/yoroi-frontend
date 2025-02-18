@@ -468,7 +468,7 @@ export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node
         settingFiatPairUnit={unitOfAccount}
         currentWallet={currentWalletInfo}
         openDialogWrapper={openDialogWrapper}
-        shouldHideBalance={stores.profile.shouldHideBalance}
+        shouldHideBalance={shouldHideBalance}
       >
         <Suspense fallback={null}>{children}</Suspense>
       </PortfolioContextProvider>
