@@ -9,7 +9,7 @@ type Props = {
   match: any;
 };
 
-const PortfolioDetailPage = ({ match, ...props }: Props) => {
+const PortfolioDetailPage = ({ match, stores, ...props }: Props) => {
   const tokenId = match.params.tokenId;
 
   const { ftAssetList } = usePortfolio();
@@ -21,8 +21,8 @@ const PortfolioDetailPage = ({ match, ...props }: Props) => {
   }, [tokenId]);
 
   return (
-    <PortfolioLayout {...props}>
-      <TokenDetails tokenInfo={tokenInfo} />
+    <PortfolioLayout {...props} stores={stores}>
+      <TokenDetails tokenInfo={tokenInfo} stores={stores} />
     </PortfolioLayout>
   );
 };
