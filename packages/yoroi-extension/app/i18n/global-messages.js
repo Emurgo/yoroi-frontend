@@ -1028,6 +1028,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.emptyWalletMessage.goToFaucet',
     defaultMessage: '!!!GO TO TADA FAUCET',
   },
+  welcomeMessageTestnet: {
+    id: 'wallet.emptyWalletMessage.testnet',
+    defaultMessage: '!!!Learn Cardano with test ADA ⭐',
+  },
+  welcomeMessageSubtitleTestnet: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnet',
+    defaultMessage: '!!!Get started with Cardano\'s test currency, TADA. It\'s your key to testing a new world of possibilities.',
+  },
 });
 export default globalMessages;
 

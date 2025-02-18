@@ -28,14 +28,6 @@ const messages = defineMessages({
     id: 'wallet.emptyWalletMessageSubtitle',
     defaultMessage: '!!!Top up your wallet safely using our trusted partners',
   },
-  welcomeMessageTestnet: {
-    id: 'wallet.emptyWalletMessage.testnet',
-    defaultMessage: '!!!Learn Cardano with test ADA ⭐',
-  },
-  welcomeMessageSubtitleTestnet: {
-    id: 'wallet.emptyWalletMessageSubtitle.testnet',
-    defaultMessage: '!!!Get started with Cardano\'s test currency, TADA. It\'s your key to testing a new world of possibilities.',
-  },
 });
 
 function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): Node {
@@ -58,10 +50,10 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
         </Box>
         <Box>
           <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
-            {intl.formatMessage(isTestnet? messages.welcomeMessageTestnet : messages.welcomeMessage)}
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageTestnet : messages.welcomeMessage)}
           </Typography>
           <Typography component="div" variant="body1" color="ds.gray_max" mb="24px">
-            {intl.formatMessage(isTestnet? messages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>
         <Stack direction="row" gap="16px">
