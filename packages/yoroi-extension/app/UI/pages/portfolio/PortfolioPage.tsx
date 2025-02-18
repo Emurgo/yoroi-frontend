@@ -10,7 +10,7 @@ type Props = {
 const PortfolioPage = (props: Props) => {
   return (
     <PortfolioLayout {...props}>
-      <PortfolioWallet />
+      <PortfolioWallet stores={props.stores} />
     </PortfolioLayout>
   );
 };
