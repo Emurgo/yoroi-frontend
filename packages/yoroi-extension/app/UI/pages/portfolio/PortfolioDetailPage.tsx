@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import React from 'react';
 import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
 import TokenDetails from './../../features/portfolio/useCases/TokenDetails/TokenDetails';
@@ -9,7 +10,7 @@ type Props = {
   match: any;
 };
 
-const PortfolioDetailPage = ({ match, stores, ...props }: Props) => {
+const PortfolioDetailPage = observer(({ match, stores, ...props }: Props) => {
   const tokenId = match.params.tokenId;
 
   const { ftAssetList } = usePortfolio();
@@ -25,6 +26,6 @@ const PortfolioDetailPage = ({ match, stores, ...props }: Props) => {
       <TokenDetails tokenInfo={tokenInfo} stores={stores} />
     </PortfolioLayout>
   );
-};
+});
 
 export default PortfolioDetailPage;
