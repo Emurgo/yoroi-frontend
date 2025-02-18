@@ -5,7 +5,7 @@ import { NotificationTypes } from '../../types/notifications';
 import { Theme, toast } from 'react-toastify';
 import { noop } from 'lodash';
 
-const NOTIFICATION_TIMEOUT = 3000; // 3s
+const NOTIFICATION_TIMEOUT = 4000; // 4s
 
 export type NotificationProps = {
   title: string;
