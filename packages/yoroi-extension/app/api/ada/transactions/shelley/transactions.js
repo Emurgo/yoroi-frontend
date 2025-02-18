@@ -1002,8 +1002,6 @@ async function newAdaUnsignedTxFromUtxoForConnector(
     throw error;
   }
 
-  await txBuilder.prepareForPlutus(COSTMODELS);
-
   const changeAddress = changeAdaAddr &&
     await LibWalletAddress.from(
       changeAdaAddr.address,

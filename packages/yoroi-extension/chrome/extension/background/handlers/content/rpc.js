@@ -425,6 +425,7 @@ const Handlers = Object.freeze({
     const networkInfo = wallet.getParent().getNetworkInfo();
     const adaApi = new AdaApi();
     const foreignUtxoFetcher = adaApi.createForeignUtxoFetcher(stateFetcher, networkInfo);
+    // <TODO:PENDING_REMOVAL> only used for experimental
     const resp = await connectorCreateCardanoTx(
       wallet,
       null,

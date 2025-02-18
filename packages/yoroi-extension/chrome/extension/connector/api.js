@@ -792,6 +792,7 @@ async function __connectorSignCardanoTx(
   return signedTx.witness_set().to_hex();
 }
 
+// <TODO:PENDING_REMOVAL> only used for experimental
 export async function connectorCreateCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: ?string,
@@ -872,7 +873,7 @@ export async function connectorSendTxCardano(
     body: {
       network: wallet.getParent().getNetworkInfo(),
       id: transactionHexToHash(signedTxHex),
-      encodedTx: bytesToHex(signedTxHex),
+      encodedTx: hexToBytes(signedTxHex),
     },
     lastLaunchVersion: await localStorage.getLastLaunchVersion() ?? '',
     currentLocale: await localStorage.getUserLocale() ?? '',
@@ -929,8 +930,8 @@ export async function connectorRecordSubmittedCardanoTransaction(
   let isIntraWallet = true;
   const txBody = tx.body();
 
-  const fee = new MultiToken([], defaults);
-  fee.joinAddMutable(fee.createDefaultEntry(new BigNumber(txBody.fee().to_str())));
+  const mt = new MultiToken([], defaults);
+  const fee = mt.add(mt.createDefaultEntry(new BigNumber(txBody.fee().to_str())));
 
   const usedUtxos = [];
   for (const input of iterateLenGet(txBody.inputs())) {
