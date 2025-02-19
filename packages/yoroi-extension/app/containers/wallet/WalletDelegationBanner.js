@@ -22,7 +22,6 @@ type Props = {|
   +isWalletWithNoFunds: boolean,
   +isTestnet: boolean,
   +poolInfo: PoolData | void,
-  +onDelegateClick: string => Promise<void>,
   +ticker: string,
   +stores: any,
 |};
@@ -74,16 +73,7 @@ const messages = defineMessages({
   },
 });
 
-function WalletDelegationBanner({
-  isOpen,
-  isWalletWithNoFunds,
-  isTestnet,
-  onDelegateClick,
-  intl,
-  ticker,
-  poolInfo,
-  stores,
-}: Props & Intl): Node {
+function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, ticker, poolInfo, stores }: Props & Intl): Node {
   if (poolInfo == null) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" py="40px">
@@ -173,30 +163,11 @@ function WalletDelegationBanner({
           >
             {intl.formatMessage(globalMessages.learnMore)}
           </Link>
-          {/* <Button
-            variant="primary"
-            sx={{
-              '&.MuiButton-sizeMedium': {
-                padding: '9px 20px',
-              },
-            }}
-            onClick={() =>
-              onDelegateClick(
-                // Testnet pool:
-                // https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
-                isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : id
-              )
-            }
-            disabled={isWalletWithNoFunds}
-          >
-            {intl.formatMessage(globalMessages.delegateLabel)}
-          </Button> */}
           <DelegateButton
             poolID={id}
             stores={stores}
             label={intl.formatMessage(globalMessages.delegateLabel)}
             isWalletWithNoFunds={isWalletWithNoFunds}
-            // onDelegateClick={onDelegateClick}
             isTestnet={isTestnet}
           />
         </Box>

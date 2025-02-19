@@ -1,17 +1,19 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
-import { toSvg } from 'jdenticon';
 import React from 'react';
-import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import SeizaFetcher from './SeizaFetcher';
+import { toSvg } from 'jdenticon';
+import { Box, Stack, Typography } from '@mui/material';
 
-export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolID }) => {
+export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
+  const [selectedPoolId, setSelectedPoolId] = React.useState(null);
   const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, networkId, closeTxReviewModal } = useTxReviewModal();
+  const selectedPool = stores.delegation.getLocalPoolInfo(networkId, selectedPoolId);
+  console.log('selectedPool', { selectedPoolId, selectedPool });
 
-  const avatarSource = toSvg(poolID, 36, { padding: 0 });
-  const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-  const selectedPool = stores.delegation.getLocalPoolInfo(networkId, poolID);
-  const onDelegate = async () => {
-    const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
-    const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
+  const onDelegate = async poolID => {
+    const avatarSource = toSvg(poolID, 36, { padding: 0 });
+    const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+    const { signTxRequest } = await stores.delegation.createDelegationTransaction(poolID);
     const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
@@ -30,7 +32,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
           },
         ],
       },
-      unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
+      unsignedTx: parsedUnsignedTx,
     });
   };
 
@@ -43,30 +45,31 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         wallet: selectedWallet,
         dialog: null,
       });
-      // ampli.stakingCenterDelegationSubmitted({
-      //   ada_amount: delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
-      //   staking_pool: selectedPoolId,
-      // });
+      // ampli.stakingCenterDelegationInitiated();
     } catch (error) {
     } finally {
       stopLoadingTxReview();
-      closeTxReviewModal;
+      closeTxReviewModal();
     }
   };
 
   return (
-    <Button
-      variant="primary"
-      sx={{
-        '&.MuiButton-sizeMedium': {
-          padding: '9px 20px',
-        },
-      }}
-      onClick={onDelegate}
-      disabled={isWalletWithNoFunds}
-    >
-      {label}
-    </Button>
+    <Box sx={{ iframe: { minHeight: '60vh' } }}>
+      {/* {this.getDialog()} */}
+      <SeizaFetcher
+        urlTemplate={urlTemplate}
+        locale={locale}
+        bias={bias}
+        totalAda={totalAda}
+        poolList={poolList}
+        setFirstPool={setFirstPool}
+        stakepoolSelectedAction={async poolId => {
+          setSelectedPoolId(poolId);
+          console.log('stakepoolSelectedAction', poolId);
+          onDelegate(poolId);
+        }}
+      />
+    </Box>
   );
 };
 
