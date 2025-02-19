@@ -24,8 +24,6 @@ import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
 import { refreshTransactions } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import PubSub from 'pubsub-js';
-import {NotificationTopics} from '../../UI/features/notifications/module/NotificationsProvider'
 
 type TxHistoryState = {|
   publicDeriverId: number,
@@ -177,8 +175,6 @@ export default class TransactionsStore extends Store<StoresMap> {
       if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
         withdrawalIds.add(txid);
       }
-
-      PubSub.publish(NotificationTopics.NEW_TX, {txid})
     }
     await this._updateTransactionPriceData(publicDeriver, timestamps);
     await Promise.all([

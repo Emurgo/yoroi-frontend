@@ -4,7 +4,6 @@ import { useStrings } from '../../../common/hooks/useStrings';
 import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
 import LocalStorageApi from '../../../../api/localStorage';
-import PubSub from 'pubsub-js';
 
 export const NotificationTopics = {
   NEW_TX: "NEW_TX"
@@ -129,14 +128,6 @@ export default function NotificationsProvider({ children }) {
       unsubscribe()
     }
   }, [toastQueue])
-
-  React.useEffect(() => {
-    PubSub.subscribe(NotificationTopics.NEW_TX, handleSubscription);
-
-    return () => {
-      PubSub.unsubscribe(NotificationTopics.NEW_TX)
-    }
-  }, [])
 
 
   const value = React.useMemo(() => ({
