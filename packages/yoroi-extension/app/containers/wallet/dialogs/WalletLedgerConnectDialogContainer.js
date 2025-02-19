@@ -14,6 +14,7 @@ import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresProps } from '../../../stores';
+import { ampli } from '../../../../ampli/index';
 
 type LocalProps = {|
   +onClose: void => void,
@@ -22,7 +23,6 @@ type LocalProps = {|
 
 @observer
 export default class WalletLedgerConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;
     if (selectedNetwork === undefined) {
@@ -50,7 +50,10 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            submit={ledgerConnectStore.submitCheck}
+            submit={() => {
+              ledgerConnectStore.submitCheck();
+              ampli.connectWalletConnectPageViewed();
+            }}
             cancel={this.cancel}
             onBack={this.props.onBack}
           />);
@@ -62,7 +65,10 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={ledgerConnectStore.goBackToCheck}
+            goBack={()=> {
+              ledgerConnectStore.goBackToCheck();
+              ampli.connectWalletCheckPageViewed();
+            }}
             submit={ledgerConnectStore.submitConnect}
             cancel={this.cancel}
           />);

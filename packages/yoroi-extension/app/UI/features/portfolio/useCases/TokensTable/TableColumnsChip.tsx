@@ -2,6 +2,7 @@ import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
+import { observer } from 'mobx-react';
 import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
@@ -124,9 +125,9 @@ export const TokenPriceChangeChip = ({
   );
 };
 
-export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
+export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stores }) => {
   const theme = useTheme();
-  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner, isHiddenAmount } = usePortfolio();
+  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
@@ -188,7 +189,7 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
     <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
       <Stack direction="column">
         <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
-          <HiddenAmount isHidden={isHiddenAmount}>
+          <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
             <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
           </HiddenAmount>
           <Typography>{token.info.name}</Typography>
@@ -197,14 +198,14 @@ export const TokenPriceTotal = ({ token, secondaryToken24Activity }) => {
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
-            <HiddenAmount isHidden={isHiddenAmount}>{totalTokenPrice}</HiddenAmount>
+            <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{totalTokenPrice}</HiddenAmount>
             <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
           </Typography>
         )}
       </Stack>
     </Stack>
   );
-};
+});
 
 export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const { unitOfAccount } = usePortfolio();

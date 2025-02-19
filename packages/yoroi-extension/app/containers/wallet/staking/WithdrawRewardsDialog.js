@@ -30,6 +30,7 @@ import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackage
 import HorizintallyCenteredLayout from '../../../components/layout/HorizintallyCenteredLayout';
 import type { StoresProps } from '../../../stores';
 import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -112,6 +113,20 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
         onError: () => {},
       });
     }
+
+    const { stores } = this.props;
+    const { numberOfDecimals } = genLookupOrFail(stores.tokenInfoStore.tokenInfo)({
+      identifier: stores.wallets.selectedOrFail.defaultTokenId,
+      networkId: stores.wallets.selectedOrFail.networkId,
+    }).Metadata;
+
+    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
+    if (signRequest == null) return;
+
+    ampli.claimAdaTransactionSubmitted({
+      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount
+        .shiftedBy(-numberOfDecimals).toNumber()
+    });
   };
 
   getTotalBalance: (

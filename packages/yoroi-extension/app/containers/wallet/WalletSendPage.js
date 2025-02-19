@@ -107,7 +107,13 @@ export default class WalletSendPage extends Component<StoresProps> {
       throw new Error('unexpectedly missing wallet')
     }
 
+    const amount = signRequest.totalInput();
+    const { numberOfDecimals } = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
+      amount.getDefaultEntry()
+    ).Metadata;
+
     ampli.sendSummarySubmitted({
+      ada_amount: amount.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
       asset_count: signRequest.totalInput().nonDefaultEntries().length,
     });
     
