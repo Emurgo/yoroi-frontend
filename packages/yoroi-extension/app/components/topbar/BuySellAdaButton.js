@@ -44,7 +44,7 @@ export default class BuySellAdaButton extends Component<Props> {
         variant="secondary"
         onClick={() => this.props.onBuySellClick()}
       >
-        {intl.formatMessage(this.props.isTestnet? messages.addTestAda : buttonText)}
+        {intl.formatMessage(this.props.isTestnet ? messages.addTestAda : buttonText)}
       </Button>
     );
   }
