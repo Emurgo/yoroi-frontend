@@ -121,6 +121,8 @@ export const ReviewTxProvider = ({
       primaryBalance: currentWalletInfo?.walletBalance.ada,
       checkUserPassword,
       walletType: currentWalletInfo?.walletType,
+      isHardwareWallet: currentWalletInfo?.isHardwareWallet,
+      selectedExplorer: currentWalletInfo?.selectedExplorer,
       ...actions,
     }),
     [state, actions]

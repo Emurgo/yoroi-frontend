@@ -245,6 +245,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       nftAssetList: nftAssetList,
       walletAddresses,
       explorer: { tokenInfo: explorerTransactionInfo },
+      selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
     };
   } catch (error) {

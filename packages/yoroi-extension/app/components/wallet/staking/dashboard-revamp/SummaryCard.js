@@ -106,6 +106,8 @@ function SummaryCard({
     return maybe(unitOfAccountCalculated, u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
   };
 
+  const hasNoRewards = token => maybe(token, t => t.getDefaultEntry()?.amount?.isZero?.()) ?? false;
+
   return (
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_max' }}>
       <Box
@@ -139,6 +141,8 @@ function SummaryCard({
           // withdrawRewards={withdrawRewards}
           govStatusFetched={govStatusFetched}
           stores={stores}
+          intl={intl}
+          isDisabled={hasNoRewards(totalRewards)}
         />
       </Box>
       <Box sx={{ display: 'flex' }}>

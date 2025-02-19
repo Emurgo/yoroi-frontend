@@ -15,6 +15,8 @@ import { SocialMediaStakePool, HelperTooltip } from '../../components/wallet/sta
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
+import { DelegateButton } from '../../components/wallet/staking/dashboard-revamp/DelegateButton';
+
 type Props = {|
   +isOpen: boolean,
   +isWalletWithNoFunds: boolean,
@@ -22,6 +24,7 @@ type Props = {|
   +poolInfo: PoolData | void,
   +onDelegateClick: string => Promise<void>,
   +ticker: string,
+  +stores: any,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -79,6 +82,7 @@ function WalletDelegationBanner({
   intl,
   ticker,
   poolInfo,
+  stores,
 }: Props & Intl): Node {
   if (poolInfo == null) {
     return (
@@ -169,7 +173,7 @@ function WalletDelegationBanner({
           >
             {intl.formatMessage(globalMessages.learnMore)}
           </Link>
-          <Button
+          {/* <Button
             variant="primary"
             sx={{
               '&.MuiButton-sizeMedium': {
@@ -186,7 +190,15 @@ function WalletDelegationBanner({
             disabled={isWalletWithNoFunds}
           >
             {intl.formatMessage(globalMessages.delegateLabel)}
-          </Button>
+          </Button> */}
+          <DelegateButton
+            poolID={id}
+            stores={stores}
+            label={intl.formatMessage(globalMessages.delegateLabel)}
+            isWalletWithNoFunds={isWalletWithNoFunds}
+            // onDelegateClick={onDelegateClick}
+            isTestnet={isTestnet}
+          />
         </Box>
       </Box>
     </WrapperBanner>

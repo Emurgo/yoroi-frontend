@@ -4,7 +4,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, walletType, isHardwareWallet } = useTxReviewModal();
 
   if (poolTransition?.shouldShowTransitionFunnel) {
     return (
@@ -39,55 +39,39 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
 
   const submitTx = async passswordInput => {
     const selected = stores.wallets.selected;
-    // if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
-    console.log('signRequest', signRequest);
-    // check hardware wallet
-    if (false) {
-      if (selected.type === 'trezor') {
-        await stores.substores.ada.trezorSend.sendUsingTrezor({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (selected.type === 'ledger') {
-        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-    } else {
-      try {
-        startLoadingTxReview();
-        console.log('passswordInput', passswordInput);
+
+    try {
+      startLoadingTxReview();
+      if (isHardwareWallet) {
+        if (walletType === 'trezor') {
+          await stores.substores.ada.trezorSend.sendUsingTrezor({
+            params: { signRequest },
+            wallet: selected,
+          });
+        }
+        if (walletType === 'ledger') {
+          await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
+            params: { signRequest },
+            wallet: selected,
+          });
+        }
+      } else {
         await stores.substores.ada.mnemonicSend.sendMoney({
           signRequest,
           password: passswordInput,
           wallet: selected,
         });
-        console.log('=============success');
-        stopLoadingTxReview();
-      } catch (error) {
-        console.log('error', error);
-        stopLoadingTxReview();
       }
-
-      //   this.spendingPasswordForm.submit({
-      //     onSuccess: async form => {
-      //       const { walletPassword } = form.values();
-      //       await stores.substores.ada.mnemonicSend.sendMoney({
-      //         signRequest,
-      //         password: walletPassword,
-      //         wallet: selected,
-      //       });
-      //     },
-      //     onError: () => {},
-      //   });
+      stopLoadingTxReview();
+      // ampli.claimAdaTransactionSubmitted({
+      //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
+      // });
+    } catch (error) {
+      console.log('error', error);
+      stopLoadingTxReview();
     }
-    // ampli.claimAdaTransactionSubmitted({
-    //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
-    // });
   };
 
   return (

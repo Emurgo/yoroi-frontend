@@ -120,8 +120,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
     }).Metadata;
 
     ampli.claimAdaTransactionSubmitted({
-      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount
-        .shiftedBy(-numberOfDecimals).toNumber()
+      reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
     });
   };
 
@@ -207,15 +206,10 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
     const error = this.props.stores.wallets.sendMoneyRequest.error;
     const spendingPasswordForm =
       publicDeriver.type !== 'mnemonic' ? undefined : (
-        <SpendingPasswordInput
-          setForm={form => this.setSpendingPasswordForm(form)}
-          isSubmitting={isSubmitting}
-        />
+        <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={isSubmitting} />
       );
 
-    const selectedExplorer = this.props.stores.explorers.selectedExplorer.get(
-      publicDeriver.networkId
-    );
+    const selectedExplorer = this.props.stores.explorers.selectedExplorer.get(publicDeriver.networkId);
     if (!selectedExplorer) throw new Error('No explorer for wallet network');
 
     return (
