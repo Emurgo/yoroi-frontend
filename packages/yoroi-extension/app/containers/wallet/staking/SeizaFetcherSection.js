@@ -47,6 +47,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
       });
       // ampli.stakingCenterDelegationInitiated();
     } catch (error) {
+      console.warn('Failed to sign transaction', error);
     } finally {
       stopLoadingTxReview();
       closeTxReviewModal();

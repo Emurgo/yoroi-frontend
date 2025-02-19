@@ -100,7 +100,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
   );
 });
 
-const OperationsDetails = ({ intl, avatarGenerated, name, receiverAddress, selectedExplorer, recoveredBalance, ticker }) => {
+const OperationsDetails = () => {
   return (
     <Stack direction="column" spacing={2}>
       <Stack direction="row" justifyContent="space-between">

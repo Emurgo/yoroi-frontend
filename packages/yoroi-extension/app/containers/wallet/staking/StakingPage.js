@@ -13,8 +13,11 @@ import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { PoolTransitionBanner } from './PoolTransitionBanner';
 import type { StoresProps } from '../../../stores';
+// $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
 import { ReviewTxModal } from '../../../UI/features/transaction-review/useCases/ReviewTx';
+// $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');

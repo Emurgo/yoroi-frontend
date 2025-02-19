@@ -31,7 +31,6 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
-  +withdrawRewards: void | (void => Promise<void>),
   +govStatusFetched: boolean,
   +stores: any,
 |};
@@ -65,7 +64,6 @@ function SummaryCard({
   totalDelegated,
   getTokenInfo,
   onOverviewClick: _onOverviewClick, // todo: remove?
-  withdrawRewards,
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
@@ -123,22 +121,9 @@ function SummaryCard({
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
-        {/* <Button
-          variant="primary"
-          sx={{
-            '&.MuiButton-sizeMedium': {
-              height: 'unset',
-              p: '9px 20px',
-            },
-          }}
-          onClick={withdrawRewards}
-          disabled={!withdrawRewards}
-        >
-          {intl.formatMessage(globalMessages.withdrawLabel)}
-        </Button> */}
+
         <WithdrawButton
           label={intl.formatMessage(globalMessages.withdrawLabel)}
-          // withdrawRewards={withdrawRewards}
           govStatusFetched={govStatusFetched}
           stores={stores}
           intl={intl}

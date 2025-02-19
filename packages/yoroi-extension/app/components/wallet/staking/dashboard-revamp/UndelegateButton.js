@@ -1,5 +1,4 @@
 import { Button, Stack, Typography, styled } from '@mui/material';
-import React from 'react';
 import globalMessages from '../../../../i18n/global-messages';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 

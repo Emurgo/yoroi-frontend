@@ -29,7 +29,7 @@ import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDia
 import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import type { StoresProps } from '../../../stores';
-import { ampli } from '../../../../ampli/index';
+// import { ampli } from '../../../../ampli/index';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -242,7 +242,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
                   dialog: OverviewModal,
                 })
               }
-              // withdrawRewards={isStakeRegistered && this.state.govStatusFetched ? handleRewardsWithdrawal : undefined}
               unitOfAccount={this.toUnitOfAccount}
               getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={stores.profile.shouldHideBalance}

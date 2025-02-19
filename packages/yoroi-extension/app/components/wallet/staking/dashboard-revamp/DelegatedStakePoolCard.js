@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
-import { Button, Stack, Typography, useTheme } from '@mui/material';
+import { Stack, Typography, useTheme } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -10,7 +10,6 @@ import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
-import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { UndelegateButton } from './UndelegateButton';
 
 type Props = {|

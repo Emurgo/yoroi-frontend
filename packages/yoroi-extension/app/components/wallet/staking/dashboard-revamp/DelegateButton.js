@@ -1,6 +1,5 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { toSvg } from 'jdenticon';
-import React from 'react';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolID }) => {
@@ -48,9 +47,10 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
       //   staking_pool: selectedPoolId,
       // });
     } catch (error) {
+      console.warn('Delegation error', error);
     } finally {
       stopLoadingTxReview();
-      closeTxReviewModal;
+      closeTxReviewModal();
     }
   };
 

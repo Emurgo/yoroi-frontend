@@ -2,7 +2,6 @@
 import { Box, Typography, styled } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
-import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
@@ -40,7 +39,6 @@ export default function ConfirmSwapTransaction({
   const { orderData } = useSwap();
   const {
     selectedPoolCalculation: { pool },
-    bestPoolCalculation: { pool: bestPool },
   } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
   const { ptAmount, formattedPtAmount, formattedNonPtAmount, formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
