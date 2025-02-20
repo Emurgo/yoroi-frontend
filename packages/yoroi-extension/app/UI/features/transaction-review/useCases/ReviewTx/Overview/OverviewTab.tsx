@@ -78,7 +78,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 
       <MyWalletSection tx={tx} stakingAddress={stakingAddress} operationFee={operationFee} />
 
-      {receiverCustomTitle == null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
+      {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
 
       {extraOverviewDetails && <WalletExtraDetails extraDetails={extraOverviewDetails} />}
 
