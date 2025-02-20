@@ -150,7 +150,13 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
           trigger: async () => {
             await this.props.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
               signRequest: tentativeTx.signRequest,
-              wallet: selected,
+              wallet: {
+                 ...selected,
+                 // when transfering ledger wallet Byron Utxos to Shelley, we should use the
+                 // Byron public key
+                 publicKey: tentativeTx.publicKey.key.to_hex(),
+                 pathToPublic: tentativeTx.publicKey.addressing.path,
+              },
             });
             this.props.onSubmit();
           },

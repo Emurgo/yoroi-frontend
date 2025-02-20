@@ -43,6 +43,7 @@ import {
   maybe
 } from '../../../../coreUtils';
 import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
+import { WalletTypePurpose } from '../../../../config/numbersConfig';
 
 // ==================== LEDGER ==================== //
 function toLedgerTokenBundle(
@@ -854,6 +855,8 @@ export function buildConnectorSignedTransaction(
     key: RustModule.WalletV4.Bip32PublicKey,
   |},
   metadata: ?RustModule.WalletV4.AuxiliaryData,
+  // to support transfering from Byron address when initializing Ledger wallets
+  pathToReceiverMapping: Map<string, string> = new Map(),
 ): {| txHex: string, txId: string |} {
 
   const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
@@ -879,12 +882,29 @@ export function buildConnectorSignedTransaction(
         key: publicKey.key,
       }
     });
-    const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
-      RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
-      RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
-    );
+    if (witness.path[0] === WalletTypePurpose.BIP44) {
+      const receiver = pathToReceiverMapping.get(witness.path.join('/'));
+      if (!receiver) {
+        throw new Error('unexpectedly missing Byron path');
+      }
+      const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
+        RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
+        witnessKey.chaincode(),
+        RustModule.WalletV4.ByronAddress.from_base58(receiver).attributes(),
+      );
 
-    fixedTx.add_vkey_witness(vkeyWit);
+      fixedTx.add_bootstrap_witness(bootstrapWit);
+    } else if (witness.path[0] === WalletTypePurpose.CIP1852) {
+      const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
+        RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
+      );
+
+      fixedTx.add_vkey_witness(vkeyWit);
+    } else {
+      throw new Error(`unexpected witness path purpose value ${witness.path[0]}`);
+    }
   }
   const txHex = fixedTx.to_hex();
   return { txHex, txId: transactionHexToHash(txHex)};

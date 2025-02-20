@@ -24,6 +24,7 @@ import { broadcastTransaction } from '../../../api/thunk';
 import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { CardanoAddressedUtxo } from '../../../api/ada/transactions/types';
 
 export type SendUsingLedgerParams = {|
   signRequest: ISignRequest<any>,
@@ -73,6 +74,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
         wallet: request.wallet,
         catalystData: request.signRequest.ledgerNanoCatalystRegistrationTxSignData,
         changeAddrs: request.signRequest.changeAddr,
+        additionalSenderUtxos: request.signRequest.senderUtxos,
       });
 
       if (metadata) {
@@ -102,6 +104,9 @@ export default class LedgerSendStore extends Store<StoresMap> {
       ...
     },
     changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
+    // The purpose of this parameter is to support transfering from Byron address when initializing
+   //  Ledger wallets. It is needed because the wallet's utxos property no longer contains Byron UTxOs.
+    additionalSenderUtxos?: Array<CardanoAddressedUtxo>,
     catalystData?: LedgerNanoCatalystRegistrationTxSignData,
   |} => Promise<{|
     signedTxHex: string,
@@ -134,6 +139,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
         expectedSerial,
         networkId: request.wallet.networkId,
         catalystData: request.catalystData,
+        additionalSenderUtxos: request.additionalSenderUtxos,
       });
 
     } catch (error) {
@@ -152,6 +158,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
     changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkId: number,
     expectedSerial: string | void,
+    additionalSenderUtxos?: Array<CardanoAddressedUtxo>,
     catalystData?: LedgerNanoCatalystRegistrationTxSignData,
   |} => Promise<{|
     signedTxHex: string,
@@ -182,7 +189,10 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
       const txBodyHex = transactionHexToBodyHex(rawTxHex);
 
-      const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
+      const addressedUtxos = [
+        ...await this.stores.wallets.getAddressedUtxos(),
+        ...(request.additionalSenderUtxos || [])
+      ];
 
       const response = this.api.ada.createHwSignTxDataFromRawTx('ledger', {
         txBodyHex,
@@ -262,6 +272,9 @@ export default class LedgerSendStore extends Store<StoresMap> {
         ledgerSignTxResp.witnesses,
         request.publicKey,
         metadata,
+        new Map((request.additionalSenderUtxos || []).map(
+          ({ addressing, receiver }) => [addressing.path.join('/'), receiver]
+        )),
       );
 
       return { signedTxHex: txHex, txId, metadata };
