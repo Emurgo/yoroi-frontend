@@ -46,5 +46,6 @@ export type CurrentWalletType = {
   explorer: { tokenInfo: { name: string; baseUrl: string } }; // TODO to be removed
   selectedExplorer: any;
   walletAddresses: string;
+  isStakeRegistered: boolean;
   walletType: 'ledger' | 'trezor';
 };

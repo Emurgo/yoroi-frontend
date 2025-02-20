@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import { Balance } from '@yoroi/types';
 import React from 'react';
-import { Quantities } from '../../../utils/quantities';
+import { asQuantity, Quantities } from '../../../utils/quantities';
 import { CertificateType, FormattedTx } from './types';
 
 type OperationsCount = Record<CertificateType, number>;
@@ -14,15 +14,18 @@ export type Operations = {
   totalFee: Balance.Quantity;
 };
 
-export const useOperations = (certificates: FormattedTx['certificates']) => {
+export const useOperations = (
+  certificates: FormattedTx['certificates'],
+  isStakeRegistered: boolean,
+  stakeKeyDeposit: any,
+  primaryTokenInfo: any
+) => {
   const operationCount: any = {};
-
   if (certificates === null)
     return {
       components: [],
       totalFee: Quantities.zero,
     };
-
   const certificatesTypes = certificates.map((cert: { type: CertificateType }) => cert.type);
   certificatesTypes.forEach((cert: CertificateType) => updateOperationsCount(cert, operationCount));
 
@@ -35,18 +38,18 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
       const fistElementIndex = certificatesTypes.indexOf(certificate.type);
       const isFistElement = fistElementIndex === index;
       const isNotFirstElementDuplicated = operationCount[certificate.type] > 1 && !isFistElement;
-      // const isFirstElementDuplicated = operationCount[certificate.type] > 1 && isFistElement;
       //
       switch (certificate.type) {
         case CertificateType.VoteDelegation: {
           const drep = certificate.value.drep;
+          const keyDepositFee = isStakeRegistered ? null : `${asQuantity(stakeKeyDeposit)} ${primaryTokenInfo.name}`;
 
           if (drep === 'AlwaysAbstain')
             return {
               components: [
                 ...acc.components,
                 {
-                  component: <AbstainOperation key={index} label="Select abstain" />,
+                  component: <AbstainOperation key={index} label="Select abstain" fee={keyDepositFee} />,
                   duplicated: isNotFirstElementDuplicated,
                   type: CertificateType.VoteDelegation,
                 },
@@ -58,7 +61,7 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
               components: [
                 ...acc.components,
                 {
-                  component: <NoConfidenceOperation label="Select no confidence" />,
+                  component: <NoConfidenceOperation key={index} label="Select no confidence" fee={keyDepositFee} />,
                   duplicated: isNotFirstElementDuplicated,
                   type: CertificateType.VoteDelegation,
                 },
@@ -71,16 +74,7 @@ export const useOperations = (certificates: FormattedTx['certificates']) => {
             components: [
               ...acc.components,
               {
-                component: (
-                  <VoteDelegationOperation
-                    key={index}
-                    hash={hash}
-                    // type={type}
-                    // showWarning={isFirstElementDuplicated}
-                    // strike={isNotFirstElementDuplicated}
-                    label="Delegate voting to"
-                  />
-                ),
+                component: <VoteDelegationOperation key={index} hash={hash} label="Delegate voting to" fee={keyDepositFee} />,
                 duplicated: isNotFirstElementDuplicated,
                 type: CertificateType.VoteDelegation,
               },
@@ -167,31 +161,56 @@ const updateOperationsCount = (operation: CertificateType, operationsCount: Oper
   return operationsCount;
 };
 
-export const AbstainOperation = ({ label }: { label: string }) => {
+export const AbstainOperation = ({ label, fee }: { label: string; fee: string | null }) => {
   return (
-    <Stack gap="12px">
-      <Typography color="ds.text_gray_low">{label}</Typography>
+    <Stack direction="column" spacing={2}>
+      {fee && (
+        <Stack direction="row" justifyContent="space-between">
+          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_medium">{fee}</Typography>
+        </Stack>
+      )}
+      <Stack gap="12px">
+        <Typography color="ds.text_gray_low">{label}</Typography>
+      </Stack>
     </Stack>
   );
 };
-export const NoConfidenceOperation = ({ label }: { label: string }) => {
+export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: string | null }) => {
   return (
-    <Stack gap="12px">
-      <Typography color="ds.text_gray_low">{label}</Typography>
+    <Stack direction="column" spacing={2}>
+      {fee && (
+        <Stack direction="row" justifyContent="space-between">
+          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_medium">{fee}</Typography>
+        </Stack>
+      )}
+      <Stack gap="12px">
+        <Typography color="ds.text_gray_low">{label}</Typography>
+      </Stack>
     </Stack>
   );
 };
-export const VoteDelegationOperation = ({ label, hash }: { label: string; hash?: string }) => {
+export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash?: string; fee: string | null }) => {
   // const label = formatDrepHash(hash, type)  TODO format it when package is available in NPM
 
   return (
-    <Stack gap="12px" direction="row" justifyContent="space-between" alignItems="flex-start" minWidth="450px">
-      <Typography color="ds.text_gray_low" minWidth="200px" sx={{ wordWrap: 'break-word' }}>
-        {label}
-      </Typography>
-      <Typography color="ds.text_gray_medium" minWidth="230px" sx={{ wordWrap: 'break-word' }} textAlign="right">
-        {hash}
-      </Typography>
+    <Stack direction="column" spacing={2}>
+      {fee && (
+        <Stack direction="row" justifyContent="space-between">
+          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_medium">{fee}</Typography>
+        </Stack>
+      )}
+
+      <Stack gap="12px" direction="row" justifyContent="space-between" alignItems="flex-start" minWidth="450px">
+        <Typography color="ds.text_gray_low" minWidth="200px" sx={{ wordWrap: 'break-word' }}>
+          {label}
+        </Typography>
+        <Typography color="ds.text_gray_medium" minWidth="230px" sx={{ wordWrap: 'break-word' }} textAlign="right">
+          {hash}
+        </Typography>
+      </Stack>
     </Stack>
   );
 };

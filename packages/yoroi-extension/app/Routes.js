@@ -437,6 +437,7 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
+
   return (
     <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
       <GovernanceContextProvider

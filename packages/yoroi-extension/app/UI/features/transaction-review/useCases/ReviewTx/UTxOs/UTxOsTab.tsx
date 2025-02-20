@@ -3,7 +3,6 @@ import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
-import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
 // TODO Define the type for an individual asset
 interface Asset {
@@ -157,9 +156,9 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
 
       <Stack direction="row" gap="8px" alignItems="flex-start">
         <Typography sx={{ wordWrap: 'break-word' }} variant="body1" maxWidth="450px">
-          {output.ownAddress}
+          {output.address}
         </Typography>
-        <CopyButton textToCopy={output.ownAddress} strings={strings} />
+        <CopyButton textToCopy={output.address} strings={strings} />
       </Stack>
 
       {output.assets.length > 0 && (
@@ -172,8 +171,6 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
 };
 
 const FeeDisplay = ({ fee }) => {
-  const { primaryTokenInfo } = useTxReviewModal();
-
   return (
     <Stack direction="column" my="24px">
       <Divider />
@@ -181,9 +178,7 @@ const FeeDisplay = ({ fee }) => {
         <Typography variant="body1" fontWeight="500">
           Fee
         </Typography>
-        <Typography variant="body1">
-          {`-${fee.shiftedBy(-primaryTokenInfo.decimals)}`} {primaryTokenInfo.name}
-        </Typography>
+        <Typography variant="body1">{`-${fee}`}</Typography>
       </Stack>
       <Divider />
     </Stack>

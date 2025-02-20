@@ -1,5 +1,5 @@
-import React from 'react';
-import { getPrivateStakingKey } from '../../../../api/thunk';
+import React, { useEffect } from 'react';
+import { getPrivateStakingKey, getProtocolParameters } from '../../../../api/thunk';
 import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { addressHexToBech32 } from '../../../utils/common';
@@ -48,6 +48,7 @@ export const ReviewTxProvider = ({
   intl: any;
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
+  const [stakeKeyDeposit, setStakingKeyDeposit] = React.useState(0);
   const currentWalletInfo = createCurrrentWalletInfo(stores);
 
   const checkUserPassword = async (password: string): Promise<any> => {
@@ -56,6 +57,15 @@ export const ReviewTxProvider = ({
     } catch (error) {
       return error;
     }
+  };
+
+  useEffect(() => {
+    protocolParameters();
+  }, []);
+
+  const protocolParameters = async () => {
+    const protocolParameters = await getProtocolParameters({ networkId: currentWalletInfo?.networkId });
+    setStakingKeyDeposit(protocolParameters.keyDeposit);
   };
 
   const actions = React.useRef<ModalActions>({
@@ -74,7 +84,6 @@ export const ReviewTxProvider = ({
         receiverCustomTitle: payload.receiverCustomTitle,
         submitTx: payload.submitTx,
         createUnsignedTx: payload.createUnsignedTx,
-        operationFee: payload.operationFee,
         operations: payload.operations,
         extraOverviewDetails: payload.extraOverviewDetails,
       });
@@ -123,6 +132,8 @@ export const ReviewTxProvider = ({
       walletType: currentWalletInfo?.walletType,
       isHardwareWallet: currentWalletInfo?.isHardwareWallet,
       selectedExplorer: currentWalletInfo?.selectedExplorer,
+      isStakeRegistered: currentWalletInfo?.isStakeRegistered,
+      stakeKeyDeposit,
       ...actions,
     }),
     [state, actions]
@@ -151,7 +162,6 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         modalView: action.modalView ?? defaultState.modalView,
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
         receiverCustomTitle: action.receiverCustomTitle,
-        operationFee: action.operationFee,
         submitTx: action.submitTx,
         createUnsignedTx: action.createUnsignedTx,
         operations: action.operations,

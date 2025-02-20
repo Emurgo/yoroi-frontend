@@ -52,6 +52,7 @@ export const GovernanceStatusSelection = () => {
     changePasswordInputValue,
     drepCredentialHex,
     setUnsignedTx,
+    networkId,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
@@ -117,9 +118,6 @@ export const GovernanceStatusSelection = () => {
           title: 'Transaction Review',
           modalView: 'transactionReview',
           unsignedTx: parsedUnsignedTx,
-          operationFee: {
-            total: `${parsedUnsignedTx.body.fee / 1000000} ADA`,
-          },
           submitTx: password => {
             signGovernanceTx(password);
           },
@@ -136,11 +134,6 @@ export const GovernanceStatusSelection = () => {
   const signGovernanceTx = async password => {
     try {
       startLoadingTxReview();
-      console.log('TESTTSTS signGovernanceTx ', {
-        password,
-        wallet: selectedWallet,
-        dialog: null,
-      });
       await signDelegationTransaction({
         password,
         wallet: selectedWallet,

@@ -1,8 +1,8 @@
+import { Box, Stack, Typography } from '@mui/material';
+import { toSvg } from 'jdenticon';
 import React from 'react';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import SeizaFetcher from './SeizaFetcher';
-import { toSvg } from 'jdenticon';
-import { Box, Stack, Typography } from '@mui/material';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
   const [selectedPoolId, setSelectedPoolId] = React.useState(null);
@@ -21,9 +21,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
       title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
-      operationFee: {
-        total: parsedUnsignedTx.body.fee / 1000000 + 2, // TODO refactor - add proper calculation
-      },
       operations: {
         components: [
           {

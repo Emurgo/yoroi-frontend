@@ -34,7 +34,7 @@ export const AssetCarousel = ({ data }) => {
 
             position: 'absolute',
             top: '16px',
-            right: '0',
+            right: '16px',
           },
           children: (
             <IconWrapper>
@@ -50,7 +50,7 @@ export const AssetCarousel = ({ data }) => {
 
             position: 'absolute',
             top: '16px',
-            right: '40px',
+            right: '50px',
           },
           children: (
             <IconWrapper>

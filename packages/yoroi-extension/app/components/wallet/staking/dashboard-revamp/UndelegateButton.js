@@ -26,9 +26,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
       title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
-      operationFee: {
-        total: parsedUnsignedTx.body.fee / 1000000,
-      },
       operations: {
         components: [{ component: <OperationsDetails />, duplicated: false }],
       },

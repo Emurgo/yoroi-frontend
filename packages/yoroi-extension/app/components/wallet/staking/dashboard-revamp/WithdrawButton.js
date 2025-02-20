@@ -33,9 +33,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
-      operationFee: {
-        total: parsedUnsignedTx.body.fee / 1000000,
-      },
       operations: {
         components: [
           {

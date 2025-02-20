@@ -187,6 +187,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       throw new Error(`no selected Wallet. Should never happen`);
     }
 
+    const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
 
@@ -247,6 +248,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       explorer: { tokenInfo: explorerTransactionInfo },
       selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
+      isStakeRegistered,
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);

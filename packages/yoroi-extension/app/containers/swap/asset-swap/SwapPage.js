@@ -216,9 +216,6 @@ function SwapPage(props: StoresProps & Intl): Node {
           submitTx: pasword => {
             handleSubmitTransaction(pasword);
           },
-          operationFee: {
-            total: formattedPtAmount,
-          },
           extraOverviewDetails: {
             title: 'Swap Details',
             onClick: () => changeModalView({ modalView: 'extraDetails' }),

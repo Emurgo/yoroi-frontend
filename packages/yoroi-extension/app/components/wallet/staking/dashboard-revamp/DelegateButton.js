@@ -18,9 +18,6 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
       title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
-      operationFee: {
-        total: parsedUnsignedTx.body.fee / 1000000 + 2, // TODO refactor - add proper calculation
-      },
       operations: {
         components: [
           {

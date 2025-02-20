@@ -7,18 +7,27 @@ import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
+import { Quantities } from '../../../../utils/quantities';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, networkId } = useTxReviewModal();
+  const {
+    walletUtxos,
+    walletAddresses,
+    primaryTokenInfo,
+    ftAssetsList,
+    networkId,
+    isStakeRegistered,
+    stakeKeyDeposit,
+  } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
 
   const inputUtxos = useUtxos(inputs, walletUtxos);
 
-  const formattedFee = formatFee(primaryTokenInfo, data);
+  const formattedFee = formatFee(primaryTokenInfo, data, isStakeRegistered, stakeKeyDeposit);
 
   const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
   const formattedCertificates = formatCertificates(data?.certs);
@@ -126,13 +135,11 @@ const sumAmountsByAddress = (outputs: Output[]) => {
 
 const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenInfo: any): Promise<any> => {
   const summedOutputs = sumAmountsByAddress(outputs);
-
   return Promise.all(
-    Object.entries(summedOutputs).map(async ([address, totalCoin]) => {
+    Object.entries(summedOutputs).map(async ([address, totalCoin], index) => {
       const coin: any = totalCoin;
       const addressKind = await getAddressKind(address);
       const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
-
       const primaryAssets = [
         {
           tokenInfo: primaryTokenInfo,
@@ -164,18 +171,32 @@ const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenI
         address,
         addressKind,
         rewardAddress,
-        ownAddress: address,
+        ownAddress: Object.keys(summedOutputs).length === 1 ? true : index === 1,
       };
     })
   );
 };
 
-export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => {
-  const fee = asQuantity(data?.fee ?? '0');
+export const formatFee = (
+  primaryTokenInfo: any,
+  data: TransactionBody,
+  isStakeRegistered: boolean,
+  stakeKeyDeposit: any
+): any => {
+  let defaultFee: any = 0;
+  const hasCerts = (data?.certs ?? []).length > 0;
+  if (hasCerts) {
+    defaultFee = isStakeRegistered
+      ? asQuantity(data.fee).shiftedBy(-primaryTokenInfo.decimals)
+      : asQuantity(Quantities.sum([defaultFee, stakeKeyDeposit])).shiftedBy(-primaryTokenInfo.decimals);
+  } else {
+    defaultFee = asQuantity(data?.fee ?? '0').shiftedBy(-primaryTokenInfo.decimals);
+  }
 
   return {
     tokenInfo: primaryTokenInfo,
-    quantity: fee,
+    quantity: `${defaultFee} ${primaryTokenInfo.name}`,
+    rawQuantity: `${asQuantity(data?.fee ?? '0').shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`,
   };
 };
 

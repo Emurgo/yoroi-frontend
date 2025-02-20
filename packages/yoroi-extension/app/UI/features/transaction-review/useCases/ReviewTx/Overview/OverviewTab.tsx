@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { Box, Divider, Stack, styled } from '@mui/material';
 import WalletAccountIcon from '../../../../../../components/topbar/WalletAccountIcon';
-import { truncateAddress } from '../../../../../../utils/formatters';
+import { truncateAddress, truncateLongName } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { useOperations } from '../../../common/operations';
@@ -27,19 +27,22 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
     currentWalletDetails,
     changeModalView,
     stakingAddress,
-    operationFee,
     operations,
     extraOverviewDetails,
+    isStakeRegistered,
+    stakeKeyDeposit,
+    primaryTokenInfo,
   } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
   // const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
   // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
-  const operationsCerts = useOperations(tx.certificates);
+
+  const operationsCerts = useOperations(tx.certificates, isStakeRegistered, stakeKeyDeposit, primaryTokenInfo);
 
   const { plate } = selected;
   const currentWalletIcon = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={8} scalePx={4} />;
 
-  const waletInfoDsiplay = (
+  const waletInfoDisplay = (
     <Stack
       direction="row"
       alignItems="center"
@@ -57,11 +60,9 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
           changeModalView({ modalView: 'walletInfo', title: 'Wallet Details' });
         }}
       >
-        <Typography
-          variant="body1"
-          color="ds.text_primary_medium"
-          fontWeight={500}
-        >{`${selectedWalletName} | ${plate.TextPart}`}</Typography>
+        <Typography variant="body1" color="ds.text_primary_medium" fontWeight={500}>{`${truncateLongName(selectedWalletName)} | ${
+          plate.TextPart
+        }`}</Typography>
       </Box>
     </Stack>
   );
@@ -69,14 +70,14 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   return (
     <Stack sx={{ padding: '24px' }}>
       <Stack direction="column" gap="8px">
-        <InfoInline label="Wallet" value={waletInfoDsiplay} />
+        <InfoInline label="Wallet" value={waletInfoDisplay} />
         {/* <InfoInline label="Connected to" value="dapp" /> */}
-        <InfoInline label="Fee" value={`-${tx.fee.quantity / 1000000} ADA`} />
+        <InfoInline label="Fee" value={`-${tx.fee.rawQuantity}`} />
       </Stack>
 
       <Divider sx={{ margin: '24px 0px' }} />
 
-      <MyWalletSection tx={tx} stakingAddress={stakingAddress} operationFee={operationFee} />
+      <MyWalletSection tx={tx} stakingAddress={stakingAddress} />
 
       {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
 
@@ -102,7 +103,7 @@ const InfoInline = ({ label, value }) => {
   );
 };
 
-const MyWalletSection = ({ tx, stakingAddress, operationFee }) => {
+const MyWalletSection = ({ tx, stakingAddress }) => {
   return (
     <Box>
       <Collapsible
@@ -113,7 +114,7 @@ const MyWalletSection = ({ tx, stakingAddress, operationFee }) => {
             <CopyableText value={stakingAddress}>
               <Typography>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
-            <MyWalletTokens operationFee={operationFee} tx={tx} />
+            <MyWalletTokens tx={tx} />
           </Stack>
         }
       />
@@ -158,7 +159,7 @@ const OperationsSection = ({ operations }) => {
   );
 };
 
-const MyWalletTokens = ({ operationFee, tx }) => {
+const MyWalletTokens = ({ tx }) => {
   // const notPrimaryTokenSent = [];
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
@@ -170,7 +171,7 @@ const MyWalletTokens = ({ operationFee, tx }) => {
           <Typography fontWeight="500">Send</Typography>
         </Stack>
         <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px' }}>
-          <Typography color="ds.white_static">{operationFee?.total || `${tx.fee.quantity / 1000000} ADA`}</Typography>
+          <Typography color="ds.white_static">{tx.fee.quantity}</Typography>
         </Box>
       </Stack>
 
