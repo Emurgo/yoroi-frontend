@@ -91,93 +91,34 @@ export default class AdaWalletsStore extends Store<StoresMap> {
     },
     password: string,
   |}) => Promise<{| signedTxHex: string |}> = async ({ wallet, transactionHex, password }) => {
-    const walletType: string = wallet.type;
-    const baseSignRequest = { wallet, transactionHex };
-    const signRequest = wallet.isHardware
-      ? { [walletType]: baseSignRequest }
-      : { normal: { ...baseSignRequest, password } };
-    // $FlowIgnore[incompatible-call]
-    return this.adaSignTransactionHex({ signRequest });
-  }
-
-  adaSignTransactionHex: ({|
-    signRequest:
-      | {|
-          normal: {|
-            +wallet: {
-              publicDeriverId: number,
-              +plate: { TextPart: string, ... },
-              ...
-            },
-            transactionHex: string,
-            password: string,
-          |},
-        |}
-      | {|
-          trezor: {|
-            transactionHex: string,
-            +wallet: {
-              publicDeriverId: number,
-              +plate: { TextPart: string, ... },
-              publicKey: string,
-              pathToPublic: Array<number>,
-              stakingAddressing: Addressing,
-              networkId: number,
-              hardwareWalletDeviceId: ?string,
-              ...
-            },
-          |},
-        |}
-      | {|
-          ledger: {|
-            transactionHex: string,
-            +wallet: {
-              publicDeriverId: number,
-              +plate: { TextPart: string, ... },
-              stakingAddressing: Addressing,
-              publicKey: string,
-              pathToPublic: Array<number>,
-              networkId: number,
-              hardwareWalletDeviceId: ?string,
-              ...
-            }
-          |},
-        |},
-  |}) => Promise<{| signedTxHex: string |}> = async request => {
-    if (request.signRequest.ledger) {
-      const { wallet, transactionHex } = request.signRequest.ledger;
-      const { signedTxHex } = await this.stores.substores.ada.ledgerSend.signRawTxFromWallet({
-        rawTxHex: transactionHex,
-        wallet,
-        // by happenstance the use case of this function is not to send
-        // money while getting the change so there is no change address
-        changeAddrs: [],
-      });
-      return { signedTxHex };
-    }
-    if (request.signRequest.trezor) {
-      const { wallet, transactionHex } = request.signRequest.trezor;
-      const { signedTxHex } = await this.stores.substores.ada.trezorSend.signRawTxFromWallet({
-        rawTxHex: transactionHex,
-        wallet,
-        // by happenstance the use case of this function is not to send
-        // money while getting the change so there is no change address
-        changeAddrs: [],
-      });
-      return { signedTxHex };
-    }
-    if (request.signRequest.normal) {
-      const { wallet, transactionHex, password } = request.signRequest.normal;
+    let result;
+    if (wallet.type === 'mnemonic') {
       const signedTxHex = await signTransaction({
         publicDeriverId: wallet.publicDeriverId,
         transactionHex,
         password,
       });
-      return { signedTxHex };
+      result = { signedTxHex };
+    } else if (wallet.type === 'trezor') {
+      result = await this.stores.substores.ada.trezorSend.signRawTxFromWallet({
+        rawTxHex: transactionHex,
+        wallet,
+        // by happenstance the use case of this function is not to send
+        // money while getting the change so there is no change address
+        changeAddrs: [],
+      });
+    } else if (wallet.type === 'ledger') {
+      result = await this.stores.substores.ada.ledgerSend.signRawTxFromWallet({
+        rawTxHex: transactionHex,
+        wallet,
+        // by happenstance the use case of this function is not to send
+        // money while getting the change so there is no change address
+        changeAddrs: [],
+      });
+    } else {
+      throw new Error('unexpected wallet type');
     }
-    throw new Error(
-      `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
-    );
+    return { signedTxHex: result.signedTxHex };
   };
 
   // =================== WALLET RESTORATION ==================== //
