@@ -86,10 +86,22 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
         };
       })
       .sort((a, b) => {
-        // Move tokens with special names to the end
-        if (a.isSpecialName && !b.isSpecialName) return 1;
-        if (!a.isSpecialName && b.isSpecialName) return -1;
-        return b.percentage - a.percentage;
+        // If both tokens have special names, sort them by percentage
+        if (a.isSpecialName && b.isSpecialName) {
+          return Number(b.percentage) - Number(a.percentage);
+        }
+        // If only one token has a special name but has percentage > 0, still sort it normally
+        if (a.isSpecialName && a.percentage > 0 && !b.isSpecialName) {
+          return Number(b.percentage) - Number(a.percentage);
+        }
+        if (b.isSpecialName && b.percentage > 0 && !a.isSpecialName) {
+          return Number(b.percentage) - Number(a.percentage);
+        }
+        // Move tokens with special names and 0 percentage to the bottom
+        if (a.isSpecialName && a.percentage === 0) return 1;
+        if (b.isSpecialName && b.percentage === 0) return -1;
+        // Default sorting by percentage
+        return Number(b.percentage) - Number(a.percentage);
       });
   }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo, ptTokenDataInterval7d, ptTokenDataInterval1M]);
 

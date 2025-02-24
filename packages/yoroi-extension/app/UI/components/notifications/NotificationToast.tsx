@@ -1,44 +1,34 @@
-import { IconButton, styled, Box, Typography, useTheme } from '@mui/material';
 import React from 'react';
-import { useStrings } from '../../common/hooks/useStrings';
+import { Box, useTheme, Typography } from '@mui/material';
 import { Icon } from '../icons/index';
+import { NotificationTypes } from '../../types/notifications';
+import { FadeInOut } from './NotificationsStyles';
+import { Theme, toast } from 'react-toastify';
 
-enum NotificationTypes {
-  Income = "Income",
-  Cancelled = "Cancelled",
-  Outcome = "Outcome",
-  Rewards = "Rewards"
-}
+const NOTIFICATION_TIMEOUT = 3000; // 3s
 
-interface Props {
-  text: string;
+export type NotificationProps = {
+  title: string;
+  subtitle: string;
   type: NotificationTypes;
-  onClick(): void;
-  onClose(): void;
+  theme: Theme;
 }
-
-const IconWrapper = styled(IconButton)(({ theme }: any) => ({
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_medium,
-    },
-  },
-}));
-
-const SNotificationContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  borderRadius: '8px',
-  width: '446px',
-  paddingTop: '16px',
-  paddingBottom: '16px',
-  backgroundColor: theme.palette["ds"].bg_color_contrast_high,
-  boxShadow: theme.palette["ds"].light_shadow_notification,
-}));
-
 type IconProps = {
   type: NotificationTypes
 }
 
+export const NotificationCloseButton = ({ closeToast }) => {
+  const theme = useTheme()
+  const handleClose = () => {
+    closeToast("closed");
+  }
+
+  return (
+    <Box onClick={handleClose} sx={{ padding: 0 }}>
+      <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
+    </Box>
+  )
+}
 
 const IconContainer = ({ children, ...props }) => (
   <Box {...props} sx={{
@@ -55,9 +45,6 @@ const IconContainer = ({ children, ...props }) => (
 
 const NotificationIcon = ({ type }: IconProps) => {
   const theme = useTheme();
-
-  console.log("theme", theme.palette["ds"], theme.palette)
-
   switch (type) {
     case NotificationTypes.Rewards:
       return (
@@ -88,46 +75,21 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-export default function NotificationToast({ onClick, onClose, type }: Props) {
-  const strings = useStrings();
-  const theme = useTheme();
-
-  const notificationTexts = {
-    [NotificationTypes.Rewards]: strings.clickToView,
-    [NotificationTypes.Income]: strings.tokensReceived,
-    [NotificationTypes.Outcome]: strings.tokensSent,
-    [NotificationTypes.Cancelled]: strings.txFailed,
-  }
-
-  const handleClick = (e) => {
-    e.preventDefault();
-    console.log("clicked");
-    onClick();
-  }
-
-  const handleClose = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    onClose();
-    console.log("closed");
-  }
-
+const NotificationBody = ({ title, subtitle }) => {
   return (
-    <Box id="notif-toast" sx={{ position: 'fixed', top: 10, right: 10, zIndex: 9999 }}>
-      <SNotificationContainer onClick={handleClick}>
-        <Box px="16px" flexShrink={0} sx={{ cursor: 'pointer', alignSelf: 'center' }}>
-          <NotificationIcon type={type} />
-        </Box>
-        <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-          <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{notificationTexts[type]}</Typography>
-          <Typography component="div" variant='body2' color="ds.text_gray_low">{strings.clickToView}</Typography>
-        </Box>
-        <Box px="12px" flexShrink={0}>
-          <IconWrapper onClick={handleClose} sx={{ padding: 0 }}>
-            <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
-          </IconWrapper>
-        </Box>
-      </SNotificationContainer>
+    <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
+      <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{title}</Typography>
+      <Typography component="div" variant='body2' color="ds.text_gray_low">{subtitle}</Typography>
     </Box>
-  );
-};
+  )
+}
+
+export function createToast({ title, subtitle, type, theme = "light" }: NotificationProps) {
+  return toast(<NotificationBody title={title} subtitle={subtitle} />, {
+    autoClose: NOTIFICATION_TIMEOUT,
+    icon: () => <NotificationIcon type={type} />,
+    theme,
+    transition: FadeInOut,
+    closeOnClick: true,
+  });
+}

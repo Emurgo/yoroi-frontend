@@ -52,12 +52,15 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
   });
 }
 
-export function transactionHexAddVkeyWitnessesFromWitnessSetHex(txHex: string, witnessSetHex: string): string {
+export function transactionHexAddSignaturesFromWitnessSetHex(txHex: string, witnessSetHex: string): string {
   return RustModule.WasmScope(Module => {
     const fixedTransaction = Module.WalletV4.FixedTransaction.from_hex(txHex);
     const witnessSet = Module.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex);
     for (const vkeyWitness of iterateLenGet(witnessSet.vkeys())) {
       fixedTransaction.add_vkey_witness(vkeyWitness);
+    }
+    for (const bootstrapWitness of iterateLenGet(witnessSet.bootstraps())) {
+      fixedTransaction.add_bootstrap_witness(bootstrapWitness);
     }
     return fixedTransaction.to_hex();
   });

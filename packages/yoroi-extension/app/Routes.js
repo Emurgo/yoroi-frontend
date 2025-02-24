@@ -13,7 +13,6 @@ import { ROUTES } from './routes-config';
 import type { StoresMap, StoresProps } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { useObserver } from 'mobx-react-lite';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
@@ -253,10 +252,7 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
-          <Route
-            path={ROUTES.PORTFOLIO.ROOT}
-            component={() => PortfolioSubpages(stores)}
-          />
+          <Route path={ROUTES.PORTFOLIO.ROOT} component={() => PortfolioSubpages(stores)} />
           <Redirect to={ROUTES.WALLETS.ROOT} />
         </Switch>
       </Suspense>
@@ -323,25 +319,15 @@ const SettingsSubpages = stores => (
   </Switch>
 );
 
-const PortfolioSubpages = (stores) => (
-  WrapPortfolio({ stores },
+const PortfolioSubpages = stores =>
+  WrapPortfolio(
+    { stores },
     <Switch>
-      <Route exact
-        path={ROUTES.PORTFOLIO.ROOT}
-        component={props => <PortfolioPage {...props} stores={stores} />}
-      />
-      <Route
-        exact
-        path={ROUTES.PORTFOLIO.DAPPS}
-        component={props => <PortfolioDappsPage {...props} stores={stores} />}
-      />
-      <Route exact
-        path={ROUTES.PORTFOLIO.DETAILS}
-        component={props => <PortfolioDetailPage {...props} stores={stores} />}
-      />
+      <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} stores={stores} />} />
+      <Route exact path={ROUTES.PORTFOLIO.DAPPS} component={props => <PortfolioDappsPage {...props} stores={stores} />} />
+      <Route exact path={ROUTES.PORTFOLIO.DETAILS} component={props => <PortfolioDetailPage {...props} stores={stores} />} />
     </Switch>
-  )
-);
+  );
 
 const NFTsSubPages = stores => (
   <Switch>
@@ -461,29 +447,26 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
 
 export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const { stores } = portfolioProps;
+  const { shouldHideBalance, unitOfAccount } = stores.profile;
 
-  return useObserver(() => {
-    const { shouldHideBalance, unitOfAccount } = stores.profile;
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
 
-    const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const openDialogWrapper = dialog => {
+    stores.uiDialogs.open({ dialog });
+  };
 
-    const openDialogWrapper = dialog => {
-      stores.uiDialogs.open({ dialog });
-    };
-
-    return (
-      <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
-        <PortfolioContextProvider
-          settingFiatPairUnit={unitOfAccount}
-          currentWallet={currentWalletInfo}
-          openDialogWrapper={openDialogWrapper}
-          shouldHideBalance={shouldHideBalance}
-        >
-          <Suspense fallback={null}>{children}</Suspense>
-        </PortfolioContextProvider>
-      </CurrencyProvider>
-    );
-  });
+  return (
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <PortfolioContextProvider
+        settingFiatPairUnit={unitOfAccount}
+        currentWallet={currentWalletInfo}
+        openDialogWrapper={openDialogWrapper}
+        shouldHideBalance={shouldHideBalance}
+      >
+        <Suspense fallback={null}>{children}</Suspense>
+      </PortfolioContextProvider>
+    </CurrencyProvider>
+  );
 }
 
 export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
@@ -494,13 +477,8 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
   };
 
   return (
-    <DappCenterContextProvider
-      currentWallet={currentWalletInfo}
-      openDialogWrapper={openDialogWrapper}
-    >
-      <Suspense fallback={null}>
-        {children}
-      </Suspense>
+    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
+      <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
   );
 }

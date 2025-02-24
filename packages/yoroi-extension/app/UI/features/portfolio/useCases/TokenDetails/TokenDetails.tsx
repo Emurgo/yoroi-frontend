@@ -20,9 +20,10 @@ const TokenInfo = styled(Stack)({
 
 interface Props {
   tokenInfo: TokenInfoType;
+  stores: any;
 }
 
-const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
+const TokenDetails = ({ tokenInfo, stores }: Props): JSX.Element => {
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
@@ -42,7 +43,7 @@ const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
       <Stack direction="column" spacing={theme.spacing(3)} sx={{ marginTop: theme.spacing(2) }}>
         <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(3)}>
           <Card>
-            <HeaderSection tokenInfo={tokenInfo} />
+            <HeaderSection tokenInfo={tokenInfo} stores={stores} />
             <Divider />
             <TokenChartInterval tokenInfo={tokenInfo} />
           </Card>
