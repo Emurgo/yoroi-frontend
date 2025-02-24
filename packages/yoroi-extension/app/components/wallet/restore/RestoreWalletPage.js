@@ -174,7 +174,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
               throw new Error('unexpected nullish restore mode');
             }
             const isValid = walletRestore.isValidMnemonic({ mnemonic: phrase, mode: selectedRestoreMode });
-            ampli.restoreWalletEnterPhraseStepStatus({ recovery_prhase_status: isValid });
             return isValid;
           }}
           openDuplicatedWallet={lastDuplicatedWalletId => {
