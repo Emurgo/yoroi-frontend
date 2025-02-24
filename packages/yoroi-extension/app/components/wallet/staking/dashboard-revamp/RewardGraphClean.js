@@ -1,7 +1,7 @@
 // @flow
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { GraphItems } from '../dashboard/GraphWrapper';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, useTheme } from '@mui/material';
 
 const graphVars = {
   barWidth: 10,
@@ -21,17 +21,18 @@ type Props = {|
 
 const RewardGraphClean = (props: Props): any => {
   const { hideYAxis, data, xAxisLabel, yAxisLabel, primaryBarLabel, epochTitle, stakepoolNameTitle } = props;
+  const theme = useTheme();
 
   const formatYAxis = value => (!hideYAxis ? value : '∗∗∗ ');
   const GraphTooltip = ({ active, payload, label }: {| active: boolean, payload: ?[any], label: string |}) => {
-    if (active && payload != null) {
+    if (active && payload != null && payload.length !== 0) {
       const { poolName } = payload[0].payload;
       const values = [[epochTitle, label], [primaryBarLabel, payload[0].value], poolName ? [stakepoolNameTitle, poolName] : []];
       return (
         <Box
           sx={{
             padding: '8px 12px 8px 8px',
-            bgcolor: theme => theme.palette.ds.gray_900,
+            bgcolor: theme.palette.ds.gray_900,
             color: 'ds.bg_color_max',
             lineHeight: '14px',
             borderRadius: '4px',
@@ -70,7 +71,7 @@ const RewardGraphClean = (props: Props): any => {
       <BarChart data={data.slice(-10)} height={200} margin={{ top: 0, right: 0, left: 56, bottom: 0 }}>
         <XAxis
           tick={{
-            fill: '#6B7384',
+            fill: theme.palette.ds.text_gray_low,
             fontSize: graphVars.fontSize,
             lineHeight: graphVars.lineHeight,
           }}
@@ -80,22 +81,22 @@ const RewardGraphClean = (props: Props): any => {
             value: xAxisLabel,
             position: 'insideBottom',
             fontSize: '12px',
-            fill: '#6B7384',
+            fill: theme.palette.ds.text_gray_low,
             offset: 10,
           }}
           padding={{ left: 24, right: 24 }}
-          stroke="#DCE0E9"
+          stroke={theme.palette.ds.gray_200}
           tickLine={false}
         />
         <YAxis
           tickFormatter={formatYAxis}
           padding={{ top: 12 }}
           tick={{
-            fill: '#6B7384',
+            fill: theme.palette.ds.text_gray_low,
             fontSize: graphVars.fontSize,
             lineHeight: graphVars.lineHeight,
           }}
-          stroke="#DCE0E9"
+          stroke={theme.palette.ds.gray_200}
           tickLine={false}
           label={{
             value: yAxisLabel,
@@ -103,7 +104,7 @@ const RewardGraphClean = (props: Props): any => {
             offset: 15,
             dy: 50,
             angle: -90,
-            fill: '#6B7384',
+            fill: theme.palette.ds.text_gray_low,
             textAnchor: 'middle',
             fontSize: '12px',
             fontWeight: 400,
@@ -118,7 +119,7 @@ const RewardGraphClean = (props: Props): any => {
           radius={[4, 4, 0, 0]}
           dataKey="primary"
           stackId="a"
-          fill="#3154CB"
+          fill={theme.palette.ds.el_primary_medium}
         />
       </BarChart>
     </ResponsiveContainer>

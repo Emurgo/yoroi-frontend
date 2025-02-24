@@ -32,6 +32,9 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
+  PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
+  BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -95,6 +98,29 @@ export default class LocalStorageApi {
   getUserThemeMode: void => Promise<?string> = () => getLocalItem(storageKeys.USER_THEME);
 
   setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
+
+  // ========== Portfolio FIAT Pair ========== //
+
+  getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+
+  setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+
+  unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+  
+  // ========== Notifications Setting ========== //
+
+  getNotificationsSetting: void => Promise<?string> = () => getLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
+
+  setNotificationsSetting: string => Promise<void> = allowed => setLocalItem(storageKeys.NOTIFICATIONS_ENABLED, allowed);
+
+  unsetNotificationsSetting: void => Promise<void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
+
+  // ========== Buy/Sell Disclaimer ========== //
+  getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+
+  setBuySellDisclaimer: string => Promise<void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
+
+  unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
   // ========== Theme Migration ========== //
 
@@ -345,6 +371,7 @@ export default class LocalStorageApi {
     await this.unsetToggleSidebar();
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
+    await this.unsetPortfolioFiatPair();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);
@@ -462,8 +489,8 @@ export function createStorageFlag(key: string, defaultValue: boolean): StorageFi
 }
 
 export function createFlagStorage(): StorageAPI {
-    return {
-      get: async s => (await getLocalItem(s)) ?? null,
-      set: setLocalItem,
-    };
+  return {
+    get: async s => (await getLocalItem(s)) ?? null,
+    set: setLocalItem,
+  };
 }

@@ -6,7 +6,6 @@ import WalletBackupDialog from '../../components/wallet/WalletBackupDialog';
 import {
   HARD_DERIVATION_START,
 } from '../../config/numbersConfig';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 
 export type WalletBackupSteps = 'privacyWarning' | 'recoveryPhraseDisplay' | 'recoveryPhraseEntry' | null;
@@ -19,7 +18,7 @@ export type RecoveryPhraseSortedArray = Array<{|
 
 /** Pipeline for users to create their wallet and backing up their mnemonic somewhere safe */
 export default
-class WalletBackupStore extends Store<StoresMap, ActionsMap> {
+class WalletBackupStore extends Store<StoresMap> {
 
   @observable inProgress: boolean;
   @observable currentStep: WalletBackupSteps;
@@ -46,22 +45,9 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
   setup(): void {
     super.setup();
     this._reset();
-    const a = this.actions.walletBackup;
-    a.initiateWalletBackup.listen(this._initiateWalletBackup);
-    a.continueToPrivacyWarning.listen(this._continueToPrivacyWarning);
-    a.togglePrivacyNoticeForWalletBackup.listen(this._togglePrivacyNoticeForWalletBackup);
-    a.continueToRecoveryPhraseForWalletBackup.listen(this._continueToRecoveryPhraseForWalletBackup);
-    a.startWalletBackup.listen(this._startWalletBackup);
-    a.addWordToWalletBackupVerification.listen(this._addWordToWalletBackupVerification);
-    a.clearEnteredRecoveryPhrase.listen(this._clearEnteredRecoveryPhrase);
-    a.acceptWalletBackupTermDevice.listen(this._acceptWalletBackupTermDevice);
-    a.acceptWalletBackupTermRecovery.listen(this._acceptWalletBackupTermRecovery);
-    a.restartWalletBackup.listen(this._restartWalletBackup);
-    a.cancelWalletBackup.listen(this._cancelWalletBackup);
-    a.removeOneMnemonicWord.listen(this._removeOneWord);
   }
 
-  @action _initiateWalletBackup: {|
+  @action initiateWalletBackup: {|
       recoveryPhrase: Array<string>,
       name: string,
       password: string,
@@ -91,28 +77,28 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
         clearInterval(this.countdownTimerInterval);
       }
     }, 1000);
-    this.actions.dialogs.open.trigger({
+    this.stores.uiDialogs.open({
       dialog: WalletBackupDialog,
     });
   };
 
-  @action _continueToPrivacyWarning: void => void = () => {
+  @action continueToPrivacyWarning: void => void = () => {
     this.currentStep = 'privacyWarning';
   };
 
-  @action _togglePrivacyNoticeForWalletBackup: void => void = () => {
+  @action togglePrivacyNoticeForWalletBackup: void => void = () => {
     this.isPrivacyNoticeAccepted = !this.isPrivacyNoticeAccepted;
   };
 
-  @action _continueToRecoveryPhraseForWalletBackup: void => void = () => {
+  @action continueToRecoveryPhraseForWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _startWalletBackup: void => void = () => {
+  @action startWalletBackup: void => void = () => {
     this.currentStep = 'recoveryPhraseEntry';
   };
 
-  @action _addWordToWalletBackupVerification: {|
+  @action addWordToWalletBackupVerification: {|
     word: string,
     index: number
   |} => void = (params) => {
@@ -122,14 +108,14 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
     if (pickedWord && pickedWord.word === word) pickedWord.isActive = false;
   };
 
-  @action _clearEnteredRecoveryPhrase: void => void = () => {
+  @action clearEnteredRecoveryPhrase: void => void = () => {
     this.enteredPhrase = [];
     this.recoveryPhraseSorted = this.recoveryPhraseSorted.map(
       ({ word }) => ({ word, isActive: true })
     );
   };
 
-  @action _removeOneWord: void => void = () => {
+  @action removeOneMnemonicWord: void => void = () => {
     if (!this.enteredPhrase) {
       return;
     }
@@ -144,20 +130,20 @@ class WalletBackupStore extends Store<StoresMap, ActionsMap> {
     );
   }
 
-  @action _acceptWalletBackupTermDevice: void => void = () => {
+  @action acceptWalletBackupTermDevice: void => void = () => {
     this.isTermDeviceAccepted = true;
   };
 
-  @action _acceptWalletBackupTermRecovery: void => void = () => {
+  @action acceptWalletBackupTermRecovery: void => void = () => {
     this.isTermRecoveryAccepted = true;
   };
 
-  @action _restartWalletBackup: void => void = () => {
-    this._clearEnteredRecoveryPhrase();
+  @action restartWalletBackup: void => void = () => {
+    this.clearEnteredRecoveryPhrase();
     this.currentStep = 'recoveryPhraseDisplay';
   };
 
-  @action _cancelWalletBackup: void => void = () => {
+  @action cancelWalletBackup: void => void = () => {
     this.teardown();
   };
 

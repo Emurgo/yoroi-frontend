@@ -51,9 +51,14 @@ export const lightPalette = {
   sys_orange_500: '#ED8600',
   sys_orange_100: '#FFF2E2',
 
+  static_green: '#08C29D',
+
   bg_gradient_1: 'linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%)',
   bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
   bg_gradient_3: 'linear-gradient(30deg, #244ABF 0%, #4760FF 100%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
   special_web_bg_sidebar: '#1F232ECC',
+  light_shadow_dropdown_words: `0px 3px 10px rgba(24, 26, 30, 0.08)`,
+  light_shadow_dropdown_menu: `0px 4px 10px rgba(24, 26, 30, 0.16)`,
+  light_shadow_notification: `-1px 8px 20px 0px rgba(138, 146, 163, 0.1)`,
 };

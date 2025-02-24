@@ -35,7 +35,6 @@ type Props = {|
   error: ?LocalizableError,
   onCancel: void => void,
   onSubmit: TxMemoTablePreInsert => Promise<void>,
-  classicTheme: boolean,
 |};
 
 type State = {|
@@ -60,8 +59,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     fields: {
       memoContent: {
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
-        placeholder: this.props.classicTheme ?
-          this.context.intl.formatMessage(memoMessages.optionalMemo) : '',
+        placeholder: '',
         value: '',
         validators: [({ field }) => (
           [
@@ -131,7 +129,7 @@ export default class AddMemoDialog extends Component<Props, State> {
       <Dialog
         className={classnames([styles.component])}
         title={intl.formatMessage(memoMessages.addMemo)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}

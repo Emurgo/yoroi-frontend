@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresProps } from '../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
@@ -11,20 +11,22 @@ import environment from '../../environment';
 import OptForAnalyticsForm from '../../components/profile/terms-of-use/OptForAnalyticsForm';
 
 @observer
-export default class OptForAnalyticsPage extends Component<StoresAndActionsProps> {
+export default class OptForAnalyticsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
+
     return (
       <Box height="100vh" paddingBottom="24px" sx={{ overflowY: 'auto' }}>
         <IntroBanner isNightly={environment.isNightly()} />
-        <OptForAnalyticsForm
-          onOpt={this.props.actions.profile.optForAnalytics.trigger}
-          variant="startup"
-          isOptedIn={false}
-        />
+          <OptForAnalyticsForm
+            onOpt={this.props.stores.profile.onOptForAnalytics}
+            variant="startup"
+            isOptedIn={false}
+            privacyNotice={this.props.stores.profile.privacyNotice}
+          />
       </Box>
     );
   }

@@ -46,6 +46,32 @@ export type LoadOptions =
   | LoadOptionsWithEnvironment
   | LoadOptionsWithApiKey
   | LoadOptionsWithClientInstance;
+export type ClaimAdaTransactionSettledProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  reward_amount?: number,
+|};
+export type ClaimAdaTransactionSubmittedProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  reward_amount?: number,
+|};
+export type ConnectWalletDetailsSubmittedProperties = {|
+  /**
+   * The name of the hardware wallet.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | Ledger, Trezor |
+   */
+  hardware_wallet?: "Ledger" | "Trezor",
+|};
 export type CreateWalletVerifyPhraseWordSelectedProperties = {|
   recovery_word_order?: any,
 |};
@@ -59,6 +85,35 @@ export type DappPopupConnectWalletPageViewedProperties = {|
    * | Type | number |
    */
   wallet_count: number,
+|};
+export type DappPopupSignTransactionSubmittedProperties = {|
+  /**
+   * Total ada value of every assets sent in the transaction
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  total_ada_value?: number,
+|};
+export type ExchangeSubmittedProperties = {|
+  /**
+   * The amount of ADA that the user will be exchanging.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  ada_amount?: number,
+
+  /**
+   * The type of ramp selected on a given transaction.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | Buy, Sell |
+   */
+  ramp_type: "Buy" | "Sell",
 |};
 export type GovernanceConfirmTransactionPageViewedProperties = {|
   /**
@@ -75,6 +130,17 @@ export type GovernanceTransactionSuccessPageViewedProperties = {|
    * | Enum Values | Delegate, Abstain, No Confidence |
    */
   governance_selection: "Delegate" | "Abstain" | "No Confidence",
+|};
+export type InAppNotificationClosedProperties = {|
+  type: string,
+|};
+export type InAppNotificationOpenedProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | tx_received, staking_rewards |
+   */
+  type?: "tx_received" | "staking_rewards",
 |};
 export type NetworkSelectedProperties = {|
   /**
@@ -182,7 +248,7 @@ export type ReceiveAmountGeneratedPageViewedProperties = {|
    * |---|---|
    * | Type | number |
    */
-  ada_amount: number,
+  ada_amount?: number,
 |};
 export type ReceiveCopyAddressClickedProperties = {|
   /**
@@ -329,11 +395,33 @@ export type SendSummaryPageViewedProperties = {|
 |};
 export type SendSummarySubmittedProperties = {|
   /**
+   * The amount of ADA that the user will be exchanging.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  ada_amount?: number,
+
+  /**
    * | Rule | Value |
    * |---|---|
    * | Type | number |
    */
   asset_count: number,
+
+  /**
+   * Total ada countervalue of the nfts sent
+   */
+  nft_ada_value?: string,
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  nft_amount?: number,
+  nft_name?: string,
 
   /**
    * ```
@@ -351,6 +439,23 @@ export type SendSummarySubmittedProperties = {|
   nfts?: any[],
 
   /**
+   * Ada countervalue of the total tokens sent
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  token_ada_value?: number,
+
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  token_amount?: number,
+  token_name?: string,
+
+  /**
    * ```
    * Tokens: [
    *      {
@@ -365,6 +470,25 @@ export type SendSummarySubmittedProperties = {|
    * ```
    */
   tokens?: any[],
+|};
+export type SettingsInAppNotificationsStatusUpdatedProperties = {|
+  /**
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | enabled, disabled |
+   */
+  status?: "enabled" | "disabled",
+|};
+export type StakingCenterDelegationSubmittedProperties = {|
+  /**
+   * The amount of ADA that the user will be exchanging.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  ada_amount?: number,
+  staking_pool?: string,
 |};
 export type SwapAssetFromChangedProperties = {|
   /**
@@ -454,7 +578,7 @@ export type SwapConfirmedPageViewedProperties = {|
    * |---|---|
    * | Enum Values | Open Orders, Completed Orders |
    */
-  swap_tab: "Open Orders" | "Completed Orders",
+  swap_tab?: "Open Orders" | "Completed Orders",
 |};
 export type SwapInitiatedProperties = {|
   /**
@@ -593,6 +717,13 @@ export type SwapOrderSubmittedProperties = {|
   from_asset: any[],
 
   /**
+   * | Rule | Value |
+   * |---|---|
+   * | Type | number |
+   */
+  from_asset_ada_value?: number,
+
+  /**
    * The type of order selected on a given transaction
    *
    * | Rule | Value |
@@ -625,6 +756,11 @@ export type SwapOrderSubmittedProperties = {|
   swap_fees?: number,
 
   /**
+   * Cryptocurrency pairs being swapped (e.g., ADA to SNEK {ADA/SNEK}).
+   */
+  swap_pair?: string,
+
+  /**
    * The amount of asset that the user is swapping to
    */
   to_amount: string,
@@ -647,6 +783,16 @@ export type SwapSlippageChangedProperties = {|
    * | Type | number |
    */
   slippage_tolerance: number,
+|};
+export type ThemeSelectedProperties = {|
+  /**
+   * The theme that is selected.
+   *
+   * | Rule | Value |
+   * |---|---|
+   * | Enum Values | auto, light, dark |
+   */
+  theme: "auto" | "light" | "dark",
 |};
 export type SendProperties = {|
   /**
@@ -761,8 +907,35 @@ declare export class AllWalletsPageViewed mixins BaseEvent {
 declare export class AssetsPageViewed mixins BaseEvent {
   event_type: string;
 }
+declare export class BuyAdaSuccessRedirect mixins BaseEvent {
+  event_type: string;
+}
 declare export class ClaimAdaPageViewed mixins BaseEvent {
   event_type: string;
+}
+declare export class ClaimAdaTransactionSettled mixins BaseEvent {
+  event_properties?: ClaimAdaTransactionSettledProperties;
+  event_type: string;
+  constructor(event_properties?: ClaimAdaTransactionSettledProperties): this;
+}
+declare export class ClaimAdaTransactionSubmitted mixins BaseEvent {
+  event_properties?: ClaimAdaTransactionSubmittedProperties;
+  event_type: string;
+  constructor(event_properties?: ClaimAdaTransactionSubmittedProperties): this;
+}
+declare export class ConnectWalletCheckPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletConnectPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletDetailsPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ConnectWalletDetailsSubmitted mixins BaseEvent {
+  event_properties?: ConnectWalletDetailsSubmittedProperties;
+  event_type: string;
+  constructor(event_properties?: ConnectWalletDetailsSubmittedProperties): this;
 }
 declare export class ConnectorPageViewed mixins BaseEvent {
   event_type: string;
@@ -818,7 +991,19 @@ declare export class DappPopupSignTransactionPageViewed mixins BaseEvent {
   event_type: string;
 }
 declare export class DappPopupSignTransactionSubmitted mixins BaseEvent {
+  event_properties?: DappPopupSignTransactionSubmittedProperties;
   event_type: string;
+  constructor(
+    event_properties?: DappPopupSignTransactionSubmittedProperties
+  ): this;
+}
+declare export class ExchangePageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class ExchangeSubmitted mixins BaseEvent {
+  event_properties: ExchangeSubmittedProperties;
+  event_type: string;
+  constructor(event_properties: ExchangeSubmittedProperties): this;
 }
 declare export class GovernanceChooseDrepPageViewed mixins BaseEvent {
   event_type: string;
@@ -839,6 +1024,19 @@ declare export class GovernanceTransactionSuccessPageViewed mixins BaseEvent {
   constructor(
     event_properties: GovernanceTransactionSuccessPageViewedProperties
   ): this;
+}
+declare export class InAppNotificationClosed mixins BaseEvent {
+  event_properties: InAppNotificationClosedProperties;
+  event_type: string;
+  constructor(event_properties: InAppNotificationClosedProperties): this;
+}
+declare export class InAppNotificationOpened mixins BaseEvent {
+  event_properties?: InAppNotificationOpenedProperties;
+  event_type: string;
+  constructor(event_properties?: InAppNotificationOpenedProperties): this;
+}
+declare export class InAppNotificationViewed mixins BaseEvent {
+  event_type: string;
 }
 declare export class NetworkSelected mixins BaseEvent {
   event_properties: NetworkSelectedProperties;
@@ -876,6 +1074,9 @@ declare export class NftGallerySearchActivated mixins BaseEvent {
   event_type: string;
   constructor(event_properties: NftGallerySearchActivatedProperties): this;
 }
+declare export class OnboardingAnalyticsPageViewed mixins BaseEvent {
+  event_type: string;
+}
 declare export class PortfolioTokenDetails mixins BaseEvent {
   event_properties: PortfolioTokenDetailsProperties;
   event_type: string;
@@ -894,10 +1095,10 @@ declare export class PortfolioTokensListSearchActivated mixins BaseEvent {
   ): this;
 }
 declare export class ReceiveAmountGeneratedPageViewed mixins BaseEvent {
-  event_properties: ReceiveAmountGeneratedPageViewedProperties;
+  event_properties?: ReceiveAmountGeneratedPageViewedProperties;
   event_type: string;
   constructor(
-    event_properties: ReceiveAmountGeneratedPageViewedProperties
+    event_properties?: ReceiveAmountGeneratedPageViewedProperties
   ): this;
 }
 declare export class ReceiveAmountPageViewed mixins BaseEvent {
@@ -943,6 +1144,12 @@ declare export class RestoreWalletEnterPhraseStepViewed mixins BaseEvent {
 declare export class RestoreWalletTypeStepViewed mixins BaseEvent {
   event_type: string;
 }
+declare export class SellAdaInputAmount mixins BaseEvent {
+  event_type: string;
+}
+declare export class SellAdaSuccessRedirect mixins BaseEvent {
+  event_type: string;
+}
 declare export class SendInitiated mixins BaseEvent {
   event_type: string;
 }
@@ -969,8 +1176,25 @@ declare export class SendSummarySubmitted mixins BaseEvent {
   event_type: string;
   constructor(event_properties: SendSummarySubmittedProperties): this;
 }
+declare export class SettingsInAppNotificationsStatusUpdated mixins BaseEvent {
+  event_properties?: SettingsInAppNotificationsStatusUpdatedProperties;
+  event_type: string;
+  constructor(
+    event_properties?: SettingsInAppNotificationsStatusUpdatedProperties
+  ): this;
+}
 declare export class SettingsPageViewed mixins BaseEvent {
   event_type: string;
+}
+declare export class StakingCenterDelegationInitiated mixins BaseEvent {
+  event_type: string;
+}
+declare export class StakingCenterDelegationSubmitted mixins BaseEvent {
+  event_properties?: StakingCenterDelegationSubmittedProperties;
+  event_type: string;
+  constructor(
+    event_properties?: StakingCenterDelegationSubmittedProperties
+  ): this;
 }
 declare export class StakingCenterPageViewed mixins BaseEvent {
   event_type: string;
@@ -991,9 +1215,9 @@ declare export class SwapCancelationSubmitted mixins BaseEvent {
   constructor(event_properties: SwapCancelationSubmittedProperties): this;
 }
 declare export class SwapConfirmedPageViewed mixins BaseEvent {
-  event_properties: SwapConfirmedPageViewedProperties;
+  event_properties?: SwapConfirmedPageViewedProperties;
   event_type: string;
-  constructor(event_properties: SwapConfirmedPageViewedProperties): this;
+  constructor(event_properties?: SwapConfirmedPageViewedProperties): this;
 }
 declare export class SwapInitiated mixins BaseEvent {
   event_properties: SwapInitiatedProperties;
@@ -1018,10 +1242,21 @@ declare export class SwapSlippageChanged mixins BaseEvent {
   event_type: string;
   constructor(event_properties: SwapSlippageChangedProperties): this;
 }
+declare export class ThemeSelected mixins BaseEvent {
+  event_properties: ThemeSelectedProperties;
+  event_type: string;
+  constructor(event_properties: ThemeSelectedProperties): this;
+}
 declare export class TransactionsPageViewed mixins BaseEvent {
   event_type: string;
 }
 declare export class VotingPageViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class WalletPageBuyBannerClicked mixins BaseEvent {
+  event_type: string;
+}
+declare export class WalletPageExchangeClicked mixins BaseEvent {
   event_type: string;
 }
 declare export class WalletPageViewed mixins BaseEvent {
@@ -1088,6 +1323,18 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Buy Ada Success Redirect
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Buy%20Ada%20Success%20Redirect)
+   *
+   * This event tracks when a user is redirected to Yoroi after successfully buying ADA
+   * @param options Amplitude event options.
+   */
+  buyAdaSuccessRedirect(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Claim ADA Page Viewed
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20ADA%20Page%20Viewed)
@@ -1098,6 +1345,84 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   claimAdaPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Claim Ada Transaction Settled
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Settled)
+   *
+   * Event to track when a user successfully claims ADA and transaction is settled on chain
+   * @param properties The event's properties (e.g. reward_amount)
+   * @param options Amplitude event options.
+   */
+  claimAdaTransactionSettled(
+    properties?: ClaimAdaTransactionSettledProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Claim Ada Transaction Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Claim%20Ada%20Transaction%20Submitted)
+   *
+   * This Event to track when a user submits a transaction to claim ADA staking rewards.
+   * @param properties The event's properties (e.g. reward_amount)
+   * @param options Amplitude event options.
+   */
+  claimAdaTransactionSubmitted(
+    properties?: ClaimAdaTransactionSubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Check Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Check%20Page%20Viewed)
+   *
+   * This event tracks when user chooses the connect hardware wallet option. This is the 1st step of the connect hardware wallet flow. In this page, the information about connecting a harware wallet is displayed to the user.
+   * @param options Amplitude event options.
+   */
+  connectWalletCheckPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Connect Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Connect%20Page%20Viewed)
+   *
+   * This event tracks when user connects the device and instructions are displayed. This is the 2nd step of the flow.
+   * @param options Amplitude event options.
+   */
+  connectWalletConnectPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Details Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Page%20Viewed)
+   *
+   * This event tracks when user accesses the enter wallet name page. This is the 3rd and final step of the flow
+   * @param options Amplitude event options.
+   */
+  connectWalletDetailsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Connect Wallet Details Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Connect%20Wallet%20Details%20Submitted)
+   *
+   * This event captures the submission of the wallet name on the last step of the connecting a hardware wallet flow.
+   * @param properties The event's properties (e.g. hardware_wallet)
+   * @param options Amplitude event options.
+   */
+  connectWalletDetailsSubmitted(
+    properties?: ConnectWalletDetailsSubmittedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1297,9 +1622,37 @@ declare export class Ampli {
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Dapp%20Popup%20Sign%20Transaction%20Submitted)
    *
    * This event tracks the submission of a sign transaction request within the Dapp Connector screen. It's a Popup on extension and a full screen in Mobile.
+   * @param properties The event's properties (e.g. total_ada_value)
    * @param options Amplitude event options.
    */
   dappPopupSignTransactionSubmitted(
+    properties?: DappPopupSignTransactionSubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Exchange Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Page%20Viewed)
+   *
+   * This event tracks when a user loads the default state of the first step of the fiat on/off ramp on the new Banxa flow. That screen shows input ADA Amount, with the BUY ADA option selected by default.
+   * @param options Amplitude event options.
+   */
+  exchangePageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Exchange Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Exchange%20Submitted)
+   *
+   * This event tracks when a user clicks on "Proceed" in the Exchange page.
+   * @param properties The event's properties (e.g. ada_amount)
+   * @param options Amplitude event options.
+   */
+  exchangeSubmitted(
+    properties: ExchangeSubmittedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1352,6 +1705,56 @@ declare export class Ampli {
    */
   governanceTransactionSuccessPageViewed(
     properties: GovernanceTransactionSuccessPageViewedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * In App Notification Closed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Closed)
+   *
+   * This event tracks when a user has manually closed a notification (not through the timer):
+   *
+   * * click on cross on extension
+   *
+   * * swipe on mobile
+   * @param properties The event's properties (e.g. type)
+   * @param options Amplitude event options.
+   */
+  inAppNotificationClosed(
+    properties: InAppNotificationClosedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * In App Notification Opened
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Opened)
+   *
+   * This event tracks when a user opens an in app notification:
+   *
+   * * click on extension
+   *
+   * * tap on mobile
+   *
+   * Type property indicates what type of in app notification it is - triggered by receiving a tx or because staking rewards are received.
+   * @param properties The event's properties (e.g. type)
+   * @param options Amplitude event options.
+   */
+  inAppNotificationOpened(
+    properties?: InAppNotificationOpenedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * In App Notification Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/In%20App%20Notification%20Viewed)
+   *
+   * This event tracks when an in app notification is displayed to the user.
+   * @param options Amplitude event options.
+   */
+  inAppNotificationViewed(
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1464,6 +1867,18 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Onboarding Analytics Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Onboarding%20Analytics%20Page%20Viewed)
+   *
+   * Event to track when a user views the onboarding analytics page.
+   * @param options Amplitude event options.
+   */
+  onboardingAnalyticsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Portfolio Token Details
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Portfolio%20Token%20Details)
@@ -1515,7 +1930,7 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   receiveAmountGeneratedPageViewed(
-    properties: ReceiveAmountGeneratedPageViewedProperties,
+    properties?: ReceiveAmountGeneratedPageViewedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1662,6 +2077,30 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Sell Ada Input Amount
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Input%20Amount)
+   *
+   * Event to track when user starts the Sell ada flow so after selecting the sell option and having to input amount of ADA to sell
+   * @param options Amplitude event options.
+   */
+  sellAdaInputAmount(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Sell Ada Success Redirect
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Sell%20Ada%20Success%20Redirect)
+   *
+   * This event tracks when a user is redirected to Yoroi after successfully selling ADA
+   * @param options Amplitude event options.
+   */
+  sellAdaSuccessRedirect(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Send Initiated
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Send%20Initiated)
@@ -1734,11 +2173,25 @@ declare export class Ampli {
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Send%20Summary%20Submitted)
    *
    * When a user click "send" on the "Preview" step on the send flow.
-   * @param properties The event's properties (e.g. asset_count)
+   * @param properties The event's properties (e.g. ada_amount)
    * @param options Amplitude event options.
    */
   sendSummarySubmitted(
     properties: SendSummarySubmittedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Settings In App Notifications Status Updated
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Settings%20In%20App%20Notifications%20Status%20Updated)
+   *
+   * This event tracks when a user edits the in app notification setting by disabling or enabling in app notifications.
+   * @param properties The event's properties (e.g. status)
+   * @param options Amplitude event options.
+   */
+  settingsInAppNotificationsStatusUpdated(
+    properties?: SettingsInAppNotificationsStatusUpdatedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1751,6 +2204,32 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   settingsPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Staking Center Delegation Initiated
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Initiated)
+   *
+   * Event to track when a user initiates the delegation process in the Staking Center, accessing the delegate modal after selecting a pool
+   * @param options Amplitude event options.
+   */
+  stakingCenterDelegationInitiated(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Staking Center Delegation Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Staking%20Center%20Delegation%20Submitted)
+   *
+   * Event indicating that a user has submitted a delegation in the staking center.
+   * @param properties The event's properties (e.g. ada_amount)
+   * @param options Amplitude event options.
+   */
+  stakingCenterDelegationSubmitted(
+    properties?: StakingCenterDelegationSubmittedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1826,7 +2305,7 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   swapConfirmedPageViewed(
-    properties: SwapConfirmedPageViewedProperties,
+    properties?: SwapConfirmedPageViewedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1909,6 +2388,20 @@ declare export class Ampli {
   ): PromiseResult<any>;
 
   /**
+   * Theme Selected
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Theme%20Selected)
+   *
+   * This event is triggrered when a user had selected a theme.
+   * @param properties The event's properties (e.g. theme)
+   * @param options Amplitude event options.
+   */
+  themeSelected(
+    properties: ThemeSelectedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
    * Transactions Page Viewed
    *
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Transactions%20Page%20Viewed)
@@ -1929,6 +2422,32 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   votingPageViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Wallet Page Buy Banner Clicked
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Buy%20Banner%20Clicked)
+   *
+   * This event tracks when a user clicks on "Buy Button" on the Wallet Page’s BUY ADA banner.
+   *
+   * This banner only appears for **new users** or those **users that has 0 ADA** Balance.
+   * @param options Amplitude event options.
+   */
+  walletPageBuyBannerClicked(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Wallet Page Exchange Clicked
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Wallet%20Page%20Exchange%20Clicked)
+   *
+   * This event tracks when a user clicks on "Buy" on the Wallet Page.
+   * @param options Amplitude event options.
+   */
+  walletPageExchangeClicked(
     options?: EventOptions
   ): PromiseResult<any>;
 

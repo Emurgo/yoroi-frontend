@@ -4,13 +4,12 @@ import { observable, computed, runInAction } from 'mobx';
 import Store from '../base/Store';
 import type { ServerStatusErrorType } from '../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import { listenForServerStatusUpdate } from '../../api/thunk';
 import type { ServerStatus } from '../../../chrome/extension/background/types';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
-export default class ServerConnectionStore extends Store<StoresMap, ActionsMap> {
+export default class ServerConnectionStore extends Store<StoresMap> {
   @observable serverStatusByNetworkId: {| [networkId: number]: ServerStatus |} = {};
 
   setup(): void {

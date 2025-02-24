@@ -6,13 +6,21 @@ import { intlShape } from 'react-intl';
 import styles from './WarningHeader.scss';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 
 type Props = {|
   +message: Node,
   +children?: ?Node,
 |};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.sys_magenta_500,
+    },
+  },
+}));
 
 @observer
 export default class WarningHeader extends Component<Props> {
@@ -42,20 +50,21 @@ export default class WarningHeader extends Component<Props> {
                 justifyContent: 'flex-start',
               }}
             >
-              <AttentionIcon />
+              <IconWrapper>
+                <AttentionIcon />
+              </IconWrapper>
               <Typography
                 variant="body1"
                 color="ds.sys_magenta_500"
                 sx={{
                   fontWeight: 500,
                   paddingLeft: '8px',
-                }}>
+                }}
+              >
                 {intl.formatMessage(globalMessages.attentionHeaderText)}
               </Typography>
             </Box>
-            <Box sx={{ paddingTop: '8px' }}>
-              {this.props.message}
-            </Box>
+            <Box sx={{ paddingTop: '8px' }}>{this.props.message}</Box>
           </Box>
         </div>
         {this.props.children}

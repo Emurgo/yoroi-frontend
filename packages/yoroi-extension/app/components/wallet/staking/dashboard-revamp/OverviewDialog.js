@@ -90,7 +90,7 @@ export default class OverviewModal extends Component<Props> {
     return (
       <Dialog
         title={this.context.intl.formatMessage(globalMessages.overview)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onClose} />}
         onClose={onClose}

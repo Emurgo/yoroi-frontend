@@ -48,6 +48,7 @@ export const isLinux = () => getCurrentOS() === 'linux';
 export const isMacOS = () => getCurrentOS() === 'darwin';
 export const isHeadless = () => process.env.HEADLESS === 'true';
 export const isDapp = () => process.env.ISDAPP === 'true';
+export const isLocalRun = () => process.env.EXTENSION_LOCAL_RUN === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');
@@ -230,6 +231,20 @@ export const convertPrettyDateToNormal = prettyDate => {
   return `${year}-${month}-${day}`;
 };
 
+const uglyDateToDateObject = uglyDateStr => {
+  const yearStr = uglyDateStr.slice(-4);
+  const monthStr = uglyDateStr.slice(0, 2);
+  const dayStr = uglyDateStr.slice(2, 4);
+  return new Date(`${yearStr}-${monthStr}-${dayStr}`);
+};
+
+export const groupDateIsInPeriod = (groupDate, startDate, endDate) => {
+  const groupDateObject = new Date(groupDate);
+  const startDateObject = uglyDateToDateObject(startDate);
+  const endDateObject = uglyDateToDateObject(endDate);
+  return startDateObject <= groupDateObject && groupDateObject <= endDateObject;
+};
+
 export const convertPrettyTimeToNormal = prettyTime => {
   const [time, modifier] = prettyTime.split(' ');
   let [hours, minutes] = time.split(':');
@@ -272,3 +287,5 @@ export const getCurrenciesPrices = async () => {
     throw new Error(`Error happen while getting currencies prices. Error: ${error}`);
   }
 };
+
+export const filterTxs = (startDate, endDate) => {};

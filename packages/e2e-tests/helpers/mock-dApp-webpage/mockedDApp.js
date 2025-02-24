@@ -6,7 +6,8 @@ import {
   getCSLPubKeyHash,
   getCslValue,
   getDRepIDHexAndBechFromHex,
-  mapCborUtxos, bytesToHex,
+  mapCborUtxos,
+  bytesToHex,
 } from './dAppTxHelper.js';
 
 class MockDAppWebpageError extends Error {}
@@ -22,13 +23,9 @@ export class MockDAppWebpage {
     this.logger = logger;
   }
 
-  async _requestAccess(auth = false) {
-    this.logger.info(
-      `MockDApp::_requestAccess Requesting the access ${auth ? 'with' : 'without'} authentication`
-    );
-    const scriptString = `window.accessRequestPromise = cardano.yoroi.enable(${
-      auth ? '{requestIdentification: true}' : ''
-    })`;
+  async requestAccess() {
+    this.logger.info(`MockDApp::requestAccess Requesting the access without authentication`);
+    const scriptString = `window.accessRequestPromise = window.cardano.yoroi.enable()`;
     await this.driver.executeScript(scriptString);
   }
 
@@ -165,14 +162,6 @@ export class MockDAppWebpage {
     return addressesResult;
   }
 
-  async requestNonAuthAccess() {
-    await this._requestAccess();
-  }
-
-  async requestAuthAccess() {
-    await this._requestAccess(true);
-  }
-
   async checkAccessRequest() {
     this.logger.info(`MockDApp::checkAccessRequest Checking the access request`);
     const accessResponse = await this.driver.executeAsyncScript((...args) => {
@@ -180,12 +169,9 @@ export class MockDAppWebpage {
       window.accessRequestPromise
         .then(
           // eslint-disable-next-line promise/always-return
-          api => {
-            window.api = api;
+          result => {
+            window.api = result;
             callback({ success: true, retValue: null, errMsg: null });
-          },
-          error => {
-            callback({ success: false, retValue: null, errMsg: error });
           }
         )
         .catch(error => {
@@ -639,7 +625,7 @@ export class MockDAppWebpage {
   }
 
   async getSigningDataCIP95Result() {
-    this.logger.info(`MockDApp::getSigningDataResult Getting signing data result`);
+    this.logger.info(`MockDApp::getSigningDataCIP95Result Getting signing data result`);
     const signingResult = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.signDataCIP95Promise
@@ -656,7 +642,7 @@ export class MockDAppWebpage {
         });
     });
     this.logger.info(
-      `MockDApp::getSigningDataResult Signing data result: ${JSON.stringify(signingResult, null, 2)}`
+      `MockDApp::getSigningDataCIP95Result Signing data result: ${JSON.stringify(signingResult, null, 2)}`
     );
     return signingResult;
   }

@@ -12,11 +12,11 @@ import globalMessages from '../../../../../i18n/global-messages';
 import RestoreRecoveryPhraseForm from './RestoreRecoveryPhraseForm';
 import DuplicatedWalletDialog from './DuplicatedWalletDialog';
 import { TIPS_DIALOGS } from '../../../dialogs/constants';
-import type { RestoreModeType } from '../../../../../actions/common/wallet-restore-actions';
 import { fail } from '../../../../../coreUtils';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
+import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
 
 const messages = defineMessages({
   description: {
@@ -103,7 +103,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
         justifyContent="center"
         maxWidth={length === 15 ? '636px' : '760px'}
       >
-        <Typography component="div" mb="16px">
+        <Typography component="div" mb="16px" color="ds.text_gray_medium">
           <FormattedHTMLMessage {...messages.description} />
         </Typography>
 
@@ -116,7 +116,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
 
         <Box mt="10px">
           <StepController
-            actions={[
+            stepActions={[
               {
                 label: intl.formatMessage(globalMessages.backButtonLabel),
                 disabled: false,

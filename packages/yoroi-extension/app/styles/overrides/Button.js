@@ -1,7 +1,7 @@
 // @flow
 
-import { lightThemeBase } from '../themes/light-theme-base';
 import { darkThemeBase } from '../themes/dark-theme-base';
+import { lightThemeBase } from '../themes/light-theme-base';
 
 const { palette: darkThemePalette } = darkThemeBase;
 const { palette: lightThemePalette } = lightThemeBase;
@@ -57,7 +57,7 @@ export const LightButton: any = {
       props: { variant: 'destructive' },
       style: {
         backgroundColor: ltDs.sys_magenta_500,
-        color: ltDs.white_static,
+        color: ltDs.gray_min,
         ':hover': { backgroundColor: ltDs.sys_magenta_600 },
         ':active': { backgroundColor: ltDs.sys_magenta_700 },
         ':focus': {
@@ -66,14 +66,14 @@ export const LightButton: any = {
           outlineColor: ltDs.sys_yellow_500,
         },
         '&.Mui-disabled': {
-          color: ltDs.white_static,
+          color: ltDs.gray_min,
           backgroundColor: ltDs.sys_magenta_300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: ltDs.white_static },
-        '& .MuiButton-startIcon svg': { fill: ltDs.white_static },
-        '& .MuiButton-startIcon svg path': { fill: ltDs.white_static },
+        '& .MuiLoadingButton-loadingIndicator': { color: ltDs.gray_min },
+        '& .MuiButton-startIcon svg': { fill: ltDs.gray_min },
+        '& .MuiButton-startIcon svg path': { fill: ltDs.gray_min },
       },
     },
     {
@@ -124,7 +124,7 @@ export const DarkButton: any = {
       props: { variant: 'destructive' },
       style: {
         backgroundColor: dtDs.sys_magenta_500,
-        color: dtDs.white_static,
+        color: dtDs.gray_min,
         ':hover': { backgroundColor: dtDs.sys_magenta_600 },
         ':active': { backgroundColor: dtDs.sys_magenta_700 },
         ':focus': {
@@ -133,14 +133,14 @@ export const DarkButton: any = {
           outlineColor: dtDs.sys_yellow_500,
         },
         '&.Mui-disabled': {
-          color: dtDs.white_static,
+          color: dtDs.gray_min,
           backgroundColor: dtDs.sys_magenta_300,
           cursor: 'not-allowed',
           pointerEvents: 'unset',
         },
-        '& .MuiLoadingButton-loadingIndicator': { color: dtDs.white_static },
-        '& .MuiButton-startIcon svg': { fill: dtDs.white_static },
-        '& .MuiButton-startIcon svg path': { fill: dtDs.white_static },
+        '& .MuiLoadingButton-loadingIndicator': { color: dtDs.gray_min },
+        '& .MuiButton-startIcon svg': { fill: dtDs.gray_min },
+        '& .MuiButton-startIcon svg path': { fill: dtDs.gray_min },
       },
     },
   ],
@@ -160,41 +160,55 @@ function getContainedStyles(variant: 'primary' | 'secondary', themePalette: Obje
     '&.Mui-disabled': {
       color: themePalette.gray_min,
       backgroundColor: themePalette[`${variant}_200`],
-      opacity: '0.8',
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
-    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.gray_min },
-    '& .MuiButton-startIcon svg': { fill: themePalette.gray_min },
-    '& .MuiButton-startIcon svg path': { fill: themePalette.gray_min },
+    '&.MuiLoadingButton-root.Mui-disabled': {
+      backgroundColor: themePalette.primary_200,
+    },
+    '& .MuiLoadingButton-loadingIndicator': { color: themePalette.white_static },
+    '& .MuiButton-startIcon svg': { fill: themePalette.white_static },
+    '& .MuiButton-startIcon svg path': { fill: themePalette.white_static },
   };
 }
 
 function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_500`],
+    color: themePalette.text_primary_medium,
     border: '2px solid',
-    borderColor: themePalette[`${variant}_500`],
+    borderColor: themePalette.el_primary_medium,
     ':hover': {
       border: '2px solid',
-      color: themePalette[`${variant}_600`],
-      borderColor: themePalette[`${variant}_600`],
+      color: themePalette.text_primary_max,
+      backgroundColor: themePalette.primary_100,
+      borderColor: themePalette.el_primary_max,
     },
-    ':active': { borderColor: themePalette[`${variant}_700`] },
+    ':pressed': {
+      border: '2px solid',
+      color: themePalette.text_primary_max,
+      backgroundColor: themePalette.primary_200,
+      borderColor: themePalette.el_primary_max,
+    },
+    ':active': {
+      borderColor: themePalette.el_primary_max,
+      color: themePalette.text_primary_max,
+    },
     ':focus': {
-      borderColor: themePalette[`${variant}_500`],
+      borderColor: themePalette.el_primary_medium,
+      color: themePalette.text_primary_medium,
       outline: '2px solid',
       outlineColor: themePalette.sys_yellow_500,
     },
     '&.Mui-disabled': {
       border: '2px solid',
-      borderColor: themePalette[`${variant}_200`],
-      color: themePalette[`${variant}_200`],
+      borderColor: themePalette.el_primary_low,
+      color: themePalette.text_primary_low,
       cursor: 'not-allowed',
       pointerEvents: 'unset',
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
+    '& .MuiLoadingButton-root': { backgroundColor: themePalette.primary_500 },
     '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
     '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
   };
@@ -203,12 +217,12 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Objec
 function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Object): Object {
   return {
     backgroundColor: 'transparent',
-    color: themePalette[`${variant}_500`],
+    color: themePalette.text_primary_medium,
     ':hover': {
-      backgroundColor: themePalette.gray_50,
-      color: themePalette[`${variant}_600`],
-      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_600`] },
-      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_600`] },
+      backgroundColor: themePalette[`${variant}_100`],
+      color: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max,
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
     },
     ':active': {
       backgroundColor: themePalette.gray_100,
@@ -221,14 +235,22 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       outlineColor: themePalette.sys_yellow_500,
     },
     ':disabled': {
-      color: themePalette[`${variant}_200`],
+      color: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
       cursor: 'not-allowed',
       pointerEvents: 'unset',
-      '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_200`] },
-      '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_200`] },
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+    },
+    '&.Mui-disabled': {
+      color: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
+      cursor: 'not-allowed',
+      pointerEvents: 'unset',
+      opacity: 1,
+      '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
-    '& .MuiButton-startIcon svg': { fill: themePalette[`${variant}_500`] },
-    '& .MuiButton-startIcon svg path': { fill: themePalette[`${variant}_500`] },
+    '& .MuiButton-startIcon svg': { fill: themePalette.text_primary_medium },
+    '& .MuiButton-startIcon svg path': { fill: themePalette.text_primary_medium },
   };
 }

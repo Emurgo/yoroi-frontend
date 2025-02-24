@@ -24,14 +24,12 @@ import { autorun, observable, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
-import type { ActionsMap } from './actions';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
 import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
-import { LayoutProvider } from '../styles/context/layout';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
@@ -55,7 +53,6 @@ addLocaleData([
 
 type Props = {|
   +stores: StoresMap,
-  +actions: ActionsMap,
   +history: RouterHistory,
 |};
 type State = {|
@@ -106,31 +103,28 @@ class App extends Component<Props, State> {
 
     const currentTheme = stores.profile.currentTheme;
     const muiTheme = MuiThemes[currentTheme];
-
     changeToplevelTheme(currentTheme);
 
     return (
       <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
-        <LayoutProvider layout={currentTheme}>
-          <ThemeProvider theme={muiTheme}>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            <ThemeManager />
-            <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-              {this.getContent()}
-            </IntlProvider>
-          </ThemeProvider>
-        </LayoutProvider>
+        <ThemeProvider theme={muiTheme}>
+          <CssBaseline />
+          {globalStyles(muiTheme)}
+          <ThemeManager />
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+            {this.getContent()}
+          </IntlProvider>
+        </ThemeProvider>
       </div>
     );
   }
 
   getContent: void => ?Node = () => {
-    const { stores, actions, history } = this.props;
+    const { stores, history } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
-    return <Router history={history}>{Routes(stores, actions)}</Router>;
+    return <Router history={history}>{Routes(stores)}</Router>;
   };
 }
 

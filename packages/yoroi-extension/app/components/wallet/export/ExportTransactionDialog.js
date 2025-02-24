@@ -1,22 +1,19 @@
 // @flow
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { TransactionRowsToExportRequest } from '../../../actions/common/transactions-actions';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import globalMessages from '../../../i18n/global-messages';
-import CheckboxLabel from '../../common/CheckboxLabel';
 import DateRange from './DateRange';
 import { Box } from '@mui/system';
 import { Moment } from 'moment';
-import { withLayout } from '../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import type { TransactionRowsToExportRequest } from '../../../stores/toplevel/TransactionsStore';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -48,7 +45,7 @@ type State = {|
 |};
 
 @observer
-class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, State> {
+export default class ExportTransactionDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -66,7 +63,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
 
   render(): Node {
     const { intl } = this.context;
-    const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds, isRevampLayout } = this.props;
+    const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (
       <Box
@@ -87,6 +84,7 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
 
     const startDateIsCorrect = startDate !== null && startDate.isValid() && startDate.isSameOrBefore(endDate);
     const endDateIsCorrect = endDate !== null && endDate.isValid();
+    const parentLocationId = 'exportTransactionsDialog';
 
     const dialogActions = [
       {
@@ -102,13 +100,13 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
       <Dialog
         className="ExportTransactionDialog"
         title={intl.formatMessage(messages.dialogTitle)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={cancel}
-        id="exportTransactionsDialog"
+        id={parentLocationId}
       >
-        <Box width={isRevampLayout ? '600px' : '100%'}>
+        <Box width="600px">
           {infoBlock}
           <DateRange
             date={{ startDate, endDate }}
@@ -118,10 +116,10 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
             setEndDate={date => {
               this.setState({ endDate: date });
             }}
-            initialId="exportTransactionsDialog"
+            initialId={parentLocationId}
           />
 
-          {isRevampLayout ? (
+          {(
             <FormControlLabel
               sx={{
                 ml: '-1px',
@@ -130,23 +128,15 @@ class ExportTransactionDialog extends Component<Props & InjectedLayoutProps, Sta
                 },
                 color: 'ds.text_gray_medium',
               }}
-              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
+              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds}/>}
               label={intl.formatMessage(messages.includeTxIds)}
-              id="exportTransactionsDialog-includeTxIds-checkbox"
-            />
-          ) : (
-            <CheckboxLabel
-              label={intl.formatMessage(messages.includeTxIds)}
-              onChange={toggleIncludeTxIds}
-              checked={shouldIncludeTxIds}
+              id={`${parentLocationId}-includeTxIds-checkbox`}
             />
           )}
 
-          {error && <ErrorBlock error={error} />}
+          {error && <ErrorBlock error={error} parentId={parentLocationId} />}
         </Box>
       </Dialog>
     );
   }
 }
-
-export default (withLayout(ExportTransactionDialog): ComponentType<Props>);

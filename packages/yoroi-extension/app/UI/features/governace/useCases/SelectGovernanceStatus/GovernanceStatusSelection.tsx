@@ -107,17 +107,19 @@ export const GovernanceStatusSelection = () => {
       setLoadingUnsignTx(false);
     }
   };
+  // noinspection JSIncompatibleTypesComparison
+  const statusDelegating = governanceStatus.status === 'delegate';
   const optionsList = [
     {
-      title: governanceStatus.status === 'delegate' ? strings.delegatingToDRep : strings.delegateToDRep,
-      titleHover: governanceStatus.status === 'delegate' ? 'Change DRep' : strings.delegateToDRep,
+      title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
+      titleHover: statusDelegating ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
       descriptionHover:
-        governanceStatus.status === 'delegate'
+        statusDelegating
           ? `Current DRep selection: ${governanceStatus.drep}`
           : strings.designatingSomeoneElse,
       icon: <DRepIlustration />,
-      selected: governanceStatus.status === 'delegate' ? true : false,
+      selected: statusDelegating,
       onClick: handleDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === 'delegate',
@@ -126,7 +128,7 @@ export const GovernanceStatusSelection = () => {
       title: strings.abstain,
       description: strings.abstainInfo,
       icon: <Abstein />,
-      selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN ? true : false,
+      selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN,
       onClick: handleAbstain,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_ABSTAIN,
@@ -135,7 +137,7 @@ export const GovernanceStatusSelection = () => {
       title: strings.noConfidence,
       description: strings.noConfidenceInfo,
       icon: <NoConfidance />,
-      selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE ? true : false,
+      selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE,
       onClick: handleNoConfidence,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE,

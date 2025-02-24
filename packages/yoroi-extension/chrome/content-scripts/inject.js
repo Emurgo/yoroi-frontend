@@ -131,6 +131,24 @@ function listenToBackgroundServiceWorker() {
     connected = true;
 }
 
+const ATTEMPT_COUNT = 2;
+const RETRY_DELAY = 3000;
+
+async function sendMessageToBackground(message) {
+  for (let c = 0; c < ATTEMPT_COUNT; c++) {
+    try {
+      return chrome.runtime.sendMessage(message);
+    } catch (error) {
+      if (error.message.includes('Could not establish connection. Receiving end does not exist.')) {
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+        continue;
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
 async function handleConnectorConnectRequest(event, protocol) {
     const requestIdentification = event.data.requestIdentification;
     if ((cardanoApiInjected && !requestIdentification) && connected) {
@@ -158,7 +176,7 @@ async function handleConnectorConnectRequest(event, protocol) {
                   },
                   protocol,
               };
-              chrome.runtime.sendMessage(message);
+              sendMessageToBackground(message);
           });
     }
 }
@@ -169,7 +187,7 @@ async function handleConnectorRpcRequest(event) {
         listenToBackgroundServiceWorker();
     }
     try {
-        await chrome.runtime.sendMessage(event.data);
+        await sendMessageToBackground(event.data);
     } catch (e) {
         console.error(`Could not send RPC to Yoroi: ${e}`);
         window.postMessage({

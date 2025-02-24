@@ -1,13 +1,14 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import TextField from '@mui/material/TextField';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DatePicker } from '@mui/x-date-pickers';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { ReactComponent as CalendarIcon } from '../../../assets/images/calendar-24.inline.svg';
+import { styled, Box, TextField } from '@mui/material';
 
 const messages = defineMessages({
   startDate: {
@@ -33,6 +34,24 @@ type Props = {|
   setEndDate(Date | null): void,
   initialId: string,
 |};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignContent: 'center',
+  justifyContent: 'center',
+  alignItems: 'center',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_max,
+    },
+  },
+}));
+
+const OpenPickerIcon = () => (
+  <IconWrapper>
+    <CalendarIcon />
+  </IconWrapper>
+);
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
@@ -80,6 +99,9 @@ export default class ExportTransactionDialog extends Component<Props> {
             className={componentId}
             renderInput={params => {
               return <TextField {...params} sx={{ mb: '24px' }} />;
+            }}
+            components={{
+              OpenPickerIcon,
             }}
           />
         ))}

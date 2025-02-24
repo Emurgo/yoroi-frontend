@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { useState } from 'react';
 import { useCombobox } from 'downshift';
-import { Input, Box, FormControl } from '@mui/material';
-import { styled } from '@mui/system';
+import { Input, Box, FormControl, Typography, styled } from '@mui/material';
 
 type Props = {|
   +options: Array<string>,
@@ -31,9 +30,7 @@ function useCachedOptions(options) {
     if (!inputValue) return [];
 
     if (!cachedOptions[inputValue]) {
-      cachedOptions[inputValue] = options.filter(w =>
-        w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? '')
-      );
+      cachedOptions[inputValue] = options.filter(w => w.toLowerCase().startsWith(inputValue?.toLowerCase() ?? ''));
     }
 
     return cachedOptions[inputValue];
@@ -66,15 +63,7 @@ function Autocomplete({
   const filteredList = isInputPresent ? getCachedOptions(inputValue) : [];
   const hasError = isInputPresent && filteredList.length === 0;
 
-  const {
-    isOpen,
-    getMenuProps,
-    getInputProps,
-    getComboboxProps,
-    highlightedIndex,
-    getItemProps,
-    closeMenu,
-  } = useCombobox({
+  const { isOpen, getMenuProps, getInputProps, getComboboxProps, highlightedIndex, getItemProps, closeMenu } = useCombobox({
     inputValue,
     defaultHighlightedIndex: 0,
     selectedItem: '',
@@ -168,12 +157,7 @@ function Autocomplete({
 
   return (
     <SFormControl error={Boolean(error)} onKeyDownCapture={handleKeyDownEvent}>
-      <InputWrapper
-        isVerified={isVerified}
-        onClick={() => !isOpen}
-        error={hasError}
-        isOpen={isOpen}
-      >
+      <InputWrapper isVerified={isVerified} onClick={() => !isOpen} error={hasError} isOpen={isOpen}>
         <Box {...getComboboxProps()}>
           <Input
             inputRef={inputRef}
@@ -194,8 +178,8 @@ function Autocomplete({
       <ULList
         component="ul"
         {...getMenuProps()}
+        isOpen
         sx={{
-          boxShadow: isOpen ? '0px 3px 10px rgba(24, 26, 30, 0.08)' : 'unset',
           maxHeight: 44 * maxVisibleOptions + 'px',
           color: 'ds.gray_900',
           borderRadius: '8px',
@@ -206,27 +190,31 @@ function Autocomplete({
         {isOpen && (
           <>
             {filteredList.length === 0 ? (
-              <Box sx={{ padding: '16px', bgcolor: 'ds.bg_color_max' }}>{noResultsMessage}</Box>
+              <Typography color="ds.text_gray_medium" sx={{ padding: '16px', bgcolor: 'ds.bg_color_max' }}>
+                {noResultsMessage}
+              </Typography>
             ) : (
-              <Box sx={{ paddingY: '8px' }}>
-                {filteredList.map((item, index) => {
-                  const regularPart = inputValue != null ? item.replace(inputValue.toLowerCase(), '') : item;
-                  return (
-                    <Box
-                      key={`${item}${index}`}
-                      sx={{
-                        padding: '16px',
-                        backgroundColor: highlightedIndex === index ? 'ds.gray_50' : 'ds.bg_color_max',
-                        cursor: 'pointer',
-                      }}
-                      {...getItemProps({ item, index })}
-                    >
-                      <span style={{ fontWeight: 'bold' }}>{inputValue?.toLowerCase()}</span>
-                      <span>{regularPart}</span>
-                    </Box>
-                  );
-                })}
-              </Box>
+              filteredList.map((item, index) => {
+                const regularPart = inputValue != null ? item.replace(inputValue.toLowerCase(), '') : item;
+                return (
+                  <Box
+                    key={`${item}${index}`}
+                    sx={{
+                      padding: '16px',
+                      backgroundColor: highlightedIndex === index ? 'ds.bg_color_contrast_min' : 'ds.bg_color_contrast_high',
+                      cursor: 'pointer',
+                    }}
+                    {...getItemProps({ item, index })}
+                  >
+                    <Typography component="span" color="ds.text_gray_medium" style={{ fontWeight: 'bold' }}>
+                      {inputValue?.toLowerCase()}
+                    </Typography>
+                    <Typography component="span" color="ds.text_gray_medium">
+                      {regularPart}
+                    </Typography>
+                  </Box>
+                );
+              })
             )}
           </>
         )}
@@ -244,9 +232,8 @@ Autocomplete.defaultProps = {
   noResultsMessage: '',
 };
 
-const ULList = styled(Box)(({ theme }) => ({
+const ULList = styled(Box)(({ theme, isOpen }) => ({
   width: '100%',
-  background: theme.palette.ds.bg_color_max,
   margin: 0,
   borderTop: 0,
   position: 'absolute',
@@ -259,12 +246,13 @@ const ULList = styled(Box)(({ theme }) => ({
   outline: '0',
   transition: 'opacity .1s ease',
   borderRadius: 0,
+  boxShadow: isOpen ? theme.palette.ds.light_shadow_dropdown_words : 'unset',
 }));
 
 const InputWrapper = styled(Box)(
   ({ theme, error, isVerified }) => `
   width: 100%;
-  background-color: transparent;
+  background-color: ${theme.palette.ds.bg_color_max};
   height: 40px;
   align-content: baseline;
   display: inline-flex;
@@ -273,7 +261,8 @@ const InputWrapper = styled(Box)(
   cursor: text;
   margin-bottom: 0;
   border-radius: 8px;
-  
+  marginBottom: '2px';
+
   & input {
     background-color: transparent;
     color: ${theme.palette.primary[600]};
@@ -295,8 +284,8 @@ const InputWrapper = styled(Box)(
         ? `&:not([value=""]):not(:focus) {
         border-color: transparent;
         border: 0;
+        color: ${isVerified && theme.palette.ds.black_static};
         background: ${isVerified ? theme.palette.ds.el_secondary : theme.palette.ds.primary_100};
-        color: ${isVerified ? theme.palette.ds.black_static : theme.palette.ds.primary_600};
       }`
         : ''
     }

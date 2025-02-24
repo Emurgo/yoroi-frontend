@@ -23,6 +23,6 @@ export default class OpenInExplorer extends Component<Props> {
         return <a href={`https://cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
     }
     // Cardano testnet
-    return <a href={`https://testnet.cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
+    return <a href={`https://preprod.cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
   }
 }

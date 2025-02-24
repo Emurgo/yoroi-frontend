@@ -1,7 +1,7 @@
-import React from 'react';
-import { TableHead, TableRow, TableCell, Stack, Typography } from '@mui/material';
-import { Sort as SortIcon } from '../../../../components/icons/Sort';
+import { Stack, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import React from 'react';
+import { Sort as SortIcon } from '../../../../components/icons/Sort';
 import { IHeadCell } from '../types/table';
 
 interface Props {
@@ -15,7 +15,14 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
   const theme = useTheme();
 
   return (
-    <TableHead>
+    <TableHead
+      sx={{
+        '& .MuiTableCell-head': {
+          borderBottom: '1px solid',
+          borderColor: 'ds.gray_200',
+        },
+      }}
+    >
       <TableRow>
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (

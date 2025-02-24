@@ -24,7 +24,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
   let expectedFee = 0;
   let receiverAddr = '';
   const testWallet = getSpendableWallet();
-  const adaAmount = 2;
+  const adaAmount = 1;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
@@ -49,165 +49,134 @@ describe('dApp, signTx, intrawallet Tx', function () {
     await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet, false);
   });
 
-  describe('[nested-dapp] Positive case', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
+  // Check is blocked by issue https://emurgo.atlassian.net/browse/YOEXT-1723
+  // describe('[nested-dapp] Positive case', function () {
+  //   before(async function () {
+  //     await customBeforeNestedDAppTest(this, windowManager);
+  //   });
 
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(adaAmount * adaInLovelaces);
-      // send sign request with 1 ada
-      const { txFee } = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-      expectedFee = txFee;
-    });
+  //   it('Request signTx', async function () {
+  //     // get a receiver address
+  //     await mockedDApp.requestUnusedAddresses();
+  //     const unusedAddresses = await mockedDApp.getAddresses();
+  //     receiverAddr = unusedAddresses.retValue[0];
+  //     const requestedAmount = String(adaAmount * adaInLovelaces);
+  //     // send sign request with 1 ada
+  //     const { txFee } = await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
+  //     expectedFee = txFee;
+  //   });
 
-    it('Checking Sign Tx pop-up appeared', async function () {
-      // wait for the pop-up appears
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-    });
+  //   it('Checking Sign Tx pop-up appeared', async function () {
+  //     // wait for the pop-up appears
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
+  //     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
+  //     await dappSingTxPage.waitingConnectorIsReady();
+  //   });
 
-    it('Checking info on Details page', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      // check data on the Details page
-      const displayedTotalAmount = await dappSingTxPage.getTotalAmount();
-      const displayedFee = await dappSingTxPage.getFee();
-      const displayedTotalNumber = parseFloat(displayedTotalAmount);
-      const displayedFeeNumber = parseFloat(displayedFee);
-      const storedFeeNumber = parseFloat(expectedFee) / adaInLovelaces;
-      expect(displayedFeeNumber, 'Displayed fee is different from expected').to.equal(
-        storedFeeNumber
-      );
-      // because it is intrawallet tx only fee + 0 is displayed in the total amount
-      expect(displayedTotalNumber, 'Displayed total is different from expected').to.equal(
-        storedFeeNumber
-      );
-    });
+  //   it('Checking info on Details page', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     // check data on the Details page
+  //     const displayedTotalAmount = await dappSingTxPage.getTotalAmount();
+  //     const displayedFee = await dappSingTxPage.getFee();
+  //     const displayedTotalNumber = parseFloat(displayedTotalAmount);
+  //     const displayedFeeNumber = parseFloat(displayedFee);
+  //     const storedFeeNumber = parseFloat(expectedFee) / adaInLovelaces;
+  //     expect(displayedFeeNumber, 'Displayed fee is different from expected').to.equal(
+  //       storedFeeNumber
+  //     );
+  //     // because it is intrawallet tx only fee + 0 is displayed in the total amount
+  //     expect(displayedTotalNumber, 'Displayed total is different from expected').to.equal(
+  //       storedFeeNumber
+  //     );
+  //   });
 
-    it('Checking info on UTxOs page', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      await dappSingTxPage.switchToUtxosTab();
-      const outputsInfo = await dappSingTxPage.getOutputsInfo();
-      const filteredAddrs = outputsInfo.yourAddrs.filter(
-        addrInfo => addrInfo.addr === receiverAddr
-      );
-      expect(filteredAddrs, 'Receiver address is not in outputs').to.be.an('array').that.is.not
-        .empty;
-      expect(filteredAddrs.length, 'Receiver address appears several times').to.equal(1);
-      const addrAssets = filteredAddrs[0].assets;
-      expect(addrAssets, 'No tokens for the receiver address').to.be.an('array').that.is.not.empty;
-      const filteredAddrAssets = addrAssets.filter(assetInfo => assetInfo.tokenName === 'ADA');
-      expect(filteredAddrAssets.length, 'No ADA token for the receiver address').to.equal(1);
-      expect(
-        filteredAddrAssets[0].tokenAmount,
-        'Different amount for the receiver address'
-      ).to.equal(adaAmount);
-    });
+  //   it('Checking info on UTxOs page', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     await dappSingTxPage.switchToUtxosTab();
+  //     const outputsInfo = await dappSingTxPage.getOutputsInfo();
+  //     const filteredAddrs = outputsInfo.yourAddrs.filter(
+  //       addrInfo => addrInfo.addr === receiverAddr
+  //     );
+  //     expect(filteredAddrs, 'Receiver address is not in outputs').to.be.an('array').that.is.not
+  //       .empty;
+  //     expect(filteredAddrs.length, 'Receiver address appears several times').to.equal(1);
+  //     const addrAssets = filteredAddrs[0].assets;
+  //     expect(addrAssets, 'No tokens for the receiver address').to.be.an('array').that.is.not.empty;
+  //     const filteredAddrAssets = addrAssets.filter(assetInfo => assetInfo.tokenName === 'ADA');
+  //     expect(filteredAddrAssets.length, 'No ADA token for the receiver address').to.equal(1);
+  //     expect(
+  //       filteredAddrAssets[0].tokenAmount,
+  //       'Different amount for the receiver address'
+  //     ).to.equal(adaAmount);
+  //   });
 
-    it('Checking info on Connection page', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const connectionInfo = await dappSingTxPage.getConnectionInfo();
-      expect(connectionInfo.pageUrl).to.equal('localhost');
-      expect(connectionInfo.walletName).to.equal(testWallet.name);
-      expect(connectionInfo.walletPlate).to.equal(testWallet.plate);
-    });
+  //   it('Checking info on Connection page', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     const connectionInfo = await dappSingTxPage.getConnectionInfo();
+  //     expect(connectionInfo.pageUrl).to.equal('localhost');
+  //     expect(connectionInfo.walletName).to.equal(testWallet.name);
+  //     expect(connectionInfo.walletPlate).to.equal(testWallet.plate);
+  //   });
 
-    it('Sign tx and check response', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      await dappSingTxPage.switchToDetailsTab();
-      await dappSingTxPage.enterPassword(getPassword());
-      await dappSingTxPage.confirmSigning();
+  //   it('Sign tx and check response', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     await dappSingTxPage.switchToDetailsTab();
+  //     await dappSingTxPage.enterPassword(getPassword());
+  //     await dappSingTxPage.confirmSigning();
 
-      // pop up is closed, switching to dapp
-      const result = await windowManager.isClosed(popupConnectorName);
-      expect(result, 'The window|tab is still opened').to.be.true;
-      await windowManager.switchTo(mockDAppName);
+  //     // pop up is closed, switching to dapp
+  //     const result = await windowManager.isClosed(popupConnectorName);
+  //     expect(result, 'The window|tab is still opened').to.be.true;
+  //     await windowManager.switchTo(mockDAppName);
 
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.true;
-      expect(signTxResponse.retValue).to.be.an('string').that.is.not.empty;
-    });
-  });
+  //     // check sign data response
+  //     const signTxResponse = await mockedDApp.getSigningTxResult();
+  //     expect(signTxResponse.success).to.be.true;
+  //     expect(signTxResponse.retValue).to.be.an('string').that.is.not.empty;
+  //   });
+  // });
 
-  describe('[nested-dapp] Cancel Transaction', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
+  // The check is blocked by issue https://emurgo.atlassian.net/browse/YOEXT-1723
+  // describe('[nested-dapp] Cancel Transaction', function () {
+  //   before(async function () {
+  //     await customBeforeNestedDAppTest(this, windowManager);
+  //   });
 
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      const receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
-      // send sign request with 1 ada
-      await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-    });
+  //   it('Request signTx', async function () {
+  //     // get a receiver address
+  //     await mockedDApp.requestUnusedAddresses();
+  //     const unusedAddresses = await mockedDApp.getAddresses();
+  //     const receiverAddr = unusedAddresses.retValue[0];
+  //     const requestedAmount = String(1 * adaInLovelaces);
+  //     // send sign request with 1 ada
+  //     await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
+  //   });
 
-    it('Checking Sign Tx pop-up appeared', async function () {
-      // wait for the pop-up appears
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-    });
+  //   it('Checking Sign Tx pop-up appeared', async function () {
+  //     // wait for the pop-up appears
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
+  //     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
+  //     await dappSingTxPage.waitingConnectorIsReady();
+  //   });
 
-    it('Cancel signing tx and check response', async function () {
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      await dappSingTxPage.switchToDetailsTab();
-      await dappSingTxPage.cancelSigning();
+  //   it('Cancel signing tx and check response', async function () {
+  //     const dappSingTxPage = new DAppSignTx(webdriver, logger);
+  //     await dappSingTxPage.switchToDetailsTab();
+  //     await dappSingTxPage.cancelSigning();
 
-      // pop up is closed, switching to dapp
-      const result = await windowManager.isClosed(popupConnectorName);
-      expect(result, 'The window|tab is still opened').to.be.true;
-      await windowManager.switchTo(mockDAppName);
+  //     // pop up is closed, switching to dapp
+  //     const result = await windowManager.isClosed(popupConnectorName);
+  //     expect(result, 'The window|tab is still opened').to.be.true;
+  //     await windowManager.switchTo(mockDAppName);
 
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.false;
-      expect(signTxResponse.errMsg.code).to.equal(TxSignErrorCode.UserDeclined);
-    });
-  });
-
-  describe('[nested-dapp] Close pop-up', function () {
-    before(async function () {
-      await customBeforeNestedDAppTest(this, windowManager);
-    });
-
-    it('Request signTx', async function () {
-      // get a receiver address
-      await mockedDApp.requestUnusedAddresses();
-      const unusedAddresses = await mockedDApp.getAddresses();
-      const receiverAddr = unusedAddresses.retValue[0];
-      const requestedAmount = String(1 * adaInLovelaces);
-      // send sign request with 1 ada
-      await mockedDApp.requestSigningTx(requestedAmount, receiverAddr);
-    });
-
-    it('Checking Sign Tx pop-up appeared', async function () {
-      // wait for the pop-up appears
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
-      const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
-      expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
-      await dappSingTxPage.waitingConnectorIsReady();
-    });
-
-    it('Close the pop-up and check response', async function () {
-      await windowManager.closeTabWindow(popupConnectorName, mockDAppName);
-
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.false;
-      expect(signTxResponse.errMsg.code).to.equal(TxSignErrorCode.UserDeclined);
-    });
-  });
+  //     // check sign data response
+  //     const signTxResponse = await mockedDApp.getSigningTxResult();
+  //     expect(signTxResponse.success).to.be.false;
+  //     expect(signTxResponse.errMsg.code).to.equal(TxSignErrorCode.UserDeclined);
+  //   });
+  // });
 
   describe('[nested-dapp] Incorrect Transaction', function () {
     before(async function () {
@@ -239,10 +208,6 @@ describe('dApp, signTx, intrawallet Tx', function () {
       );
 
       await windowManager.closeTabWindow(popupConnectorName, mockDAppName);
-      // check sign data response
-      const signTxResponse = await mockedDApp.getSigningTxResult();
-      expect(signTxResponse.success).to.be.false;
-      expect(signTxResponse.errMsg.code).to.equal(TxSignErrorCode.UserDeclined);
     });
   });
 

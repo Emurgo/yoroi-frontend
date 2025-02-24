@@ -1,4 +1,5 @@
 import AddNewWallet from '../pages/addNewWallet.page.js';
+import BasePage from '../pages/basepage.js';
 import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
 import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
@@ -8,7 +9,14 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { walletNameShortener } from '../utils/utils.js';
+import { isChrome, walletNameShortener } from '../utils/utils.js';
+import {
+  extensionTabName,
+  serviceWorkersLink,
+  serviceWorkersTabName,
+  WindowManager,
+} from './windowManager.js';
+import { quarterSecond } from './timeConstants.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -98,16 +106,72 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
 };
 
 export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
+  logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
-  expect(state).to.be.true;
+  expect(state, 'The Add new wallet page is not displayed').to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName);
-  await addWalletPage.refreshPage();
+  // It is necessary to re-run the service worker after loading info into the indexedDB
+  if (isChrome()) {
+    await restartServiceWorker(webdriver, logger);
+  } else {
+    await addWalletPage.refreshPage();
+  }
+  logger.info(`--------------------- preloadDBAndStorage END ---------------------`);
 };
 
 export const waitTxPage = async (webdriver, logger) => {
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
+  await transactionsPage.waitInitialWalletLoaderIsClosed();
   await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
 };
+
+export const restartServiceWorker = async (webdriver, logger) => {
+  logger.info(`--------------------- restartServiceWorker START ---------------------`);
+  const windowManager = new WindowManager(webdriver, logger);
+  windowManager.init();
+  await windowManager.openNewTab(serviceWorkersTabName, serviceWorkersLink);
+
+  const basepage = new BasePage(webdriver, logger);
+  await basepage.sleep(quarterSecond);
+
+  const stopBtnLocator = {
+    locator: 'div.worker-controls > button:nth-child(1)',
+    method: 'css',
+  };
+  const startBtnLocator = {
+    locator: 'div.registration-controls > button:nth-child(2)',
+    method: 'css',
+  };
+
+  await basepage.click(stopBtnLocator);
+  await basepage.sleep(500);
+  await basepage.click(startBtnLocator);
+  await basepage.sleep(500);
+
+  await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);
+  await basepage.refreshPage();
+  logger.info(`--------------------- restartServiceWorker END ---------------------`);
+};
+
+export const collectInfo = async (mochaContext, webdriver, logger) => {
+  logger.info(`--------------------- collectInfo START ---------------------`);
+  const basepage = new BasePage(webdriver, logger);
+  basepage.takeScreenshot(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.takeSnapshot(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.getBrowserLogs(mochaContext.test.parent.title, 'preparationSteps');
+  basepage.getDriverLogs(mochaContext.test.parent.title, 'preparationSteps');
+  logger.info(`--------------------- collectInfo END ---------------------`);
+};
+
+export const prepareWallet = async (webdriver, logger, testWalletName, mochaContext) => {
+  try {
+    await preloadDBAndStorage(webdriver, logger, testWalletName);
+    await waitTxPage(webdriver, logger); 
+  } catch (error) {
+    await collectInfo(mochaContext, webdriver, logger);
+    throw new Error(error);
+  }
+}

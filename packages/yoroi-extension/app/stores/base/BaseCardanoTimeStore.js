@@ -3,7 +3,6 @@
 import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import Store from './Store';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { RelativeSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
@@ -40,7 +39,7 @@ export type CurrentTimeRequests = {|
 /**
  * Different wallets can be on different networks and therefore have different measures of time
 */
-export default class BaseCardanoTimeStore extends Store<StoresMap, ActionsMap> {
+export default class BaseCardanoTimeStore extends Store<StoresMap> {
 
   @observable time: Date = new Date();
 

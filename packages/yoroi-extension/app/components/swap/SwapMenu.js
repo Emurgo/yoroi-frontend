@@ -1,57 +1,29 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { Component } from 'react';
-import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import SubMenu from '../topbar/SubMenu';
-
-const messages = defineMessages({
-  assetSwapLabel: {
-    id: 'swap.menu.swap',
-    defaultMessage: '!!!Asset swap',
-  },
-  orderSwapLabel: {
-    id: 'swap.menu.orders',
-    defaultMessage: '!!!Orders',
-  },
-});
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
   +isActiveItem: string => boolean,
   +onItemClick: string => void,
 |};
-@observer
-export default class SwapMenu extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
 
-  render(): Node {
-    const { intl } = this.context;
-    const { onItemClick, isActiveItem } = this.props;
+export default function SwapMenu({ onItemClick, isActiveItem }: Props): Node {
+  const strings = useStrings();
 
-    const settingOptions: Array<Object> = [
-      {
-        label: intl.formatMessage(messages.assetSwapLabel),
-        route: ROUTES.SWAP.ROOT,
-        className: 'swap',
-      },
-      {
-        label: intl.formatMessage(messages.orderSwapLabel),
-        route: ROUTES.SWAP.ORDERS,
-        className: 'orders',
-      },
-    ];
+  const settingOptions: Array<Object> = [
+    {
+      label: strings.assetSwapLabel,
+      route: ROUTES.SWAP.ROOT,
+      className: 'swap',
+    },
+    {
+      label: strings.orderSwapLabel,
+      route: ROUTES.SWAP.ORDERS,
+      className: 'orders',
+    },
+  ];
 
-    return (
-      <SubMenu
-        options={settingOptions}
-        onItemClick={onItemClick}
-        isActiveItem={isActiveItem}
-        locationId='swap'
-      />
-    );
-  }
+  return <SubMenu options={settingOptions} onItemClick={onItemClick} isActiveItem={isActiveItem} locationId="swap" />;
 }
