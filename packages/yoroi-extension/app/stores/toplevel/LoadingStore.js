@@ -1,7 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import { action, observable, computed, runInAction } from 'mobx';
-import { pathToRegexp } from 'path-to-regexp';
 import BaseLoadingStore from '../base/BaseLoadingStore';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
