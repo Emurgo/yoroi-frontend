@@ -39,6 +39,16 @@ const SBox = styled(Box)(({ theme }) => ({
   color: 'ds.gray_min',
 }));
 
+const SBoxHWNotes = styled(Box)(({ theme }) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '16px',
+  marginTop: '16px',
+  backgroundImage: theme.palette.ds.bg_gradient_1,
+  borderRadius: '8px',
+}));
+
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: SelectedExplorer,
@@ -350,18 +360,16 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       infoLine2 = globalMessages.txConfirmationLedgerNanoLine2;
     }
     return (
-      <div className={styles.infoBlock}>
-        <ul>
-          <li key="1">
-            <span>{intl.formatMessage(infoLine1)}</span>
-            <br />
-          </li>
-          <li key="2">
-            <span>{intl.formatMessage(infoLine2)}</span>
-            <br />
-          </li>
-        </ul>
-      </div>
+      <SBoxHWNotes>
+        <Box display="flex" flexDirection="row" color="ds.text_gray_max" gap="8px" pl="8px">
+          <Typography variant="body1">&#x2022;</Typography>
+          <Typography variant="body1">{intl.formatMessage(infoLine1)}</Typography>
+        </Box>
+        <Box display="flex" flexDirection="row" color="ds.text_gray_max" gap="8px" pl="8px">
+          <Typography variant="body1">&#x2022;</Typography>
+          <Typography variant="body1">{intl.formatMessage(infoLine2)}</Typography>
+        </Box>
+      </SBoxHWNotes>
     );
   }
 
