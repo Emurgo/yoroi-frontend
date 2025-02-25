@@ -20,7 +20,7 @@ export const useOperations = (
   isStakeRegistered: boolean,
   stakeKeyDeposit: any,
   primaryTokenInfo: any,
-  operations: string
+  operations: { kind: 'delegate' }
 ) => {
   const operationCount: any = {};
   if (certificates === null)
