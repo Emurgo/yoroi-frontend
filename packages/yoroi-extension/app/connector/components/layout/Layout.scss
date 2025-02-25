@@ -73,3 +73,11 @@
 .content {
   position: relative;
 }
+
+.badge {
+  border-radius: 16px;
+  padding-left: 8px;
+  padding-right: 8px;
+  height: 24px;
+  line-height: 24px; // vertically center text
+}

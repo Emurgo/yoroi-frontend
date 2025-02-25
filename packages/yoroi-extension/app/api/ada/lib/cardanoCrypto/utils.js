@@ -1,7 +1,7 @@
 // @flow
 
 import { RustModule } from './rustLoader';
-import { bytesToHex, fail, forceNonNull, hexToBytes, maybe } from '../../../../coreUtils';
+import { bytesToHex, fail, forceNonNull, hexToBytes, iterateLenGet, maybe } from '../../../../coreUtils';
 import { base32ToHex, hexToBase32 } from '../storage/bridge/utils';
 
 export function v4PublicToV2(
@@ -48,6 +48,17 @@ export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: st
   return RustModule.WasmScope(Module => {
     const fixedTransaction = Module.WalletV4.FixedTransaction.from_hex(txHex);
     fixedTransaction.set_witness_set(hexToBytes(witnessSetHex));
+    return fixedTransaction.to_hex();
+  });
+}
+
+export function transactionHexAddVkeyWitnessesFromWitnessSetHex(txHex: string, witnessSetHex: string): string {
+  return RustModule.WasmScope(Module => {
+    const fixedTransaction = Module.WalletV4.FixedTransaction.from_hex(txHex);
+    const witnessSet = Module.WalletV4.TransactionWitnessSet.from_hex(witnessSetHex);
+    for (const vkeyWitness of iterateLenGet(witnessSet.vkeys())) {
+      fixedTransaction.add_vkey_witness(vkeyWitness);
+    }
     return fixedTransaction.to_hex();
   });
 }

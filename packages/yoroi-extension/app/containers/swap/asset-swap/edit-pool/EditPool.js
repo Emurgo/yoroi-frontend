@@ -11,6 +11,7 @@ import { useSwapForm } from '../../context/swap-form';
 import { useSwapFeeDisplay } from '../../hooks';
 import SwapPoolFullInfo from './PoolFullInfo';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
+import { useStrings } from '../../common/useStrings';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -26,6 +27,7 @@ type Props = {|
 |};
 
 export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props): React$Node {
+  const strings = useStrings();
   const [showFullInfo, setShowFullInfo] = useState(true);
   const { orderData } = useSwap();
 
@@ -62,14 +64,14 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
       >
         <Box display="flex" gap="8px" alignItems="center">
           <Typography component="div" variant="body1" color="ds.text_gray_medium">
-            DEX
+            {strings.dexLabel}
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
           <Box display="flex" gap="8px" alignItems="center">
             <SwapPoolIcon provider={pool.provider} />
             <Typography component="div" variant="body1" color="ds.text_gray_medium">
-              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? '(Auto)' : ''}`) ?? 'No pool found'}
+              {maybe(pool.provider, p => `${capitalize(p)} ${isAutoPool ? strings.auto : ''}`) ?? strings.noPoolFound}
             </Typography>
             {isLimitOrder && (
               <IconWrapper sx={{ cursor: 'pointer' }} onClick={isLimitOrder ? handleEditPool : undefined}>
@@ -113,7 +115,9 @@ export default function EditSwapPool({ handleEditPool, defaultTokenInfo }: Props
             }}
           >
             <Box sx={{ transform: showFullInfo ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-              <ChevronDownIcon />
+              <IconWrapper>
+                <ChevronDownIcon />
+              </IconWrapper>
             </Box>
           </Box>
         </Box>

@@ -436,17 +436,17 @@ export const ConnectWindowRetrieveData: HandlerType<
   },
 });
 
-export const RemoveWalletFromWhiteList: HandlerType<
-  {| url: string |},
+export const NotifyDAppConnectionRemoved: HandlerType<
+  {| url: string |} | void,
   void
 > = Object.freeze({
-  typeTag: 'remove_wallet_from_whitelist',
+  typeTag: 'notify-dapp-connection-removed',
 
   handle: async (request) => {
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
-      if (site.url === request.url) {
+      if (!request || site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
         break;
       }

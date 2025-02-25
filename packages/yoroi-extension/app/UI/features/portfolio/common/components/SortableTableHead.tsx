@@ -15,7 +15,14 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
   const theme = useTheme();
 
   return (
-    <TableHead>
+    <TableHead
+      sx={{
+        '& .MuiTableCell-head': {
+          borderBottom: '1px solid',
+          borderColor: 'ds.gray_200',
+        },
+      }}
+    >
       <TableRow>
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (

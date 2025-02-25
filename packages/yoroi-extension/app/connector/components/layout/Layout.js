@@ -9,9 +9,11 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 import { ReactComponent as DappConnectorIcon } from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import environment from '../../../environment';
+import { NETWORK_BADGES } from '../../../containers/NavBarContainerRevamp';
 
 type Props = {|
   children: Node,
+  networkId: number,
 |};
 
 const messages = defineMessages({
@@ -29,6 +31,14 @@ export default class Layout extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
 
+    let testnetBadge = null;
+    const badge = NETWORK_BADGES[this.props.networkId];
+    if (badge) {
+      testnetBadge = (
+        <div className={styles.badge} style={{ backgroundColor: badge.color }}>{badge.text}</div>
+      );
+    }
+
     return (
       <div className={styles.layout}>
         <TestnetWarningBanner isTestnet={environment.isTest()} />
@@ -41,6 +51,7 @@ export default class Layout extends Component<Props> {
             <div className={styles.connectorLogoContainer}>
               <DappConnectorIcon className={styles.connectorLogo} />
             </div>
+            {testnetBadge}
           </div>
         </div>
         <div className={styles.content}>{this.props.children}</div>

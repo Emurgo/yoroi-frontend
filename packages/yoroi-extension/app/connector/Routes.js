@@ -14,7 +14,7 @@ export const Routes = (stores: StoresMap): Node => {
   if (stores.loading.isLoading) {
     return <LoadingPage stores={stores} />;
   }
-  return wrapPages(getContent(stores));
+  return wrapPages(getContent(stores), stores);
 };
 
 const getContent = (stores) => (
@@ -32,6 +32,10 @@ const getContent = (stores) => (
   </Switch>
 );
 
-export function wrapPages(children: Node): Node {
-  return <Layout>{children}</Layout>;
+function wrapPages(children: Node, stores: StoresMap): Node {
+  const { currentNetworkId } = stores.profile;
+  if (currentNetworkId == null) {
+    throw new Error('unexpectedly missing network ID');
+  }
+  return <Layout networkId={currentNetworkId}>{children}</Layout>;
 }

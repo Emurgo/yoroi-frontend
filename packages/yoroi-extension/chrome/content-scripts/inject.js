@@ -118,6 +118,7 @@ function listenToBackgroundServiceWorker() {
                     }
                 }
             }
+            connected = true;
             window.postMessage({
                 type: "connector_connected",
                 success: message.success,
@@ -128,7 +129,6 @@ function listenToBackgroundServiceWorker() {
             disconnectWallet(connectedProtocolHolder[0]);
         }
     });
-    connected = true;
 }
 
 const ATTEMPT_COUNT = 2;
@@ -183,6 +183,19 @@ async function handleConnectorConnectRequest(event, protocol) {
 
 async function handleConnectorRpcRequest(event) {
     console.debug("connector received from page: " + JSON.stringify(event.data) + " with source = " + event.source + " and origin = " + event.origin);
+    if (!connected) {
+          window.postMessage({
+              type: "connector_rpc_response",
+              uid: event.data.uid,
+              return: {
+                  err: {
+                      code: API_REFUSED,
+                    info: 'disconnected from wallet',
+                  }
+              }
+          }, location.origin);
+    }
+
     if (event.data.function === 'is_enabled/cardano' && !connected) {
         listenToBackgroundServiceWorker();
     }

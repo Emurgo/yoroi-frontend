@@ -1,6 +1,8 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import type { StoresProps } from '../../../stores';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import WalletNameSetting from '../../../components/wallet/settings/WalletNameSetting';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
@@ -15,9 +17,10 @@ import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { Typography } from '@mui/material';
 import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import type { StoresProps } from '../../../stores';
+// $FlowIgnore: suppressing this error
+import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
+import environment from '../../../environment';
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
@@ -30,6 +33,8 @@ export default class WalletSettingsPage extends Component <StoresProps> {
     const { stores } = this.props;
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
+
+    const notifFeatFlagEnabled = environment.isDev();
 
     const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
     if (selectedWallet == null) {
@@ -70,8 +75,11 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
+        {notifFeatFlagEnabled && (
+          <NotificationsSettings intl={intl}/>
+        )}
         {selectedWallet.type === 'mnemonic' && (
-          <SpendingPasswordSetting
+          <SpendingPasswordSetting 
             openDialog={() =>
               stores.uiDialogs.open({
                 dialog: ChangeWalletPasswordDialogContainer,

@@ -4,6 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import styles from './AnnotatedLoader.scss';
+import { Typography } from '@mui/material';
 
 type Props = {|
   +title: string,
@@ -12,7 +13,6 @@ type Props = {|
 
 @observer
 export default class AnnotatedLoader extends Component<Props> {
-
   render(): Node {
     const { title, details } = this.props;
 
@@ -22,9 +22,12 @@ export default class AnnotatedLoader extends Component<Props> {
           <div className={styles.spinner}>
             <LoadingSpinner />
           </div>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.progressInfo}>{details}
-          </div>
+          <Typography className={styles.title} color="ds.text_gray_medium">
+            {title}
+          </Typography>
+          <Typography className={styles.progressInfo} color="ds.text_gray_medium">
+            {details}
+          </Typography>
         </div>
       </div>
     );

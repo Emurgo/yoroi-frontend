@@ -17,11 +17,10 @@ import { InfoTooltip } from '../widgets/InfoTooltip';
 import { PriceImpactColored, PriceImpactIcon } from './PriceImpact';
 import type { AssetAmount, PriceImpact } from './types';
 import LoadingSpinner from '../widgets/LoadingSpinner';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 const fromTemplateColumns = '1fr minmax(auto, 136px)';
 const toTemplateColumns = '1fr minmax(auto, 152px) minmax(auto, 136px)';
-const fromColumns = ['Asset', 'Amount'];
-const toColumns = [];
 
 type Props = {|
   assets: Array<AssetAmount>,
@@ -43,6 +42,10 @@ export default function SelectAssetDialog({
   getTokenInfoBatch,
 }: Props): React$Node {
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const strings = useStrings();
+
+  const fromColumns = [strings.asset, strings.amount];
+  const toColumns = [];
 
   const handleAssetSelected = asset => {
     onAssetSelected(asset);
@@ -60,7 +63,7 @@ export default function SelectAssetDialog({
 
   return (
     <Dialog
-      title={`Swap ${type}`}
+      title={type === 'to' ? strings.swapToLabel : strings.swapFromLabel}
       onClose={onClose}
       withCloseButton
       closeOnOverlayClick
@@ -112,7 +115,7 @@ export default function SelectAssetDialog({
           </Box>
           <Box sx={{ marginBottom: '16px' }}>
             <Typography component="div" variant="body2" color="ds.text_gray_low">
-              {filteredAssets.length} assets {searchTerm ? 'found' : 'available'}
+              {searchTerm ? strings.numAssetsFound(filteredAssets.length) : strings.numAssetsAvailable(filteredAssets.length)}
             </Typography>
           </Box>
         </>
@@ -148,7 +151,7 @@ export default function SelectAssetDialog({
                 <>
                   <NoAssetsFound />
                   <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_low">
-                    {type === 'from' ? `No tokens found for “${searchTerm}”` : 'No asset was found to swap'}
+                    {type === 'from' ? strings.noAssetFoundWithTerm(searchTerm) : strings.noAssetFoundToSwap}
                   </Typography>
                 </>
               )}

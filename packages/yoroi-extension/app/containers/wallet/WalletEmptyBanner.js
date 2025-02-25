@@ -7,9 +7,12 @@ import { ReactComponent as CoverBg } from '../../assets/images/transaction/walle
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
+import { ampli } from '../../../ampli/index';
+import links from '../../links';
 
 type Props = {|
   onBuySellClick: () => void,
+  isTestnet: boolean,
 |};
 
 type Intl = {|
@@ -27,7 +30,7 @@ const messages = defineMessages({
   },
 });
 
-function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
+function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): Node {
   return (
     <Box>
       <Box
@@ -47,10 +50,10 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
         </Box>
         <Box>
           <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
-            {intl.formatMessage(messages.welcomeMessage)}
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageTestnet : messages.welcomeMessage)}
           </Typography>
-          <Typography component="div" variant="body1" color="ds.gray_max" maxWidth="600px" mb="24px">
-            {intl.formatMessage(messages.welcomeMessageSubtitle)}
+          <Typography component="div" variant="body1" color="ds.gray_max" mb="24px">
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
           </Typography>
         </Box>
         <Stack direction="row" gap="16px">
@@ -64,7 +67,14 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
                 height: 'unset',
               },
             }}
-            onClick={onBuySellClick}
+            onClick={() => {
+              if (isTestnet) {
+                window.open(links.testnetFaucet, '_blank');
+              } else {
+                onBuySellClick();
+                ampli.walletPageBuyBannerClicked();
+              }
+            }}
           >
             <Typography
               component="div"
@@ -74,7 +84,7 @@ function WalletEmptyBanner({ onBuySellClick, intl }: Props & Intl): Node {
                 lineHeight: '19px',
               }}
             >
-              {intl.formatMessage(globalMessages.buyAda)}
+              {intl.formatMessage(isTestnet? globalMessages.goToFaucetButton: globalMessages.buyAda)}
             </Typography>
           </Button>
         </Stack>

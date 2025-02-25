@@ -590,6 +590,10 @@ const globalMessages: * = defineMessages({
     id: 'profile.uriPrompt.form.skipLabel',
     defaultMessage: '!!!Skip',
   },
+  refuseLabel: {
+    id: 'profile.uriPrompt.form.refuseLabel',
+    defaultMessage: '!!!Refuse',
+  },
   checkLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
     defaultMessage: '!!!CHECK',
@@ -1014,15 +1018,23 @@ const globalMessages: * = defineMessages({
   },
   preprod: {
     id: 'networkName.preprod',
-    defaultMessage: '!!!Preproduction testnet',
+    defaultMessage: '!!!Preprod',
   },
   preview: {
     id: 'networkName.preview',
-    defaultMessage: '!!!Preview testnet',
+    defaultMessage: '!!!Preview',
   },
-  sancho: {
-    id: 'networkName.sancho',
-    defaultMessage: '!!!Sancho testnet',
+  goToFaucetButton: {
+    id: 'wallet.emptyWalletMessage.goToFaucet',
+    defaultMessage: '!!!GO TO TADA FAUCET',
+  },
+  welcomeMessageTestnet: {
+    id: 'wallet.emptyWalletMessage.testnet',
+    defaultMessage: '!!!Learn Cardano with test ADA ⭐',
+  },
+  welcomeMessageSubtitleTestnet: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnet',
+    defaultMessage: '!!!Get started with Cardano\'s test currency, TADA. It\'s your key to testing a new world of possibilities.',
   },
 });
 export default globalMessages;

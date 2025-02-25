@@ -30,6 +30,7 @@ import { truncateToken } from '../../../utils/formatters';
 import { Box } from '@mui/system';
 import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../../stores';
+import { ampli } from '../../../../ampli/index';
 
 type Props = {|
   urlTemplate: ?string,
@@ -108,7 +109,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
       return (
         <>
-          {!isCurrentlyDelegating ? (
+          {(!selectedWallet.isTestnet && !isCurrentlyDelegating) ? (
             <WalletDelegationBanner
               isOpen={this.props.stores.transactions.showDelegationBanner}
               onDelegateClick={async poolId => {
@@ -128,23 +129,26 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
             />
           ) : null}
 
-          <Box sx={{ iframe: { minHeight: '60vh' } }}>
-            {this.getDialog()}
-            <SeizaFetcher
-              urlTemplate={urlTemplate}
-              locale={locale}
-              bias={stakingListBias}
-              totalAda={totalAda}
-              poolList={poolList}
-              setFirstPool={pool => {
-                this.setState({ firstPool: pool });
-              }}
-              stakepoolSelectedAction={async poolId => {
-                this.setState({ selectedPoolId: poolId });
-                await this.props.stores.delegation.createDelegationTransaction(poolId);
-              }}
-            />
-          </Box>
+          {!selectedWallet.isTestnet && (
+            <Box sx={{ iframe: { minHeight: '60vh' } }}>
+              {this.getDialog()}
+              <SeizaFetcher
+                urlTemplate={urlTemplate}
+                locale={locale}
+                bias={stakingListBias}
+                totalAda={totalAda}
+                poolList={poolList}
+                setFirstPool={pool => {
+                  this.setState({ firstPool: pool });
+                }}
+                stakepoolSelectedAction={async poolId => {
+                  this.setState({ selectedPoolId: poolId });
+                  await this.props.stores.delegation.createDelegationTransaction(poolId);
+                  ampli.stakingCenterDelegationInitiated();
+                }}
+              />
+            </Box>
+          )}
         </>
       );
     }
@@ -397,6 +401,10 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               password,
               wallet: selectedWallet,
               dialog: DelegationSuccessDialog,
+            });
+            ampli.stakingCenterDelegationSubmitted({
+              ada_amount: delegationTx.totalAmountToDelegate.getDefault().toNumber(),
+              staking_pool: selectedPoolId,
             });
           }}
           error={stores.wallets.sendMoneyRequest.error}

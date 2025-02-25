@@ -6,6 +6,7 @@ import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages } from 'react-intl';
+import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   lightTheme: {
@@ -37,8 +38,10 @@ const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => 
           aria-labelledby="theme-switch-buttons"
           value={name === 'light-theme' ? 'light' : 'dark'}
           onChange={async e => {
-            toggleColorMode(e.target.value);
-            await localStorageApi.setUserThemeMode(e.target.value);
+            const theme = e.target.value;
+            toggleColorMode(theme);
+            await localStorageApi.setUserThemeMode(theme);
+            ampli.themeSelected({ theme });
           }}
           sx={{
             display: 'flex',

@@ -7,6 +7,7 @@ import { ReactComponent as MuesliImage } from '../../assets/images/revamp/dex/mu
 import { ReactComponent as SpecImage } from '../../assets/images/revamp/dex/spec.inline.svg';
 import { ReactComponent as VyfiImage } from '../../assets/images/revamp/dex/vyfi.inline.svg';
 import { ReactComponent as WingridersImage } from '../../assets/images/revamp/dex/wingriders.inline.svg';
+import { useStrings } from '../../containers/swap/common/useStrings';
 
 const poolIcons = {
   muesliswap: <MuesliImage />,
@@ -21,26 +22,20 @@ const poolIcons = {
   spectrum: <SpecImage />,
 };
 
-export function SwapPoolIcon({ provider }: {|
-  +provider: string,
-|}): React$Node {
-  return (
-    <Box sx={{ width: '24px', height: '24px' }}>{poolIcons[provider] || <DefaultToken />}</Box>
-  );
+export function SwapPoolIcon({ provider }: {| +provider: string |}): React$Node {
+  return <Box sx={{ width: '24px', height: '24px' }}>{poolIcons[provider] || <DefaultToken />}</Box>;
 }
 
-export function SwapPoolLabel({ provider, isAutoPool = false }: {|
-  +provider: string,
-  +isAutoPool?: boolean,
-|}): React$Node {
+export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: string, +isAutoPool?: boolean |}): React$Node {
+  const strings = useStrings();
   return (
     <Box display="flex" alignItems="center" gap="8px">
       <Box display="inline-flex">
         <SwapPoolIcon provider={provider} />
       </Box>
-      <Typography component="div" variant="body1" color="primary.500" fontWeight={500}>
-        {provider} {isAutoPool ? '(Auto)' : null}
+      <Typography component="div" variant="body1" color="ds.text_primary_medium" fontWeight={500}>
+        {provider} {isAutoPool ? strings.auto : null}
       </Typography>
     </Box>
-  )
+  );
 }

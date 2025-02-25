@@ -5,6 +5,7 @@ import Tabs from '../../../../components/common/tabs/Tabs';
 import { ReactComponent as RefreshIcon } from '../../../../assets/images/revamp/icons/refresh.inline.svg';
 import { useSwap } from '@yoroi/swap';
 import { useSwapForm } from '../../context/swap-form';
+import { useStrings } from '../../common/useStrings';
 
 type TopActionsProps = {|
   orderType: string,
@@ -13,17 +14,19 @@ type TopActionsProps = {|
 export const TopActions = ({ orderType }: TopActionsProps): React$Node => {
   const { orderTypeChanged } = useSwap();
   const { sellTokenInfo = {}, buyTokenInfo = {} } = useSwapForm();
+  const { marketTabLabel, limitTabLabel } = useStrings();
 
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   const isDisabled = !isValidTickers;
 
   const orderTypeTabs = [
-    { type: 'market', label: 'Market' },
-    { type: 'limit', label: 'Limit' },
+    { type: 'market', label: marketTabLabel },
+    { type: 'limit', label: limitTabLabel },
   ];
 
   const [rotationDegrees, setRotationDegrees] = useState(0);
 
+  // <TODO:SWAP> Implement refresh
   const handleRefresh = () => {
     document.activeElement?.blur();
     setRotationDegrees(prevDegrees => prevDegrees + 360);

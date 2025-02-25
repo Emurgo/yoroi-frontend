@@ -13,8 +13,11 @@ import SidebarContainer from '../SidebarContainer';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
+import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
 import type { StoresProps } from '../../stores';
+import TestnetDisabledSwap from '../../components/swap/TestnetDisabledSwap';
+import SwitchNetworkDialogContainer from '../settings/categories/SwitchNetworkDialogContainer';
 
 type Props = {|
   +children?: Node,
@@ -51,10 +54,12 @@ export default class SwapPageContainer extends Component<AllProps> {
   render(): Node {
     const { children } = this.props;
     const { stores } = this.props;
+    const { intl } = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
+    const { isTestnet } = stores.wallets.selectedOrFail;
 
-    const menu = (
+    const menu = isTestnet ? null : (
       <SwapMenu
         onItemClick={route => stores.app.goToRoute({ route })}
         isActiveItem={this.isActivePage}
@@ -62,23 +67,31 @@ export default class SwapPageContainer extends Component<AllProps> {
     );
 
     return (
-      <TopBarLayout
-        banner={<BannerContainer stores={stores} />}
-        sidebar={sidebarContainer}
-        isErrorPage={isErrorPage}
-        navbar={
-          <NavBarContainerRevamp
-            stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-            menu={menu}
+        <IntlProvider intl={intl}>
+          <TopBarLayout
+            banner={<BannerContainer stores={stores} />}
+            sidebar={sidebarContainer}
             isErrorPage={isErrorPage}
-          />
-        }
-        showInContainer
-        withPadding={false}
-      >
-        <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-      </TopBarLayout>
+            navbar={
+              <NavBarContainerRevamp
+                stores={stores}
+                title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+                menu={menu}
+                isErrorPage={isErrorPage}
+              />
+            }
+            showInContainer
+            withPadding={false}
+          >
+            {isTestnet ? (
+              <TestnetDisabledSwap
+                onSwitch={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
+              />
+            ): (
+              <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+            )}
+          </TopBarLayout>
+        </IntlProvider>
     );
   }
 }
