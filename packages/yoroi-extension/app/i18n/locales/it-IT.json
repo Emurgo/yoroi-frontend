@@ -860,6 +860,8 @@
   "wallet.send.confirmationDialog.txSizeLabel": "Size (bytes)",
   "wallet.send.confirmationDialog.walletPasswordFieldPlaceholder": "Digita la tua password di spesa",
   "wallet.send.confirmationDialog.walletPasswordLabel": "Password di spesa",
+  "wallet.send.error.description.mnemonic": "The transaction cannot be done due to technical reasons. Try again or <link>ask our support team</link>",
+  "wallet.send.error.title.transactionError": "Transaction Error",
   "wallet.send.form.addAssets": "Add assets",
   "wallet.send.form.amount.minimumRequiredADA": "Minimum required is {number} ADA",
   "wallet.send.form.calculatingFee": "Calcolo della commissione...",

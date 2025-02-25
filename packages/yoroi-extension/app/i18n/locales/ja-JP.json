@@ -860,6 +860,8 @@
   "wallet.send.confirmationDialog.txSizeLabel": "Size (bytes)",
   "wallet.send.confirmationDialog.walletPasswordFieldPlaceholder": "ウォレットパスワードを入力してください",
   "wallet.send.confirmationDialog.walletPasswordLabel": "送金パスワード",
+  "wallet.send.error.description.mnemonic": "The transaction cannot be done due to technical reasons. Try again or <link>ask our support team</link>",
+  "wallet.send.error.title.transactionError": "Transaction Error",
   "wallet.send.form.addAssets": "Add assets",
   "wallet.send.form.amount.minimumRequiredADA": "Minimum required is {number} ADA",
   "wallet.send.form.calculatingFee": "手数料を計算中...",
