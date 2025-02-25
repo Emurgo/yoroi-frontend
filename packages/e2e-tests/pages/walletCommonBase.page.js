@@ -133,30 +133,17 @@ class WalletCommonBase extends BasePage {
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 
-    const [walletName, walletPlate] = await this.waitPresentedAndAct(
-      this.walletNameAndPlateNumberTextLocator,
-      async () => {
-        const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
-        return rawNameAndPlateText.split('\n');
-      }
-    );
+    const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
 
-    const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
-      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-      const [numberPart] = rawBalanceText.split(' ');
-      const digits = numberPart.split('\n');
-      return Number(digits.join(''));
-    });
+    const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+    const [numberPart] = rawBalanceText.split(' ');
+    const digits = numberPart.split('\n');
+    const adaBalance = Number(digits.join(''));
 
-    const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
-      this.walletFiatBalanceTextLocator,
-      async () => {
-        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-        const [fiatBalanceStr, fiatCurrencyInner] = rawFiatBalanceText.split(' ');
-        const fiatBalanceInner = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
-        return [fiatBalanceInner, fiatCurrencyInner];
-      }
-    );
+    const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+    const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
+    const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
 
     const walletInfo = {
       name: walletName,

@@ -76,16 +76,12 @@ class InitialStepsPage extends BasePage {
     await this.openLanguageSelection();
     await this.pickLanguage(countryCode);
   }
-  async acceptToSPP() {
-    this.logger.info(`InitialStepsPage::acceptToSPP is called`);
+  async acceptToSAndPP() {
+    this.logger.info(`InitialStepsPage::acceptToSAndPP is called`);
     await this.waitPresentedAndAct(
-      this.languagesDropDownLocator,
-      async () => {
-        await this.waitPresentedAndAct(
-          this.agreeCheckboxLocator,
-          async () => await this.click(this.agreeCheckboxLocator)
-        )
-      }
+      this.agreeCheckboxLocator,
+      async () => await this.click(this.agreeCheckboxLocator),
+      defaultWaitTimeout
     );
     const buttonElem = await this.waitEnable(this.tosContinueButtonLocator);
     await buttonElem.click();
@@ -130,7 +126,7 @@ class InitialStepsPage extends BasePage {
   async skipInitialSteps() {
     this.logger.info(`InitialStepsPage::skipInitialSteps is called`);
     await this.setImplicitTimeout(oneSecond, this.skipInitialSteps.name);
-    await this.acceptToSPP();
+    await this.acceptToSAndPP();
     await this.skipAnalytics();
     if (isChrome()) {
       await this.skipCardanoPaymentUrls();
