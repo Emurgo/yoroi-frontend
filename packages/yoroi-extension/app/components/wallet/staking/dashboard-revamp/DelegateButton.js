@@ -1,9 +1,20 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import { toSvg } from 'jdenticon';
+import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolID }) => {
-  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, networkId, closeTxReviewModal } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stopLoadingTxReview,
+    networkId,
+    closeTxReviewModal,
+    stakeKeyDeposit,
+    primaryTokenInfo,
+  } = useTxReviewModal();
+  const navigateTo = useNavigateTo();
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -21,10 +32,19 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
       operations: {
         components: [
           {
-            component: <OperationsDetails avatarGenerated={avatarGenerated} poolName={selectedPool?.info.name} />,
+            component: (
+              <OperationsDetails
+                avatarGenerated={avatarGenerated}
+                poolName={selectedPool?.info.name}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
+                  primaryTokenInfo.name
+                }`}
+              />
+            ),
             duplicated: false,
           },
         ],
+        kind: 'delegate',
       },
       unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
     });
@@ -45,6 +65,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
       // });
     } catch (error) {
       console.warn('Delegation error', error);
+      navigateTo.transactionFail();
     } finally {
       stopLoadingTxReview();
       closeTxReviewModal();
@@ -67,12 +88,12 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
   );
 };
 
-const OperationsDetails = ({ avatarGenerated, poolName }) => {
+const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
   return (
     <Stack direction="column" spacing={2}>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
-        <Typography color="ds.text_gray_medium">2.000000 ADA</Typography>
+        <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Stake entire wallet balance to</Typography>

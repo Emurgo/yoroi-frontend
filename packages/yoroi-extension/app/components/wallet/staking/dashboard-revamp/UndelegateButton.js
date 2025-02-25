@@ -1,9 +1,20 @@
 import { Button, Stack, Typography, styled } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import globalMessages from '../../../../i18n/global-messages';
+import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, walletType, isHardwareWallet } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stopLoadingTxReview,
+    walletType,
+    isHardwareWallet,
+    stakeKeyDeposit,
+    primaryTokenInfo,
+  } = useTxReviewModal();
+  const navigateTo = useNavigateTo();
 
   if (poolTransition?.shouldShowTransitionFunnel) {
     return (
@@ -20,14 +31,25 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
 
     const txBodyjson = await unsignedTx.unsignedTx.build_tx().to_json();
     const parsedUnsignedTx = JSON.parse(txBodyjson);
-    console.log('parsedUnsignedTx', parsedUnsignedTx);
 
     openTxReviewModal({
       title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
       operations: {
-        components: [{ component: <OperationsDetails />, duplicated: false }],
+        components: [
+          {
+            component: (
+              <OperationsDetails
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
+                  primaryTokenInfo.name
+                }`}
+              />
+            ),
+            duplicated: false,
+          },
+        ],
+        kind: 'undelegate',
       },
       unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
     });
@@ -67,6 +89,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     } catch (error) {
       console.log('error', error);
       stopLoadingTxReview();
+      navigateTo.transactionFail();
     }
   };
 
@@ -89,18 +112,23 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   );
 };
 
-const OperationsDetails = () => {
+const OperationsDetails = ({ stakeKeyDeposit }) => {
   return (
-    <Stack direction="row" justifyContent="space-between">
-      <Typography color="ds.text_gray_low">Staking</Typography>
-      <Typography color="ds.text_gray_medium">Undelagate</Typography>
+    <Stack gap="8px">
+      <Stack direction="row" justifyContent="space-between">
+        <Typography color="ds.text_gray_low">Staking</Typography>
+        <Typography color="ds.text_gray_medium">Undelegation</Typography>
+      </Stack>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography color="ds.text_gray_low">Unregister Staking key deposit</Typography>
+        <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
+      </Stack>
     </Stack>
   );
 };
 
 const UpdatePoolButton = styled(Button)(({ theme }) => ({
   minWidth: 'auto',
-  // width: 'unset',
   width: '140px',
   marginLeft: 'auto',
   background: theme.palette.ds.sys_magenta_500,

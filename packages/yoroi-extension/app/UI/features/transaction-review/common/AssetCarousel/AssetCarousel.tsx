@@ -15,7 +15,7 @@ const IconWrapper: any = styled(Box)(({ theme }: { theme: any }) => ({
 
 export const AssetCarousel = ({ data }) => {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
-  const { name }: any = useTheme();
+  const { name, palette }: any = useTheme();
 
   const defaultImage = name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
 
@@ -31,11 +31,14 @@ export const AssetCarousel = ({ data }) => {
             alignSelf: 'center',
             border: 'none',
             cursor: 'pointer',
-
             position: 'absolute',
             top: '16px',
             right: '16px',
+            borderRadius: '8px',
+            transition: 'background-color 0.3s ease',
           },
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>
               <Icon.RightArrow />
@@ -47,11 +50,14 @@ export const AssetCarousel = ({ data }) => {
             alignSelf: 'center',
             border: 'none',
             cursor: 'pointer',
-
             position: 'absolute',
             top: '16px',
             right: '50px',
+            transition: 'background-color 0.3s ease',
+            borderRadius: '8px',
           },
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>
               <Icon.LeftArrow />

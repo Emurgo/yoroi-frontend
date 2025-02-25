@@ -1,10 +1,12 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
+import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
   const { openTxReviewModal, walletType, isHardwareWallet, stopLoadingTxReview, startLoadingTxReview } = useTxReviewModal();
+  const navigateTo = useNavigateTo();
 
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
   const wallet = stores.wallets.selected;
@@ -40,6 +42,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
             duplicated: false,
           },
         ],
+        kind: 'withdraw',
       },
       unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
     });
@@ -77,6 +80,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       // });
     } catch (error) {
       stopLoadingTxReview();
+      navigateTo.transactionFail();
     }
   };
 

@@ -1,5 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { Balance } from '@yoroi/types';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 import { asQuantity, Quantities } from '../../../utils/quantities';
 import { CertificateType, FormattedTx } from './types';
@@ -18,7 +19,8 @@ export const useOperations = (
   certificates: FormattedTx['certificates'],
   isStakeRegistered: boolean,
   stakeKeyDeposit: any,
-  primaryTokenInfo: any
+  primaryTokenInfo: any,
+  operations: string
 ) => {
   const operationCount: any = {};
   if (certificates === null)
@@ -28,6 +30,13 @@ export const useOperations = (
     };
   const certificatesTypes = certificates.map((cert: { type: CertificateType }) => cert.type);
   certificatesTypes.forEach((cert: CertificateType) => updateOperationsCount(cert, operationCount));
+
+  if (operations?.kind === 'delegate') {
+    return {
+      components: [],
+      totalFee: isStakeRegistered ? 0 : asQuantity(stakeKeyDeposit),
+    };
+  }
 
   return certificates.reduce(
     (
@@ -39,10 +48,12 @@ export const useOperations = (
       const isFistElement = fistElementIndex === index;
       const isNotFirstElementDuplicated = operationCount[certificate.type] > 1 && !isFistElement;
       //
-      switch (certificate.type) {
+      switch (certificate.type || operations?.kind) {
         case CertificateType.VoteDelegation: {
           const drep = certificate.value.drep;
-          const keyDepositFee = isStakeRegistered ? null : `${asQuantity(stakeKeyDeposit)} ${primaryTokenInfo.name}`;
+          const keyDepositFee = isStakeRegistered
+            ? null
+            : `${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${primaryTokenInfo.name}`;
 
           if (drep === 'AlwaysAbstain')
             return {
@@ -54,7 +65,7 @@ export const useOperations = (
                   type: CertificateType.VoteDelegation,
                 },
               ],
-              totalFee: acc.totalFee,
+              totalFee: isStakeRegistered ? 0 : asQuantity(stakeKeyDeposit),
             };
           if (drep === 'AlwaysNoConfidence')
             return {
@@ -66,7 +77,7 @@ export const useOperations = (
                   type: CertificateType.VoteDelegation,
                 },
               ],
-              totalFee: acc.totalFee,
+              totalFee: isStakeRegistered ? 0 : asQuantity(stakeKeyDeposit),
             };
 
           const hash = ('KeyHash' in drep ? drep.KeyHash : drep.ScriptHash) ?? '';
@@ -79,65 +90,7 @@ export const useOperations = (
                 type: CertificateType.VoteDelegation,
               },
             ],
-            totalFee: acc.totalFee,
-          };
-        }
-
-        case CertificateType.DRepRegistration: {
-          // const fee = asQuantity(wallet.protocolParams.keyDeposit);
-          return {
-            components: [
-              ...acc.components,
-              {
-                component: (
-                  <DrepRegistrationOperation
-                    // fee={fee}
-                    // key={index}
-                    // showWarning={isFirstElementDuplicated}
-                    // strike={isNotFirstElementDuplicated}
-                    label="DrepRegistrationOperation - in progress"
-                  />
-                ),
-                duplicated: isNotFirstElementDuplicated,
-                type: CertificateType.DRepRegistration,
-              },
-            ],
-            // totalFee: Quantities.sum([fee, acc.totalFee]),
-          };
-        }
-
-        case CertificateType.DRepDeregistration: {
-          return {
-            components: [
-              ...acc.components,
-              {
-                component: (
-                  <DrepDeregistrationOperation
-                    key={index}
-                    label="DrepDeregistrationOperation - in progress"
-                    // showWarning={isFirstElementDuplicated}
-                    // strike={isNotFirstElementDuplicated}
-                  />
-                ),
-                duplicated: isNotFirstElementDuplicated,
-                type: CertificateType.DRepDeregistration,
-              },
-            ],
-            totalFee: acc.totalFee,
-          };
-        }
-
-        case CertificateType.DRepUpdate: {
-          return {
-            components: [
-              ...acc.components,
-              {
-                component: <DrepUpdateOperation key={index} label="In Progress" />,
-                duplicated: isNotFirstElementDuplicated,
-                type: CertificateType.DRepUpdate,
-              },
-            ],
-            totalFee: acc.totalFee,
+            totalFee: isStakeRegistered ? 0 : asQuantity(stakeKeyDeposit),
           };
         }
 

@@ -5,15 +5,13 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import SeizaFetcher from './SeizaFetcher';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
-  const [selectedPoolId, setSelectedPoolId] = React.useState(null);
   const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, networkId, closeTxReviewModal } = useTxReviewModal();
-  const selectedPool = stores.delegation.getLocalPoolInfo(networkId, selectedPoolId);
-  console.log('selectedPool', { selectedPoolId, selectedPool });
 
   const onDelegate = async poolID => {
     const avatarSource = toSvg(poolID, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(poolID);
+    const selectedPool = await stores.delegation.getLocalPoolInfo(networkId, poolID);
     const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
@@ -28,6 +26,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
             duplicated: false,
           },
         ],
+        kind: 'delegate',
       },
       unsignedTx: parsedUnsignedTx,
     });
@@ -62,8 +61,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
         poolList={poolList}
         setFirstPool={setFirstPool}
         stakepoolSelectedAction={async poolId => {
-          setSelectedPoolId(poolId);
-          console.log('stakepoolSelectedAction', poolId);
           onDelegate(poolId);
         }}
       />
@@ -72,12 +69,18 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
 };
 
 const OperationsDetails = ({ avatarGenerated, poolName }) => {
+  const { isStakeRegistered, stakeKeyDeposit, primaryTokenInfo } = useTxReviewModal();
+  console.log('isStakeRegistered', isStakeRegistered);
   return (
     <Stack direction="column" spacing={2}>
-      <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
-        <Typography color="ds.text_gray_medium">2.000000 ADA</Typography>
-      </Stack>
+      {!isStakeRegistered && (
+        <Stack direction="row" justifyContent="space-between">
+          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_medium">
+            {stakeKeyDeposit} {primaryTokenInfo.name}
+          </Typography>
+        </Stack>
+      )}
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Stake entire wallet balance to</Typography>
         <Stack direction="row" spacing={1} alignItems="center">

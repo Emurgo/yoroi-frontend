@@ -1,8 +1,10 @@
 import { Divider, Stack, Typography } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
+import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 
 // TODO Define the type for an individual asset
 interface Asset {
@@ -34,10 +36,11 @@ interface OutputProps {
 }
 
 export const UTxOsTab: any = ({ tx }) => {
+  const { primaryTokenInfo } = useTxReviewModal();
   return (
     <Stack direction="column" sx={{ padding: '24px', direction: 'collumn' }}>
       <Inputs inputs={tx.inputs} />
-      <FeeDisplay fee={tx.fee.quantity} />
+      <FeeDisplay fee={tx.fee.quantity} primaryTokenInfo={primaryTokenInfo} />
       <Outputs outputs={tx.outputs} />
     </Stack>
   );
@@ -170,7 +173,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
   );
 };
 
-const FeeDisplay = ({ fee }) => {
+const FeeDisplay = ({ fee, primaryTokenInfo }) => {
   return (
     <Stack direction="column" my="24px">
       <Divider />
@@ -178,7 +181,9 @@ const FeeDisplay = ({ fee }) => {
         <Typography variant="body1" fontWeight="500">
           Fee
         </Typography>
-        <Typography variant="body1">{`-${fee}`}</Typography>
+        <Typography variant="body1">{`-${new BigNumber(fee).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
+          primaryTokenInfo.name
+        }`}</Typography>
       </Stack>
       <Divider />
     </Stack>

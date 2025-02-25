@@ -92,4 +92,7 @@ export const ROUTES = {
     DAPPS: '/portfolio/dapps',
     DETAILS: '/portfolio/details/:tokenId',
   },
+  TX_REVIEW: {
+    FAIL: '/tx-review/failed',
+  },
 };

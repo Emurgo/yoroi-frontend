@@ -38,7 +38,7 @@ export const SwapTxInfo = ({ defaultTokenInfo, getTokenInfo, priceImpactState, s
 
   return (
     <Box p="24px">
-      <Box display="flex" gap="16px" flexDirection="column">
+      <Box display="flex" gap="16px" flexDirection="column" mb="24px">
         <Box>
           <Box>
             <Typography component="div" variant="body1" color="ds.text_gray_low">

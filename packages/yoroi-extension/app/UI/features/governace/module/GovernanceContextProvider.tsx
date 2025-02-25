@@ -122,8 +122,12 @@ export const GovernanceContextProvider = ({
       networkId: networkId,
       wasmFactory: RustModule.CrossCsl.init,
     });
-
-    const governanceStatusState: any = await govApi.getAccountState(stakingKeyHex || '', stakingKeyHex || '');
+    console.log('getGovApiState stakingKeyHex', stakingKeyHex);
+    const governanceStatusState: any = await govApi.getAccountState(
+      stakingAddress.substring(2) || '',
+      stakingAddress.substring(2) || ''
+    );
+    console.log('@@@governanceStatusState', governanceStatusState);
     const { drep, drepKind } = governanceStatusState?.drepDelegation ?? {};
 
     if (drep === 'abstain') {

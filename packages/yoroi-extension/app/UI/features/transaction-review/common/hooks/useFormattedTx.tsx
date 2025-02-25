@@ -7,33 +7,24 @@ import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
-import { Quantities } from '../../../../utils/quantities';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  const {
-    walletUtxos,
-    walletAddresses,
-    primaryTokenInfo,
-    ftAssetsList,
-    networkId,
-    isStakeRegistered,
-    stakeKeyDeposit,
-  } = useTxReviewModal();
+  const { walletUtxos, walletAddresses, primaryTokenInfo, ftAssetsList, networkId } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
 
   const inputUtxos = useUtxos(inputs, walletUtxos);
 
-  const formattedFee = formatFee(primaryTokenInfo, data, isStakeRegistered, stakeKeyDeposit);
+  const formattedFee = formatFee(primaryTokenInfo, data);
 
   const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
   const formattedCertificates = formatCertificates(data?.certs);
 
   const formattedInputs = useFormattedInputs(inputUtxos, ftAssetsList, networkId, primaryTokenInfo, walletAddresses);
-  const formattedOutputs = useFormattedOutputs(outputs, networkId, primaryTokenInfo);
+  const formattedOutputs = useFormattedOutputs(outputs, networkId, primaryTokenInfo, walletAddresses);
 
   return {
     inputs: formattedInputs,
@@ -58,10 +49,14 @@ export const useFormattedInputs = (inputUtxos, ftAssetsList, networkId, primaryT
   return query.data;
 };
 
-export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo) => {
-  const query = useQuery<any>(['useFormattedOutputs', outputs], () => formatOutputs(outputs, networkId, primaryTokenInfo), {
-    suspense: true,
-  });
+export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo, walletAddresses) => {
+  const query = useQuery<any>(
+    ['useFormattedOutputs', outputs],
+    () => formatOutputs(outputs, networkId, primaryTokenInfo, walletAddresses),
+    {
+      suspense: true,
+    }
+  );
 
   if (!query.data) throw new Error('invalid formatted outputs');
   return query.data;
@@ -133,10 +128,10 @@ const sumAmountsByAddress = (outputs: Output[]) => {
   }, {});
 };
 
-const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenInfo: any): Promise<any> => {
+const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenInfo: any, walletAddresses: any): Promise<any> => {
   const summedOutputs = sumAmountsByAddress(outputs);
   return Promise.all(
-    Object.entries(summedOutputs).map(async ([address, totalCoin], index) => {
+    Object.entries(summedOutputs).map(async ([address, totalCoin]) => {
       const coin: any = totalCoin;
       const addressKind = await getAddressKind(address);
       const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
@@ -171,32 +166,17 @@ const formatOutputs = async (outputs: Output[], networkId: number, primaryTokenI
         address,
         addressKind,
         rewardAddress,
-        ownAddress: Object.keys(summedOutputs).length === 1 ? true : index === 1,
+        ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
       };
     })
   );
 };
 
-export const formatFee = (
-  primaryTokenInfo: any,
-  data: TransactionBody,
-  isStakeRegistered: boolean,
-  stakeKeyDeposit: any
-): any => {
-  let defaultFee: any = 0;
-  const hasCerts = (data?.certs ?? []).length > 0;
-  if (hasCerts) {
-    defaultFee = isStakeRegistered
-      ? asQuantity(data.fee).shiftedBy(-primaryTokenInfo.decimals)
-      : asQuantity(Quantities.sum([defaultFee, stakeKeyDeposit])).shiftedBy(-primaryTokenInfo.decimals);
-  } else {
-    defaultFee = asQuantity(data?.fee ?? '0').shiftedBy(-primaryTokenInfo.decimals);
-  }
-
+export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => {
   return {
     tokenInfo: primaryTokenInfo,
-    quantity: `${defaultFee} ${primaryTokenInfo.name}`,
-    rawQuantity: `${asQuantity(data?.fee ?? '0').shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`,
+    quantity: asQuantity(data?.fee ?? '0'),
+    rawQuantity: asQuantity(data?.fee ?? '0'),
   };
 };
 
@@ -248,7 +228,7 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
 };
 
 const isOwnedAddress = (walletAddresses: any[], bech32Address: string): boolean => {
-  return walletAddresses.some(a => a.address === bech32Address);
+  return walletAddresses.some(a => a === bech32Address);
 };
 
 const formatCertificates = (certificates: TransactionBody['certs']) => {

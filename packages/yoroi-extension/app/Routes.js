@@ -60,7 +60,9 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
+
 // $FlowIgnore: suppressing this error
+import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -260,6 +262,11 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
           <Route path={ROUTES.PORTFOLIO.ROOT} component={() => PortfolioSubpages(stores)} />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
 
           <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>

@@ -61,7 +61,7 @@ export const ReviewTxProvider = ({
 
   useEffect(() => {
     protocolParameters();
-  }, []);
+  }, [stakeKeyDeposit]);
 
   const protocolParameters = async () => {
     const protocolParameters = await getProtocolParameters({ networkId: currentWalletInfo?.networkId });
@@ -116,6 +116,7 @@ export const ReviewTxProvider = ({
     startLoadingTxReview: () => dispatch({ type: 'startLoading', isLoading: true }),
     stopLoadingTxReview: () => dispatch({ type: 'stopLoading', isLoading: false }),
   }).current;
+
   const context: any = React.useMemo(
     () => ({
       ...state,
@@ -136,7 +137,7 @@ export const ReviewTxProvider = ({
       stakeKeyDeposit,
       ...actions,
     }),
-    [state, actions]
+    [state, actions, stakeKeyDeposit]
   );
 
   return (

@@ -1,32 +1,14 @@
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { maybe } from '../../coreUtils';
-import { allAddressSubgroups, applyAddressFilter } from '../../stores/stateless/addressStores';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
 import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
-
-// TODO To be added and constructed from wallet apo
-const primaryTokenFullInfo = {
-  application: 'coin',
-  decimals: 6,
-  description: 'Cardano',
-  fingerprint: '',
-  id: '.',
-  name: 'ADA',
-  nature: 'primary',
-  originalImage: '',
-  reference: '',
-  status: 'valid',
-  symbol: '₳',
-  tag: '',
-  ticker: 'ADA',
-  type: 'ft',
-  website: 'https://www.cardano.org/',
-};
+import { networkConfigs } from './network-config';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -187,6 +169,12 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       throw new Error(`no selected Wallet. Should never happen`);
     }
 
+    const allWalletAddresses = selectedWallet?.allAddresses?.utxoAddresses?.map(a => {
+      if (a.address?.Hash) {
+        return RustModule.WalletV4.Address.from_hex(a.address?.Hash).to_bech32();
+      }
+    });
+
     const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
@@ -217,12 +205,8 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const selectedExplorer = explorers.selectedExplorer.get(networkId);
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
-    const addressTypeStore = getTypeStore(stores);
 
-    const walletAddresses = applyAddressFilter({
-      addressFilter: stores.addresses.addressFilter,
-      addresses: addressTypeStore?.request.all,
-    });
+    const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -237,14 +221,14 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       backendService: BackendService,
       backendServiceZero: BackendServiceZero,
       isHardwareWallet: isHardware,
-      primaryTokenInfo: { ...primaryTokenFullInfo, quantity: shiftedAmount },
+      primaryTokenInfo: { ...primaryTokenInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
       ftAssetList: ftAssetList,
       nftAssetList: nftAssetList,
-      walletAddresses,
+      walletAddresses: allWalletAddresses,
       explorer: { tokenInfo: explorerTransactionInfo },
       selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
@@ -292,19 +276,4 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   }
 
   return null;
-};
-
-const getTypeStore = (stores): any => {
-  for (const addressStore of allAddressSubgroups) {
-    if (!addressStore.isRelated()) {
-      continue;
-    }
-
-    const request = stores.addresses.addressSubgroupMap.get(addressStore.class);
-    if (request == null) throw new Error('Should never happen');
-    return {
-      request,
-      meta: addressStore,
-    };
-  }
 };

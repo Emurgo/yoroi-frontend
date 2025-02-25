@@ -52,7 +52,6 @@ export const GovernanceStatusSelection = () => {
     changePasswordInputValue,
     drepCredentialHex,
     setUnsignedTx,
-    networkId,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
