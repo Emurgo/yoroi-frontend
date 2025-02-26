@@ -99,7 +99,7 @@ export async function migrateToLatest(
     ['<3.8.0', () => cardanoTxHistoryReset(persistentDb)],
     ['<4.18', () => populateNewUtxodata(persistentDb)],
     ['<5.4', () => unsetLegacyThemeFlags(localStorageApi)],
-    ['<5.5', () => migrateWalletOrderAndSelectedWalletForNetworkSwitch(persistentDb, localStorageApi)],
+    ['<5.6', () => migrateWalletOrderAndSelectedWalletForNetworkSwitch(persistentDb, localStorageApi)],
   ];
 
   let appliedMigration = false;
