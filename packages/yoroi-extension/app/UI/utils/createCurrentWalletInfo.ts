@@ -177,6 +177,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
     const currentWalletId = selectedWallet.publicDeriverId;
+    console.log('selectedWallet', selectedWallet);
     const networkId = selectedWallet.networkId;
 
     // Backend services

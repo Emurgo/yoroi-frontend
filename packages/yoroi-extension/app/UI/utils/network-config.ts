@@ -82,6 +82,17 @@ export const networkConfigs = {
 
     legacyApiBaseUrl: 'https://preprod-backend.yoroiwallet.com/api',
   },
+  250: {
+    network: Chain.Network.Preprod,
+    primaryTokenInfo: primaryTokenInfoAnyTestnet,
+    chainId: 0,
+    protocolMagic: 1,
+    eras: [shelleyPreprodEraConfig],
+    name: 'Preprod',
+    isMainnet: false,
+
+    legacyApiBaseUrl: 'https://preprod-backend.yoroiwallet.com/api',
+  },
   2: {
     network: Chain.Network.Preview,
     primaryTokenInfo: primaryTokenInfoAnyTestnet,
@@ -90,7 +101,6 @@ export const networkConfigs = {
     eras: [shelleyEraConfig],
     name: 'Preview',
     isMainnet: false,
-
     legacyApiBaseUrl: 'https://preview-backend.emurgornd.com/api',
   },
 };
