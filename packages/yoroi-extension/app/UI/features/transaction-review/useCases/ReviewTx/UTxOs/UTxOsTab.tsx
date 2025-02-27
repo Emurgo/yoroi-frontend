@@ -1,4 +1,5 @@
 import { Divider, Stack, Typography } from '@mui/material';
+import { Portfolio } from '@yoroi/types';
 import BigNumber from 'bignumber.js';
 import React from 'react';
 import { Collapsible, CopyButton, Icon } from '../../../../../components';
@@ -92,10 +93,16 @@ const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
 
 const Input: React.FC<InputProps> = ({ input }: any) => {
   const strings = useStrings();
+
   const renderAssets = () => {
     if (!input.assets.length) return null;
     return input.assets.map(asset => (
-      <TokenItem key={asset.tokenInfo.id} tokenInfo={asset.tokenInfo} quantity={asset.quantity} />
+      <TokenItem
+        key={asset.tokenInfo.id}
+        tokenInfo={asset.tokenInfo}
+        quantity={asset.quantity}
+        isPrimary={asset.tokenInfo.nature === Portfolio.Token.Nature.Primary}
+      />
     ));
   };
 
@@ -128,7 +135,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
       </Stack>
 
       {input.assets.length > 0 && (
-        <Stack direction="row" gap="8px" justifyContent="flex-end">
+        <Stack direction="row" gap="8px" justifyContent="flex-end" flexWrap="wrap">
           {renderAssets()}
         </Stack>
       )}
@@ -139,12 +146,17 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
 const Output: React.FC<OutputProps> = ({ output }: any) => {
   const strings = useStrings();
   const isOwnAdddress = output.ownAddress;
-
   const renderAssets = () => {
     if (!output.assets.length) return null;
 
     return output.assets.map(asset => (
-      <TokenItem key={asset.tokenInfo.id} tokenInfo={asset.tokenInfo} quantity={asset.quantity} isSent={false} />
+      <TokenItem
+        key={asset.tokenInfo.id}
+        tokenInfo={asset?.tokenInfo}
+        quantity={asset.quantity}
+        isSent={false}
+        isPrimary={asset.tokenInfo.nature === Portfolio.Token.Nature.Primary}
+      />
     ));
   };
 
@@ -165,7 +177,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
       </Stack>
 
       {output.assets.length > 0 && (
-        <Stack direction="row" gap="8px" justifyContent="flex-end">
+        <Stack direction="row" gap="8px" justifyContent="flex-end" flexWrap="wrap">
           {renderAssets()}
         </Stack>
       )}

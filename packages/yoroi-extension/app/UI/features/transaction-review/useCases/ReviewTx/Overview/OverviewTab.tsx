@@ -223,12 +223,12 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
           </Box>
           {notPrimaryTokenSent.length > 0 &&
             notPrimaryTokenSent.map(item => {
-              const decimals = item.tokenInfo[0].info.numberOfDecimals;
+              const decimals = item.tokenInfo.info.numberOfDecimals;
 
               return (
                 <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_100', borderRadius: '8px', flexWrap: 'nowrap' }}>
                   <Typography color="ds.white_static">
-                    {new BigNumber(item.quantity).shiftedBy(-decimals).toString()} {item.tokenInfo[0].info.name}
+                    {new BigNumber(item.quantity).shiftedBy(-decimals).toString()} {item.tokenInfo.info.name}
                   </Typography>
                 </Box>
               );

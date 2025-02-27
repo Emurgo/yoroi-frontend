@@ -94,19 +94,7 @@ const formatInputs = async (
           quantity: a.quantity,
         };
       });
-      // const multiAssets =
-      //   utxo?.assets
-      //     .map((a: any) => {
-      //       const tokenInfo = allAssetList.get(a?.assetId);
-      //       if (!tokenInfo) return null;
-      //       const quantity = asQuantity(a.amount);
 
-      //       return {
-      //         tokenInfo,
-      //         quantity: quantity,
-      //       };
-      //     })
-      //     .filter(Boolean) ?? [];
       return {
         assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
         address,
@@ -159,13 +147,12 @@ const formatOutputs = async (
               const quantity: any = asQuantity(String(amount));
 
               return {
-                tokenInfo,
+                tokenInfo: tokenInfo[0],
                 quantity,
               };
             });
           })
         : [];
-
       const assets = [...primaryAssets, ...multiAssets];
 
       return {
