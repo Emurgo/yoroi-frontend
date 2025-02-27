@@ -792,6 +792,7 @@ async function __connectorSignCardanoTx(
   return signedTx.witness_set().to_hex();
 }
 
+// <TODO:PENDING_REMOVAL> only used for experimental
 export async function connectorCreateCardanoTx(
   publicDeriver: PublicDeriver<>,
   password: ?string,
@@ -865,14 +866,14 @@ export async function connectorCreateCardanoTx(
 
 export async function connectorSendTxCardano(
   wallet: IPublicDeriver</* ConceptualWallet */>,
-  signedTx: Buffer,
+  signedTxHex: string,
   localStorage: LocalStorageApi,
 ): Promise<void> {
   await sendTx({
     body: {
       network: wallet.getParent().getNetworkInfo(),
-      id: transactionHexToHash(bytesToHex(signedTx)),
-      encodedTx: signedTx,
+      id: transactionHexToHash(signedTxHex),
+      encodedTx: hexToBytes(signedTxHex),
     },
     lastLaunchVersion: await localStorage.getLastLaunchVersion() ?? '',
     currentLocale: await localStorage.getUserLocale() ?? '',
@@ -888,7 +889,7 @@ export async function connectorSendTxCardano(
 
 export async function connectorRecordSubmittedCardanoTransaction(
   publicDeriver: PublicDeriver<>,
-  tx: RustModule.WalletV4.Transaction,
+  sourceTxHex: string,
   addressedUtxos?: ?Array<CardanoAddressedUtxo>,
 ) {
   const withUtxos = asGetAllUtxos(publicDeriver);
@@ -916,7 +917,8 @@ export async function connectorRecordSubmittedCardanoTransaction(
     submittedTxs,
   );
 
-  const txId = transactionHexToHash(tx.to_hex());
+  const txId = transactionHexToHash(sourceTxHex);
+  const tx = RustModule.WalletV4.Transaction.from_hex(sourceTxHex);
   const defaultToken = publicDeriver.getParent().defaultToken;
   const defaults = {
     defaultNetworkId: defaultToken.NetworkId,
@@ -924,10 +926,13 @@ export async function connectorRecordSubmittedCardanoTransaction(
   };
 
   const amount = new MultiToken([], defaults);
-  const fee = new MultiToken([], defaults);
   const addresses = { from: [], to: [] };
   let isIntraWallet = true;
   const txBody = tx.body();
+
+  const mt = new MultiToken([], defaults);
+  const fee = mt.add(mt.createDefaultEntry(new BigNumber(txBody.fee().to_str())));
+
   const usedUtxos = [];
   for (const input of iterateLenGet(txBody.inputs())) {
     const txHash = input.transaction_id().to_hex();
@@ -960,7 +965,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     if (allAddresses.has(utxo.receiver)) {
       amount.joinSubtractMutable(value);
     }
-    fee.joinAddMutable(value);
   }
   for (const output of iterateLenGet(txBody.outputs())) {
     const value = multiTokenFromCardanoValue(output.amount(), defaults);
@@ -975,7 +979,6 @@ export async function connectorRecordSubmittedCardanoTransaction(
     } else {
       isIntraWallet = false;
     }
-    fee.joinSubtractMutable(value);
   }
 
   const withdrawalsData = iterateLenGetMap(txBody.withdrawals())

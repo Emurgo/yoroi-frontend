@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, fiveSeconds, quarterSecond } from '../helpers/timeConstants.js';
+import { halfMinute, fiveSeconds, quarterSecond } from '../helpers/timeConstants.js';
 import WalletCommonBase from './walletCommonBase.page.js';
 
 class AddNewWallet extends WalletCommonBase {
@@ -45,22 +45,24 @@ class AddNewWallet extends WalletCommonBase {
   // functions
   async isDisplayed() {
     this.logger.info(`AddNewWallet::selectCreateNewWallet is called`);
-    const createBtnDisplayed = await this.customWaitIsPresented(
+    const createBtnDisplayed = this.customWaitIsPresented(
       this.createWalletButtonLocator,
-      defaultWaitTimeout,
+      halfMinute,
       quarterSecond
     );
-    const restoreBtnDisplayed = await this.customWaitIsPresented(
+    const restoreBtnDisplayed = this.customWaitIsPresented(
       this.restoreWalletButtonLocator,
-      defaultWaitTimeout,
+      halfMinute,
       quarterSecond
     );
-    const connectHWBtnDisplayed = await this.customWaitIsPresented(
+    const connectHWBtnDisplayed = this.customWaitIsPresented(
       this.connectHwButtonLocator,
-      defaultWaitTimeout,
+      halfMinute,
       quarterSecond
     );
-    return createBtnDisplayed && restoreBtnDisplayed && connectHWBtnDisplayed;
+    return (
+      (await createBtnDisplayed) && (await restoreBtnDisplayed) && (await connectHWBtnDisplayed)
+    );
   }
   async selectCreateNewWallet() {
     this.logger.info(`AddNewWallet::selectCreateNewWallet is called`);

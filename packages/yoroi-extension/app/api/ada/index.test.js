@@ -498,7 +498,7 @@ describe('app/api/ada/index', () => {
         {
           identifier: '',
           networkId: 300,
-          amount: new BigNumber('8812367')
+          amount: new BigNumber('8820947')
         },
         {
           amount: new BigNumber('45000000'),
@@ -508,7 +508,7 @@ describe('app/api/ada/index', () => {
       ]
     );
 
-    expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('187633');
+    expect(response.unsignedTx.get_fee_if_set()?.to_str()).toEqual('179053');
 
     function cmpOutputs(o1: any, o2: any): number {
       if (o1.address > o2.address) {
@@ -530,7 +530,7 @@ describe('app/api/ada/index', () => {
         collateral_return: null,
         current_treasury_value: null,
         donation: null,
-        fee: '187633',
+        fee: '179053',
         inputs: [
           {
             index: 1,
@@ -552,65 +552,38 @@ describe('app/api/ada/index', () => {
           {
             address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
             amount: {
-              coin: '1000000',
-              multiasset: null
-            },
-            plutus_data: null,
-            script_ref: null
-          },
-          {
-            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
-            amount: {
-              coin: '1000000',
-              multiasset: null
-            },
-            plutus_data: null,
-            script_ref: null
-          },
-          {
-            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
-            amount: {
-              coin: '1000000',
-              multiasset: null
-            },
-            plutus_data: null,
-            script_ref: null
-          },
-          {
-            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
-            amount: {
-              coin: '1000000',
-              multiasset: null
-            },
-            plutus_data: null,
-            script_ref: null
-          },
-          {
-            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
-            amount: {
-              coin: '1000000',
-              multiasset: null
-            },
-            plutus_data: null,
-            script_ref: null
-          },
-          {
-            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
-            amount: {
               coin: '1155080',
               multiasset: {
                 'c85f714f2187021c7bab53741f659d0c5b1a6e7529d32b7794ff051c': {
                   '474f4c44': '45000000',
                 },
-              },
+              }
             },
             plutus_data: null,
-            script_ref: null,
+            script_ref: null
           },
           {
             address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
             amount: {
-              coin: '2657287',
+              coin: '2000000',
+              multiasset: null,
+            },
+            plutus_data: null,
+            script_ref: null
+          },
+          {
+            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+            amount: {
+              coin: '2000000',
+              multiasset: null,
+            },
+            plutus_data: null,
+            script_ref: null
+          },
+          {
+            address: 'addr_test1qp00295qtc07m8f65trccaveaycum8zaj9xrwt4jw2qqdn7r3y3kdut55a40jff00qmg74686vz44v6k363md06qkq0qn97ahn',
+            amount: {
+              coin: '3665867',
               multiasset: null
             },
             plutus_data: null,

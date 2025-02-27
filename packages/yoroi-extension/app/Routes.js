@@ -13,7 +13,6 @@ import { ROUTES } from './routes-config';
 import type { StoresMap, StoresProps } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { useObserver } from 'mobx-react-lite';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
@@ -466,29 +465,26 @@ export function wrapGovernance(governanceProps: StoresProps, children: Node): No
 
 export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node {
   const { stores } = portfolioProps;
+  const { shouldHideBalance, unitOfAccount } = stores.profile;
 
-  return useObserver(() => {
-    const { shouldHideBalance, unitOfAccount } = stores.profile;
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
 
-    const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const openDialogWrapper = dialog => {
+    stores.uiDialogs.open({ dialog });
+  };
 
-    const openDialogWrapper = dialog => {
-      stores.uiDialogs.open({ dialog });
-    };
-
-    return (
-      <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
-        <PortfolioContextProvider
-          settingFiatPairUnit={unitOfAccount}
-          currentWallet={currentWalletInfo}
-          openDialogWrapper={openDialogWrapper}
-          shouldHideBalance={shouldHideBalance}
-        >
-          <Suspense fallback={null}>{children}</Suspense>
-        </PortfolioContextProvider>
-      </CurrencyProvider>
-    );
-  });
+  return (
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <PortfolioContextProvider
+        settingFiatPairUnit={unitOfAccount}
+        currentWallet={currentWalletInfo}
+        openDialogWrapper={openDialogWrapper}
+        shouldHideBalance={shouldHideBalance}
+      >
+        <Suspense fallback={null}>{children}</Suspense>
+      </PortfolioContextProvider>
+    </CurrencyProvider>
+  );
 }
 
 export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {

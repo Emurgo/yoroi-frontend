@@ -47,7 +47,7 @@ const getStakePoolMeta = (stores: any) => {
   };
 };
 
-const getTotalAmount = (walletAmount, rewards) => {
+export const getTotalAmount = (walletAmount, rewards) => {
   return maybe(walletAmount, w => rewards.joinAddCopy(w));
 };
 
