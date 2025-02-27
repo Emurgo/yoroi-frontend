@@ -10,7 +10,7 @@ type Props = {
 const CopyableText: React.FC<Props> = ({ children, value }) => {
   return (
     <Stack direction="row" justifyContent="space-between">
-      <Box>{children}</Box>
+      <Box mr="4px">{children}</Box>
       <CopyButton textToCopy={value} />
     </Stack>
   );

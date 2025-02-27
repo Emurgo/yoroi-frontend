@@ -8,7 +8,7 @@ interface TokenItemProps {
   quantity: any;
 }
 
-export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, tokenInfo, quantity }: any) => {
+export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary = true, tokenInfo, quantity }: any) => {
   const backgroundColor = isSent ? 'ds.primary_500' : 'ds.secondary_300';
   const { primaryTokenInfo } = useTxReviewModal();
 

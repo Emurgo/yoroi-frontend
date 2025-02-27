@@ -66,7 +66,7 @@ const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*:
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
 
-const getFTAssetWalletAssetList = (stores: any) => {
+const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
   const spendableBalance = stores.transactions.balance;
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   if (spendableBalance == null) return [];
@@ -75,7 +75,13 @@ const getFTAssetWalletAssetList = (stores: any) => {
       entry,
       info: getTokenInfo(entry),
     }))
-    .filter((item: any) => item.info.IsNFT === false)
+    .filter((item: any) => {
+      if (noFilter) {
+        return item;
+      }
+      return item.info.IsNFT === false;
+    })
+
     .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
@@ -197,7 +203,9 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const isHardware: boolean = selectedWallet.isHardware;
 
     // FT Asset List
-    const ftAssetList = getFTAssetWalletAssetList(stores);
+    const ftAssetList = getFTAssetWalletAssetList(stores, false);
+    // All Assets LIst
+    const allAssetList = getFTAssetWalletAssetList(stores, true);
     // NFT Asset List
     const nftAssetList = getNFTAssetWalletAssetList(stores);
 
@@ -228,6 +236,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       },
       ftAssetList: ftAssetList,
       nftAssetList: nftAssetList,
+      allAssetList,
       walletAddresses: allWalletAddresses,
       explorer: { tokenInfo: explorerTransactionInfo },
       selectedExplorer: selectedExplorer,

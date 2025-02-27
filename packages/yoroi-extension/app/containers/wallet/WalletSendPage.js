@@ -31,6 +31,8 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import type { StoresProps } from '../../stores';
+import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -153,7 +155,8 @@ export default class WalletSendPage extends Component<StoresProps> {
       ? addressStore.resolveDomainAddress.bind(addressStore)
       : null;
     return (
-      <>
+      <ReviewTxProvider stores={stores} intl={this.context.intl}>
+        <ReviewTxModal />
         <WalletSendFormRevamp
           stores={this.props.stores}
           resolveDomainAddress={resolveDomainAddressFunc}
@@ -216,7 +219,7 @@ export default class WalletSendPage extends Component<StoresProps> {
           trezorSend={stores.substores.ada.trezorSend}
         />
         {this.renderDialog()}
-      </>
+      </ReviewTxProvider>
     );
   }
 

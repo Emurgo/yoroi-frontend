@@ -122,6 +122,7 @@ export const ReviewTxProvider = ({
       ...state,
       ftAssetsList: currentWalletInfo?.ftAssetList,
       nftAssetList: currentWalletInfo?.nftAssetList,
+      allAssetList: currentWalletInfo?.allAssetList,
       currentWalletDetails: stores.wallets,
       walletUtxos: currentWalletInfo?.selectedWallet.utxos,
       networkId: currentWalletInfo?.networkId,

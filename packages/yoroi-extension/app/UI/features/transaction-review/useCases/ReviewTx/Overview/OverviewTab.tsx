@@ -5,7 +5,7 @@ import { Box, Divider, Stack, styled } from '@mui/material';
 import { Portfolio } from '@yoroi/types';
 import BigNumber from 'bignumber.js';
 import WalletAccountIcon from '../../../../../../components/topbar/WalletAccountIcon';
-import { truncateAddress, truncateLongName } from '../../../../../../utils/formatters';
+import { truncateAddress, truncateAddressShort, truncateLongName } from '../../../../../../utils/formatters';
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { Quantities } from '../../../../../utils/quantities';
@@ -42,8 +42,6 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
 
   const operationsCerts = useOperations(tx.certificates, isStakeRegistered, stakeKeyDeposit, primaryTokenInfo, operations);
-
-  console.log('operationsCerts', { operationsCerts, operations });
 
   const warningComp = useWarningSection(operations);
 
@@ -92,11 +90,13 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 
       <MyWalletSection tx={tx} stakingAddress={stakingAddress} notOwnedOutputs={notOwnedOutputs} operationFee={operationsCerts} />
 
-      {receiverCustomTitle !== null && <ExternalPartySection receiverCustomTitle={receiverCustomTitle} />}
+      {notOwnedOutputs?.length === 1 && (
+        <ExternalPartySection receiverCustomTitle={receiverCustomTitle} output={notOwnedOutputs[0]} />
+      )}
 
       {extraOverviewDetails && <WalletExtraDetails extraDetails={extraOverviewDetails} />}
 
-      {(operationsCerts?.components.length > 0 || operations?.components.length > 0) && (
+      {(operationsCerts?.components.length > 0 || operations?.components?.length > 0) && (
         <OperationsSection operations={operationsCerts?.components.length > 0 ? operationsCerts : operations} />
       )}
     </Stack>
@@ -135,13 +135,17 @@ const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) 
   );
 };
 
-const ExternalPartySection = ({ receiverCustomTitle }) => {
+const ExternalPartySection = ({ receiverCustomTitle, output }) => {
+  const address = output?.rewardAddress ?? output?.address ?? '-';
+
   return (
     <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
       <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
         To:
       </Typography>
-      {receiverCustomTitle}
+      <Typography variant="body1" color="ds.text_gray_medium">
+        {receiverCustomTitle ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
+      </Typography>
     </Stack>
   );
 };
@@ -181,31 +185,56 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
         .reduce((previous, current) => Quantities.sum([previous, current.quantity]), Quantities.zero),
     [notOwnedOutputs]
   );
-  console.log('operationFeeoperationFeeoperationFeeoperationFee', operationFee);
+
   const totalPrimaryTokenSpent = React.useMemo(
     () => Quantities.sum([totalPrimaryTokenSent, tx.fee.quantity, operationFee.totalFee]),
     [totalPrimaryTokenSent, tx.fee.quantity, operationFee]
+  );
+
+  const notPrimaryTokenSent = React.useMemo(
+    () =>
+      notOwnedOutputs.flatMap(output => output.assets.filter(asset => asset.tokenInfo.nature !== Portfolio.Token.Nature.Primary)),
+    [notOwnedOutputs]
   );
 
   const formatedFee = new BigNumber(totalPrimaryTokenSpent).shiftedBy(-primaryTokenInfo.decimals).toString();
 
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
-      <Stack direction="row" alignItems="center" justifyContent="space-between" width="100%">
-        <Stack direction="row" alignItems="center" gap="4px">
+      <Stack
+        direction="row"
+        justifyContent={notPrimaryTokenSent.length === 0 ? 'space-between' : 'space-between'}
+        width="100%"
+        alignItems="flex-start"
+      >
+        <Stack direction="row" gap="4px" alignItems="flex-start">
           <IconWrapper>
             <Icon.Send />
           </IconWrapper>
           <Typography fontWeight="500">Send</Typography>
         </Stack>
-        <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px' }}>
-          <Typography color="ds.white_static">
-            {formatedFee} {primaryTokenInfo.name}
-          </Typography>
-        </Box>
-      </Stack>
+        <Stack direction="row" gap="8px" justifyContent="flex-end" flexWrap="wrap">
+          <Box
+            sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px', flexWrap: 'nowrap', ml: '40px' }}
+          >
+            <Typography color="ds.white_static">
+              {formatedFee} {primaryTokenInfo.name}
+            </Typography>
+          </Box>
+          {notPrimaryTokenSent.length > 0 &&
+            notPrimaryTokenSent.map(item => {
+              const decimals = item.tokenInfo[0].info.numberOfDecimals;
 
-      {/* {notPrimaryTokenSent.length > 0 && notPrimaryTokenSent.map(item => <TokenItem label={item} isPrimaryToken={false} />)} */}
+              return (
+                <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_100', borderRadius: '8px', flexWrap: 'nowrap' }}>
+                  <Typography color="ds.white_static">
+                    {new BigNumber(item.quantity).shiftedBy(-decimals).toString()} {item.tokenInfo[0].info.name}
+                  </Typography>
+                </Box>
+              );
+            })}
+        </Stack>
+      </Stack>
     </Stack>
   );
 };
