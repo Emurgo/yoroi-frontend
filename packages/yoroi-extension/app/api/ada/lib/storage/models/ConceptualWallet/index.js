@@ -170,7 +170,7 @@ function isHwKind(
 }
 export const isAnyTrezorWallet = (
   conceptualWallet: IConceptualWallet,
-): boolean => isTrezorTWallet(conceptualWallet) || isTrezorSafe3Wallet(conceptualWallet);
+): boolean => isTrezorTWallet(conceptualWallet) || isTrezorSafe3Wallet(conceptualWallet) || isTrezorSafe5Wallet(conceptualWallet);
 
 export function isTrezorTWallet(
   conceptualWallet: IConceptualWallet,
@@ -190,6 +190,16 @@ export function isTrezorSafe3Wallet(
   return isHwKind(
     conceptualWallet,
     (hwWalletMeta) => hwWalletMeta.Vendor === ts3Vendor && hwWalletMeta.Model === ts3Model
+  );
+}
+export function isTrezorSafe5Wallet(
+  conceptualWallet: IConceptualWallet,
+): boolean {
+  const ts5Vendor = Config.wallets.hardwareWallet.trezorSafe5.VENDOR;
+  const ts5Model = Config.wallets.hardwareWallet.trezorSafe5.MODEL;
+  return isHwKind(
+    conceptualWallet,
+    (hwWalletMeta) => hwWalletMeta.Vendor === ts5Vendor && hwWalletMeta.Model === ts5Model
   );
 }
 export function isLedgerNanoWallet(
