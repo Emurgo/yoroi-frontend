@@ -11,12 +11,12 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
-  const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, nftAssetList, networkId } = useTxReviewModal();
+  const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, networkId } = useTxReviewModal();
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
 
-  const inputUtxos = useUtxos(inputs, walletUtxos, allAssetList);
+  const inputUtxos = useUtxos(inputs, walletUtxos);
 
   const formattedFee = formatFee(primaryTokenInfo, data);
 
@@ -31,7 +31,6 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
     outputs: formattedOutputs,
     fee: formattedFee,
     certificates: formattedCertificates,
-    // mint: formattedMintData,
     referenceInputs: referenceInputUtxos,
   };
 };
@@ -193,19 +192,19 @@ const getAddressKind = async (addressBech32: string): Promise<any> => {
   }
 };
 
-export const useUtxos = (inputs: TransactionInputs, walletUtxos: any, allAssetList: any) => {
-  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos, allAssetList), {
+export const useUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
+  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos), {
     suspense: true,
   });
   if (!query.data) throw new Error('invalid formatted inputs');
   return query.data;
 };
 
-const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any, allAssetList: any) => {
-  return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index, allAssetList))) ?? [];
+const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any) => {
+  return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index))) ?? [];
 };
 
-const getUtxo = async (utxos: any, txHash: string, txIndex: number, allAssetList) => {
+const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
   const internalUtxo = utxos.find(
     u => u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex
   );

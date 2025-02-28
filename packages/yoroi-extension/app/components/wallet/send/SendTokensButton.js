@@ -3,20 +3,21 @@ import React from 'react';
 import { useNavigateTo } from '../../../UI/features/transaction-review/common/hooks/useNavigateTo';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
-export const SendTokensButton = ({ disabled, onNext, label, stores }) => {
+export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
     stopLoadingTxReview,
     networkId,
     closeTxReviewModal,
-    stakeKeyDeposit,
-    primaryTokenInfo,
+    onTxSuccess,
+    onTxFailure,
   } = useTxReviewModal();
 
   const navigateTo = useNavigateTo();
 
   const handleSubmit = async () => {
+    onTxSuccess();
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
     const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
     const parsedUnsignedTx = JSON.parse(txBodyjson);
@@ -24,7 +25,7 @@ export const SendTokensButton = ({ disabled, onNext, label, stores }) => {
     openTxReviewModal({
       title: 'Transaction review',
       modalView: 'transactionReview',
-      submitTx: passswordInput => submitTx(passswordInput),
+      submitTx: passswordInput => submitTx(passswordInput, signTxRequest),
       operations: {
         kind: 'send',
       },
@@ -32,25 +33,26 @@ export const SendTokensButton = ({ disabled, onNext, label, stores }) => {
     });
   };
 
-  const submitTx = async passswordInput => {
+  const submitTx = async (passswordInput, signTxRequest) => {
     const selectedWallet = stores.wallets.selected;
+
     try {
       startLoadingTxReview();
-      // await stores.substores.ada.delegationTransaction.signTransaction({
-      //   password: passswordInput,
-      //   wallet: selectedWallet,
-      //   dialog: null,
-      // });
-      // ampli.stakingCenterDelegationSubmitted({
-      //   ada_amount: delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
-      //   staking_pool: selectedPoolId,
-      // });
+      await stores.substores.ada.mnemonicSend.sendMoney({
+        signRequest: signTxRequest,
+        password: passswordInput,
+        wallet: selectedWallet,
+        onSuccess: () => {
+          onSuccess();
+          navigateTo.transactionSuccess();
+        },
+      });
     } catch (error) {
       console.warn('Delegation error', error);
       navigateTo.transactionFail();
     } finally {
-      // stopLoadingTxReview();
-      // closeTxReviewModal();
+      stopLoadingTxReview();
+      closeTxReviewModal();
     }
   };
 

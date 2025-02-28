@@ -33,6 +33,8 @@ import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import type { StoresProps } from '../../stores';
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
+import { ModalProvider } from '../../UI/components/modals/ModalContext';
+import { ModalManager } from '../../UI/components/modals/ModalManager';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
@@ -155,71 +157,74 @@ export default class WalletSendPage extends Component<StoresProps> {
       ? addressStore.resolveDomainAddress.bind(addressStore)
       : null;
     return (
-      <ReviewTxProvider stores={stores} intl={this.context.intl}>
-        <ReviewTxModal />
-        <WalletSendFormRevamp
-          stores={this.props.stores}
-          resolveDomainAddress={resolveDomainAddressFunc}
-          supportedAddressDomainBannerState={{
-            isDisplayed: this.showSupportedAddressDomainBanner,
-            onClose: this.onSupportedAddressDomainBannerClose,
-          }}
-          selectedNetwork={network}
-          selectedWallet={selected}
-          selectedExplorer={stores.explorers.selectedExplorer}
-          selectedToken={transactionBuilderStore.selectedToken}
-          defaultToken={defaultToken}
-          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          onSubmit={transactionBuilderStore.updateTentativeTx}
-          totalInput={transactionBuilderStore.totalInput}
-          hasAnyPending={hasAnyPending}
-          shouldSendAll={transactionBuilderStore.shouldSendAll}
-          updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
-            transactionBuilderStore.updateReceiver({ address, handle })
-          }
-          updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
-          updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
-          fee={transactionBuilderStore.fee}
-          isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
-          reset={transactionBuilderStore.reset}
-          error={transactionBuilderStore.createUnsignedTx.error}
-          // Min ADA for all tokens that is already included in the tx
-          minAda={transactionBuilderStore.minAda}
-          uriParams={stores.loading.uriParams}
-          resetUriParams={stores.loading.resetUriParams}
-          memo={transactionBuilderStore.memo}
-          showMemo={this.showMemo}
-          updateMemo={(content: void | string) => transactionBuilderStore.updateMemo(content)}
-          onAddMemo={() =>
-            this.showMemoDialog({
-              dialog: MemoNoExternalStorageDialog,
-              continuation: this.toggleShowMemo,
-            })
-          }
-          spendableBalance={stores.transactions.balance}
-          onAddToken={transactionBuilderStore.addToken}
-          onRemoveTokens={transactionBuilderStore.removeTokens}
-          plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
-          isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
-          openDialog={this.openDialog}
-          closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
-          isOpen={uiDialogs.isOpen}
-          openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
-          unitOfAccountSetting={stores.profile.unitOfAccount}
-          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-          calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
-          maxSendableAmount={transactionBuilderStore.maxSendableAmount}
-          signRequest={transactionBuilderStore.tentativeTx}
-          staleTx={transactionBuilderStore.txMismatch}
-          sendMoneyRequest={stores.wallets.sendMoneyRequest}
-          sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
-          ledgerSendError={stores.substores.ada.ledgerSend.error || null}
-          trezorSendError={stores.substores.ada.trezorSend.error || null}
-          ledgerSend={stores.substores.ada.ledgerSend}
-          trezorSend={stores.substores.ada.trezorSend}
-        />
-        {this.renderDialog()}
-      </ReviewTxProvider>
+      <ModalProvider>
+        <ModalManager />
+        <ReviewTxProvider stores={stores} intl={this.context.intl}>
+          <ReviewTxModal />
+          <WalletSendFormRevamp
+            stores={this.props.stores}
+            resolveDomainAddress={resolveDomainAddressFunc}
+            supportedAddressDomainBannerState={{
+              isDisplayed: this.showSupportedAddressDomainBanner,
+              onClose: this.onSupportedAddressDomainBannerClose,
+            }}
+            selectedNetwork={network}
+            selectedWallet={selected}
+            selectedExplorer={stores.explorers.selectedExplorer}
+            selectedToken={transactionBuilderStore.selectedToken}
+            defaultToken={defaultToken}
+            getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+            onSubmit={transactionBuilderStore.updateTentativeTx}
+            totalInput={transactionBuilderStore.totalInput}
+            hasAnyPending={hasAnyPending}
+            shouldSendAll={transactionBuilderStore.shouldSendAll}
+            updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
+              transactionBuilderStore.updateReceiver({ address, handle })
+            }
+            updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
+            updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
+            fee={transactionBuilderStore.fee}
+            isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+            reset={transactionBuilderStore.reset}
+            error={transactionBuilderStore.createUnsignedTx.error}
+            // Min ADA for all tokens that is already included in the tx
+            minAda={transactionBuilderStore.minAda}
+            uriParams={stores.loading.uriParams}
+            resetUriParams={stores.loading.resetUriParams}
+            memo={transactionBuilderStore.memo}
+            showMemo={this.showMemo}
+            updateMemo={(content: void | string) => transactionBuilderStore.updateMemo(content)}
+            onAddMemo={() =>
+              this.showMemoDialog({
+                dialog: MemoNoExternalStorageDialog,
+                continuation: this.toggleShowMemo,
+              })
+            }
+            spendableBalance={stores.transactions.balance}
+            onAddToken={transactionBuilderStore.addToken}
+            onRemoveTokens={transactionBuilderStore.removeTokens}
+            plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+            isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
+            openDialog={this.openDialog}
+            closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
+            isOpen={uiDialogs.isOpen}
+            openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
+            unitOfAccountSetting={stores.profile.unitOfAccount}
+            getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
+            calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
+            maxSendableAmount={transactionBuilderStore.maxSendableAmount}
+            signRequest={transactionBuilderStore.tentativeTx}
+            staleTx={transactionBuilderStore.txMismatch}
+            sendMoneyRequest={stores.wallets.sendMoneyRequest}
+            sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
+            ledgerSendError={stores.substores.ada.ledgerSend.error || null}
+            trezorSendError={stores.substores.ada.trezorSend.error || null}
+            ledgerSend={stores.substores.ada.ledgerSend}
+            trezorSend={stores.substores.ada.trezorSend}
+          />
+          // {this.renderDialog()}
+        </ReviewTxProvider>
+      </ModalProvider>
     );
   }
 

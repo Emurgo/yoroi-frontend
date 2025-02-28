@@ -42,6 +42,7 @@ export type CurrentWalletType = {
   primaryTokenInfo: PrimaryTokenInfo;
   walletBalance: WalletBalance;
   ftAssetList: any[];
+  allAssetList: any[];
   nftAssetList: any[];
   explorer: { tokenInfo: { name: string; baseUrl: string } }; // TODO to be removed
   selectedExplorer: any;

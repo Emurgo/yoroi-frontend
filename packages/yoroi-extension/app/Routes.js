@@ -266,6 +266,11 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.TX_REVIEW.FAIL}
             component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
           />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
 
           <Redirect to={ROUTES.MY_WALLETS} />
         </Switch>

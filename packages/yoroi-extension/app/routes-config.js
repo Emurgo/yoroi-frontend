@@ -94,5 +94,6 @@ export const ROUTES = {
   },
   TX_REVIEW: {
     FAIL: '/tx-review/failed',
+    SUCCESS: '/tx-review/success',
   },
 };

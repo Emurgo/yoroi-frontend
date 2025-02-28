@@ -170,21 +170,21 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
   };
 
-  const handleTxCancelRequest = async order => {
-    console.log('order', order);
-    try {
-      let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
-        wallet,
-      });
-      let collateralReorgTxHex: ?string = null;
-      let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
+  // const handleTxCancelRequest = async order => {
+  //   console.log('order', order);
+  //   try {
+  //     let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
+  //       wallet,
+  //     });
+  //     let collateralReorgTxHex: ?string = null;
+  //     let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
 
-      console.log('utxoHex', utxoHex);
-    } catch (e) {
-      console.error('Failed to prepare a collateral utxo for cancel', e);
-      throw e;
-    }
-  };
+  //     console.log('utxoHex', utxoHex);
+  //   } catch (e) {
+  //     console.error('Failed to prepare a collateral utxo for cancel', e);
+  //     throw e;
+  //   }
+  // };
 
   const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData) => {
     const sender = order.sender;
@@ -370,13 +370,13 @@ export default function SwapOrdersPage(props: StoresProps): Node {
                   order={order}
                   defaultTokenInfo={defaultTokenInfo}
                   selectedExplorer={selectedExplorer}
-                  handleCancel={() => handleTxCancelRequest(order)}
+                  handleCancel={() => handleCancelRequest(order)}
                   txHashToRenderedTimestamp={txHashToRenderedTimestamp}
                 />
               ))}
         </Table>
       </Box>
-      {/* {cancellationState && (
+      {cancellationState && (
         <CancelSwapOrderDialog
           order={cancellationState.order}
           reorgTxData={cancellationState.collateralReorgTx?.txData}
@@ -395,7 +395,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
           walletType={wallet.type}
           hwWalletError={null}
         />
-      )} */}
+      )}
       {!showCompletedOrders && openOrdersLoading && <LoadingOpenOrders columnLeftPaddings={columnLeftPaddings} />}
       {showCompletedOrders && completedOrdersLoading && <LoadingCompletedOrders columnLeftPaddings={columnLeftPaddings} />}
       {!openOrdersLoading && isDisplayOpenOrdersEmpty && <NoOpenOrders />}

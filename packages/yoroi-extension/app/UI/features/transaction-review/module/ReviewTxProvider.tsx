@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { getPrivateStakingKey, getProtocolParameters } from '../../../../api/thunk';
+import { useModal } from '../../../components/modals/ModalContext';
 import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { addressHexToBech32 } from '../../../utils/common';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
+import { TxSuccess } from '../common/TransactionResult/TxSuccess';
 
 type ModalState = {
   isOpen: boolean;
@@ -50,6 +52,7 @@ export const ReviewTxProvider = ({
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const [stakeKeyDeposit, setStakingKeyDeposit] = React.useState(0);
   const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const { openModal, height, width, title } = useModal();
 
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
@@ -62,6 +65,11 @@ export const ReviewTxProvider = ({
   useEffect(() => {
     protocolParameters();
   }, [stakeKeyDeposit]);
+
+  const handleSucessTxSuccess = () => {
+    openModal({ title: 'Transaction results', content: <TxSuccess /> });
+  };
+  const handleTxFailure = () => {};
 
   const protocolParameters = async () => {
     const protocolParameters = await getProtocolParameters({ networkId: currentWalletInfo?.networkId });
@@ -136,6 +144,8 @@ export const ReviewTxProvider = ({
       selectedExplorer: currentWalletInfo?.selectedExplorer,
       isStakeRegistered: currentWalletInfo?.isStakeRegistered,
       stakeKeyDeposit,
+      onTxSuccess: handleSucessTxSuccess,
+      onTxFailure: handleTxFailure,
       ...actions,
     }),
     [state, actions, stakeKeyDeposit]
