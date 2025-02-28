@@ -168,6 +168,11 @@ function isHwKind(
   }
   return matchKind(hwWalletMeta);
 }
+
+export const isAnyTrezorWallet = (
+  conceptualWallet: IConceptualWallet,
+): boolean => isTrezorTWallet(conceptualWallet) || isTrezorSafe3Wallet(conceptualWallet);
+
 export function isTrezorTWallet(
   conceptualWallet: IConceptualWallet,
 ): boolean {
