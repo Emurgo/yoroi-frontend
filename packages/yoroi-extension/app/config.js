@@ -25,6 +25,17 @@ export default Object.freeze({
           }
         }
       },
+      trezorSafe3: {
+        VENDOR: 'trezor.io',
+        MODEL: 'Safe 3',
+        manifest: {
+          EMAIL: 'rnd@emurgo.io',
+          appURL: {
+            CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
+            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/'
+          }
+        }
+      },
       ledgerNano: {
         // Ledger does not provide device model info up till now
         DEFAULT_WALLET_NAME: 'Yoroi-Ledger',

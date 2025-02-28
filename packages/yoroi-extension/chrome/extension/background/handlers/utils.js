@@ -22,7 +22,7 @@ import {
   getAllAddressesForWallet,
 } from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isTrezorTWallet, isTrezorSafe3Wallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import { isCardanoHaskell, isTestnet, } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
@@ -75,9 +75,10 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   const network = conceptualWallet.getNetworkInfo();
 
   const isLedger = isLedgerNanoWallet(conceptualWallet);
-  const isTrezor = isTrezorTWallet(conceptualWallet);
-  const isHardware = isLedger || isTrezor;
-  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
+  const isTrezorModelT = isTrezorTWallet(conceptualWallet);
+  const isTrezorSafe3 = isTrezorSafe3Wallet(conceptualWallet);
+  const isHardware = isLedger || isTrezorModelT || isTrezorSafe3;
+  const type = (isLedger ? 'ledger' : ((isTrezorModelT || isTrezorSafe3) ? 'trezor' : ('mnemonic')));
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -251,9 +252,10 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
   const network = publicDeriver.getParent().getNetworkInfo();
 
   const isLedger = isLedgerNanoWallet(publicDeriver.getParent());
-  const isTrezor = isTrezorTWallet(publicDeriver.getParent());
-  const isHardware = isLedger || isTrezor;
-  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
+  const isTrezorModelT = isTrezorTWallet(publicDeriver.getParent());
+  const isTrezorSafe3 = isTrezorSafe3Wallet(publicDeriver.getParent());
+  const isHardware = isLedger || isTrezorModelT || isTrezorSafe3;
+  const type = (isLedger ? 'ledger' : ((isTrezorModelT || isTrezorSafe3) ? 'trezor' : ('mnemonic')));
 
   const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
 
