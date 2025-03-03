@@ -19,9 +19,11 @@ import { ReviewTxProvider } from '../../../UI/features/transaction-review/module
 import { ReviewTxModal } from '../../../UI/features/transaction-review/useCases/ReviewTx';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
+import { ModalProvider } from '../../../UI/components/modals/ModalContext';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
+import { ModalManager } from '../../../UI/components/modals/ModalManager';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -56,10 +58,13 @@ class StakingPage extends Component<StoresProps> {
       >
         <Suspense fallback={null}>
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <ReviewTxProvider stores={stores} intl={this.context.intl}>
-              <ReviewTxModal />
-              <StakingPageContent stores={this.props.stores} />
-            </ReviewTxProvider>
+            <ModalProvider>
+              <ModalManager />
+              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                <ReviewTxModal />
+                <StakingPageContent stores={this.props.stores} />
+              </ReviewTxProvider>
+            </ModalProvider>
           </CurrencyProvider>
         </Suspense>
       </TopBarLayout>

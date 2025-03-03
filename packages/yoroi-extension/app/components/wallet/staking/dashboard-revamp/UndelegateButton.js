@@ -1,7 +1,7 @@
 import { Button, Stack, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import globalMessages from '../../../../i18n/global-messages';
-import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
+import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, stores }) => {
@@ -13,8 +13,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     isHardwareWallet,
     stakeKeyDeposit,
     primaryTokenInfo,
+    showTxResultModal,
   } = useTxReviewModal();
-  const navigateTo = useNavigateTo();
 
   if (poolTransition?.shouldShowTransitionFunnel) {
     return (
@@ -33,7 +33,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
-      title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
       operations: {
@@ -51,7 +50,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
         ],
         kind: 'undelegate',
       },
-      unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
+      unsignedTx: parsedUnsignedTx,
     });
   };
 
@@ -83,13 +82,14 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
         });
       }
       stopLoadingTxReview();
+      showTxResultModal(TransactionResult.SUCCESS);
+
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });
     } catch (error) {
-      console.log('error', error);
       stopLoadingTxReview();
-      navigateTo.transactionFail();
+      showTxResultModal(TransactionResult.FAIL);
     }
   };
 

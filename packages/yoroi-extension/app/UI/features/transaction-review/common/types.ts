@@ -105,3 +105,10 @@ export type CertificateType = typeof CertificateType[keyof typeof CertificateTyp
 
 // Makes sure CertificateType lists all the certificates in CertificateJSON
 export type AssertAllImplementedCertTypes = AssertEqual<CertificateType, keyof UnionToIntersection<CertificateJSON>>;
+
+export const TransactionResult = {
+  SUCCESS: 'success', //
+  FAIL: 'fail', //
+} as const;
+
+export type TransactionResultType = typeof TransactionResult[keyof typeof TransactionResult];

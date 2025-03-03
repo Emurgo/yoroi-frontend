@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { toSvg } from 'jdenticon';
-import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
+import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolID }) => {
@@ -13,8 +13,8 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
     closeTxReviewModal,
     stakeKeyDeposit,
     primaryTokenInfo,
+    showTxResultModal,
   } = useTxReviewModal();
-  const navigateTo = useNavigateTo();
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -26,7 +26,6 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
-      title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
       operations: {
@@ -46,7 +45,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         ],
         kind: 'delegate',
       },
-      unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
+      unsignedTx: parsedUnsignedTx,
     });
   };
 
@@ -59,13 +58,14 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         wallet: selectedWallet,
         dialog: null,
       });
+      showTxResultModal(TransactionResult.SUCCESS);
       // ampli.stakingCenterDelegationSubmitted({
       //   ada_amount: delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
       //   staking_pool: selectedPoolId,
       // });
     } catch (error) {
       console.warn('Delegation error', error);
-      navigateTo.transactionFail();
+      showTxResultModal(TransactionResult.FAIL);
     } finally {
       stopLoadingTxReview();
       closeTxReviewModal();

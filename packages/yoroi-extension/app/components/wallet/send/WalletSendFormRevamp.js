@@ -1019,7 +1019,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </ActionButton>
-            <ActionButton
+            {/* <ActionButton
               key="amount-next"
               variant="primary"
               size="medium"
@@ -1031,7 +1031,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
             >
               {intl.formatMessage(globalMessages.nextButtonLabel)}ss
-            </ActionButton>
+            </ActionButton>  */}
             <SendTokensButton
               stores={this.props.stores}
               disabled={!this.props.fee || this.props.hasAnyPending || invalidMemo || maxSendableAmount.isExecuting}

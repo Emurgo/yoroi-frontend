@@ -2,10 +2,18 @@ import { Button, Stack, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
 import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
+import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
-  const { openTxReviewModal, walletType, isHardwareWallet, stopLoadingTxReview, startLoadingTxReview } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    walletType,
+    isHardwareWallet,
+    stopLoadingTxReview,
+    startLoadingTxReview,
+    showTxResultModal,
+  } = useTxReviewModal();
   const navigateTo = useNavigateTo();
 
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
@@ -32,7 +40,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
-      title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
       operations: {
@@ -75,12 +82,14 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         });
       }
       stopLoadingTxReview();
+      showTxResultModal(TransactionResult.SUCCESS);
+
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
       // });
     } catch (error) {
       stopLoadingTxReview();
-      navigateTo.transactionFail();
+      showTxResultModal(TransactionResult.FAIL);
     }
   };
 

@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
+import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
@@ -52,6 +53,7 @@ export const GovernanceStatusSelection = () => {
     changePasswordInputValue,
     drepCredentialHex,
     setUnsignedTx,
+    showTxResultModal,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
@@ -69,7 +71,6 @@ export const GovernanceStatusSelection = () => {
     }
 
     const vote: Vote = { kind: 'delegate', drepID: drepCredentialHex };
-    console.log('vote', vote);
     governanceVoteChanged(vote);
     openTxReviewModal({
       title: 'CHOOSE YOUR DREP',
@@ -111,10 +112,9 @@ export const GovernanceStatusSelection = () => {
         const txSignRequest: any = await createDrepDelegationTransaction(kind);
 
         const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
-
         const parsedUnsignedTx = JSON.parse(txBodyjson);
+
         openTxReviewModal({
-          title: 'Transaction Review',
           modalView: 'transactionReview',
           unsignedTx: parsedUnsignedTx,
           submitTx: password => {
@@ -139,15 +139,12 @@ export const GovernanceStatusSelection = () => {
         dialog: null,
       });
       stopLoadingTxReview();
-
-      navigateTo.transactionSubmited();
       changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
+      showTxResultModal(TransactionResult.SUCCESS);
     } catch (error) {
-      console.log('errorerror', error);
       console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
       stopLoadingTxReview();
-
-      navigateTo.transactionFail();
+      showTxResultModal(TransactionResult.FAIL);
     }
   };
 

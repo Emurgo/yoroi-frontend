@@ -1,6 +1,6 @@
 import { Button, styled } from '@mui/material';
 import React from 'react';
-import { useNavigateTo } from '../../../UI/features/transaction-review/common/hooks/useNavigateTo';
+import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
@@ -8,13 +8,9 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
     openTxReviewModal,
     startLoadingTxReview,
     stopLoadingTxReview,
-    networkId,
     closeTxReviewModal,
-    onTxSuccess,
-    onTxFailure,
+    showTxResultModal,
   } = useTxReviewModal();
-
-  const navigateTo = useNavigateTo();
 
   const handleSubmit = async () => {
     onTxSuccess();
@@ -23,13 +19,12 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
-      title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput, signTxRequest),
       operations: {
         kind: 'send',
       },
-      unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
+      unsignedTx: parsedUnsignedTx,
     });
   };
 
@@ -44,12 +39,12 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
         wallet: selectedWallet,
         onSuccess: () => {
           onSuccess();
-          navigateTo.transactionSuccess();
+          showTxResultModal(TransactionResult.SUCCESS);
         },
       });
     } catch (error) {
       console.warn('Delegation error', error);
-      navigateTo.transactionFail();
+      showTxResultModal(TransactionResult.FAIL);
     } finally {
       stopLoadingTxReview();
       closeTxReviewModal();
@@ -65,7 +60,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
       disabled={disabled}
       id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
     >
-      {label} (In preogress)
+      {label}
     </ActionButton>
   );
 };

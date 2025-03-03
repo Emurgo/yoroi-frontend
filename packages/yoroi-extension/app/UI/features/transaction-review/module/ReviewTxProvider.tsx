@@ -5,7 +5,9 @@ import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { addressHexToBech32 } from '../../../utils/common';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
+import { TxFail } from '../common/TransactionResult/TxFail';
 import { TxSuccess } from '../common/TransactionResult/TxSuccess';
+import { TransactionResult, TransactionResultType } from '../common/types';
 
 type ModalState = {
   isOpen: boolean;
@@ -52,7 +54,7 @@ export const ReviewTxProvider = ({
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const [stakeKeyDeposit, setStakingKeyDeposit] = React.useState(0);
   const currentWalletInfo = createCurrrentWalletInfo(stores);
-  const { openModal, height, width, title } = useModal();
+  const { openModal } = useModal();
 
   const checkUserPassword = async (password: string): Promise<any> => {
     try {
@@ -66,10 +68,14 @@ export const ReviewTxProvider = ({
     protocolParameters();
   }, [stakeKeyDeposit]);
 
-  const handleSucessTxSuccess = () => {
-    openModal({ title: 'Transaction results', content: <TxSuccess /> });
+  const handleTxResult = (result: TransactionResultType) => {
+    openModal({
+      title: 'Transaction results',
+      height: '440px',
+      width: '612px',
+      content: result === TransactionResult.SUCCESS ? <TxSuccess /> : <TxFail />,
+    });
   };
-  const handleTxFailure = () => {};
 
   const protocolParameters = async () => {
     const protocolParameters = await getProtocolParameters({ networkId: currentWalletInfo?.networkId });
@@ -144,8 +150,7 @@ export const ReviewTxProvider = ({
       selectedExplorer: currentWalletInfo?.selectedExplorer,
       isStakeRegistered: currentWalletInfo?.isStakeRegistered,
       stakeKeyDeposit,
-      onTxSuccess: handleSucessTxSuccess,
-      onTxFailure: handleTxFailure,
+      showTxResultModal: result => handleTxResult(result),
       ...actions,
     }),
     [state, actions, stakeKeyDeposit]

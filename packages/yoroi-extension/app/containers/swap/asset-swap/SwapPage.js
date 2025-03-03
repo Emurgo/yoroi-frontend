@@ -39,6 +39,7 @@ import { downloadLogs } from '../../../utils/logging';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import { SwapTxInfo } from './SwapTxInfo';
+import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -56,7 +57,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal, closeTxReviewModal, changeModalView } = useTxReviewModal();
+  const { openTxReviewModal, closeTxReviewModal, changeModalView, showTxResultModal } = useTxReviewModal();
 
   const {
     slippage,
@@ -292,6 +293,8 @@ function SwapPage(props: StoresProps & Intl): Node {
       // $FlowIgnore[incompatible-call]
       await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
+      showTxResultModal(TransactionResult.SUCCESS);
+
       try {
         ampli.swapOrderSubmitted({
           ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
@@ -329,9 +332,9 @@ function SwapPage(props: StoresProps & Intl): Node {
     const isPasswordError = e instanceof IncorrectWalletPasswordError;
     runInAction(() => {
       txSubmitErrorState.update(e);
-      console.log('SWAPP ERROROOR', e);
       closeTxReviewModal();
       setOrderStepValue(isPasswordError ? 1 : 2);
+      showTxResultModal(TransactionResult.FAIL);
     });
     if (!isPasswordError) {
       console.error('Failed to submit swap tx', e);

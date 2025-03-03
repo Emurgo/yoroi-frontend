@@ -1,11 +1,19 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { toSvg } from 'jdenticon';
 import React from 'react';
+import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import SeizaFetcher from './SeizaFetcher';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, stopLoadingTxReview, networkId, closeTxReviewModal } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stopLoadingTxReview,
+    networkId,
+    closeTxReviewModal,
+    showTxResultModal,
+  } = useTxReviewModal();
 
   const onDelegate = async poolID => {
     const avatarSource = toSvg(poolID, 36, { padding: 0 });
@@ -16,7 +24,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
     const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
-      title: 'Transaction review',
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
       operations: {
@@ -41,9 +48,12 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
         wallet: selectedWallet,
         dialog: null,
       });
+      showTxResultModal(TransactionResult.SUCCESS);
+
       // ampli.stakingCenterDelegationInitiated();
     } catch (error) {
       console.warn('Failed to sign transaction', error);
+      showTxResultModal(TransactionResult.FAIL);
     } finally {
       stopLoadingTxReview();
       closeTxReviewModal();

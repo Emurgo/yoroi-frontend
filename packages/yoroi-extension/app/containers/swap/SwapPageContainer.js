@@ -23,6 +23,8 @@ import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/Rev
 import type { StoresProps } from '../../stores';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
+import { ModalProvider } from '../../UI/components/modals/ModalContext';
+import { ModalManager } from '../../UI/components/modals/ModalManager';
 
 type Props = {|
   +children?: Node,
@@ -83,12 +85,15 @@ export default class SwapPageContainer extends Component<AllProps> {
           withPadding={false}
         >
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
-                <ReviewTxModal />
-                {children}
-              </ReviewTxProvider>
-            </SwapFormProvider>
+            <ModalProvider>
+              <ModalManager />
+              <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+                <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                  <ReviewTxModal />
+                  {children}
+                </ReviewTxProvider>
+              </SwapFormProvider>
+            </ModalProvider>
           </CurrencyProvider>
         </TopBarLayout>
       </IntlProvider>
