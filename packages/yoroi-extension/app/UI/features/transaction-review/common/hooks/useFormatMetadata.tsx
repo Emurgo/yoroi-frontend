@@ -7,9 +7,6 @@ export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): 
     const hash = txBody.auxiliary_data_hash ?? null;
     const decodedMetadata = await unsignedTx.auxiliary_data.metadata;
     const parsedMetadata = parseMetadata222(decodedMetadata);
-    // const msg = [parseMsg(JSON.parse(decodedMetadata)?.msg ?? [''])];
-
-    // console.log('JSON.parse(decodedMetadata)', JSON.parse(decodedMetadata['674']));
 
     return {
       hash,
