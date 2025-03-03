@@ -6,8 +6,8 @@ export const mochaHooks = {
   beforeAll(done) {
     this.timeout(defaultWaitTimeout);
     driversPoolsManager.createPoolOfDrivers(DRIVERS_AMOUNT);
-    driversPoolsManager.prepareExtensions();
-    done();
+    driversPoolsManager.prepareExtensions().then((result => done())
+    );
   },
   async beforeEach(done) {
     // Check for nested descibe sections in case if any tests failed in a main describe
