@@ -165,6 +165,7 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
           </Link>
           <DelegateButton
             poolID={id}
+            poolName={name}
             stores={stores}
             label={intl.formatMessage(globalMessages.delegateLabel)}
             isWalletWithNoFunds={isWalletWithNoFunds}

@@ -4,7 +4,7 @@ import { toSvg } from 'jdenticon';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
-export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolID }) => {
+export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolName, poolID }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
@@ -16,7 +16,6 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-  const selectedPool = stores.delegation.getLocalPoolInfo(networkId, poolID);
   const onDelegate = async () => {
     const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
@@ -32,7 +31,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
             component: (
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
-                poolName={selectedPool?.info.name}
+                poolName={poolName}
                 stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
                   primaryTokenInfo.name
                 }`}

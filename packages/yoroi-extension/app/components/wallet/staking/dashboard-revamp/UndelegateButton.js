@@ -1,20 +1,23 @@
-import { Button, Stack, Typography, styled } from '@mui/material';
+import { Box, Button, Stack, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
+import { toSvg } from 'jdenticon';
 import globalMessages from '../../../../i18n/global-messages';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
-export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, stores }) => {
+export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
-    stopLoadingTxReview,
     walletType,
     isHardwareWallet,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
+    networkId,
   } = useTxReviewModal();
+  const avatarSource = toSvg(poolId, 36, { padding: 0 });
+  const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
   if (poolTransition?.shouldShowTransitionFunnel) {
     return (
@@ -40,6 +43,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           {
             component: (
               <OperationsDetails
+                avatarGenerated={avatarGenerated}
+                poolName={poolName}
                 stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
                   primaryTokenInfo.name
                 }`}
@@ -109,12 +114,24 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   );
 };
 
-const OperationsDetails = ({ stakeKeyDeposit }) => {
+const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName }) => {
   return (
     <Stack gap="8px">
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Staking</Typography>
-        <Typography color="ds.text_gray_medium">Undelegation</Typography>
+        <Typography color="ds.text_gray_low">TBD</Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Box
+            sx={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              display: 'inline-block',
+            }}
+            component="img"
+            src={avatarGenerated}
+          />
+          <Typography color="ds.text_gray_medium">{poolName}</Typography>
+        </Stack>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Unregister Staking key deposit</Typography>

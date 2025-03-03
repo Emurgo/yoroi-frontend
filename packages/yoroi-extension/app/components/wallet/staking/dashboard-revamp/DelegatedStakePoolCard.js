@@ -70,6 +70,8 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
         <UndelegateButton
+          poolId={id}
+          poolName={name}
           poolTransition={poolTransition}
           intl={intl}
           delegateToSpecificPool={delegateToSpecificPool}
