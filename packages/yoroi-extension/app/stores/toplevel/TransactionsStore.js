@@ -1,31 +1,31 @@
 // @flow
+import type { ExportTransactionsFunc, } from '../../api/common/index';
+import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
+import type { StoresMap } from '../index';
+import type { TransactionExportRow } from '../../api/export';
+import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
+import type { WalletState } from '../../../chrome/extension/background/types';
 import { action, computed, observable, runInAction } from 'mobx';
 import { find } from 'lodash';
+import { Logger, stringifyError } from '../../utils/logging';
+import { getNetworkById, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { MultiToken } from '../../api/common/lib/MultiToken';
+import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
+import moment, { Moment } from 'moment';
+import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
+import { refreshTransactions } from '../../api/thunk';
+import {NotificationTopics} from '../../UI/features/notifications/module/NotificationsProvider'
 import BigNumber from 'bignumber.js';
+import PubSub from 'pubsub-js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
 import WalletTransaction from '../../domain/WalletTransaction';
-import type { ExportTransactionsFunc, } from '../../api/common/index';
-import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
-import { Logger, stringifyError } from '../../utils/logging';
-import globalMessages from '../../i18n/global-messages';
-import { getNetworkById, isCardanoHaskell, } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { MultiToken } from '../../api/common/lib/MultiToken';
-import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
-import type { StoresMap } from '../index';
-import moment, { Moment } from 'moment';
-import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
-import type { TransactionExportRow } from '../../api/export';
-import type { HistoryRequest } from '../../api/ada/lib/state-fetch/types';
 import appConfig from '../../config';
-import { refreshTransactions } from '../../api/thunk';
-import type { WalletState } from '../../../chrome/extension/background/types';
-import PubSub from 'pubsub-js';
-import {NotificationTopics} from '../../UI/features/notifications/module/NotificationsProvider'
+import globalMessages from '../../i18n/global-messages';
 
 type TxHistoryState = {|
   publicDeriverId: number,

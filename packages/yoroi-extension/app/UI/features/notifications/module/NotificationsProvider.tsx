@@ -52,17 +52,20 @@ export default function NotificationsProvider({ children }) {
 
   const handleToastClose = (props) => {
     toast.update(props.toastId, { data: { event: "closed" } })
+    // todo: implement analytics
     console.log("close toast", props)
     toast.dismiss(props.toastId);
   }
 
   const handleToastClick = (props) => {
     toast.update(props.toastId, { data: { event: "clicked" } })
+    // todo: implement analytics
     console.log("click toast", props)
     toast.dismiss(props.toastId);
   }
 
   const handleToastExpired = (props) => {
+    // todo: implement analytics
     console.log("toast expired", props)
   }
 
@@ -130,6 +133,8 @@ export default function NotificationsProvider({ children }) {
     }
   }, [toastQueue])
 
+
+  // subscribe to event topics on mount
   React.useEffect(() => {
     PubSub.subscribe(NotificationTopics.NEW_TX, handleSubscription);
 
