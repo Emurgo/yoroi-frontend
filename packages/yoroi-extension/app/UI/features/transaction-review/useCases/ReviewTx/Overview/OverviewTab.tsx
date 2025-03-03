@@ -68,7 +68,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
       >
         <Typography variant="body1" color="ds.text_primary_medium" fontWeight={500}>{`${truncateLongName(
           selectedWalletName,
-          33
+          29
         )} | ${plate.TextPart}`}</Typography>
       </Box>
     </Stack>
