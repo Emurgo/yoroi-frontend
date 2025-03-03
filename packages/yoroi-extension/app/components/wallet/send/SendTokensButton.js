@@ -9,10 +9,10 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
     stopLoadingTxReview,
     closeTxReviewModal,
     showTxResultModal,
+    isHardwareWallet,
   } = useTxReviewModal();
 
   const handleSubmit = async () => {
-    onTxSuccess();
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
     const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
     const parsedUnsignedTx = JSON.parse(txBodyjson);
@@ -32,15 +32,40 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
 
     try {
       startLoadingTxReview();
-      await stores.substores.ada.mnemonicSend.sendMoney({
-        signRequest: signTxRequest,
-        password: passswordInput,
-        wallet: selectedWallet,
-        onSuccess: () => {
-          onSuccess();
-          showTxResultModal(TransactionResult.SUCCESS);
-        },
-      });
+      if (isHardwareWallet) {
+        if (walletType === 'ledger') {
+          const ledgerSendStore = stores.substores.ada.ledgerSend;
+          ledgerSendStore.sendUsingLedgerWallet({
+            params: { signRequest: signTxRequest },
+            onSuccess: () => {
+              onSuccess();
+              showTxResultModal(TransactionResult.SUCCESS);
+            },
+            wallet: selectedWallet,
+          });
+        }
+        if (walletType === 'trezor') {
+          const trezorSendStore = stores.substores.ada.trezorSend;
+          trezorSendStore.sendUsingTrezor({
+            params: { signRequest: signTxRequest },
+            onSuccess: () => {
+              onSuccess();
+              showTxResultModal(TransactionResult.SUCCESS);
+            },
+            wallet: selectedWallet,
+          });
+        }
+      } else {
+        await stores.substores.ada.mnemonicSend.sendMoney({
+          signRequest: signTxRequest,
+          password: passswordInput,
+          wallet: selectedWallet,
+          onSuccess: () => {
+            onSuccess();
+            showTxResultModal(TransactionResult.SUCCESS);
+          },
+        });
+      }
     } catch (error) {
       console.warn('Delegation error', error);
       showTxResultModal(TransactionResult.FAIL);
