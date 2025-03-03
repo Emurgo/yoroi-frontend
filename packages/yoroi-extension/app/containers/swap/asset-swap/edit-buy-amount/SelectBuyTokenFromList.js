@@ -35,8 +35,6 @@ export default function SelectBuyTokenFromList({
 
   const { walletVerifiedAssets, isLoading, errored } = useBuyVerifiedSwapTokens(store.assets, sellTokenInfo);
 
-  console.log('errored', errored);
-
   const { orderData, resetQuantities } = useSwap();
 
   const handleAssetSelected = token => {

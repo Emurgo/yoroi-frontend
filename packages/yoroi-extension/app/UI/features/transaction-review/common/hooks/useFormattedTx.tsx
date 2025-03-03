@@ -23,7 +23,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
   const formattedCertificates = formatCertificates(data?.certs);
 
-  const formattedInputs = useFormattedInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses, walletUtxos);
+  const formattedInputs = useFormattedInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses);
   const formattedOutputs = useFormattedOutputs(outputs, networkId, primaryTokenInfo, walletAddresses, allAssetList);
 
   return {
@@ -35,10 +35,10 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   };
 };
 
-export const useFormattedInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses, walletUtxos) => {
+export const useFormattedInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses) => {
   const query = useQuery<any>(
     ['useFormattedInputs', inputUtxos],
-    async () => formatInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses, walletUtxos),
+    async () => formatInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses),
     {
       suspense: true,
     }
@@ -61,15 +61,7 @@ export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo, wallet
   return query.data;
 };
 
-const formatInputs = async (
-  inputUtxos,
-  allAssetList,
-  networkId,
-  primaryTokenInfo,
-  walletAddresses,
-  walletUtxos
-): Promise<any> => {
-  console.log('@@@@inputUtxos', { inputUtxos, allAssetList, walletAddresses, walletUtxos });
+const formatInputs = async (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
   return Promise.all(
     inputUtxos.map(async (utxo, index) => {
       const address = utxo?.receiver;

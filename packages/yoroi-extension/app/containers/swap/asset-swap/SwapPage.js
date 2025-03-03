@@ -39,6 +39,7 @@ import { downloadLogs } from '../../../utils/logging';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import { SwapTxInfo } from './SwapTxInfo';
+// $FlowIgnore: suppressing this error
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
@@ -88,7 +89,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const priceImpactState: PriceImpact | null =
     impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
 
-  const { formattedFeeQuantity, formattedPtAmount } = useSwapFeeDisplay(defaultTokenInfo);
+  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);

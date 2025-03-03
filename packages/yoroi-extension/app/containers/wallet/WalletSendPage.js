@@ -31,9 +31,13 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import type { StoresProps } from '../../stores';
+// $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
+// $FlowIgnore: suppressing this error
 import { ModalProvider } from '../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 
 const messages = defineMessages({
@@ -222,7 +226,7 @@ export default class WalletSendPage extends Component<StoresProps> {
             ledgerSend={stores.substores.ada.ledgerSend}
             trezorSend={stores.substores.ada.trezorSend}
           />
-          // {this.renderDialog()}
+          {this.renderDialog()}
         </ReviewTxProvider>
       </ModalProvider>
     );

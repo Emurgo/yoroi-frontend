@@ -19,11 +19,13 @@ import { ReviewTxProvider } from '../../../UI/features/transaction-review/module
 import { ReviewTxModal } from '../../../UI/features/transaction-review/useCases/ReviewTx';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
+// $FlowIgnore: suppressing this error
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
+import { ModalManager } from '../../../UI/components/modals/ModalManager';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
-import { ModalManager } from '../../../UI/components/modals/ModalManager';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;

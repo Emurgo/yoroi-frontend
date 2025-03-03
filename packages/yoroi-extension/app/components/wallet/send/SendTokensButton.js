@@ -1,5 +1,4 @@
 import { Button, styled } from '@mui/material';
-import React from 'react';
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 

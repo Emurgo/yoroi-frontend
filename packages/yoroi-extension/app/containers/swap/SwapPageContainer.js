@@ -23,7 +23,9 @@ import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/Rev
 import type { StoresProps } from '../../stores';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
+// $FlowIgnore: suppressing this error
 import { ModalProvider } from '../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 
 type Props = {|

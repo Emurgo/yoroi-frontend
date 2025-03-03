@@ -1,7 +1,6 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
-import { useNavigateTo } from '../../../../UI/features/transaction-review/common/hooks/useNavigateTo';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
@@ -14,7 +13,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
     startLoadingTxReview,
     showTxResultModal,
   } = useTxReviewModal();
-  const navigateTo = useNavigateTo();
 
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
   const wallet = stores.wallets.selected;

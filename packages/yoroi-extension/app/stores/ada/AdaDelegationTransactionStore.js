@@ -83,7 +83,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
       absSlotNumber,
       protocolParameters,
     }).promise;
-    console.log('delegationTxPromise', delegationTxPromise);
+
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }

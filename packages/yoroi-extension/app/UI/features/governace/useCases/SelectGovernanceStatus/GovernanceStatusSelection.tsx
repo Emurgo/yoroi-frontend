@@ -13,7 +13,6 @@ import { BECOME_DREP_LINK, DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN
 import { Abstein } from '../../common/ilustrations/Abstein';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { NoConfidance } from '../../common/ilustrations/NoConfidance';
-import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
@@ -58,7 +57,6 @@ export const GovernanceStatusSelection = () => {
 
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
