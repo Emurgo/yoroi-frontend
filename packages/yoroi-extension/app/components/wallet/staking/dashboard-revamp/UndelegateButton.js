@@ -81,14 +81,11 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           wallet: selected,
         });
       }
-      stopLoadingTxReview();
       showTxResultModal(TransactionResult.SUCCESS);
-
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });
     } catch (error) {
-      stopLoadingTxReview();
       showTxResultModal(TransactionResult.FAIL);
     }
   };

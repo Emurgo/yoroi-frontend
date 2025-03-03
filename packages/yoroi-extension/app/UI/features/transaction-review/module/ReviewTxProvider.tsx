@@ -69,6 +69,8 @@ export const ReviewTxProvider = ({
   }, [stakeKeyDeposit]);
 
   const handleTxResult = (result: TransactionResultType) => {
+    dispatch({ type: 'stopLoading', isLoading: false });
+    dispatch({ type: 'close' });
     openModal({
       title: 'Transaction results',
       height: '440px',

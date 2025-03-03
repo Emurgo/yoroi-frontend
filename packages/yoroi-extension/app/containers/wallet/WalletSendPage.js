@@ -34,6 +34,7 @@ import type { StoresProps } from '../../stores';
 // $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
 // $FlowIgnore: suppressing this error
+
 import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 // $FlowIgnore: suppressing this error
 import { ModalProvider } from '../../UI/components/modals/ModalContext';

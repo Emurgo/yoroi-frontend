@@ -58,7 +58,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
-  const { openTxReviewModal, closeTxReviewModal, changeModalView, showTxResultModal } = useTxReviewModal();
+  const { openTxReviewModal, changeModalView, showTxResultModal } = useTxReviewModal();
 
   const {
     slippage,
@@ -314,7 +314,6 @@ function SwapPage(props: StoresProps & Intl): Node {
       handleTransactionError(e);
     } finally {
       setOpenedDialog('');
-      closeTxReviewModal();
     }
   };
 
@@ -333,7 +332,6 @@ function SwapPage(props: StoresProps & Intl): Node {
     const isPasswordError = e instanceof IncorrectWalletPasswordError;
     runInAction(() => {
       txSubmitErrorState.update(e);
-      closeTxReviewModal();
       setOrderStepValue(isPasswordError ? 1 : 2);
       showTxResultModal(TransactionResult.FAIL);
     });

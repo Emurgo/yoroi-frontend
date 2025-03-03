@@ -8,9 +8,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
   const {
     openTxReviewModal,
     startLoadingTxReview,
-    stopLoadingTxReview,
     networkId,
-    closeTxReviewModal,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
@@ -66,9 +64,6 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
     } catch (error) {
       console.warn('Delegation error', error);
       showTxResultModal(TransactionResult.FAIL);
-    } finally {
-      stopLoadingTxReview();
-      closeTxReviewModal();
     }
   };
 

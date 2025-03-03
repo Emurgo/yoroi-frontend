@@ -3,14 +3,7 @@ import { TransactionResult } from '../../../UI/features/transaction-review/commo
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    stopLoadingTxReview,
-    closeTxReviewModal,
-    showTxResultModal,
-    isHardwareWallet,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet } = useTxReviewModal();
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -69,9 +62,6 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
     } catch (error) {
       console.warn('Delegation error', error);
       showTxResultModal(TransactionResult.FAIL);
-    } finally {
-      stopLoadingTxReview();
-      closeTxReviewModal();
     }
   };
 

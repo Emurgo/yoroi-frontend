@@ -5,14 +5,7 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import SeizaFetcher from './SeizaFetcher';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    stopLoadingTxReview,
-    networkId,
-    closeTxReviewModal,
-    showTxResultModal,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
 
   const onDelegate = async poolID => {
     const avatarSource = toSvg(poolID, 36, { padding: 0 });
@@ -53,9 +46,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
     } catch (error) {
       console.warn('Failed to sign transaction', error);
       showTxResultModal(TransactionResult.FAIL);
-    } finally {
-      stopLoadingTxReview();
-      closeTxReviewModal();
     }
   };
 
