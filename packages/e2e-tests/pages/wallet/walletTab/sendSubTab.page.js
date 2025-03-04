@@ -129,7 +129,7 @@ class SendSubTab extends WalletTab {
   }
   async receiverIsGood() {
     this.logger.info(`SendSubTab::receiverIsGood is called.`);
-    return await this.customWaitIsPresented(this.receiverDoneIcon, fiveSeconds, quarterSecond);
+    return await this.customWaitIsPresented(this.receiverDoneIcon, defaultWaitTimeout, quarterSecond);
   }
   async getReceiverHelperText() {
     this.logger.info(`SendSubTab::getReceiverHelperText is called.`);

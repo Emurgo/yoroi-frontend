@@ -68,16 +68,17 @@ class DriversManager {
     const basePage = new BasePage(driverObject.driver, logger);
     await basePage.goToExtension();
     const initialStepsPage = new InitialStepsPage(driverObject.driver, logger);
-    return initialStepsPage.skipInitialSteps();
+    await initialStepsPage.skipInitialSteps();
+    return true; 
   }
 
-  prepareExtensions() {
+  async prepareExtensions() {
     const prepExtPromisesArr = [];
     this.logger.info(`DriversManager::prepareExtensions Amount of drivers ${poolOfDrivers.length}`);
     for (const driverObject of poolOfDrivers) {
       prepExtPromisesArr.push(this.prepareExtension(driverObject));
     }
-    Promise.all(prepExtPromisesArr);
+    return await Promise.all(prepExtPromisesArr);
   }
 
   async getDriverFromPool() {
