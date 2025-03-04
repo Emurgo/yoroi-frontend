@@ -30,7 +30,7 @@ import type { ReferenceTransaction, BaseGetTransactionsRequest } from '../../../
 import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
-import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
+import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
 import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver';
 
 type CreateWalletRequest = {|
@@ -125,7 +125,7 @@ function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
   (async () => {
     const db = await getDb();
     const publicDerivers = await loadWalletsFromStorage(db);
-    if (publicDerivers.length === 1 && !isTrezorTWallet(newWallet.getParent())) {
+    if (publicDerivers.length === 1 && !isAnyTrezorWallet(newWallet.getParent())) {
       notifyAllTabsCashbackWalletChange();
     }
   })().catch(console.error);

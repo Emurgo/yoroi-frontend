@@ -1,6 +1,6 @@
 // @flow
 import LocalStorageApi from '../../../../../app/api/localStorage';
-import { isTrezorTWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
+import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { getAllAddressesForDisplay } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getDb } from '../../state';
@@ -51,7 +51,7 @@ const handlers = Object.freeze({
     const publicDerivers = await loadWalletsFromStorage(db);
     const result = [];
     for (const publicDeriver of publicDerivers) {
-      if (!isTrezorTWallet(publicDeriver.getParent())) {
+      if (!isAnyTrezorWallet(publicDeriver.getParent())) {
         result.push({
           id: publicDeriver.getPublicDeriverId(),
           address: (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address,
