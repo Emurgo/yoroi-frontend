@@ -33,6 +33,10 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.2new',
     defaultMessage: '!!!Dark mode',
   },
+  update3: {
+    id: 'wallet.revampAnnouncement.updates.3new',
+    defaultMessage: '!!!Trezor Safe 3 and Safe 5 support"',
+  },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
     defaultMessage: '!!!Go to the wallet',
@@ -98,7 +102,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                   width: '100%',
                 }}
               >
-                {[messages.update1, messages.update2].map(message => (
+                {[messages.update1, messages.update2, messages.update3].map(message => (
                   <Typography component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>
