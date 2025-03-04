@@ -213,6 +213,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (isRevampDialogOpen)
       return (
         <RevampAnnouncementDialog
+          // $FlowIgnore[incompatible-type]
           onClose={async () => {
             await stores.profile.setLastAnnouncedFeatureVersion('5.5.0');
             this.props.stores.uiDialogs.closeActiveDialog();

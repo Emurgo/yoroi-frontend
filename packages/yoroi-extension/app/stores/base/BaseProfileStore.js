@@ -243,7 +243,7 @@ export default class BaseProfileStore
       && !this.getLastAnnouncedFeatureVersionRequest.isExecuting) {
       this.getLastAnnouncedFeatureVersionRequest.execute();
     }
-    return this.getLastAnnouncedFeatureVersionRequest.result;
+    return this.getLastAnnouncedFeatureVersionRequest.result ?? null;
   }
 
   @action
