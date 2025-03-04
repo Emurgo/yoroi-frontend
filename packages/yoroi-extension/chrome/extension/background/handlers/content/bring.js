@@ -79,7 +79,7 @@ const handlers = Object.freeze({
 async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
   const publicDerivers = (await loadWalletsFromStorage(db)).filter(publicDeriver =>
-    !isTrezorTWallet(publicDeriver.getParent())
+    !isAnyTrezorWallet(publicDeriver.getParent())
   );
   if (!publicDerivers.length) {
     return null;
