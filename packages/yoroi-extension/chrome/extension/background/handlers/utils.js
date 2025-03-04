@@ -22,7 +22,7 @@ import {
   getAllAddressesForWallet,
 } from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
-import { isLedgerNanoWallet, isTrezorTWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
+import { isLedgerNanoWallet, isAnyTrezorWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import {
   isCardanoHaskell,
@@ -120,7 +120,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   const network = conceptualWallet.getNetworkInfo();
 
   const isLedger = isLedgerNanoWallet(conceptualWallet);
-  const isTrezor = isTrezorTWallet(conceptualWallet);
+  const isTrezor = isAnyTrezorWallet(conceptualWallet);
   const isHardware = isLedger || isTrezor;
   const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
@@ -296,7 +296,7 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
   const network = publicDeriver.getParent().getNetworkInfo();
 
   const isLedger = isLedgerNanoWallet(publicDeriver.getParent());
-  const isTrezor = isTrezorTWallet(publicDeriver.getParent());
+  const isTrezor = isAnyTrezorWallet(publicDeriver.getParent());
   const isHardware = isLedger || isTrezor;
   const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
