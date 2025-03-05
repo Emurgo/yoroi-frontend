@@ -28,11 +28,9 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: false,
         }}
       >
-        {(environment.isDev() || environment.isNightly()) && (
-          <Box sx={{ mt: '20px' }}>
-            <ThemeToggler intl={intl} />
-          </Box>
-        )}
+        <Box sx={{ mt: '20px' }}>
+          <ThemeToggler intl={intl}/>
+        </Box>
       </Box>
     );
   }
