@@ -19,8 +19,11 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
+// $FlowIgnore: suppressing this error
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
+// $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
+// $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data

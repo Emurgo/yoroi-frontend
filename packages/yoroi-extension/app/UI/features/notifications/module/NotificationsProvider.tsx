@@ -7,6 +7,7 @@ import LocalStorageApi from '../../../../api/localStorage';
 import PubSub from 'pubsub-js';
 import { useHistory } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
+import { ampli } from '../../../../../ampli/index';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
@@ -56,39 +57,29 @@ export default function NotificationsProvider({ children }) {
 
   const handleToastClose = props => {
     toast.update(props.toastId, { data: { event: 'closed' } });
-    // todo: implement analytics
-    console.log('close toast', props);
     toast.dismiss(props.toastId);
+
+    // analytics for close event
+    const { data } = props;
+    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+    ampli.inAppNotificationClosed({ type: analyticsTypeValue });
   };
 
   const handleToastClick = props => {
     toast.update(props.toastId, { data: { event: 'clicked' } });
-    // todo: implement analytics
-    console.log('click toast', props);
     toast.dismiss(props.toastId);
 
     const { data } = props;
-    switch (data.type) {
-      case NotificationTypes.Income:
-        history.push(ROUTES.WALLETS.TRANSACTIONS);
-        break;
-      case NotificationTypes.Outcome:
-        history.push(ROUTES.WALLETS.TRANSACTIONS);
-        break;
-      case NotificationTypes.Rewards:
-        history.push(ROUTES.STAKING);
-        break;
-      case NotificationTypes.Cancelled:
-        history.push(ROUTES.WALLETS.TRANSACTIONS);
-        break;
-      default:
-        return;
-    }
+    // analytics for click event
+    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+    ampli.inAppNotificationOpened({ type: analyticsTypeValue });
+    // redirect after analytics
+    const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
+    history.push(redirectTo);
   };
 
-  const handleToastExpired = props => {
-    // todo: implement analytics
-    console.log('toast expired', props);
+  const handleToastExpired = () => {
+    // do nothing for now
   };
 
   const isActiveSettingsForWallet = async () => {
@@ -100,12 +91,10 @@ export default function NotificationsProvider({ children }) {
   const createNotification = async (type: NotificationTypes, id?: string) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
-
     // Early returns:
-    // - return if settings are off
+    // return if settings are off
     if (!notifyWallet) return;
-
-    // - return if we're on the same route as the event redirection
+    // return if we're on the same route as the event redirection
     switch (type) {
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
@@ -145,23 +134,19 @@ export default function NotificationsProvider({ children }) {
   };
 
   const handleToastChanges = props => {
-    console.log(props, toastQueue);
     // event is expired, trigger callback
     if (props.status === 'removed' && !Boolean(props.data.event)) {
-      handleToastExpired(props);
+      handleToastExpired();
       return;
     }
 
-    // Remove the oldest toast if more than 3 exist
-    if (toastQueue.length >= 3 && props.status === 'added') {
-      toast.dismiss(toastQueue[0]);
-      setToastQueue(prev => [...prev.slice(-2), props.id]);
-      return;
-    }
-
-    // add to queue if a new one is added
     if (props.status === 'added') {
+      ampli.inAppNotificationViewed();
+      // Remove the oldest toast if more than 3 exist
+      toastQueue.length >= 3 && toast.dismiss(toastQueue[0]);
+      // Update toast queue
       setToastQueue(prev => [...prev.slice(-2), props.id]);
+      return;
     }
   };
 

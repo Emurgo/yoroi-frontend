@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { intlShape } from 'react-intl';
+import { intlShape, IntlProvider } from 'react-intl';
 import { IntlProvider as IntlCustomProvider } from '../../context/IntlProvider';
-import { IntlProvider } from 'react-intl';
 
 export class IntlContextProvider extends React.Component {
   static defaultProps = {
