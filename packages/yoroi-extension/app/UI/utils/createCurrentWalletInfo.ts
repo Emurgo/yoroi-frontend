@@ -6,25 +6,7 @@ import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from 
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
-
-// TODO To be added and constructed from wallet apo
-const primaryTokenFullInfo = {
-  application: 'coin',
-  decimals: 6,
-  description: 'Cardano',
-  fingerprint: '',
-  id: '.',
-  name: 'ADA',
-  nature: 'primary',
-  originalImage: '',
-  reference: '',
-  status: 'valid',
-  symbol: '₳',
-  tag: '',
-  ticker: 'ADA',
-  type: 'ft',
-  website: 'https://www.cardano.org/',
-};
+import { networkConfigs } from './network-config';
 
 export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   if (!state.drepDelegation) return null;
@@ -183,6 +165,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const selectedExplorer = explorers.selectedExplorer.get(networkId);
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
+    const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -197,7 +180,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       backendService: BackendService,
       backendServiceZero: BackendServiceZero,
       isHardwareWallet: isHardware,
-      primaryTokenInfo: { ...primaryTokenFullInfo, quantity: shiftedAmount },
+      primaryTokenInfo: { ...primaryTokenInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
         ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
