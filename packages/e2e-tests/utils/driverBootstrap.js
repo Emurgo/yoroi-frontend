@@ -72,6 +72,7 @@ const getChromeBuilder = () => {
     .addArguments('--disable-gpu')
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
+    .addArguments('--remote-debugging-pipe')
     .setUserPreferences({ 'download.default_directory': downloadsDir });
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');

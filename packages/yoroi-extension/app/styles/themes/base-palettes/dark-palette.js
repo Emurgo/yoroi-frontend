@@ -51,10 +51,15 @@ export const darkPalette = {
   sys_orange_500: '#FAB357',
   sys_orange_100: '#291802',
 
+  static_green: '#08C29D',
+
   bg_gradient_1:
     'linear-gradient(195deg, rgba(26, 227, 187, 0.26) 0.57%, rgba(75, 109, 222, 0.10) 41.65%, rgba(75, 109, 222, 0.16) 100%)',
   bg_gradient_2: 'linear-gradient(206deg, rgba(11, 153, 125, 0.48) -10.43%, rgba(8, 194, 157, 0.08) 100%)',
   bg_gradient_3: 'linear-gradient(23deg, #2E4BB0 15.04%, #2B3E7D 84.96%)',
   special_web_overlay: 'rgba(31, 35, 46, 0.80)',
   special_web_bg_sidebar: 'rgba(0, 0, 0, 0.16)',
+  light_shadow_dropdown_words: `0px 3px 10px rgba(24, 26, 30, 0.08)`, // dropdown shadow
+  light_shadow_dropdown_menu: `0px 4px 10px rgba(24, 26, 30, 0.16)`,
+  light_shadow_notification: `-1px 8px 20px 0px rgba(138, 146, 163, 0.1)`,
 };

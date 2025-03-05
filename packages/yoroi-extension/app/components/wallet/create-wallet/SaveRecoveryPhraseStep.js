@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Stack, Typography, Box } from '@mui/material';
+import { Stack, Typography, Box, styled } from '@mui/material';
 import StepController from './StepController';
 import { CREATE_WALLET_SETPS, isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import HowToSaveRecoveryPhraseTipsDialog from './HowToSaveRecoveryPhraseTipsDialog';
@@ -19,6 +19,14 @@ const messages: * = defineMessages({
     defaultMessage: '!!!Click <strong>“Show recovery phrase”</strong> below to reveal and keep it.',
   },
 });
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -44,14 +52,16 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
-          <Typography component="div">
+          <Typography component="div" color="ds.text_gray_medium">
             <FormattedHTMLMessage {...messages.description} />
           </Typography>
           <Box
             sx={{ cursor: 'pointer' }}
             onClick={() => openDialog(HowToSaveRecoveryPhraseTipsDialog)}
           >
-            <InfoIcon />
+            <IconWrapper>
+              <InfoIcon />
+            </IconWrapper>
           </Box>
         </Stack>
 
@@ -64,7 +74,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         )}
 
         <StepController
-          actions={[
+          stepActions={[
             {
               label: intl.formatMessage(globalMessages.backButtonLabel),
               disabled: false,

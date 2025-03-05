@@ -11,6 +11,7 @@ import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
 type drepDelegation = { status: string | null; drep: string | null };
+type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
 
 type GovernanceAnalytics = {
   governanceChooseDrepPageViewed: () => void,
@@ -51,6 +52,7 @@ type GovernanceProviderProps = {
   signDelegationTransaction: (params: any) => Promise<void>;
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
+  getCurrentPrice: GetCurrentPrice;
   ampli: GovernanceAnalytics;
 };
 
@@ -63,6 +65,7 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
+  getCurrentPrice,
   ampli,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
@@ -79,7 +82,6 @@ export const GovernanceContextProvider = ({
     backendService,
     defaultTokenInfo,
     unitOfAccount,
-    getCurrentPrice,
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,

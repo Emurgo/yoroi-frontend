@@ -1,14 +1,8 @@
 export interface IChartDataItem {
-  time: string;
+  label: string;
   value: number;
-  fiatValue: number;
+  changePercent: number;
+  changeValue: number;
 }
 
-export interface IChartData {
-  start24HoursAgo: IChartDataItem[];
-  start1WeekAgo: IChartDataItem[];
-  start1MonthAgo: IChartDataItem[];
-  start6MonthAgo: IChartDataItem[];
-  start1YearAgo: IChartDataItem[];
-  ALL: IChartDataItem[];
-}
+export type IChartData = IChartDataItem[];

@@ -8,7 +8,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import { Stack, Typography } from '@mui/material';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import { ReactComponent as SuccessImg } from '../../../assets/images/transfer-success.inline.svg';
+import { ReactComponent as SuccessImg } from '../../../assets/images/revamp/tx-submitted.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -32,7 +32,6 @@ const messages = defineMessages({
 
 type Props = {|
   +onClose: void => PossiblyAsync<void>,
-  +classicTheme: boolean,
   +process: 'for-sell' | 'normal',
 |};
 
@@ -47,8 +46,8 @@ export default class TransactionSuccessDialog extends Component<Props> {
 
     return (
       <Dialog
-        title={intl.formatMessage(messages.title)}
-        actions={[
+        // title={intl.formatMessage(messages.title)}
+        dialogActions={[
           {
             label: intl.formatMessage(this.props.process === 'normal' ? globalMessages.goToTransactions : messages.goToExchange),
             onClick: this.props.onClose,
@@ -60,7 +59,10 @@ export default class TransactionSuccessDialog extends Component<Props> {
       >
         <Stack alignItems="center">
           <SuccessImg />
-          <Typography component="div" color="ds.text_gray_medium" fontWeight={500} mt="16px" textAlign="center" maxWidth="400px">
+          <Typography mt="48px" color="ds.text_gray_medium" fontWeight="500" variant="h4">
+            {intl.formatMessage(messages.title)}
+          </Typography>
+          <Typography varianr="body1" color="ds.text_gray_low" mt="8px" textAlign="center">
             {intl.formatMessage(this.props.process === 'normal' ? messages.explanation : messages.sellSendDone)}
           </Typography>
         </Stack>

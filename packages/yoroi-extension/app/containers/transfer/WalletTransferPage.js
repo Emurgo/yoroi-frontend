@@ -1,26 +1,33 @@
 // @flow
 import type { Node } from 'react';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { getTokenName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { intlShape } from 'react-intl';
+
 import TransferTypeSelect from '../../components/transfer/cards/TransferTypeSelect';
 import YoroiTransferPage from './YoroiTransferPage';
+import type { StoresProps } from '../../stores';
 
 @observer
-export default class WalletTransferPage extends Component<StoresAndActionsProps> {
+export default class WalletTransferPage extends Component<StoresProps> {
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
+    intl: intlShape.isRequired,
+  };
+
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   // <TODO:PENDING_REMOVAL> paper
   startTransferYoroiPaperFunds: void => void = () => {
-    this.props.actions.yoroiTransfer.startTransferFunds.trigger();
+    this.props.stores.yoroiTransfer.startTransferFunds();
   };
 
   render(): Node {
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
     const wallet = stores.wallets.selected;
     if (wallet == null) {
       return null;
@@ -30,8 +37,11 @@ export default class WalletTransferPage extends Component<StoresAndActionsProps>
 
     return (
       <>
-        <TransferTypeSelect onByron={this.startTransferYoroiPaperFunds} ticker={truncateToken(getTokenName(defaultTokenInfo))} />
-        <YoroiTransferPage actions={actions} stores={stores} />
+        <TransferTypeSelect
+          onByron={this.startTransferYoroiPaperFunds}
+          ticker={truncateToken(getTokenName(defaultTokenInfo))}
+        />
+        <YoroiTransferPage stores={stores} />
       </>
     );
   }

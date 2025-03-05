@@ -25,15 +25,15 @@ import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walle
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { ActionsMap } from '../../actions/index';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { ampli } from '../../../ampli/index';
 
 export default class LedgerConnectStore
-  extends Store<StoresMap, ActionsMap>
+  extends Store<StoresMap>
   implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
 
   // =================== VIEW RELATED =================== //
@@ -59,23 +59,15 @@ export default class LedgerConnectStore
   setup(): void {
     super.setup();
     this._reset();
-    const ledgerConnectAction = this.actions.ada.ledgerConnect;
-    ledgerConnectAction.init.listen(this._init);
-    ledgerConnectAction.cancel.listen(this._cancel);
-    ledgerConnectAction.submitCheck.listen(this._submitCheck);
-    ledgerConnectAction.goBackToCheck.listen(this._goBackToCheck);
-    ledgerConnectAction.submitConnect.listen(this._submitConnect);
-    ledgerConnectAction.submitSave.listen(this._submitSave);
-    ledgerConnectAction.finishTransfer.listen(this._finishTransfer);
   }
 
   /** setup() is called when stores are being created
     * _init() is called when connect dialog is about to show */
-  _init: void => void = () => {
-    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._init)} called`);
+  init: void => void = () => {
+    Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this.init)} called`);
   }
 
-  @action _cancel: void => void = () => {
+  @action cancel: void => void = () => {
     this.teardown();
     if (this.ledgerConnect) {
       this.ledgerConnect.dispose();
@@ -108,7 +100,7 @@ export default class LedgerConnectStore
 
   // =================== CHECK =================== //
   /** CHECK dialog submit(Next button) */
-  @action _submitCheck: void => void = () => {
+  @action submitCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.LOAD;
@@ -117,14 +109,14 @@ export default class LedgerConnectStore
 
   // =================== CONNECT =================== //
   /** CONNECT dialog goBack button */
-  @action _goBackToCheck: void => void = () => {
+  @action goBackToCheck: void => void = () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CHECK;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
   /** CONNECT dialog submit (Connect button) */
-  @action _submitConnect: void => Promise<void> = async () => {
+  @action submitConnect: void => Promise<void> = async () => {
     this.error = undefined;
     this.progressInfo.currentStep = ProgressStep.CONNECT;
     this.progressInfo.stepState = StepState.PROCESS;
@@ -309,6 +301,7 @@ export default class LedgerConnectStore
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
+    ampli.connectWalletDetailsPageViewed();
   };
 
   @action _goToTransfer: void => void = () => {
@@ -318,7 +311,7 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action _submitSave: (string) => Promise<void> = async (
+  @action submitSave: (string) => Promise<void> = async (
     walletName,
   ) => {
     this.error = null;
@@ -327,6 +320,7 @@ export default class LedgerConnectStore
     await this._saveHW(
       walletName,
     );
+    ampli.connectWalletDetailsSubmitted({ hardware_wallet: 'Ledger' });
   };
 
   /** creates new wallet and loads it */
@@ -400,18 +394,19 @@ export default class LedgerConnectStore
 
   async _onSaveSuccess(wallet: WalletState): Promise<void> {
     // close the active dialog
+    const { stores } = this;
     Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._onSaveSuccess)} success`);
-    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
-      this.actions.dialogs.closeActiveDialog.trigger();
+    if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      this.stores.uiDialogs.closeActiveDialog();
     }
 
-    await this.stores.wallets.addHwWallet(wallet);
-    this.actions.wallets.setActiveWallet.trigger({ publicDeriverId: wallet.publicDeriverId });
-    if (this.stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
-      this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+    await stores.wallets.addHwWallet(wallet);
+    stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
+    if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
+      stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
       // show success notification
-      this.stores.wallets.showLedgerWalletIntegratedNotification();
+      stores.wallets.showLedgerWalletIntegratedNotification();
 
       this.teardown();
       Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
@@ -420,9 +415,9 @@ export default class LedgerConnectStore
     }
   }
 
-  _finishTransfer: void => void = () => {
-    this.actions.dialogs.closeActiveDialog.trigger();
-    this.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ROOT });
+  finishTransfer: void => void = () => {
+    this.stores.uiDialogs.closeActiveDialog();
+    this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
     this.stores.wallets.showLedgerWalletIntegratedNotification();

@@ -590,6 +590,10 @@ const globalMessages: * = defineMessages({
     id: 'profile.uriPrompt.form.skipLabel',
     defaultMessage: '!!!Skip',
   },
+  refuseLabel: {
+    id: 'profile.uriPrompt.form.refuseLabel',
+    defaultMessage: '!!!Refuse',
+  },
   checkLabel: {
     id: 'wallet.connect.hw.dialog.step.about.label',
     defaultMessage: '!!!CHECK',
@@ -746,6 +750,10 @@ const globalMessages: * = defineMessages({
   ledgerTitle: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.title',
     defaultMessage: '!!!Ledger Hardware Wallet',
+  },
+  transactions: {
+    id: 'wallet.navigation.transactions',
+    defaultMessage: '!!!Transactions',
   },
   trezorTitle: {
     id: 'wallet.add.optionDialog.connect.hw.trezor.title',

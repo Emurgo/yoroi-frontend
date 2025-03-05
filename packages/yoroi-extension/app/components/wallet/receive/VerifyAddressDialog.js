@@ -2,13 +2,12 @@
 
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
-import type { InjectedLayoutProps } from '../../../styles/context/layout';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape } from 'react-intl';
@@ -23,7 +22,6 @@ import {
   normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
 import { ComplexityLevels } from '../../../types/complexityLevelType';
-import { withLayout } from '../../../styles/context/layout';
 import classnames from 'classnames';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import Dialog from '../../widgets/Dialog';
@@ -35,7 +33,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './VerifyAddressDialog.scss';
 import CopyableAddress from '../../widgets/CopyableAddress';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({
   addressDetailsTitleLabel: {
@@ -58,39 +56,36 @@ type Props = {|
   +onCopyAddressTooltip: string => void,
   +isHardware: boolean,
   +addressInfo: $ReadOnly<StandardAddress>,
-  +classicTheme: boolean,
   +complexityLevel: ?ComplexityLevelType,
+  +isAddressBook: boolean,
 |};
 
 @observer
-class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
+export default class VerifyAddressDialog extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
-  };
-
-  getLabelStyle: void => string = () => {
-    return this.props.classicTheme ? 'SimpleFormField_label FormFieldOverridesClassic_label' : styles.label;
   };
 
   render(): Node {
     const { intl } = this.context;
 
-    const dialogActions = !this.props.isHardware
-      ? []
-      : [
-          {
-            label: intl.formatMessage(messages.verifyAddressButtonLabel),
-            primary: true,
-            isSubmitting: this.props.isActionProcessing,
-            onClick: this.props.verify,
-          },
-        ];
+    const dialogActions =
+      !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
+        ? []
+        : [
+            {
+              label: intl.formatMessage(messages.verifyAddressButtonLabel),
+              primary: true,
+              isSubmitting: this.props.isActionProcessing,
+              onClick: this.props.verify,
+            },
+          ];
 
     return (
       <Dialog
         className={classnames([styles.component, 'VerifyAddressDialog'])}
         title={intl.formatMessage(messages.addressDetailsTitleLabel)}
-        actions={dialogActions}
+        dialogActions={dialogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={this.props.cancel}
@@ -112,7 +107,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const notificationId = 'verify-address-notification';
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.addressLabel)}
         </Typography>
         <div className="verificationAddress">
@@ -144,11 +139,19 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
   renderQrCode: void => Node = () => {
     return (
       <>
-        <div align="center">
-          <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
-        </div>
-        <br />
-        <br />
+        <Box display="flex" justifyContent="center" marginBottom="16px">
+          <Box
+            padding="16px"
+            width="184px"
+            height="184px"
+            borderRadius="8px"
+            sx={{
+              backgroundColor: 'ds.white_static',
+            }}
+          >
+            <QrCodeWrapper value={this.props.addressInfo.address} size={152} />
+          </Box>
+        </Box>
       </>
     );
   };
@@ -173,7 +176,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (stakingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.stakingKeyHashLabel)}
         </Typography>
         <div className="stakingKey" id="verifyAddressDialog-stakingKeyHash-text">
@@ -209,7 +212,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     if (spendingKey == null) return null;
     return (
       <>
-        <Typography variant="body1" color="ds.text_gray_medium" className={this.getLabelStyle()}>
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.spendingKeyHashLabel)}
         </Typography>
         <div className="spendingKey">
@@ -245,7 +248,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
 
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.keyRegistrationPointer)}sdsds
         </Typography>
         <Typography className="keyPointer" variant="body1" color="ds.text_gray_low">
@@ -264,7 +267,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>
-        <Typography className={this.getLabelStyle()} variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(globalMessages.derivationPathLabel)}
         </Typography>
         <div className={derivationClasses}>
@@ -272,7 +275,7 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
             className={styles.hash}
             id="verifyAddressDialog-derivationPath-text"
             variant="body1"
-            color="ds.text_gray_low"
+            color="ds.text_gray_medium"
           >
             {toDerivationPathString(addressing.path)}
           </Typography>
@@ -282,5 +285,3 @@ class VerifyAddressDialog extends Component<Props & InjectedLayoutProps> {
     );
   };
 }
-
-export default (withLayout(VerifyAddressDialog): ComponentType<Props>);

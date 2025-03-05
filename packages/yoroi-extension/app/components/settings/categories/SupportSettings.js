@@ -1,12 +1,11 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../styles/context/layout';
 
 const messages = defineMessages({
   faqTitle: {
@@ -53,36 +52,34 @@ type Props = {|
   +onPaperWalletTransfer: void => void,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class SupportSettings extends Component<Props & InjectedProps> {
+export default class SupportSettings extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   render(): Node {
-    const { onExternalLinkClick, onDownloadLogs, isRevampLayout } = this.props;
+    const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;
 
     const faqLink = (
-      <a
+      <Link
         href={intl.formatMessage(globalMessages.faqLinkUrl)}
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-faq-link"
       >
         {intl.formatMessage(messages.faqLink)}
-      </a>
+      </Link>
     );
 
     const supportRequestLink = (
-      <a
+      <Link
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-requestSupport-link"
       >
         {intl.formatMessage(messages.supportRequestLink)}
-      </a>
+      </Link>
     );
 
     const downloadLogsLink = (
@@ -108,42 +105,24 @@ class SupportSettings extends Component<Props & InjectedProps> {
 
     return (
       <Box>
-        {isRevampLayout && (
-          <Typography component="h5" variant="h5" mb="24px" color="ds.text_gray_medium" fontWeight={500}>
-            {intl.formatMessage(globalMessages.support)}
-          </Typography>
-        )}
+        <Typography component="h5" variant="h5" mb="24px" color="ds.text_gray_medium" fontWeight={500}>
+          {intl.formatMessage(globalMessages.support)}
+        </Typography>
 
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: isRevampLayout ? '40px' : '20px',
+            gap: '40px',
           }}
         >
           {sections.map(({ title, text }) => {
             return (
               <Box key={title.id}>
-                <Typography
-                  component="div"
-                  variant={isRevampLayout ? 'body1' : 'h5'}
-                  color="ds.text_gray_medium"
-                  fontWeight={500}
-                  mb="8px"
-                >
+                <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
                   {intl.formatMessage(title)}
                 </Typography>
-                <Typography
-                  component="div"
-                  sx={{
-                    '& a': {
-                      color: 'ds.primary_500',
-                      textDecoration: isRevampLayout ? 'none' : 'underline',
-                    },
-                  }}
-                  color="ds.text_gray_medium"
-                  variant={isRevampLayout ? 'body1' : 'body2'}
-                >
+                <Typography component="div" color="ds.text_gray_medium" variant="body1">
                   {text}
                 </Typography>
               </Box>
@@ -151,10 +130,10 @@ class SupportSettings extends Component<Props & InjectedProps> {
           })}
         </Box>
         <Button
-          variant={isRevampLayout ? 'contained' : 'primary'}
-          size={isRevampLayout ? 'flat' : 'medium'}
+          variant="contained"
+          size="flat"
           onClick={onDownloadLogs}
-          sx={{ marginTop: isRevampLayout ? '40px' : '20px' }}
+          sx={{ marginTop: '40px' }}
           id="settings:support-downloadLogs-buttons"
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
@@ -164,13 +143,7 @@ class SupportSettings extends Component<Props & InjectedProps> {
           <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.paperWallet)}
           </Typography>
-          <Button
-            variant="contained"
-            onClick={this.props.onPaperWalletTransfer}
-            sx={{
-              fontSize: '0.8rem',
-            }}
-          >
+          <Button variant="contained" onClick={this.props.onPaperWalletTransfer}>
             {intl.formatMessage(messages.paperWalletTransfer)}
           </Button>
         </Box>
@@ -178,5 +151,3 @@ class SupportSettings extends Component<Props & InjectedProps> {
     );
   }
 }
-
-export default (withLayout(SupportSettings): ComponentType<Props>);

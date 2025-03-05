@@ -1,8 +1,8 @@
+import { observer } from 'mobx-react';
 import React from 'react';
-import mockData from '../../features/portfolio/common/mockData';
-import PortfolioLayout from './layout';
+import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
 import TokenDetails from './../../features/portfolio/useCases/TokenDetails/TokenDetails';
-import { TokenType } from '../../features/portfolio/common/types';
+import PortfolioLayout from './layout';
 
 type Props = {
   stores: any;
@@ -10,20 +10,22 @@ type Props = {
   match: any;
 };
 
-const PortfolioDetailPage = ({ match, ...props }: Props) => {
+const PortfolioDetailPage = observer(({ match, stores, ...props }: Props) => {
   const tokenId = match.params.tokenId;
 
+  const { ftAssetList } = usePortfolio();
+
   const tokenInfo = React.useMemo(() => {
-    const tmp = mockData.wallet.tokenList.find(item => item.id === tokenId);
-    if (tmp) return tmp;
-    return {} as TokenType;
+    const token = ftAssetList.find(item => item.id === tokenId);
+    if (token) return token;
+    return {};
   }, [tokenId]);
 
   return (
-    <PortfolioLayout {...props}>
-      <TokenDetails tokenInfo={tokenInfo} />
+    <PortfolioLayout {...props} stores={stores}>
+      <TokenDetails tokenInfo={tokenInfo} stores={stores} />
     </PortfolioLayout>
   );
-};
+});
 
 export default PortfolioDetailPage;

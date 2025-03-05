@@ -1,39 +1,27 @@
 // @flow
-import type { ComponentType, Node } from 'react';
+import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import Sidebar from '../components/topbar/Sidebar';
-import type { StoresAndActionsProps } from '../types/injectedProps.types';
-import { allCategories, allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import type { SidebarCategoryRevamp } from '../stores/stateless/sidebarCategories';
+import { allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
-import { withLayout } from '../styles/context/layout';
-import type { LayoutComponentMap } from '../styles/context/layout';
 import { ROUTES } from '../routes-config';
 import { runInAction } from 'mobx';
-
-type Props = {|
-  ...StoresAndActionsProps,
-|};
-type InjectedLayoutProps = {|
-  +selectedLayout: string,
-  +renderLayoutComponent: LayoutComponentMap => Node,
-|};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+import type { StoresProps } from '../stores';
 
 type State = {|
   featureFlags: { [string]: boolean },
 |};
 
 @observer
-class SidebarContainer extends Component<AllProps, State> {
+export default class SidebarContainer extends Component<StoresProps, State> {
 
   state: State = {
     featureFlags: {},
   };
 
   toggleSidebar: void => Promise<void> = async () => {
-    await this.props.actions.profile.toggleSidebar.trigger();
+    await this.props.stores.profile.toggleSidebar();
   };
 
   componentDidMount(): * {
@@ -63,38 +51,16 @@ class SidebarContainer extends Component<AllProps, State> {
   }
 
   render(): Node {
-    const { stores, actions } = this.props;
-    const { profile } = stores;
-
-    const SidebarComponent = (
-      <Sidebar
-        onCategoryClicked={category => {
-          actions.router.goToRoute.trigger({
-            route: category.route,
-          });
-        }}
-        isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
-        categories={allCategories.filter(category =>
-          category.isVisible({
-            hasAnyWallets: stores.wallets.hasAnyWallets === true,
-            selected: stores.wallets.selected,
-            currentRoute: stores.app.currentRoute,
-          })
-        )}
-        onToggleSidebar={this.toggleSidebar}
-        isSidebarExpanded={profile.isSidebarExpanded}
-      />
-    );
-
-    const SidebarRevampComponent = (
+    const { stores } = this.props;
+    return (
       <SidebarRevamp
         onLogoClick={() => {
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: ROUTES.WALLETS.ROOT,
           });
         }}
         onCategoryClicked={category => {
-          actions.router.goToRoute.trigger({
+          stores.app.goToRoute({
             route: category.route,
           });
         }}
@@ -111,11 +77,5 @@ class SidebarContainer extends Component<AllProps, State> {
         )}
       />
     );
-
-    return this.props.renderLayoutComponent({
-      CLASSIC: SidebarComponent,
-      REVAMP: SidebarRevampComponent,
-    });
   }
 }
-export default (withLayout(SidebarContainer): ComponentType<Props>);

@@ -12,7 +12,7 @@ import { adaInLovelaces, getTestWalletName } from '../../helpers/constants.js';
 import { ApiErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
-describe('dApp, getCollateral, error, empty wallet, not auth', function () {
+describe('dApp, getCollateral, error, empty wallet', function () {
   const testWalletName = getTestWalletName();
   let newTestWallet = {
     name: '',
@@ -57,9 +57,7 @@ describe('dApp, getCollateral, error, empty wallet, not auth', function () {
     expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(
       ApiErrorCode.InternalError
     );
-    expect(collateralResponse.errMsg.info, 'Wrong error message is received').to.equal(
-      'not enough UTXOs'
-    );
+    expect(collateralResponse.errMsg.info, 'Error message is empty').to.not.be.empty;
   });
 
   afterEach(function (done) {

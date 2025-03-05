@@ -54,12 +54,12 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import TrezorSendActions from '../../../actions/ada/trezor-send-actions';
-import LedgerSendActions from '../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
+import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
+import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -169,7 +169,6 @@ type Props = {|
   +hasAnyPending: boolean,
   +onSubmit: void => void,
   +totalInput: ?MultiToken,
-  +isClassicTheme: boolean,
   +updateReceiver: (void | string, void | {| handle: string, nameServer: string |}) => void,
   +updateAmount: (?BigNumber) => void,
   +updateMemo: (void | string) => void,
@@ -224,13 +223,27 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendActions,
-  +trezorSend: TrezorSendActions,
+  +ledgerSend: LedgerSendStore,
+  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
   'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
     WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+  },
+}));
+
+const STextField = styled(TextField)(({ theme }) => ({
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected': {
+    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+    '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
+  },
+  '& .MuiFormHelperText-root': {
+    marginInline: 0,
+    mt: 0.5,
+    fontSize: '0.750rem',
+    lineHeight: '1rem',
+    letterSpacing: '0.2px',
   },
 }));
 
@@ -387,7 +400,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       fields: {
         receiver: {
           label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
-          placeholder: this.props.isClassicTheme ? this.context.intl.formatMessage(messages.receiverHint) : '',
+          placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
@@ -447,7 +460,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         },
         amount: {
           label: this.context.intl.formatMessage(globalMessages.amountLabel),
-          placeholder: this.props.isClassicTheme ? `0.${'0'.repeat(this.getNumDecimals())}` : '',
+          placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
             return this.props.uriParams ? formatValue(this.props.uriParams.amount.getDefaultEntry()) : null;
@@ -631,7 +644,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               </Box>
             ) : null}
             <Box sx={{ position: 'relative' }}>
-              <TextField
+              <STextField
                 greenCheck={domainResolverResult != null}
                 isLoading={this.state.domainResolverIsLoading}
                 className="send_form_receiver"
@@ -643,22 +656,14 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
-                sx={{
-                  '& .MuiFormHelperText-root': {
-                    marginInline: 0,
-                    mt: 0.5,
-                    fontSize: '0.750rem',
-                    lineHeight: '1rem',
-                    letterSpacing: '0.2px',
-                  },
-                }}
               />
               {domainResolverResult != null ? (
                 <Typography
                   component="div"
                   variant="caption1"
+                  align="right"
                   color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                  sx={{ position: 'absolute', bottom: '10px', right: '0' }}
+                  sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
                   id="wallet:send:enterAddressStep-domainResolverAddress-text"
                 >
                   {intl.formatMessage(messages.receiverFieldLabelResolvedAddress)}:&nbsp;
@@ -700,8 +705,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               <Typography
                 component="div"
                 variant="caption1"
+                align="right"
                 color={invalidMemo ? 'ds.sys_magenta_500' : 'ds.gray_600'}
-                sx={{ position: 'absolute', bottom: '5px', right: '0' }}
+                sx={{ position: 'absolute', bottom: '28px', right: '0px' }}
               >
                 {memo ? memo.length : 0}/{MAX_MEMO_SIZE}
               </Typography>
@@ -744,7 +750,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             )}
             <Box
               sx={{
-                height: '129px',
+                height: showFiat ? '129px' : '64px',
                 position: 'relative',
                 padding: '16px 0px',
                 borderRadius: '8px',
@@ -820,7 +826,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   placeholder="0"
                 />
 
-                <Typography component="div" variant="button2" color="grey.600" fontWeight={500} mr="12px">
+                <Typography component="div" variant="button2" color="ds.text_gray_low" fontWeight={500} mr="12px">
                   ADA
                 </Typography>
 
@@ -830,10 +836,17 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                   size="small"
                   sx={{
                     '&.MuiButton-sizeSmall': {
-                      lineHeight: '17px',
-                      padding: '8px',
+                      padding: '8px 4px',
                       backgroundColor: 'ds.gray_100',
                       color: 'ds.text_gray_low',
+                      minWidth: '48px',
+                      height: '30px',
+                      ':hover': {
+                        backgroundColor: 'ds.gray_200',
+                      },
+                      ':active': {
+                        backgroundColor: 'ds.gray_300',
+                      },
                     },
                   }}
                   disabled={maxSendableAmount.isExecuting}
@@ -856,7 +869,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }
                   }}
                 >
-                  {maxSendableAmount.isExecuting ? <LoadingSpinner small /> : intl.formatMessage(messages.max)}
+                  {
+                    maxSendableAmount.isExecuting
+                      ? <LoadingSpinner small />
+                      : <Typography variant='body2' fontWeight={500} >
+                          {intl.formatMessage(messages.max)}
+                        </Typography>
+                  }
                 </Button>
               </Box>
               {showFiat && (
@@ -952,7 +971,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             sendMoney={this.props.sendMoney}
             getTokenInfo={this.props.getTokenInfo}
             getCurrentPrice={this.props.getCurrentPrice}
-            isClassicTheme={this.props.isClassicTheme}
             ledgerSendError={this.props.ledgerSendError}
             trezorSendError={this.props.trezorSendError}
             ledgerSend={this.props.ledgerSend}

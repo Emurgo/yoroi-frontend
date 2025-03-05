@@ -113,6 +113,10 @@ const CopyButton = styled(Button)(({ theme }) => ({
 }));
 
 const SImageButton = styled(IconButton)(({ theme }) => ({
+  width: '32px',
+  borderRadius: '8px',
+  ':hover': { backgroundColor: theme.palette.ds.bg_color_contrast_min },
+  ':active': { backgroundColor: theme.palette.ds.gray_200 },
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_medium,
@@ -121,7 +125,7 @@ const SImageButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const STypography = styled(Typography)(({ theme }) => ({
-  color: theme.palette.ds.el_gray_medium
+  color: theme.palette.ds.el_gray_medium,
 }));
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
@@ -172,7 +176,9 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
       <SButton LinkComponent={Link} to={ROUTES.NFTS.ROOT} startIcon={<BackArrow />}>
-        <Typography fontWeight="500">{intl.formatMessage(messages.back)}</Typography>
+        <Typography fontWeight="500" fontSize="14px">
+          {intl.formatMessage(messages.back)}
+        </Typography>
       </SButton>
       <Grid
         container
@@ -230,7 +236,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 </TruncatedText>
               </Box>
 
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={2}>
                 <Link
                   to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
                   onClick={() => {
@@ -239,7 +245,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)', width: '32px' }}>
+                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)' }}>
                     <Chevron />
                   </SImageButton>
                 </Link>
@@ -251,7 +257,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <SImageButton aria-label="Next" sx={{ width: '32px' }}>
+                  <SImageButton aria-label="Next">
                     <Chevron />
                   </SImageButton>
                 </Link>

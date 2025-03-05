@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../../types/injectedProps.types';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -9,9 +8,10 @@ import { defineMessages, intlShape } from 'react-intl';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
 import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
+import { Typography } from '@mui/material';
+import type { StoresProps } from '../../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
   publicDeriverId: number,
 |};
 
@@ -24,7 +24,7 @@ const dialogMessages = defineMessages({
 });
 
 @observer
-export default class ResyncWalletDialogContainer extends Component<Props> {
+export default class ResyncWalletDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
@@ -57,20 +57,32 @@ export default class ResyncWalletDialogContainer extends Component<Props> {
           label: intl.formatMessage(globalMessages.resyncButtonLabel),
           danger: false,
           onClick: async () => {
-            await this.props.actions.walletSettings.resyncHistory.trigger({
+            await this.props.stores.walletSettings.resyncHistory({
               publicDeriverId: this.props.publicDeriverId,
             });
-            this.props.actions.dialogs.closeActiveDialog.trigger();
+            this.props.stores.uiDialogs.closeActiveDialog();
           },
         }}
-        onCancel={this.props.actions.dialogs.closeActiveDialog.trigger}
+        onCancel={this.props.stores.uiDialogs.closeActiveDialog}
         secondaryButton={{
-          onClick: this.props.actions.dialogs.closeActiveDialog.trigger,
+          onClick: this.props.stores.uiDialogs.closeActiveDialog,
         }}
         id="resyncWalletDialog"
       >
-        <p>{intl.formatMessage(messages.resyncExplanation)}</p>
-        <p>{intl.formatMessage(dialogMessages.warning)}</p>
+        <Typography
+          variant='body1'
+          mb='16px'
+          color="ds.text_gray_medium"
+        >
+          {intl.formatMessage(messages.resyncExplanation)}
+        </Typography>
+        <Typography
+          variant='body1'
+          color="ds.text_gray_medium"
+          mb='16px'
+        >
+          {intl.formatMessage(dialogMessages.warning)}
+        </Typography>
       </DangerousActionDialog>
     );
   }

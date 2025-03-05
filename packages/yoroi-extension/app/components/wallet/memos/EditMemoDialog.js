@@ -31,7 +31,6 @@ type Props = {|
   onCancel: void => void,
   onSubmit: TxMemoTableUpsert => Promise<void>,
   onClickDelete: void => void,
-  classicTheme: boolean,
 |};
 
 type State = {|
@@ -57,9 +56,7 @@ export default class EditMemoDialog extends Component<Props, State> {
       memoContent: {
         type: 'memo',
         label: this.context.intl.formatMessage(memoMessages.memoLabel),
-        placeholder: this.props.classicTheme
-          ? this.context.intl.formatMessage(memoMessages.memoLabel)
-          : '',
+        placeholder: '',
         value: this.props.existingMemo.Content,
         validators: [({ field }) => (
           [
@@ -133,7 +130,7 @@ export default class EditMemoDialog extends Component<Props, State> {
       <Dialog
         className={classnames([styles.component])}
         title={intl.formatMessage(memoMessages.editMemo)}
-        actions={actions}
+        dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}

@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import { Box, styled } from '@mui/system';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography, useTheme } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -23,6 +23,7 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransition, delegateToSpecificPool }: Props & Intl): Node {
+  const theme = useTheme();
   const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const avatarGenerated = getAvatarFromPoolId(id);
   const renderDelegationBtn = () => {
@@ -36,7 +37,8 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
 
     return (
       <UndelegateButton
-        variant="text"
+        variant="tertiary"
+        color="primary"
         onClick={undelegate}
         disabled={!undelegate}
         sx={{
@@ -62,7 +64,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
       }}
     >
       <Stack direction="row" px={4} py={2} alignItems="center">
-        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+        <Typography component="div" variant="h5" color={theme.palette.ds.text_gray_medium} fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
         {renderDelegationBtn()}
@@ -85,7 +87,7 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography component="div" color="grayscale.max" variant="body1" fontWeight="medium" mb="3px">
+          <Typography component="div" color={theme.palette.ds.text_gray_medium} variant="body1" fontWeight="medium" mb="3px">
             {ticker !== undefined ? `[${ticker}]` : ''} {name}
           </Typography>
           <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
@@ -94,30 +96,30 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>
         {roa != null ? (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography component="div" variant="caption1" color="grayscale.500" sx={{ textTransform: 'uppercase' }}>
+            <Typography component="div" variant="caption1" color={theme.palette.ds.text_gray_low} sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.roa30d)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color={theme.palette.ds.text_gray_medium} variant="h2">
               {roa} %
             </Typography>
           </Box>
         ) : null}
         {poolSize != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography component="div" variant="caption1" color="grayscale.500" sx={{ textTransform: 'uppercase' }}>
+            <Typography component="div" variant="caption1" color={theme.palette.ds.text_gray_low} sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color={theme.palette.ds.text_gray_medium} variant="h2">
               {poolSize}
             </Typography>
           </Box>
         )}
         {share != null && (
           <Box sx={{ display: 'flex', flexFlow: 'column' }}>
-            <Typography component="div" variant="caption1" color="grayscale.500" sx={{ textTransform: 'uppercase' }}>
+            <Typography component="div" variant="caption1" color={theme.palette.ds.text_gray_low} sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.poolSaturation)}
             </Typography>
-            <Typography as="span" fontWeight={500} color="grayscale.max" variant="h2">
+            <Typography as="span" fontWeight={500} color={theme.palette.ds.text_gray_medium} variant="h2">
               {share} %
             </Typography>
           </Box>
@@ -148,11 +150,13 @@ const AvatarWrapper: any = styled(Box)({
   borderRadius: '20px',
   overflow: 'hidden',
 });
-const AvatarImg: any = styled('img')({
+
+const AvatarImg = styled('img')(({ theme }) => ({
   width: '100%',
-  background: 'white',
+  background: theme.palette.ds.primary_100,
   objectFit: 'scale-down',
-});
+}));
+
 const UndelegateButton: any = styled(Button)({
   minWidth: 'auto',
   width: 'unset',

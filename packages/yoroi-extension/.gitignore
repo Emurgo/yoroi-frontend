@@ -46,3 +46,6 @@ Yoroi Shelley Testnet
 
 # SSL overrides for DEV
 scripts/sslOverrides.js
+
+*.d.ts
+app/UI/**/*.d.ts

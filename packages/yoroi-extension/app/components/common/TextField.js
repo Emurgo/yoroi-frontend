@@ -3,7 +3,6 @@
 import React from 'react';
 import type { ElementRef, Node } from 'react';
 import { IconButton, InputAdornment, TextField as TextFieldBase, useTheme, styled } from '@mui/material';
-import { ReactComponent as ErrorIcon } from '../../assets/images/forms/error.inline.svg';
 import { ReactComponent as DoneIcon } from '../../assets/images/forms/done.inline.svg';
 import { ReactComponent as EyeIcon } from '../../assets/images/forms/password-eye-close.inline.svg';
 import { ReactComponent as CloseEyeIcon } from '../../assets/images/forms/password-eye.inline.svg';
@@ -69,6 +68,7 @@ function TextField({
     event.preventDefault();
   };
 
+  // <TODO:CHECK> pending removal cuz always true? the `-light` part is SUS
   const isRevampTheme = appTheme.name === 'revamp-light';
 
   return (
@@ -91,7 +91,7 @@ function TextField({
           letterSpacing: '0.2px',
         },
         '& .MuiFormLabel-root': {
-          color: theme => `${theme.palette.ds.text_gray_medium} !important`,
+          color: theme => `${theme.palette.ds.text_gray_low} !important`,
           backgroundColor: theme => `${theme.palette.ds.bg_color_max} !important`,
           padding: '0 4px',
         },
@@ -101,6 +101,9 @@ function TextField({
         },
         'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active': {
           WebkitBoxShadow: `0 0 0 30px ${appTheme.palette.ds.bg_color_max} inset !important`,
+        },
+        '& .MuiInputBase-input.Mui-disabled': {
+          '-webkit-text-fill-color': theme => `${theme.palette.ds.text_gray_medium} !important`,
         },
       }}
       /*
@@ -118,7 +121,7 @@ function TextField({
           </InputAdornment>
         ) : type === 'password' ? (
           <InputAdornment position="end" sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}>
-            {Boolean(error) === true && !isRevampTheme ? <ErrorIcon /> : done === true && !isRevampTheme ? <DoneIcon /> : null}
+            {done === true && !isRevampTheme ? <DoneIcon /> : null}
             <SIconButton
               aria-label="toggle password visibility"
               onClick={handleClickShowPassword}
@@ -134,16 +137,14 @@ function TextField({
           </InputAdornment>
         ) : QRHandler ? (
           <InputAdornment position="end" sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}>
-            {Boolean(error) === true && !isRevampTheme ? <ErrorIcon /> : done === true && !isRevampTheme ? <DoneIcon /> : null}
+            {done === true && !isRevampTheme ? <DoneIcon /> : null}
             <SIconButton aria-label="QR Code Scanner" onClick={QRHandler} edge="end">
               <QRLogo />
             </SIconButton>
           </InputAdornment>
         ) : (
           <InputAdornment position="end">
-            {Boolean(error) === true && !isRevampTheme ? (
-              <ErrorIcon id="input-error-icon" />
-            ) : (done === true && !isRevampTheme) || greenCheck ? (
+            {(done === true && !isRevampTheme) || greenCheck ? (
               <DoneIcon id="input-done-icon" />
             ) : null}
           </InputAdornment>

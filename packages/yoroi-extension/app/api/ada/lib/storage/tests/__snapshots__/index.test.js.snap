@@ -801,11 +801,11 @@ Object {
     },
     Object {
       "Endpoints": Object {
-        "address": "https://testnet.cardanoscan.io/address/",
-        "pool": "https://testnet.cardanoscan.io/pool/",
-        "stakeAddress": "https://testnet.cardanoscan.io/stakeKey/",
-        "token": "https://testnet.cardanoscan.io/token/",
-        "transaction": "https://testnet.cardanoscan.io/transaction/",
+        "address": "https://preprod.cardanoscan.io/address/",
+        "pool": "https://preprod.cardanoscan.io/pool/",
+        "stakeAddress": "https://preprod.cardanoscan.io/stakeKey/",
+        "token": "https://preprod.cardanoscan.io/token/",
+        "transaction": "https://preprod.cardanoscan.io/transaction/",
       },
       "ExplorerId": 450,
       "IsBackup": true,

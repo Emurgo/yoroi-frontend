@@ -1,14 +1,11 @@
 // @flow
-import type { Node, ComponentType } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
-import type { LayoutComponentMap } from '../../styles/context/layout';
+import type { Node } from 'react';
 import { Component } from 'react';
-import { observer } from 'mobx-react';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
+import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { genLookupOrFail, getTokenName } from '../../stores/stateless/tokenHelpers';
-import { withLayout } from '../../styles/context/layout';
 import { Box } from '@mui/system';
 import MyWallets from '../../components/wallet/my-wallets/MyWallets';
 import TopBarLayout from '../../components/layout/TopBarLayout';
@@ -19,81 +16,58 @@ import WalletSubRow from '../../components/wallet/my-wallets/WalletSubRow';
 import NavPlate from '../../components/topbar/NavPlate';
 import SidebarContainer from '../SidebarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import NavBar from '../../components/topbar/NavBar';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import WalletSync from '../../components/wallet/my-wallets/WalletSync';
 import moment from 'moment';
-import NavBarAddButton from '../../components/topbar/NavBarAddButton';
-import BuySellAdaButton from '../../components/topbar/BuySellAdaButton';
 import globalMessages from '../../i18n/global-messages';
-import BuySellDialog from '../../components/buySell/BuySellDialog';
 import NavBarRevamp from '../../components/topbar/NavBarRevamp';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
-
-type Props = StoresAndActionsProps;
-
-type InjectedLayoutProps = {| +renderLayoutComponent: LayoutComponentMap => Node |};
-type AllProps = {| ...Props, ...InjectedLayoutProps |};
+import type { StoresProps } from '../../stores';
 
 @observer
-class MyWalletsPage extends Component<AllProps> {
+export default class MyWalletsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
 
   onClose: void => void = () => {
-    this.props.actions.dialogs.closeActiveDialog.trigger();
+    this.props.stores.uiDialogs.closeActiveDialog();
   };
 
   openDialogWrapper: any => void = dialog => {
-    this.props.actions.dialogs.open.trigger({ dialog });
+    this.props.stores.uiDialogs.open({ dialog });
   };
 
   updateHideBalance: void => Promise<void> = async () => {
-    await this.props.actions.profile.updateHideBalance.trigger();
+    await this.props.stores.profile.updateHideBalance();
   };
 
   handleWalletNavItemClick: number => void = (
     publicDeriverId
   ) => {
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.WALLETS.ROOT,
       publicDeriverId,
     });
   };
 
   openToSettings: (number) => void = publicDeriverId => {
-    this.props.actions.wallets.setActiveWallet.trigger({
+    this.props.stores.wallets.setActiveWallet({
       publicDeriverId
     });
-    this.props.actions.router.goToRoute.trigger({
+    this.props.stores.app.goToRoute({
       route: ROUTES.SETTINGS.WALLET,
     });
   };
 
   render(): Node {
     const { intl } = this.context;
-    const { actions, stores } = this.props;
+    const { stores } = this.props;
 
-    const sidebarContainer = <SidebarContainer actions={actions} stores={stores} />;
-    const { wallets } = this.props.stores.wallets;
+    const sidebarContainer = <SidebarContainer stores={stores} />;
+    const { wallets } = stores.wallets;
     const navbarTitle = <NavBarTitle title={intl.formatMessage(globalMessages.sidebarWallets)} />;
-    const navbarElementClassic = (
-      <NavBar
-        title={navbarTitle}
-        button={
-          <NavBarAddButton
-            onClick={() =>
-              this.props.actions.router.goToRoute.trigger({ route: ROUTES.WALLETS.ADD })
-            }
-          />
-        }
-        buyButton={
-          <BuySellAdaButton onBuySellClick={() => this.openDialogWrapper(BuySellDialog)} />
-        }
-      />
-    );
 
     const navbarElementRevamp = (
       <NavBarRevamp
@@ -107,18 +81,13 @@ class MyWalletsPage extends Component<AllProps> {
       />
     );
 
-    const navbarElement = this.props.renderLayoutComponent({
-      CLASSIC: navbarElementClassic,
-      REVAMP: navbarElementRevamp,
-    });
-
     const walletsList = <Box flex={1}>{wallets.map(wallet => this.generateRow(wallet))}</Box>;
 
     return (
       <TopBarLayout
-        banner={<BannerContainer actions={actions} stores={stores} />}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
-        navbar={navbarElement}
+        navbar={navbarElementRevamp}
         showInContainer
       >
         <MyWallets>{walletsList}</MyWallets>
@@ -240,4 +209,3 @@ class MyWalletsPage extends Component<AllProps> {
     return walletSubRow;
   };
 }
-export default (withLayout(MyWalletsPage): ComponentType<Props>);

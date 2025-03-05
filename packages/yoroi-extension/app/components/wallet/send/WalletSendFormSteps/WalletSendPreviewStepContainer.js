@@ -11,12 +11,12 @@ import type { ISignRequest } from '../../../../api/common/lib/transactions/ISign
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { ampli } from '../../../../../ampli/index';
-import TrezorSendActions from '../../../../actions/ada/trezor-send-actions';
-import LedgerSendActions from '../../../../actions/ada/ledger-send-actions';
 import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
 import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from '../../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import LedgerSendStore from '../../../../stores/ada/send/LedgerSendStore';
+import TrezorSendStore from '../../../../stores/ada/send/TrezorSendStore';
 
 // TODO: unmagic the constants
 const MAX_VALUE_BYTES = 5000;
@@ -36,7 +36,6 @@ type Props = {|
   +onUpdateStep: (step: number) => void,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +isClassicTheme: boolean,
   +openTransactionSuccessDialog: void => void,
   +sendMoneyRequest: SendMoneyRequest,
   +sendMoney: (params: {|
@@ -51,8 +50,8 @@ type Props = {|
   |}) => Promise<void>,
   +ledgerSendError: null | LocalizableError,
   +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendActions,
-  +trezorSend: TrezorSendActions,
+  +ledgerSend: LedgerSendStore,
+  +trezorSend: TrezorSendStore,
   selectedExplorer: Map<number, SelectedExplorer>,
   +selectedWallet: WalletState,
 |};
@@ -61,8 +60,8 @@ type Props = {|
 export default class WalletSendPreviewStepContainer extends Component<Props> {
   componentWillUnmount() {
     this.props.sendMoneyRequest.reset();
-    this.props.ledgerSend.cancel.trigger();
-    this.props.trezorSend.cancel.trigger();
+    this.props.ledgerSend.cancel();
+    this.props.trezorSend.cancel();
   }
 
   onSubmit: ({| password: string |}) => Promise<void> = async ({ password }) => {
@@ -71,18 +70,21 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
 
     if (signRequest == null) throw new Error('Unexpected missing active signing request');
 
+    const amount = signRequest.totalInput();
+    const { numberOfDecimals } = this.props.getTokenInfo(amount.getDefaultEntry()).Metadata;
     ampli.sendSummarySubmitted({
+      ada_amount: amount.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
       asset_count: signRequest.totalInput().nonDefaultEntries().length,
     });
 
     if (selectedWallet.type === 'ledger') {
-      await ledgerSend.sendUsingLedgerWallet.trigger({
+      await ledgerSend.sendUsingLedgerWallet({
         params: { signRequest },
         onSuccess: openTransactionSuccessDialog,
         wallet: selectedWallet,
      });
     } else if (selectedWallet.type === 'trezor') {
-      await trezorSend.sendUsingTrezor.trigger({
+      await trezorSend.sendUsingTrezor({
         params: { signRequest },
         onSuccess: openTransactionSuccessDialog,
         wallet: selectedWallet,
@@ -106,7 +108,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
       selectedWallet,
       selectedExplorer,
       sendMoneyRequest,
-      isClassicTheme,
       getTokenInfo,
       getCurrentPrice,
     } = this.props;
@@ -154,7 +155,6 @@ export default class WalletSendPreviewStepContainer extends Component<Props> {
         }
         onSubmit={this.onSubmit}
         isSubmitting={sendMoneyRequest.isExecuting}
-        classicTheme={isClassicTheme}
         unitOfAccountSetting={unitOfAccountSetting}
         addressToDisplayString={addr => addressToDisplayString(addr, network)}
         selectedNetwork={network}

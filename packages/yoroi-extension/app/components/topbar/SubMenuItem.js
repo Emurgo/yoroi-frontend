@@ -1,11 +1,10 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SubMenuItem.scss';
 import { Box, Typography } from '@mui/material';
-import { withLayout } from '../../styles/context/layout';
 
 type Props = {|
   +label: string,
@@ -16,10 +15,8 @@ type Props = {|
   locationId: string,
 |};
 
-type InjectedProps = {| +isRevampLayout: boolean |};
-
 @observer
-class SubMenuItem extends Component<Props & InjectedProps> {
+export default class SubMenuItem extends Component<Props> {
   static defaultProps: {| disabled: boolean |} = {
     disabled: false,
   };
@@ -44,7 +41,7 @@ class SubMenuItem extends Component<Props & InjectedProps> {
         onClick={onClick}
         id={locationId + '-' + subMenuItemId + 'SubTab-button'}
       >
-        <Typography variant="body1" fontWeight="500" color={active ? 'primary.500' : 'grayscale.600'}>
+        <Typography variant="body1" fontWeight={500}>
           {label}
         </Typography>
       </Box>
@@ -53,22 +50,39 @@ class SubMenuItem extends Component<Props & InjectedProps> {
 }
 
 function getStyles(active: boolean): Object {
-  if (active)
-    return {
+  let componentStyles = {};
+  if (active) {
+    componentStyles = {
       borderBottomColor: 'ds.text_primary_medium',
+      borderBottom: '2px solid',
       color: 'ds.text_primary_medium',
       ':hover': {
         borderBottomColor: 'ds.text_primary_max',
         color: 'ds.text_primary_max',
-      },
-      fontWeight: 500,
-      marginRight: '24px',
+      }
     };
+  } else {
+    componentStyles = {
+      color: 'ds.text_gray_low',
+      ':hover': {
+        color: 'ds.text_gray_medium',
+      }
+    };
+  }
 
   return {
-    fontWeight: 500,
+    ...componentStyles,
     marginRight: '24px',
+    padding: '6px 0px',
+    textAlign: 'left',
+    ':focus': {
+      outlineColor: 'ds.sys_yellow_500',
+      outlineWidth: '2px',
+      outlineStyle: 'solid',
+    },
+    '&.Mui-disabled': {
+      color: 'ds.text_gray_min',
+      borderBottomColor: active ? 'ds.el_gray_min' : 'transparent',
+    },
   };
 }
-
-export default (withLayout(SubMenuItem): ComponentType<Props>);

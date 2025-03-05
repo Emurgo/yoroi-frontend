@@ -10,10 +10,10 @@ import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from 
 import { truncateToken } from '../../utils/formatters';
 import { getAuthorFromTokenMetadata, getDescriptionFromTokenMetadata, getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { StoresAndActionsProps } from '../../types/injectedProps.types';
+import type { StoresProps } from '../../stores';
 
 type Props = {|
-  ...StoresAndActionsProps,
+  ...StoresProps,
 |};
 type MatchProps = {|
   match: Match,

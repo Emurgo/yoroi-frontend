@@ -15,6 +15,7 @@ import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import { Box, Button, Fade, Stack, Typography } from '@mui/material';
 import environment from '../../../../../environment';
+import { ampli } from '../../../../../../ampli/index';
 
 const messages = defineMessages({
   title: {
@@ -137,29 +138,17 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
-    const allWordsEntered =
-      recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
+    const allWordsEntered = recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
     const mnemonicError = intl.formatMessage(messages.incorrectRecoveryPhrase);
+    const wordEntered = recoveryPhrase.some(word => Boolean(word.value));
+    const clearAllButtonColor = wordEntered ? 'ds.text_primary_medium' : 'ds.text_primary_min';
 
     if (isValidPhrase && !form.submitted) this.submit();
 
     return (
-      <Box
-        sx={{
-          width: '100%',
-          borderRadius: '8px',
-          marginBottom: '16px',
-        }}
-      >
-        <Stack
-          gap="8px"
-          p="16px 0px"
-          flexDirection="row"
-          flexWrap="wrap"
-          alignItems="center"
-          justifyContent="center"
-        >
+      <Box>
+        <Stack gap="8px" p="16px 0px" flexDirection="row" flexWrap="wrap" alignItems="center" justifyContent="center">
           {recoveryPhrase?.map((word, idx) => {
             const wordField = form.$(`recoveryPhrase[${idx}].value`);
             const fieldBind = wordField.bind();
@@ -186,7 +175,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                   }}
                   variant="body1"
                 >
-                  <Typography component="div" variant="body1" color="ds.primary_500" width="24px">
+                  <Typography component="div" variant="body1" color="ds.text_primary_medium" width="24px">
                     {idx + 1}.
                   </Typography>
 
@@ -203,6 +192,13 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                     noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
                     {...fieldBind}
                     onFocus={e => e.target.setSelectionRange(0, e.target.value?.length)}
+                    onChange={(newWord) => {
+                      fieldBind.onChange(newWord);
+                      if (newWord && idx === recoveryPhrase.length - 1) {
+                        const isValid = isValidMnemonic(form.values().recoveryPhrase);
+                        ampli.restoreWalletEnterPhraseStepStatus({ recovery_prhase_status: isValid });
+                      }
+                    }}
                   />
                 </Box>
               </Stack>
@@ -216,17 +212,17 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
               <Button
                 variant="outlined"
                 color="primary"
-                size="small"
                 onClick={form.onReset}
-                disabled={!recoveryPhrase.some(word => Boolean(word.value))}
+                disabled={!wordEntered}
                 sx={{
                   border: 0,
                   height: '32px',
                   fontSize: '14px',
                   lineHeight: '15px',
-                  padding: '0px',
-                  mb: '8px',
-                  ml: '-6px',
+                  '&.MuiButton-sizeMedium': {
+                    px: '20px',
+                    py: '9px',
+                  },
                   minWidth: 0,
                   minHeight: 0,
                   '&:hover': { border: 0 },
@@ -234,7 +230,9 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                 }}
                 id="clearAllButton"
               >
-                {intl.formatMessage(messages.clearAll)}
+                <Typography variant="button2" color={clearAllButtonColor}>
+                  {intl.formatMessage(messages.clearAll)}
+                </Typography>
               </Button>
             </Fade>
 
@@ -249,13 +247,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
         <Fade in={isValidPhrase}>
           <Stack gap="10px" direction="row" mt="12px" alignItems="center">
             <VerifiedIcon />
-            <Typography
-              component="div"
-              variant="body1"
-              fontWeight={500}
-              id="validPhraseMessage"
-              color="ds.gray_900"
-            >
+            <Typography component="div" variant="body1" fontWeight={500} id="validPhraseMessage" color="ds.text_gray_medium">
               {intl.formatMessage(messages.verified)}
             </Typography>
           </Stack>

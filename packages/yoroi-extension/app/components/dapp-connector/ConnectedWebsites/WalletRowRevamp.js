@@ -83,16 +83,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
   };
 
   render(): Node {
-    const {
-      url,
-      plate,
-      onRemoveWallet,
-      balance,
-      shouldHideBalance,
-      walletName,
-      websiteIcon,
-      id,
-    } = this.props;
+    const { url, plate, onRemoveWallet, balance, shouldHideBalance, walletName, websiteIcon, id } = this.props;
     const { showDeleteIcon } = this.state;
 
     const [, plateIcon] = constructPlate40(plate);
@@ -112,10 +103,8 @@ export default class WalletRowRevamp extends Component<Props, State> {
           mb: '12px',
           position: 'relative',
           borderRadius: '8px',
-          border: '1px solid',
-          borderColor: 'ds.gray_200',
           '&:hover': {
-            borderColor: 'grayscale.400',
+            backgroundColor: 'ds.bg_color_contrast_min',
           },
         }}
         id={id}
@@ -126,7 +115,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
             <Typography component="div" variant="caption1" color="grayscale.900" id="connectedWalletNameLabel">
               {walletName}
             </Typography>
-            <Typography component="div" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
+            <Typography color="ds.text_gray_medium" variant="body2" fontWeight={500} id="connectedWalletBalanceLabel">
               {this.renderAmountDisplay({
                 shouldHideBalance,
                 amount: balance,

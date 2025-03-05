@@ -37,6 +37,14 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& rect': {
+      fill: theme.palette.ds.primary_100,
+    },
+  },
+}));
+
 const messages = defineMessages({
   summary: {
     id: 'wallet.staking.summary',
@@ -124,7 +132,9 @@ function SummaryCard({
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <StakingIcon />
+          <IconWrapper>
+            <StakingIcon />
+          </IconWrapper>
           <InfoDetails>
             <Typography component="div" variant="caption1" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
@@ -143,7 +153,9 @@ function SummaryCard({
             </OverviewButton> */}
         </InfoRow>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <TotalDelegatedIcon />
+          <IconWrapper>
+            <TotalDelegatedIcon />
+          </IconWrapper>
           <InfoDetails>
             <Typography
               component="div"

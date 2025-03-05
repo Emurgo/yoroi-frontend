@@ -11,7 +11,6 @@ import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 type Props = {|
   +progressInfo: ProgressInfo,
   +error: ?LocalizableError,
-  +classicTheme: boolean
 |};
 
 @observer

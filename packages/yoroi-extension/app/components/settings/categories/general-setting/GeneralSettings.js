@@ -1,10 +1,10 @@
 // @flow
 import { Component } from 'react';
-import type { Node, ComponentType } from 'react';
+import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
-import { Box, MenuItem, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -14,8 +14,8 @@ import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { withLayout } from '../../../../styles/context/layout';
-import type { InjectedLayoutProps } from '../../../../styles/context/layout';
+import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
+import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
 type Props = {|
   +languages: Array<LanguageType>,
@@ -37,7 +37,7 @@ const messages = defineMessages({
 });
 
 @observer
-class GeneralSettings extends Component<Props & InjectedLayoutProps> {
+export default class GeneralSettings extends Component<Props> {
   static defaultProps: {| error: void |} = {
     error: undefined,
   };
@@ -53,18 +53,14 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(
-          this.props.isRevampLayout
-            ? messages.languageSelectLabel
-            : globalMessages.languageSelectLabel
-        ),
+        label: this.context.intl.formatMessage(messages.languageSelectLabel),
         value: this.props.currentLocale,
       },
     },
   });
 
   render(): Node {
-    const { languages, isSubmitting, error, isRevampLayout } = this.props;
+    const { languages, isSubmitting, error } = this.props;
     const { intl } = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
@@ -74,54 +70,58 @@ class GeneralSettings extends Component<Props & InjectedLayoutProps> {
       svg: language.svg,
     }));
     const componentClassNames = classNames([styles.component, 'general']);
+    const selectedLanguage = languageOptions.filter(item => item.value === this.props.currentLocale)[0];
 
     return (
       <div className={componentClassNames}>
-        {isRevampLayout && (
-          <Typography component="div" variant="body1" mb="16px" color="grayscale.900" fontWeight={500}>
-            {intl.formatMessage(messages.languageLabel)}
-          </Typography>
-        )}
+        <Typography component="div" variant="body1" mb="16px" color="ds.text_gray_medium" fontWeight={500}>
+          {intl.formatMessage(messages.languageLabel)}
+        </Typography>
         <Box
           sx={{
-            width: isRevampLayout ? '506px' : '100%',
+            width: '506px',
           }}
         >
+          <GlobalStyledScrollbar />
           <Select
             labelId="languages-select"
             {...languageId.bind()}
             onChange={this.selectLanguage}
             disabled={isSubmitting}
-            renderValue={value => (
-              <Typography component="div" variant="body1">
-                {languageOptions.filter(item => item.value === value)[0].label}
+            renderValue={() => (
+              <Typography component="div" variant="body1" color="ds.text_gray_medium">
+                {selectedLanguage.label}
               </Typography>
             )}
           >
             {languageOptions.map(option => (
-              <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
+              <MenuItemStyled
+                key={option.value}
+                value={option.value}
+                id={'selectLanguage-' + option.value + '-menuItem'}
+              >
                 <FlagLabel svg={option.svg} label={option.label} />
-              </MenuItem>
+              </MenuItemStyled>
             ))}
           </Select>
           {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
         </Box>
 
         {!tier1Languages.includes(languageId.value) && (
-          <div className={styles.info}>
-            <h1>{intl.formatMessage(globalMessages.languageSelectLabelInfo)}</h1>
-            <div>
+          <Box component="div" className={styles.info}>
+            <Typography variant="body2" color="ds.text_gray_medium" fontWeight={500}>
+              {intl.formatMessage(globalMessages.languageSelectLabelInfo)}
+            </Typography>
+            <Typography variant="body2" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.languageSelectInfo)}{' '}
               {listOfTranslators(
                 intl.formatMessage(globalMessages.translationContributors),
                 intl.formatMessage(globalMessages.translationAcknowledgment)
               )}
-            </div>
-          </div>
+            </Typography>
+          </Box>
         )}
       </div>
     );
   }
 }
-
-export default (withLayout(GeneralSettings): ComponentType<Props>);

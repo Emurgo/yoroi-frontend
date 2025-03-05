@@ -7,8 +7,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import {
   checkCorrectWalletIsDisplayed,
   restoreWallet,
-  preloadDBAndStorage,
-  waitTxPage,
+  prepareWallet,
 } from '../helpers/restoreWalletHelper.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
@@ -23,10 +22,9 @@ describe('Removing the first wallet, two wallets is added', function () {
   let logger = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadDBAndStorage(webdriver, logger, 'testWallet1');
-    await waitTxPage(webdriver, logger);
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   // restore the second wallet

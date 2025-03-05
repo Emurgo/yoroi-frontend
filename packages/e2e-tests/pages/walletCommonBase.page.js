@@ -1,5 +1,12 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import { defaultWaitTimeout, halfSecond, oneMinute, oneSecond } from '../helpers/timeConstants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class WalletCommonBase extends BasePage {
@@ -107,6 +114,10 @@ class WalletCommonBase extends BasePage {
     locator: '.AmountDisplay_isLoading',
     method: 'css',
   };
+  walletIsLoadingLogo = {
+    locator: '.Loading_yoroiLogo',
+    method: 'css',
+  };
   // modal window of selecting a wallet
   // "Discover a new Yoroi" modal window
   dialogUpdatesTitleLocator = {
@@ -122,30 +133,17 @@ class WalletCommonBase extends BasePage {
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 
-    const [walletName, walletPlate] = await this.waitPresentedAndAct(
-      this.walletNameAndPlateNumberTextLocator,
-      async () => {
-        const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
-        return rawNameAndPlateText.split('\n');
-      }
-    );
+    const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+    const [walletName, walletPlate] = rawNameAndPlateText.split('\n');
 
-    const adaBalance = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
-      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-      const [numberPart, ] = rawBalanceText.split(' ');
-      const digits = numberPart.split('\n');
-      return Number(digits.join(''));
-    });
+    const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+    const [numberPart] = rawBalanceText.split(' ');
+    const digits = numberPart.split('\n');
+    const adaBalance = Number(digits.join(''));
 
-    const [fiatBalance, fiatCurrency] = await this.waitPresentedAndAct(
-      this.walletFiatBalanceTextLocator,
-      async () => {
-        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-        const [fiatBalanceStr, fiatCurrencyInner] = rawFiatBalanceText.split(' ');
-        const fiatBalanceInner = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
-        return [fiatBalanceInner, fiatCurrencyInner];
-      }
-    );
+    const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+    const [fiatBalanceStr, fiatCurrency] = rawFiatBalanceText.split(' ');
+    const fiatBalance = fiatBalanceStr === '-' ? 0 : Number(fiatBalanceStr);
 
     const walletInfo = {
       name: walletName,
@@ -161,8 +159,12 @@ class WalletCommonBase extends BasePage {
   }
   async closeUpdatesModalWindow() {
     this.logger.info(`WalletCommonBase::closeUpdatesModalWindow is called`);
-    await this.waitForElement(this.dialogUpdatesTitleLocator);
-    await this.waitForElement(this.dialogUpdatesGoToWalletButtonLocator);
+    await this.customWaitIsPresented(this.dialogUpdatesTitleLocator, fiveSeconds, quarterSecond);
+    await this.customWaitIsPresented(
+      this.dialogUpdatesGoToWalletButtonLocator,
+      fiveSeconds,
+      quarterSecond
+    );
     await this.click(this.dialogUpdatesGoToWalletButtonLocator);
     await this.sleep(500);
   }
@@ -170,9 +172,11 @@ class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
     const state = await this.customWaiter(
       async () => {
-        const elAmount = await this.findElements(this.prepareWalletBannerLocator);
-        const loadersAmount = await this.findElements(this.walletIsLoadingSpinnerLocator);
-        return elAmount.length === 0 && loadersAmount.length === 0;
+        const bannersElems = await this.findElements(this.prepareWalletBannerLocator);
+        // const loadersElems = await this.findElements(this.walletIsLoadingSpinnerLocator);
+        // TEMPORARY SOLUTION because of the issue https://emurgo.atlassian.net/browse/YOEXT-1288
+        const loadersElems = [];
+        return bannersElems.length === 0 && loadersElems.length === 0;
       },
       oneMinute,
       halfSecond
@@ -180,6 +184,22 @@ class WalletCommonBase extends BasePage {
     if (!state) {
       this.logger.error(
         `WalletCommonBase::waitPrepareWalletBannerIsClosed The prepare wallet banner is still displayed after ${
+          oneMinute / 1000
+        } seconds`
+      );
+      throw new Error(`The wallet is still loading after ${oneMinute / 1000} seconds`);
+    }
+  }
+  async waitInitialWalletLoaderIsClosed() {
+    this.logger.info(`WalletCommonBase::waitInitialWalletLoaderisClosed is called`);
+    const state = await this.customWaitIsNotPresented(
+      this.walletIsLoadingLogo,
+      oneMinute,
+      halfSecond,
+    );
+    if (!state) {
+      this.logger.error(
+        `WalletCommonBase::waitInitialWalletLoaderisClosed The wallet loading banner is still displayed after ${
           oneMinute / 1000
         } seconds`
       );
@@ -293,7 +313,7 @@ class WalletCommonBase extends BasePage {
       this.walletBalanceTextLocator,
       async () => {
         const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-        const balanceStr = rawBalanceText.split(' ')[0];
+        const balanceStr = rawBalanceText.split(' ')[0].trim();
         return balanceStr === balanceReplacer;
       }
     );
@@ -302,7 +322,7 @@ class WalletCommonBase extends BasePage {
       this.walletFiatBalanceTextLocator,
       async () => {
         const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0];
+        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0].trim();
         return fiatBalanceStr === balanceReplacer;
       }
     );

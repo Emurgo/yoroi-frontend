@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 
 type Props = {|
   +label: string,
@@ -15,6 +15,14 @@ type Props = {|
   +sx?: Object,
   +tooltip?: Node,
 |};
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.sys_magenta_500,
+    },
+  },
+}));
 
 @observer
 export default class ReceiveNavButtonRevamp extends Component<Props> {
@@ -49,7 +57,7 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
           <Typography component="div" variant="body1" fontWeight={this.props.isActive ? 500 : 400}>
             {this.props.label}
           </Typography>
-          <Box component="span" color="grayscale.600" sx={{ '& path': { fill: 'currentcolor' } }}>
+          <Box component="span">
             {this.props.tooltip}
           </Box>
         </Box>
@@ -85,9 +93,9 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
       >
         {this.renderButton()}
         {IconComponent != null && (
-          <div>
+          <IconWrapper>
             <IconComponent />
-          </div>
+          </IconWrapper>
         )}
       </Box>
     );
