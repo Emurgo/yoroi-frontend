@@ -8,17 +8,17 @@ export const messages = Object.freeze(
       id: 'notifications.description.clickToView',
       defaultMessage: '!!!Click to view',
     },
-    tokensReceived: {
+    assetsReceived: {
       id: 'notifications.title.income',
-      defaultMessage: '!!!Tokens received',
+      defaultMessage: '!!!Assets received',
     },
     txFailed: {
       id: 'notifications.title.cancelled',
       defaultMessage: '!!!Transaction failed',
     },
-    tokensSent: {
+    assetsSent: {
       id: 'notifications.title.outcome',
-      defaultMessage: '!!!Tokens sent',
+      defaultMessage: '!!!Assets sent',
     },
     stakingRewardsReceived: {
       id: 'notifications.title.rewards',
@@ -32,9 +32,9 @@ export const useStrings = () => {
 
   return React.useRef({
     clickToView: intl.formatMessage(messages.clickToView),
-    tokensReceived: intl.formatMessage(messages.tokensReceived),
+    assetsReceived: intl.formatMessage(messages.assetsReceived),
     txFailed: intl.formatMessage(messages.txFailed),
-    tokensSent: intl.formatMessage(messages.tokensSent),
+    assetsSent: intl.formatMessage(messages.assetsSent),
     stakingRewardsReceived: intl.formatMessage(messages.stakingRewardsReceived),
   }).current;
 };

@@ -19,7 +19,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
-import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider'
+import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
@@ -95,12 +95,7 @@ class App extends Component<Props, State> {
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
           <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
-            <IntlContextProvider>
-              <NotificationsProvider>
-                <NotificationsManager />
-                {this.getContent()}
-              </NotificationsProvider>
-            </IntlContextProvider>
+            {this.getContent()}
           </IntlProviderWrapper>
         </ColorModeProvider>
       </div>
@@ -117,10 +112,15 @@ class App extends Component<Props, State> {
     }
     return (
       <Router history={history}>
-        <div style={{ height: '100%' }}>
-          <Support />
-          {Routes(stores)}
-        </div>
+        <IntlContextProvider>
+          <NotificationsProvider>
+            <NotificationsManager />
+            <div style={{ height: '100%' }}>
+              <Support />
+              {Routes(stores)}
+            </div>
+          </NotificationsProvider>
+        </IntlContextProvider>
       </Router>
     );
   };

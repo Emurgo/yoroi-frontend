@@ -15,9 +15,9 @@ import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import moment, { Moment } from 'moment';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions'
 import { refreshTransactions } from '../../api/thunk';
-import {NotificationTopics} from '../../UI/features/notifications/module/NotificationsProvider'
+// import {NotificationTopics} from '../../UI/features/notifications/module/NotificationsProvider'
+// import PubSub from 'pubsub-js';
 import BigNumber from 'bignumber.js';
-import PubSub from 'pubsub-js';
 import Store from '../base/Store';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import CardanoShelleyTransaction from '../../domain/CardanoShelleyTransaction';
@@ -178,7 +178,8 @@ export default class TransactionsStore extends Store<StoresMap> {
         withdrawalIds.add(txid);
       }
 
-      PubSub.publish(NotificationTopics.NEW_TX, {txid})
+      // TODO: Filter out new tx by best block
+      // PubSub.publish(NotificationTopics.NEW_TX, {txid})
     }
     await this._updateTransactionPriceData(publicDeriver, timestamps);
     await Promise.all([
