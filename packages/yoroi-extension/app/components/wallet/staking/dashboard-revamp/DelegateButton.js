@@ -19,8 +19,6 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
   const onDelegate = async () => {
     const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
-    const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -42,7 +40,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         ],
         kind: 'delegate',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: signTxRequest.unsignedTx,
     });
   };
 

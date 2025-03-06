@@ -138,16 +138,16 @@ export default function CancelSwapOrderDialog({
           fullWidth
           variant="destructive"
           onClick={async () => {
-            try {
-              await onCancelOrder(order, password);
-            } catch (e) {
-              if (e instanceof WrongPassphraseError) {
-                setIncorrectPassword(true);
-                return;
-              }
-              console.error('Failed to process order cancel! ', e);
-              alert('Failed to process order cancel! ' + stringifyError(e));
-            }
+            // try {
+            //   await onCancelOrder(order, password);
+            // } catch (e) {
+            //   if (e instanceof WrongPassphraseError) {
+            //     setIncorrectPassword(true);
+            //     return;
+            //   }
+            //   console.error('Failed to process order cancel! ', e);
+            //   alert('Failed to process order cancel! ' + stringifyError(e));
+            // }
           }}
           disabled={isLoading || (isPasswordWallet && password.length === 0)}
         >

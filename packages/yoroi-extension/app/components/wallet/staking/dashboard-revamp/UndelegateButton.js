@@ -32,9 +32,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     stores.substores.ada.delegationTransaction.setShouldDeregister(true);
     const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
 
-    const txBodyjson = await unsignedTx.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
-
     openTxReviewModal({
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
@@ -55,7 +52,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
         ],
         kind: 'undelegate',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: unsignedTx.unsignedTx,
     });
   };
 

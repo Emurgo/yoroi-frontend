@@ -367,12 +367,10 @@ function SwapPage(props: StoresProps & Intl): Node {
     };
     const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     const unsigned = txSignRequest;
-    const txBodyjson = await unsigned.unsignedTx.build_tx().to_json();
-
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
+    const txBodyjson = unsigned.unsignedTx;
 
     runInAction(() => {
-      setParsedSignRequest(parsedUnsignedTx);
+      setParsedSignRequest(txBodyjson);
       setSignRequest(txSignRequest);
     });
   };

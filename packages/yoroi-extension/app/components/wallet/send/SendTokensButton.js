@@ -7,8 +7,6 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
-    const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -16,7 +14,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
       operations: {
         kind: 'send',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: signTxRequest.unsignedTx,
     });
   };
 

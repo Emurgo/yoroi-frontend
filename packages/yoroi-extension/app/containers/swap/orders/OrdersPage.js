@@ -5,14 +5,14 @@ import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { MappedOrder } from './hooks';
 import type { FormattedTokenValue } from './util';
 import moment from 'moment';
-import AssetPair from '../../../components/common/assets/AssetPair';
+import AssetPair, { tokenImg } from '../../../components/common/assets/AssetPair';
 import Table from '../../../components/common/table/Table';
 import Tabs from '../../../components/common/tabs/Tabs';
 import CancelSwapOrderDialog from '../../../components/swap/CancelOrderDialog';
 import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useSwap } from '@yoroi/swap';
 import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
@@ -21,7 +21,7 @@ import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
 import { fail, forceNonNull, maybe } from '../../../coreUtils';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import { truncateAddressShort } from '../../../utils/formatters';
+import { truncateAddress, truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { useRichOrders } from './hooks';
 import { createFormattedTokenValues } from './util';
@@ -31,6 +31,8 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
+import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { SummaryRow } from '../asset-swap/SwapTxInfo';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -91,6 +93,16 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       width: 'auto',
     },
   ];
+
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    networkId,
+    stakeKeyDeposit,
+    primaryTokenInfo,
+    showTxResultModal,
+    changeModalView,
+  } = useTxReviewModal();
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
   const [cancellationState, setCancellationState] = useState<?{|
@@ -170,23 +182,31 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
   };
 
-  // const handleTxCancelRequest = async order => {
-  //   console.log('order', order);
-  //   try {
-  //     let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
-  //       wallet,
-  //     });
-  //     let collateralReorgTxHex: ?string = null;
-  //     let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
+  const handleTxCancelRequest = async order => {
+    console.log('order', order);
+    try {
+      let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
+        wallet,
+      });
+      console.log('======= handleTxCancelRequest', { order, utxoHex });
+      let collateralReorgTxHex: ?string = null;
+      let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
+      let hasCollateral = false;
+      if (utxoHex == null) {
+        const { unsignedTxHex, txData, collateralUtxoHex } = await swapStore.createCollateralReorgForCancel({ wallet });
+        collateralReorgTxHex = unsignedTxHex;
+        collateralReorgTxData = txData;
+        utxoHex = collateralUtxoHex;
+        hasCollateral = true;
+      }
+      return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData, hasCollateral);
+    } catch (e) {
+      console.error('Failed to prepare a collateral utxo for cancel', e);
+      throw e;
+    }
+  };
 
-  //     console.log('utxoHex', utxoHex);
-  //   } catch (e) {
-  //     console.error('Failed to prepare a collateral utxo for cancel', e);
-  //     throw e;
-  //   }
-  // };
-
-  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData) => {
+  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData, hasCollateral) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
@@ -199,6 +219,8 @@ export default function SwapOrdersPage(props: StoresProps): Node {
           collateral: utxoHex,
         },
       });
+      console.log('cancelTxCbor', { cancelTxCbor });
+
       if (cancelTxCbor == null || !isHex(cancelTxCbor)) {
         console.error('Failed to receive swap cancel tx from API. Expected cbor hex, got: ', cancelTxCbor);
         // eslint-disable-next-line no-alert
@@ -222,26 +244,85 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         forceNonNull(defaultTokenInfo.decimals),
         forceNonNull(defaultTokenInfo.decimals)
       );
-      setCancellationState(s => {
-        // State might have been reset to null in the meantime
-        if (s == null) return null;
-        // State might have been recreated for another order in the meantime
-        if (s.order.utxo !== order.utxo) return s;
-        return {
-          order: s.order,
-          collateralReorgTx:
-            collateralReorgTx && collateralReorgTxData ? { cbor: collateralReorgTx, txData: collateralReorgTxData } : undefined,
-          tx: {
-            cbor: cancelTxCbor,
-            formattedFee: formattedFeeValue,
-            formattedReturn: formattedCancelValues,
+      const tx = {
+        cbor: cancelTxCbor,
+        formattedFee: formattedFeeValue,
+        formattedReturn: formattedCancelValues,
+      };
+      console.log('CANCEL DETAILS', { tx });
+      // setCancellationState(s => {
+      //   // State might have been reset to null in the meantime
+      //   if (s == null) return null;
+      //   // State might have been recreated for another order in the meantime
+      //   if (s.order.utxo !== order.utxo) return s;
+      //   return {
+      //     order: s.order,
+      //     collateralReorgTx:
+      //       collateralReorgTx && collateralReorgTxData ? { cbor: collateralReorgTx, txData: collateralReorgTxData } : undefined,
+      //     tx: {
+      //       cbor: cancelTxCbor,
+      //       formattedFee: formattedFeeValue,
+      //       formattedReturn: formattedCancelValues,
+      //     },
+      //   };
+      // });
+
+      if (hasCollateral) {
+        openTxReviewModal({
+          modalView: 'transactionReview',
+          submitTx: (passswordInput, cancelTxCbor) => submitTx(passswordInput, cancelTxCbor),
+          cbor: cancelTxCbor,
+          extraOverviewDetails: {
+            title: 'Cancel swap order details',
+            onClick: () => changeModalView({ modalView: 'extraDetails' }),
+            component: (
+              <SwapTxCancelInfo
+                formattedFeeValue={formattedFeeValue}
+                defaultTokenInfo={defaultTokenInfo}
+                order={order}
+                returnValues={totalCancelOutput}
+                swapPoolLabel={<SwapPoolLabel provider={order.provider} />}
+              />
+            ),
           },
-        };
-      });
+        });
+      }
+      if (hasCollateral === false) {
+        openTxReviewModal({
+          modalView: 'collateralCreation',
+          submitTx: (passswordInput, cancelTxCbor) => submitTx(passswordInput, cancelTxCbor),
+          cbor: cancelTxCbor,
+          operations: {
+            components: [
+              {
+                component: <OperationsDetails />,
+                duplicated: false,
+              },
+            ],
+            kind: 'delegate',
+          },
+        });
+      }
     } catch (e) {
       console.error('Failed to prepare a cancellation transaction', e);
       throw e;
     }
+  };
+
+  const submitTx = async (passswordInput, cancelTxCbor) => {
+    console.log('SUMITTTTTT', passswordInput);
+    const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+      wallet,
+      transactionHex: cancelTxCbor,
+      password: passswordInput,
+    });
+
+    const signedTransactionHexes = signedCollateralReorgTx != null ? [signedCollateralReorgTx, signedCancelTx] : [signedCancelTx];
+
+    await swapStore.executeTransactionHexes({
+      wallet,
+      signedTransactionHexes,
+    });
   };
 
   const handleReorgConfirm = async (cancelledOrder: any, password: string) => {
@@ -370,7 +451,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
                   order={order}
                   defaultTokenInfo={defaultTokenInfo}
                   selectedExplorer={selectedExplorer}
-                  handleCancel={() => handleCancelRequest(order)}
+                  handleCancel={() => handleTxCancelRequest(order)}
                   txHashToRenderedTimestamp={txHashToRenderedTimestamp}
                 />
               ))}
@@ -449,5 +530,84 @@ const OrderRow = ({
         ))}
       </Box>
     </>
+  );
+};
+
+const SwapTxCancelInfo = ({ defaultTokenInfo, order, swapPoolLabel, formattedFeeValue }) => {
+  console.log('order', order);
+  return (
+    <Box p="24px">
+      <Box display="flex" gap="16px" flexDirection="column" mb="24px">
+        <Box>
+          <Box>
+            <AssetAndAmountRow order={order} defaultTokenInfo={defaultTokenInfo} type="from" />
+          </Box>
+        </Box>
+        <Box>
+          <Typography component="div" variant="body1" color="ds.gray_500" mb="14px">
+            Swap to
+          </Typography>
+          <Box>
+            <AssetAndAmountRow order={order} defaultTokenInfo={defaultTokenInfo} type="to" />
+          </Box>
+        </Box>
+      </Box>
+      <Stack direction="column" gap="8px">
+        <SummaryRow col1="DEX">{swapPoolLabel}</SummaryRow>
+        <SummaryRow col1="Asset Price">
+          {order.price} {order.from.token.ticker}/{order.to.token.ticker}
+        </SummaryRow>
+        <SummaryRow col1="Asset amount">
+          {order.amount} {order.to.token.ticker}
+        </SummaryRow>
+        <SummaryRow col1="Total returned">{order?.totalValues ? order.totalValues[0].formattedValue : '-'}</SummaryRow>
+        <SummaryRow col1="Cancellation Fee">
+          {formattedFeeValue} {order.from.token.ticker}
+        </SummaryRow>
+      </Stack>
+    </Box>
+  );
+};
+
+const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
+  const assetName = type === 'from' ? order.from?.token.ticker ?? '-' : order.to?.token.ticker ?? '-';
+  const assetFingerprint = type === 'from' ? order.from?.token.fingerprint ?? '-' : order.to?.token.fingerprint ?? '-';
+  const assetImage =
+    type === 'from'
+      ? tokenImg(order.from.token, defaultTokenInfo, '48px', '48px')
+      : tokenImg(order.to.token, defaultTokenInfo, '48px', '48px');
+  const assetAmount = type === 'from' ? Number(order.from.quantity) : Number(order.to.quantity);
+
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Stack direction="row" justifyContent="flex-start">
+        <Stack direction="row" justifyContent="flex-start" gap="8px">
+          <Box>{assetImage}</Box>
+          <Stack direction="column">
+            <Typography variant="body1" color="ds.gray_900">
+              {assetName}
+            </Typography>
+            <Typography variant="body2" color="ds.gray_600">
+              {truncateAddressShort(assetFingerprint) ?? 'Cardano'}
+            </Typography>
+          </Stack>
+        </Stack>
+      </Stack>
+      <Stack>
+        <Typography variant="body1" color="ds.gray_max">
+          {assetAmount} {assetName}
+        </Typography>
+      </Stack>
+    </Stack>
+  );
+};
+
+const OperationsDetails = () => {
+  return (
+    <Stack direction="column" spacing={2}>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography color="ds.text_gray_low">Colateral creation</Typography>
+      </Stack>
+    </Stack>
   );
 };
