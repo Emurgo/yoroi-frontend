@@ -40,7 +40,7 @@ class BasePage {
   };
 
   async goToUrl(theURL) {
-    this.logger.info('BasePage::goToUrl is called');
+    this.logger.info(`BasePage::goToUrl is called. "${theURL}"`);
     await this.driver.get(theURL);
   }
   async refreshPage() {
@@ -99,8 +99,7 @@ class BasePage {
     return await this.waitPresentedAndAct(
       locator,
       async () => {
-        const locatorElem = await this.findElement(locator);
-        return await locatorElem.getText();
+        return await (await this.findElement(locator)).getText();
       }
     );
   }
