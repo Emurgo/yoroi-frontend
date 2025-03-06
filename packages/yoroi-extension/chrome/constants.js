@@ -63,3 +63,5 @@ export const injectedScripts = [
   'cardanoApiInject.js',
   'initialInject.js',
 ];
+
+export const speculosEndpoint = 'http://localhost:5000';

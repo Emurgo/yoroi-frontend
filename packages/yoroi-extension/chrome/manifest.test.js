@@ -6,9 +6,7 @@ import {
   Ports,
   portToPermission,
 } from '../scripts/connections';
-import {
-  genCSP,
-} from './constants';
+import { genCSP, speculosEndpoint } from './constants';
 import pkg from '../package.json';
 
 export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
@@ -19,6 +17,7 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
     additional: {
       'connect-src': [
         portToPermission(Ports.DevBackendServer),
+        speculosEndpoint,
       ],
     },
   }),
