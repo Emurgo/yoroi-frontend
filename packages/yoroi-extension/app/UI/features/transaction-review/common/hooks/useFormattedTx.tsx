@@ -12,7 +12,6 @@ import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, networkId } = useTxReviewModal();
-  console.log('useFormattedTx data', data);
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const collateral = data?.collateral ?? [];
@@ -63,7 +62,6 @@ export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo, wallet
 };
 
 const formatInputs = async (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
-  console.log('inputUtxos', inputUtxos);
   return Promise.all(
     inputUtxos.map(async (utxo, index) => {
       const address = utxo?.receiver;

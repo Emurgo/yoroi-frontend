@@ -34,8 +34,7 @@ const getCborTxBody = async (cbor: any) => {
 };
 
 const getUnsignedTxTxBody = async (unsignedTx: any) => {
-  console.log('unsignedTx', unsignedTx.unsignedTx);
-  const txBodyjson = await unsignedTx.unsignedTx.build_tx().to_json();
+  const txBodyjson = await unsignedTx.build_tx().to_json();
   const parsedUnsignedTx = JSON.parse(txBodyjson);
   return parsedUnsignedTx;
 };

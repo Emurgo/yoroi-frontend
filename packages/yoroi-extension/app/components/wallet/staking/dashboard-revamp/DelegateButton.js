@@ -5,14 +5,7 @@ import { TransactionResult } from '../../../../UI/features/transaction-review/co
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolName, poolID }) => {
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    networkId,
-    stakeKeyDeposit,
-    primaryTokenInfo,
-    showTxResultModal,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal } = useTxReviewModal();
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;

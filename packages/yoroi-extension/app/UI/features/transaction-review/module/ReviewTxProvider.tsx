@@ -18,6 +18,7 @@ type ModalState = {
   isLoading: boolean;
   modalView: 'transactionReview' | 'walletInfo';
   unsignedTx: YoroiUnsignedTx | null;
+  cborTx: YoroiUnsignedTx | null;
 };
 type ModalActions = {
   openTxReviewModal: any;
@@ -25,6 +26,7 @@ type ModalActions = {
   changePasswordInputValue: any;
   setInputError: any;
   setUnsignedTx: any;
+  setCborTx: any;
   closeTxReviewModal: () => void;
   startLoadingTxReview: () => void;
   stopLoadingTxReview: () => void;
@@ -89,6 +91,7 @@ export const ReviewTxProvider = ({
       dispatch({ type: 'close' });
     },
     openTxReviewModal: (payload: any) => {
+      console.log('payload', payload);
       dispatch({
         type: 'open',
         title: payload.title,
@@ -97,7 +100,7 @@ export const ReviewTxProvider = ({
         width: payload.width,
         modalView: payload.modalView,
         unsignedTx: payload.unsignedTx,
-        cbor: payload.cbor,
+        cborTx: payload.cborTx,
         receiverCustomTitle: payload.receiverCustomTitle,
         submitTx: payload.submitTx,
         createUnsignedTx: payload.createUnsignedTx,
@@ -128,6 +131,12 @@ export const ReviewTxProvider = ({
       dispatch({
         type: 'setUnsignedTx',
         unsignedTx: payload.unsignedTx,
+      });
+    },
+    setCborTx: (payload: any) => {
+      dispatch({
+        type: 'setCborTx',
+        cborTx: payload.cborTx,
       });
     },
     startLoadingTxReview: () => dispatch({ type: 'startLoading', isLoading: true }),
@@ -181,7 +190,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         isLoading: false,
         modalView: action.modalView ?? defaultState.modalView,
         unsignedTx: action.unsignedTx ?? defaultState.unsignedTx,
-        cbor: action.cbor ?? defaultState.cbor,
+        cborTx: action.cborTx ?? defaultState.cborTx,
         receiverCustomTitle: action.receiverCustomTitle,
         submitTx: action.submitTx,
         createUnsignedTx: action.createUnsignedTx,
@@ -200,6 +209,9 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
 
     case 'setUnsignedTx':
       return { ...state, unsignedTx: action.unsignedTx };
+
+    case 'setCborTx':
+      return { ...state, cborTx: action.cborTx };
 
     case 'close':
       return { ...defaultState, isOpen: false, extraDetails: null, receiverCustomTitle: null, operations: null };
@@ -224,7 +236,7 @@ const defaultState: ModalState = Object.freeze({
   isLoading: false,
   modalView: 'transactionReview',
   unsignedTx: null,
-  cbor: null,
+  cborTx: null,
   passswordInput: '',
   inputError: null,
   extraDetails: null,

@@ -27,13 +27,10 @@ export interface SubMenuOption {
 export const ReviewTxSection = () => {
   const theme = useTheme();
 
-  const { unsignedTx, cbor, receiverCustomTitle } = useTxReviewModal();
+  const { unsignedTx, cborTx, receiverCustomTitle } = useTxReviewModal();
 
-  const txBody: any = useTxBody({ cbor, unsignedTx });
-  console.log('txBody', txBody);
-  const formatedTxJsonBody = cbor ? txBody : txBody?.body;
-  console.log('formatedTxJsonBody', formatedTxJsonBody);
-
+  const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
+  const formatedTxJsonBody = cborTx ? txBody : txBody?.body;
   const formattedTx = useFormattedTx(formatedTxJsonBody);
   const formattedMetadata = useFormattedMetadata({ txBody: formatedTxJsonBody, unsignedTx: txBody, cbor: null });
 

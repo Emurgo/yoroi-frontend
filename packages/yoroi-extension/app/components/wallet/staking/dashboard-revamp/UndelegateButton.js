@@ -14,7 +14,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
-    networkId,
   } = useTxReviewModal();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
