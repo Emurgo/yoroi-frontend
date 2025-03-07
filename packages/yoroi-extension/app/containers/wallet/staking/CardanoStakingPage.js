@@ -28,7 +28,7 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
 import { Box } from '@mui/system';
-import { getNetworkById, isTestnet, networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../../stores';
 import { ampli } from '../../../../ampli/index';
 

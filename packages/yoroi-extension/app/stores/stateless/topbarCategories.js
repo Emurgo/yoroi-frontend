@@ -8,7 +8,6 @@ import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-n
 import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
 import { ReactComponent as dashboardIcon } from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
-import { ReactComponent as delegationListIcon } from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
