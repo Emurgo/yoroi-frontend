@@ -86,6 +86,10 @@ class BasePage {
     const clickable = await this.findElement(locator);
     await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
   }
+  async scrollIntoViewElement(webElement) {
+    this.logger.info(`BasePage::scrollIntoViewElement is called.`);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', webElement);
+  }
   async findElement(locator) {
     this.logger.info(`BasePage::findElement is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElement(getByLocator(locator));
