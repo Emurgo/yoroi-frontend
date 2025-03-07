@@ -191,7 +191,10 @@ export class TransactionsSubTab extends WalletTab {
       fiveSeconds,
       quarterSecond
     );
-    const [submenuState, summaryState] = await Promise.all([submenuStatePromise, summaryStatePromise]);
+    const [submenuState, summaryState] = await Promise.all([
+      submenuStatePromise,
+      summaryStatePromise,
+    ]);
 
     return submenuState && summaryState;
   }
@@ -342,6 +345,16 @@ export class TransactionsSubTab extends WalletTab {
     }
     return txsAmount;
   }
+  async scrollIntoViewLastTx() {
+    this.logger.info(`TransactionsSubTab::scrollIntoViewLastTx is called`);
+    const allGroups = await this.__getTxsGroups();
+    let lastTx = null;
+    for (const txGroup of allGroups) {
+      const allTxs = await this.findElements(this.txsInGroupLocator(txGroup.groupIndex));
+      lastTx = allTxs[allTxs.length - 1];
+    }
+    await this.scrollIntoViewElement(lastTx);
+  }
   async showMoreBtnIsDisplayed() {
     this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is called`);
     const state = await this.customWaitIsPresented(
@@ -412,13 +425,18 @@ export class TransactionsSubTab extends WalletTab {
         return await this._pressShowMoreTransactions();
       }
     }
-    this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
+    this.logger.warn(
+      `TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`
+    );
     return false;
   }
   async loadMoreTxs(amountOfLoads = 1) {
     this.logger.info(`TransactionsSubTab::loadMoreTxs is called. Amount of loads ${amountOfLoads}`);
     for (let tryNumber = 0; tryNumber < amountOfLoads; tryNumber++) {
+      this.logger.info(`TransactionsSubTab::loadMoreTxs Try number ${tryNumber}`);
+      await this.scrollIntoViewLastTx();
       const canLoadMore = await this._loadMore();
+      this.logger.info(`TransactionsSubTab::loadMoreTxs Can load more txs ${canLoadMore}`);
       if (!canLoadMore) {
         break;
       }
