@@ -20,10 +20,12 @@ import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
+import semver from 'semver/preload';
 
 type Props = {|
   +children: Node,
 |};
+
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -31,8 +33,13 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   };
 
   componentDidMount() {
-    if (!this.props.stores.profile.isRevampAnnounced)
+    const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
+    if (lastAnnouncedVersion == null) {
+      return;
+    }
+    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.5.0')) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
+    }
   }
 
   checkRoute(): void | string {
@@ -190,8 +197,9 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (isRevampDialogOpen)
       return (
         <RevampAnnouncementDialog
-          onClose={() => {
-            stores.profile.markRevampAsAnnounced();
+          // $FlowIgnore[incompatible-type]
+          onClose={async () => {
+            await stores.profile.setLastAnnouncedFeatureVersion('5.5.0');
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />

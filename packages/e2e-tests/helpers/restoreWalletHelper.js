@@ -138,29 +138,17 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
-    locator: '.stop',
+    locator: 'div.worker-controls > button:nth-child(1)',
     method: 'css',
   };
-  const btnLocator = {
-    locator: '//button',
-    method: 'xpath',
+  const startBtnLocator = {
+    locator: 'div.registration-controls > button:nth-child(2)',
+    method: 'css',
   };
 
-  const stopBtnElems = await basepage.findElements(stopBtnLocator);
-  let stopBtnElem;
-  if (stopBtnElems.length === 1) {
-    stopBtnElem = stopBtnElems[0];
-  } else {
-    stopBtnElem = stopBtnElems[1];
-  }
-  await stopBtnElem.click();
-
+  await basepage.click(stopBtnLocator);
   await basepage.sleep(500);
-
-  const allBtns = await basepage.findElements(btnLocator);
-  const startBtn = allBtns[7];
-  await startBtn.click();
-
+  await basepage.click(startBtnLocator);
   await basepage.sleep(500);
 
   await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);

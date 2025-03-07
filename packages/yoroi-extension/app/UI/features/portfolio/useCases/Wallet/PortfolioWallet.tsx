@@ -8,7 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from '../TokensTable/StatsTable';
 
-const PortfolioWallet = (): JSX.Element => {
+const PortfolioWallet = ({ stores }): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
   const { walletBalance, ftAssetList, showWelcomeBanner, isTestnet } = usePortfolio();
@@ -53,6 +53,7 @@ const PortfolioWallet = (): JSX.Element => {
   return (
     <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
+        stores={stores}
         walletBalance={walletBalance || { ada: '0' }}
         setKeyword={setKeyword}
         isLoading={isLoading}
@@ -70,7 +71,7 @@ const PortfolioWallet = (): JSX.Element => {
           </>
         }
       />
-      <StatsTable data={tokenList} isLoading={isLoading} />
+      <StatsTable data={tokenList} isLoading={isLoading} stores={stores} />
       {showWelcomeBanner && <WelcomeBanner isTestnet={isTestnet} />}
     </Stack>
   );

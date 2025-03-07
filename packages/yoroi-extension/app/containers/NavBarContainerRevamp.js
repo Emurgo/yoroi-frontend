@@ -157,7 +157,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
                 if (isTestnet) {
                   window.open(links.testnetFaucet, '_blank');
                 } else {
-                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS)) {
+                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
                     ampli.walletPageExchangeClicked();
                   }
                   this.props.stores.uiDialogs.open({ dialog: BuySellDialog });

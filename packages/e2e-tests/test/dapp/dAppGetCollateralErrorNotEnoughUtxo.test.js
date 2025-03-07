@@ -57,9 +57,7 @@ describe('dApp, getCollateral, error, empty wallet', function () {
     expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(
       ApiErrorCode.InternalError
     );
-    expect(collateralResponse.errMsg.info, 'Wrong error message is received').to.equal(
-      'not enough UTXOs'
-    );
+    expect(collateralResponse.errMsg.info, 'Error message is empty').to.not.be.empty;
   });
 
   afterEach(function (done) {

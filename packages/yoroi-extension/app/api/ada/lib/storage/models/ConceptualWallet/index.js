@@ -168,7 +168,16 @@ function isHwKind(
   }
   return matchKind(hwWalletMeta);
 }
-export function isTrezorTWallet(
+
+export const isAnyTrezorWallet = (
+  conceptualWallet: IConceptualWallet,
+): boolean => {
+  return isTrezorTWallet(conceptualWallet)
+    || isTrezorSafe3Wallet(conceptualWallet)
+    || isTrezorSafe5Wallet(conceptualWallet);
+};
+
+function isTrezorTWallet(
   conceptualWallet: IConceptualWallet,
 ): boolean {
   const tVendor = Config.wallets.hardwareWallet.trezorT.VENDOR;
@@ -176,6 +185,28 @@ export function isTrezorTWallet(
   return isHwKind(
     conceptualWallet,
     (hwWalletMeta) => hwWalletMeta.Vendor === tVendor && hwWalletMeta.Model === tModel
+  );
+}
+
+function isTrezorSafe3Wallet(
+  conceptualWallet: IConceptualWallet,
+): boolean {
+  const ts3Vendor = Config.wallets.hardwareWallet.trezorSafe3.VENDOR;
+  const ts3Model = Config.wallets.hardwareWallet.trezorSafe3.MODEL;
+  return isHwKind(
+    conceptualWallet,
+    (hwWalletMeta) => hwWalletMeta.Vendor === ts3Vendor && hwWalletMeta.Model === ts3Model
+  );
+}
+
+function isTrezorSafe5Wallet(
+  conceptualWallet: IConceptualWallet,
+): boolean {
+  const ts5Vendor = Config.wallets.hardwareWallet.trezorSafe5.VENDOR;
+  const ts5Model = Config.wallets.hardwareWallet.trezorSafe5.MODEL;
+  return isHwKind(
+    conceptualWallet,
+    (hwWalletMeta) => hwWalletMeta.Vendor === ts5Vendor && hwWalletMeta.Model === ts5Model
   );
 }
 export function isLedgerNanoWallet(

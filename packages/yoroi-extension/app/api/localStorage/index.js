@@ -20,7 +20,7 @@ const storageKeys = {
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
-  IS_REVAMP_THEME_ANNOUNCED: 'IS_REVAMP_THEME_ANNOUNCED',
+  LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
@@ -134,13 +134,13 @@ export default class LocalStorageApi {
   setUserRevampMigrationStatus: boolean => Promise<void> = status =>
     setLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP, status.toString());
 
-  // ========== Revamp Announcement  ========== //
+  // ========== Updates Announcement  ========== //
 
-  getUserRevampAnnouncementStatus: void => Promise<boolean> = async () =>
-    (await getLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED)) === 'true';
+  getLastAnnouncedFeatureVersion: void => Promise<string> = async () =>
+    (await getLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION)) ?? '';
 
-  setUserRevampAnnouncementStatus: boolean => Promise<void> = status =>
-    setLocalItem(storageKeys.IS_REVAMP_THEME_ANNOUNCED, status.toString());
+  setLastAnnouncedFeatureVersion: string => Promise<void> = version =>
+    setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
 
   // ========== Legacy Select Wallet ========== //
 

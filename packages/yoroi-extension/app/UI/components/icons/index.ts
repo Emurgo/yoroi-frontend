@@ -13,6 +13,7 @@ import { Staking } from './Staking';
 import { Switch } from './Switch';
 import { VisibilityOff } from './VisibilityOff';
 import { VisibilityOn } from './VisibilityOn';
+import { Receive } from './Receive';
 
 export const Icon = {
   CloseIcon,
@@ -30,4 +31,5 @@ export const Icon = {
   ChevronUp,
   Search,
   Switch,
+  Receive
 };

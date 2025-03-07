@@ -92,16 +92,16 @@ export default class BaseProfileStore
     (boolean) => Promise<void>
   > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
 
-  @observable getUserRevampAnnouncementStatusRequest: Request<
-    (void) => Promise<boolean>
-  > = new Request<(void) => Promise<boolean>>(
-    this.api.localStorage.getUserRevampAnnouncementStatus
+  @observable getLastAnnouncedFeatureVersionRequest: Request<
+    (void) => Promise<string | null>
+  > = new Request<(void) => Promise<string | null>>(
+    this.api.localStorage.getLastAnnouncedFeatureVersion
   );
 
-  @observable setUserRevampAnnouncementStatusRequest: Request<
-    (boolean) => Promise<void>
-  > = new Request<(boolean) => Promise<void>>(
-    this.api.localStorage.setUserRevampAnnouncementStatus
+  @observable setLastAnnouncedFeatureVersionRequest: Request<
+    (string) => Promise<void>
+  > = new Request<(string) => Promise<void>>(
+    this.api.localStorage.setLastAnnouncedFeatureVersion
   );
 
   @observable getComplexityLevelRequest: Request<
@@ -157,7 +157,7 @@ export default class BaseProfileStore
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
-    noop(this.isRevampAnnounced);
+    noop(this.lastAnnouncedFeatureVersion);
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',
@@ -267,20 +267,18 @@ export default class BaseProfileStore
     );
   }
 
-  @computed get isRevampAnnounced(): boolean {
-    let { result } = this.getUserRevampAnnouncementStatusRequest;
-
-    if (result == null) {
-      result = this.getUserRevampAnnouncementStatusRequest.execute().result;
+  @computed get lastAnnouncedFeatureVersion(): string | null {
+    if (!this.getLastAnnouncedFeatureVersionRequest.wasExecuted
+      && !this.getLastAnnouncedFeatureVersionRequest.isExecuting) {
+      this.getLastAnnouncedFeatureVersionRequest.execute();
     }
-
-    return result === true;
+    return this.getLastAnnouncedFeatureVersionRequest.result ?? null;
   }
 
   @action
-  markRevampAsAnnounced: void => Promise<void> = async () => {
-    await this.setUserRevampAnnouncementStatusRequest.execute(true);
-    await this.getUserRevampAnnouncementStatusRequest.execute();
+  setLastAnnouncedFeatureVersion: string => Promise<void> = async (version) => {
+    await this.setLastAnnouncedFeatureVersionRequest.execute(version);
+    await this.getLastAnnouncedFeatureVersionRequest.execute();
   };
 
   @action

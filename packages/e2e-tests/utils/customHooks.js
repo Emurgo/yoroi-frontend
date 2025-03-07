@@ -3,6 +3,7 @@ import { mockDAppName, popupConnectorName } from '../helpers/windowManager.js';
 
 export const customAfterEach = async (mochaContext, webdriver, logger) => {
   if (mochaContext.currentTest.isFailed()) {
+    logger.info(`--------------------- collecting debug info START ---------------------`);
     const basepage = new BasePage(webdriver, logger);
     // preparing test name
     const curTestTitle = mochaContext.currentTest.title;
@@ -17,6 +18,7 @@ export const customAfterEach = async (mochaContext, webdriver, logger) => {
     // taking browser console logs
     basepage.getBrowserLogs(mochaContext.test.parent.title, testCaseNameWithNumberInTestSuite);
     basepage.getDriverLogs(mochaContext.test.parent.title, testCaseNameWithNumberInTestSuite);
+    logger.info(`--------------------- collecting debug info END ---------------------`);
   }
 };
 

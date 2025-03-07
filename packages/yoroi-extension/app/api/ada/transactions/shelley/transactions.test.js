@@ -405,23 +405,23 @@ describe('Create unsigned TX from UTXO', () => {
 
     await testTxConstruction([0.2, 0.2, 0.2, 0.2, 0.2], {
       inputs: [utxos[3]],
-      fee: '1342',
+      fee: '1138',
       sumInputs: '30000000',
-      sumOutputs: '29998658',
+      sumOutputs: '29998862',
     });
 
     await testTxConstruction([0.7, 0.7, 0.7, 0.7, 0.7], {
       inputs: [utxos[2]],
-      fee: '1414',
+      fee: '1210',
       sumInputs: '10000001',
-      sumOutputs: '9998587',
+      sumOutputs: '9998791',
     });
 
     await testTxConstruction([0.7, 0.2, 0.7, 0.2, 0.7], {
       inputs: [utxos[2]],
-      fee: '1414',
+      fee: '1210',
       sumInputs: '10000001',
-      sumOutputs: '9998587',
+      sumOutputs: '9998791',
     });
   });
 
@@ -463,16 +463,25 @@ describe('Create unsigned TX from UTXO', () => {
     );
 
     // always take utxos[4], take either utxos[2] or utxos[3] randomly
+    let variant;
     try {
-      expect(new Set([utxos[4], utxos[2]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
-      expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998036');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1966');
+      expect(new Set(unsignedTxResponse.senderUtxos)).toEqual(new Set([utxos[2], utxos[4]]));
+      variant = 1;
     } catch {
-      expect(new Set([utxos[4], utxos[3]])).toEqual(new Set(unsignedTxResponse.senderUtxos));
+      expect(new Set(unsignedTxResponse.senderUtxos)).toEqual(new Set([utxos[3], utxos[4]]));
+      variant = 2;
+    }
+
+    if (variant === 1) {
+      expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('12000002');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('11998240');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1762');
+    } else if (variant === 2) {
       expect(unsignedTxResponse.txBuilder.get_explicit_input().coin().to_str()).toEqual('32000001');
-      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998319');
-      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1682');
+      expect(unsignedTxResponse.txBuilder.get_explicit_output().coin().to_str()).toEqual('31998523');
+      expect(unsignedTxResponse.txBuilder.min_fee().to_str()).toEqual('1478');
+    } else {
+      throw new Error('Invalid test variant: ' + variant);
     }
 
     function assertMultiAsset(masset: any, policy: string, name: string, amount: string): void {
@@ -494,8 +503,9 @@ describe('Create unsigned TX from UTXO', () => {
     );
 
     const tx = unsignedTxResponse.txBuilder.build();
+    expect(tx.outputs().len()).toEqual(4);
     assertMultiAsset(
-      tx.outputs().get(4).amount().multiasset(),
+      tx.outputs().get(2).amount().multiasset(),
       assetSplit.policyId,
       assetSplit.name,
       '234',
@@ -1048,12 +1058,12 @@ describe('Create signed transactions', () => {
     const txBody = unsignedTxResponse.txBuilder.build();
     expect(txBody.withdrawals()?.len()).toEqual(1);
     const fee = txBody.fee().to_str();
-    expect(fee).toEqual('1972');
-    expect(txBody.outputs().len()).toEqual(6);
-    expect(txBody.outputs().get(5).amount().coin().to_str()).toEqual(
+    expect(fee).toEqual('1712');
+    expect(txBody.outputs().len()).toEqual(4);
+    expect(txBody.outputs().get(3).amount().coin().to_str()).toEqual(
       new BigNumber(addressedUtxos[3].amount)
         .minus(fee)
-        .minus(5_000_000) // collateral
+        .minus(6_000_000) // collateral
         .plus(withdrawAmount)
         .plus(protocolParams.keyDeposit)
         .toString()
@@ -1066,8 +1076,8 @@ describe('Create signed transactions', () => {
     ].sort();
 
     expect(witArray).toEqual([
-      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840b84f78dabde17e36fbf2fdf683c6aae459288325afb1cd6873e971c408d991c9e8dfcd742c62773276edfb32f40100e50f6949d8f13e34f10bc58354fad3fe0c',
-      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840eba05e14f29629cd90ea8cf0553462714227001c4e0470f278ea84afe3ecedcae4cd5d3fdc73b058991ed79a36829c4889827f2ba43ae6ace6019b8064e8bd0c',
+      '82582001c01f8b958699ae769a246e9785db5a70e023977ea4b856dfacf23c23346caf5840ee22be758cae48eb64c07c201791ecc5b21a3a6c8d3dc8f85073bf32552f605e7c866ce4a23fc0e95ffe8d51912e9d7ed02e3f197174ac556f695b18a5abee04',
+      '82582038c14a0756e1743081a8ebfdb9169b11283a7bf6c38045c4c4a5e62a7689639d5840b06f4d4e7127d21368dfac2210f2e7bf7fa059f9c52481d0cc4f96552177c1d47ace7017851bb055abd0a7a74c4940f0e8d8cc2d7d461bec30a3663716b9a20a',
     ]);
   });
 });

@@ -1,5 +1,6 @@
 import { Box, Divider, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
+import { observer } from 'mobx-react';
 import React from 'react';
 import { BackButton, Card } from '../../../../components';
 import NavigationButton from '../../common/components/NavigationButton';
@@ -20,40 +21,43 @@ const TokenInfo = styled(Stack)({
 
 interface Props {
   tokenInfo: TokenInfoType;
+  stores: any;
 }
 
-const TokenDetails = ({ tokenInfo }: Props): JSX.Element => {
-  const theme: any = useTheme();
-  const navigateTo = useNavigateTo();
-  const strings = useStrings();
-  const isPrimaryToken: boolean = tokenInfo.id === '-';
+const TokenDetails = observer(
+  ({ tokenInfo, stores }: Props): JSX.Element => {
+    const theme: any = useTheme();
+    const navigateTo = useNavigateTo();
+    const strings = useStrings();
+    const isPrimaryToken: boolean = tokenInfo.id === '-';
 
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Header>
-        <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
-        <Stack direction="row" spacing={theme.spacing(2)}>
-          <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
-          <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
-          <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Header>
+          <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
+          <Stack direction="row" spacing={theme.spacing(2)}>
+            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
+            <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
+            <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
+          </Stack>
+        </Header>
+
+        <Stack direction="column" spacing={theme.spacing(3)} sx={{ marginTop: theme.spacing(2) }}>
+          <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(3)}>
+            <Card>
+              <HeaderSection tokenInfo={tokenInfo} stores={stores} />
+              <Divider />
+              <TokenChartInterval tokenInfo={tokenInfo} />
+            </Card>
+
+            <OverviewPerformance tokenInfo={tokenInfo} />
+          </TokenInfo>
+
+          {/* <TransactionTable history={mockData.transactionHistory} tokenName={tokenInfo.name} /> */}
         </Stack>
-      </Header>
-
-      <Stack direction="column" spacing={theme.spacing(3)} sx={{ marginTop: theme.spacing(2) }}>
-        <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(3)}>
-          <Card>
-            <HeaderSection tokenInfo={tokenInfo} />
-            <Divider />
-            <TokenChartInterval tokenInfo={tokenInfo} />
-          </Card>
-
-          <OverviewPerformance tokenInfo={tokenInfo} />
-        </TokenInfo>
-
-        {/* <TransactionTable history={mockData.transactionHistory} tokenName={tokenInfo.name} /> */}
-      </Stack>
-    </Box>
-  );
-};
+      </Box>
+    );
+  }
+);
 
 export default TokenDetails;
