@@ -135,13 +135,11 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     label: messages.delegationById,
     isVisible: request => {
       const { networkId } = request;
-      return (
-        (environment.isTest() || environment.isDev()
-          || environment.isNightly() ||
-         networkId === networks.CardanoPreprodTestnet.NetworkId ||
-         networkId === networks.CardanoPreviewTestnet.NetworkId
-        )
-      );
+      return environment.isTest()
+        || environment.isDev()
+        || environment.isNightly()
+        || networkId === networks.CardanoPreprodTestnet.NetworkId
+        || networkId === networks.CardanoPreviewTestnet.NetworkId;
     },
   },
 ];
