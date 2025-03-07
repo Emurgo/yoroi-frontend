@@ -210,7 +210,6 @@ function SwapPage(props: StoresProps & Intl): Node {
         handleInitialStep();
       } else if (orderStep === 1) {
         const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
-        console.log('processSwapOrder parsedSignRequest', parsedSignRequest);
         openTxReviewModal({
           title: 'Transaction confirmation',
           modalView: 'transactionReview',
