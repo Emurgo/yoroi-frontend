@@ -151,6 +151,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
         wallet,
       });
+      console.log('utxoHex', utxoHex);
       let collateralReorgTxHex: ?string = null;
       let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
       let hasCollateral = true;
@@ -161,11 +162,12 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         utxoHex = collateralUtxoHex;
         hasCollateral = false;
       }
-
+      console.log('COLATEREALL', { collateralReorgTxHex, collateralReorgTxData, utxoHex, hasCollateral });
       return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData, hasCollateral);
     } catch (e) {
       console.error('Failed to prepare a collateral utxo for cancel', e);
-      throw e;
+      const { unsignedTxHex, txData, collateralUtxoHex } = await swapStore.createCollateralReorgForCancel({ wallet });
+      console.log('{ unsignedTxHex, txData, collateralUtxoHex }', { unsignedTxHex, txData, collateralUtxoHex });
     }
   };
 
@@ -226,8 +228,8 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       if (hasCollateral === false) {
         openTxReviewModal({
           modalView: 'collateralCreation',
-          submitTx: passswordInput => submitTx(passswordInput, cancelTxCbor, collateralReorgTxObj, order),
-          cborTx: cancelTxCbor,
+          submitTx: passswordInput => addColateral(passswordInput, cancelTxCbor, collateralReorgTxObj, order),
+          cborTx: collateralReorgTxObj.cbor,
           operations: {
             components: [
               {
@@ -274,6 +276,27 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     } catch (error) {
       console.log('Failed to sign transaction', error);
       showTxResultModal(TransactionResult.FAIL);
+    }
+  };
+  const addColateral = async (passswordInput, cancelTxCbor, collateralReorgTxObj, order: any) => {
+    if (collateralReorgTxObj == null) {
+      console.log('Reorg transaction is not available. Ignoring.');
+      return;
+    }
+
+    try {
+      const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+        wallet,
+        transactionHex: collateralReorgTxObj.cbor,
+        password: passswordInput,
+      });
+
+      console.log('COLLATERA SUCCES', signedCollateralReorgTx);
+      console.log('cancelTxCbor', cancelTxCbor);
+      setCborTx({ type: 'setCborTx', cborTx: cancelTxCbor });
+      changeModalView({ modalView: 'transactionReview' });
+    } catch (error) {
+      console.log('Failed to sign collateral transaction', error);
     }
   };
 
