@@ -109,7 +109,7 @@ export const GovernanceStatusSelection = () => {
 
         openTxReviewModal({
           modalView: 'transactionReview',
-          unsignedTx: txSignRequest.signTxRequest,
+          unsignedTx: txSignRequest.signTxRequest.unsignedTx,
           submitTx: password => {
             signGovernanceTx(password);
           },
