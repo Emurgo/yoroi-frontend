@@ -26,7 +26,6 @@ export interface SubMenuOption {
 
 export const ReviewTxSection = () => {
   const theme = useTheme();
-
   const { unsignedTx, cborTx, receiverCustomTitle } = useTxReviewModal();
 
   const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
