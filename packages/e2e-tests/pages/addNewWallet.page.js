@@ -24,12 +24,24 @@ class AddNewWallet extends WalletCommonBase {
     locator: '.WalletConnectHWOptionDialog_connectTrezor',
     method: 'css',
   };
+  ledgerHWButtonLocator = {
+    locator: '.WalletConnectHWOptionDialog_connectLedger',
+    method: 'css',
+  };
   checkDialogLocator = {
     locator: '.CheckDialog',
     method: 'css',
   };
   nextButtonLocator = {
-    locator: 'primaryButton',
+    locator: 'dialog-next-button',
+    method: 'id',
+  };
+  connectButtonLocator = {
+    locator: 'dialog-connect-button',
+    method: 'id',
+  };
+  saveButtonLocator = {
+    locator: 'dialog-save-button',
     method: 'id',
   };
   connectDialogLocator = {
@@ -95,6 +107,12 @@ class AddNewWallet extends WalletCommonBase {
       await this.click(this.trezorHWButtonLocator);
     });
   }
+  async selectLedgerHW() {
+    this.logger.info(`AddNewWallet::selectLedgerHW is called`);
+    await this.waitPresentedAndAct(this.ledgerHWButtonLocator, async () => {
+      await this.click(this.ledgerHWButtonLocator);
+    });
+  }
   async confirmChecking() {
     this.logger.info(`AddNewWallet::confirmChecking is called`);
     await this.customWaitIsPresented(this.checkDialogLocator, fiveSeconds, quarterSecond);
@@ -107,13 +125,13 @@ class AddNewWallet extends WalletCommonBase {
       }
     });
   }
-  async connectTrezor() {
-    this.logger.info(`AddNewWallet::connectTrezor is called`);
+  async connectHardwareWallet() {
+    this.logger.info(`AddNewWallet::connectHardwareWallet is called`);
     await this.customWaitIsPresented(this.connectDialogLocator, fiveSeconds, quarterSecond);
-    await this.waitPresentedAndAct(this.nextButtonLocator, async () => {
-      const btnEnabled = await this.buttonIsEnabled(this.nextButtonLocator);
+    await this.waitPresentedAndAct(this.connectButtonLocator, async () => {
+      const btnEnabled = await this.buttonIsEnabled(this.connectButtonLocator);
       if (btnEnabled) {
-        await this.click(this.nextButtonLocator);
+        await this.click(this.connectButtonLocator);
       } else {
         throw new Error(`The button ${this.nextButtonLocator.locator} is disabled`);
       }
@@ -126,8 +144,8 @@ class AddNewWallet extends WalletCommonBase {
     await this.input(this.hwWalletNameInputLocator, walletName);
   }
   async saveHWInfo() {
-    await this.waitPresentedAndAct(this.nextButtonLocator, async () => {
-      await this.click(this.nextButtonLocator);
+    await this.waitPresentedAndAct(this.saveButtonLocator, async () => {
+      await this.click(this.saveButtonLocator);
     });
   }
   // ::end trezor connect section

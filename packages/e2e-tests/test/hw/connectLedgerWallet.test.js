@@ -2,35 +2,33 @@ import { expect } from 'chai';
 import { getDriver } from '../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
-import { TrezorEmulatorController } from '../../helpers/trezorEmulatorController.js';
-import { runAndPrepareTrezor } from '../../helpers/trezorHelper.js';
+import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
 import {
   WindowManager,
   extensionTabName,
-  trezorConnectTabName,
+  ledgerConnectTabName,
 } from '../../helpers/windowManager.js';
-import { testWalletTrezor } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
 import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
-import TrezorConnect from '../../pages/trezorConnect.page.js';
+import LedgerConnect from '../../pages/ledgerConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
 
-describe('Connect Trezor HW wallet', function () {
+describe('Connect Ledger HW wallet', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
-  let trezorLogger = null;
-  let trezorController = null;
+  let ledgerLogger = null;
+  let ledgerController = null;
   let wmLogger = null;
   let windowManager = null;
 
   before(function (done) {
     webdriver = getDriver();
     logger = getTestLogger(this.test.parent.title);
-    trezorLogger = getTestLogger('trezor', this.test.parent.title);
-    trezorController = new TrezorEmulatorController(trezorLogger);
+    ledgerLogger = getTestLogger('ledger', this.test.parent.title);
+    ledgerController = new LedgerEmulatorController(ledgerLogger);
     wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
     const basePage = new BasePage(webdriver, logger);
@@ -44,31 +42,32 @@ describe('Connect Trezor HW wallet', function () {
     await initialStepsPage.skipInitialSteps();
   });
 
-  it('Trezor initialization', async function () {
-    await runAndPrepareTrezor(trezorController, testWalletTrezor.mnemonic);
+  it('Ledger initialization', async function () {
+    //todo ping Speculos
   });
 
   it('Selecting Connect HW wallet', async function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectConnectHW();
     await addNewWalletPage.selectCardanoNetwork();
-    await addNewWalletPage.selectTrezorHW();
+    await addNewWalletPage.selectLedgerHW();
     await addNewWalletPage.confirmChecking();
     await addNewWalletPage.connectHardwareWallet();
   });
 
   it('Approve connection', async function () {
-    await windowManager.findNewWindowAndSwitchTo(trezorConnectTabName);
-    const trezorConnectPage = new TrezorConnect(webdriver, logger);
-    await trezorConnectPage.tickCheckbox();
-    await trezorConnectPage.allowConnection();
-    await trezorConnectPage.allowPubKeysExport();
-    await windowManager.waitForClosingAndSwitchTo(trezorConnectTabName, extensionTabName);
+    await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
+    const ledgerConnectPage = new LedgerConnect(webdriver, logger);
+
+    await ledgerConnectPage.selectNanoS();
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    await ledgerController.clickBoth();
+    await windowManager.waitForClosingAndSwitchTo(ledgerConnectTabName, extensionTabName);
   });
 
   it('Enter wallet details', async function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
-    await addNewWalletPage.enterHWWalletName(testWalletTrezor.name);
+    await addNewWalletPage.enterHWWalletName('Speculos');
     await addNewWalletPage.saveHWInfo();
   });
 
@@ -79,16 +78,16 @@ describe('Connect Trezor HW wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.walletBalance, 'The wallet balance is different').to.equal(
-      testWalletTrezor.balance
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
+      0,
     );
-    expect(walletInfo.walletName, `The wallet name should be "${testWalletTrezor.name}"`).to.equal(
-      testWalletTrezor.name
+    expect(walletInfo.name, `The wallet name should be YoroSpeculos.`).to.equal(
+      'YoroSpeculos',
     );
     expect(
-      walletInfo.walletPlate,
-      `The wallet plate should be "${testWalletTrezor.plate}"`
-    ).to.equal(testWalletTrezor.plate);
+      walletInfo.plate,
+      `The wallet plate should be PAXX-9560`
+    ).to.equal('PAXX-9560');
   });
 
   afterEach(function (done) {
@@ -99,8 +98,5 @@ describe('Connect Trezor HW wallet', function () {
   after(async function () {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
-    await trezorController.bridgeStop();
-    await trezorController.emulatorStop();
-    trezorController.closeWsConnection();
   });
 });
