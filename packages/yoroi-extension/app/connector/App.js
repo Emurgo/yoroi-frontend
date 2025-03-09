@@ -1,8 +1,9 @@
 // @flow
 import type { Node } from 'react';
+import type { RouterHistory } from 'react-router-dom';
+import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { RouterHistory } from 'react-router-dom';
 import { Router } from 'react-router-dom';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
@@ -21,9 +22,7 @@ import tr from 'react-intl/locale-data/tr';
 import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
 import { autorun, observable, runInAction } from 'mobx';
-import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
-import type { StoresMap } from './stores';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
@@ -31,6 +30,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
+import { Routes } from './revamp/Routes';
+import { SignTxPage } from './revamp/SignTxPage';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -124,7 +125,11 @@ class App extends Component<Props, State> {
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
-    return <Router history={history}>{Routes(stores)}</Router>;
+    return (
+      <Router history={history}>
+        {Routes(stores)}
+      </Router>
+    );
   };
 }
 
