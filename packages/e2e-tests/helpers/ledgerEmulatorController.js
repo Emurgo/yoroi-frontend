@@ -1,4 +1,4 @@
-const SPECULOS_ENDPOINT = 'http://localhost:5000';
+const SPECULOS_ENDPOINT = 'http://localhost:5001';
 
 export class LedgerEmulatorController {
   constructor(logger) {

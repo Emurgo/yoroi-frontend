@@ -64,4 +64,4 @@ export const injectedScripts = [
   'initialInject.js',
 ];
 
-export const speculosEndpoint = 'http://localhost:5000';
+export const speculosEndpoint = 'http://localhost:5001';

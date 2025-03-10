@@ -4,7 +4,7 @@ import Transport from "@ledgerhq/hw-transport";
 import { TransportError } from "@ledgerhq/errors";
 import axios from "axios";
 
-const SPECULOS_ENDPOINT = 'http://localhost:5000/apdu';
+const SPECULOS_ENDPOINT = 'http://localhost:5001/apdu';
 /**
  * HTTP transport implementation
  */
