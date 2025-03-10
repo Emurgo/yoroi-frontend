@@ -33,9 +33,5 @@ const getContent = (stores) => (
 );
 
 function wrapPages(children: Node, stores: StoresMap): Node {
-  const { currentNetworkId } = stores.profile;
-  if (currentNetworkId == null) {
-    throw new Error('unexpectedly missing network ID');
-  }
-  return <Layout networkId={currentNetworkId}>{children}</Layout>;
+  return <Layout networkId={stores.profile.getCurrentNetworkId()}>{children}</Layout>;
 }

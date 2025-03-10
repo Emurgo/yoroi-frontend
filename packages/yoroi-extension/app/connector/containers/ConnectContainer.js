@@ -173,10 +173,7 @@ export default class ConnectContainer extends Component<
     const wallets = this.props.stores.connector.wallets;
     const error = this.props.stores.connector.errorWallets;
     const loadingWallets = this.props.stores.connector.loadingWallets;
-    const { currentNetworkId } = this.props.stores.profile;
-    if (currentNetworkId == null) {
-      throw new Error('unexpectedly missing network ID');
-    }
+    const currentNetworkId = this.props.stores.profile.getCurrentNetworkId();
 
     return (
       <ConnectPage

@@ -384,7 +384,7 @@ export default class ConnectorStore extends Store<StoresMap> {
 
     try {
       const wallets = await getWallets(
-        this.stores.profile.currentNetworkId ?? networks.CardanoMainnet.NetworkId
+        this.stores.profile.getCurrentNetworkId()
       );
 
       runInAction(() => {
