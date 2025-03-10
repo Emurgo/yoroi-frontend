@@ -142,7 +142,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     }
 
-    const isTestnet = this.props.stores.profile.currentNetworkId !== networks.CardanoMainnet.NetworkId;
+    const isTestnet = this.props.stores.profile.getCurrentNetworkId() !== networks.CardanoMainnet.NetworkId;
 
     return (
       <>
