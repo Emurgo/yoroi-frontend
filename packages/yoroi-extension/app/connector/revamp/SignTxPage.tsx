@@ -14,6 +14,7 @@ import globalMessages from '../../i18n/global-messages';
 import config from '../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import BigNumber from 'bignumber.js';
+import { useIntl } from '../../UI/context/IntlProvider';
 
 type Props = {
   stores: ConnectorStoresProps['stores'];
@@ -21,17 +22,17 @@ type Props = {
 
 export const SignTxPage: React.FC<Props> = observer(({ stores }) => {
   const { connector, profile, tokenInfoStore, explorers, coinPriceStore } = stores;
-  const intl = useIntl();
-  
-  const { 
-    adaTransaction, 
-    signingMessage, 
+  const { intl } = useIntl();
+
+  const {
+    adaTransaction,
+    signingMessage,
     submissionError,
     hwWalletError,
     isHwWalletErrorRecoverable,
     connectedWallet,
     confirmSignInTx,
-    cancelSignInTx
+    cancelSignInTx,
   } = connector;
 
   const form = new ReactToolboxMobxForm({
@@ -66,15 +67,13 @@ export const SignTxPage: React.FC<Props> = observer(({ stores }) => {
 
     if (connectedWallet.type === 'mnemonic') {
       form.submit({
-        onSuccess: async (form) => {
+        onSuccess: async form => {
           const { walletPassword } = form.values();
           try {
             await confirmSignInTx(walletPassword);
           } catch (error) {
             if (error instanceof WrongPassphraseError) {
-              form.$('walletPassword').invalidate(
-                intl.formatMessage(globalMessages.incorrectWalletPasswordError)
-              );
+              form.$('walletPassword').invalidate(intl.formatMessage(globalMessages.incorrectWalletPasswordError));
             } else {
               throw error;
             }
@@ -91,9 +90,7 @@ export const SignTxPage: React.FC<Props> = observer(({ stores }) => {
     return (
       <Layout>
         <Box p={3}>
-          <Typography variant="h5">
-            {intl.formatMessage(globalMessages.noTransactionToSign)}
-          </Typography>
+          <Typography variant="h5">{intl.formatMessage(globalMessages.noTransactionToSign)}</Typography>
         </Box>
       </Layout>
     );
@@ -121,34 +118,30 @@ export const SignTxPage: React.FC<Props> = observer(({ stores }) => {
             <Typography variant="subtitle1" gutterBottom>
               {intl.formatMessage(globalMessages.transaction)}:
             </Typography>
-            <textarea 
-              rows={10} 
-              style={{ width: '100%', fontFamily: 'monospace' }} 
-              readOnly 
-              value={signingMessage.sign.tx.tx} 
-            />
+            <textarea rows={10} style={{ width: '100%', fontFamily: 'monospace' }} readOnly value={signingMessage.sign.tx.tx} />
           </Box>
         )}
       </Box>
     );
   }
 
-  const signData = signingMessage?.sign?.type === 'data' 
-    ? {
-        address: signingMessage.sign.address,
-        payload: signingMessage.sign.payload
-      }
-    : null;
+  const signData =
+    signingMessage?.sign?.type === 'data'
+      ? {
+          address: signingMessage.sign.address,
+          payload: signingMessage.sign.payload,
+        }
+      : null;
 
-  const txData = signingMessage?.sign?.type === 'tx/cardano' 
-    ? signingMessage.sign.tx?.tx 
-    : undefined;
+  // const txData = signingMessage?.sign?.type === 'tx/cardano'
+  //   ? signingMessage.sign.tx?.tx
+  //   : undefined;
 
   const defaultToken = {
     networkId: connectedWallet.networkId,
     identifier: connectedWallet.defaultTokenId || '',
     isDefault: true,
-    amount: new BigNumber(0)
+    amount: new BigNumber(0),
   };
 
   const handleCopyAddress = useCallback((address: string) => {
@@ -185,4 +178,4 @@ export const SignTxPage: React.FC<Props> = observer(({ stores }) => {
       />
     </Box>
   );
-}); 
+});

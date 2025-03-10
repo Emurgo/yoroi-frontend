@@ -2,10 +2,10 @@ import { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeri
 import { WalletChecksum } from './wallet';
 
 export enum LoadingWalletStates {
-  IDLE = 'IDLE',
-  PENDING = 'PENDING',
-  SUCCESS = 'SUCCESS',
-  REJECTED = 'REJECTED'
+  IDLE = 0,
+  PENDING = 1,
+  SUCCESS = 2,
+  REJECTED = 3,
 }
 
 export interface ConnectMessage {
@@ -40,4 +40,4 @@ export interface ConnectedWalletProps {
   };
   walletBalance: string | null;
   onClick?: () => void;
-} 
+}

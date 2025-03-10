@@ -1,6 +1,6 @@
 // @flow
-import { Component } from 'react';
 import type { Node } from 'react';
+import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import styles from './LoadingSpinner.scss';

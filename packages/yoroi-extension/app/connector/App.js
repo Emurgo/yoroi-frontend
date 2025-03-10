@@ -31,26 +31,10 @@ import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 import { Routes } from './revamp/Routes';
-import { SignTxPage } from './revamp/SignTxPage';
+// import { Routes } from './Routes';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...nl,
-  ...pt,
-  ...id,
-  ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
-]);
+addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it, ...tr, ...cs, ...sk]);
 
 type Props = {|
   +stores: StoresMap,
@@ -112,9 +96,7 @@ class App extends Component<Props, State> {
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager />
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
-            {this.getContent()}
-          </IntlProvider>
+          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>{this.getContent()}</IntlProvider>
         </ThemeProvider>
       </div>
     );
@@ -125,11 +107,7 @@ class App extends Component<Props, State> {
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
-    return (
-      <Router history={history}>
-        {Routes(stores)}
-      </Router>
-    );
+    return <Router history={history}>{Routes(stores)}</Router>;
   };
 }
 

@@ -1,13 +1,13 @@
+import type { DisplayAmount, TokenRow } from '../../../types/cardano';
+import type { SelectedExplorer } from '../../../../../../domain/SelectedExplorer';
 import React from 'react';
 import { Box, Typography, Stack, styled, IconButton, Tooltip } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
-import { ReactComponent as ExternalLinkIcon } from '../../../../../assets/images/external-link.inline.svg';
-import { ReactComponent as CopyIcon } from '../../../../../../assets/images/copy.inline.svg';
 import ExplorableHashContainer from '../../../../../../containers/widgets/ExplorableHashContainer';
 import { truncateToken } from '../../../../../../utils/formatters';
-import type { DisplayAmount, TokenRow } from '../../../types/cardano';
-import type { SelectedExplorer } from '../../../../../../domain/SelectedExplorer';
 import { useAddressHandling } from '../../../hooks/useAddressHandling';
+import { Icon } from '../../../../../components/icons';
+
 
 const DetailRow = styled(Stack)({
   flexDirection: 'row',
@@ -92,7 +92,7 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
         linkType="address"
       >
         <span>{formatAddress(address)}</span>
-        <ExternalLinkIcon />
+        <Icon.ExternalLink />
       </ExplorableHashContainer>
       <Tooltip title={<FormattedMessage id="global.copy" />}>
         <IconButton
@@ -100,7 +100,7 @@ export const TransactionDetails: React.FC<TransactionDetailsProps> = ({
           onClick={() => handleCopyAddress(address)}
           aria-label="copy address"
         >
-          <CopyIcon />
+          <Icon.Copy />
         </IconButton>
       </Tooltip>
     </AddressActions>

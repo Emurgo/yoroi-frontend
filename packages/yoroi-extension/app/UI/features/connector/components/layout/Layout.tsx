@@ -1,11 +1,11 @@
+import type { LayoutProps } from '../../types/layout';
 import React from 'react';
 import { styled } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
-import { ReactComponent as YoroiLogo } from '../../../../connector/assets/images/yoroi-logo.inline.svg';
-import { ReactComponent as DappConnectorIcon } from '../../../../../assets/images/dapp-connector/dapp-connector.inline.svg';
-import { TestnetWarningBanner } from '../../../../../components/topbar/banners/TestnetWarningBanner';
-import { environment } from '../../../../../environment';
-import type { LayoutProps } from '../../types/layout';
+import { YoroiConnectorLogo } from '../../../../components/ilustrations/YoroiConnectorLogo';
+import { DappConnectorIlustration } from '../../../../components/ilustrations/DappConnector';
+// import { TestnetWarningBanner } from '../../../../../components/topbar/banners/TestnetWarningBanner';
+// import { environment } from '../../../../../environment';
 
 const Container = styled('div')({
   width: '480px',
@@ -22,7 +22,7 @@ const Container = styled('div')({
 
 const Header = styled('div')({
   height: '56px',
-  background: 'linear-gradient(30.09deg, #244abf 0%, #4760ff 176.73%)',
+  background: 'linear-gradient(30.09deg, #244abf 0%, #4760ff 100%)',
   display: 'flex',
   alignItems: 'center',
   padding: '16px 32px',
@@ -57,7 +57,7 @@ const ConnectorLogoContainer = styled('div')({
   alignItems: 'center',
 });
 
-const ConnectorLogo = styled(DappConnectorIcon)({
+const ConnectorLogo = styled(DappConnectorIlustration)({
   width: '20px',
   height: '20px',
   marginLeft: '10px',
@@ -68,14 +68,13 @@ const Content = styled('div')({
 });
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const isTestnet = environment.isTest();
-
+  // const isTestnet = environment.isTest();
   return (
     <Container>
-      <TestnetWarningBanner isTestnet={isTestnet} />
+      {/* <TestnetWarningBanner isTestnet={isTestnet} /> */}
       <Header>
         <Menu>
-          <YoroiLogo />
+          <YoroiConnectorLogo />
           <Logo>
             <h3>
               <FormattedMessage id="global.connector.yoroiDappConnector" />
@@ -91,4 +90,4 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;
