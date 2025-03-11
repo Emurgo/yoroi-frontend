@@ -134,13 +134,13 @@ export const GovernanceStatusSelection = () => {
       descriptionHover: statusDelegatingToYoroi
         ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
         : strings.designatingSomeoneElse,
-      extraInfo: statusDelegatingToYoroi && governanceStatus.drep,
+      extraInfo: statusDelegatingToYoroi ? governanceStatus.drep : null,
       icon: <DRepIlustration />,
       selected: statusDelegatingToYoroi,
       onClick: handleYoroiDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegatingToYoroi,
-      isVisible: networkId === 0,
+      isVisible: Number(networkId) === 0,
     },
     {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
@@ -148,7 +148,7 @@ export const GovernanceStatusSelection = () => {
       description: strings.designatingSomeoneElse,
       descriptionHover: statusDelegating ? `Current DRep selection: ${governanceStatus.drep}` : strings.designatingSomeoneElse,
 
-      extraInfo: statusDelegating && governanceStatus.drep,
+      extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,
       onClick: handleDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,

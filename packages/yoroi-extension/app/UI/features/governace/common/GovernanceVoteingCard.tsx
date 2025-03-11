@@ -19,7 +19,7 @@ type Props = {
   loading: boolean;
   smallCard?: boolean;
   isVisible?: boolean;
-  extraInfo?: string;
+  extraInfo: string | null;
 };
 
 const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({

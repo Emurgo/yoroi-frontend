@@ -39,6 +39,7 @@ const initialGovernanceProvider = {
   recentTransactions: [],
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
   ampli: null as GovernanceAnalytics | null,
+  networkId: '',
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
