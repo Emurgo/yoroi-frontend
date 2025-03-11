@@ -14,9 +14,9 @@ type drepDelegation = { status: string | null; drep: string | null };
 type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
 
 type GovernanceAnalytics = {
-  governanceChooseDrepPageViewed: () => void,
-  governanceConfirmTransactionPageViewed: () => void,
-  governanceTransactionSuccessPageViewed: () => void,
+  governanceChooseDrepPageViewed: () => void;
+  governanceConfirmTransactionPageViewed: () => void;
+  governanceTransactionSuccessPageViewed: () => void;
 };
 
 const initialGovernanceProvider = {
@@ -37,8 +37,8 @@ const initialGovernanceProvider = {
   governanceStatus: { status: null, drep: null },
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
-  submitedTransactions: ([] as Array<{ isDrepDelegation: Boolean }>),
-  ampli: (null as GovernanceAnalytics | null),
+  submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
+  ampli: null as GovernanceAnalytics | null,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -157,6 +157,7 @@ export const GovernanceContextProvider = ({
     stakePoolKeyHash: currentPool?.hash ?? '',
     walletId: currentWallet.walletId,
     stakingKeyHex,
+    networkId,
     checkUserPassword,
     createDrepDelegationTransaction,
     txDelegationResult,
