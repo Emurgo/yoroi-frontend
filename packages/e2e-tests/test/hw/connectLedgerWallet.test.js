@@ -43,7 +43,8 @@ describe('Connect Ledger HW wallet', function () {
   });
 
   it('Ledger initialization', async function () {
-    //todo ping Speculos
+    const ledgerState = await ledgerController.readScreen();
+    expect(ledgerState, 'Cardano app is not ready').to.equal('Cardano is ready');
   });
 
   it('Selecting Connect HW wallet', async function () {
@@ -78,16 +79,9 @@ describe('Connect Ledger HW wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
-      0,
-    );
-    expect(walletInfo.name, `The wallet name should be YoroSpeculos.`).to.equal(
-      'YoroSpeculos',
-    );
-    expect(
-      walletInfo.plate,
-      `The wallet plate should be PAXX-9560`
-    ).to.equal('PAXX-9560');
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(0);
+    expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal('Speculos');
+    expect(walletInfo.plate, `The wallet plate should be PAXX-9560`).to.equal('PAXX-9560');
   });
 
   afterEach(function (done) {
