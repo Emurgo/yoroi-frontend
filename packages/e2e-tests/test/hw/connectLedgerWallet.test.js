@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import { getDriver } from '../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
-import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
+import {
+  CARDANO_IS_READY,
+  LedgerEmulatorController,
+} from '../../helpers/ledgerEmulatorController.js';
 import {
   WindowManager,
   extensionTabName,
@@ -13,7 +16,7 @@ import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
+import { oneMinute, quarterSecond, threeSeconds } from '../../helpers/timeConstants.js';
 
 describe('Connect Ledger HW wallet', function () {
   this.timeout(2 * oneMinute);
@@ -42,9 +45,9 @@ describe('Connect Ledger HW wallet', function () {
     await initialStepsPage.skipInitialSteps();
   });
 
-  it('Ledger initialization', async function () {
+  it('Ledger is ready', async function () {
     const ledgerState = await ledgerController.readScreen();
-    expect(ledgerState, 'Cardano app is not ready').to.equal('Cardano is ready');
+    expect(ledgerState, 'Cardano app is not ready').to.equal(CARDANO_IS_READY);
   });
 
   it('Selecting Connect HW wallet', async function () {
@@ -59,9 +62,9 @@ describe('Connect Ledger HW wallet', function () {
   it('Approve connection', async function () {
     await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
     const ledgerConnectPage = new LedgerConnect(webdriver, logger);
-
     await ledgerConnectPage.selectNanoS();
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const ledgerIsReady = await ledgerController.isReadyForAction(threeSeconds, quarterSecond);
+    expect(ledgerIsReady, `Ledger isn't ready after ${threeSeconds / 1000} seconds`).to.be.true;
     await ledgerController.clickBoth();
     await windowManager.waitForClosingAndSwitchTo(ledgerConnectTabName, extensionTabName);
   });
