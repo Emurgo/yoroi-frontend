@@ -139,8 +139,7 @@ class AddNewWallet extends WalletCommonBase {
   }
   async enterHWWalletName(walletName) {
     await this.customWaitIsPresented(this.hwWalletNameInputLocator, fiveSeconds, quarterSecond);
-    // the label "Emulator" is used in TrezorEmulatorController.emulatorSetup()
-    await this.clearInputUpdatingForm(this.hwWalletNameInputLocator, 'Emulator'.length);
+    await this.clearInputAll(this.hwWalletNameInputLocator);
     await this.input(this.hwWalletNameInputLocator, walletName);
   }
   async saveHWInfo() {
