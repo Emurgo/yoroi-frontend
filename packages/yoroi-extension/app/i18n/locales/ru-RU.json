@@ -45,7 +45,7 @@
   "app.errors.unexpectedError": "Произошла ошибка. Попробуйте снова чуть позже.",
   "app.errors.unknowError": "Произошла ошибка. Попробуйте снова чуть позже.",
   "button.buyAda": "Купить ADA",
-  "button.buySellAda": "Купить/Продать ADA",
+  "button.buySellAda": "Купить\\Продать ADA",
   "button.sellAda": "Продать ADA",
   "buysell.dialog.adaAmount": "Количество ADA",
   "buysell.dialog.buyProviderFee": "2% комиссия",
