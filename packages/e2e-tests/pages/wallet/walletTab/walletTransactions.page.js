@@ -191,7 +191,10 @@ export class TransactionsSubTab extends WalletTab {
       fiveSeconds,
       quarterSecond
     );
-    const [submenuState, summaryState] = await Promise.all([submenuStatePromise, summaryStatePromise]);
+    const [submenuState, summaryState] = await Promise.all([
+      submenuStatePromise,
+      summaryStatePromise,
+    ]);
 
     return submenuState && summaryState;
   }
@@ -342,6 +345,38 @@ export class TransactionsSubTab extends WalletTab {
     }
     return txsAmount;
   }
+  async scrollIntoViewLastTx() {
+    this.logger.info(`TransactionsSubTab::scrollIntoViewLastTx is called`);
+    const allGroups = await this.__getTxsGroups();
+    let lastTx = null;
+    for (const txGroup of allGroups) {
+      const allTxs = await this.findElements(this.txsInGroupLocator(txGroup.groupIndex));
+      lastTx = allTxs[allTxs.length - 1];
+    }
+    await this.scrollIntoViewElement(lastTx);
+  }
+  async showMoreOrLoaderDisplayed() {
+    this.logger.info(`TransactionsSubTab::showMoreOrLoaderDisplayed is called`);
+    const commonTimeout = fiveSeconds;
+    const showMoreStatePromise = this.customWaitIsPresented(
+      this.showMoreTxsButtonLocator,
+      commonTimeout,
+      quarterSecond
+    );
+    const loaderStatePromise = this.customWaitIsPresented(
+      this.txsLoaderSpinnerLocator,
+      commonTimeout,
+      quarterSecond
+    );
+    const state = await Promise.any([showMoreStatePromise, loaderStatePromise]);
+    if (state) {
+      this.logger.info(`TransactionsSubTab::showMoreOrLoaderDisplayed Show more or loader is displayed`);
+      return true;
+    } else {
+      this.logger.warn(`TransactionsSubTab::showMoreOrLoaderDisplayed Nothing is not displayed`);
+      return false;
+    }
+  }
   async showMoreBtnIsDisplayed() {
     this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is called`);
     const state = await this.customWaitIsPresented(
@@ -395,36 +430,45 @@ export class TransactionsSubTab extends WalletTab {
     return true;
   }
   async _loadMore() {
-    const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
-    if (showMoreIsDisplayed) {
-      return await this._pressShowMoreTransactions();
-    }
-    const loaderIsDisplayed = await this.loaderIsDisplayed();
-    if (loaderIsDisplayed) {
-      const thirtySec = 3 * defaultWaitTimeout;
-      await this.scrollIntoView(this.txsLoaderSpinnerLocator);
-      const result = await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
-      if (!result) {
-        throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
-      }
-      const btnIsDisplayed = await this.showMoreBtnIsDisplayed();
-      if (btnIsDisplayed) {
+    const somethingIsDisplayed = await this.showMoreOrLoaderDisplayed();
+    if(somethingIsDisplayed) {
+      const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
+      if (showMoreIsDisplayed) {
         return await this._pressShowMoreTransactions();
       }
+      const loaderIsDisplayed = await this.loaderIsDisplayed();
+      if (loaderIsDisplayed) {
+        const thirtySec = 3 * defaultWaitTimeout;
+        await this.scrollIntoView(this.txsLoaderSpinnerLocator);
+        const result = await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
+        if (!result) {
+          throw new Error(`Transactions are still loading after ${thirtySec / 1000} seconds`);
+        }
+        const btnIsDisplayed = await this.showMoreBtnIsDisplayed();
+        if (btnIsDisplayed) {
+          return await this._pressShowMoreTransactions();
+        }
+      }
     }
-    this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
+    this.logger.warn(
+      `TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`
+    );
     return false;
   }
   async loadMoreTxs(amountOfLoads = 1) {
     this.logger.info(`TransactionsSubTab::loadMoreTxs is called. Amount of loads ${amountOfLoads}`);
     for (let tryNumber = 0; tryNumber < amountOfLoads; tryNumber++) {
+      this.logger.info(`TransactionsSubTab::loadMoreTxs Try number ${tryNumber}`);
+      await this.scrollIntoViewLastTx();
       const canLoadMore = await this._loadMore();
+      this.logger.info(`TransactionsSubTab::loadMoreTxs Can load more txs ${canLoadMore}`);
       if (!canLoadMore) {
         break;
       }
       await this.sleep(oneSecond);
     }
     const thirtySec = 3 * defaultWaitTimeout;
+    await this.scrollIntoViewLastTx();
     await this.waitTxLoaderIsNotDisplayed(thirtySec, quarterSecond);
   }
   async downloadAllTxs() {

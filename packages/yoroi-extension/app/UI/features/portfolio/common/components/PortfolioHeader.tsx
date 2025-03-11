@@ -143,7 +143,11 @@ const PortfolioHeader = observer(
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
-            {loading || isLoading ? <Skeleton width="64px" height="13px" /> : <HeaderPrice isLoading={tokenActivity === null} />}
+            {loading || isLoading ? (
+              <Skeleton width="64px" height="13px" />
+            ) : (
+              <HeaderPrice isLoading={tokenActivity === null} isHiddenAmount={stores.profile.shouldHideBalance} />
+            )}
             {isLoading || loading ? (
               <Skeletons theme={theme} />
             ) : (

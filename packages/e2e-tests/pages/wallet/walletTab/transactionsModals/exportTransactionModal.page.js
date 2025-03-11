@@ -1,5 +1,10 @@
 import BasePage from '../../../basepage.js';
-import { twoSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
+import {
+  twoSeconds,
+  quarterSecond,
+  defaultWaitTimeout,
+  halfSecond,
+} from '../../../../helpers/timeConstants.js';
 import { isHeadless, isLinux } from '../../../../utils/utils.js';
 
 class ExportTransactionsModal extends BasePage {
@@ -45,19 +50,19 @@ class ExportTransactionsModal extends BasePage {
   exportUbuntuPenIconButtonLocator = {
     locator: '.MuiPickersToolbar-penIconButton',
     method: 'css',
-  }
+  };
   exportUbuntuClickInputLocator = {
     locator: '.MuiInputBase-formControl',
     method: 'css',
-  }
+  };
   exportUbuntuDateInputLocator = {
     locator: '.MuiOutlinedInput-input',
     method: 'css',
-  }
+  };
   exportUbuntuOkButtonLocator = {
     locator: 'div.MuiDialogActions-root > button:nth-child(2)',
     method: 'css',
-  }
+  };
   // methods
   async isDisplayed() {
     this.logger.info(`ExportTransactionsModal::isDisplayed is called`);
@@ -75,7 +80,19 @@ class ExportTransactionsModal extends BasePage {
       return false;
     }
   }
-  async _ubuntuHeadlessSetDate(dateString){
+  async isNotDisplayed() {
+    this.logger.info(`ExportTransactionsModal::isNotDisplayed is called`);
+    const modalWindowIsNotPresented = await this.customWaitIsNotPresented(
+      this.exportDialogWindowLocator,
+      defaultWaitTimeout,
+      halfSecond
+    );
+    this.logger.info(
+      `ExportTransactionsModal::isNotDisplayed The export modal is displayed: ${modalWindowIsNotPresented}`
+    );
+    return modalWindowIsNotPresented;
+  }
+  async _ubuntuHeadlessSetDate(dateString) {
     await this.waitForElement(this.exportUbuntuPenIconButtonLocator);
     await this.click(this.exportUbuntuPenIconButtonLocator);
 
@@ -137,7 +154,6 @@ class ExportTransactionsModal extends BasePage {
   async exportTransactionsFile() {
     this.logger.info(`ExportTransactionsModal::exportTransactionsFile is called`);
     await this.click(this.exportTransactionsButtonLocator);
-    await this.sleep(twoSeconds + twoSeconds);
   }
   async getStartDateInputBorderColor() {
     this.logger.info(`ExportTransactionsModal::getStartDateInputBorderColor is called`);

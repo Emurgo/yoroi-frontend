@@ -23,14 +23,14 @@ describe('dApp, CIP-95, signData', function () {
   let mockedDApp = null;
 
   before(async function () {
-    mockServer = getMockServer({});
-    logger = getTestLogger(this.test.parent.title);
     try {
+      mockServer = await getMockServer({});
       webdriver = await driversPoolsManager.getDriverFromPool();
+      logger = getTestLogger(this.test.parent.title);
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-      windowManager = new WindowManager(webdriver, wmLogger);
-      windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
+      windowManager = new WindowManager(webdriver, wmLogger);
+      await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
