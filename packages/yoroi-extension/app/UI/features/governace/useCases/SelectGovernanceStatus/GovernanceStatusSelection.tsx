@@ -126,7 +126,7 @@ export const GovernanceStatusSelection = () => {
   const statusDelegating = governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID;
   const optionsList = [
     {
-      title: statusDelegating ? strings.delegateToYoroiDRep : strings.delegateToYoroiDRep,
+      title: strings.delegateToYoroiDRep,
       titleHover: statusDelegating ? 'Change DRep' : strings.delegateToYoroiDRep,
       description: statusDelegatingToYoroi
         ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
