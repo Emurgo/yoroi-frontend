@@ -18,6 +18,7 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
 import DAppConnectWallet from '../../pages/dapp/dAppConnectWallet.page.js';
+import { collectInfo } from '../../helpers/restoreWalletHelper.js';
 
 describe('dApp, connection, no wallets', function () {
   this.timeout(2 * oneMinute);
@@ -27,18 +28,23 @@ describe('dApp, connection, no wallets', function () {
   let mockServer = null;
   let mockedDApp = null;
 
-  before(function () {
-    webdriver = getDriver();
-    mockServer = getMockServer({});
-    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    windowManager.init();
-    const dappLogger = getTestLogger('dApp', this.test.parent.title);
-    mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
-    logger = getTestLogger(this.test.parent.title);
-    const basePage = new BasePage(webdriver, logger);
-    // first open the dapp page
-    basePage.goToUrl(mockDAppUrl);
+  before(async function () {
+    try {
+      webdriver = getDriver();
+      mockServer = await getMockServer({});
+      logger = getTestLogger(this.test.parent.title);
+      const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+      const dappLogger = getTestLogger('dApp', this.test.parent.title);
+      windowManager = new WindowManager(webdriver, wmLogger);
+      const basePage = new BasePage(webdriver, logger);
+      // first open the dapp page
+      basePage.goToUrl(mockDAppUrl);
+      await windowManager.init();
+      mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+    } catch (error) {
+      await collectInfo(this, webdriver, logger);
+      throw new Error(error);
+    }
   });
 
   it('Request connection', async function () {

@@ -28,7 +28,7 @@ import { MultiToken } from '../../../api/common/lib/MultiToken';
 import WalletDelegationBanner from '../WalletDelegationBanner';
 import { truncateToken } from '../../../utils/formatters';
 import { Box } from '@mui/system';
-import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, isTestnet, networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../../stores';
 import { ampli } from '../../../../ampli/index';
 
@@ -89,6 +89,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
 
+    const isMainnet = selectedWallet.networkId === networks.CardanoMainnet.NetworkId;
+
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
@@ -131,21 +133,23 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
           <Box sx={{ iframe: { minHeight: '60vh' } }}>
             {this.getDialog()}
-            <SeizaFetcher
-              urlTemplate={urlTemplate}
-              locale={locale}
-              bias={stakingListBias}
-              totalAda={totalAda}
-              poolList={poolList}
-              setFirstPool={pool => {
-                this.setState({ firstPool: pool });
-              }}
-              stakepoolSelectedAction={async poolId => {
-                this.setState({ selectedPoolId: poolId });
-                await this.props.stores.delegation.createDelegationTransaction(poolId);
-                ampli.stakingCenterDelegationInitiated();
-              }}
-            />
+            {isMainnet && (
+              <SeizaFetcher
+                urlTemplate={urlTemplate}
+                locale={locale}
+                bias={stakingListBias}
+                totalAda={totalAda}
+                poolList={poolList}
+                setFirstPool={pool => {
+                  this.setState({ firstPool: pool });
+                }}
+                stakepoolSelectedAction={async poolId => {
+                  this.setState({ selectedPoolId: poolId });
+                  await this.props.stores.delegation.createDelegationTransaction(poolId);
+                  ampli.stakingCenterDelegationInitiated();
+                }}
+              />
+            )}
           </Box>
         </>
       );
