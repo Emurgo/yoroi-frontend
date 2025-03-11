@@ -110,6 +110,7 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
               className={styles.button}
               type="button"
               onClick={this.onExecuteActionClicked.bind(this, DEVICE_CODE.NANO_S)}
+              id='ledgerConnect-selectNanoS-button'
             >
               <div className={styles.text}>
                 {intl.formatMessage(message.deviceNanos)}
@@ -119,6 +120,7 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
               className={styles.button}
               type="button"
               onClick={this.onExecuteActionClicked.bind(this, DEVICE_CODE.NANO_X)}
+              id='ledgerConnect-selectNanoX-button'
             >
               <div className={styles.text}>
                 {intl.formatMessage(message.deviceNanox)}
