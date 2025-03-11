@@ -1,5 +1,6 @@
 import { halfMinute, fiveSeconds, quarterSecond } from '../helpers/timeConstants.js';
 import WalletCommonBase from './walletCommonBase.page.js';
+import { CardanoNetworks } from '../helpers/constants.js';
 
 class AddNewWallet extends WalletCommonBase {
   // locators
@@ -15,11 +16,19 @@ class AddNewWallet extends WalletCommonBase {
     locator: 'connectHardwareWalletButton',
     method: 'id',
   };
-  // ::start trezor connect section
-  cardanoNetworkButtonLocator = {
-    locator: '.PickCurrencyOptionDialog_cardano',
-    method: 'css',
+  mainnetNetworkButtonLocator = {
+    locator: 'connectHWWallet-selectMainnetNetwork-button',
+    method: 'id',
   };
+  preprodNetworkButtonLocator = {
+    locator: 'connectHWWallet-selectPreprodNetwork-button',
+    method: 'id',
+  };
+  previewNetworkButtonLocator = {
+    locator: 'connectHWWallet-selectPreviewNetwork-button',
+    method: 'id',
+  };
+  // ::start HW connect section
   trezorHWButtonLocator = {
     locator: '.WalletConnectHWOptionDialog_connectTrezor',
     method: 'css',
@@ -52,7 +61,7 @@ class AddNewWallet extends WalletCommonBase {
     locator: '//input[starts-with(@id, "walletName-")]',
     method: 'xpath',
   };
-  // ::end trezor connect section
+  // ::end HW connect section
 
   // functions
   async isDisplayed() {
@@ -94,13 +103,25 @@ class AddNewWallet extends WalletCommonBase {
       await this.click(this.connectHwButtonLocator);
     });
   }
-  // ::start trezor connect section
-  async selectCardanoNetwork() {
-    this.logger.info(`AddNewWallet::selectCardanoNetwork is called`);
-    await this.waitPresentedAndAct(this.cardanoNetworkButtonLocator, async () => {
-      await this.click(this.cardanoNetworkButtonLocator);
+  async selectCardanoNetwork(network = CardanoNetworks.MN) {
+    this.logger.info(`AddNewWallet::selectCardanoNetwork is called. Network to select: ${network}`);
+    let networkButtonLocator;
+    switch (network) {
+      case CardanoNetworks.PP:
+        networkButtonLocator = this.preprodNetworkButtonLocator;
+        break;
+      case CardanoNetworks.PV:
+        networkButtonLocator = this.previewNetworkButtonLocator;
+        break;
+      default:
+        networkButtonLocator = this.mainnetNetworkButtonLocator;
+        break;
+    }
+    await this.waitPresentedAndAct(networkButtonLocator, async () => {
+      await this.click(networkButtonLocator);
     });
   }
+  // ::start HW connect section
   async selectTrezorHW() {
     this.logger.info(`AddNewWallet::selectTrezorHW is called`);
     await this.waitPresentedAndAct(this.trezorHWButtonLocator, async () => {
