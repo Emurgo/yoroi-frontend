@@ -1,5 +1,7 @@
 const SPECULOS_ENDPOINT = 'http://localhost:5001';
 
+class LedgerEmulatorControllerError extends Error {}
+
 export class LedgerEmulatorController {
   constructor(logger) {
     this.logger = logger;
@@ -32,9 +34,20 @@ export class LedgerEmulatorController {
 
   // todo
   async readScreen() {
-    // POST to http://localhost:5000/apdu
-    // '{"apduHex":"d700000000"}'
-    // and receive from http://localhost:5000/events?stream=true
-    // 'data: {"text": "...screen text...", "x": 42, "y": 42, "w": 45, "h": 13, "clear": false}'
+    try {
+      const eventsResponse = await fetch(
+        `${SPECULOS_ENDPOINT}/events?currentscreenonly=true`
+      );
+      if (!eventsResponse.ok) {
+        throw new LedgerEmulatorController('Not able to receive events for the current screen');
+      }
+      const eventsObj = await eventsResponse.json();
+      const eventsText = eventsObj.events.map(evt => evt.text).join(' ');
+
+      return eventsText;
+    } catch (error) {
+      console.error(error);
+      throw new LedgerEmulatorController('Some error happen: ', error);
+    }
   }
 }
