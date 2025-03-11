@@ -240,10 +240,7 @@ export const GovernanceStatusSelection = () => {
                 <GovernanceVoteingCard
                   key={index}
                   title={option.title}
-                  titleHover={option?.titleHover}
                   description={option.description}
-                  descriptionHover={option?.descriptionHover}
-                  icon={option.icon}
                   selected={option.selected}
                   onClick={option.onClick}
                   pending={option.pending}

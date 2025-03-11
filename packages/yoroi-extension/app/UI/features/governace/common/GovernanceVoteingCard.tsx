@@ -12,14 +12,14 @@ type Props = {
   titleHover?: string;
   description: string;
   descriptionHover?: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   selected: boolean;
   onClick: () => void;
   pending: boolean;
   loading: boolean;
   smallCard?: boolean;
   isVisible?: boolean;
-  extraInfo: string | null;
+  extraInfo?: string | null;
 };
 
 const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({
