@@ -32,6 +32,7 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import { SummaryRow } from '../asset-swap/SwapTxInfo';
 // $FlowIgnore: suppressing this error
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
+import { React } from 'react';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -52,6 +53,7 @@ function resolveValueOrGetter(v: ColumnValueOrGetter, ctx: ColumnContext): strin
 }
 
 export default function SwapOrdersPage(props: StoresProps): Node {
+  const [openTxModalAfterColateral, setOpenTxModalAfterColateral] = useState({ open: false, tx: null });
   const { order: orderApi } = useSwap();
   const strings = useStrings();
 
@@ -93,7 +95,38 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     },
   ];
 
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, changeModalView, setCborTx } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    showTxResultModal,
+    changeModalView,
+    setCborTx,
+    closeTxReviewModal,
+  } = useTxReviewModal();
+
+  useEffect(() => {
+    if (openTxModalAfterColateral.open) {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: passswordInput => {},
+        // submitTx: passswordInput => submitTx(openTxModalAfterColateral.passswordInput, cancelTxCbor, collateralReorgTxObj, order),
+        cborTx: openTxModalAfterColateral.tx,
+        extraOverviewDetails: {
+          title: 'Cancel swap order details',
+          onClick: () => changeModalView({ modalView: 'extraDetails' }),
+          // component: (
+          //   <SwapTxCancelInfo
+          //     formattedFeeValue={formattedFeeValue}
+          //     defaultTokenInfo={defaultTokenInfo}
+          //     order={order}
+          //     returnValues={totalCancelOutput}
+          //     swapPoolLabel={<SwapPoolLabel provider={order.provider} />}
+          //   />
+          // ),
+        },
+      });
+    }
+  }, [openTxModalAfterColateral]);
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
 
@@ -151,7 +184,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       let utxoHex = await swapStore.getCollateralUtxoHexForCancel({
         wallet,
       });
-      console.log('utxoHex', utxoHex);
       let collateralReorgTxHex: ?string = null;
       let collateralReorgTxData: ?CardanoConnectorSignRequest = null;
       let hasCollateral = true;
@@ -162,7 +194,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         utxoHex = collateralUtxoHex;
         hasCollateral = false;
       }
-      console.log('COLATEREALL', { collateralReorgTxHex, collateralReorgTxData, utxoHex, hasCollateral });
       return handleCreateCancelTransaction(order, utxoHex, collateralReorgTxHex, collateralReorgTxData, hasCollateral);
     } catch (e) {
       console.error('Failed to prepare a collateral utxo for cancel', e);
@@ -171,7 +202,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
   };
 
-  const handleCreateCancelTransaction = async (order: any, utxoHex, collateralReorgTx, collateralReorgTxData, hasCollateral) => {
+  const handleCreateCancelTransaction = async (order, utxoHex, collateralReorgTx, collateralReorgTxData, hasCollateral) => {
     const sender = order.sender;
     if (sender == null) {
       throw new Error('Cannot cancel a completed order (sender == null)');
@@ -185,7 +216,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         },
       });
 
-      setCborTx({ type: 'setCborTx', cborTx: cancelTxCbor });
+      // setCborTx({ type: 'setCborTx', cborTx: utxoHex });
 
       if (cancelTxCbor == null || !isHex(cancelTxCbor)) {
         console.error('Failed to receive swap cancel tx from API. Expected cbor hex, got: ', cancelTxCbor);
@@ -195,6 +226,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         );
         return;
       }
+
       const totalCancelOutput = getTransactionTotalOutputFromCbor(cancelTxCbor, wallet.balance.getDefaults());
       const formattedFeeValue = Quantities.format(
         getTransactionFeeFromCbor(cancelTxCbor).toString(),
@@ -228,7 +260,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       if (hasCollateral === false) {
         openTxReviewModal({
           modalView: 'collateralCreation',
-          submitTx: passswordInput => addColateral(passswordInput, cancelTxCbor, collateralReorgTxObj, order),
+          submitTx: passswordInput => addColateral(passswordInput, cancelTxCbor, collateralReorgTxObj, order, utxoHex),
           cborTx: collateralReorgTxObj.cbor,
           operations: {
             components: [
@@ -278,7 +310,8 @@ export default function SwapOrdersPage(props: StoresProps): Node {
       showTxResultModal(TransactionResult.FAIL);
     }
   };
-  const addColateral = async (passswordInput, cancelTxCbor, collateralReorgTxObj, order: any) => {
+  const addColateral = async (passswordInput, cancelTxCbor, collateralReorgTxObj, order: any, utxoHex) => {
+    startLoadingTxReview();
     if (collateralReorgTxObj == null) {
       console.log('Reorg transaction is not available. Ignoring.');
       return;
@@ -290,11 +323,9 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         transactionHex: collateralReorgTxObj.cbor,
         password: passswordInput,
       });
-
-      console.log('COLLATERA SUCCES', signedCollateralReorgTx);
-      console.log('cancelTxCbor', cancelTxCbor);
-      setCborTx({ type: 'setCborTx', cborTx: cancelTxCbor });
-      changeModalView({ modalView: 'transactionReview' });
+      console.log('TEST DATA BEFORE OPEN', { cancelTxCbor, utxoHex, collateralReorgTxObj, signedCollateralReorgTx });
+      setOpenTxModalAfterColateral({ open: true, tx: cancelTxCbor, signedCollateralReorgTx, collateralReorgTxObj });
+      closeTxReviewModal();
     } catch (error) {
       console.log('Failed to sign collateral transaction', error);
     }

@@ -12,6 +12,7 @@ import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, networkId } = useTxReviewModal();
+
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
   const collateral = data?.collateral ?? [];
@@ -203,6 +204,19 @@ const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
   let internalUtxo = utxos.find(u => {
     return u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex;
   });
+
+  if (internalUtxo === undefined) {
+    const hexAddr = RustModule.WalletV4.Address.from_hex(utxos[0].address).to_bech32();
+    internalUtxo = {
+      address: hexAddr,
+      amount: utxos[0].output?.tokens[0].TokenList.Amount,
+      assets: utxos[0].output?.tokens,
+      tx_hash: utxos[0].output?.Transaction?.Hash,
+      tx_index: utxos[0].output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: `${utxos[0].output?.Transaction?.Hash}:${utxos[0].output.UtxoTransactionOutput.OutputIndex}`,
+    };
+    return internalUtxo;
+  }
 
   const hexAddr = RustModule.WalletV4.Address.from_hex(internalUtxo?.address).to_bech32();
   return {

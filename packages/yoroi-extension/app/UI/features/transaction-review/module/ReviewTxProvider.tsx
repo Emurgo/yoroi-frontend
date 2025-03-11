@@ -91,7 +91,6 @@ export const ReviewTxProvider = ({
       dispatch({ type: 'close' });
     },
     openTxReviewModal: (payload: any) => {
-      console.log('payload', payload);
       dispatch({
         type: 'open',
         title: payload.title,
