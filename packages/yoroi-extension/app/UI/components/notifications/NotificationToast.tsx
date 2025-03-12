@@ -2,30 +2,44 @@ import React from 'react';
 import { Box, useTheme, Typography } from '@mui/material';
 import { Icon } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
-import { FadeInOut } from './NotificationsStyles';
 import { Theme, toast } from 'react-toastify';
+import { noop } from 'lodash';
 
-const NOTIFICATION_TIMEOUT = 3000; // 3s
+const NOTIFICATION_TIMEOUT = 4000; // 4s
 
 export type NotificationProps = {
   title: string;
   subtitle: string;
   type: NotificationTypes;
   theme: Theme;
+  id: string;
+  onClick(props: any): void;
+  onClose(props: any): void;
 }
 type IconProps = {
   type: NotificationTypes
 }
 
-export const NotificationCloseButton = ({ closeToast }) => {
-  const theme = useTheme()
-  const handleClose = () => {
-    closeToast("closed");
+export const NotificationCloseButton = ({ closeToast, ...props }) => {
+  const theme = useTheme();
+
+  const handleClose = (e) => {
+    e.stopPropagation();
+    const { onClose } = props.data;
+    onClose && onClose(props);
   }
 
   return (
-    <Box onClick={handleClose} sx={{ padding: 0 }}>
-      <Icon.CloseIcon fill={theme.palette["ds"].el_gray_low} />
+    <Box onClick={handleClose} sx={{
+      padding: 0,
+      width: "24px",
+      height: "24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: 'pointer'
+    }}>
+      <Icon.CloseIcon fill={theme.palette["ds"].el_gray_medium} />
     </Box>
   )
 }
@@ -75,21 +89,43 @@ const NotificationIcon = ({ type }: IconProps) => {
   }
 }
 
-const NotificationBody = ({ title, subtitle }) => {
+const NotificationBody = ({ toastProps }: any) => {
+  const { data } = toastProps;
+  const { title, subtitle, onClick } = data;
+  
+  const handleClick = () => {
+    onClick && onClick(toastProps);
+  }
+
   return (
-    <Box sx={{ flexGrow: 1, cursor: "pointer" }}>
-      <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{title}</Typography>
-      <Typography component="div" variant='body2' color="ds.text_gray_low">{subtitle}</Typography>
+    <Box sx={{ display: "flex", alignItems: "flex-start", gap: "12px" }} onClick={handleClick}>
+      <Box sx={{ width: "324px", cursor: "pointer" }}>
+        <Typography mb="2px" component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">{title}</Typography>
+        <Typography component="div" variant='body2' color="ds.text_gray_low">{subtitle}</Typography>
+      </Box>
+      <Box>
+        <NotificationCloseButton {...toastProps} />
+      </Box>
     </Box>
   )
 }
 
-export function createToast({ title, subtitle, type, theme = "light" }: NotificationProps) {
-  return toast(<NotificationBody title={title} subtitle={subtitle} />, {
+export function createToast({
+  title,
+  subtitle,
+  type,
+  id,
+  onClick = noop,
+  onClose = noop,
+  theme = "light"
+}: NotificationProps) {
+
+  return toast((props) => <NotificationBody {...props} />, {
+    theme,
+    toastId: id,
     autoClose: NOTIFICATION_TIMEOUT,
     icon: () => <NotificationIcon type={type} />,
-    theme,
-    transition: FadeInOut,
-    closeOnClick: true,
+    data: { title, subtitle, type, onClick, onClose },
+    draggable: false
   });
 }
