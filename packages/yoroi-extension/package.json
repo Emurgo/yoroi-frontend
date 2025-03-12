@@ -211,6 +211,7 @@
     "path-browserify": "1.0.1",
     "pbkdf2": "3.1.2",
     "process": "0.11.10",
+    "pubsub-js": "^1.9.5",
     "qrcode.react": "3.1.0",
     "react": "17.0.2",
     "react-beautiful-dnd": "13.1.1",
