@@ -1,7 +1,7 @@
 import { Button, IconButton, Stack, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { dRepNormalize } from '../../../api/ada/lib/cardanoCrypto/utils';
 import LocalStorageApi from '../../../api/localStorage/index';
 import { ROUTES } from '../../../routes-config';
@@ -33,48 +33,64 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
 const HIDE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 1 month in milliseconds
 const MIN_BALANCE_ADA = 5;
 
-export const DrepPromotionBanner = observer(({ stores }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const selectedWallet /*: WalletState */ = stores.wallets.selectedOrFail;
-  const balance = selectedWallet.balance.getDefaultEntry().amount;
-
+const useDrepBannerVisibility = (balance: BigNumber) => {
   const localStorageApi = new LocalStorageApi();
+  const [isVisible, setIsVisible] = useState(false);
 
-  const [governanceInfo, setGovernanceInfo] = useState({ isParticipatingToGovernance: false, isDelegatingToYoroiDrep: false });
   useEffect(() => {
-    checkBannerVisibility();
+    const checkVisibility = async () => {
+      const lastDismissed = await localStorageApi.getDrepYoroiBanerTimestamp();
+      const now = Date.now();
+
+      if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
+        if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
+          setIsVisible(true);
+        }
+      }
+    };
+
+    checkVisibility();
+  }, [balance]);
+
+  const dismissBanner = useCallback(() => {
+    localStorageApi.setDrepYoroiBanerTimestamp(Date.now());
+    setIsVisible(false);
+  }, [localStorageApi]);
+
+  return { isVisible, dismissBanner };
+};
+
+const useGovernanceStatus = stores => {
+  const [governanceInfo, setGovernanceInfo] = useState({
+    isParticipatingToGovernance: false,
+    isDelegatingToYoroiDrep: false,
+  });
+
+  useEffect(() => {
+    const getGovStatus = () => {
+      const govInfo = stores.delegation.governanceStatus?.drepDelegation;
+      if (govInfo) {
+        const isParticipatingToGovernance = govInfo !== null;
+        const drepEncoded = dRepNormalize(govInfo?.drep, govInfo?.drepKind);
+        const isDelegatingToYoroiDrep = isParticipatingToGovernance && drepEncoded === YOROI_DREP_ID;
+        setGovernanceInfo({ isParticipatingToGovernance, isDelegatingToYoroiDrep });
+      }
+    };
+
     getGovStatus();
   }, [stores.delegation.governanceStatus]);
 
-  /** Checks if the banner should be visible */
-  const checkBannerVisibility = async () => {
-    const lastDismissed = await localStorageApi.getDrepYoroiBanerTimestamp();
-    const now = Date.now();
+  return governanceInfo;
+};
 
-    const walletBalance = new BigNumber(balance).shiftedBy(-6).toString();
+export const DrepPromotionBanner = observer(({ stores }) => {
+  const selectedWallet = stores.wallets.selectedOrFail;
+  const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
+    selectedWallet,
+  ]);
 
-    // Show banner only if balance >= 5 ADA and dismissal period has passed
-    if (Number(walletBalance) >= MIN_BALANCE_ADA) {
-      if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
-        setIsVisible(true);
-      }
-    }
-  };
-
-  const handleBannerClose = () => {
-    localStorageApi.setDrepYoroiBanerTimestamp(Date.now().toString());
-    setIsVisible(false);
-  };
-
-  const getGovStatus = () => {
-    const govInfo = stores.delegation.governanceStatus?.drepDelegation;
-    if (govInfo) {
-      const isParticipatingToGovernance = govInfo !== null;
-      const drepEncoded = dRepNormalize(govInfo?.drep, govInfo?.drepKind);
-      const isDelegatingToYoroiDrep = isParticipatingToGovernance && drepEncoded === YOROI_DREP_ID;
-      setGovernanceInfo({ isParticipatingToGovernance, isDelegatingToYoroiDrep });
-    }
-  };
+  const { isVisible, dismissBanner } = useDrepBannerVisibility(balance);
+  const governanceInfo = useGovernanceStatus(stores);
 
   if (
     !isVisible ||
@@ -88,11 +104,7 @@ export const DrepPromotionBanner = observer(({ stores }) => {
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
       {!governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance && (
         <Stack sx={{ position: 'absolute', right: 20, top: 20 }}>
-          <IconWrapper
-            onClick={() => {
-              handleBannerClose();
-            }}
-          >
+          <IconWrapper onClick={dismissBanner}>
             <Icon.CloseIcon />
           </IconWrapper>
         </Stack>

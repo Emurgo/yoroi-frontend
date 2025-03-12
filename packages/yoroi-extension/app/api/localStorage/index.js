@@ -106,6 +106,8 @@ export default class LocalStorageApi {
 
   setDrepYoroiBanerTimestamp: string => Promise<void> = timestamp => setLocalItem(storageKeys.DREP_YOROI_BANNER, timestamp);
 
+  unsetDrepYoroiBanerTimestamp: void => Promise<void> = () => removeLocalItem(storageKeys.DREP_YOROI_BANNER);
+
   // ========== Portfolio FIAT Pair ========== //
 
   getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
