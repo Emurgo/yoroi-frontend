@@ -8,7 +8,7 @@ import { ROUTES } from '../../routes-config';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
-import type { WalletsNavigation } from '../../api/localStorage'
+import type { WalletsNavigation } from '../../api/localStorage';
 import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
 import { noop } from '../../coreUtils';
@@ -111,8 +111,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
           stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
         } else {
-          const firstWallet =
-            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
+          const firstWallet = wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
           if (firstWallet == null) {
             stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
             return;
@@ -133,38 +132,33 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     },
   ];
 
-  @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getUriSchemeAcceptance);
+  @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getUriSchemeAcceptance
+  );
 
-  @observable setUriSchemeAcceptanceRequest: Request<(void) => Promise<void>> = new Request<
-    (void) => Promise<void>
-  >(this.api.localStorage.setUriSchemeAcceptance);
+  @observable setUriSchemeAcceptanceRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
+    this.api.localStorage.setUriSchemeAcceptance
+  );
 
-  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getToggleSidebar);
+  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getToggleSidebar
+  );
 
-  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<
-    (boolean) => Promise<void>
-  >(this.api.localStorage.setToggleSidebar);
+  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<(boolean) => Promise<void>>(
+    this.api.localStorage.setToggleSidebar
+  );
 
-  @observable getWalletsNavigationRequest:
-    Request<(void) => Promise<?WalletsNavigation>> = new Request<
+  @observable getWalletsNavigationRequest: Request<(void) => Promise<?WalletsNavigation>> = new Request<
     (void) => Promise<?WalletsNavigation>
   >(this.api.localStorage.getWalletsNavigation);
 
-  @observable setWalletsNavigationRequest: Request<
-  WalletsNavigation => Promise<void>
-  > = new Request<WalletsNavigation => Promise<void>>(
-    (walletsNavigation) => this.api.localStorage.setWalletsNavigation(walletsNavigation)
-  );
+  @observable setWalletsNavigationRequest: Request<(WalletsNavigation) => Promise<void>> = new Request<
+    (WalletsNavigation) => Promise<void>
+  >(walletsNavigation => this.api.localStorage.setWalletsNavigation(walletsNavigation));
 
   setup(): void {
     super.setup();
-    this.registerReactions([
-      this._checkSetupSteps,
-    ]);
+    this.registerReactions([this._checkSetupSteps]);
     this._getUriSchemeAcceptance(); // eagerly cache
     noop(this._getSortedWalletList());
   }
@@ -199,10 +193,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
   // ========== URI Scheme acceptance ========== //
 
   @computed get hasLoadedUriSchemeAcceptance(): boolean {
-    return (
-      this.getUriSchemeAcceptanceRequest.wasExecuted &&
-      this.getUriSchemeAcceptanceRequest.result !== null
-    );
+    return this.getUriSchemeAcceptanceRequest.wasExecuted && this.getUriSchemeAcceptanceRequest.result !== null;
   }
 
   @computed get isUriSchemeAccepted(): boolean {
@@ -261,8 +252,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     await this.getWalletsNavigationRequest.execute();
   };
 
-  updateSortedWalletList: WalletsNavigation => Promise<void>
-    = async (walletsNavigation) => {
+  updateSortedWalletList: WalletsNavigation => Promise<void> = async walletsNavigation => {
     await this.setWalletsNavigationRequest.execute(walletsNavigation);
     await this.getWalletsNavigationRequest.execute();
   };

@@ -5,19 +5,14 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
+import { useLocation } from 'react-router-dom';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import {
-  BECOME_DREP_LINK,
-  DREP_ALWAYS_ABSTAIN,
-  DREP_ALWAYS_NO_CONFIDENCE,
-  LEARN_MORE_LINK,
-  YOROI_DREP_ID,
-} from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
@@ -59,6 +54,14 @@ export const GovernanceStatusSelection = () => {
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+
+  const params: any = useLocation();
+
+  React.useEffect(() => {
+    if (params?.delegateToYoroiDrep) {
+      handleYoroiDelegate();
+    }
+  }, [params]);
 
   const openDRepIdModal = (onSubmit: (drepID: string, drepCredential: string) => void) => {
     if (!governanceManager) {
@@ -121,6 +124,7 @@ export const GovernanceStatusSelection = () => {
       setLoadingUnsignTx(false);
     }
   };
+
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
   const statusDelegating = governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID;
@@ -259,11 +263,6 @@ export const GovernanceStatusSelection = () => {
           <Typography variant="body2" align="center" color="ds.text_gray_medium" gutterBottom>
             {strings.drepId} {governanceStatus.drep}
           </Typography>
-        )}
-        {governanceStatus.status === 'none' && (
-          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" lineHeight="22px">
-            {strings.becomeADrep}
-          </Link>
         )}
         <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
           {strings.learnMore}

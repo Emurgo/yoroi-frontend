@@ -123,12 +123,12 @@ export const DRepIlustration = () => {
           y2="89.8411"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_853_15975"
@@ -138,12 +138,12 @@ export const DRepIlustration = () => {
           y2="112.703"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_853_15975"
@@ -153,15 +153,15 @@ export const DRepIlustration = () => {
           y2="86.0117"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_853_15975"
@@ -171,15 +171,15 @@ export const DRepIlustration = () => {
           y2="-0.331"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_853_15975"
@@ -189,15 +189,15 @@ export const DRepIlustration = () => {
           y2="35.3877"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_853_15975"
@@ -207,15 +207,15 @@ export const DRepIlustration = () => {
           y2="-0.0654438"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_853_15975"
@@ -225,12 +225,12 @@ export const DRepIlustration = () => {
           y2="88.0149"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_853_15975"
@@ -240,12 +240,12 @@ export const DRepIlustration = () => {
           y2="105.032"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_853_15975"
@@ -255,12 +255,12 @@ export const DRepIlustration = () => {
           y2="106.029"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_853_15975"
@@ -270,12 +270,12 @@ export const DRepIlustration = () => {
           y2="117.246"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_853_15975"
@@ -285,15 +285,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_853_15975"
@@ -303,15 +303,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_853_15975"
@@ -321,15 +321,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_853_15975"
@@ -339,15 +339,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_853_15975"
@@ -357,15 +357,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_853_15975"
@@ -375,15 +375,15 @@ export const DRepIlustration = () => {
           y2="65.4719"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#1D45BA" />
-          <stop offset="0.4204" stop-color="#1D47BA" />
-          <stop offset="0.5718" stop-color="#1D4EB9" />
-          <stop offset="0.6797" stop-color="#1C59B8" />
-          <stop offset="0.767" stop-color="#1B6AB6" />
-          <stop offset="0.8417" stop-color="#1A80B3" />
-          <stop offset="0.9079" stop-color="#199CB0" />
-          <stop offset="0.9663" stop-color="#18BBAD" />
-          <stop offset="1" stop-color="#17D1AA" />
+          <stop stopColor="#1D45BA" />
+          <stop offset="0.4204" stopColor="#1D47BA" />
+          <stop offset="0.5718" stopColor="#1D4EB9" />
+          <stop offset="0.6797" stopColor="#1C59B8" />
+          <stop offset="0.767" stopColor="#1B6AB6" />
+          <stop offset="0.8417" stopColor="#1A80B3" />
+          <stop offset="0.9079" stopColor="#199CB0" />
+          <stop offset="0.9663" stopColor="#18BBAD" />
+          <stop offset="1" stopColor="#17D1AA" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_853_15975"
@@ -393,12 +393,12 @@ export const DRepIlustration = () => {
           y2="75.6723"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
       </defs>
     </svg>

@@ -35,6 +35,7 @@ const storageKeys = {
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
+  DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
   SELECTED_WALLET: 'SELECTED_WALLET',
@@ -99,6 +100,12 @@ export default class LocalStorageApi {
 
   setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
 
+  // ========== Dred Yoroi Banner ========== //
+
+  getDrepYoroiBanerTimestamp: void => Promise<?string> = () => getLocalItem(storageKeys.DREP_YOROI_BANNER);
+
+  setDrepYoroiBanerTimestamp: string => Promise<void> = timestamp => setLocalItem(storageKeys.DREP_YOROI_BANNER, timestamp);
+
   // ========== Portfolio FIAT Pair ========== //
 
   getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
@@ -106,7 +113,7 @@ export default class LocalStorageApi {
   setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
   unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
-  
+
   // ========== Notifications Setting ========== //
 
   getNotificationsSetting: void => Promise<?string> = () => getLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
@@ -156,26 +163,20 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  setSelectedWalletId: number => Promise<void> = async (id) => {
+  setSelectedWalletId: number => Promise<void> = async id => {
     await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
   };
 
   // ========== Legacy Theme ========== //
 
   hasAnyLegacyThemeFlags: void => Promise<boolean> = async () => {
-    const [a, b] = await Promise.all([
-      getLocalItem(storageKeys.THEME),
-      getLocalItem(storageKeys.CUSTOM_THEME),
-    ]);
+    const [a, b] = await Promise.all([getLocalItem(storageKeys.THEME), getLocalItem(storageKeys.CUSTOM_THEME)]);
     return a != null || b != null;
-  }
+  };
 
   unsetLegacyThemeFlags: void => Promise<void> = async () => {
-    await Promise.all([
-      removeLocalItem(storageKeys.THEME),
-      removeLocalItem(storageKeys.CUSTOM_THEME),
-    ]);
-  }
+    await Promise.all([removeLocalItem(storageKeys.THEME), removeLocalItem(storageKeys.CUSTOM_THEME)]);
+  };
 
   // ========== Last Launch Version Number ========== //
 
@@ -266,7 +267,7 @@ export default class LocalStorageApi {
     return JSON.parse(unitOfAccount);
   };
 
-  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
+  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await setLocalItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
   };
 
@@ -344,7 +345,7 @@ export default class LocalStorageApi {
       key += '-firefox';
     }
     return key;
-  }
+  };
 
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
     const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
@@ -354,9 +355,9 @@ export default class LocalStorageApi {
     return JSON.parse(json);
   };
 
-  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
+  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
     await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
-  }
+  };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
@@ -428,13 +429,15 @@ export async function loadSubmittedTransactions(): Promise<Array<PersistedSubmit
   if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
     return [];
   }
-  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
-    networkId,
-    publicDeriverId,
-    transaction: deserializeTransactionCtorData(transaction),
-    usedUtxos,
-    isDrepDelegation,
-  }));
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(
+    ({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
+      networkId,
+      publicDeriverId,
+      transaction: deserializeTransactionCtorData(transaction),
+      usedUtxos,
+      isDrepDelegation,
+    })
+  );
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {

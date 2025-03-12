@@ -6,35 +6,29 @@ import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
 
 export default class AppStore extends Store<StoresMap> {
-
   @computed get currentRoute(): string {
     return this.stores.router.location.pathname;
   }
 
-  redirect: {|
+  redirect: ({|
     route: string,
     params?: Object,
-  |} => void = (
-    options
-  ) => {
+  |}) => void = options => {
     const routePath = buildRoute(options.route, options.params);
     this.stores.router.replace(routePath);
   };
 
-  goToRoute: {|
+  goToRoute: ({|
     route: string,
     params?: Object,
     publicDeriverId?: null | number,
-  |} => void = (
-    options
-  ) => {
+    delegateToYoroiDrep?: null | boolean,
+  |}) => void = options => {
+    console.log('options', options);
     const routePath = buildRoute(options.route, options.params);
     const { stores } = this;
     const currentRoute = stores.router.location.pathname;
-    if (
-      options.publicDeriverId !== undefined &&
-      options.publicDeriverId !== stores.wallets.selected?.publicDeriverId
-    ) {
+    if (options.publicDeriverId !== undefined && options.publicDeriverId !== stores.wallets.selected?.publicDeriverId) {
       if (options.publicDeriverId == null) {
         stores.wallets.unsetActiveWallet();
       } else {
@@ -48,7 +42,7 @@ export default class AppStore extends Store<StoresMap> {
         stores.router.push({ pathname: routePath });
       });
     } else if (currentRoute !== routePath) {
-      stores.router.push(routePath);
+      stores.router.push({ pathname: routePath, delegateToYoroiDrep: options.delegateToYoroiDrep });
     }
   };
 }
