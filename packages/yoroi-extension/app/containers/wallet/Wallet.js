@@ -46,14 +46,11 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
     const wallet = this.props.stores.wallets.selected;
     if (wallet == null) {
-      throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
+      throw new Error(`no public deriver. Should never happen`);
     }
     this.props.stores.delegation
       .checkGovernanceStatus(wallet)
       .then(() => {
-        this.setState({
-          govStatusFetched: true,
-        });
         return null;
       })
       .catch(e => {

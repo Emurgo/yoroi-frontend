@@ -32,11 +32,16 @@ const MIN_BALANCE_ADA = 5;
 
 const useDrepBannerVisibility = (balance: BigNumber) => {
   const localStorageApi = new LocalStorageApi();
+  // localStorageApi.unsetDrepYoroiBanerTimestamp();
   const [isVisible, setIsVisible] = useState(false);
   useEffect(() => {
     try {
       const checkVisibility = async () => {
-        const lastDismissed = await localStorageApi.getDrepYoroiBanerTimestamp();
+        const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
+        const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
+        const selectedWalletId = await localStorageApi.getSelectedWalletId();
+
+        const lastDismissed = bannerSettings[selectedWalletId];
         const now = Date.now();
 
         if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
@@ -52,8 +57,11 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
     }
   }, [balance]);
 
-  const dismissBanner = useCallback(() => {
-    localStorageApi.setDrepYoroiBanerTimestamp(String(Date.now()));
+  const dismissBanner = useCallback(async () => {
+    const selectedWalletId = await localStorageApi.getSelectedWalletId();
+
+    // localStorageApi.setDrepYoroiBanerTimestamp(String(Date.now()));
+    localStorageApi.setDrepYoroiBanerTimestamp(JSON.stringify({ [selectedWalletId]: Date.now() }));
     setIsVisible(false);
   }, [localStorageApi]);
 
