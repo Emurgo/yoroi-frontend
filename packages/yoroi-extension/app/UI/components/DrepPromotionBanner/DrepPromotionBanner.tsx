@@ -35,26 +35,22 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      const checkVisibility = async () => {
-        const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
-        const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
-        const selectedWalletId = await localStorageApi.getSelectedWalletId();
+    const checkVisibility = async () => {
+      const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
+      const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
+      const selectedWalletId = await localStorageApi.getSelectedWalletId();
 
-        const lastDismissed = bannerSettings[selectedWalletId];
-        const now = Date.now();
+      const lastDismissed = bannerSettings[selectedWalletId];
+      const now = Date.now();
 
-        if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
-          if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
-            setIsVisible(true);
-          }
+      if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
+        if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
+          setIsVisible(true);
         }
-      };
+      }
+    };
 
-      checkVisibility();
-    } catch (error) {
-      console.error('Error checking DREP banner visibility', error);
-    }
+    checkVisibility();
   }, [balance]);
 
   const dismissBanner = useCallback(async () => {
