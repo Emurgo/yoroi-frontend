@@ -32,8 +32,8 @@ const MIN_BALANCE_ADA = 5;
 
 const useDrepBannerVisibility = (balance: BigNumber) => {
   const localStorageApi = new LocalStorageApi();
-  // localStorageApi.unsetDrepYoroiBanerTimestamp();
   const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     try {
       const checkVisibility = async () => {
@@ -60,7 +60,6 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
   const dismissBanner = useCallback(async () => {
     const selectedWalletId = await localStorageApi.getSelectedWalletId();
 
-    // localStorageApi.setDrepYoroiBanerTimestamp(String(Date.now()));
     localStorageApi.setDrepYoroiBanerTimestamp(JSON.stringify({ [selectedWalletId]: Date.now() }));
     setIsVisible(false);
   }, [localStorageApi]);
@@ -142,4 +141,3 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
     </Container>
   );
 });
-// hmm, I thought we keep the buttons consistent across the app
