@@ -131,7 +131,7 @@ export const GovernanceStatusSelection = () => {
   const optionsList = [
     {
       title: strings.delegateToYoroiDRep,
-      titleHover: statusDelegating ? 'Change DRep' : strings.delegateToYoroiDRep,
+      titleHover: strings.delegateToYoroiDRep,
       description: statusDelegatingToYoroi
         ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
         : strings.designatingSomeoneElse,
@@ -150,7 +150,7 @@ export const GovernanceStatusSelection = () => {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
       titleHover: statusDelegating ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
-      descriptionHover: statusDelegating ? `Current DRep selection` : strings.designatingSomeoneElse,
+      descriptionHover: strings.designatingSomeoneElse,
 
       extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,
