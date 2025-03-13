@@ -24,7 +24,10 @@ import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../conf
 import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  networks,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresMap } from '../index';
 import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
@@ -195,7 +198,8 @@ export default class LedgerConnectStore
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(LedgerConnectStore)}::${nameof(this._checkAndStoreHWDeviceInfo)} no network selected`);
     }
-    const { selectedNetwork } = this.stores.profile;
+    // regardless the current network, we only recover Byron balance on the mainnet
+    const selectedNetwork = networks.CardanoMainnet;
     const fullConfig = getCardanoHaskellBaseConfig(
       selectedNetwork
     );
