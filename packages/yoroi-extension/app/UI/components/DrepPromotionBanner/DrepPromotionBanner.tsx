@@ -56,11 +56,7 @@ const useDrepBannerVisibility = (balance: BigNumber, selectedWalletId: number) =
     const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
     const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
 
-    localStorageApi.setDrepYoroiBanerTimestamp(
-      JSON.stringify(
-        Object.assign(bannerSettings, { [selectedWalletId]: Date.now() })
-      )
-    );
+    localStorageApi.setDrepYoroiBanerTimestamp(JSON.stringify(Object.assign(bannerSettings, { [selectedWalletId]: Date.now() })));
     setIsVisible(false);
   }, [localStorageApi]);
 
@@ -113,7 +109,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         </Stack>
       )}
 
-      <Stack direction="column" p="16px">
+      <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
           {!governanceInfo.isParticipatingToGovernance
             ? intl.formatMessage(globalMessages.delegateToYoroiDRep)
@@ -129,8 +125,8 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
             width: 'fit-content',
             height: '40px',
             '&.MuiButton-sizeMedium': {
-              p: '9px 20px'
-            }
+              p: '9px 20px',
+            },
           }}
           onClick={() => {
             stores.app.goToRoute({
