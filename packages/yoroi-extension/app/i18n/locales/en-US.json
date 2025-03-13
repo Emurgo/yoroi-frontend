@@ -1151,7 +1151,7 @@
   "yoroiTransfer.waiting.progressInfo.restoringAddresses": "Fetching addresses",
   "yoroiTransfer.waiting.title.label": "Wallet is being restored",
   "governance.delegateToYoroiDRep": "Delegate to Yoroi DRep",
-  "governance.considerDelegating": "Consider delegating to Yoroi?",
+  "governance.considerDelegating": "Consider delegating to Yoroi DRep?",
   "gouvernace.delegateToDRep": "Delegate to a DRep",
   "gouvernace.delegatingToDRep": "Delegating to a DRep",
   "gouvernace.designatingSomeoneElse": "You are designating someone else to cast your vote on your behalf for all proposals now and in the future.",
