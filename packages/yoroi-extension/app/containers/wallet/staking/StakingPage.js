@@ -50,10 +50,10 @@ class StakingPage extends Component<StoresProps> {
         }
         showInContainer
       >
-        <Suspense fallback={null}>
-          <DrepPromotionBanner stores={stores} page="staking" />
-          <StakingPageContent stores={this.props.stores} />
-        </Suspense>
+        {/* <Suspense fallback={null}> */}
+        <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
+        <StakingPageContent stores={this.props.stores} />
+        {/* </Suspense> */}
       </TopBarLayout>
     );
   }

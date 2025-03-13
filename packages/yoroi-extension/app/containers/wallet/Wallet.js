@@ -22,6 +22,8 @@ import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDi
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 type Props = {|
   +children: Node,
@@ -57,9 +59,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-    const activeCategory = categories.find(category =>
-      this.props.stores.app.currentRoute.startsWith(category.route)
-    );
+    const activeCategory = categories.find(category => this.props.stores.app.currentRoute.startsWith(category.route));
 
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
@@ -67,12 +67,9 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const visibilityContext = {
       selected: wallet.publicDeriverId,
       networkId: wallet.networkId,
-      walletHasAssets
+      walletHasAssets,
     };
-    if (
-      !activeCategory?.isVisible(visibilityContext) &&
-      activeCategory?.isHiddenButAllowed !== true
-    ) {
+    if (!activeCategory?.isVisible(visibilityContext) && activeCategory?.isHiddenButAllowed !== true) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
@@ -112,7 +109,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
     const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
     const spendableBalance = stores.transactions.balance;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
@@ -123,7 +120,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
       networkId: selectedWallet.networkId,
-      walletHasAssets
+      walletHasAssets,
     };
 
     const menu = (
@@ -145,12 +142,12 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer stores={stores}/>}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)}/>}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
             menu={isInitialSyncing ? null : menu}
           />
         }
@@ -158,9 +155,10 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
       >
         {warning}
         {isInitialSyncing ? (
-          <WalletLoadingAnimation/>
+          <WalletLoadingAnimation />
         ) : (
           <>
+            <DrepPromotionBanner stores={stores} intl={intl} />
             {this.props.children}
             {this.getDialogs(intl, currentPool)}
           </>
@@ -169,7 +167,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     );
   }
 
-  getWarning: (number) => void | Node = publicDeriverId => {
+  getWarning: number => void | Node = publicDeriverId => {
     const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriverId).dialogs;
     if (warnings.length === 0) {
       return undefined;
@@ -183,7 +181,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
     const selectedWallet = stores.wallets.selected;
     const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
-
 
     if (
       stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&

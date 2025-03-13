@@ -176,6 +176,22 @@ const globalMessages: * = defineMessages({
     id: 'wallet.receive.confirmationDialog.derivationPathLabel',
     defaultMessage: '!!!Derivation Path',
   },
+  delegateNow: {
+    id: 'wallet.staking.banner.delegate',
+    defaultMessage: '!!!Delegate Now',
+  },
+  delegateToYoroi: {
+    id: 'wallet.staking.banner.delegateToYoroi',
+    defaultMessage: '!!!Delegate to our DRep and help the Cardano network evolve in a way that benefits your wallet experience.',
+  },
+  delegateToYoroiDRep: {
+    id: 'governance.delegateToYoroiDRep',
+    defaultMessage: '!!!Delegate to Yoroi DRep',
+  },
+  considerDelegating: {
+    id: 'governance.considerDelegating',
+    defaultMessage: '!!!Consider delegating to Yoroi?',
+  },
   publicKeyExplanation: {
     id: 'global.publicKey.explanation',
     defaultMessage: `!!!Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)`,

@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { dRepNormalize } from '../../../api/ada/lib/cardanoCrypto/utils';
 import LocalStorageApi from '../../../api/localStorage/index';
+import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import { YOROI_DREP_ID } from '../../features/governace/common/constants';
 import { Icon } from '../icons';
@@ -13,16 +14,12 @@ const Container = styled(Stack)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_1,
   borderRadius: '8px',
   height: '154px',
-  padding: '16px',
   marginBottom: '24px',
 }));
 
 const IconWrapper = styled(IconButton)(({ theme }: any) => ({
-  border: '1px solid',
-  borderColor: theme.palette.ds.gray_max,
-  borderRadius: '50%',
-  width: '24px',
-  height: '24px',
+  borderColor: theme.palette.ds.el_gray_max,
+
   '& svg': {
     '& path': {
       fill: theme.palette.ds.el_gray_max,
@@ -36,20 +33,24 @@ const MIN_BALANCE_ADA = 5;
 const useDrepBannerVisibility = (balance: BigNumber) => {
   const localStorageApi = new LocalStorageApi();
   const [isVisible, setIsVisible] = useState(false);
-
+  // localStorageApi.unsetDrepYoroiBanerTimestamp();
   useEffect(() => {
-    const checkVisibility = async () => {
-      const lastDismissed = await localStorageApi.getDrepYoroiBanerTimestamp();
-      const now = Date.now();
+    try {
+      const checkVisibility = async () => {
+        const lastDismissed = await localStorageApi.getDrepYoroiBanerTimestamp();
+        const now = Date.now();
 
-      if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
-        if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
-          setIsVisible(true);
+        if (balance.isGreaterThanOrEqualTo(MIN_BALANCE_ADA)) {
+          if (!lastDismissed || now - Number(lastDismissed) > HIDE_DURATION_MS) {
+            setIsVisible(true);
+          }
         }
-      }
-    };
+      };
 
-    checkVisibility();
+      checkVisibility();
+    } catch (error) {
+      console.error('Error checking DREP banner visibility', error);
+    }
   }, [balance]);
 
   const dismissBanner = useCallback(() => {
@@ -83,7 +84,7 @@ const useGovernanceStatus = stores => {
   return governanceInfo;
 };
 
-export const DrepPromotionBanner = observer(({ stores }) => {
+export const DrepPromotionBanner = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
   const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
     selectedWallet,
@@ -103,24 +104,26 @@ export const DrepPromotionBanner = observer(({ stores }) => {
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
       {!governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance && (
-        <Stack sx={{ position: 'absolute', right: 20, top: 20 }}>
+        <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
           <IconWrapper onClick={dismissBanner}>
-            <Icon.CloseIcon />
+            <Icon.CloseCircleIcon />
           </IconWrapper>
         </Stack>
       )}
 
-      <Stack direction="column">
+      <Stack direction="column" p="16px">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
-          {!governanceInfo.isParticipatingToGovernance ? 'Delegate to Yoroi DRep' : 'Consider delegating to Yoroi?'}
+          {!governanceInfo.isParticipatingToGovernance
+            ? intl.formatMessage(globalMessages.delegateToYoroiDRep)
+            : intl.formatMessage(globalMessages.considerDelegating)}
         </Typography>
         <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
-          Delegate to our DRep and help the Cardano network evolve in a way that benefits your wallet experience.
+          {intl.formatMessage(globalMessages.delegateToYoroi)}
         </Typography>
         <Button
           //  @ts-ignore
           variant="secondary"
-          sx={{ width: '161px', padding: '6px 16px', height: '40px' }}
+          sx={{ width: '168px', padding: '6px 16px', height: '40px', fontWeight: 500 }}
           onClick={() => {
             stores.app.goToRoute({
               route: ROUTES.Governance.ROOT,
@@ -128,12 +131,13 @@ export const DrepPromotionBanner = observer(({ stores }) => {
             });
           }}
         >
-          <Typography fontSize="14px">Delegate now</Typography>
+          <Typography fontSize="14px">{intl.formatMessage(globalMessages.delegateNow)}</Typography>
         </Button>
       </Stack>
-      <Stack sx={{ width: '300px', marginRight: '40px' }}>
+      <Stack sx={{ marginRight: '40px', marginTop: '20px' }}>
         <Ilustration />
       </Stack>
     </Container>
   );
 });
+// hmm, I thought we keep the buttons consistent across the app
