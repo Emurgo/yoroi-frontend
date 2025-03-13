@@ -380,6 +380,11 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     if (delegationTx != null && selectedPoolId != null && showSignDialog) {
       // may happen for a split second before backend query starts
       if (selectedPoolInfo == null) return null;
+
+      const { numberOfDecimals } = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
+        delegationTx.totalAmountToDelegate.getDefaultEntry()
+      ).Metadata;
+
       return (
         <DelegationTxDialog
           staleTx={delegationTransaction.isStale}
@@ -403,7 +408,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               dialog: DelegationSuccessDialog,
             });
             ampli.stakingCenterDelegationSubmitted({
-              ada_amount: delegationTx.totalAmountToDelegate.getDefault().toNumber(),
+              ada_amount:
+                delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
               staking_pool: selectedPoolId,
             });
           }}

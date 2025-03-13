@@ -40,6 +40,7 @@ class BlockchainSubTab extends SettingsTab {
   async selectExplorer(explorer) {
     this.logger.info(`BlockchainSubTab::selectExplorer is called. Explorer: "${explorer}"`);
     await this.openExplorerSelection();
+    await this.sleep(400);
     await this.pickExplorer(explorer);
     await this.sleep(500);
   }

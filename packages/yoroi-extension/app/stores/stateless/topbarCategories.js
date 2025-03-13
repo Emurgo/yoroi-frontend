@@ -10,12 +10,9 @@ import { ReactComponent as dashboardIcon } from '../../assets/images/wallet-nav/
 import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
-  transactions: {
-    id: 'wallet.navigation.transactions',
-    defaultMessage: '!!!Transactions',
-  },
   send: {
     id: 'wallet.navigation.send',
     defaultMessage: '!!!Send',
@@ -78,7 +75,7 @@ export const SUMMARY: TopbarCategory = registerCategory({
   className: 'summary',
   route: ROUTES.WALLETS.TRANSACTIONS,
   icon: transactionsIcon,
-  label: messages.transactions,
+  label: globalMessages.transactions,
   isVisible: _request => true,
 });
 export const SEND: TopbarCategory = registerCategory({
@@ -115,7 +112,7 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
   {
     className: 'summary',
     route: ROUTES.WALLETS.TRANSACTIONS,
-    label: messages.transactions,
+    label: globalMessages.transactions,
     isVisible: _request => true,
   },
   {
@@ -136,12 +133,11 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     label: messages.delegationById,
     isVisible: request => {
       const { networkId } = request;
-      return (
-        (environment.isTest() ||
-         networkId === networks.CardanoPreprodTestnet.NetworkId ||
-         networkId === networks.CardanoPreviewTestnet.NetworkId
-        )
-      );
+      return environment.isTest()
+        || environment.isDev()
+        || environment.isNightly()
+        || networkId === networks.CardanoPreprodTestnet.NetworkId
+        || networkId === networks.CardanoPreviewTestnet.NetworkId;
     },
   },
 ];

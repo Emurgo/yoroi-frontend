@@ -143,7 +143,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     }
 
-    const isTestnet = this.props.stores.profile.currentNetworkId !== networks.CardanoMainnet.NetworkId;
+    const isTestnet = this.props.stores.profile.getCurrentNetworkId() !== networks.CardanoMainnet.NetworkId;
 
     return (
       <>
@@ -158,7 +158,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
                 if (isTestnet) {
                   window.open(links.testnetFaucet, '_blank');
                 } else {
-                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS)) {
+                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
                     ampli.walletPageExchangeClicked();
                   }
                   this.props.stores.uiDialogs.open({ dialog: BuySellDialog });

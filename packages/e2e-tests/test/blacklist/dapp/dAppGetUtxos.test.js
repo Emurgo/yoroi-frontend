@@ -1,17 +1,18 @@
-import BasePage from '../../pages/basepage.js';
-import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
-import { testWallet1 } from '../../utils/testWallets.js';
+import BasePage from '../../../pages/basepage.js';
+import { customAfterEach, customBeforeNestedDAppTest } from '../../../utils/customHooks.js';
+import { testWallet1 } from '../../../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils/utils.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
-import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
-import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
-import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
-import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
-import { adaInLovelaces } from '../../helpers/constants.js';
-import driversPoolsManager from '../../utils/driversPool.js';
-import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { getTestLogger } from '../../../utils/utils.js';
+import { oneMinute } from '../../../helpers/timeConstants.js';
+import { WindowManager, mockDAppName } from '../../../helpers/windowManager.js';
+import { getMockServer, mockDAppUrl } from '../../../helpers/mock-dApp-webpage/mockServer.js';
+import { MockDAppWebpage } from '../../../helpers/mock-dApp-webpage/mockedDApp.js';
+import { connectNonAuth } from '../../../helpers/mock-dApp-webpage/dAppHelper.js';
+import { adaInLovelaces } from '../../../helpers/constants.js';
+import driversPoolsManager from '../../../utils/driversPool.js';
+import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../../helpers/restoreWalletHelper.js';
 
+// Related issue https://emurgo.atlassian.net/browse/YOEXT-1723
 describe('dApp, getUtxos, nested tests', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
@@ -21,13 +22,13 @@ describe('dApp, getUtxos, nested tests', function () {
   let mockedDApp = null;
 
   before(async function () {
-    mockServer = getMockServer({});
-    logger = getTestLogger(this.test.parent.title);
     try {
+      mockServer = await getMockServer({});
+      logger = getTestLogger(this.test.parent.title);
       webdriver = await driversPoolsManager.getDriverFromPool();
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
-      windowManager.init();
+      await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');

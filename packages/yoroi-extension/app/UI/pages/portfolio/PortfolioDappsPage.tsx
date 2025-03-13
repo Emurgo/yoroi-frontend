@@ -1,6 +1,6 @@
 import React from 'react';
-import PortfolioDapps from '../../features/portfolio/useCases/Dapps/PortfolioDapps';
 import mockData from '../../features/portfolio/common/mockData';
+import PortfolioDapps from '../../features/portfolio/useCases/Dapps/PortfolioDapps';
 import PortfolioLayout from './layout';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 const PortfolioDappsPage = (props: Props) => {
   return (
     <PortfolioLayout {...props}>
-      <PortfolioDapps data={mockData.dapps} />
+      <PortfolioDapps data={mockData.dapps} stores={props.stores} />
     </PortfolioLayout>
   );
 };

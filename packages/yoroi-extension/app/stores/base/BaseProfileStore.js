@@ -92,16 +92,16 @@ export default class BaseProfileStore
     (boolean) => Promise<void>
   > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
 
-  @observable getUserRevampAnnouncementStatusRequest: Request<
-    (void) => Promise<boolean>
-  > = new Request<(void) => Promise<boolean>>(
-    this.api.localStorage.getUserRevampAnnouncementStatus
+  @observable getLastAnnouncedFeatureVersionRequest: Request<
+    (void) => Promise<string | null>
+  > = new Request<(void) => Promise<string | null>>(
+    this.api.localStorage.getLastAnnouncedFeatureVersion
   );
 
-  @observable setUserRevampAnnouncementStatusRequest: Request<
-    (boolean) => Promise<void>
-  > = new Request<(boolean) => Promise<void>>(
-    this.api.localStorage.setUserRevampAnnouncementStatus
+  @observable setLastAnnouncedFeatureVersionRequest: Request<
+    (string) => Promise<void>
+  > = new Request<(string) => Promise<void>>(
+    this.api.localStorage.setLastAnnouncedFeatureVersion
   );
 
   @observable getComplexityLevelRequest: Request<
@@ -148,7 +148,7 @@ export default class BaseProfileStore
 
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
-  currentNetworkId: ?number = undefined;
+  _currentNetworkId: ?number = undefined;
 
   setup(): void {
     super.setup();
@@ -157,7 +157,7 @@ export default class BaseProfileStore
       this._updateMomentJsLocaleAfterLocaleChange,
     ]);
     this._getSelectComplexityLevel(); // eagerly cache
-    noop(this.isRevampAnnounced);
+    noop(this.lastAnnouncedFeatureVersion);
     this.stores.loading.registerBlockingLoadingRequest(
       this._loadAcceptedTosVersion(),
       'load-tos-version',
@@ -173,20 +173,19 @@ export default class BaseProfileStore
   }
 
   getCurrentNetworkId(): number {
-    const { currentNetworkId } = this;
-    if (currentNetworkId == null) {
+    if (this._currentNetworkId == null) {
       return networks.CardanoMainnet.NetworkId;
     }
-    return currentNetworkId;
+    return this._currentNetworkId;
   }
 
   async setCurrentNetworkId(id: number): Promise<void> {
-    this.currentNetworkId = id;
+    this._currentNetworkId = id;
     await this.api.localStorage.saveCurrentNetworkId(id);
   }
 
   _loadCurrentNetworkId: () => Promise<void> = async () => {
-    this.currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
+    this._currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
   }
 
   get selectedNetwork(): $ReadOnly<NetworkRow> {
@@ -267,20 +266,18 @@ export default class BaseProfileStore
     );
   }
 
-  @computed get isRevampAnnounced(): boolean {
-    let { result } = this.getUserRevampAnnouncementStatusRequest;
-
-    if (result == null) {
-      result = this.getUserRevampAnnouncementStatusRequest.execute().result;
+  @computed get lastAnnouncedFeatureVersion(): string | null {
+    if (!this.getLastAnnouncedFeatureVersionRequest.wasExecuted
+      && !this.getLastAnnouncedFeatureVersionRequest.isExecuting) {
+      this.getLastAnnouncedFeatureVersionRequest.execute();
     }
-
-    return result === true;
+    return this.getLastAnnouncedFeatureVersionRequest.result ?? null;
   }
 
   @action
-  markRevampAsAnnounced: void => Promise<void> = async () => {
-    await this.setUserRevampAnnouncementStatusRequest.execute(true);
-    await this.getUserRevampAnnouncementStatusRequest.execute();
+  setLastAnnouncedFeatureVersion: string => Promise<void> = async (version) => {
+    await this.setLastAnnouncedFeatureVersionRequest.execute(version);
+    await this.getLastAnnouncedFeatureVersionRequest.execute();
   };
 
   @action

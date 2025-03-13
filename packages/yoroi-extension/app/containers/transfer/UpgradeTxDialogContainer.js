@@ -176,7 +176,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
             ),
             ...tentativeTx,
             expectedSerial,
-            networkId: selected.networkId,
+            networkId: tentativeTx.signRequest.networkSettingSnapshot.NetworkId,
           }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}

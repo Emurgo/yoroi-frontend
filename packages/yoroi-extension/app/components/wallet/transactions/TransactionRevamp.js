@@ -116,7 +116,7 @@ export default class TransactionRevamp extends Component<Props, State> {
         ) {
           return {
             icon: 'reward',
-            msg: intl.formatMessage({ id: 'wallet.transaction.type.rewardWithdrawn' }),
+            msg: intl.formatMessage(messages.rewardWithdrawn),
           };
         }
         if (features.includes('CatalystVotingRegistration') && features.length === 1) {

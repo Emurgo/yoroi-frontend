@@ -8,7 +8,7 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { getTestWalletName } from '../../helpers/constants.js';
-import { createWallet } from '../../helpers/restoreWalletHelper.js';
+import { collectInfo, createWallet } from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getUtxos, empty wallet', function () {
@@ -26,14 +26,19 @@ describe('dApp, getUtxos, empty wallet', function () {
   let mockedDApp = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
-    mockServer = getMockServer({});
-    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    windowManager.init();
-    const dappLogger = getTestLogger('dApp', this.test.parent.title);
-    mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
-    logger = getTestLogger(this.test.parent.title);
+    try {
+      webdriver = await driversPoolsManager.getDriverFromPool();
+      mockServer = await getMockServer({});
+      logger = getTestLogger(this.test.parent.title);
+      const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+      const dappLogger = getTestLogger('dApp', this.test.parent.title);
+      windowManager = new WindowManager(webdriver, wmLogger);
+      await windowManager.init();
+      mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+    } catch (error) {
+      await collectInfo(this, webdriver, logger);
+      throw new Error(error);
+    }
   });
 
   it('Create an empty wallet', async function () {

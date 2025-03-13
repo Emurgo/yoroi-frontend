@@ -23,7 +23,7 @@ import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../stores';
-import { ampli } from '../../../ampli/index'
+import { ampli } from '../../../ampli/index';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
@@ -56,6 +56,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.trezorConnect.init();
+      ampli.connectWalletCheckPageViewed();
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
@@ -66,6 +67,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.ledgerConnect.init();
+      ampli.connectWalletCheckPageViewed();
     };
 
     let activeDialog = null;
@@ -149,7 +151,6 @@ export default class AddWalletPage extends Component<StoresProps> {
         <AddWalletPageRevamp
           onHardwareConnect={() => {
             this.openDialogWrapper(WalletConnectHWOptionDialog);
-            ampli.connectWalletCheckPageViewed();
           }}
           onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
           onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}

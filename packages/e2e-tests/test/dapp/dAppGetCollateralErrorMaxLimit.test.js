@@ -22,13 +22,13 @@ describe('dApp, getCollateral, error, max limit', function () {
   let mockedDApp = null;
 
   before(async function () {
-    mockServer = getMockServer({});
-    logger = getTestLogger(this.test.parent.title);
     try {
+      mockServer = await getMockServer({});
+      logger = getTestLogger(this.test.parent.title);
       webdriver = await driversPoolsManager.getDriverFromPool();
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
-      windowManager.init();
+      await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');

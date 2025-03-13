@@ -7,7 +7,7 @@ import {
 } from '../../../connector/api';
 import {
   transactionHexToHash,
-  transactionHexAddVkeyWitnessesFromWitnessSetHex,
+  transactionHexAddSignaturesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 import {
   asGetSigningKey,
@@ -18,9 +18,10 @@ import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoa
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import LocalStorageApi from '../../../../../app/api/localStorage/index';
 import { getCardanoStateFetcher } from '../../utils';
-import { hexToBytes } from '../../../../../app/coreUtils';
+import { bytesToHex, hexToBytes } from '../../../../../app/coreUtils';
 import { getWalletsState  } from '../utils';
 import type { CardanoAddressedUtxo } from '../../../../../app/api/ada/transactions/types';
+import { getNetworkById } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 export type SignTransactionRequestType = {|
   publicDeriverId: number,
@@ -47,7 +48,7 @@ export const SignTransaction: HandlerType<
           partialSign: false
         },
       );
-      return transactionHexAddVkeyWitnessesFromWitnessSetHex(transactionHex, signedWitnessSetHex);
+      return transactionHexAddSignaturesFromWitnessSetHex(transactionHex, signedWitnessSetHex);
     } catch (error) {
       return { error: error.message };
     }
@@ -134,7 +135,7 @@ export const SignAndBroadcastTransaction: HandlerType<
         try {
           await connectorRecordSubmittedCardanoTransaction(
             publicDeriver,
-            Scope.WalletV4.Transaction.from_hex(signedTxHex)
+            signedTxHex,
           );
         } catch (_error) {
           // ignore
@@ -155,7 +156,8 @@ export type BroadcastTransactionRequestType = {|
   |} | {|
     addressedUtxos?: Array<CardanoAddressedUtxo>,
     signedTxHex: string,
-  |})
+  |}),
+  networkId?: number,
 |};
 
 export const BroadcastTransaction: HandlerType<
@@ -183,19 +185,25 @@ export const BroadcastTransaction: HandlerType<
       addressedUtxoArray = [addressedUtxos];
     }
 
+    const walletNetwork = publicDeriver.getParent().getNetworkInfo();
+
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     try {
       await stateFetcher.sendTx({
-        network: publicDeriver.getParent().getNetworkInfo(),
+        network: typeof request.networkId === 'number' ? getNetworkById(request.networkId) : walletNetwork,
         txs,
       });
+      if (typeof request.networkId === 'number' && walletNetwork.NetworkId !== request.networkId) {
+        // this is Ledger wallet Byron balance transfer
+        return null;
+      }
       try {
         for (let i = 0; i < txs.length; i++) {
-          await RustModule.WasmScope(Scope => connectorRecordSubmittedCardanoTransaction(
+          await connectorRecordSubmittedCardanoTransaction(
             publicDeriver,
-            Scope.WalletV4.Transaction.from_bytes(txs[i].encodedTx),
+            bytesToHex(txs[i].encodedTx),
             addressedUtxoArray[i]
-          ));
+          );
         }
       } catch (_error) {
         // ignore

@@ -5,8 +5,8 @@ import { Switch } from '../../../../components/Switch/Switch';
 import LocalStorageApi from '../../../../../api/localStorage';
 import { ampli } from '../../../../../../ampli';
 
-const NotificationsSettings = ({ intl }) => {
-  const strings = useStrings(intl);
+const NotificationsSettings = () => {
+  const strings = useStrings();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [selectedWalletId, setSelectedWalletId] = React.useState("");
 
