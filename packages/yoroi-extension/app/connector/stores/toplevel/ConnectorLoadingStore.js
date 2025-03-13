@@ -7,16 +7,11 @@ import {
 
 export default class ConnectorLoadingStore extends BaseLoadingStore<StoresMap> {
 
-  async preLoadingScreenEnd(): Promise<void> {
-    await super.preLoadingScreenEnd();
+  async loadingEnd(): Promise<void> {
     // fixme ? wait for wallets loading
 
     await this.stores.tokenInfoStore.refreshTokenInfo();
     await this.stores.coinPriceStore.loadFromStorage();
-  }
-
-  postLoadingScreenEnd(): void {
-    super.postLoadingScreenEnd();
   }
 
   getTabIdKey(): string {

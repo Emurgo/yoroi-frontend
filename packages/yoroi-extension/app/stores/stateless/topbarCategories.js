@@ -3,7 +3,6 @@ import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
 import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
