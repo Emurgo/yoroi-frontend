@@ -24,7 +24,6 @@ export default class AppStore extends Store<StoresMap> {
     publicDeriverId?: null | number,
     delegateToYoroiDrep?: null | boolean,
   |}) => void = options => {
-    console.log('options', options);
     const routePath = buildRoute(options.route, options.params);
     const { stores } = this;
     const currentRoute = stores.router.location.pathname;

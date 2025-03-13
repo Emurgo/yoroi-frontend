@@ -150,7 +150,7 @@ export const GovernanceStatusSelection = () => {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
       titleHover: statusDelegating ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
-      descriptionHover: statusDelegating ? `Current DRep selection: ${governanceStatus.drep}` : strings.designatingSomeoneElse,
+      descriptionHover: statusDelegating ? `Current DRep selection` : strings.designatingSomeoneElse,
 
       extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,

@@ -35,7 +35,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     intl: intlShape.isRequired,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {
       return;
@@ -43,6 +43,22 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.5.0')) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
     }
+
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
+      throw new Error(`${nameof(StakingPageContent)} no public deriver. Should never happen`);
+    }
+    this.props.stores.delegation
+      .checkGovernanceStatus(wallet)
+      .then(() => {
+        this.setState({
+          govStatusFetched: true,
+        });
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to fetch governance status', e);
+      });
   }
 
   checkRoute(): void | string {

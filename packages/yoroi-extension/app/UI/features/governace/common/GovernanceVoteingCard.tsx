@@ -30,8 +30,8 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selec
   width: smallCard ? '298px' : '612px',
   paddingTop: '16px',
   paddingBottom: '16px',
-  height: 'auto',
   maxHeight: '300px',
+  minHeight: '126px',
   borderRadius: '8px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
 
@@ -97,7 +97,7 @@ export const GovernanceVoteingCard = ({
         onClick={pending ? undefined : onClick}
         pending={pending ? 'true' : undefined}
         selected={selected}
-        is_drep_selected={String(governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID)}
+        is_drep_selected={String(governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID)}
         smallCard={smallCard}
       >
         {loading && (

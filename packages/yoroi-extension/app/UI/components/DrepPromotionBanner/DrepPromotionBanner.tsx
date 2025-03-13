@@ -33,7 +33,6 @@ const MIN_BALANCE_ADA = 5;
 const useDrepBannerVisibility = (balance: BigNumber) => {
   const localStorageApi = new LocalStorageApi();
   const [isVisible, setIsVisible] = useState(false);
-  // localStorageApi.unsetDrepYoroiBanerTimestamp();
   useEffect(() => {
     try {
       const checkVisibility = async () => {
@@ -54,14 +53,21 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
   }, [balance]);
 
   const dismissBanner = useCallback(() => {
-    localStorageApi.setDrepYoroiBanerTimestamp(Date.now());
+    localStorageApi.setDrepYoroiBanerTimestamp(String(Date.now()));
     setIsVisible(false);
   }, [localStorageApi]);
 
   return { isVisible, dismissBanner };
 };
 
-const useGovernanceStatus = stores => {
+export const DrepPromotionBanner = observer(({ stores, intl }) => {
+  const selectedWallet = stores.wallets.selectedOrFail;
+  const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
+    selectedWallet,
+  ]);
+
+  const { isVisible, dismissBanner } = useDrepBannerVisibility(balance);
+
   const [governanceInfo, setGovernanceInfo] = useState({
     isParticipatingToGovernance: false,
     isDelegatingToYoroiDrep: false,
@@ -79,19 +85,7 @@ const useGovernanceStatus = stores => {
     };
 
     getGovStatus();
-  }, [stores.delegation, governanceInfo]);
-
-  return governanceInfo;
-};
-
-export const DrepPromotionBanner = observer(({ stores, intl }) => {
-  const selectedWallet = stores.wallets.selectedOrFail;
-  const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
-    selectedWallet,
-  ]);
-
-  const { isVisible, dismissBanner } = useDrepBannerVisibility(balance);
-  const governanceInfo = useGovernanceStatus(stores);
+  }, [stores.delegation.governanceStatus]);
 
   if (
     !isVisible ||
