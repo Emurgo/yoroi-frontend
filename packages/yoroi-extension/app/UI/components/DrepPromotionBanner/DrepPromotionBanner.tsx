@@ -79,7 +79,7 @@ const useGovernanceStatus = stores => {
     };
 
     getGovStatus();
-  }, [stores.delegation.governanceStatus]);
+  }, [stores.delegation, governanceInfo]);
 
   return governanceInfo;
 };
@@ -123,7 +123,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <Button
           //  @ts-ignore
           variant="secondary"
-          sx={{ width: '168px', padding: '6px 16px', height: '40px', fontWeight: 500 }}
+          sx={{ width: '178px', padding: '6px 16px', height: '40px', fontWeight: 500 }}
           onClick={() => {
             stores.app.goToRoute({
               route: ROUTES.Governance.ROOT,
@@ -131,7 +131,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
             });
           }}
         >
-          <Typography fontSize="14px">{intl.formatMessage(globalMessages.delegateNow)}</Typography>
+          {intl.formatMessage(globalMessages.delegateNow)}
         </Button>
       </Stack>
       <Stack sx={{ marginRight: '40px', marginTop: '20px' }}>
