@@ -120,7 +120,13 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <Button
           //  @ts-ignore
           variant="secondary"
-          sx={{ width: '180px', height: '40px', fontWeight: 500 }}
+          sx={{
+            width: 'fit-content',
+            height: '40px',
+            '&.MuiButton-sizeMedium': {
+              p: '9px 20px'
+            }
+          }}
           onClick={() => {
             stores.app.goToRoute({
               route: ROUTES.Governance.ROOT,
