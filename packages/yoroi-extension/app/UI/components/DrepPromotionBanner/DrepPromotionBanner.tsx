@@ -30,7 +30,7 @@ const IconWrapper = styled(IconButton)(({ theme }: any) => ({
 const HIDE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 1 month in milliseconds
 const MIN_BALANCE_ADA = 5;
 
-const useDrepBannerVisibility = (balance: BigNumber) => {
+const useDrepBannerVisibility = (balance: BigNumber, selectedWalletId: number) => {
   const localStorageApi = new LocalStorageApi();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -38,7 +38,6 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
     const checkVisibility = async () => {
       const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
       const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
-      const selectedWalletId = await localStorageApi.getSelectedWalletId();
 
       const lastDismissed = bannerSettings[selectedWalletId];
       const now = Date.now();
@@ -54,9 +53,14 @@ const useDrepBannerVisibility = (balance: BigNumber) => {
   }, [balance]);
 
   const dismissBanner = useCallback(async () => {
-    const selectedWalletId = await localStorageApi.getSelectedWalletId();
+    const drepBannerSettingsStr = await localStorageApi.getDrepYoroiBanerTimestamp();
+    const bannerSettings = JSON.parse(drepBannerSettingsStr || '{}');
 
-    localStorageApi.setDrepYoroiBanerTimestamp(JSON.stringify({ [selectedWalletId]: Date.now() }));
+    localStorageApi.setDrepYoroiBanerTimestamp(
+      JSON.stringify(
+        Object.assign(bannerSettings, { [selectedWalletId]: Date.now() })
+      )
+    );
     setIsVisible(false);
   }, [localStorageApi]);
 
@@ -68,8 +72,9 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
   const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
     selectedWallet,
   ]);
+  const selectedWalletId = selectedWallet.publicDeriverId;
 
-  const { isVisible, dismissBanner } = useDrepBannerVisibility(balance);
+  const { isVisible, dismissBanner } = useDrepBannerVisibility(balance, selectedWalletId);
 
   const [governanceInfo, setGovernanceInfo] = useState({
     isParticipatingToGovernance: false,
