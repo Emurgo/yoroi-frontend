@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from '../../../context/IntlProvider';
+import globalMessages from '../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -181,5 +182,6 @@ export const useStrings = () => {
     theTransactionCanTake: intl.formatMessage(messages.theTransactionCanTake),
     participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
     goToGovernance: intl.formatMessage(messages.goToGovernance),
+    goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
   }).current;
 };

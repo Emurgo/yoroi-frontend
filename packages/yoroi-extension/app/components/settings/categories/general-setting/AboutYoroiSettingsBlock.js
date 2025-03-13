@@ -18,7 +18,7 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -77,6 +77,10 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.git.branch',
     defaultMessage: '!!!Branch:',
   },
+  switchNetwork: {
+    id: 'settings.general.aboutYoroi.switchNetwork',
+    defaultMessage: '!!!SWITCH NETWORK',
+  },
 });
 
 const basePageComponentPath = 'settings:general';
@@ -130,7 +134,8 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | { isTestnet: boolean, ... }
+  wallet: null | { isTestnet: boolean, ... },
+  onSwitchNetwork: () => void,
 |};
 
 @observer
@@ -149,42 +154,55 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
         sx={{
           pb: '20px',
           mt: '40px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
         }}
       >
         <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 
-        {network && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {network && (
+            <LabelWithValue
+              label={intl.formatMessage(messages.networkLabel)}
+              value={intl.formatMessage(messages[network])}
+              componentId={basePageComponentPath + '-networkInfo-text'}
+            />
+          )}
+
           <LabelWithValue
-            label={intl.formatMessage(messages.networkLabel)}
-            value={intl.formatMessage(messages[network])}
-            componentId={basePageComponentPath + '-networkInfo-text'}
+            label={intl.formatMessage(messages.versionLabel)}
+            value={environment.getVersion()}
+            url={baseGithubUrl + 'releases/'}
+            componentId={basePageComponentPath + '-versionInfo-text'}
           />
-        )}
 
-        <LabelWithValue
-          label={intl.formatMessage(messages.versionLabel)}
-          value={environment.getVersion()}
-          url={baseGithubUrl + 'releases/'}
-          componentId={basePageComponentPath + '-versionInfo-text'}
-        />
-
-        <LabelWithValue
-          label={intl.formatMessage(messages.commitLabel)}
-          value={environment.commit}
-          url={baseGithubUrl + 'commit/' + environment.commit}
-          componentId={basePageComponentPath + '-commitInfo-text'}
-        />
-
-        {!environment.isProduction() && (
           <LabelWithValue
-            label={intl.formatMessage(messages.branchLabel)}
-            value={environment.branch}
-            url={baseGithubUrl + 'tree/' + environment.branch}
-            componentId={basePageComponentPath + '-branchInfo-text'}
+            label={intl.formatMessage(messages.commitLabel)}
+            value={environment.commit}
+            url={baseGithubUrl + 'commit/' + environment.commit}
+            componentId={basePageComponentPath + '-commitInfo-text'}
           />
-        )}
+
+          {!environment.isProduction() && (
+            <LabelWithValue
+              label={intl.formatMessage(messages.branchLabel)}
+              value={environment.branch}
+              url={baseGithubUrl + 'tree/' + environment.branch}
+              componentId={basePageComponentPath + '-branchInfo-text'}
+            />
+          )}
+        </Box>
+
+        <Button
+          onClick={this.props.onSwitchNetwork}
+          variant="secondary"
+          style={{ width: '200px' }}
+        >
+          {intl.formatMessage(messages.switchNetwork)}
+        </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

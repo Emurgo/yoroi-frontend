@@ -21,7 +21,7 @@ import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import { removeAllTransactions } from './bridge/updateTransactions';
 import { removePublicDeriver } from './bridge/walletBuilder/remove';
-import { asGetAllUtxos, asHasLevels, } from './models/PublicDeriver/traits';
+import { asGetAllUtxos, asHasLevels, asGetPublicKey, } from './models/PublicDeriver/traits';
 import { ConceptualWallet, isLedgerNanoWallet, } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
@@ -32,6 +32,7 @@ import { getAllSchemaTables, raii, } from './database/utils';
 import type { BlockRow } from './database/primitives/tables';
 import { GetBlock } from './database/primitives/api/read';
 import { ModifyUtxoAtSafePoint } from './database/utxo/api/write';
+import type { PublicDeriver } from './models/PublicDeriver/index';
 
 export async function migrateToLatest(
   localStorageApi: LocalStorageApi,
@@ -98,6 +99,7 @@ export async function migrateToLatest(
     ['<3.8.0', () => cardanoTxHistoryReset(persistentDb)],
     ['<4.18', () => populateNewUtxodata(persistentDb)],
     ['<5.4', () => unsetLegacyThemeFlags(localStorageApi)],
+    ['<5.6', () => migrateWalletOrderAndSelectedWalletForNetworkSwitch(persistentDb, localStorageApi)],
   ];
 
   let appliedMigration = false;
@@ -421,4 +423,43 @@ async function unsetLegacyThemeFlags(localStorageApi: LocalStorageApi): Promise<
   }
   await localStorageApi.unsetLegacyThemeFlags();
   return true;
+}
+
+async function migrateWalletOrderAndSelectedWalletForNetworkSwitch(
+  db: lf$Database,
+  localStorageApi: LocalStorageApi,
+): Promise<boolean> {
+  const wallets = await loadWalletsFromStorage(db);
+
+  const oldWalletOrder = (await localStorageApi.getWalletsNavigation())?.cardano || [];
+  const publicKeyList = [];
+  for (const id of oldWalletOrder) {
+    const wallet = wallets.find(w => w.getPublicDeriverId() === id);
+    if (wallet) {
+      publicKeyList.push(await getPublicKey(wallet));
+    }
+  }
+  for (const wallet of wallets) {
+    if (!oldWalletOrder.includes(wallet.getPublicDeriverId())) {
+      publicKeyList.push(await getPublicKey(wallet));
+    }
+  }
+  await localStorageApi.saveWalletListOrder(publicKeyList);
+
+  const selectedWalletId = await localStorageApi.getSelectedWalletId();
+  const selectedWallet = wallets.find(
+    wallet => wallet.getPublicDeriverId() === selectedWalletId
+  );
+  if (selectedWallet) {
+    await localStorageApi.setSelectedWalletPublicKey(await getPublicKey(selectedWallet));
+  }
+  return true;
+}
+
+async function getPublicKey(publicDeriver: PublicDeriver<>): Promise<string> {
+  const withPubKey = asGetPublicKey(publicDeriver);
+  if (withPubKey == null) {
+    throw new Error('unexpected missing asGetPublicKey result');
+  }
+  return (await withPubKey.getPublicKey()).Hash;
 }

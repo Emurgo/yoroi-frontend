@@ -18,6 +18,8 @@ import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
 import { refreshCurrentCoinPrice } from '../../api/thunk';
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
@@ -146,6 +148,8 @@ export default class BaseProfileStore
 
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
+  _currentNetworkId: ?number = undefined;
+
   setup(): void {
     super.setup();
     this.registerReactions([
@@ -162,6 +166,30 @@ export default class BaseProfileStore
       this._loadWhetherAnalyticsAllowed(),
       'load-analytics-flag',
     );
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadCurrentNetworkId(),
+      'load-current-network-id',
+    );
+  }
+
+  getCurrentNetworkId(): number {
+    if (this._currentNetworkId == null) {
+      return networks.CardanoMainnet.NetworkId;
+    }
+    return this._currentNetworkId;
+  }
+
+  async setCurrentNetworkId(id: number): Promise<void> {
+    this._currentNetworkId = id;
+    await this.api.localStorage.saveCurrentNetworkId(id);
+  }
+
+  _loadCurrentNetworkId: () => Promise<void> = async () => {
+    this._currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
+  }
+
+  get selectedNetwork(): $ReadOnly<NetworkRow> {
+    return getNetworkById(this.getCurrentNetworkId());
   }
 
   _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {
