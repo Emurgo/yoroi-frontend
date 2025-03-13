@@ -2494,7 +2494,7 @@
         },
         "Name": "CardanoScan"
       }
-    },
+    }
   ],
   "HwWalletMeta": [],
   "Key": [
@@ -3196,7 +3196,7 @@
         ],
         "Fork": 0
       }
-    },
+    }
   ],
   "PreferredExplorer": [],
   "PriceData": [],
@@ -3291,7 +3291,7 @@
           "numberOfDecimals": 6
         }
       }
-    },
+    }
   ],
   "TokenList": [
     {

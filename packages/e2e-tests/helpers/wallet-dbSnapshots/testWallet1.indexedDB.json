@@ -2473,7 +2473,7 @@
         "Name": "CardanoScan",
         "NetworkId": 350
       }
-    },
+    }
   ],
   "HwWalletMeta": [],
   "Key": [
@@ -3175,7 +3175,7 @@
         "NetworkId": 350,
         "NetworkName": "Cardano Preview Testnet"
       }
-    },
+    }
   ],
   "PreferredExplorer": [],
   "PriceData": [],
@@ -3270,7 +3270,7 @@
         "NetworkId": 350,
         "TokenId": 3
       }
-    },
+    }
   ],
   "TokenList": [
     {
