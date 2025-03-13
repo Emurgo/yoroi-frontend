@@ -22,7 +22,7 @@ import type {
 } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
-import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
 
 type LocalProps = {|
@@ -135,24 +135,21 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     if (selected == null) {
       throw new Error(`${nameof(UpgradeTxDialogContainer)} no wallet selected`);
     }
-    const network = getNetworkById(selected.networkId);
-    const defaultToken = {
-      defaultNetworkId: selected.networkId,
-      defaultIdentifier: selected.defaultTokenId,
-    };
-    const defaultTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)({
-      identifier: defaultToken.defaultIdentifier,
-      networkId: defaultToken.defaultNetworkId,
-    });
+    // CardanoMainnet.NetworkId is hardcoded here because the functionality is available only on mainnet
+    const network = getNetworkById(networks.CardanoMainnet.NetworkId);
 
     const { intl } = this.context;
     const header = (
       <div>
-        {intl.formatMessage(
-          messages.explanation,
-          { ticker: truncateToken(getTokenName(defaultTokenInfo)) }
-        )}
-        <br /><br />
+        {intl.formatMessage(messages.explanation, {
+          ticker: truncateToken(
+            getTokenName(
+              genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(transferTx.recoveredBalance.getDefaultEntry())
+            )
+          ),
+        })}
+        <br />
+        <br />
       </div>
     );
 
