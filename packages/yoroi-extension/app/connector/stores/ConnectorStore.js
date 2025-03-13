@@ -27,7 +27,6 @@ import {
   getCardanoHaskellBaseConfig,
   getNetworkById,
   isCardanoHaskell,
-  networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
