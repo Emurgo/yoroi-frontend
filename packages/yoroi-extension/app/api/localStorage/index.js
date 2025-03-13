@@ -27,7 +27,6 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
@@ -36,9 +35,12 @@ const storageKeys = {
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
+  CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
+  WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
+  SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
+
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
-  SELECTED_WALLET: 'SELECTED_WALLET',
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
@@ -46,6 +48,8 @@ const storageKeys = {
   // ========== LEGACY USED FOR MIGRATIONS ========== //
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -147,17 +151,17 @@ export default class LocalStorageApi {
   setLastAnnouncedFeatureVersion: string => Promise<void> = version =>
     setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
 
-  // ========== Select Wallet ========== //
+  // ========== Legacy Select Wallet ========== //
 
   getSelectedWalletId: void => Promise<number | null> = async () => {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
-    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
     if (!id) {
-      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
-      if (/^\d+$/.test(id)) {
-        await this.setSelectedWalletId(Number(id));
+      id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
+      if (!/^\d+$/.test(id)) {
+        id = null;
       }
     }
+
     if (!id) {
       return null;
     }
@@ -165,8 +169,13 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  setSelectedWalletId: number => Promise<void> = async id => {
-    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
+  // ========== Selected Wallet ========== //
+  getSelectedWalletPublicKey: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
+  };
+
+  setSelectedWalletPublicKey: string => Promise<void> = async publicKey => {
+    await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
   };
 
   // ========== Legacy Theme ========== //
@@ -362,6 +371,30 @@ export default class LocalStorageApi {
   };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
+  loadCurrentNetworkId: () => Promise<?number> = async () => {
+    const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
+    if (raw == null) {
+      return undefined;
+    }
+    return Number(raw);
+  };
+
+  saveCurrentNetworkId: number => Promise<void> = async networkId => {
+    await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+  };
+
+  loadWalletListOrder: () => Promise<Array<string>> = async () => {
+    const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
+    if (raw == null) {
+      return [];
+    }
+    return JSON.parse(raw);
+  };
+
+  saveWalletListOrder: (Array<string>) => Promise<void> = async publicKeyList => {
+    await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
+  };
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();

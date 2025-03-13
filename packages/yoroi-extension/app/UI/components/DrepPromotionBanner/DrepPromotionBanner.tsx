@@ -120,7 +120,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <Button
           //  @ts-ignore
           variant="secondary"
-          sx={{ width: '178px', padding: '6px 16px', height: '40px', fontWeight: 500 }}
+          sx={{ width: '180px', height: '40px', fontWeight: 500 }}
           onClick={() => {
             stores.app.goToRoute({
               route: ROUTES.Governance.ROOT,
@@ -128,7 +128,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
             });
           }}
         >
-          {intl.formatMessage(globalMessages.delegateNow)}
+          {intl.formatMessage(globalMessages.delegateVote)}
         </Button>
       </Stack>
       <Stack sx={{ marginRight: '40px', marginTop: '20px' }}>

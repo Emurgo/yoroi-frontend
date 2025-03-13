@@ -180,6 +180,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.staking.banner.delegate',
     defaultMessage: '!!!Delegate Now',
   },
+  delegateVote: {
+    id: 'wallet.staking.banner.delegateVote',
+    defaultMessage: '!!!Delegate Vote',
+  },
   delegateToYoroi: {
     id: 'wallet.staking.banner.delegateToYoroi',
     defaultMessage: '!!!Delegate to our DRep and help the Cardano network evolve in a way that benefits your wallet experience.',
@@ -1031,6 +1035,30 @@ const globalMessages: * = defineMessages({
   provider: {
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
+  },
+  mainnet: {
+    id: 'networkName.mainnet',
+    defaultMessage: '!!!Mainnet',
+  },
+  preprod: {
+    id: 'networkName.preprod',
+    defaultMessage: '!!!Preprod',
+  },
+  preview: {
+    id: 'networkName.preview',
+    defaultMessage: '!!!Preview',
+  },
+  goToFaucetButton: {
+    id: 'wallet.emptyWalletMessage.goToFaucet',
+    defaultMessage: '!!!GO TO TADA FAUCET',
+  },
+  welcomeMessageTestnet: {
+    id: 'wallet.emptyWalletMessage.testnet',
+    defaultMessage: '!!!Learn Cardano with test ADA ⭐',
+  },
+  welcomeMessageSubtitleTestnet: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnet',
+    defaultMessage: "!!!Get started with Cardano's test currency, TADA. It's your key to testing a new world of possibilities.",
   },
 });
 export default globalMessages;

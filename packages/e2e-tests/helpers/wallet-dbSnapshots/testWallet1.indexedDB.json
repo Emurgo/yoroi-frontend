@@ -2474,22 +2474,6 @@
         "NetworkId": 350
       }
     },
-    {
-      "id": 107,
-      "value": {
-        "Endpoints": {
-          "address": "https://sancho.cexplorer.io/address/",
-          "pool": "https://sancho.cexplorer.io/pool/",
-          "stakeAddress": "https://sancho.cexplorer.io/stake/",
-          "token": "https://sancho.cexplorer.io/asset/",
-          "transaction": "https://sancho.cexplorer.io/tx/"
-        },
-        "ExplorerId": 650,
-        "IsBackup": true,
-        "Name": "Cexplorer",
-        "NetworkId": 450
-      }
-    }
   ],
   "HwWalletMeta": [],
   "Key": [
@@ -3192,47 +3176,6 @@
         "NetworkName": "Cardano Preview Testnet"
       }
     },
-    {
-      "id": 97,
-      "value": {
-        "Backend": {
-          "BackendService": "https://sanchonet-backend.yoroiwallet.com",
-          "BackendServiceZero": "https://yoroi-backend-zero-sanchonet.emurgornd.com",
-          "TokenInfoService": "https://stage-cdn.yoroiwallet.com"
-        },
-        "BaseConfig": [
-          {
-            "ByronNetworkId": 4,
-            "ChainNetworkId": "0",
-            "GenesisDate": "1686789000000",
-            "SlotDuration": 20,
-            "SlotsPerEpoch": 4320,
-            "StartAt": 0
-          },
-          {
-            "CoinsPerUtxoWord": "34482",
-            "KeyDeposit": "2000000",
-            "LinearFee": {
-              "coefficient": "44",
-              "constant": "155381"
-            },
-            "MinimumUtxoVal": "1000000",
-            "PerEpochPercentageReward": 69344,
-            "PoolDeposit": "500000000",
-            "SlotDuration": 1,
-            "SlotsPerEpoch": 86400,
-            "StartAt": 0
-          },
-          {
-            "CoinsPerUtxoByte": "4310"
-          }
-        ],
-        "CoinType": 2147485463,
-        "Fork": 0,
-        "NetworkId": 450,
-        "NetworkName": "Cardano Sancho Testnet"
-      }
-    }
   ],
   "PreferredExplorer": [],
   "PriceData": [],
@@ -3328,26 +3271,6 @@
         "TokenId": 3
       }
     },
-    {
-      "id": 111,
-      "value": {
-        "Digest": -5.874115065217367e+270,
-        "Identifier": "",
-        "IsDefault": true,
-        "IsNFT": false,
-        "Metadata": {
-          "assetName": "",
-          "logo": null,
-          "longName": null,
-          "numberOfDecimals": 6,
-          "policyId": "",
-          "ticker": "TADA",
-          "type": "Cardano"
-        },
-        "NetworkId": 450,
-        "TokenId": 4
-      }
-    }
   ],
   "TokenList": [
     {

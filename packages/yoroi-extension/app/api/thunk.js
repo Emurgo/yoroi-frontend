@@ -71,7 +71,7 @@ import {
   SignFail,
   SignWindowRetrieveData,
   ConnectWindowRetrieveData,
-  RemoveWalletFromWhiteList,
+  NotifyDAppConnectionRemoved,
   GetConnectedSites,
 } from '../../chrome/extension/background/handlers/yoroi/connector';
 import { GetProtocolParameters } from '../../chrome/extension/background/handlers/yoroi/protocolParameters';
@@ -154,8 +154,8 @@ function patchWalletState(walletState: Object): WalletState {
   return walletState;
 }
 
-export async function getWallets(walletId?: number): Promise<Array<WalletState>> {
-  const resp = await callBackground({ type: GetWallets.typeTag, request: { walletId } });
+export async function getWallets(networkId: number): Promise<Array<WalletState>> {
+  const resp = await callBackground({ type: GetWallets.typeTag, request: { networkId } });
   if (resp.error) {
     console.error('error when loading wallets:', resp.error);
     throw new Error(`error when loading wallets: ${resp.error}`);
@@ -398,8 +398,10 @@ export const connectWindowRetrieveData: GetEntryFuncType<typeof ConnectWindowRet
   return await callBackground({ type: ConnectWindowRetrieveData.typeTag });
 }
 
-export const removeWalletFromWhiteList: GetEntryFuncType<typeof RemoveWalletFromWhiteList> = async (request) => {
-  await callBackground({ type: RemoveWalletFromWhiteList.typeTag, request });
+export const notifyDAppConnectionRemoved: GetEntryFuncType<typeof NotifyDAppConnectionRemoved> = async (
+  request
+) => {
+  await callBackground({ type: NotifyDAppConnectionRemoved.typeTag, request });
 }
 
 export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = async () => {

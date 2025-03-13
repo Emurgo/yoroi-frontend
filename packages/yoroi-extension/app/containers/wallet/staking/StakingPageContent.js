@@ -227,7 +227,10 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     return (
       <Box>
         {isWalletWithNoFunds ? (
-          <WalletEmptyBanner onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })} />
+          <WalletEmptyBanner
+            onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })}
+            isTestnet={wallet.isTestnet}
+          />
         ) : null}
 
         {currentlyDelegating ? (

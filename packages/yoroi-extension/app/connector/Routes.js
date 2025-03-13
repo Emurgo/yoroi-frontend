@@ -14,7 +14,7 @@ export const Routes = (stores: StoresMap): Node => {
   if (stores.loading.isLoading) {
     return <LoadingPage stores={stores} />;
   }
-  return wrapPages(getContent(stores));
+  return wrapPages(getContent(stores), stores);
 };
 
 const getContent = (stores) => (
@@ -32,6 +32,6 @@ const getContent = (stores) => (
   </Switch>
 );
 
-export function wrapPages(children: Node): Node {
-  return <Layout>{children}</Layout>;
+function wrapPages(children: Node, stores: StoresMap): Node {
+  return <Layout networkId={stores.profile.getCurrentNetworkId()}>{children}</Layout>;
 }

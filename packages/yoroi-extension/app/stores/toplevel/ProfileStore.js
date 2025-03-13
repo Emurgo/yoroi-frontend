@@ -1,11 +1,10 @@
 // @flow
-import { action, computed, observable, runInAction } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage';
@@ -14,8 +13,6 @@ import { subscribe } from '../../api/thunk';
 import { noop } from '../../coreUtils';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
-  @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
-
   /**
    * We only want to redirect users once when the app launches
    */
@@ -160,7 +157,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     super.setup();
     this.registerReactions([this._checkSetupSteps]);
     this._getUriSchemeAcceptance(); // eagerly cache
-    noop(this._getSortedWalletList());
   }
 
   teardown(): void {
@@ -172,16 +168,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       EXPONENTIAL_AT: (1e9: any),
       FORMAT: this.bigNumberDecimalFormat,
     });
-  };
-
-  // ========== Active API ========== //
-
-  @computed get selectedNetwork(): void | $ReadOnly<NetworkRow> {
-    return this.__selectedNetwork;
-  }
-
-  @action setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
-    this.__selectedNetwork = type;
   };
 
   // ========== Paper Wallets ========== //
@@ -238,23 +224,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         return;
       }
     }
-  };
-
-  // ========== Sort wallets - Revamp ========== //
-  @computed get walletsNavigation(): WalletsNavigation {
-    let { result } = this.getWalletsNavigationRequest;
-    if (result == null) {
-      result = this.getWalletsNavigationRequest.execute().result;
-    }
-    return result ?? { cardano: [] };
-  }
-  _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getWalletsNavigationRequest.execute();
-  };
-
-  updateSortedWalletList: WalletsNavigation => Promise<void> = async walletsNavigation => {
-    await this.setWalletsNavigationRequest.execute(walletsNavigation);
-    await this.getWalletsNavigationRequest.execute();
   };
 }
 

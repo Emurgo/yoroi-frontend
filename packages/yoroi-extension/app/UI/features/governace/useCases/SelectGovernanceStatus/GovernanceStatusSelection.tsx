@@ -18,6 +18,8 @@ import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
+import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import links from '../../../../../links';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -185,6 +187,8 @@ export const GovernanceStatusSelection = () => {
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
   if (walletAdaBalance !== null && walletAdaBalance === 0) {
+    const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
+
     return (
       <Stack alignItems="center" margin="0 auto" mt="185px" maxWidth="500px">
         <NoTransactions />
@@ -200,8 +204,18 @@ export const GovernanceStatusSelection = () => {
           To participate in governance you need to have ADA in your wallet.
         </Typography>
         {/* @ts-ignore */}
-        <Button variant="primary" sx={{ marginTop: '16px' }} onClick={() => triggerBuySellAdaDialog()}>
-          Buy Ada
+        <Button variant="primary"
+          sx={{ marginTop: '16px' }}
+          onClick={() => {
+            if (isTestnet) {
+              window.open(links.testnetFaucet, '_blank');
+            } else {
+              // @ts-ignore
+              triggerBuySellAdaDialog();
+            }
+          }}
+        >
+          {isTestnet ?  strings.goToFaucet : 'Buy Ada'}
         </Button>
       </Stack>
     );
