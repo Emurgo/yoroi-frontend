@@ -336,7 +336,6 @@ const CashbackPageContainer = observer((props: AllProps) => {
       setPassword('');
     } catch (error) {
       setErrMsg(error instanceof LocalizableError ? intl.formatMessage(error) : error.message);
-      // console.warn(error);
     }
   }, []);
 
