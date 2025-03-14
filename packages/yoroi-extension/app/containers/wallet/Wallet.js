@@ -5,11 +5,8 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
-import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -21,10 +18,12 @@ import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
+import semver from 'semver/preload';
 
 type Props = {|
   +children: Node,
 |};
+
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
@@ -32,8 +31,13 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   };
 
   componentDidMount() {
-    if (!this.props.stores.profile.isRevampAnnounced)
+    const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
+    if (lastAnnouncedVersion == null) {
+      return;
+    }
+    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.5.0')) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
+    }
   }
 
   checkRoute(): void | string {
@@ -87,23 +91,8 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     }
     const { intl } = this.context;
     const selectedWallet = stores.wallets.selectedOrFail;
-
-    if (!selectedWallet) {
-      return (
-        <TopBarLayout
-          banner={<BannerContainer stores={stores} />}
-          navbar={<NavBarContainer title="" stores={stores} />}
-          showInContainer
-        >
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </TopBarLayout>
-      );
-    }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-
-    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
+    const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 
@@ -206,8 +195,9 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (isRevampDialogOpen)
       return (
         <RevampAnnouncementDialog
-          onClose={() => {
-            stores.profile.markRevampAsAnnounced();
+          // $FlowIgnore[incompatible-type]
+          onClose={async () => {
+            await stores.profile.setLastAnnouncedFeatureVersion('5.5.0');
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />

@@ -11,6 +11,8 @@ import { stringifyError } from '../../../../../app/utils/logging';
 import { sendToInjector, getBoundsForTabWindow, popupProps } from './utils';
 import { getWallets } from '../../../../../app/api/common';
 import { getDb, syncWallet } from '../../state';
+import { networks } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 
 declare var chrome;
 
@@ -158,16 +160,26 @@ export async function findWhitelistedConnection(
   requestIdentification?: boolean,
   localStorageApi: LocalStorageApi,
 ): Promise<?WhitelistEntry> {
+  const db = await getDb();
+  const networkIdByPublicDeriverId = new Map(
+    (await loadWalletsFromStorage(db)).map(publicDeriver => [
+      publicDeriver.getPublicDeriverId(),
+      publicDeriver.getParent().getNetworkInfo().NetworkId,
+    ])
+  );
+
+  const currentNetworkId = await localStorageApi.loadCurrentNetworkId() || networks.CardanoMainnet.NetworkId;
+
   const isAuthRequested = Boolean(requestIdentification);
-  const appAuthID = isAuthRequested ? url : undefined;
-  const whitelist = await localStorageApi.getWhitelist() ?? [];
-  return whitelist.find((entry: WhitelistEntry) => {
+
+  return (await localStorageApi.getWhitelist() ?? []).find((entry: WhitelistEntry) => {
     // Whitelist is only matching if same auth or auth is not requested
     const matchingUrl = entry.url === url;
-    const matchingAuthId = entry.appAuthID === appAuthID;
+    const matchingAuthId = entry.appAuthID === (isAuthRequested ? url : undefined);
     const isAuthWhitelisted = entry.appAuthID != null;
     const isAuthPermitted = isAuthWhitelisted && matchingAuthId;
-    return matchingUrl && (!isAuthRequested || isAuthPermitted);
+    return (currentNetworkId === networkIdByPublicDeriverId.get(entry.publicDeriverId)) &&
+      matchingUrl && (!isAuthRequested || isAuthPermitted);
   });
 }
 

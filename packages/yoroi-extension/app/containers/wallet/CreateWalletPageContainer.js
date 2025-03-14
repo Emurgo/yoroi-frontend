@@ -23,7 +23,6 @@ export default class CreateWalletPageContainer extends Component<StoresProps> {
         <CreateWalletPage
           genWalletRecoveryPhrase={stores.substores.ada.wallets.genWalletRecoveryPhrase}
           createWallet={request => stores.substores.ada.wallets.createWallet(request)}
-          setSelectedNetwork={stores.profile.setSelectedNetwork}
           selectedNetwork={stores.profile.selectedNetwork}
           openDialog={dialog => this.props.stores.uiDialogs.open({ dialog })}
           closeDialog={this.props.stores.uiDialogs.closeActiveDialog}

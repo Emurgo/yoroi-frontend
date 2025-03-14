@@ -382,7 +382,9 @@ export default class ConnectorStore extends Store<StoresMap> {
     });
 
     try {
-      const wallets = await getWallets();
+      const wallets = await getWallets(
+        this.stores.profile.getCurrentNetworkId()
+      );
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;

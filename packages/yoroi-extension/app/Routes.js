@@ -80,8 +80,6 @@ const WalletSettingsPagePromise = () => import('./containers/settings/categories
 const WalletSettingsPage = React.lazy(WalletSettingsPagePromise);
 const ExternalStorageSettingsPagePromise = () => import('./containers/settings/categories/ExternalStorageSettingsPage');
 const ExternalStorageSettingsPage = React.lazy(ExternalStorageSettingsPagePromise);
-const OAuthDropboxPagePromise = () => import('./containers/settings/categories/OAuthDropboxPage');
-const OAuthDropboxPage = React.lazy(OAuthDropboxPagePromise);
 const TermsOfUseSettingsPagePromise = () => import('./containers/settings/categories/TermsOfUseSettingsPage');
 const TermsOfUseSettingsPage = React.lazy(TermsOfUseSettingsPagePromise);
 const SupportSettingsPagePromise = () => import('./containers/settings/categories/SupportSettingsPage');
@@ -91,9 +89,6 @@ const AnalyticsSettingsPage = React.lazy(AnalyticsSettingsPagePromise);
 
 const NightlyPagePromise = () => import('./containers/profile/NightlyPage');
 const NightlyPage = React.lazy(NightlyPagePromise);
-
-const MyWalletsPagePromise = () => import('./containers/wallet/MyWalletsPage');
-const MyWalletsPage = React.lazy(MyWalletsPagePromise);
 
 const WalletSummaryPagePromise = () => import('./containers/wallet/WalletSummaryPage');
 const WalletSummaryPage = React.lazy(WalletSummaryPagePromise);
@@ -162,11 +157,9 @@ export const LazyLoadPromises: Array<() => any> = [
   GeneralSettingsPagePromise,
   WalletSettingsPagePromise,
   ExternalStorageSettingsPagePromise,
-  OAuthDropboxPagePromise,
   TermsOfUseSettingsPagePromise,
   SupportSettingsPagePromise,
   NightlyPagePromise,
-  MyWalletsPagePromise,
   WalletSummaryPagePromise,
   WalletSendPagePromise,
   WalletAssetsPagePromise,
@@ -221,7 +214,6 @@ export const Routes = (stores: StoresMap): Node => {
             path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
             component={props => <OptForAnalyticsPage {...props} stores={stores} />}
           />
-          <Route exact path={ROUTES.MY_WALLETS} component={props => <MyWalletsPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
@@ -246,11 +238,6 @@ export const Routes = (stores: StoresMap): Node => {
           <Route path={ROUTES.SWAP.ROOT} component={props => wrapSwap({ ...props, stores }, SwapSubpages(stores))} />
           <Route path={ROUTES.TRANSFER.ROOT} component={props => <Transfer {...props} stores={stores} />} />
           <Route exact path={ROUTES.SEND_FROM_URI.ROOT} component={props => <URILandingPage {...props} stores={stores} />} />
-          <Route
-            exact
-            path={ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX}
-            component={props => <OAuthDropboxPage {...props} stores={stores} />}
-          />
           <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} />} />
           <Route exact path={ROUTES.REVAMP.CATALYST_VOTING} component={props => <VotingPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.EXCHANGE_END} component={props => <ExchangeEndPage {...props} stores={stores} />} />
@@ -272,7 +259,7 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
           />
 
-          <Redirect to={ROUTES.MY_WALLETS} />
+          <Redirect to={ROUTES.WALLETS.ROOT} />
         </Switch>
       </Suspense>
     </QueryClientProvider>

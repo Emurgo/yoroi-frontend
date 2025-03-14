@@ -7,8 +7,8 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { ModalProvider } from '../components/modals/ModalContext';
 
 import { ModalManager } from '../components/modals/ModalManager';
-import NotificationsManager from '../components/notifications/NotificationsManager';
 import { IntlProvider } from '../context/IntlProvider';
+import NotificationsManager from '../features/notifications/common/NotificationsManager';
 import { ReviewTxManager } from '../features/transaction-review/module/ReviewTxManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 

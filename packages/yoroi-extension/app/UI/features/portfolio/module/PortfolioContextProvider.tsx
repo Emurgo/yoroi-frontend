@@ -26,6 +26,7 @@ export type PortfolioListTab = typeof PortfolioListTab[keyof typeof PortfolioLis
 
 import BuySellDialog from '../../../../components/buySell/BuySellDialog';
 import { DEFAULT_FIAT_PAIR } from '../common/helpers/constants';
+import links from '../../../../links';
 
 const initialPortfolioProvider = {
   ...defaultPortfolioState,
@@ -98,10 +99,17 @@ export const PortfolioContextProvider = ({
       networkId,
       primaryTokenInfo,
       isHiddenAmount: shouldHideBalance,
-      openBuyDialog: () => openDialogWrapper(BuySellDialog),
+      openBuyDialog: () => {
+        if (selectedWallet.isTestnet) {
+          window.open(links.testnetFaucet, '_blank');
+        } else {
+          openDialogWrapper(BuySellDialog);
+        }
+      },
       showWelcomeBanner: ftAssetList.length === 1,
       backendServiceZero: backendServiceZero,
       explorer,
+      isTestnet: selectedWallet.isTestnet,
     }),
     [state, actions, ftAssetList]
   );

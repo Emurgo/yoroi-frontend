@@ -4,7 +4,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import type { WalletsNavigation } from '../../api/localStorage';
 import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -67,67 +66,25 @@ type Props = {|
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +cardanoWallets: Array<WalletInfo>,
-  +walletsNavigation: WalletsNavigation,
-  +updateSortedWalletList: WalletsNavigation => Promise<void>,
+  +onUpdateWalletListOrder: (from: number, to: number) => Promise<void>,
   +onSelect: number => void,
   +selectedWalletId: ?number,
 |};
 type State = {|
-  cardanoWalletsIdx: number[],
   selectedWalletId: number | null,
 |};
 
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
-};
-
-const getGeneratedWalletIds = (sortedWalletListIdx, currentWalletIdx) => {
-  let generatedWalletIds;
-  if (sortedWalletListIdx !== undefined && sortedWalletListIdx.length > 0) {
-    const newWalletIds = currentWalletIdx.filter(id => {
-      const index = sortedWalletListIdx.indexOf(id);
-      if (index === -1) {
-        return true;
-      }
-      return false;
-    });
-    generatedWalletIds = [...sortedWalletListIdx, ...newWalletIds];
-  } else {
-    generatedWalletIds = currentWalletIdx;
-  }
-
-  return generatedWalletIds;
-};
 @observer
 export default class WalletListDialog extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
   state: State = {
-    cardanoWalletsIdx: [],
     selectedWalletId: null,
   };
 
   async componentDidMount(): Promise<void> {
-    const cardanoWalletsId = getGeneratedWalletIds(
-      this.props.walletsNavigation.cardano,
-      this.props.cardanoWallets.map(wallet => wallet.walletId)
-    );
-
-    this.setState(
-      {
-        cardanoWalletsIdx: cardanoWalletsId,
-        selectedWalletId: this.props.selectedWalletId,
-      },
-      async () => {
-        await this.props.updateSortedWalletList({
-          cardano: cardanoWalletsId,
-        });
-      }
-    );
+    this.setState({ selectedWalletId: this.props.selectedWalletId });
   }
 
   onDragEnd: (network: 'cardano', result: Object) => any = async (network, result) => {
@@ -135,20 +92,7 @@ export default class WalletListDialog extends Component<Props, State> {
     if (!destination || destination.index === source.index) {
       return;
     }
-
-    this.setState(
-      prev => {
-        const walletListIdx = reorder(prev.cardanoWalletsIdx, result.source.index, result.destination.index);
-        return {
-          cardanoWalletsIdx: walletListIdx,
-        };
-      },
-      async function () {
-        await this.props.updateSortedWalletList({
-          cardano: this.state.cardanoWalletsIdx,
-        });
-      }
-    );
+    this.props.onUpdateWalletListOrder(source.index, destination.index);
   };
 
   onSelect: void => void = () => {
@@ -165,7 +109,6 @@ export default class WalletListDialog extends Component<Props, State> {
 
   render(): Node {
     const { intl } = this.context;
-    const { cardanoWalletsIdx } = this.state;
 
     const {
       shouldHideBalance,
@@ -239,35 +182,25 @@ export default class WalletListDialog extends Component<Props, State> {
               <Droppable droppableId="cardano-list-droppable">
                 {provided => (
                   <div className={styles.list} {...provided.droppableProps} ref={provided.innerRef}>
-                    {cardanoWalletsIdx.length > 0 &&
-                      cardanoWalletsIdx
-                        .map((walletId, idx) => {
-                          const wallet = cardanoWallets.find(w => w.walletId === walletId);
-                          if (!wallet) {
-                            return null;
-                          }
-
-                          return (
-                            <WalletCard
-                              key={walletId}
-                              idx={idx}
-                              onSelect={() => this.setState({ selectedWalletId: wallet.walletId })}
-                              isCurrentWallet={this.isCurrentWallet(wallet.walletId, 'local')}
-                              plate={wallet.plate}
-                              type={wallet.type}
-                              name={wallet.name}
-                              rewards={wallet.rewards}
-                              shouldHideBalance={this.props.shouldHideBalance}
-                              walletAmount={wallet.amount}
-                              walletId={walletId}
-                              getTokenInfo={this.props.getTokenInfo}
-                              unitOfAccountSetting={unitOfAccountSetting}
-                              getCurrentPrice={getCurrentPrice}
-                              id="changeWalletDialog:walletsList"
-                            />
-                          );
-                        })
-                        .filter(Boolean)}
+                    {cardanoWallets.map((wallet, idx) => (
+                      <WalletCard
+                        key={wallet.walletId}
+                        idx={idx}
+                        onSelect={() => this.setState({ selectedWalletId: wallet.walletId })}
+                        isCurrentWallet={this.isCurrentWallet(wallet.walletId, 'local')}
+                        plate={wallet.plate}
+                        type={wallet.type}
+                        name={wallet.name}
+                        rewards={wallet.rewards}
+                        shouldHideBalance={this.props.shouldHideBalance}
+                        walletAmount={wallet.amount}
+                        walletId={wallet.walletId}
+                        getTokenInfo={this.props.getTokenInfo}
+                        unitOfAccountSetting={unitOfAccountSetting}
+                        getCurrentPrice={getCurrentPrice}
+                        id="changeWalletDialog:walletsList"
+                      />
+                    ))}
                     {provided.placeholder}
                   </div>
                 )}
