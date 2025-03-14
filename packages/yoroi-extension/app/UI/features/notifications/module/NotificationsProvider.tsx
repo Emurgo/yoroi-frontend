@@ -11,6 +11,7 @@ import { ampli } from '../../../../../ampli/index';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
+  REWARDS: 'REWARDS_RECEIVED',
 };
 
 const initialValue = {
@@ -42,8 +43,9 @@ function getRandomNotification() {
 
 const Context = React.createContext(initialValue);
 
-export default function NotificationsProvider({ children }) {
+export default function NotificationsProvider({ children, appLoadedSlots = {} }) {
   const lsApi = new LocalStorageApi();
+  const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
   const history = useHistory();
@@ -123,7 +125,15 @@ export default function NotificationsProvider({ children }) {
   const handleSubscription = async (topic, data) => {
     const notifTypeByTopic = {
       [NotificationTopics.NEW_TX]: NotificationTypes.Income,
+      [NotificationTopics.REWARDS]: NotificationTypes.Rewards,
     };
+
+    console.log('notif trigger', notifLimitSlots);
+
+    // check if the slot is older than the last slot on app load for the network
+    if (data.slot < notifLimitSlots[data.networkId]) {
+      return;
+    }
 
     createNotification(notifTypeByTopic[topic] || NotificationTypes.Cancelled, data.txid);
   };
@@ -161,9 +171,11 @@ export default function NotificationsProvider({ children }) {
   // subscribe to event topics on mount
   React.useEffect(() => {
     PubSub.subscribe(NotificationTopics.NEW_TX, handleSubscription);
+    PubSub.subscribe(NotificationTopics.REWARDS, handleSubscription);
 
     return () => {
       PubSub.unsubscribe(NotificationTopics.NEW_TX);
+      PubSub.unsubscribe(NotificationTopics.REWARDS);
     };
   }, []);
 
