@@ -4,7 +4,6 @@ import { observable, computed } from 'mobx';
 import Request from '../lib/LocalizedRequest';
 import Store from '../base/Store';
 import type {
-  ConnectingMessage,
   WhitelistEntry,
   ConnectedSites,
 } from '../../../chrome/extension/connector/types';
@@ -12,7 +11,7 @@ import type { StoresMap } from '../index';
 import { noop } from '../../coreUtils';
 import {
   getConnectedSites,
-  removeWalletFromWhiteList,
+  notifyDAppConnectionRemoved,
 } from '../../api/thunk';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
@@ -21,8 +20,6 @@ type SetWhitelistFunc = {|
 |} => Promise<void>;
 
 export default class ConnectorStore extends Store<StoresMap> {
-  @observable connectingMessage: ?ConnectingMessage = null;
-  @observable whiteList: Array<WhitelistEntry> = [];
   @observable getConnectorWhitelistRequest: Request<
     GetWhitelistFunc
   > = new Request<GetWhitelistFunc>(
@@ -63,14 +60,18 @@ export default class ConnectorStore extends Store<StoresMap> {
   removeWalletFromWhitelist1: (
     request: {| url: string |}
   ) => Promise<void> = async request => {
-    const filter = this.currentConnectorWhitelist.filter(
-      e => e.url !== request.url
+    const currentNetworkWalletIdSet = new Set(
+      this.stores.wallets.wallets.map(w => w.publicDeriverId)
     );
+
+    const filter = this.currentConnectorWhitelist.filter(e => !(
+      e.url === request.url && currentNetworkWalletIdSet.has(e.publicDeriverId)
+    ));
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
     await this.getConnectorWhitelistRequest.execute();
-    await removeWalletFromWhiteList({ url: request.url });
+    await notifyDAppConnectionRemoved({ url: request.url });
   };
 
   refreshActiveSites: void => Promise<void> = async () => {

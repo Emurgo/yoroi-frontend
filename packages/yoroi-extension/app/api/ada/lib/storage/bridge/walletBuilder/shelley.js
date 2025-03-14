@@ -23,7 +23,6 @@ import type { HWFeatures, } from '../../database/walletTypes/core/tables';
 import { WalletBuilder } from './builder';
 
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
-import { encryptWithPassword } from '../../../../../../utils/passwordCipher';
 
 import {
   Bip44DerivationLevels,
@@ -153,8 +152,8 @@ export async function getAccountDefaultDerivations(
 
 export async function createStandardCip1852Wallet(request: {|
   db: lf$Database,
-  rootPk: RustModule.WalletV4.Bip32PrivateKey,
-  password: string,
+  encryptedRoot: string,
+  accountPublicKey: RustModule.WalletV4.Bip32PublicKey,
   accountIndex: number,
   walletName: string,
   accountName: string,
@@ -164,24 +163,13 @@ export async function createStandardCip1852Wallet(request: {|
     throw new Error(`${nameof(createStandardCip1852Wallet)} needs hardened index`);
   }
 
-  const encryptedRoot = encryptWithPassword(
-    request.password,
-    request.rootPk.as_bytes(),
-  );
-
-  const accountPublicKey = request.rootPk
-    .derive(WalletTypePurpose.CIP1852)
-    .derive(CoinTypes.CARDANO)
-    .derive(request.accountIndex)
-    .to_public();
-
   if (request.network.BaseConfig[0].ChainNetworkId == null) {
     throw new Error(`${nameof(createStandardCip1852Wallet)} missing Byron network id`);
   }
 
   const initialDerivations = await getAccountDefaultDerivations(
     Number.parseInt(request.network.BaseConfig[0].ChainNetworkId, 10),
-    accountPublicKey,
+    request.accountPublicKey,
     rawGenAddByHash(new Set()),
   );
 
@@ -203,7 +191,7 @@ export async function createStandardCip1852Wallet(request: {|
         _finalState => ({
           rootInsert: {
             privateKeyInfo: {
-              Hash: encryptedRoot,
+              Hash: request.encryptedRoot,
               IsEncrypted: true,
               PasswordLastUpdate: null,
               Type: KeyKind.BIP32ED25519,
@@ -244,7 +232,10 @@ export async function createStandardCip1852Wallet(request: {|
           }
           return {
             deriverRequest: {
-              decryptPrivateDeriverPassword: request.password,
+              decryptPrivateDeriver: {
+                preDerived: true,
+                result: { pubKeyHex: request.accountPublicKey.to_hex() }
+              },
               publicDeriverMeta: {
                 name: request.accountName,
               },

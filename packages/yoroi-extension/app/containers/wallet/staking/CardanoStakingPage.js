@@ -104,7 +104,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
       return (
         <>
-          {!isCurrentlyDelegating ? (
+          {!selectedWallet.isTestnet && !isCurrentlyDelegating ? (
             <WalletDelegationBanner
               stores={this.props.stores}
               isOpen={this.props.stores.transactions.showDelegationBanner}

@@ -4,6 +4,8 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
+import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import links from '../../../../../links';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
@@ -43,6 +45,7 @@ export const GovernanceStatusSelection = () => {
     governanceVote,
     signDelegationTransaction,
     selectedWallet,
+    networkId,
   } = useGovernance();
 
   const {
@@ -183,6 +186,8 @@ export const GovernanceStatusSelection = () => {
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
   if (walletAdaBalance !== null && walletAdaBalance === 0) {
+    const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
+
     return (
       <Stack alignItems="center" margin="0 auto" mt="185px" maxWidth="500px">
         <NoTransactions />
@@ -198,8 +203,18 @@ export const GovernanceStatusSelection = () => {
           To participate in governance you need to have ADA in your wallet.
         </Typography>
         {/* @ts-ignore */}
-        <Button variant="primary" sx={{ marginTop: '16px' }} onClick={() => triggerBuySellAdaDialog()}>
-          Buy Ada
+        <Button variant="primary"
+          sx={{ marginTop: '16px' }}
+          onClick={() => {
+            if (isTestnet) {
+              window.open(links.testnetFaucet, '_blank');
+            } else {
+              // @ts-ignore
+              triggerBuySellAdaDialog();
+            }
+          }}
+        >
+          {isTestnet ?  strings.goToFaucet : 'Buy Ada'}
         </Button>
       </Stack>
     );

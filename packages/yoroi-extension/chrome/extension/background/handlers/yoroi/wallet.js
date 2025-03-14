@@ -21,6 +21,7 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
   asHasLevels,
+  asGetPublicKey,
 } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   removeAllTransactions,
@@ -92,8 +93,6 @@ export const CreateHardwareWallet: HandlerType<
 
     const db = await getDb();
 
-    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
-
     const adaApi = new AdaApi();
     const { publicDeriver } = await adaApi.createHardwareWallet({
       db,
@@ -101,7 +100,6 @@ export const CreateHardwareWallet: HandlerType<
       walletName: request.walletName,
       publicKey: request.publicKey,
       hwFeatures: request.hwFeatures,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
       addressing: request.addressing,
     });
 
@@ -125,12 +123,27 @@ export const RemoveWallet: HandlerType<
   typeTag: 'remove-wallet',
 
   handle: async (request) => {
-    const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+    const removeKey = await (async () => {
+      const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      return (await withPublicKey.getPublicKey()).Hash;
+    })();
 
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
+    for (const publicDeriver of await loadWalletsFromStorage(await getDb())) {
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      if ((await withPublicKey.getPublicKey()).Hash === removeKey) {
+        await removePublicDeriver({
+          publicDeriver,
+          conceptualWallet: publicDeriver.getParent(),
+        });
+      }
+    }
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
@@ -171,13 +184,13 @@ export const RenameConceptualWallet: HandlerType<
 });
 
 export const GetWallets: HandlerType<
-  {| walletId: ?number |},
+  {| networkId: number |},
   Array<WalletState>,
 > = Object.freeze({
   typeTag: 'get-wallets',
 
   handle: async (request) => {
-    return await getWalletsState(request.walletId);
+    return await getWalletsState(undefined, request.networkId);
   },
 });
 

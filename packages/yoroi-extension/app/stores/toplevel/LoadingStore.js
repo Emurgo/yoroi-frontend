@@ -1,7 +1,6 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import { action, observable, computed, runInAction } from 'mobx';
-import { pathToRegexp } from 'path-to-regexp';
 import BaseLoadingStore from '../base/BaseLoadingStore';
 import { ROUTES } from '../../routes-config';
 import { matchRoute } from '../../utils/routing';
@@ -26,8 +25,6 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
    * null if app not opened from URI Scheme OR URI scheme was invalid
    */
   @observable _uriParams: ?UriParams = null;
-  @observable _shouldRedirect: boolean = false;
-  @observable _redirectUri: string = '';
   sellAdaParams: ?SellAdaParamsType = null;
 
   _originRoute: {|
@@ -67,16 +64,15 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     });
   }
 
-  @computed get shouldRedirect(): boolean {
-    return this._shouldRedirect;
-  }
-
-  @computed get redirectUri() : string {
-    return this._redirectUri;
-  }
-
-  async preLoadingScreenEnd(): Promise<void> {
-    await super.preLoadingScreenEnd();
+  async loadingEnd(): Promise<void> {
+    // Save the landing route and go to the route that shows the loading screen
+    runInAction(() => {
+      this._originRoute = {
+        route: this.stores.app.currentRoute,
+        location: window.location.href,
+      };
+    });
+    this.stores.app.goToRoute({ route: ROUTES.ROOT });
 
     if (this.fromUriScheme) {
       const networkId = networks.CardanoMainnet.NetworkId;
@@ -107,34 +103,6 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   resetUriParams: void => void = (): void => {
     this._uriParams = null;
     this._originRoute = { route: '', location: '' };
-  }
-
-  @action
-  redirect: void => void = () => {
-    this._shouldRedirect = false;
-    this.stores.app.goToRoute({
-      route: this._redirectUri
-    });
-  }
-
-  _redirectRegex: RegExp = pathToRegexp(ROUTES.OAUTH_FROM_EXTERNAL.DROPBOX);
-
-  postLoadingScreenEnd(): void {
-    super.postLoadingScreenEnd();
-    const { stores } = this;
-    if (this._redirectRegex.test(stores.app.currentRoute)) {
-      this._shouldRedirect = true;
-      this._redirectUri = stores.app.currentRoute;
-    }
-    // before redirecting, save origin route in case we need to come back to
-    // it later (this is the case when user comes from a URI link)
-    runInAction(() => {
-      this._originRoute = {
-        route: stores.app.currentRoute,
-        location: window.location.href,
-      };
-    });
-    stores.app.goToRoute({ route: ROUTES.ROOT });
   }
 
   getTabIdKey(): string {

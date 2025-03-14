@@ -5,7 +5,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
-import environment from '../../../../environment';
 import ThemeToggler from '../../themeToggler';
 
 type Props = {|
@@ -28,11 +27,9 @@ export default class ThemeSettingsBlock extends Component<Props> {
           py: false,
         }}
       >
-        {(environment.isDev() || environment.isNightly()) && (
-          <Box sx={{ mt: '20px' }}>
-            <ThemeToggler intl={intl} />
-          </Box>
-        )}
+        <Box sx={{ mt: '20px' }}>
+          <ThemeToggler intl={intl}/>
+        </Box>
       </Box>
     );
   }

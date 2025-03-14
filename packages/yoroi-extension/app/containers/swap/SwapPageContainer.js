@@ -27,6 +27,8 @@ import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../UI/components/modals/ModalManager';
+import TestnetDisabledSwap from '../../components/swap/TestnetDisabledSwap';
+import SwitchNetworkDialogContainer from '../settings/categories/SwitchNetworkDialogContainer';
 
 type Props = {|
   +children?: Node,
@@ -66,6 +68,7 @@ export default class SwapPageContainer extends Component<AllProps> {
     const { intl } = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
+    const { isTestnet } = stores.wallets.selectedOrFail;
 
     const menu = <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />;
 

@@ -51,6 +51,8 @@ describe('Export transactions, positive', function () {
     const btnEnabled = await exportDialog.exportButtonIsEnabled();
     expect(btnEnabled, 'The export button is not enabled').to.be.true;
     await exportDialog.exportTransactionsFile();
+    const exportDialogState = await exportDialog.isNotDisplayed();
+    expect(exportDialogState, 'The export dialog is still displayed').to.be.true;
   });
   // Check the exported file
   it('Checking the exported file', async function () {

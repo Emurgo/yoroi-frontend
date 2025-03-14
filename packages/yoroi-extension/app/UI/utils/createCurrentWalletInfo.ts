@@ -213,6 +213,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
 
     const selectedExplorer = explorers.selectedExplorer.get(networkId);
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
+    const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
 
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
 

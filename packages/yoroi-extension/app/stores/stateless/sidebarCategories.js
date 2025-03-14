@@ -9,7 +9,6 @@ import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revam
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
-import environment from '../../environment';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -32,6 +31,8 @@ export type SidebarCategoryRevamp = {|
   +featureFlagName?: string,
 |};
 
+const HAS_SELECTED_WALLET = ({ selected }) => selected != null;
+
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   // Open `/wallets` only if the user is on any other page other than `/wallets/add`
@@ -51,72 +52,57 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: ({ selected, isRewardWallet }) => !!selected && isRewardWallet(selected),
+    isVisible: HAS_SELECTED_WALLET,
   },
   {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => !selected?.isTestnet,
+    isVisible: (_request) => true,
   },
   {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: () => environment.isDev() || environment.isNightly(),
+    isVisible: HAS_SELECTED_WALLET,
   },
   {
     className: 'nfts',
     route: ROUTES.NFTS.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: _request => _request.selected !== null,
+    isVisible: HAS_SELECTED_WALLET,
   },
   {
     className: 'voting',
     route: ROUTES.REVAMP.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
-    // $FlowFixMe[prop-missing]
-    isVisible: request => request.selected != null,
+    isVisible: HAS_SELECTED_WALLET,
   },
   {
     className: 'connected-websites',
     route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
     icon: dappConnectorIcon,
     label: connectorMessages.connector,
-    isVisible: _request => true,
+    isVisible: () => true,
   },
   {
     className: 'governance',
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: ({ selected }) => selected != null,
+    isVisible: HAS_SELECTED_WALLET,
   },
   {
     className: 'settings',
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: _request => true,
+    isVisible: () => true,
   },
-  // {
-  //   className: 'new-updates',
-  //   route: '/new-updates',
-  //   icon: newUpdatesIcon,
-  //   label: globalMessages.sidebarNewUpdates,
-  //   isVisible: _request => true,
-  // },
-  // {
-  //   className: 'feedback',
-  //   route: '/feedback',
-  //   icon: feedbackIcon,
-  //   label: globalMessages.sidebarFeedback,
-  //   isVisible: _request => true,
-  // },
 ];
 
 function makeWalletCategory(route: string, isVisible: isVisibleFunc): SidebarCategoryRevamp {

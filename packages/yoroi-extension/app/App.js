@@ -5,7 +5,7 @@ import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Router } from 'react-router-dom';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import { addLocaleData } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { locales, translations } from './i18n/translations';
@@ -19,6 +19,12 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
+// $FlowIgnore: suppressing this error
+import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
+// $FlowIgnore: suppressing this error
+import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
+// $FlowIgnore: suppressing this error
+import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -91,9 +97,9 @@ class App extends Component<Props, State> {
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProvider>
+          </IntlProviderWrapper>
         </ColorModeProvider>
       </div>
     );
@@ -109,10 +115,15 @@ class App extends Component<Props, State> {
     }
     return (
       <Router history={history}>
-        <div style={{ height: '100%' }}>
-          <Support />
-          {Routes(stores)}
-        </div>
+        <IntlContextProvider>
+          <NotificationsProvider>
+            <NotificationsManager />
+            <div style={{ height: '100%' }}>
+              <Support />
+              {Routes(stores)}
+            </div>
+          </NotificationsProvider>
+        </IntlContextProvider>
       </Router>
     );
   };
