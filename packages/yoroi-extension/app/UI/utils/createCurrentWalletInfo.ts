@@ -215,8 +215,6 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
 
-    const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
-
     return {
       currentPool: walletCurrentPoolInfo,
       networkId,
