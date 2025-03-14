@@ -2345,7 +2345,7 @@
       "value": {
         "ConceptualWalletId": 1,
         "NetworkId": 0,
-        "Name": "ftw"
+        "Name": "TestWallet1"
       }
     }
   ],
@@ -2503,9 +2503,9 @@
       "value": {
         "KeyId": 1,
         "Type": 0,
-        "Hash": "83d3c27852bc4bda4719dd046553467f31998c23d219c54c87d973998c611d726a4ef8b1e61b74ca06579ce820f931a1fe0b7f459986d4f2bc44de2636a284a53f34bb5a8049a16e1a5c64dbab5b3811d97c0a63c47d7c9df6934bbe8c69c4acaabe798abc6f296583f1ea2825bfb0a3e6c2ab5a789977919567ff5298974b20ff6f01fe3150387e5f926a87c055c53e757c0d94ca763feb841c18cd",
+        "Hash": "16a6674257b23b7004c1100c9642ee03ebce7cbef6040dc383b2b5e4853226447284cb8885626de553f35fe7faa061c9b7c71117fcb79133fc0d6e4456fdcec73f9e89bc46428ee27bfc1e5c1f503b9eaf55376ae367acb0908ed737c74e15aa13b54620c57b848a6418ea91a7b1d019c6c2ba17fd2c2e0a33380763a37eb5a449eab178e8233de9fb83286288055c47f779aa12470229533f84cee5",
         "IsEncrypted": true,
-        "PasswordLastUpdate": null
+        "PasswordLastUpdate": 1741944653080
       }
     },
     {
@@ -3066,10 +3066,10 @@
       "id": 121,
       "value": {
         "LastSyncInfoId": 1,
-        "Time": 1741941302751,
-        "SlotNum": 150375006,
-        "BlockHash": "9640be7b5825ee79c536637cc8655e7a991f078cc467b80a15dd7beea990f266",
-        "Height": 11601274
+        "Time": 1741944821303,
+        "SlotNum": 150378520,
+        "BlockHash": "c0342cd805c195e3dfbbbe6e3a88d8e3d8497513672a7289a2eeb2c9a1c9312e",
+        "Height": 11601445
       }
     }
   ],
@@ -3799,7 +3799,7 @@
         "UtxoAtSafePointId": 1,
         "PublicDeriverId": 1,
         "UtxoAtSafePoint": {
-          "lastSafeBlockHash": "3f006f4818701147faaf2e38f202fa3c13efb42ef078a16755ac426e0bbfde7c",
+          "lastSafeBlockHash": "2fb18a0c5fd9d7da9e689129de54b2014a058788f415547967d999462d8fd2b6",
           "utxos": [
             {
               "utxoId": "952dcb958f0b7e7b8f7bcc601faa79414b157f0d25f6e7c6635fb4d1ea592e0b:0",
@@ -3826,51 +3826,41 @@
   ],
   "UtxoDiffToBestBlock": [
     {
-      "id": 534,
+      "id": 706,
       "value": {
-        "UtxoDiffToBestBlockId": 2,
+        "UtxoDiffToBestBlockId": 26,
         "PublicDeriverId": 1,
-        "lastBestBlockHash": "3201361cb16b48d21feb3315619bf75d08ffa84dfce9d2b30aaa621e4f81fcf4",
+        "lastBestBlockHash": "65865950c7045034e1c6ee802af1b84977dd356338103be3090470af2222ebff",
         "spentUtxoIds": [],
         "newUtxos": []
       }
     },
     {
-      "id": 537,
+      "id": 708,
       "value": {
-        "UtxoDiffToBestBlockId": 3,
+        "UtxoDiffToBestBlockId": 27,
         "PublicDeriverId": 1,
-        "lastBestBlockHash": "c18b2d18703272d404db94945744fa320cc46028f5ca8f74a1e477b37040fd7e",
+        "lastBestBlockHash": "647e0174caef4adffa0e0c7dae31807b5ae4aee73588a8a51aa01c7c62fccfe0",
         "spentUtxoIds": [],
         "newUtxos": []
       }
     },
     {
-      "id": 539,
+      "id": 711,
       "value": {
-        "UtxoDiffToBestBlockId": 4,
+        "UtxoDiffToBestBlockId": 28,
         "PublicDeriverId": 1,
-        "lastBestBlockHash": "ba98f04bb357f5ffa74f50a22de790892694b5b119be331d3425ec0df236dba6",
+        "lastBestBlockHash": "c1a6ea5260e5b8fe362a2c853cb910594456912f2cb35ca947dc4c97b051371c",
         "spentUtxoIds": [],
         "newUtxos": []
       }
     },
     {
-      "id": 542,
+      "id": 714,
       "value": {
-        "UtxoDiffToBestBlockId": 5,
+        "UtxoDiffToBestBlockId": 29,
         "PublicDeriverId": 1,
-        "lastBestBlockHash": "f4ebadab0b223ba600c9af8a38cd3c4b9415f37eb3155e5b71f6a91f5e5ab397",
-        "spentUtxoIds": [],
-        "newUtxos": []
-      }
-    },
-    {
-      "id": 545,
-      "value": {
-        "UtxoDiffToBestBlockId": 6,
-        "PublicDeriverId": 1,
-        "lastBestBlockHash": "9640be7b5825ee79c536637cc8655e7a991f078cc467b80a15dd7beea990f266",
+        "lastBestBlockHash": "c0342cd805c195e3dfbbbe6e3a88d8e3d8497513672a7289a2eeb2c9a1c9312e",
         "spentUtxoIds": [],
         "newUtxos": []
       }
