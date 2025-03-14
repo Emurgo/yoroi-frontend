@@ -16,6 +16,8 @@ import { SwapFormProvider } from './context/swap-form';
 import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
 import type { StoresProps } from '../../stores';
+import TestnetDisabledSwap from '../../components/swap/TestnetDisabledSwap';
+import SwitchNetworkDialogContainer from '../settings/categories/SwitchNetworkDialogContainer';
 
 type Props = {|
   +children?: Node,
@@ -55,8 +57,9 @@ export default class SwapPageContainer extends Component<AllProps> {
     const { intl } = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
+    const { isTestnet } = stores.wallets.selectedOrFail;
 
-    const menu = (
+    const menu = isTestnet ? null : (
       <SwapMenu
         onItemClick={route => stores.app.goToRoute({ route })}
         isActiveItem={this.isActivePage}
@@ -80,7 +83,13 @@ export default class SwapPageContainer extends Component<AllProps> {
             showInContainer
             withPadding={false}
           >
-            <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+            {isTestnet ? (
+              <TestnetDisabledSwap
+                onSwitch={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
+              />
+            ): (
+              <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
+            )}
           </TopBarLayout>
         </IntlProvider>
     );

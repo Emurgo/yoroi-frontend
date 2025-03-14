@@ -110,16 +110,6 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     const { stores } = this;
     stores.wallets.unsetActiveWallet(); // deselect before deleting
 
-    // Remove this wallet from wallet sort list
-    const walletsNavigation = stores.profile.walletsNavigation
-    const newWalletsNavigation = {
-      ...walletsNavigation,
-      // $FlowFixMe[invalid-computed-prop]
-      'cardano': walletsNavigation.cardano.filter(
-        walletId => walletId !== request.publicDeriverId)
-    }
-    await stores.profile.updateSortedWalletList(newWalletsNavigation);
-
     // ==================== Disconnect related dApps ====================
     await this.stores.connector.getConnectorWhitelist();
     const connectorWhitelist = stores.connector.currentConnectorWhitelist;

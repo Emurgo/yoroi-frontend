@@ -5,11 +5,8 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
-import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -94,23 +91,8 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     }
     const { intl } = this.context;
     const selectedWallet = stores.wallets.selectedOrFail;
-
-    if (!selectedWallet) {
-      return (
-        <TopBarLayout
-          banner={<BannerContainer stores={stores} />}
-          navbar={<NavBarContainer title="" stores={stores} />}
-          showInContainer
-        >
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </TopBarLayout>
-      );
-    }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-
-    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
+    const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
 

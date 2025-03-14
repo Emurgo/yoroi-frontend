@@ -59,7 +59,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => !selected?.isTestnet,
+    isVisible: (_request) => true,
   },
   {
     className: 'portfolio',

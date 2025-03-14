@@ -11,7 +11,7 @@ import StatsTable from '../TokensTable/StatsTable';
 const PortfolioWallet = ({ stores }): JSX.Element => {
   const theme = useTheme();
   const strings = useStrings();
-  const { walletBalance, ftAssetList, showWelcomeBanner } = usePortfolio();
+  const { walletBalance, ftAssetList, showWelcomeBanner, isTestnet } = usePortfolio();
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
@@ -72,7 +72,7 @@ const PortfolioWallet = ({ stores }): JSX.Element => {
         }
       />
       <StatsTable data={tokenList} isLoading={isLoading} stores={stores} />
-      {showWelcomeBanner && <WelcomeBanner />}
+      {showWelcomeBanner && <WelcomeBanner isTestnet={isTestnet} />}
     </Stack>
   );
 };
