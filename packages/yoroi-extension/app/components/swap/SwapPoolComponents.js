@@ -26,7 +26,7 @@ export function SwapPoolIcon({ provider }: {| +provider: string |}): React$Node 
   return <Box sx={{ width: '24px', height: '24px' }}>{poolIcons[provider] || <DefaultToken />}</Box>;
 }
 
-export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: string, +isAutoPool?: boolean |}): React$Node {
+export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: any, +isAutoPool?: boolean |}): React$Node {
   const strings = useStrings();
   return (
     <Box display="flex" alignItems="center" gap="8px">

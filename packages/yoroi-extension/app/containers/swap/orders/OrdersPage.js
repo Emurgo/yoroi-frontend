@@ -32,7 +32,6 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import { SummaryRow } from '../asset-swap/SwapTxInfo';
 // $FlowIgnore: suppressing this error
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
-import { React } from 'react';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -95,20 +94,12 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     },
   ];
 
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    showTxResultModal,
-    changeModalView,
-    setCborTx,
-    closeTxReviewModal,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, changeModalView, closeTxReviewModal } = useTxReviewModal();
 
   useEffect(() => {
     if (openTxModalAfterColateral.open) {
       openTxReviewModal({
         modalView: 'transactionReview',
-        submitTx: passswordInput => {},
         submitTx: passswordInput =>
           submitTx(
             passswordInput,
@@ -273,7 +264,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         openTxReviewModal({
           modalView: 'collateralCreation',
           submitTx: passswordInput => addColateral(passswordInput, cancelTxCbor, collateralReorgTxObj, order, utxoHex, tx),
-          cborTx: collateralReorgTxObj.cbor,
+          cborTx: collateralReorgTxObj?.cbor,
           operations: {
             components: [
               {
@@ -298,7 +289,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         transactionHex: cancelTxCbor,
         password: passswordInput,
       });
-      const signedTransactionHexes =
+      const signedTransactionHexes: any =
         signedCollateralReorgTx != null ? [signedCollateralReorgTx, signedCancelTx] : [signedCancelTx];
       await swapStore.executeTransactionHexes({
         wallet,
@@ -490,7 +481,7 @@ const OrderRow = ({
   );
 };
 
-const SwapTxCancelInfo = ({ defaultTokenInfo, order, swapPoolLabel, formattedFeeValue }) => {
+const SwapTxCancelInfo = ({ defaultTokenInfo, order, swapPoolLabel, formattedFeeValue }: any) => {
   return (
     <Box p="24px">
       <Box display="flex" gap="16px" flexDirection="column" mb="24px">

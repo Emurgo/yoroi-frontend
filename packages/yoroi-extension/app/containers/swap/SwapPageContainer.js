@@ -70,7 +70,9 @@ export default class SwapPageContainer extends Component<AllProps> {
     const isErrorPage = this.isErrorPage();
     const { isTestnet } = stores.wallets.selectedOrFail;
 
-    const menu = <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />;
+    const menu = isTestnet ? null : (
+      <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />
+    );
 
     return (
       <IntlProvider intl={intl}>
@@ -89,17 +91,21 @@ export default class SwapPageContainer extends Component<AllProps> {
           showInContainer
           withPadding={false}
         >
-          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <ModalProvider>
-              <ModalManager />
-              <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-                <ReviewTxProvider stores={stores} intl={this.context.intl}>
-                  <ReviewTxModal />
-                  {children}
-                </ReviewTxProvider>
-              </SwapFormProvider>
-            </ModalProvider>
-          </CurrencyProvider>
+          {isTestnet ? (
+            <TestnetDisabledSwap onSwitch={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })} />
+          ) : (
+            <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+              <ModalProvider>
+                <ModalManager />
+                <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+                  <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                    <ReviewTxModal />
+                    {children}
+                  </ReviewTxProvider>
+                </SwapFormProvider>
+              </ModalProvider>
+            </CurrencyProvider>
+          )}
         </TopBarLayout>
       </IntlProvider>
     );
