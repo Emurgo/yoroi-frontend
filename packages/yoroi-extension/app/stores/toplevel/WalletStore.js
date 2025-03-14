@@ -166,7 +166,7 @@ export default class WalletStore extends Store<StoresMap> {
 
   @action
   _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
-    if (this.stores.loading.isFromCashback) {
+    if (this.stores.loading.isFromCashback()) {
       noop(this.api.localStorage.setSelectedWalletPublicKey(
         newWallet.publicKey
       ));
