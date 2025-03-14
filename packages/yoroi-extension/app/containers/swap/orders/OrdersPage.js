@@ -553,7 +553,7 @@ const OperationsDetails = () => {
   return (
     <Stack direction="column" spacing={2}>
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Colateral creation</Typography>
+        <Typography color="ds.text_gray_low">Collateral creation</Typography>
       </Stack>
     </Stack>
   );
