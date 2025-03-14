@@ -26,9 +26,14 @@ export const getMockServer = settings => {
              `);
   });
 
-  const mockServer = server.listen(mockedServerPorts, () => {
-    console.log(`JSON Server is running at http://localhost:${mockedServerPorts}`);
-  });
+  return new Promise((resolve, reject) => {
+    const mockServer = server.listen(mockedServerPorts, () => {
+      console.log(`JSON Server is running at http://localhost:${mockedServerPorts}`);
+      resolve(mockServer);
+    });
 
-  return mockServer;
+    mockServer.on('error', (err) => {
+      reject(err);
+    });
+  });
 };

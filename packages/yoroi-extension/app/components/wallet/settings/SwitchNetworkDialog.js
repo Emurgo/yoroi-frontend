@@ -8,9 +8,9 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
-import { MenuItem, Box } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Typography } from '@mui/material';
 import Select from '../../common/Select';
+import { MenuItemStyled } from '../../common/commonStyles/MenuItemStyled';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -30,12 +30,6 @@ const messages = defineMessages({
     defaultMessage: '!!!Select Network',
   },
 });
-
-const DialogText = styled(Box)(() => ({
-  fontSize: '16px',
-  fontWeight: 400,
-  lineHeight: '24px',
-}));
 
 type Props = {|
   +onCancel: void => void,
@@ -73,6 +67,7 @@ export default class Switch extends Component<Props> {
         onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
         id="switchNetworkDialog"
+        styleOverride={{ maxWidth: '648px' }}
         dialogActions={[
           {
             label: intl.formatMessage(globalMessages.cancel),
@@ -86,18 +81,18 @@ export default class Switch extends Component<Props> {
           },
         ]}          
       >
-        <DialogText>
+        <Typography variant="body1" color="ds.text_gray_medium">
           {intl.formatMessage(messages.dialogText)}
-        </DialogText>
+        </Typography>
         <Select
           formControlProps={{ sx: { marginTop: '25px' } }}
           labelId="network-select"
           {...this.form.$('selectedNetwork').bind()}
         >
           {networks.map(({ id, name }) => (
-            <MenuItem value={id} key={id}>
+            <MenuItemStyled value={id} key={id} id={'selectNetwork-network_' + id + '-menuItem'} isGray>
               {intl.formatMessage(name)}
-            </MenuItem>
+            </MenuItemStyled>
           ))}
         </Select>
       </Dialog>

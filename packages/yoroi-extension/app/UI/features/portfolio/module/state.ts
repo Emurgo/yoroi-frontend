@@ -45,6 +45,7 @@ export type PortfolioState = {
   openBuyDialog: () => void;
   backendServiceZero: string;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
+  isTestnet: boolean,
 };
 
 // Define default state
@@ -64,6 +65,7 @@ export const defaultPortfolioState: PortfolioState = {
   openBuyDialog: () => { },
   backendServiceZero: '',
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
+  isTestnet: false,
 };
 
 // Define action handlers

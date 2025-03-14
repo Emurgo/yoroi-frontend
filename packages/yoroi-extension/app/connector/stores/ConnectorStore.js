@@ -27,7 +27,6 @@ import {
   getCardanoHaskellBaseConfig,
   getNetworkById,
   isCardanoHaskell,
-  networks,
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -384,7 +383,7 @@ export default class ConnectorStore extends Store<StoresMap> {
 
     try {
       const wallets = await getWallets(
-        this.stores.profile.currentNetworkId ?? networks.CardanoMainnet.NetworkId
+        this.stores.profile.getCurrentNetworkId()
       );
 
       runInAction(() => {

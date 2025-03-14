@@ -10,10 +10,12 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 import { ReactComponent as DappConnectorIcon } from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
 import environment from '../../../environment';
+import { NETWORK_BADGES } from '../../../containers/NavBarContainerRevamp';
 import { ROUTES } from '../../routes-config';
 
 type Props = {|
   children: Node,
+  networkId: number,
 |};
 type LocationProp = {|
   location: Location,
@@ -43,6 +45,14 @@ class Layout extends Component<Props & LocationProp> {
         messages.yoroiConnector : messages.yoroiDappConnector
     );
 
+    let testnetBadge = null;
+    const badge = NETWORK_BADGES[this.props.networkId];
+    if (badge) {
+      testnetBadge = (
+        <div className={styles.badge} style={{ backgroundColor: badge.color }}>{badge.text}</div>
+      );
+    }
+
     return (
       <div className={styles.layout}>
         <TestnetWarningBanner isTestnet={environment.isTest()} />
@@ -55,6 +65,7 @@ class Layout extends Component<Props & LocationProp> {
             <div className={styles.connectorLogoContainer}>
               <DappConnectorIcon className={styles.connectorLogo} />
             </div>
+            {testnetBadge}
           </div>
         </div>
         <div className={styles.content}>{this.props.children}</div>

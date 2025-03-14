@@ -40,7 +40,7 @@ class BasePage {
   };
 
   async goToUrl(theURL) {
-    this.logger.info('BasePage::goToUrl is called');
+    this.logger.info(`BasePage::goToUrl is called. "${theURL}"`);
     await this.driver.get(theURL);
   }
   async refreshPage() {
@@ -63,7 +63,18 @@ class BasePage {
   }
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
-    await this.driver.findElement(getByLocator(locator)).click();
+    let element = await this.driver.findElement(getByLocator(locator));
+    try {
+      await element.click();
+    } catch (error) {
+      if (error.name === 'StaleElementReferenceError') {
+        this.logger.info(`BasePage::click Re-try because of StaleElementReferenceError`);
+        element = await this.driver.findElement(getByLocator(locator));
+        await element.click();
+      } else {
+        throw error;
+      }
+    }
   }
   async clickByScript(locator) {
     this.logger.info(`BasePage::clickByScript is called. Locator: ${JSON.stringify(locator)}`);
@@ -86,6 +97,10 @@ class BasePage {
     const clickable = await this.findElement(locator);
     await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
   }
+  async scrollIntoViewElement(webElement) {
+    this.logger.info(`BasePage::scrollIntoViewElement is called.`);
+    await this.driver.executeScript('arguments[0].scrollIntoView()', webElement);
+  }
   async findElement(locator) {
     this.logger.info(`BasePage::findElement is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElement(getByLocator(locator));
@@ -96,13 +111,20 @@ class BasePage {
   }
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
-    return await this.waitPresentedAndAct(
-      locator,
-      async () => {
-        const locatorElem = await this.findElement(locator);
-        return await locatorElem.getText();
+    return await this.waitPresentedAndAct(locator, async () => {
+      let element = await this.findElement(locator);
+      try {
+        return await element.getText();
+      } catch (error) {
+        if (error.name === 'StaleElementReferenceError') {
+          this.logger.info(`BasePage::getText Re-try because of StaleElementReferenceError`);
+          element = await this.findElement(locator);
+          return await element.getText();
+        } else {
+          throw error;
+        }
       }
-    );
+    });
   }
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(
@@ -167,9 +189,7 @@ class BasePage {
     await input.sendKeys(value);
   }
   async inputElem(webElement, value) {
-    this.logger.info(
-      `BasePage::inputElem is called. Value: ${value}`
-    );
+    this.logger.info(`BasePage::inputElem is called. Value: ${value}`);
     await webElement.sendKeys(value);
   }
   async clearInput(locator) {
@@ -200,7 +220,9 @@ class BasePage {
     await input.sendKeys(Key.BACK_SPACE);
   }
   async setImplicitTimeout(timeoutMs, functionName) {
-    this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
+    this.logger.info(
+      `BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`
+    );
     await this.driver.manage().setTimeouts({ implicit: timeoutMs });
   }
   async getFromLocalStorage(key) {
@@ -252,7 +274,7 @@ class BasePage {
       const jsonLogsStrings = logEntries.map(l => {
         const splitMsg = l.message.split(' ');
         const message = splitMsg.slice(2).join(' ');
-        return `[${l.level}] [${l.timestamp}] ${message}`
+        return `[${l.level}] [${l.timestamp}] ${message}`;
       });
       await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
     }
@@ -266,7 +288,9 @@ class BasePage {
       .manage()
       .logs()
       .get(logging.Type.DRIVER, logging.Level.INFO);
-      const driverLogsStrings = driverLogEntries.map(l =>`[${l.level}] [${l.timestamp}] ${l.message}`);
+    const driverLogsStrings = driverLogEntries.map(
+      l => `[${l.level}] [${l.timestamp}] ${l.message}`
+    );
     await writeFile(driverLogsPaths, driverLogsStrings.join(''));
   }
   async waitForElementLocated(locator) {
@@ -447,22 +471,22 @@ class BasePage {
   }
   async getInfoFromIndexedDBFF(tableName) {
     this.logger.info(`BasePage::getInfoFromIndexedDBFF Table name "${tableName}"`);
-    await this.driver.executeScript(
-      (table) => {
-        const dbName = 'yoroi-schema';
-        const dbRequest = window.indexedDB.open(dbName);
-        dbRequest.onsuccess = function (event) {
-          const db = event.target.result;
-          // without that it doesn't work
-          window.dataBase = db;
-          const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).mozGetAll();
-          tableContentRequest.onsuccess = function (event) {
-            window.tableData = event.target.result;
-          };
+    await this.driver.executeScript(table => {
+      const dbName = 'yoroi-schema';
+      const dbRequest = window.indexedDB.open(dbName);
+      dbRequest.onsuccess = function (event) {
+        const db = event.target.result;
+        // without that it doesn't work
+        window.dataBase = db;
+        const tableContentRequest = db
+          .transaction(table, 'readonly')
+          .objectStore(table)
+          .mozGetAll();
+        tableContentRequest.onsuccess = function (event) {
+          window.tableData = event.target.result;
         };
-      },
-      tableName
-    );
+      };
+    }, tableName);
     let tableContent;
     try {
       // without that it doesn't work
@@ -601,7 +625,7 @@ class BasePage {
         },
         'yoroi-schema',
         tableName,
-        valueItem,
+        valueItem
       );
     }
   }

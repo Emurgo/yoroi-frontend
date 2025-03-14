@@ -310,7 +310,7 @@ export default function NotificationsStyles() {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 10px;
   z-index: 1;
   opacity: 0.7;
   transform-origin: left;

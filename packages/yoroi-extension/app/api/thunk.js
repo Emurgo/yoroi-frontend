@@ -71,7 +71,7 @@ import {
   SignFail,
   SignWindowRetrieveData,
   ConnectWindowRetrieveData,
-  RemoveWalletFromWhiteList,
+  NotifyDAppConnectionRemoved,
   GetConnectedSites,
 } from '../../chrome/extension/background/handlers/yoroi/connector';
 import { GetProtocolParameters } from '../../chrome/extension/background/handlers/yoroi/protocolParameters';
@@ -398,8 +398,10 @@ export const connectWindowRetrieveData: GetEntryFuncType<typeof ConnectWindowRet
   return await callBackground({ type: ConnectWindowRetrieveData.typeTag });
 }
 
-export const removeWalletFromWhiteList: GetEntryFuncType<typeof RemoveWalletFromWhiteList> = async (request) => {
-  await callBackground({ type: RemoveWalletFromWhiteList.typeTag, request });
+export const notifyDAppConnectionRemoved: GetEntryFuncType<typeof NotifyDAppConnectionRemoved> = async (
+  request
+) => {
+  await callBackground({ type: NotifyDAppConnectionRemoved.typeTag, request });
 }
 
 export const getConnectedSites: GetEntryFuncType<typeof GetConnectedSites> = async () => {

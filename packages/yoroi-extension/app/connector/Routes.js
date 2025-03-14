@@ -30,7 +30,7 @@ export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: P
       {stores.loading.isLoading ? (
         <LoadingPage stores={stores} />
       ) : (
-        wrapPages(getContent(stores))
+        wrapPages(getContent(stores), stores)
       )}
     </>
   );
@@ -56,6 +56,6 @@ const getContent = (stores) => (
   </Switch>
 );
 
-export function wrapPages(children: Node): Node {
-  return <Layout>{children}</Layout>;
+function wrapPages(children: Node, stores: StoresMap): Node {
+  return <Layout networkId={stores.profile.getCurrentNetworkId()}>{children}</Layout>;
 }

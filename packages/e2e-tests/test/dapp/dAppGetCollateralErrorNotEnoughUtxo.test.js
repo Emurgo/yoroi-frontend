@@ -3,7 +3,7 @@ import { customAfterEach } from '../../utils/customHooks.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
-import { createWallet } from '../../helpers/restoreWalletHelper.js';
+import { collectInfo, createWallet } from '../../helpers/restoreWalletHelper.js';
 import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
 import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
@@ -27,16 +27,21 @@ describe('dApp, getCollateral, error, empty wallet', function () {
   let mockedDApp = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
-    mockServer = getMockServer({});
-    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    windowManager.init();
-    const dappLogger = getTestLogger('dApp', this.test.parent.title);
-    mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
-    logger = getTestLogger(this.test.parent.title);
-    const basePage = new BasePage(webdriver, logger);
-    basePage.goToExtension();
+    try {
+      webdriver = await driversPoolsManager.getDriverFromPool();
+      mockServer = await getMockServer({});
+      logger = getTestLogger(this.test.parent.title);
+      const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+      const dappLogger = getTestLogger('dApp', this.test.parent.title);
+      windowManager = new WindowManager(webdriver, wmLogger);
+      await windowManager.init();
+      mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      const basePage = new BasePage(webdriver, logger);
+      basePage.goToExtension();
+    } catch (error) {
+      await collectInfo(this, webdriver, logger);
+      throw new Error(error);
+    }
   });
 
   it('Create an empty wallet', async function () {

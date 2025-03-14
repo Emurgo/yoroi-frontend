@@ -12,7 +12,7 @@ const Container = styled(Box)(({ theme }: any) => ({
   position: 'relative',
 }));
 
-const WelcomeBanner = () => {
+const WelcomeBanner = (props: { isTestnet: boolean }) => {
   const strings = useStrings();
   const { openBuyDialog } = usePortfolio();
 
@@ -22,15 +22,20 @@ const WelcomeBanner = () => {
         <Stack direction="column" sx={{ padding: '24px' }}>
           <Stack direction="column" maxWidth={'400px'} mb="20px">
             <Typography variant="h3" fontWeight="500" fontSize="18px" color="ds.gray_max" mb="8px">
-              {strings.welcomeBannerTitle}
+              {props.isTestnet ? strings.welcomeMessageTestnet : strings.welcomeBannerTitle}
             </Typography>
             <Typography color="ds.gray_max" variant="body1">
-              {strings.welcomeBannerDesc}
+              {props.isTestnet ? strings.welcomeMessageSubtitleTestnet : strings.welcomeBannerDesc}
             </Typography>
           </Stack>
 
           <Stack direction="row">
-            <NavigationButton width="105px" variant="primary" onClick={() => openBuyDialog()} label={strings.buyAda} />
+            <NavigationButton
+              sx={{ width: props.isTestnet ? '200px' : '105px' }}
+              variant="primary"
+              onClick={() => openBuyDialog()}
+              label={props.isTestnet ? strings.goToFaucetButton : strings.buyAda}
+            />
           </Stack>
         </Stack>
 

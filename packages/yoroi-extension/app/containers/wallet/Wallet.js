@@ -91,12 +91,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     }
     const { intl } = this.context;
     const selectedWallet = stores.wallets.selectedOrFail;
-
-    if (!selectedWallet) {
-      return null;
-    }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-
     const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
     const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);

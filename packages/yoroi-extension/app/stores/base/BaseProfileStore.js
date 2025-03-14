@@ -156,7 +156,7 @@ export default class BaseProfileStore
 
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
-  currentNetworkId: ?number = undefined;
+  _currentNetworkId: ?number = undefined;
 
   setup(): void {
     super.setup();
@@ -182,20 +182,19 @@ export default class BaseProfileStore
   }
 
   getCurrentNetworkId(): number {
-    const { currentNetworkId } = this;
-    if (currentNetworkId == null) {
+    if (this._currentNetworkId == null) {
       return networks.CardanoMainnet.NetworkId;
     }
-    return currentNetworkId;
+    return this._currentNetworkId;
   }
 
   async setCurrentNetworkId(id: number): Promise<void> {
-    this.currentNetworkId = id;
+    this._currentNetworkId = id;
     await this.api.localStorage.saveCurrentNetworkId(id);
   }
 
   _loadCurrentNetworkId: () => Promise<void> = async () => {
-    this.currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
+    this._currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
   }
 
   get selectedNetwork(): $ReadOnly<NetworkRow> {

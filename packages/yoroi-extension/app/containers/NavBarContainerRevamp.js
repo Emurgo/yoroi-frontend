@@ -18,19 +18,16 @@ import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
+import links from '../links';
 
-const NETWORK_BADGES = Object.freeze({
+export const NETWORK_BADGES: {| [number]: {| color: string, text: string |}|} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
     color: 'rgba(236, 186, 9, 1)',
-    text: 'preprod',
+    text: 'Preprod',
   },
   [networks.CardanoPreviewTestnet.NetworkId]: {
     color: 'rgba(143, 201, 246, 1)',
-    text: 'preview',
-  },
-  [networks.CardanoSanchoTestnet.NetworkId]: {
-    color: 'rgba(147, 245, 225, 1)',
-    text: 'sancho',
+    text: 'Preview',
   },
 });
 
@@ -146,6 +143,8 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     }
 
+    const isTestnet = this.props.stores.profile.getCurrentNetworkId() !== networks.CardanoMainnet.NetworkId;
+
     return (
       <>
         {this.getDialog()}
@@ -156,11 +155,16 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() => {
-                if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
-                  ampli.walletPageExchangeClicked();
+                if (isTestnet) {
+                  window.open(links.testnetFaucet, '_blank');
+                } else {
+                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
+                    ampli.walletPageExchangeClicked();
+                  }
+                  this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
                 }
-                this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
               }}
+              isTestnet={isTestnet}
             />
           }
           isErrorPage={isErrorPage}
