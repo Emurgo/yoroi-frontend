@@ -33,7 +33,7 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
         message={null} // na
         publicDerivers={stores.connector.wallets}
         onSelectWallet={this.onSelectWallet}
-        network="Cardano"
+        networkId={stores.profile.getCurrentNetworkId()}
         getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={stores.profile.shouldHideBalance}
         unitOfAccount={stores.profile.unitOfAccount}
