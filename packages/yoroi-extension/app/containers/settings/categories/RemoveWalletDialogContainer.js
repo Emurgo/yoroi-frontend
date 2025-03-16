@@ -90,7 +90,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
   };
 
   removeWalletRevamp: void => Promise<void> = async () => {
-    this.props.stores.walletSettings.removeWallet({
+    return this.props.stores.walletSettings.removeWallet({
       publicDeriverId: this.props.publicDeriverId,
     });
   };
