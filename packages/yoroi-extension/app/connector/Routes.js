@@ -26,7 +26,7 @@ export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: P
 
   return (
     <>
-      <Helmet><title>Yoroi Connector</title></Helmet>
+      <Helmet><title>{title}</title></Helmet>
       {stores.loading.isLoading ? (
         <LoadingPage stores={stores} />
       ) : (
