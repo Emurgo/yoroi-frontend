@@ -43,6 +43,8 @@ export const getExtensionUrl = () => {
   return `${firefoxExtIdUrl}/main_window.html`;
 };
 
+export const getTransactionsURL = () => `${getExtensionUrl()}#/wallets/transactions`
+
 // builders
 const getBraveBuilder = () => {
   return new Builder()
