@@ -110,13 +110,20 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
           stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
           return;
         }
-        const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
-        stores.wallets.setActiveWallet({
-          publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
-        });
+        let wallet;
+        if (stores.loading.shouldGotoCashback) {
+          wallet = await wallets.getCashbackWallet();
+        }
+        if (!wallet) {
+          wallet = await wallets.getLastSelectedWallet();
+        }
+        if (!wallet) {
+          wallet = firstWallet;
+        }
+        stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
 
-        if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
-          stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
+        if (stores.loading.landingRoute) {
+          stores.app.goToRoute({ route: stores.loading.landingRoute });
         } else {
           stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }

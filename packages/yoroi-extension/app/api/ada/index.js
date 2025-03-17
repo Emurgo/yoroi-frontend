@@ -2785,11 +2785,13 @@ export async function encodeHardwareWalletSignResult(
   signatureHex: string,
   payloadHex: string,
   signingPublicKeyHex: string,
+  payloadHashed: boolean = false,
 ): Promise<{| signature: string, key: string |}> {
   const coseSign1 = await buildCoseSign1FromSignature (
     hexToBytes(addressHex),
     hexToBytes(signatureHex),
     hexToBytes(payloadHex),
+    payloadHashed,
   );
 
   const key = makeCip8Key(hexToBytes(signingPublicKeyHex));

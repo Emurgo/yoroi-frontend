@@ -438,7 +438,6 @@ export const NotifyDAppConnectionRemoved: HandlerType<
       const site = connectedSites[tabId];
       if (!request || site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
-        break;
       }
     }
   },
