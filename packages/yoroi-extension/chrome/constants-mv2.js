@@ -10,12 +10,12 @@ export function genCSP(request: {|
   isDev: boolean,
   additional: {|
     'default-src'?: Array<string>,
-    'frame-src'?: Array<string>,
-    'script-src'?: Array<string>,
-    'object-src'?: Array<string>,
-    'connect-src'?: Array<string>,
-    'style-src'?: Array<string>,
-    'img-src'?: Array<string>,
+      'frame-src' ?: Array < string >,
+      'script-src' ?: Array < string >,
+      'object-src' ?: Array < string >,
+      'connect-src' ?: Array < string >,
+      'style-src' ?: Array < string >,
+      'img-src' ?: Array < string >,
   |},
 |}): string {
   const defaultSrc = request.additional['default-src'] ?? [];
@@ -49,6 +49,11 @@ export function genCSP(request: {|
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
   frameSrc.push('https://emurgo.github.io/');
 
+  // Bringweb3
+  frameSrc.push('http://localhost:5173/')
+  frameSrc.push('https://*.bringweb3.io/')
+  connectSrc.push('https://*.bringweb3.io')
+
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com/');
@@ -66,6 +71,11 @@ export function genCSP(request: {|
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
+
+  // Bringweb3
+  frameSrc.push('http://localhost:5173/')
+  frameSrc.push('https://*.bringweb3.io/')
+  connectSrc.push('https://*.bringweb3.io')
 
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293

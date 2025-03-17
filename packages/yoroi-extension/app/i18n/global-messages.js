@@ -694,6 +694,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.wallets',
     defaultMessage: '!!!My wallets',
   },
+  sidebarCashback: {
+    id: 'sidebar.cashback',
+    defaultMessage: '!!!Cashback',
+  },
   sidebarAssets: {
     id: 'sidebar.assets',
     defaultMessage: '!!!Assets',
@@ -1015,6 +1019,14 @@ const globalMessages: * = defineMessages({
   provider: {
     id: 'buysell.dialog.provider',
     defaultMessage: '!!!Provider',
+  },
+  disclaimer: {
+    id: 'buysell.dialog.disclaimer',
+    defaultMessage: '!!!Disclaimer',
+  },
+  proceed: {
+    id: 'buysell.dialog.proceed',
+    defaultMessage: 'PROCEED',
   },
   mainnet: {
     id: 'networkName.mainnet',

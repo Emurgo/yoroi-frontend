@@ -10,7 +10,7 @@ import {
   isChrome,
   isMacOS,
 } from '../utils/utils.js';
-import { getExtensionUrl } from '../utils/driverBootstrap.js';
+import { getExtensionUrl, getTransactionsURL } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
   defaultWaitTimeout,
@@ -60,6 +60,14 @@ class BasePage {
     await this.waitForElementLocated(this.rootLocator);
 
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtension.name);
+  }
+  async goToExtensionTransactions() {
+    this.logger.info('BasePage::goToExtensionTransactions is called');
+    await this.setImplicitTimeout(halfSecond, this.goToExtensionTransactions.name);
+    await this.driver.get(getTransactionsURL());
+    await this.waitForElementLocated(this.rootLocator);
+
+    await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtensionTransactions.name);
   }
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);

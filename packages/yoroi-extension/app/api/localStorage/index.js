@@ -34,6 +34,7 @@ const storageKeys = {
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
+  BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
@@ -47,6 +48,9 @@ const storageKeys = {
   // ========== LEGACY USED FOR MIGRATIONS ========== //
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
+
+  CASHBACK_WALLET_ID: 'CASHBACK_WALLET_ID',
+  SHOWN_DISCLAIMERS: 'SHOWN_DISCLAIMERS',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SELECTED_WALLET: 'SELECTED_WALLET',
 };
@@ -58,6 +62,8 @@ export type SetCustomUserThemeRequest = {|
 export type WalletsNavigation = {|
   cardano: number[],
 |};
+
+type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 
 /**
  * This api layer provides access to the electron local storage
@@ -238,6 +244,19 @@ export default class LocalStorageApi {
 
   unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
 
+  // ========== Expand / retract Sidebar ========== //
+
+  getBringSandbox: void => Promise<boolean> = () =>
+    getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+
+  setBringSandbox: boolean => Promise<void> = flag => {
+    return flag
+      ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
+      : this.unsetBringSandbox();
+  };
+
+  unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
+
   // ============ External storage provider ============ //
 
   getExternalStorage: void => Promise<?SelectedExternalStorageProvider> = () =>
@@ -369,6 +388,36 @@ export default class LocalStorageApi {
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
+  saveCashbackWalletId: (number) => Promise<void> = (id) => setLocalItem(
+    storageKeys.CASHBACK_WALLET_ID,
+    String(id)
+  );
+
+  getCashbackWalletId: () => Promise<number | null> = async () => {
+    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    if (!v) {
+      return null;
+    }
+    return Number(v);
+  }
+
+  _getShownDisclaimerObject: () => Promise<Object> = async () => {
+    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+    const val = raw ? JSON.parse(raw) : {};
+    return val;
+  }
+
+  setShownDisclaimer: (Disclaimer) => Promise<void> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    val[which] = true;
+    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+  };
+
+  isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    return val[which] === true;
+  }
+
   loadCurrentNetworkId: () => Promise<?number> = async () => {
     const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
     if (raw == null) {
@@ -405,6 +454,7 @@ export default class LocalStorageApi {
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
     await this.unsetPortfolioFiatPair();
+    await this.unsetBringSandbox();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);
