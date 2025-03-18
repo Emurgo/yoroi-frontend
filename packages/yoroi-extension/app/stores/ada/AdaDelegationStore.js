@@ -18,6 +18,7 @@ import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap, forceNonNull } from '../../coreUtils';
+// $FlowIgnore: suppressing this error
 import { NotificationTopics } from '../../UI/features/notifications/module/NotificationsProvider';
 
 export default class AdaDelegationStore extends Store<StoresMap> {
@@ -140,11 +141,13 @@ export default class AdaDelegationStore extends Store<StoresMap> {
 
       const [, rewardHistoryResult] = await Promise.all([accountStateCalcs, rewardHistory]);
 
-      // publish last reward as notification on refresh
-      PubSub.publish(NotificationTopics.REWARDS, {
-        reward: rewardHistoryResult[rewardHistoryResult.length - 1],
-        networkId: wallet.networkId,
-      });
+      if (rewardHistoryResult && rewardHistoryResult.length > 0) {
+        // publish last reward as notification on refresh
+        PubSub.publish(NotificationTopics.REWARDS, {
+          reward: rewardHistoryResult[rewardHistoryResult.length - 1],
+          networkId: wallet.networkId,
+        });
+      }
     } catch (e) {
       Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }

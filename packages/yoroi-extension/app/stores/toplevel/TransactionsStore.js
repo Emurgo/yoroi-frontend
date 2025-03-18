@@ -15,6 +15,7 @@ import { genLookupOrFail, getTokenName } from '../stateless/tokenHelpers';
 import moment, { Moment } from 'moment';
 import { toRequestAddresses } from '../../api/ada/lib/storage/bridge/updateTransactions';
 import { refreshTransactions } from '../../api/thunk';
+// $FlowIgnore: suppressing this error
 import { NotificationTopics } from '../../UI/features/notifications/module/NotificationsProvider';
 import PubSub from 'pubsub-js';
 import BigNumber from 'bignumber.js';

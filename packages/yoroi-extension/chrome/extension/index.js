@@ -1,5 +1,4 @@
 // @flow
-
 import { render } from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
@@ -26,6 +25,10 @@ configure({ enforceActions: 'always' });
 // Since Yoroi handles money, it's better to error our than proceed if an error occurs
 BigNumber.DEBUG = true;
 
+type SlotsProps = {|
+  [networkId: number]: number,
+|};
+
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
   const api = await setupApi();
@@ -37,7 +40,7 @@ const initializeYoroi: void => Promise<void> = async () => {
   Logger.debug(`[yoroi] stores created`);
 
   // calculate the last slot for each network for notifications
-  const appLoadedSlotPerNetwork = Object.values(networks).reduce((acc, network) => {
+  const appLoadedSlotPerNetwork: SlotsProps = Object.values(networks).reduce((acc: SlotsProps, network: any) => {
     const fullConfig = getCardanoHaskellBaseConfig(network);
     const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
     acc[network.NetworkId] = absSlotNumber.toNumber();
