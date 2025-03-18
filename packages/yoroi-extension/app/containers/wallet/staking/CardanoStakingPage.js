@@ -92,6 +92,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
     const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(selectedWallet.publicDeriverId);
+    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
+
     if (urlTemplate != null) {
       const totalAda = this._getTotalAda();
       const locale = this.props.stores.profile.currentLocale;
@@ -132,10 +134,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         </>
       );
     }
-
     return (
       <div>
-        {this.getDialog()}
         <DelegationSendForm
           hasAnyPending={this.props.stores.transactions.hasAnyPending}
           poolQueryError={this.props.stores.delegation.poolInfoQuery.error}
@@ -143,11 +143,9 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
           updatePool={poolId => {
             this.setState({ selectedPoolId: poolId });
           }}
-          onNext={async () => {
-            if (this.state.selectedPoolId != null) {
-              return this.props.stores.delegation.createDelegationTransaction(this.state.selectedPoolId);
-            }
-          }}
+          selectedPoolId={this.state.selectedPoolId}
+          poolName={selectedPoolInfo?.info.name ?? ''}
+          stores={this.props.stores}
         />
         {this._displayPoolInfo()}
       </div>
@@ -182,7 +180,6 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
       duration: config.wallets.ADDRESS_COPY_TOOLTIP_NOTIFICATION_DURATION,
       message: globalMessages.copyTooltipMessage,
     };
-
     const moreInfo =
       selectedPoolInfo.info?.homepage != null
         ? {
@@ -262,113 +259,5 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         </>
       </Dialog>
     );
-  };
-
-  getDialog: void => void | Node = () => {
-    const { intl } = this.context;
-    const { stores } = this.props;
-    const { delegationTransaction } = stores.substores.ada;
-    const delegationTx = delegationTransaction.createDelegationTx.result;
-    const uiDialogs = stores.uiDialogs;
-
-    const selectedWallet = stores.wallets.selected;
-    if (selectedWallet == null) {
-      return null;
-    }
-
-    const networkInfo = getNetworkById(selectedWallet.networkId);
-    const currentParams = networkInfo.BaseConfig.reduce((acc, next) => Object.assign(acc, next), {});
-
-    const approximateReward = tokenEntry => {
-      const tokenRow = stores.tokenInfoStore.tokenInfo.get(tokenEntry.networkId.toString())?.get(tokenEntry.identifier);
-      if (tokenRow == null) throw new Error(`${nameof(CardanoStakingPage)} no token info for ${JSON.stringify(tokenEntry)}`);
-
-      return {
-        amount: tokenEntry.amount.times(currentParams.PerEpochPercentageReward).div(EPOCH_REWARD_DENOMINATOR),
-        token: tokenRow,
-      };
-    };
-
-    const showSignDialog =
-      stores.wallets.sendMoneyRequest.isExecuting ||
-      !stores.wallets.sendMoneyRequest.wasExecuted ||
-      stores.wallets.sendMoneyRequest.error != null;
-
-    const selectedPoolInfo = this._getPoolInfo(selectedWallet);
-    if (stores.delegation.poolInfoQuery.error != null) {
-      return undefined;
-    }
-    if (stores.delegation.poolInfoQuery.isExecuting) {
-      return (
-        <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
-          <AnnotatedLoader
-            title={intl.formatMessage(globalMessages.processingLabel)}
-            details={intl.formatMessage(globalMessages.poolFetching)}
-          />
-        </Dialog>
-      );
-    }
-    if (stores.delegation.poolInfoQuery.error != null) {
-      return this._errorDialog(stores.delegation.poolInfoQuery.error);
-    }
-    if (delegationTransaction.createDelegationTx.isExecuting) {
-      return (
-        <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
-          <AnnotatedLoader
-            title={intl.formatMessage(globalMessages.processingLabel)}
-            details={intl.formatMessage(globalMessages.txGeneration)}
-          />
-        </Dialog>
-      );
-    }
-    if (delegationTransaction.createDelegationTx.error != null) {
-      return this._errorDialog(delegationTransaction.createDelegationTx.error);
-    }
-    const selectedPoolId = this.state.selectedPoolId;
-    if (delegationTx != null && selectedPoolId != null && showSignDialog) {
-      // may happen for a split second before backend query starts
-      if (selectedPoolInfo == null) return null;
-
-      const { numberOfDecimals } = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
-        delegationTx.totalAmountToDelegate.getDefaultEntry()
-      ).Metadata;
-
-      return (
-        <DelegationTxDialog
-          staleTx={delegationTransaction.isStale}
-          poolName={selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
-          poolHash={selectedPoolId}
-          transactionFee={delegationTx.signTxRequest.fee()}
-          amountToDelegate={delegationTx.totalAmountToDelegate}
-          approximateReward={approximateReward(delegationTx.totalAmountToDelegate.getDefaultEntry())}
-          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
-          isHardware={selectedWallet.type !== 'mnemonic'}
-          onCancel={this.cancel}
-          onSubmit={async ({ password }) => {
-            await stores.substores.ada.delegationTransaction.signTransaction({
-              password,
-              wallet: selectedWallet,
-              dialog: DelegationSuccessDialog,
-            });
-            ampli.stakingCenterDelegationSubmitted({
-              ada_amount: delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
-              staking_pool: selectedPoolId,
-            });
-          }}
-          error={stores.wallets.sendMoneyRequest.error}
-          selectedExplorer={
-            stores.explorers.selectedExplorer.get(selectedWallet.networkId) ??
-            (() => {
-              throw new Error('No explorer for wallet network');
-            })()
-          }
-        />
-      );
-    }
-    if (uiDialogs.isOpen(DelegationSuccessDialog)) {
-      return <DelegationSuccessDialog onClose={() => stores.substores.ada.delegationTransaction.complete()} />;
-    }
-    return undefined;
   };
 }

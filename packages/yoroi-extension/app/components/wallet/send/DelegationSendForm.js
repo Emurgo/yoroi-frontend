@@ -16,6 +16,8 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
+import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
+import { Stack } from '@mui/material';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -28,8 +30,9 @@ type Props = {|
   +hasAnyPending: boolean,
   +updatePool: (void | string) => void,
   +poolQueryError: ?LocalizableError,
-  +onNext: void => Promise<void>,
   +isProcessing: boolean,
+  +poolName: string,
+  +selectedPoolId: string,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -127,24 +130,38 @@ export default class DelegationSendForm extends Component<Props> {
               done={poolIdField.isValid}
             />
           </div>
-          {this._makeInvokeConfirmationButton()}
+          <CreateInvokeConfirmationButton
+            intl={intl}
+            btnDisabled={
+              this.props.hasAnyPending ||
+              this.props.isProcessing ||
+              this.props.poolQueryError != null ||
+              poolIdField.error != null ||
+              poolIdField.value?.length === 0
+            }
+            hasAnyPending={this.props.hasAnyPending}
+            isProcessing={this.props.isProcessing}
+            poolQueryError={this.props.poolQueryError}
+            selectedPoolId={this.props.selectedPoolId}
+            poolName={this.props.poolName}
+            stores={this.props.stores}
+          />
         </BorderedBox>
       </Box>
     );
   }
-
-  _makeInvokeConfirmationButton(): Node {
-    const { intl } = this.context;
-
-    return (
-      <Button
-        variant="primary"
-        onClick={this.props.onNext}
-        disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
-        sx={{ margin: '30px auto 0', display: 'block' }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>
-    );
-  }
 }
+
+const CreateInvokeConfirmationButton = observer(({ intl, btnDisabled, selectedPoolId, poolName, stores }) => {
+  return (
+    <Stack alignItems="center" justifyContent="center">
+      <DelegateButton
+        stores={stores}
+        label={intl.formatMessage(globalMessages.nextButtonLabel)}
+        disabled={btnDisabled}
+        poolName={poolName}
+        poolID={selectedPoolId}
+      />
+    </Stack>
+  );
+});
