@@ -217,7 +217,7 @@ export async function createStandardBip44Wallet(request: {|
           }
           return {
             deriverRequest: {
-              decryptPrivateDeriverPassword: request.password,
+              decryptPrivateDeriver: { preDerived: false, password: request.password },
               publicDeriverMeta: {
                 name: request.accountName,
               },

@@ -9,8 +9,6 @@ import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
-import environment from '../../environment';
-import { ROUTES } from '../../routes-config';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { connectorMessages } from '../../i18n/global-messages';
@@ -27,12 +25,6 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresProp
   };
 
   async componentDidMount() {
-    // User should not be able to access the route when using Yoroi Light
-    if (environment.isLight) {
-      this.props.stores.app.goToRoute({
-        route: ROUTES.MY_WALLETS,
-      });
-    }
     await this.props.stores.connector.refreshActiveSites();
     await this.props.stores.connector.getConnectorWhitelist();
   }

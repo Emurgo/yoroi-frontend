@@ -2,14 +2,14 @@
 import { MenuItem, styled } from '@mui/material';
 import type { ComponentType } from 'react';
 
-export const MenuItemStyled: ComponentType<any> = styled(MenuItem)(({ theme }: any) => ({
+export const MenuItemStyled: ComponentType<any> = styled(MenuItem)(({ theme, isGray }: any) => ({
   '&.Mui-selected': {
     backgroundColor: theme.palette.ds.bg_color_contrast_min,
     '&:hover': {
       backgroundColor: theme.palette.ds.bg_color_contrast_min,
     },
     '&::after': {
-      borderColor: theme.palette.ds.secondary_600,
+      borderColor: isGray ? theme.palette.ds.el_gray_medium : theme.palette.ds.secondary_600,
       width: '18px',
       transform: 'rotate(-45deg) scale(-1, 1)',
     },

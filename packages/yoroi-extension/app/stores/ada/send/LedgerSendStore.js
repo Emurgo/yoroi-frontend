@@ -302,6 +302,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       await broadcastTransaction({
         publicDeriverId: request.publicDeriverId,
         signedTxHex: signedTx.to_hex(),
+        networkId: request.networkId,
       });
 
       return { txId };

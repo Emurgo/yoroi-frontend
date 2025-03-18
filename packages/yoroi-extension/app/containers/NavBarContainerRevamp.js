@@ -6,7 +6,7 @@ import { intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
-import { getNetworkById } from '../api/ada/lib/storage/database/prepackaged/networks';
+import { networks, getNetworkById } from '../api/ada/lib/storage/database/prepackaged/networks';
 import { addressToDisplayString } from '../api/ada/lib/storage/bridge/utils';
 import BuySellDialog from '../components/buySell/BuySellDialog';
 import NavBarRevamp from '../components/topbar/NavBarRevamp';
@@ -16,7 +16,20 @@ import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
 import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
+import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
+import links from '../links';
+
+export const NETWORK_BADGES: {| [number]: {| color: string, text: string |}|} = Object.freeze({
+  [networks.CardanoPreprodTestnet.NetworkId]: {
+    color: 'rgba(236, 186, 9, 1)',
+    text: 'Preprod',
+  },
+  [networks.CardanoPreviewTestnet.NetworkId]: {
+    color: 'rgba(143, 201, 246, 1)',
+    text: 'Preview',
+  },
+});
 
 type LocalProps = {|
   title: Node,
@@ -53,8 +66,9 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
     await localStorage.unsetPortfolioFiatPair();
+    this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.stores.app.goToRoute({ route, publicDeriverId: newWalletId });
+    this.props.stores.app.goToRoute({ route });
   };
 
   checkAndResetGovRoutes: void => void = () => {
@@ -102,21 +116,55 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     };
 
+    let title;
+    if (
+      this.props.stores.wallets.selected?.networkId === networks.CardanoMainnet.NetworkId ||
+      !this.props.stores.wallets.selected
+    ) {
+      title = this.props.title;
+    } else {
+      const { color, text } = NETWORK_BADGES[this.props.stores.wallets.selected.networkId];
+      title = (
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          {this.props.title}
+          <button
+            style={{
+              backgroundColor: color,
+              marginLeft: '8px',
+              borderRadius: '16px',
+              paddingLeft: '8px',
+              paddingRight: '8px',
+            }}
+            onClick={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
+          >
+            {text}
+          </button>
+        </div>
+      );
+    }
+
+    const isTestnet = this.props.stores.profile.getCurrentNetworkId() !== networks.CardanoMainnet.NetworkId;
+
     return (
       <>
         {this.getDialog()}
         <NavBarRevamp
-          title={this.props.title}
+          title={title}
           menu={this.props.menu}
           walletDetails={selected !== null ? <DropdownHead /> : null}
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() => {
-                if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
-                  ampli.walletPageExchangeClicked();
+                if (isTestnet) {
+                  window.open(links.testnetFaucet, '_blank');
+                } else {
+                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
+                    ampli.walletPageExchangeClicked();
+                  }
+                  this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
                 }
-                this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
               }}
+              isTestnet={isTestnet}
             />
           }
           isErrorPage={isErrorPage}
@@ -134,28 +182,16 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const shouldHideBalance = stores.profile.shouldHideBalance;
 
     if (stores.uiDialogs.isOpen(WalletListDialog)) {
-      const cardanoWallets = [];
-
-      wallets.forEach(wallet => {
-        const rewards = stores.delegation.getRewardBalanceOrZero(
-          wallet
-        );
-
-        const walletMap = {
-          walletId: wallet.publicDeriverId,
-          rewards,
-          amount: wallet.balance,
-          plate: wallet.plate,
-          type: wallet.type,
-          name: wallet.name,
-        };
-
-        cardanoWallets.push(walletMap);
-      });
-
       return (
         <WalletListDialog
-          cardanoWallets={cardanoWallets}
+          cardanoWallets={wallets.map(wallet => ({
+            walletId: wallet.publicDeriverId,
+            rewards: this.props.stores.delegation.getRewardBalanceOrZero(wallet),
+            amount: wallet.balance,
+            plate: wallet.plate,
+            type: wallet.type,
+            name: wallet.name,
+          }))}
           onSelect={wallet => {
             this.checkAndResetGovRoutes();
             this.onSelectWallet(wallet);
@@ -170,8 +206,9 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           getTokenInfo={getTokenInfo}
           walletAmount={selected?.balance}
           onAddWallet={this.addNewWallet}
-          updateSortedWalletList={stores.profile.updateSortedWalletList}
-          walletsNavigation={stores.profile.walletsNavigation}
+          onUpdateWalletListOrder={async (from, to) => {
+            await this.props.stores.wallets.reorderWallets(from, to);
+          }}
           unitOfAccountSetting={stores.profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         />
@@ -201,6 +238,11 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       );
     }
 
+    if (this.props.stores.uiDialogs.isOpen(SwitchNetworkDialogContainer)) {
+      return <SwitchNetworkDialogContainer stores={this.props.stores} />;
+    }
+
     return null;
   };
+
 }

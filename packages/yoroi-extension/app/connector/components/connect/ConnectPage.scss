@@ -92,6 +92,13 @@
   }
 }
 
+.cashbackApplyAll {
+  margin-left: 16px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+}
+
 .list {
   & .listItem {
     border: 1px solid #fff;
@@ -105,12 +112,12 @@
       width: 100%;
       color: var(--yoroi-palette-gray-900);
     }
-
+  }
+  & .enabledWallet {
     &:hover {
       border-color: #c4cad7;
     }
   }
-
   overflow: auto;
 }
 

@@ -10,6 +10,10 @@ import { CheckmarkFilled } from './CheckmarkFilled';
 import { CheckmarkOutlined } from './CheckmarkOutlined';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
+import { ChipArrowDown } from './ChipArrowDown';
+import { ChipArrowUp } from './ChipArrowUp';
+import { CloseCircleIcon } from './CloseCircleIcon';
+import { CloseIcon } from './CloseIcon';
 import { Coins } from './Coins';
 import { Copied } from './Copied';
 import { Copy } from './Copy';
@@ -21,6 +25,7 @@ import { Delete } from './Delete';
 import { Device } from './Device';
 import { Drag } from './Drag';
 import { ExclamationCircle } from './ExclamationCircle';
+import { Expand } from './Expand';
 import { Explore } from './Explore';
 import { Export } from './Export';
 import { Eye } from './Eye';
@@ -88,6 +93,10 @@ export const Icon = {
   CheckmarkOutlined,
   ChevronDown,
   ChevronUp,
+  ChipArrowDown,
+  ChipArrowUp,
+  CloseCircleIcon,
+  CloseIcon,
   Coins,
   Copied,
   Copy,
@@ -99,6 +108,7 @@ export const Icon = {
   Device,
   Drag,
   ExclamationCircle,
+  Expand,
   Explore,
   Export,
   Eye,
@@ -151,5 +161,5 @@ export const Icon = {
   VisibilityOn,
   Voting,
   Wallet,
-  Wallets,
+  Wallets
 };

@@ -50,3 +50,12 @@
     font-size: 14px;
   }
 }
+
+.disabledReason {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.20000000298023224px;
+  text-align: left;
+  color: var(--text-error, rgba(255, 19, 81, 1));
+}
