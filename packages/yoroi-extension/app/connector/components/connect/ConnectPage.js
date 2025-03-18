@@ -333,7 +333,7 @@ export default class ConnectPage extends Component<Props> {
                     </button>
                   </div>
 
-                  {(networkId !== networks.CardanoMainnet) && (
+                  {(networkId !== networks.CardanoMainnet.networkId) && (
                     <TestnetWarningBox>
                       <TestnetWarningTitle>
                         <ExclamationIcon />
