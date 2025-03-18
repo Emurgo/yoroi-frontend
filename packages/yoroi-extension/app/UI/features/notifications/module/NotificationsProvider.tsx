@@ -1,13 +1,15 @@
 import React from 'react';
+import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
-import LocalStorageApi from '../../../../api/localStorage';
-import PubSub from 'pubsub-js';
 import { useHistory } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
 import { ampli } from '../../../../../ampli/index';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import LocalStorageApi from '../../../../api/localStorage';
+import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
@@ -128,10 +130,18 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
       [NotificationTopics.REWARDS]: NotificationTypes.Rewards,
     };
 
-    console.log('notif trigger', notifLimitSlots);
-
-    // check if the slot is older than the last slot on app load for the network
-    if (data.slot < notifLimitSlots[data.networkId]) {
+    // We only have epoch for rewards notifications
+    if (topic === NotificationTopics.REWARDS) {
+      const epoch = data.reward[0];
+      const network = getNetworkById(data.networkId);
+      const config = getCardanoHaskellBaseConfig(network);
+      const localTimeSlot = notifLimitSlots[data.networkId];
+      const relativeSlot = TimeUtils.toRelativeSlotNumber(config, localTimeSlot);
+      // If the local epoch is greater, reward is old and we don't show it
+      if (relativeSlot.epoch > epoch) {
+        return;
+      }
+    } else if (data.slot < notifLimitSlots[data.networkId]) {
       return;
     }
 
