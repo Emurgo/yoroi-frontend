@@ -227,7 +227,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
 
               return (
                 <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_100', borderRadius: '8px', flexWrap: 'nowrap' }}>
-                  <Typography color="ds.white_static">
+                  <Typography color="ds.text_primary_medium">
                     {new BigNumber(item.quantity).shiftedBy(-decimals).toString()} {item.tokenInfo.info.name}
                   </Typography>
                 </Box>
