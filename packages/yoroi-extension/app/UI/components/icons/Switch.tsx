@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Switch = () => {
+export const Switch = (props: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
       <path

@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Placeholder = (props: React.SVGProps<SVGSVGElement>) => {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path fillRule="evenodd" clipRule="evenodd" d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM18.3199 16.9056C19.3729 15.5509 20 13.8487 20 12C20 10.1513 19.3729 8.44902 18.3198 7.09433L13.4142 12L18.3199 16.9056ZM16.9057 18.3198C15.551 19.3729 13.8487 20 12 20C10.1513 20 8.44902 19.3729 7.09433 18.3198L12 13.4142L16.9057 18.3198ZM10.5858 12L5.68012 16.9056C4.62707 15.5509 4 13.8487 4 12C4 10.1513 4.62709 8.44902 5.68016 7.09433L10.5858 12ZM12 10.5857L16.9056 5.68012C15.5509 4.62707 13.8487 4 12 4C10.1513 4 8.44906 4.62707 7.09438 5.68012L12 10.5857Z" fill={props.fill || "currentColor"}/>
     </svg>
   );

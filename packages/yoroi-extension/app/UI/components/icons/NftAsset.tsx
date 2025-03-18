@@ -2,7 +2,7 @@ import React from 'react';
 
 export const NftAsset = (props: React.SVGProps<SVGSVGElement>) => {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M7.70711 6.29289C7.42111 6.00689 6.99099 5.92134 6.61732 6.07612C6.24364 6.2309 6 6.59554 6 7V11C6 11.5523 6.44772 12 7 12C7.55228 12 8 11.5523 8 11V9.41421L10.2929 11.7071C10.5789 11.9931 11.009 12.0787 11.3827 11.9239C11.7564 11.7691 12 11.4045 12 11V7C12 6.44771 11.5523 6 11 6C10.4477 6 10 6.44771 10 7V8.58578L7.70711 6.29289Z"
         fill={props.fill || 'currentColor'}

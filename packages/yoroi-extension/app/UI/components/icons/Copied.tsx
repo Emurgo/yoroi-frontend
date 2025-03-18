@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Copied = (props: React.SVGProps<SVGSVGElement>) => {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M3 18C3.55228 18 4 17.5523 4 17V4.6C4 4.52523 4.04745 4.36676 4.20711 4.20711C4.36676 4.04745 4.52523 4 4.6 4H14C14.5523 4 15 3.55229 15 3C15 2.44771 14.5523 2 14 2H4.6C3.87477 2 3.23324 2.35255 2.79289 2.79289C2.35255 3.23324 2 3.87477 2 4.6V17C2 17.5523 2.44772 18 3 18Z"
         fill={props.fill || "currentColor"}
