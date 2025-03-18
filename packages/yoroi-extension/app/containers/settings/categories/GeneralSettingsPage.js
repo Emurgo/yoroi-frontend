@@ -7,13 +7,16 @@ import GeneralSettings from '../../../components/settings/categories/general-set
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
+import BringCashbackSettings from '../../../components/settings/categories/general-setting/BringCashbackSettings';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';
+import environment from '../../../environment';
 import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
+
 import type { StoresProps } from '../../../stores';
 
 const currencyLabels = defineMessages({
@@ -51,11 +54,19 @@ const currencyLabels = defineMessages({
   },
 });
 
+const canUseSandbox = environment.isDev() || environment.isNightly();
+
 @observer
 export default class GeneralSettingsPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
   };
+
+  componentDidMount() {
+    const request = this.props.stores.wallets.getCashbackWalletRequest;
+    request.reset();
+    request.execute();
+  }
 
   onSelectUnitOfAccount: string => Promise<void> = async value => {
     const localStorageApi = new LocalStorageApi();
@@ -66,11 +77,16 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     await this.props.stores.transactions.updateUnitOfAccount();
   };
 
+  onSelectBringCashbackWallet: number => Promise<void> = async value => {
+    this.props.stores.wallets.setCashbackWallet(value);
+  };
+
   render(): Node {
     const { intl } = this.context;
     const { stores } = this.props;
     const profileStore = stores.profile;
     const coinPriceStore = stores.coinPriceStore;
+    const { wallets, getCashbackWalletRequest } = stores.wallets;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -106,6 +122,20 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           languages={profileStore.LANGUAGE_OPTIONS}
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
+        />
+        <BringCashbackSettings
+          onSelect={this.onSelectBringCashbackWallet}
+          isSubmitting={false}
+          // $FlowFixMe this is apparently correct, flow is out of its mind
+          cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
+          // $FlowFixMe this is apparently correct, flow is out of its mind
+          currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
+          isUseSandbox={profileStore.getBringSandboxRequest.result}
+          onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
+            await profileStore.setBringSandboxRequest.execute(useSandbox);
+            await profileStore.getBringSandboxRequest.execute();
+          }) : null}
+          error={null}
         />
         <UnitOfAccountSettings
           onSelect={this.onSelectUnitOfAccount}

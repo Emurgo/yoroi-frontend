@@ -124,7 +124,11 @@ class App extends Component<Props, State> {
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
-    return <Router history={history}>{Routes(stores)}</Router>;
+    return (
+      <Router history={history}>
+        <Routes stores={stores} />
+      </Router>
+    );
   };
 }
 

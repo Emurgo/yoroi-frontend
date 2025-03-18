@@ -68,6 +68,8 @@ export default ({
     },
     permissions: [
       'storage',
+      'alarms',
+      'tabs',
       '*://connect.trezor.io/*',
       'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'
     ],
@@ -76,6 +78,16 @@ export default ({
         matches: ['*://connect.trezor.io/*/popup.html*'],
         js: ['js/trezor-content-script.js'],
       },
+      {
+        matches: [
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/bringInject.js',
+        ],
+        run_at: 'document_start',
+      }
     ],
     content_security_policy: contentSecurityPolicy,
     protocol_handlers: !enableProtocolHandlers
@@ -87,7 +99,9 @@ export default ({
           uriTemplate: 'main_window.html#/send-from-uri?q=%s',
         },
       ],
-    web_accessible_resources: [],
+    web_accessible_resources: [
+      'js/bringInject.js',
+    ],
   };
 
   if (shouldInjectConnector) {

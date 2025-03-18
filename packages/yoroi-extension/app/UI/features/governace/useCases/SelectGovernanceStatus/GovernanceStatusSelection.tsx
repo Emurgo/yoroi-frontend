@@ -5,15 +5,15 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
+import { useLocation } from 'react-router-dom';
+import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { ChooseDRepModal } from '../../common/ChooseDRepModal';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import { BECOME_DREP_LINK, DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK } from '../../common/constants';
-import { Abstein } from '../../common/ilustrations/Abstein';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
-import { NoConfidance } from '../../common/ilustrations/NoConfidance';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -57,6 +57,14 @@ export const GovernanceStatusSelection = () => {
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
+  const params: any = useLocation();
+
+  React.useEffect(() => {
+    if (params?.delegateToYoroiDrep) {
+      handleYoroiDelegate();
+    }
+  }, [params]);
+
   const openDRepIdModal = (onSubmit: (drepID: string, drepCredential: string) => void) => {
     if (!governanceManager) {
       return;
@@ -80,6 +88,14 @@ export const GovernanceStatusSelection = () => {
       governanceVoteChanged(vote);
       createUnsignTx(drepCredential);
     });
+  };
+  const handleYoroiDelegate = async () => {
+    const drepID = YOROI_DREP_ID;
+    const vote: Vote = { kind: 'delegate', drepID };
+    const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
+
+    governanceVoteChanged(vote);
+    createUnsignTx(dRepCredentialHex);
   };
 
   const handleAbstain = async () => {
@@ -110,40 +126,61 @@ export const GovernanceStatusSelection = () => {
       setLoadingUnsignTx(false);
     }
   };
+
   // noinspection JSIncompatibleTypesComparison
-  const statusDelegating = governanceStatus.status === 'delegate';
+  const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
+  const statusDelegating = governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID;
   const optionsList = [
+    {
+      title: strings.delegateToYoroiDRep,
+      titleHover: strings.delegateToYoroiDRep,
+      description: statusDelegatingToYoroi
+        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
+        : strings.designatingSomeoneElse,
+      descriptionHover: statusDelegatingToYoroi
+        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
+        : strings.designatingSomeoneElse,
+      extraInfo: statusDelegatingToYoroi ? governanceStatus.drep : null,
+      icon: <DRepIlustration />,
+      selected: statusDelegatingToYoroi,
+      onClick: handleYoroiDelegate,
+      pending: isPendindDrepDelegationTx || loadingUnsignTx,
+      loading: loadingUnsignTx && statusDelegatingToYoroi,
+      isVisible: Number(networkId) === 0,
+    },
     {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
       titleHover: statusDelegating ? 'Change DRep' : strings.delegateToDRep,
       description: strings.designatingSomeoneElse,
-      descriptionHover:
-        statusDelegating
-          ? `Current DRep selection: ${governanceStatus.drep}`
-          : strings.designatingSomeoneElse,
-      icon: <DRepIlustration />,
+      descriptionHover: strings.designatingSomeoneElse,
+
+      extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,
       onClick: handleDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
-      loading: loadingUnsignTx && governanceVote.kind === 'delegate',
+      loading: loadingUnsignTx && statusDelegating,
+      isVisible: true,
     },
+  ];
+
+  const bottomList = [
     {
       title: strings.abstain,
       description: strings.abstainInfo,
-      icon: <Abstein />,
       selected: governanceStatus.status === DREP_ALWAYS_ABSTAIN,
       onClick: handleAbstain,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_ABSTAIN,
+      isVisible: true,
     },
     {
       title: strings.noConfidence,
       description: strings.noConfidenceInfo,
-      icon: <NoConfidance />,
       selected: governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE,
       onClick: handleNoConfidence,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE,
+      isVisible: true,
     },
   ];
 
@@ -189,10 +226,10 @@ export const GovernanceStatusSelection = () => {
       <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="64px" gutterBottom color="ds.text_gray_low">
+      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low">
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
-      <Box display="flex" justifyContent="center" gap="24px">
+      <Stack direction="column" justifyContent="center" gap="16px">
         {governanceStatus.status !== null
           ? optionsList.map((option, index) => {
               return (
@@ -207,11 +244,32 @@ export const GovernanceStatusSelection = () => {
                   onClick={option.onClick}
                   pending={option.pending}
                   loading={option.loading}
+                  isVisible={option.isVisible}
+                  extraInfo={option.extraInfo}
                 />
               );
             })
           : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} />)}
-      </Box>
+      </Stack>
+      <Stack direction="row" gap="16px" mt="16px">
+        {governanceStatus.status !== null
+          ? bottomList.map((option, index) => {
+              return (
+                <GovernanceVoteingCard
+                  key={index}
+                  title={option.title}
+                  description={option.description}
+                  selected={option.selected}
+                  onClick={option.onClick}
+                  pending={option.pending}
+                  loading={option.loading}
+                  smallCard={true}
+                  isVisible={option.isVisible}
+                />
+              );
+            })
+          : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} smallCard />)}
+      </Stack>
 
       <Stack gap="17px" mt="42px">
         {error && <Alert severity="error"> {error}</Alert>}
@@ -219,11 +277,6 @@ export const GovernanceStatusSelection = () => {
           <Typography variant="body2" align="center" color="ds.text_gray_medium" gutterBottom>
             {strings.drepId} {governanceStatus.drep}
           </Typography>
-        )}
-        {governanceStatus.status === 'none' && (
-          <Link href={BECOME_DREP_LINK} target="_blank" rel="noopener" lineHeight="22px">
-            {strings.becomeADrep}
-          </Link>
         )}
         <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
           {strings.learnMore}

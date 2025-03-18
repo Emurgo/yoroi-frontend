@@ -194,6 +194,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
           <Typography variant="h2" as="p" fontSize="18px" sx={{ fontWeight: 500, color: 'ds.text_gray_medium' }}>
             {intl.formatMessage(globalMessages.transactions)}
           </Typography>
+
           {!isLoadingTransactions && (
             <Button
               variant="tertiary"

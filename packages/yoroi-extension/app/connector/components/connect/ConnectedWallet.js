@@ -10,6 +10,7 @@ import type { WalletState } from '../../../../chrome/extension/background/types'
 type Props = {|
   +publicDeriver: WalletState,
   +walletBalance?: Node,
+  +disabledForReason?: ?string,
 |};
 
 function constructPlate(
@@ -35,7 +36,7 @@ export default class WalletCard extends Component<Props> {
   };
 
   render(): Node {
-    const { publicDeriver, walletBalance } = this.props;
+    const { publicDeriver, walletBalance, disabledForReason } = this.props;
     // eslint-disable-next-line no-unused-vars
     const [_, iconComponent] = publicDeriver.plate
       ? constructPlate(publicDeriver.plate, 0, styles.icon)
@@ -44,25 +45,28 @@ export default class WalletCard extends Component<Props> {
     const checksum = this.props.publicDeriver.plate?.TextPart;
 
     return (
-      <Box className={styles.card}>
-        <div className={styles.wrapper}>
-          <div className={styles.avatar}>{iconComponent}</div>
-          <div className={styles.nameWrapper}>
-            <Typography
-              component="div"
-              color="#242838"
-              fontWeight="500"
-              variant="b1"
-              fontSize={16}
-              id="connectedWalletName"
-            >
-              {this.props.publicDeriver.name}
-            </Typography>
-            <div className={styles.checksum} id="connectedWalletPlate">{checksum}</div>
+      <>
+        <Box className={styles.card}>
+          <div className={styles.wrapper}>
+            <div className={styles.avatar}>{iconComponent}</div>
+            <div className={styles.nameWrapper}>
+              <Typography
+                component="div"
+                color="#242838"
+                fontWeight="500"
+                variant="b1"
+                fontSize={16}
+                id="connectedWalletName"
+              >
+                {this.props.publicDeriver.name}
+              </Typography>
+              <div className={styles.checksum} id="connectedWalletPlate">{checksum}</div>
+            </div>
+            {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
           </div>
-          {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
-        </div>
-      </Box>
+        </Box>
+        {disabledForReason && (<div className={styles.disabledReason}>{disabledForReason}</div>)}
+      </>
     );
   }
 }

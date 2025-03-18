@@ -153,6 +153,7 @@ export const restartServiceWorker = async (webdriver, logger) => {
 
   await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);
   await basepage.refreshPage();
+  await basepage.goToExtensionTransactions();
   logger.info(`--------------------- restartServiceWorker END ---------------------`);
 };
 

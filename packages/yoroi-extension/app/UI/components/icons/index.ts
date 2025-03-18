@@ -3,20 +3,22 @@ import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
+import { CloseCircleIcon } from './CloseCircleIcon';
 import { CloseIcon } from './CloseIcon';
 import { Copied } from './Copied';
 import { Copy } from './Copy';
 import { Expand } from './Expand';
+import { Receive } from './Receive';
 import { Search } from './Search';
 import { Send } from './Send';
 import { Staking } from './Staking';
 import { Switch } from './Switch';
 import { VisibilityOff } from './VisibilityOff';
 import { VisibilityOn } from './VisibilityOn';
-import { Receive } from './Receive';
 
 export const Icon = {
   CloseIcon,
+  CloseCircleIcon,
   VisibilityOn,
   VisibilityOff,
   Copy,
@@ -31,5 +33,5 @@ export const Icon = {
   ChevronUp,
   Search,
   Switch,
-  Receive
+  Receive,
 };

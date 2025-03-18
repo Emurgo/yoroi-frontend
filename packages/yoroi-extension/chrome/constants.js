@@ -46,6 +46,10 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
 
+  // Bringweb3
+  frameSrc.push('https://*.bringweb3.io/')
+  connectSrc.push('https://*.bringweb3.io')
+
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [
