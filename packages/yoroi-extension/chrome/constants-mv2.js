@@ -49,11 +49,6 @@ export function genCSP(request: {|
   frameSrc.push('https://emurgo.github.io/yoroi-extension-ledger-bridge');
   frameSrc.push('https://emurgo.github.io/');
 
-  // Bringweb3
-  frameSrc.push('http://localhost:5173/')
-  frameSrc.push('https://*.bringweb3.io/')
-  connectSrc.push('https://*.bringweb3.io')
-
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com/');
@@ -76,6 +71,8 @@ export function genCSP(request: {|
   frameSrc.push('http://localhost:5173/')
   frameSrc.push('https://*.bringweb3.io/')
   connectSrc.push('https://*.bringweb3.io')
+  // cashback domain whitelist
+  connectSrc.push('https://raw.githubusercontent.com');
 
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
