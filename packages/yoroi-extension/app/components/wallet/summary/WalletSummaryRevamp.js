@@ -21,7 +21,9 @@ import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
-
+import { BringBanner } from '../../../UI/components/Banners';
+import { ROUTES } from '../../../routes-config';
+import LocalStorageApi from '../../../api/localStorage';
 const messages = defineMessages({
   transactionType: {
     id: 'wallet.summary.page.type',
@@ -51,12 +53,31 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
+  +goToRoute: ({| route: string, params?: Object |}) => void,
+  +walletAmount: MultiToken,
 |};
 
+type State = {
+  isBannerVisible: boolean,
+};
+
+const localStorage = new LocalStorageApi();
+
 @observer
-export default class WalletSummaryRevamp extends Component<Props> {
+export default class WalletSummaryRevamp extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
+  };
+
+  state: State = {
+    isBannerVisible: false,
+  };
+
+  componentWillMount = async () => {
+    const wasClosed = await localStorage.getBringBannerClosed();
+    if (!wasClosed) {
+      this.setState({ isBannerVisible: true });
+    }
   };
 
   renderAmountDisplay: ({|
@@ -86,6 +107,19 @@ export default class WalletSummaryRevamp extends Component<Props> {
         {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
       </>
     );
+  };
+
+  getWalletBalance: ({|
+    shouldHideBalance: boolean,
+    amount: MultiToken,
+  |}) => Node = request => {
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const [beforeDecimal] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
+
+    return beforeDecimal;
   };
 
   renderPendingAmount(timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>, label: string): Node {
@@ -160,6 +194,28 @@ export default class WalletSummaryRevamp extends Component<Props> {
     );
   }
 
+  renderBringBanner(): Node {
+    const { goToRoute, walletAmount } = this.props;
+    const { isBannerVisible } = this.state;
+
+    const balance = this.getWalletBalance({
+      shouldHideBalance: this.props.shouldHideBalance,
+      amount: walletAmount,
+    });
+
+    if (!isBannerVisible || Number(balance) < 1) return null;
+
+    return (
+      <BringBanner
+        onClose={() => {
+          this.setState({ isBannerVisible: false });
+          localStorage.setBringBannerClosed('true');
+        }}
+        onClick={() => goToRoute({ route: ROUTES.CASHBACK.ROOT })}
+      />
+    );
+  }
+
   render(): Node {
     const {
       pendingAmount,
@@ -222,6 +278,7 @@ export default class WalletSummaryRevamp extends Component<Props> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
+        {this.renderBringBanner()}
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
           <Grid

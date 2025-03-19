@@ -89,9 +89,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             lastSyncBlock={selected.lastSyncInfo.Height}
             memoMap={stores.memos.txMemoMap.get(walletId) || new Map()}
             selectedExplorer={
-              stores.explorers.selectedExplorer.get(
-                selected.networkId
-              ) ??
+              stores.explorers.selectedExplorer.get(selected.networkId) ??
               (() => {
                 throw new Error('No explorer for wallet network');
               })()
@@ -130,9 +128,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
-            addressToDisplayString={addr =>
-              addressToDisplayString(addr, getNetworkById(selected.networkId))
-            }
+            addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
             complexityLevel={stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
@@ -191,6 +187,8 @@ export default class WalletSummaryPage extends Component<StoresProps> {
               isTestnet={selected.isTestnet}
             />
           }
+          walletAmount={selected.balance}
+          goToRoute={stores.app.goToRoute}
         />
 
         {walletTransactions}
@@ -296,9 +294,8 @@ export default class WalletSummaryPage extends Component<StoresProps> {
     stores.uiDialogs.push({ dialog: DeleteMemoDialog });
   };
 
-  readyToExportHistory: (number) => boolean = publicDeriverId => {
+  readyToExportHistory: number => boolean = publicDeriverId => {
     const delegation = this.props.stores.delegation;
-    return !delegation.isRewardWallet(publicDeriverId)
-      || delegation.hasRewardHistory(publicDeriverId);
+    return !delegation.isRewardWallet(publicDeriverId) || delegation.hasRewardHistory(publicDeriverId);
   };
 }
