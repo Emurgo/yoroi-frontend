@@ -165,6 +165,8 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       }
     };
 
+    const isDevOrNightly = environment.isDev() || environment.isNightly();
+
     return (
       <Box
         sx={{
@@ -212,13 +214,15 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           )}
         </Box>
 
-        <Button
-          onClick={this.props.onSwitchNetwork}
-          variant="secondary"
-          style={{ width: '200px' }}
-        >
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
+        {isDevOrNightly ? (
+          <Button
+            onClick={this.props.onSwitchNetwork}
+            variant="secondary"
+            style={{ width: '200px' }}
+          >
+            {intl.formatMessage(messages.switchNetwork)}
+          </Button>
+        ) : null}
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>
