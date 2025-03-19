@@ -134,6 +134,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
               borderRadius: '16px',
               paddingLeft: '8px',
               paddingRight: '8px',
+              cursor: 'pointer',
             }}
             onClick={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
           >
