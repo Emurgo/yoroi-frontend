@@ -21,9 +21,11 @@ import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
+// $FlowIgnore: supressing this error
 import { BringBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
+
 const messages = defineMessages({
   transactionType: {
     id: 'wallet.summary.page.type',
@@ -53,13 +55,13 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
-  +goToRoute: ({| route: string, params?: Object |}) => void,
+  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
   +walletAmount: MultiToken,
 |};
 
-type State = {
+type State = {|
   isBannerVisible: boolean,
-};
+|};
 
 const localStorage = new LocalStorageApi();
 
@@ -73,7 +75,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     isBannerVisible: false,
   };
 
-  componentWillMount = async () => {
+  UNSAFE_componentWillMount: void => Promise<void> = async () => {
     const wasClosed = await localStorage.getBringBannerClosed();
     if (!wasClosed) {
       this.setState({ isBannerVisible: true });
