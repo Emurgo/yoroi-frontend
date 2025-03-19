@@ -106,7 +106,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
 
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
-      {!governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance && (
+      {!governanceInfo.isDelegatingToYoroiDrep && (
         <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
           <IconWrapper onClick={dismissBanner}>
             <Icon.CloseCircleIcon />
