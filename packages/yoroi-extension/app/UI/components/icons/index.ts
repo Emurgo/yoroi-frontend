@@ -15,6 +15,7 @@ import { Staking } from './Staking';
 import { Switch } from './Switch';
 import { VisibilityOff } from './VisibilityOff';
 import { VisibilityOn } from './VisibilityOn';
+import { Info } from './Info';
 
 export const Icon = {
   CloseIcon,
@@ -28,6 +29,7 @@ export const Icon = {
   Send,
   Cancel,
   Staking,
+  Info,
   Expand,
   ChevronDown,
   ChevronUp,

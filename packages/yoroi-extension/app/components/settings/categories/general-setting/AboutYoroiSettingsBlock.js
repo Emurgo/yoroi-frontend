@@ -1,8 +1,7 @@
 // @flow
 import type { Node } from 'react';
-import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { useEffect, useCallback } from 'react';
+import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 import { observer } from 'mobx-react';
 
@@ -18,7 +17,11 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Button, Link, Typography } from '@mui/material';
+import { Box, Button, IconButton, Link, Typography, styled } from '@mui/material';
+import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
+import { Icon } from '../../../../UI/components';
+import { useModal } from '../../../../UI/components/modals/ModalContext';
+import LocalStorageApi from '../../../../api/localStorage';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -81,6 +84,11 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.switchNetwork',
     defaultMessage: '!!!SWITCH NETWORK',
   },
+
+  modalTitle: {
+    id: 'settings.general.testnetModal.title',
+    defaultMessage: '!!!What are the test networks?',
+  },
 });
 
 const basePageComponentPath = 'settings:general';
@@ -133,105 +141,146 @@ const socialMediaLinks = [
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
-type Props = {|
-  wallet: null | { isTestnet: boolean, ... },
-  onSwitchNetwork: () => void,
-|};
 
-@observer
-export default class AboutYoroiSettingsBlock extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
 
-  render(): Node {
-    const { intl } = this.context;
-    const { wallet } = this.props;
-    const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
+  const { openModal, closeModal } = useModal()
+  const localStorageApi = new LocalStorageApi();
 
-    return (
-      <Box
-        sx={{
-          pb: '20px',
-          mt: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
-          {intl.formatMessage(messages.aboutYoroiLabel)}
-        </Typography>
+  useEffect(() => {
+    const getModalInfo = async () => {
+      localStorageApi.unsetTestnetModalInfo()
+      const lsModalInfoStr = await localStorageApi.getTestnetModalInfo();
+      const selectedWalletId = wallet.publicDeriverId;
+      const lsModalInfoSettings = JSON.parse(lsModalInfoStr || '{}');
+      const modalSettings = lsModalInfoSettings[selectedWalletId];
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {network && (
-            <LabelWithValue
-              label={intl.formatMessage(messages.networkLabel)}
-              value={intl.formatMessage(messages[network])}
-              componentId={basePageComponentPath + '-networkInfo-text'}
-            />
-          )}
+      if (modalSettings === undefined) {
+        openModal({
+          title: intl.formatMessage(messages.modalTitle),
+          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
+          width: '648px',
+          height: '390px',
+        });
+      }
+    }
+    getModalInfo()
+  }, [])
 
+
+  const onCloseModalInfo = useCallback(async () => {
+    const selectedWalletId = wallet.publicDeriverId;
+    localStorageApi.setTestnetModalInfo(JSON.stringify({ [selectedWalletId]: true }));
+    closeModal()
+  }, [localStorageApi]);
+
+  const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+
+  return (
+    <Box
+      sx={{
+        pb: '20px',
+        mt: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
+        {intl.formatMessage(messages.aboutYoroiLabel)}
+      </Typography>
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {network && (
           <LabelWithValue
-            label={intl.formatMessage(messages.versionLabel)}
-            value={environment.getVersion()}
-            url={baseGithubUrl + 'releases/'}
-            componentId={basePageComponentPath + '-versionInfo-text'}
+            label={intl.formatMessage(messages.networkLabel)}
+            value={intl.formatMessage(messages[network])}
+            showInfoToolTip
+            handleTooltip={() => {
+              openModal({
+                title: intl.formatMessage(messages.modalTitle),
+                content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal} />,
+                width: '648px',
+                height: '390px',
+              });
+            }}
+            componentId={basePageComponentPath + '-networkInfo-text'}
           />
+        )}
 
+        <LabelWithValue
+          label={intl.formatMessage(messages.versionLabel)}
+          value={environment.getVersion()}
+          url={baseGithubUrl + 'releases/'}
+          componentId={basePageComponentPath + '-versionInfo-text'}
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.commitLabel)}
+          value={environment.commit}
+          url={baseGithubUrl + 'commit/' + environment.commit}
+          componentId={basePageComponentPath + '-commitInfo-text'}
+        />
+
+        {!environment.isProduction() && (
           <LabelWithValue
-            label={intl.formatMessage(messages.commitLabel)}
-            value={environment.commit}
-            url={baseGithubUrl + 'commit/' + environment.commit}
-            componentId={basePageComponentPath + '-commitInfo-text'}
+            label={intl.formatMessage(messages.branchLabel)}
+            value={environment.branch}
+            url={baseGithubUrl + 'tree/' + environment.branch}
+            componentId={basePageComponentPath + '-branchInfo-text'}
           />
-
-          {!environment.isProduction() && (
-            <LabelWithValue
-              label={intl.formatMessage(messages.branchLabel)}
-              value={environment.branch}
-              url={baseGithubUrl + 'tree/' + environment.branch}
-              componentId={basePageComponentPath + '-branchInfo-text'}
-            />
-          )}
-        </Box>
-
-        <Button
-          onClick={this.props.onSwitchNetwork}
-          variant="secondary"
-          style={{ width: '200px' }}
-        >
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
-
-        <div className={styles.aboutSocial}>
-          <GridFlexContainer rowSize={socialMediaLinks.length}>
-            {socialMediaLinks.map(link => (
-              <LinkButton
-                key={link.url}
-                {...link}
-                textClassName={styles.socialMediaLinkText}
-                onExternalLinkClick={handleExternalLinkClick}
-              />
-            ))}
-          </GridFlexContainer>
-        </div>
+        )}
       </Box>
-    );
-  }
+
+      <Button
+        onClick={onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+      >
+        {intl.formatMessage(messages.switchNetwork)}
+      </Button>
+
+      <div className={styles.aboutSocial}>
+        <GridFlexContainer rowSize={socialMediaLinks.length}>
+          {socialMediaLinks.map(link => (
+            <LinkButton
+              key={link.url}
+              {...link}
+              textClassName={styles.socialMediaLinkText}
+              onExternalLinkClick={handleExternalLinkClick}
+            />
+          ))}
+        </GridFlexContainer>
+      </div>
+    </Box>
+  );
+
 }
+
+const IconWrapper = styled(Box)(({ theme }) => ({
+  cursor: 'pointer',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 function LabelWithValue({
   label,
   value,
   url,
   componentId,
+  showInfoToolTip,
+  handleTooltip,
 }: {|
   label: string,
   value: string,
   url?: string,
   componentId?: string,
-|}): Node {
+  showInfoToolTip?: boolean,
+  handleTooltip?: () => void
+    |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -241,10 +290,10 @@ function LabelWithValue({
         component="div"
         {...(url
           ? {
-              as: Link,
-              href: url,
-              target: '_blank',
-            }
+            as: Link,
+            href: url,
+            target: '_blank',
+          }
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
@@ -253,6 +302,11 @@ function LabelWithValue({
       >
         {value}
       </Typography>
+      {showInfoToolTip &&
+        <IconWrapper onClick={handleTooltip}>
+          <Icon.Info />
+        </IconWrapper>
+      }
     </Box>
   );
 }
@@ -260,3 +314,4 @@ function LabelWithValue({
 LabelWithValue.defaultProps = {
   url: undefined,
 };
+
