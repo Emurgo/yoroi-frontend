@@ -1,4 +1,3 @@
-import type { Node } from 'react';
 import { useEffect, useCallback } from 'react';
 import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
