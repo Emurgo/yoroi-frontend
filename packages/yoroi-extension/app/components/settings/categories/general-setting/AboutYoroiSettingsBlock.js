@@ -157,11 +157,11 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       const networkId = wallet && wallet.networkId;
       switch (networkId) {
         case networks.CardanoPreprodTestnet.NetworkId:
-          return intl.formatMessage(messages['preprod'])
+          return intl.formatMessage(messages.preprod)
         case networks.CardanoPreviewTestnet.NetworkId:
-          return intl.formatMessage(messages['preview'])
+          return intl.formatMessage(messages.preview)
         default:
-          return intl.formatMessage(messages['mainnet'])
+          return intl.formatMessage(messages.mainnet)
       }
     };
 
