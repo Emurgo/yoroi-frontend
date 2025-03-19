@@ -19,6 +19,7 @@ import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { Box, Button, Link, Typography } from '@mui/material';
+import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -63,11 +64,15 @@ const messages = defineMessages({
   },
   mainnet: {
     id: 'settings.general.aboutYoroi.network.mainnet',
-    defaultMessage: '!!!Mainnet Network',
+    defaultMessage: '!!!Mainnet',
   },
-  testnet: {
-    id: 'settings.general.aboutYoroi.network.testnet',
-    defaultMessage: '!!!Testnet Network',
+  preprod: {
+    id: 'settings.general.aboutYoroi.network.preprod',
+    defaultMessage: '!!!Preprod',
+  },
+  preview: {
+    id: 'settings.general.aboutYoroi.network.preview',
+    defaultMessage: '!!!Preview',
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
@@ -134,7 +139,7 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | { isTestnet: boolean, ... },
+  wallet: null | { isTestnet: boolean, networkId: number, ... },
   onSwitchNetwork: () => void,
 |};
 
@@ -148,6 +153,17 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
     const { intl } = this.context;
     const { wallet } = this.props;
     const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+    const getNetworkValue = () => {
+      const networkId = wallet && wallet.networkId;
+      switch (networkId) {
+        case networks.CardanoPreprodTestnet.NetworkId:
+          return intl.formatMessage(messages['preprod'])
+        case networks.CardanoPreviewTestnet.NetworkId:
+          return intl.formatMessage(messages['preview'])
+        default:
+          return intl.formatMessage(messages['mainnet'])
+      }
+    };
 
     return (
       <Box
@@ -167,7 +183,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           {network && (
             <LabelWithValue
               label={intl.formatMessage(messages.networkLabel)}
-              value={intl.formatMessage(messages[network])}
+              value={getNetworkValue()}
               componentId={basePageComponentPath + '-networkInfo-text'}
             />
           )}
