@@ -1,9 +1,7 @@
-// @flow
 import type { Node } from 'react';
 import { useEffect, useCallback } from 'react';
 import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
-import { observer } from 'mobx-react';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
 import { ReactComponent as githubSvg } from '../../../../assets/images/social/github.inline.svg';
@@ -18,8 +16,11 @@ import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { Box, Button, IconButton, Link, Typography, styled } from '@mui/material';
+// $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
+// $FlowIgnore: suppressing this error
 import { Icon } from '../../../../UI/components';
+// $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 
@@ -257,7 +258,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
 
 }
 
-const IconWrapper = styled(Box)(({ theme }) => ({
+const IconWrapper = styled(IconButton)(({ theme }) => ({
   cursor: 'pointer',
   '& svg': {
     '& path': {
@@ -266,21 +267,14 @@ const IconWrapper = styled(Box)(({ theme }) => ({
   },
 }));
 
-function LabelWithValue({
+const LabelWithValue = ({
   label,
   value,
   url,
   componentId,
   showInfoToolTip,
   handleTooltip,
-}: {|
-  label: string,
-  value: string,
-  url?: string,
-  componentId?: string,
-  showInfoToolTip?: boolean,
-  handleTooltip?: () => void
-    |}): Node {
+}) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -302,16 +296,13 @@ function LabelWithValue({
       >
         {value}
       </Typography>
-      {showInfoToolTip &&
+      {
+        showInfoToolTip &&
         <IconWrapper onClick={handleTooltip}>
           <Icon.Info />
         </IconWrapper>
       }
-    </Box>
+    </Box >
   );
 }
-
-LabelWithValue.defaultProps = {
-  url: undefined,
-};
 
