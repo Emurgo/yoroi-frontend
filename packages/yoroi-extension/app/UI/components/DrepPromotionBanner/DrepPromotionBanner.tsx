@@ -65,6 +65,11 @@ const useDrepBannerVisibility = (balance: BigNumber, selectedWalletId: number) =
 
 export const DrepPromotionBanner = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
+
+  if (selectedWallet.isTestnet) {
+    return null;
+  }
+
   const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
     selectedWallet,
   ]);
@@ -101,13 +106,11 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
 
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
-      {!governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance && (
-        <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
-          <IconWrapper onClick={dismissBanner}>
-            <Icon.CloseCircleIcon />
-          </IconWrapper>
-        </Stack>
-      )}
+      <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
+        <IconWrapper onClick={dismissBanner}>
+          <Icon.CloseCircleIcon />
+        </IconWrapper>
+      </Stack>
 
       <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
