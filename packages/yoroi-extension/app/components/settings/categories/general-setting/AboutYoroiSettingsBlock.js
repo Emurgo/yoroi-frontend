@@ -67,11 +67,15 @@ const messages = defineMessages({
   },
   mainnet: {
     id: 'settings.general.aboutYoroi.network.mainnet',
-    defaultMessage: '!!!Mainnet Network',
+    defaultMessage: '!!!Mainnet',
   },
-  testnet: {
-    id: 'settings.general.aboutYoroi.network.testnet',
-    defaultMessage: '!!!Testnet Network',
+  preprod: {
+    id: 'settings.general.aboutYoroi.network.preprod',
+    defaultMessage: '!!!Preprod',
+  },
+  preview: {
+    id: 'settings.general.aboutYoroi.network.preview',
+    defaultMessage: '!!!Preview',
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
@@ -144,9 +148,24 @@ const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 
 
+
 export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
   const { openModal, closeModal } = useModal()
   const localStorageApi = new LocalStorageApi();
+  const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+  const getNetworkValue = () => {
+    const networkId = wallet && wallet.networkId;
+    switch (networkId) {
+      case networks.CardanoPreprodTestnet.NetworkId:
+        return intl.formatMessage(messages.preprod)
+      case networks.CardanoPreviewTestnet.NetworkId:
+        return intl.formatMessage(messages.preview)
+      default:
+        return intl.formatMessage(messages.mainnet)
+    }
+  };
+
+  const isDevOrNightly = environment.isDev() || environment.isNightly();
 
   useEffect(() => {
     const getModalInfo = async () => {
@@ -178,7 +197,6 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
     closeModal()
   }, [localStorageApi]);
 
-  const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
 
   return (
     <Box
@@ -198,7 +216,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         {network && (
           <LabelWithValue
             label={intl.formatMessage(messages.networkLabel)}
-            value={intl.formatMessage(messages[network])}
+            value={getNetworkValue()}
             showInfoToolTip
             handleTooltip={() => {
               openModal({
@@ -236,13 +254,14 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         )}
       </Box>
 
-      <Button
+      {isDevOrNightly && <Button
         onClick={onSwitchNetwork}
         variant="secondary"
         style={{ width: '200px' }}
       >
         {intl.formatMessage(messages.switchNetwork)}
-      </Button>
+      </Button>}
+
 
       <div className={styles.aboutSocial}>
         <GridFlexContainer rowSize={socialMediaLinks.length}>
