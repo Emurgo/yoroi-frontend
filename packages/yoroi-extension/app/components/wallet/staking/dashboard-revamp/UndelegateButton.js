@@ -63,24 +63,24 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
       startLoadingTxReview();
       if (isHardwareWallet) {
         if (walletType === 'trezor') {
-          const response = await stores.substores.ada.trezorSend.sendUsingTrezor({
+          await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
-          if (response === 'error') {
-            showTxResultModal(TransactionResult.FAIL);
-            return;
-          }
+
         }
         if (walletType === 'ledger') {
-          const response = await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
+          await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
-          if (response === 'error') {
-            showTxResultModal(TransactionResult.FAIL);
-            return;
-          }
+
         }
       } else {
         await stores.substores.ada.mnemonicSend.sendMoney({

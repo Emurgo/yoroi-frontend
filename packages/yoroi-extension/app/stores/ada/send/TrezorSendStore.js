@@ -86,7 +86,6 @@ export default class TrezorSendStore extends Store<StoresMap> {
     stores.wallets.sendMoneyRequest.reset();
     if (request.onSuccess) {
       request.onSuccess();
-      request.onSuccess()
     } else {
       stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
@@ -95,7 +94,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
     Logger.info('SUCCESS: ADA sent using Trezor SignTx');
   } catch (e) {
     this._setError(e);
-    return "error"
+    request.onFail();
   } finally {
     this._setActionProcessing(false);
   }

@@ -132,7 +132,7 @@ sendUsingLedgerWallet: {|
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
   } catch (e) {
     this._setError(e);
-    return "error"
+    request.onFail();
   } finally {
     this._setActionProcessing(false);
   }

@@ -3,7 +3,7 @@ import { TransactionResult } from '../../../UI/features/transaction-review/commo
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType, closeTxReviewModal } = useTxReviewModal();
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -26,25 +26,33 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
       if (isHardwareWallet) {
         if (walletType === 'ledger') {
           const ledgerSendStore = stores.substores.ada.ledgerSend;
-          ledgerSendStore.sendUsingLedgerWallet({
+          await ledgerSendStore.sendUsingLedgerWallet({
             params: { signRequest: signTxRequest },
             onSuccess: () => {
               onSuccess();
               showTxResultModal(TransactionResult.SUCCESS);
             },
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
             wallet: selectedWallet,
           });
+
         }
         if (walletType === 'trezor') {
           const trezorSendStore = stores.substores.ada.trezorSend;
-          trezorSendStore.sendUsingTrezor({
+          await trezorSendStore.sendUsingTrezor({
             params: { signRequest: signTxRequest },
             onSuccess: () => {
               onSuccess();
               showTxResultModal(TransactionResult.SUCCESS);
             },
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
             wallet: selectedWallet,
           });
+
         }
       } else {
         await stores.substores.ada.mnemonicSend.sendMoney({
@@ -55,10 +63,11 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
             onSuccess();
             showTxResultModal(TransactionResult.SUCCESS);
           },
+
         });
       }
     } catch (error) {
-      console.log('1111111 SENDDDDDDerror', error);
+      console.log('Send Sign Error', error);
       showTxResultModal(TransactionResult.FAIL);
     }
   };
