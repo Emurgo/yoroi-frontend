@@ -77,7 +77,7 @@ const WalletStats = () => {
       </Stack>
       <Stack direction="row" justifyContent="space-between" mt="2px">
         <Typography color="ds.white_static">
-          {totalAmount} {primaryTokenInfo.name}
+          {totalAmount} {currency || DEFAULT_FIAT_PAIR}
         </Typography>
         <Stack direction="row" gap="4px">
           <PriceChangeChip value={Number(changePercent)} />
@@ -117,7 +117,7 @@ const WalletAssetsSection = ({ data, label }) => {
         {label}
       </Typography>
       <Stack direction="column" justifyContent="space-between" gap="8px">
-        <Typography variant="h3">{data.length}</Typography>
+        <Typography variant="h3">{data.length > 0 ? data.length : '-'}</Typography>
         <AssetCarousel data={data} />
       </Stack>
     </Stack>
