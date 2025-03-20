@@ -170,8 +170,11 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
 
 
   const onCloseModalInfo = useCallback(async () => {
+    const lsModalInfoStr = await localStorageApi.getTestnetModalInfo();
     const selectedWalletId = wallet.publicDeriverId;
-    localStorageApi.setTestnetModalInfo(JSON.stringify({ [selectedWalletId]: true }));
+    const modalSettings = JSON.parse(lsModalInfoStr || '{}');
+
+    localStorageApi.setTestnetModalInfo(JSON.stringify(Object.assign(modalSettings, { [selectedWalletId]: true })));
     closeModal()
   }, [localStorageApi]);
 
