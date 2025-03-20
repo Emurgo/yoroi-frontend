@@ -22,6 +22,7 @@ import { Icon } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
+import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -155,7 +156,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
       const lsModalInfoSettings = JSON.parse(lsModalInfoStr || '{}');
       const modalSettings = lsModalInfoSettings[selectedWalletId];
 
-      if (modalSettings === undefined && networkId === 0) {
+      if (modalSettings === undefined && networkId === networks.CardanoMainnet.NetworkId) {
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
