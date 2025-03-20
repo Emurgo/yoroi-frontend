@@ -25,6 +25,7 @@ import FullscreenLayout from '../../layout/FullscreenLayout';
 import { BringBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   transactionType: {
@@ -56,7 +57,7 @@ type Props = {|
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
   +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
-  +walletAmount: MultiToken,
+  +selectedWallet: WalletState,
 |};
 
 type State = {|
@@ -197,15 +198,10 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
   }
 
   renderBringBanner(): Node {
-    const { goToRoute, walletAmount } = this.props;
+    const { goToRoute, selectedWallet } = this.props;
     const { isBannerVisible } = this.state;
 
-    const balance = this.getWalletBalance({
-      shouldHideBalance: this.props.shouldHideBalance,
-      amount: walletAmount,
-    });
-
-    if (!isBannerVisible || Number(balance) < 1) return null;
+    if (selectedWallet.isTestnet || !isBannerVisible) return null;
 
     return (
       <BringBanner
@@ -280,7 +276,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        {this.renderBringBanner()}
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>{this.renderBringBanner()}</Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
           <Grid

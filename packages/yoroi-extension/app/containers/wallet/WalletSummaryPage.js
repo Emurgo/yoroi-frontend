@@ -187,7 +187,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
               isTestnet={selected.isTestnet}
             />
           }
-          walletAmount={selected.balance}
+          selectedWallet={selected}
           goToRoute={stores.app.goToRoute}
         />
 
