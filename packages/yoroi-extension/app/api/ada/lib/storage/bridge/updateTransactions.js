@@ -2624,32 +2624,36 @@ async function certificateToDb(
     const cert = request.certificates[i];
     switch (cert.kind) {
       case ShelleyCertificateTypes.StakeRegistration: {
-        const [addressHex, certificateHex] = RustModule.WasmScope(Module => {
-          const stakeCredentials = Module.WalletV4.RewardAddress.from_address(
-            Module.WalletV4.Address.from_bytes(hexToBytes(cert.rewardAddress))
-          )?.payment_cred();
-          if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-          return [
-            bytesToHex(Module.WalletV4.RewardAddress
-              .new(request.network, stakeCredentials).to_address().to_bytes()),
-            bytesToHex(Module.WalletV4.StakeRegistration
-              .new(stakeCredentials).to_bytes()),
-          ];
-        });
-        const addressId = await addressToId(addressHex);
-        result.push((txId: number) => ({
-          certificate: {
-            Ordinal: cert.certIndex,
-            Kind: RustModule.WalletV4.CertificateKind.StakeRegistration,
-            Payload: certificateHex,
-            TransactionId: txId,
-          },
-          relatedAddresses: (certId: number) => [{
-            CertificateId: certId,
-            AddressId: addressId,
-            Relation: CertificateRelation.SIGNER,
-          }]
-        }));
+        try {
+          const [addressHex, certificateHex] = RustModule.WasmScope(Module => {
+            const stakeCredentials = Module.WalletV4.RewardAddress.from_address(
+              Module.WalletV4.Address.from_bytes(hexToBytes(cert.rewardAddress))
+            )?.payment_cred();
+            if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
+            return [
+              bytesToHex(Module.WalletV4.RewardAddress
+                .new(request.network, stakeCredentials).to_address().to_bytes()),
+              bytesToHex(Module.WalletV4.StakeRegistration
+                .new(stakeCredentials).to_bytes()),
+            ];
+          });
+          const addressId = await addressToId(addressHex);
+          result.push((txId: number) => ({
+            certificate: {
+              Ordinal: cert.certIndex,
+              Kind: RustModule.WalletV4.CertificateKind.StakeRegistration,
+              Payload: certificateHex,
+              TransactionId: txId,
+            },
+            relatedAddresses: (certId: number) => [{
+              CertificateId: certId,
+              AddressId: addressId,
+              Relation: CertificateRelation.SIGNER,
+            }]
+          }));
+        } catch (e) {
+          console.warn('Failed to process certificate:', cert, e);
+        }
         break;
       }
       case ShelleyCertificateTypes.StakeDeregistration: {
