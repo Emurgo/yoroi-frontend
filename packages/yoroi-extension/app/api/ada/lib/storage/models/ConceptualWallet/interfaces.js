@@ -75,13 +75,15 @@ export type IDerivePublicFromPrivateRequest = {|
   publicDeriverMeta: {|
     name: string,
   |},
-  decryptPrivateDeriverPassword: null | string,
-  /**
-   * void -> do not store key
-   * null -> store as unencrypted
-   * string  -> store and encrypt
-   */
-  encryptPublicDeriverPassword?: null | string,
+  decryptPrivateDeriver: {|
+    preDerived: false,
+    password: null | string
+  |} | {|
+    preDerived: true,
+    result: {|
+      pubKeyHex: string,
+    |},
+  |},
   initialDerivations: TreeInsert<any>,
   path: Array<{|
     index: number,

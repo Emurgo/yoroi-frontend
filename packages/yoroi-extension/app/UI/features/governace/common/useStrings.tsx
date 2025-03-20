@@ -1,6 +1,7 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from '../../../context/IntlProvider';
+import globalMessages from '../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -44,6 +45,10 @@ export const messages = Object.freeze(
     delegateToDRep: {
       id: 'governance.delegateToDRep',
       defaultMessage: '!!!Delegate to a DRep',
+    },
+    delegateToYoroiDRep: {
+      id: 'governance.delegateToYoroiDRep',
+      defaultMessage: '!!!Delegate to Yoroi DRep',
     },
     delegatingToDRep: {
       id: 'governance.delegatingToDRep',
@@ -149,6 +154,7 @@ export const useStrings = () => {
 
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),
+    delegateToYoroiDRep: intl.formatMessage(messages.delegateToYoroiDRep),
     delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),
@@ -181,5 +187,6 @@ export const useStrings = () => {
     theTransactionCanTake: intl.formatMessage(messages.theTransactionCanTake),
     participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
     goToGovernance: intl.formatMessage(messages.goToGovernance),
+    goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
   }).current;
 };

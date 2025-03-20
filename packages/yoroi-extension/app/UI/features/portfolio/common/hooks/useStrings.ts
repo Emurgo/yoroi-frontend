@@ -406,5 +406,8 @@ export const useStrings = () => {
     transactionId: intl.formatMessage(messages.transactionId),
     welcomeBannerTitle: intl.formatMessage(messages.welcomeBannerTitle),
     welcomeBannerDesc: intl.formatMessage(messages.welcomeBannerDesc),
+    welcomeMessageTestnet: intl.formatMessage(globalMessages.welcomeMessageTestnet),
+    welcomeMessageSubtitleTestnet: intl.formatMessage(globalMessages.welcomeMessageSubtitleTestnet),
+    goToFaucetButton: intl.formatMessage(globalMessages.goToFaucetButton),
   }).current;
 };

@@ -47,7 +47,7 @@ const extractAddress: (
   currencyValidator,
 ) => {
   // consider use of URLSearchParams
-  const addressRegex = new RegExp('cardano:([A-Za-z0-9]+)');
+  const addressRegex = new RegExp('cardano:([A-Za-z0-9_]+)');
   const currencyRegex = new RegExp('(cardano+):');
   const addressMatch = addressRegex.exec(uri);
   const currencyMatch = currencyRegex.exec(uri);

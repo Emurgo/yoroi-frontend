@@ -62,5 +62,8 @@
   "hint.catalystStep6": "Confirm the reward address by pressing <strong>both</strong> buttons.",
   "hint.catalystStep7": "Confirm the nonce by pressing <strong>both</strong> buttons.",
   "hint.catalystStep8": "Confirm voting key registration by pressing the <strong>right</strong> button.",
-  "hint.catalystStep9": "Confirm the auxilliary data hash by pressing <strong>both</strong> buttons."
+  "hint.catalystStep9": "Confirm the auxilliary data hash by pressing <strong>both</strong> buttons.",
+  "sign.data.confirm": "Confirm on your hardware wallet",
+  "sign.data.instruction1": "Take your hardware wallet device and follow the instructions there.",
+  "sign.data.instruction2": "Make sure you confirm a trusted action."
 }

@@ -3,11 +3,10 @@ import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 import { DRIVERS_AMOUNT } from '../helpers/constants.js';
 
 export const mochaHooks = {
-  beforeAll(done) {
+  async beforeAll() {
     this.timeout(defaultWaitTimeout);
     driversPoolsManager.createPoolOfDrivers(DRIVERS_AMOUNT);
-    driversPoolsManager.prepareExtensions().then((result => done())
-    );
+    await driversPoolsManager.prepareExtensions();
   },
   async beforeEach(done) {
     // Check for nested descibe sections in case if any tests failed in a main describe

@@ -368,7 +368,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
                 mb: '2px',
               }}
             >
-              <Typography component="div" variant="caption1" color="magenta.500">
+              <Typography component="div" variant="caption1" sx={{ color: 'ds.text_error' }}>
                 {intl.formatMessage(error, error.values)}
               </Typography>
             </Box>

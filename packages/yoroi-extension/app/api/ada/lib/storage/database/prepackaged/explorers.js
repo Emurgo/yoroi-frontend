@@ -118,28 +118,10 @@ const CardanoPreviewTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
   },
 ];
 
-// <TODO:SANCHO FIX WHEN EXPLORER AVAILABLE>
-const CardanoSanchoTestnetExplorers: Array<$ReadOnly<ExplorerRow>> = [
-  {
-    ExplorerId: 6_50,
-    NetworkId: networks.CardanoSanchoTestnet.NetworkId,
-    IsBackup: true,
-    Endpoints: {
-      address: 'https://sancho.cexplorer.io/address/',
-      transaction: 'https://sancho.cexplorer.io/tx/',
-      pool: 'https://sancho.cexplorer.io/pool/',
-      stakeAddress: 'https://sancho.cexplorer.io/stake/',
-      token: 'https://sancho.cexplorer.io/asset/',
-    },
-    Name: 'Cexplorer',
-  },
-];
-
 export const prepackagedExplorers: Map<number, $ReadOnlyArray<$ReadOnly<ExplorerRow>>> = new Map([
   [networks.CardanoMainnet.NetworkId, CardanoMainnetExplorers],
   [networks.CardanoPreprodTestnet.NetworkId, CardanoPreprodTestnetExplorers],
   [networks.CardanoPreviewTestnet.NetworkId, CardanoPreviewTestnetExplorers],
-  [networks.CardanoSanchoTestnet.NetworkId, CardanoSanchoTestnetExplorers],
 ]);
 const getOrThrow = function<T> (input: ?T): T {
   if (input == null) throw new Error('No backup explorer for type');
@@ -155,8 +137,5 @@ export const prepackagedDefaultExplorers:
     )],
     [networks.CardanoPreviewTestnet.NetworkId, getOrThrow(
       CardanoPreviewTestnetExplorers.find(explorer => explorer.IsBackup)
-    )],
-    [networks.CardanoSanchoTestnet.NetworkId, getOrThrow(
-      CardanoSanchoTestnetExplorers.find(explorer => explorer.IsBackup)
     )],
   ]);

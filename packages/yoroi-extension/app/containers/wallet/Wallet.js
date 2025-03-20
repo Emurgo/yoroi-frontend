@@ -5,11 +5,8 @@ import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
-import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import SidebarContainer from '../SidebarContainer';
-import NavBarContainer from '../NavBarContainer';
 import BannerContainer from '../banners/BannerContainer';
-import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { ROUTES } from '../../routes-config';
 import { allSubcategoriesRevamp } from '../../stores/stateless/topbarCategories';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
@@ -22,6 +19,8 @@ import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDi
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 type Props = {|
   +children: Node,
@@ -33,14 +32,27 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     intl: intlShape.isRequired,
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {
       return;
     }
-    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.5.0')) {
+    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.6.0')) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
     }
+
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
+      throw new Error(`no public deriver. Should never happen`);
+    }
+    this.props.stores.delegation
+      .checkGovernanceStatus(wallet)
+      .then(() => {
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to fetch governance status', e);
+      });
   }
 
   checkRoute(): void | string {
@@ -57,9 +69,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const spendableBalance = this.props.stores.transactions.balance;
     const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-    const activeCategory = categories.find(category =>
-      this.props.stores.app.currentRoute.startsWith(category.route)
-    );
+    const activeCategory = categories.find(category => this.props.stores.app.currentRoute.startsWith(category.route));
 
     // if we're on a page that isn't applicable for the currently selected wallet
     // ex: a cardano-only page for an Ergo wallet
@@ -67,12 +77,9 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const visibilityContext = {
       selected: wallet.publicDeriverId,
       networkId: wallet.networkId,
-      walletHasAssets
+      walletHasAssets,
     };
-    if (
-      !activeCategory?.isVisible(visibilityContext) &&
-      activeCategory?.isHiddenButAllowed !== true
-    ) {
+    if (!activeCategory?.isVisible(visibilityContext) && activeCategory?.isHiddenButAllowed !== true) {
       const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
       if (firstValidCategory == null) {
         throw new Error(`Selected wallet has no valid category`);
@@ -94,25 +101,10 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     }
     const { intl } = this.context;
     const selectedWallet = stores.wallets.selectedOrFail;
-
-    if (!selectedWallet) {
-      return (
-        <TopBarLayout
-          banner={<BannerContainer stores={stores} />}
-          navbar={<NavBarContainer title="" stores={stores} />}
-          showInContainer
-        >
-          <VerticallyCenteredLayout>
-            <LoadingSpinner />
-          </VerticallyCenteredLayout>
-        </TopBarLayout>
-      );
-    }
     const warning = this.getWarning(selectedWallet.publicDeriverId);
-
-    const isInitialSyncing = stores.wallets.isInitialSyncing(selectedWallet.publicDeriverId);
+    const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
     const spendableBalance = stores.transactions.balance;
-    const walletHasAssets = !!(spendableBalance?.nonDefaultEntries().length);
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) {
@@ -123,7 +115,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
       networkId: selectedWallet.networkId,
-      walletHasAssets
+      walletHasAssets,
     };
 
     const menu = (
@@ -145,12 +137,12 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer stores={stores}/>}
+        banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)}/>}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
             menu={isInitialSyncing ? null : menu}
           />
         }
@@ -158,9 +150,10 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
       >
         {warning}
         {isInitialSyncing ? (
-          <WalletLoadingAnimation/>
+          <WalletLoadingAnimation />
         ) : (
           <>
+            <DrepPromotionBanner stores={stores} intl={intl} />
             {this.props.children}
             {this.getDialogs(intl, currentPool)}
           </>
@@ -169,7 +162,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     );
   }
 
-  getWarning: (number) => void | Node = publicDeriverId => {
+  getWarning: number => void | Node = publicDeriverId => {
     const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriverId).dialogs;
     if (warnings.length === 0) {
       return undefined;
@@ -183,7 +176,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
     const selectedWallet = stores.wallets.selected;
     const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
-
 
     if (
       stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
@@ -214,8 +206,10 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
       return (
         <RevampAnnouncementDialog
           // $FlowIgnore[incompatible-type]
+          lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
+          // $FlowIgnore[incompatible-type]
           onClose={async () => {
-            await stores.profile.setLastAnnouncedFeatureVersion('5.5.0');
+            await stores.profile.setLastAnnouncedFeatureVersion('5.6.0');
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />

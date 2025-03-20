@@ -27,7 +27,6 @@ const storageKeys = {
   COIN_PRICE_PUB_KEY_DATA: networkForLocalStorage + '-COIN-PRICE-PUB-KEY-DATA',
   EXTERNAL_STORAGE: networkForLocalStorage + '-EXTERNAL-STORAGE',
   TOGGLE_SIDEBAR: networkForLocalStorage + '-TOGGLE-SIDEBAR',
-  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SUBMITTED_TRANSACTIONS: 'submittedTransactions',
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
@@ -35,9 +34,14 @@ const storageKeys = {
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
+  BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
+  DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
+  CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
+  WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
+  SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
+
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
-  SELECTED_WALLET: 'SELECTED_WALLET',
 
   IS_ANALYTICS_ALLOWED: networkForLocalStorage + '-IS_ANALYTICS_ALLOWED',
   ACCEPTED_TOS_VERSION: networkForLocalStorage + '-ACCEPTED_TOS_VERSION',
@@ -45,6 +49,11 @@ const storageKeys = {
   // ========== LEGACY USED FOR MIGRATIONS ========== //
   CUSTOM_THEME: networkForLocalStorage + '-CUSTOM-THEME',
   THEME: networkForLocalStorage + '-THEME',
+
+  CASHBACK_WALLET_ID: 'CASHBACK_WALLET_ID',
+  SHOWN_DISCLAIMERS: 'SHOWN_DISCLAIMERS',
+  WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
+  SELECTED_WALLET: 'SELECTED_WALLET',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -54,6 +63,8 @@ export type SetCustomUserThemeRequest = {|
 export type WalletsNavigation = {|
   cardano: number[],
 |};
+
+type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 
 /**
  * This api layer provides access to the electron local storage
@@ -99,6 +110,14 @@ export default class LocalStorageApi {
 
   setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
 
+  // ========== Dred Yoroi Banner ========== //
+
+  getDrepYoroiBanerTimestamp: void => Promise<?string> = () => getLocalItem(storageKeys.DREP_YOROI_BANNER);
+
+  setDrepYoroiBanerTimestamp: string => Promise<void> = timestamp => setLocalItem(storageKeys.DREP_YOROI_BANNER, timestamp);
+
+  unsetDrepYoroiBanerTimestamp: void => Promise<void> = () => removeLocalItem(storageKeys.DREP_YOROI_BANNER);
+
   // ========== Portfolio FIAT Pair ========== //
 
   getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
@@ -106,7 +125,7 @@ export default class LocalStorageApi {
   setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
   unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
-  
+
   // ========== Notifications Setting ========== //
 
   getNotificationsSetting: void => Promise<?string> = () => getLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
@@ -138,17 +157,17 @@ export default class LocalStorageApi {
   setLastAnnouncedFeatureVersion: string => Promise<void> = version =>
     setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
 
-  // ========== Select Wallet ========== //
+  // ========== Legacy Select Wallet ========== //
 
   getSelectedWalletId: void => Promise<number | null> = async () => {
     let id = await getLocalItem(storageKeys.SELECTED_WALLET);
-    // previously it was stored in window.localStorage, which is not accessible in the mv3 service worker
     if (!id) {
-      id = window?.localStorage.getItem(storageKeys.SELECTED_WALLET);
-      if (/^\d+$/.test(id)) {
-        await this.setSelectedWalletId(Number(id));
+      id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
+      if (!/^\d+$/.test(id)) {
+        id = null;
       }
     }
+
     if (!id) {
       return null;
     }
@@ -156,26 +175,25 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  setSelectedWalletId: number => Promise<void> = async (id) => {
-    await setLocalItem(storageKeys.SELECTED_WALLET, id.toString());
+  // ========== Selected Wallet ========== //
+  getSelectedWalletPublicKey: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
+  };
+
+  setSelectedWalletPublicKey: string => Promise<void> = async publicKey => {
+    await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
   };
 
   // ========== Legacy Theme ========== //
 
   hasAnyLegacyThemeFlags: void => Promise<boolean> = async () => {
-    const [a, b] = await Promise.all([
-      getLocalItem(storageKeys.THEME),
-      getLocalItem(storageKeys.CUSTOM_THEME),
-    ]);
+    const [a, b] = await Promise.all([getLocalItem(storageKeys.THEME), getLocalItem(storageKeys.CUSTOM_THEME)]);
     return a != null || b != null;
-  }
+  };
 
   unsetLegacyThemeFlags: void => Promise<void> = async () => {
-    await Promise.all([
-      removeLocalItem(storageKeys.THEME),
-      removeLocalItem(storageKeys.CUSTOM_THEME),
-    ]);
-  }
+    await Promise.all([removeLocalItem(storageKeys.THEME), removeLocalItem(storageKeys.CUSTOM_THEME)]);
+  };
 
   // ========== Last Launch Version Number ========== //
 
@@ -229,6 +247,19 @@ export default class LocalStorageApi {
 
   unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
 
+  // ========== Expand / retract Sidebar ========== //
+
+  getBringSandbox: void => Promise<boolean> = () =>
+    getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+
+  setBringSandbox: boolean => Promise<void> = flag => {
+    return flag
+      ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
+      : this.unsetBringSandbox();
+  };
+
+  unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
+
   // ============ External storage provider ============ //
 
   getExternalStorage: void => Promise<?SelectedExternalStorageProvider> = () =>
@@ -266,7 +297,7 @@ export default class LocalStorageApi {
     return JSON.parse(unitOfAccount);
   };
 
-  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (currency) => {
+  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
     await setLocalItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
   };
 
@@ -344,7 +375,7 @@ export default class LocalStorageApi {
       key += '-firefox';
     }
     return key;
-  }
+  };
 
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
     const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
@@ -354,11 +385,65 @@ export default class LocalStorageApi {
     return JSON.parse(json);
   };
 
-  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async (flag) => {
+  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
     await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
-  }
+  };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
+  saveCashbackWalletId: (number) => Promise<void> = (id) => setLocalItem(
+    storageKeys.CASHBACK_WALLET_ID,
+    String(id)
+  );
+
+  getCashbackWalletId: () => Promise<number | null> = async () => {
+    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    if (!v) {
+      return null;
+    }
+    return Number(v);
+  }
+
+  _getShownDisclaimerObject: () => Promise<Object> = async () => {
+    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+    const val = raw ? JSON.parse(raw) : {};
+    return val;
+  }
+
+  setShownDisclaimer: (Disclaimer) => Promise<void> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    val[which] = true;
+    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+  };
+
+  isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
+    const val = await this._getShownDisclaimerObject();
+    return val[which] === true;
+  }
+
+  loadCurrentNetworkId: () => Promise<?number> = async () => {
+    const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
+    if (raw == null) {
+      return undefined;
+    }
+    return Number(raw);
+  };
+
+  saveCurrentNetworkId: number => Promise<void> = async networkId => {
+    await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+  };
+
+  loadWalletListOrder: () => Promise<Array<string>> = async () => {
+    const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
+    if (raw == null) {
+      return [];
+    }
+    return JSON.parse(raw);
+  };
+
+  saveWalletListOrder: (Array<string>) => Promise<void> = async publicKeyList => {
+    await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
+  };
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
@@ -372,6 +457,7 @@ export default class LocalStorageApi {
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
     await this.unsetPortfolioFiatPair();
+    await this.unsetBringSandbox();
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);
@@ -428,13 +514,15 @@ export async function loadSubmittedTransactions(): Promise<Array<PersistedSubmit
   if (stored == null || stored[storageKeys.SUBMITTED_TRANSACTIONS] == null) {
     return [];
   }
-  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
-    networkId,
-    publicDeriverId,
-    transaction: deserializeTransactionCtorData(transaction),
-    usedUtxos,
-    isDrepDelegation,
-  }));
+  return JSON.parse(stored[storageKeys.SUBMITTED_TRANSACTIONS]).map(
+    ({ networkId, publicDeriverId, transaction, usedUtxos, isDrepDelegation }) => ({
+      networkId,
+      publicDeriverId,
+      transaction: deserializeTransactionCtorData(transaction),
+      usedUtxos,
+      isDrepDelegation,
+    })
+  );
 }
 
 export async function loadCatalystRoundInfo(): Promise<?CatalystRoundInfoResponse> {

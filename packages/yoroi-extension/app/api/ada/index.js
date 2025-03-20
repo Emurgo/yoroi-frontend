@@ -44,9 +44,10 @@ import {
   asGetSigningKey,
   asHasLevels,
   asHasUtxoChains,
+  asGetStakingKey,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
-import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption, type IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
   Address,
   Addressing,
@@ -165,6 +166,7 @@ import TimeUtils from './lib/storage/bridge/timeUtils';
 import type { IFetcher } from './lib/state-fetch/IFetcher.types';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
+import { encryptWithPassword } from '../../utils/passwordCipher';
 
 // ADA specific Request / Response params
 
@@ -494,7 +496,6 @@ export type CreateHardwareWalletRequest = {|
   publicKey: string,
   ...Addressing,
   hwFeatures: HWFeatures,
-  checkAddressesInUse: FilterFunc,
   network: $ReadOnly<NetworkRow>,
 |};
 export type CreateHardwareWalletResponse = {|
@@ -1808,6 +1809,86 @@ export default class AdaApi {
     }
   }
 
+  async cloneWallet(
+    db: lf$Database,
+    publicDeriver: PublicDeriver<>,
+    network: $ReadOnly<NetworkRow>,
+  ): Promise<PublicDeriver<>> {
+    const withPublicKey = asGetPublicKey(publicDeriver);
+    if (!withPublicKey) {
+      throw new Error('unable to get public key');
+    }
+    const publicKey = await withPublicKey.getPublicKey();
+    const accountPublicKey = RustModule.WalletV4.Bip32PublicKey.from_hex(publicKey.Hash);
+
+    const conceptualWallet = publicDeriver.getParent();
+    const walletName = (await conceptualWallet.getFullConceptualWalletInfo()).Name;
+
+    let wallet;
+    if (conceptualWallet.getWalletType() === WalletTypeOption.HARDWARE_WALLET) {
+      const withStakingKey = asGetStakingKey(publicDeriver);
+      if (!withStakingKey) {
+        throw new Error('unable to get staking key');
+      }
+      const stakingKey = await withStakingKey.getStakingKey();
+
+      const hwMeta = conceptualWallet.getHwWalletMeta();
+      if (!hwMeta) {
+        throw new Error('unexpectedly missing hardware metadata');
+      }
+
+      wallet = await createHardwareCip1852Wallet({
+        db,
+        accountPublicKey,
+        accountIndex: stakingKey.addressing.path[2],
+        walletName,
+        accountName: '',
+        hwWalletMetaInsert: {
+          Vendor: hwMeta.Vendor,
+          Model: hwMeta.Model,
+          DeviceId: hwMeta.DeviceId,
+        },
+        network,
+      });
+    } else {
+      const withSigningKey = asGetSigningKey(publicDeriver);
+      if (!withSigningKey) {
+        throw new Error('unable to get signing key');
+      }
+      const signingKey = await withSigningKey.getSigningKey();
+      const encryptedRoot = signingKey.row.Hash;
+
+      const accountIndex = signingKey.path[3].Index;
+      if (accountIndex === null) {
+        throw new Error('missing account index');
+      }
+
+      wallet = await createStandardCip1852Wallet({
+        db,
+        encryptedRoot,
+        accountPublicKey,
+        accountIndex,
+        walletName,
+        accountName: '', // set account name empty now
+        network,
+      });
+    }
+  
+    const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+      db,
+      wallet.cip1852WrapperRow,
+    );
+
+    if (wallet.publicDeriver.length !== 1) {
+      throw new Error(`${nameof(AdaApi)}::${nameof(this.cloneWallet)} should only do 1 HW derivation at a time`);
+    }
+    const pubDeriverResult = wallet.publicDeriver[0].publicDeriverResult;
+    return await PublicDeriver.createPublicDeriver(
+      pubDeriverResult,
+      cip1852Wallet,
+    );
+  }
+
   /**
    * Creates wallet and saves result to DB
   */
@@ -1823,11 +1904,21 @@ export default class AdaApi {
     try {
       // Note: we only restore for 0th account
       const rootPk = generateWalletRootKey(recoveryPhrase);
+      const encryptedRoot = encryptWithPassword(
+        walletPassword,
+        rootPk.as_bytes(),
+      );
+      const accountPublicKey = rootPk
+        .derive(WalletTypePurpose.CIP1852)
+        .derive(CoinTypes.CARDANO)
+        .derive(request.accountIndex)
+        .to_public();
+
       const newPubDerivers = [];
       const wallet = await createStandardCip1852Wallet({
         db: request.db,
-        rootPk,
-        password: walletPassword,
+        encryptedRoot,
+        accountPublicKey,
         accountIndex: request.accountIndex,
         walletName,
         accountName: '', // set account name empty now
@@ -2694,11 +2785,13 @@ export async function encodeHardwareWalletSignResult(
   signatureHex: string,
   payloadHex: string,
   signingPublicKeyHex: string,
+  payloadHashed: boolean = false,
 ): Promise<{| signature: string, key: string |}> {
   const coseSign1 = await buildCoseSign1FromSignature (
     hexToBytes(addressHex),
     hexToBytes(signatureHex),
     hexToBytes(payloadHex),
+    payloadHashed,
   );
 
   const key = makeCip8Key(hexToBytes(signingPublicKeyHex));
