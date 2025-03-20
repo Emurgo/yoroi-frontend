@@ -54,7 +54,7 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
+import type { SendMoneyRequest } from '../../../stores/toplevel/TransactionProcessingStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';

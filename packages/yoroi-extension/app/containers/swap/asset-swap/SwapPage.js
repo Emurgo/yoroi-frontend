@@ -291,7 +291,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     try {
       const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
       // $FlowIgnore[incompatible-call]
-      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      await stores.transactionProcessingStore.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);
 

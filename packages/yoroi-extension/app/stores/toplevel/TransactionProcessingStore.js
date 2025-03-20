@@ -1,32 +1,63 @@
 // @flow
-import { observable } from 'mobx';
-
 import Store from '../base/Store';
-import Request from '../lib/LocalizedRequest';
-import type { GenerateWalletRecoveryPhraseFunc } from '../../api/ada/index';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import type { StoresMap } from '../index';
-import { HARD_DERIVATION_START } from '../../config/numbersConfig';
-import { createWallet, signTransaction } from '../../api/thunk';
-import type {
-  Addressing,
-  QueriedUtxo,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { fail, first, sorted } from '../../coreUtils';
-import BigNumber from 'bignumber.js';
-import type{ WalletState } from '../../../chrome/extension/background/types';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { signTransaction } from '../../api/thunk';
+import type { Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import { observable } from 'mobx';
+import Request from '../lib/LocalizedRequest';
+import { Logger, stringifyError } from '../../utils/logging';
 
-const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
+export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
 
-export default class AdaWalletsStore extends Store<StoresMap> {
-  // REQUESTS
+export default class TransactionProcessingStore extends Store<StoresMap> {
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<
+    DeferredCall<{| txId: string |}>
+  >(request => request());
 
-  @observable
-  generateWalletRecoveryPhraseRequest: Request<GenerateWalletRecoveryPhraseFunc> = new Request<GenerateWalletRecoveryPhraseFunc>(
-    this.api.ada.generateWalletRecoveryPhrase
-  );
+  sendAndRefresh: ({|
+    publicDeriverId: void | number,
+    plateTextPart: void | string,
+    broadcastRequest: void => Promise<{| txId: string |}>,
+    refreshWallet: () => Promise<void>,
+  |}) => Promise<{| txId: string |}> = async request => {
+    this.sendMoneyRequest.reset();
+    const resp = await this.sendMoneyRequest.execute(async () => {
+      const result = await request.broadcastRequest();
 
-  // =================== SEND MONEY ==================== //
+      if (request.publicDeriverId != null) {
+        const memo = this.stores.transactionBuilderStore.memo;
+        if (memo !== '' && memo !== undefined && request.plateTextPart) {
+          try {
+            await this.stores.memos.saveTxMemo({
+              publicDeriverId: request.publicDeriverId,
+              plateTextPart: request.plateTextPart,
+              memo: {
+                Content: memo,
+                TransactionHash: result.txId,
+                LastUpdated: new Date(),
+              },
+            });
+          } catch (error) {
+            Logger.error(
+              `${nameof(TransactionProcessingStore)}::${nameof(this.sendAndRefresh)} error: ` +
+                stringifyError(error)
+            );
+            throw new Error('An error has ocurred when saving the transaction memo.');
+          }
+        }
+      }
+      try {
+        await request.refreshWallet();
+      } catch (_e) {
+        // even if refreshing the wallet fails, we don't want to fail the tx
+        // otherwise user may try and re-send the tx
+      }
+      return result;
+    }).promise;
+    if (resp == null) throw new Error(`Should never happen`);
+    return resp;
+  };
 
   adaSendAndRefresh: ({|
     broadcastRequest:
@@ -110,10 +141,10 @@ export default class AdaWalletsStore extends Store<StoresMap> {
       plateTextPart = wallet.plate.TextPart;
     } else {
       throw new Error(
-        `${nameof(AdaWalletsStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
+        `${nameof(TransactionProcessingStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
       );
     };
-    await this.stores.wallets.sendAndRefresh({
+    await this.sendAndRefresh({
       publicDeriverId,
       broadcastRequest,
       refreshWallet: request.refreshWallet,
@@ -210,76 +241,7 @@ export default class AdaWalletsStore extends Store<StoresMap> {
       return { signedTxHex };
     }
     throw new Error(
-      `${nameof(AdaWalletsStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
+      `${nameof(TransactionProcessingStore)}::${nameof(this.adaSignTransactionHex)} unhandled wallet type`
     );
   };
-
-  // =================== WALLET RESTORATION ==================== //
-
-  startWalletCreation: ({|
-    name: string,
-    password: string,
-  |}) => Promise<void> = async params => {
-    const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
-    if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
-    }
-    this.stores.walletBackup.initiateWalletBackup({
-      recoveryPhrase,
-      name: params.name,
-      password: params.password,
-    });
-  };
-
-  genWalletRecoveryPhrase: void => Promise<Array<string>> = async () => {
-    const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
-
-    if (recoveryPhrase == null) {
-      throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
-    }
-
-    return recoveryPhrase;
-  };
-
-  /** Create the wallet and go to wallet summary screen */
-  finishWalletBackup: void => Promise<void> = async () => {
-    await this.createWallet({
-      recoveryPhrase: this.stores.walletBackup.recoveryPhrase,
-      walletPassword: this.stores.walletBackup.password,
-      walletName: this.stores.walletBackup.name,
-    });
-  };
-
-  createWallet: {|
-    recoveryPhrase: Array<string>,
-    walletPassword: string,
-    walletName: string,
-  |} => Promise<void> = async (request) => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.finishWalletBackup)} no network selected`);
-    await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await createWallet({
-        walletName: request.walletName,
-        walletPassword: request.walletPassword,
-        recoveryPhrase: request.recoveryPhrase.join(' '),
-        networkId: selectedNetwork.NetworkId,
-        accountIndex: 0 + HARD_DERIVATION_START,
-      });
-      return wallet;
-    }).promise;
-  };
-
-  pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
-    const allUtxos = wallet.utxos;
-    if (allUtxos.length === 0) {
-      fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
-    }
-    const utxoDefaultCoinAmount = (u: QueriedUtxo): BigNumber =>
-      new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
-    const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
-      utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
-    const smallPureUtxos = allUtxos
-      .filter(u => u.output.tokens.length === 1 && utxoDefaultCoinAmount(u).lte(MAX_PICKED_COLLATERAL_UTXO_ADA));
-    return first(sorted(smallPureUtxos, compareDefaultCoins));
-  }
 }

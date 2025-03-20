@@ -137,6 +137,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     password?: string,
     dialog?: any,
   |}) => Promise<void> = async request => {
+debugger
     const result = this.createDelegationTx.result;
     console.log('resultresult', { result, request });
     if (result == null) {
@@ -148,7 +149,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     };
     try {
       if (request.wallet.type === 'ledger') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        await this.stores.transactionProcessingStore.adaSendAndRefresh({
           broadcastRequest: {
             ledger: {
               signRequest: result.signTxRequest,
@@ -160,7 +161,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
         return;
       }
       if (request.wallet.type === 'trezor') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        await this.stores.transactionProcessingStore.adaSendAndRefresh({
           broadcastRequest: {
             trezor: {
               signRequest: result.signTxRequest,
@@ -175,7 +176,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
       if (request.password == null) {
         throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
       }
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      await this.stores.transactionProcessingStore.adaSendAndRefresh({
         broadcastRequest: {
           normal: {
             wallet: request.wallet,
@@ -206,7 +207,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
 
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

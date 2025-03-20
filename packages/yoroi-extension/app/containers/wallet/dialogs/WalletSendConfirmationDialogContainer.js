@@ -27,7 +27,7 @@ type Props = {| ...StoresProps, ...LocalProps |};
 export default class WalletSendConfirmationDialogContainer extends Component<Props> {
 
   componentWillUnmount() {
-    this.props.stores.wallets.sendMoneyRequest.reset();
+    this.props.stores.transactionProcessingStore.sendMoneyRequest.reset();
   }
 
   render(): Node {
@@ -42,7 +42,7 @@ export default class WalletSendConfirmationDialogContainer extends Component<Pro
     if (publicDeriver == null)
       throw new Error(`Active wallet required for ${nameof(WalletSendConfirmationDialogContainer)}`);
 
-    const { sendMoneyRequest } = stores.wallets;
+    const { sendMoneyRequest } = stores.transactionProcessingStore;
 
     const totalInput = signRequest.totalInput();
     const fee = signRequest.fee();

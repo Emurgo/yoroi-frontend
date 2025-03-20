@@ -309,7 +309,7 @@ export default class VotingStore extends Store<StoresMap> {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
     if (request.wallet.type === 'ledger') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      await this.stores.transactionProcessingStore.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest: result,
@@ -321,7 +321,7 @@ export default class VotingStore extends Store<StoresMap> {
       return;
     }
     if (request.wallet.type === 'trezor') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      await this.stores.transactionProcessingStore.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
             signRequest: result,
@@ -337,7 +337,7 @@ export default class VotingStore extends Store<StoresMap> {
     if (request.password == null) {
       throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
     }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+    await this.stores.transactionProcessingStore.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
           wallet: request.wallet,
@@ -379,7 +379,7 @@ export default class VotingStore extends Store<StoresMap> {
       stepState: StepState.LOAD,
     };
     this.error = null;
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createVotingRegTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

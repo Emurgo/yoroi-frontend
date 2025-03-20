@@ -11,7 +11,7 @@ import type { ISignRequest } from '../../../../api/common/lib/transactions/ISign
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type { MultiToken, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { ampli } from '../../../../../ampli/index';
-import type { SendMoneyRequest } from '../../../../stores/toplevel/WalletStore';
+import type { SendMoneyRequest } from '../../../../stores/toplevel/TransactionProcessingStore';
 import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from '../../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';

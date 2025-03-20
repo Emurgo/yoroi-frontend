@@ -3,7 +3,7 @@
 // File is based the same pattern used for the non-ada-specific stores in our app.
 
 import { observable, action } from 'mobx';
-import AdaWalletsStore from './AdaWalletsStore';
+import MnemonicWalletCreationStore from './MnemonicWalletCreationStore';
 import AdaTransactionsStore from './AdaTransactionsStore';
 import AddressesStore from './AdaAddressesStore';
 import AdaYoroiTransferStore from './AdaYoroiTransferStore';
@@ -24,7 +24,7 @@ import type { StoresMap } from '../index';
 import BaseCardanoTimeStore from '../base/BaseCardanoTimeStore';
 
 export const adaStoreClasses = Object.freeze({
-  wallets: AdaWalletsStore,
+  mnemonicWalletCreationStore: MnemonicWalletCreationStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   yoroiTransfer: AdaYoroiTransferStore,
@@ -44,7 +44,7 @@ export const adaStoreClasses = Object.freeze({
 });
 
 export type AdaStoresMap = {|
-  wallets: AdaWalletsStore,
+  mnemonicWalletCreationStore: MnemonicWalletCreationStore,
   transactions: AdaTransactionsStore,
   addresses: AddressesStore,
   yoroiTransfer: AdaYoroiTransferStore,
@@ -64,7 +64,7 @@ export type AdaStoresMap = {|
 |};
 
 const adaStores: WithNullableFields<AdaStoresMap> = observable({
-  wallets: null,
+  mnemonicWalletCreationStore: null,
   transactions: null,
   addresses: null,
   yoroiTransfer: null,

@@ -74,7 +74,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
 
   componentWillUnmount() {
     const { stores } = this.props;
-    stores.wallets.sendMoneyRequest.reset();
+    stores.transactionProcessingStore.sendMoneyRequest.reset();
     stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
     stores.substores.ada.ledgerSend.cancel();
     stores.substores.ada.trezorSend.cancel();
@@ -202,8 +202,8 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
     const txFee = tentativeTx.fee();
     const finalRewards = this.getTotalBalance(recoveredBalance, txFee, deregistrations);
 
-    const isSubmitting = this.props.stores.wallets.sendMoneyRequest.isExecuting;
-    const error = this.props.stores.wallets.sendMoneyRequest.error;
+    const isSubmitting = this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting;
+    const error = this.props.stores.transactionProcessingStore.sendMoneyRequest.error;
     const spendingPasswordForm =
       publicDeriver.type !== 'mnemonic' ? undefined : (
         <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={isSubmitting} />

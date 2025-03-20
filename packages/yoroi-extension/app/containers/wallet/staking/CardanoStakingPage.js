@@ -290,9 +290,9 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     };
 
     const showSignDialog =
-      stores.wallets.sendMoneyRequest.isExecuting ||
-      !stores.wallets.sendMoneyRequest.wasExecuted ||
-      stores.wallets.sendMoneyRequest.error != null;
+      stores.transactionProcessingStore.sendMoneyRequest.isExecuting ||
+      !stores.transactionProcessingStore.sendMoneyRequest.wasExecuted ||
+      stores.transactionProcessingStore.sendMoneyRequest.error != null;
 
     const selectedPoolInfo = this._getPoolInfo(selectedWallet);
     if (stores.delegation.poolInfoQuery.error != null) {
@@ -342,7 +342,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
           amountToDelegate={delegationTx.totalAmountToDelegate}
           approximateReward={approximateReward(delegationTx.totalAmountToDelegate.getDefaultEntry())}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
           isHardware={selectedWallet.type !== 'mnemonic'}
           onCancel={this.cancel}
           onSubmit={async ({ password }) => {
@@ -356,7 +356,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               staking_pool: selectedPoolId,
             });
           }}
-          error={stores.wallets.sendMoneyRequest.error}
+          error={stores.transactionProcessingStore.sendMoneyRequest.error}
           selectedExplorer={
             stores.explorers.selectedExplorer.get(selectedWallet.networkId) ??
             (() => {

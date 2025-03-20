@@ -29,7 +29,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap> {
     }
 
     const { stores } = this;
-    await stores.substores.ada.wallets.adaSendAndRefresh({
+    await stores.transactionProcessingStore.adaSendAndRefresh({
       broadcastRequest: {
         normal: {
           wallet: request.wallet,
@@ -41,7 +41,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap> {
     });
 
     this.stores.uiDialogs.closeActiveDialog();
-    stores.wallets.sendMoneyRequest.reset();
+    stores.transactionProcessingStore.sendMoneyRequest.reset();
     if (request.onSuccess) {
       request.onSuccess();
     } else {

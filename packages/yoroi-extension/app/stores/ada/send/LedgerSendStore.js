@@ -75,7 +75,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
     expectedSerial: string | void,
     networkId: number,
   |} => Promise<void> = async (request) => {
-    await this.stores.wallets.sendAndRefresh({
+    await this.stores.transactionProcessingStore.sendAndRefresh({
       publicDeriverId: undefined,
       plateTextPart: undefined,
       broadcastRequest: async () => await this.signAndBroadcast(request),
@@ -111,7 +111,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       this._setActionProcessing(true);
 
       const { stores } = this;
-      await stores.substores.ada.wallets.adaSendAndRefresh({
+      await stores.transactionProcessingStore.adaSendAndRefresh({
         broadcastRequest: {
           ledger: {
             signRequest,
@@ -122,7 +122,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       });
 
       this.stores.uiDialogs.closeActiveDialog();
-      stores.wallets.sendMoneyRequest.reset();
+      stores.transactionProcessingStore.sendMoneyRequest.reset();
       if (request.onSuccess) {
         request.onSuccess();
       } else {

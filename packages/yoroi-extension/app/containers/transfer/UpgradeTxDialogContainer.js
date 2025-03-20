@@ -177,12 +177,12 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
           }),
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
-        isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+        isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         onCancel={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.skipLabel),
         }}
-        error={this.props.stores.wallets.sendMoneyRequest.error}
+        error={this.props.stores.transactionProcessingStore.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}

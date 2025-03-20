@@ -248,7 +248,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
               label: intl.formatMessage(globalMessages.nextButtonLabel),
               trigger: walletRestore.transferFromLegacy,
             }}
-            isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+            isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
             onCancel={{
               label: intl.formatMessage(globalMessages.cancel),
               trigger: this.onCancel,

@@ -72,7 +72,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
       this._setActionProcessing(true);
 
       const { stores } = this;
-      await stores.substores.ada.wallets.adaSendAndRefresh({
+      await stores.transactionProcessingStore.adaSendAndRefresh({
         broadcastRequest: {
           trezor: {
             signRequest,
@@ -83,7 +83,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
       });
 
       this.stores.uiDialogs.closeActiveDialog();
-      stores.wallets.sendMoneyRequest.reset();
+      stores.transactionProcessingStore.sendMoneyRequest.reset();
       if (request.onSuccess) {
         request.onSuccess();
       } else {

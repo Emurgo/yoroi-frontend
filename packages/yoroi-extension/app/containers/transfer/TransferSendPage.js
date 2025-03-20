@@ -67,7 +67,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
 
   componentWillUnmount() {
     const { stores } = this.props;
-    stores.wallets.sendMoneyRequest.reset();
+    stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
     stores.substores.ada.ledgerSend.cancel();
     stores.substores.ada.trezorSend.cancel();
@@ -94,7 +94,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
           wallet: selected,
         });
       }
-      if (stores.wallets.sendMoneyRequest.error == null) {
+      if (stores.transactionProcessingStore.sendMoneyRequest.error == null) {
         this.props.onSubmit.trigger();
       }
     } else {
@@ -106,7 +106,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
             password: walletPassword,
             wallet: selected,
           });
-          if (stores.wallets.sendMoneyRequest.error == null) {
+          if (stores.transactionProcessingStore.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();
           }
         },
@@ -159,7 +159,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
       ? (
         <SpendingPasswordInput
           setForm={(form) => this.setSpendingPasswordForm(form)}
-          isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         />
       ) : null;
 
@@ -178,9 +178,9 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
           label: this.props.onSubmit.label,
           trigger: this.submit,
         }}
-        isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+        isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
-        error={this.props.stores.wallets.sendMoneyRequest.error}
+        error={this.props.stores.transactionProcessingStore.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}

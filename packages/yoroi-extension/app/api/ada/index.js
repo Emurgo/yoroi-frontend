@@ -59,6 +59,7 @@ import type {
   IPublicDeriver,
   UsedStatus,
   Value,
+  QueriedUtxo,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -149,7 +150,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
+import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet, first, sorted } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -506,6 +507,7 @@ export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspent
 
 export const FETCH_TXS_BATCH_SIZE = 20;
 const MIN_REORG_OUTPUT_AMOUNT = '1000000';
+const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
 export default class AdaApi {
   /**
@@ -2364,6 +2366,20 @@ export default class AdaApi {
         };
       });
     };
+  }
+
+  pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
+    const allUtxos = wallet.utxos;
+    if (allUtxos.length === 0) {
+      fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
+    }
+    const utxoDefaultCoinAmount = (u: QueriedUtxo): BigNumber =>
+      new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
+    const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
+      utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
+    const smallPureUtxos = allUtxos
+      .filter(u => u.output.tokens.length === 1 && utxoDefaultCoinAmount(u).lte(MAX_PICKED_COLLATERAL_UTXO_ADA));
+    return first(sorted(smallPureUtxos, compareDefaultCoins));
   }
 }
 // ========== End of class AdaApi =========
