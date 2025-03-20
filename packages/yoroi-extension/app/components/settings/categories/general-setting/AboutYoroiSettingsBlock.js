@@ -221,7 +221,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
             handleTooltip={() => {
               openModal({
                 title: intl.formatMessage(messages.modalTitle),
-                content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal} />,
+                content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal()} />,
                 width: '648px',
                 height: '360px',
               });
