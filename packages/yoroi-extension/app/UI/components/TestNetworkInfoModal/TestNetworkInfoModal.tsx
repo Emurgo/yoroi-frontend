@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Link, Stack, styled, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { defineMessages } from 'react-intl';
 
 const messages = defineMessages({
@@ -55,7 +55,7 @@ export const TestNetworkInfoModal = ({ intl, onClose }) => {
           <Typography variant="body1">&#x2022; {intl.formatMessage(messages.easilyObtainable)}</Typography>
         </Stack>
       </Stack>
-      <Link mt="8px">{intl.formatMessage(messages.learnMore)}</Link>
+      {/* <Link mt="8px">{intl.formatMessage(messages.learnMore)}</Link> */}
       {/* @ts-ignore */}
       <Button variant="primary" onClick={onClose} sx={{ mt: '28px' }}>
         {intl.formatMessage(messages.understand)}

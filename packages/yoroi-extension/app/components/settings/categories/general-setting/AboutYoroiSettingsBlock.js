@@ -149,18 +149,18 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
 
   useEffect(() => {
     const getModalInfo = async () => {
-      localStorageApi.unsetTestnetModalInfo()
       const lsModalInfoStr = await localStorageApi.getTestnetModalInfo();
       const selectedWalletId = wallet.publicDeriverId;
+      const networkId = wallet.networkId;
       const lsModalInfoSettings = JSON.parse(lsModalInfoStr || '{}');
       const modalSettings = lsModalInfoSettings[selectedWalletId];
 
-      if (modalSettings === undefined) {
+      if (modalSettings === undefined && networkId === 0) {
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
           width: '648px',
-          height: '390px',
+          height: '360px',
         });
       }
     }
@@ -201,7 +201,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
                 title: intl.formatMessage(messages.modalTitle),
                 content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal} />,
                 width: '648px',
-                height: '390px',
+                height: '360px',
               });
             }}
             componentId={basePageComponentPath + '-networkInfo-text'}
