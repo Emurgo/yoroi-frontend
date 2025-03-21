@@ -70,6 +70,11 @@ export const WalletWordsSize = Object.freeze({
   Shelley: 15,
   Daedalus: 24,
 });
+export const CardanoNetworks = Object.freeze({
+  MN: 'mainnet',
+  PP: 'preprod',
+  PV: 'preview',
+});
 export const adaInLovelaces = 1000000;
 
 export const projectRootDir = path.resolve(__dirname, '..');

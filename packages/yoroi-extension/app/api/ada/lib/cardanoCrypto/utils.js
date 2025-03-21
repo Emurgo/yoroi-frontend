@@ -181,6 +181,7 @@ export const buildCoseSign1FromSignature = async (
   address: Buffer,
   signature: Buffer,
   payload: Buffer,
+  payloadHashed: boolean = false,
 ): Promise<RustModule.MessageSigning.COSESign1> => {
   const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
   protectedHeader.set_algorithm_id(
@@ -194,8 +195,19 @@ export const buildCoseSign1FromSignature = async (
   );
   const protectedSerialized = RustModule.MessageSigning.ProtectedHeaderMap.new(protectedHeader);
   const unprotected = RustModule.MessageSigning.HeaderMap.new();
+  if (payloadHashed) {
+    unprotected.set_header(
+      RustModule.MessageSigning.Label.new_text('hashed'),
+      RustModule.MessageSigning.CBORValue.new_special(
+        RustModule.MessageSigning.CBORSpecial.new_bool(true)
+      ),
+    );
+  }
   const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
   const builder = RustModule.MessageSigning.COSESign1Builder.new(headers, payload, false);
+  if (payloadHashed) {
+    builder.hash_payload();
+  }
   return builder.build(signature);
 }
 

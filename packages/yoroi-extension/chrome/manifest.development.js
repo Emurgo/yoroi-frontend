@@ -2,9 +2,7 @@
 /* eslint-disable  import/no-unused-modules */
 
 import buildManifest from './manifest.template';
-import {
-  genCSP,
-} from './constants';
+import { genCSP, speculosEndpoint } from './constants';
 import {
   Servers,
   serverToPermission,
@@ -21,6 +19,7 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
       'connect-src': [
         serverToPermission(Servers.Primary),
         serverToPermission(Servers.Testnet),
+        speculosEndpoint,
       ],
       'frame-src': [
         POOLS_UI_URL_FOR_YOROI,
