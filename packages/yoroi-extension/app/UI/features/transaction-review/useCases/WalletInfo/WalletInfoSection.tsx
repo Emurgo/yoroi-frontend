@@ -9,6 +9,7 @@ import { priceChange } from '../../../portfolio/common/helpers/priceChange';
 import { AssetCarousel } from '../../common/AssetCarousel/AssetCarousel';
 import { formatValue } from '../../common/utils';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { useStrings } from '../../common/hooks/useStrings';
 
 export const WalletInfoSection = () => {
   const { currentWalletDetails } = useTxReviewModal();
@@ -49,7 +50,7 @@ const StyledStack = styled(Stack)(({ theme }: any) => ({
 
 const WalletStats = () => {
   const { primaryBalance, primaryTokenInfo } = useTxReviewModal();
-
+  const strings = useStrings();
   const {
     ptActivity: { close: ptPrice, open },
     currency,
@@ -61,7 +62,7 @@ const WalletStats = () => {
     <StyledStack p="16px" my="16px" direction="column">
       <Stack direction="row" justifyContent="space-between" mb="19px">
         <Typography variant="caption" color="ds.white_static">
-          Total wallet value
+          {strings.tolatValue}
         </Typography>
         <Typography variant="body2" color="ds.white_static">
           1 {primaryTokenInfo.name} = {ptPrice.toFixed(4)} {currency}

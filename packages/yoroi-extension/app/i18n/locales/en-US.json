@@ -1292,5 +1292,15 @@
   "portfolio.orderTable.header.assetAmount": "Asset amount",
   "portfolio.orderTable.header.transactionId": "Transaction ID",
   "portfolio.welcomeBanner.title": "Start your crypto journey",
-  "portfolio.welcomeBanner.description": "Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities."
+  "portfolio.welcomeBanner.description": "Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities.",
+  "transaction.review.tolatValue": "Total wallet value",
+  "transaction.review.confirmHardware": "Confirm on your hardware wallet",
+  "transaction.review.enterPassword": "Enter password to sign this transaction",
+  "transaction.review.inputsLabel": "Inputs",
+  "transaction.review.outputsLabel": "Outputs",
+  "transaction.review.yourAddressLabel": "Your Address",
+  "transaction.review.collateralInfo": "Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.",
+  "transaction.review.interactWithOperations": "You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.",
+  "transaction.review.takeHardwareWallet": "Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action."
+
 }
