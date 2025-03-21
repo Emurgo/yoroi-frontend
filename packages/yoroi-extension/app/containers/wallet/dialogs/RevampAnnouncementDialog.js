@@ -5,16 +5,17 @@ import type { Node } from 'react';
 import Dialog from '../../../components/widgets/Dialog';
 import { defineMessages, intlShape } from 'react-intl';
 import { observer } from 'mobx-react';
-import { ReactComponent as NewThemeIllustration } from '../../../assets/images/new-theme-illustration.inline.svg';
+import bannerPng from '../../../assets/images/banner-yoroi-announcement-modal.png';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import semver from 'semver/preload';
 
 const messages = defineMessages({
   title: {
-    id: 'wallet.revampAnnouncement.title',
-    defaultMessage: '!!!Discover a new yoroi',
+    id: 'wallet.revampAnnouncement.titleNew',
+    defaultMessage: '!!!Discover new features in YOROI',
   },
   description: {
     id: 'wallet.revampAnnouncement.description',
@@ -22,32 +23,28 @@ const messages = defineMessages({
       '!!!Yoroi 5.0 is here. Check out our new and improved design enhancements. The latest version enables an even better experience and performance.',
   },
   updatesSectionTitle: {
-    id: 'wallet.revampAnnouncement.updatesSectionTitle',
-    defaultMessage: '!!!What’s In the Update:',
+    id: 'wallet.revampAnnouncement.updatesSectionTitleNew',
+    defaultMessage: '!!!Yoroi wallet just got more powerful new features. Start exploring the updates and take your crypto experience to the next level!',
   },
   update1: {
-    id: 'wallet.revampAnnouncement.updates.1',
-    defaultMessage: '!!!User-friendly intuitive design',
+    id: 'wallet.revampAnnouncement.updates.1new',
+    defaultMessage: '!!!Portfolio management',
   },
   update2: {
-    id: 'wallet.revampAnnouncement.updates.2',
-    defaultMessage: '!!!Multiple Asset Transactions',
+    id: 'wallet.revampAnnouncement.updates.2new',
+    defaultMessage: '!!!Dark mode',
   },
   update3: {
-    id: 'wallet.revampAnnouncement.updates.3',
-    defaultMessage: '!!!NFT Gallery',
+    id: 'wallet.revampAnnouncement.updates.3new',
+    defaultMessage: '!!!Trezor Safe 3 and Safe 5 support"',
   },
   update4: {
-    id: 'wallet.revampAnnouncement.updates.4',
-    defaultMessage: '!!!In-app self service Q&As',
+    id: 'wallet.revampAnnouncement.updates.4new',
+    defaultMessage: '!!!Cashback service integration"',
   },
   update5: {
-    id: 'wallet.revampAnnouncement.updates.5',
-    defaultMessage: '!!!In-app get help ticketing',
-  },
-  update6: {
-    id: 'wallet.revampAnnouncement.updates.6',
-    defaultMessage: '!!!Fiat Pairing',
+    id: 'wallet.revampAnnouncement.updates.5new',
+    defaultMessage: '!!!Yoroi DRep vote delegation"',
   },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
@@ -56,6 +53,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  lastAnnouncedFeatureVersion: string,
   onClose: void => void,
 |};
 
@@ -67,7 +65,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onClose } = this.props;
+    const { onClose, lastAnnouncedFeatureVersion } = this.props;
     const actions = [
       {
         label: intl.formatMessage(messages.goToWalletLabel),
@@ -75,6 +73,15 @@ export class RevampAnnouncementDialog extends Component<Props> {
         primary: true,
       },
     ];
+
+    const updates = [];
+    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.5.0')) {
+      updates.push(messages.update1, messages.update2, messages.update3);
+    }
+    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.6.0')) {
+      updates.push(messages.update4, messages.update5);
+    }
+
     return (
       <Dialog
         title={intl.formatMessage(messages.title)}
@@ -84,17 +91,16 @@ export class RevampAnnouncementDialog extends Component<Props> {
         dialogActions={actions}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }} id="dialogRevampBox">
-          <Typography component="div"
-            variant="body1"
-            sx={{
-              textAlign: 'center',
-              fontWeight: 500,
-            }}
-          >
-            {intl.formatMessage(messages.description)}
-          </Typography>
-
-          <NewThemeIllustration />
+          {/*<Typography component="div"*/}
+          {/*  variant="body1"*/}
+          {/*  sx={{*/}
+          {/*    textAlign: 'center',*/}
+          {/*    fontWeight: 500,*/}
+          {/*  }}*/}
+          {/*>*/}
+          {/*  {intl.formatMessage(messages.description)}*/}
+          {/*</Typography>*/}
+          <Box component="img" src={bannerPng} />
           <Stack gap="16px">
             <Typography component="div" color="grayscale.900" variant="body1" fontWeight={500}>
               {intl.formatMessage(messages.updatesSectionTitle)}
@@ -115,21 +121,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                   width: '100%',
                 }}
               >
-                {[messages.update1, messages.update2, messages.update3].map(message => (
-                  <Typography component="li" variant="body1" color="grayscale.900">
-                    {intl.formatMessage(message)}
-                  </Typography>
-                ))}
-              </Box>
-              <Box
-                component="ul"
-                sx={{
-                  listStyle: 'inside',
-                  color: 'grayscale.900',
-                  width: '100%',
-                }}
-              >
-                {[messages.update4, messages.update5, messages.update6].map(message => (
+                {updates.map(message => (
                   <Typography component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>

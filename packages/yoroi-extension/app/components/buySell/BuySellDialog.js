@@ -468,7 +468,7 @@ export default class BuySellDialog extends Component<Props, State> {
         closeButton={<DialogCloseButton />}
         dialogActions={[
           {
-            label: intl.formatMessage(messages.proceed),
+            label: intl.formatMessage(globalMessages.proceed),
             primary: true,
             disabled: state.amountAda === '' || state.inputError !== null,
             onClick: this.onSubmit,

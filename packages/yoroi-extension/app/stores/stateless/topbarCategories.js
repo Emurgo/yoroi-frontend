@@ -3,11 +3,9 @@ import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
 import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-
 import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import { ReactComponent as delegationListIcon } from '../../assets/images/wallet-nav/tab-delegation_list.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
@@ -99,30 +97,6 @@ export const VOTING: TopbarCategory = registerCategory({
   label: messages.voting,
   isVisible: _request => true,
 });
-export const SEIZA_STAKE_SIMULATOR: TopbarCategory = registerCategory({
-  className: 'stakeSimulator',
-  route: ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE,
-  icon: delegationListIcon,
-  label: messages.delegationList,
-  isVisible: request => request.networkId === networks.CardanoMainnet.NetworkId,
-});
-
-export const CARDANO_DELEGATION: TopbarCategory = registerCategory({
-  className: 'cardanoStake',
-  route: ROUTES.WALLETS.CARDANO_DELEGATION,
-  icon: undefined,
-  label: messages.delegationById,
-  isVisible: request => {
-    const { networkId } = request;
-    return (
-      (environment.isTest() ||
-        networkId === networks.CardanoPreprodTestnet.NetworkId ||
-        networkId === networks.CardanoPreviewTestnet.NetworkId ||
-        networkId === networks.CardanoSanchoTestnet.NetworkId)
-    );
-  },
-  isHiddenButAllowed: true,
-});
 
 /** Revamp Wallet categoriess */
 export const allSubcategoriesRevamp: Array<TopbarCategory> = [
@@ -145,9 +119,16 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     isVisible: _request => true,
   },
   {
-    className: CARDANO_DELEGATION.className,
-    route: CARDANO_DELEGATION.route,
-    label: CARDANO_DELEGATION.label,
-    isVisible: CARDANO_DELEGATION.isVisible,
+    className: 'cardanoStake',
+    route: ROUTES.WALLETS.CARDANO_DELEGATION,
+    label: messages.delegationById,
+    isVisible: request => {
+      const { networkId } = request;
+      return environment.isTest()
+        || environment.isDev()
+        || environment.isNightly()
+        || networkId === networks.CardanoPreprodTestnet.NetworkId
+        || networkId === networks.CardanoPreviewTestnet.NetworkId;
+    },
   },
 ];

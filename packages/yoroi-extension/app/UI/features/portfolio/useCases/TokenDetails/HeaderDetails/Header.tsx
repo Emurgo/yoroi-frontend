@@ -23,7 +23,7 @@ const HeaderSection = observer(
   ({ tokenInfo, stores }: Props): JSX.Element => {
     const theme: any = useTheme();
     const strings = useStrings();
-    const { unitOfAccount, accountPair, primaryTokenInfo, isHiddenAmount } = usePortfolio();
+    const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
     const isPrimaryToken: boolean = tokenInfo.id === '-';
 
     // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
@@ -79,7 +79,7 @@ const HeaderSection = observer(
         <Stack direction="column" spacing={theme.spacing(0.5)}>
           <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-start">
             <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
-              <HiddenAmount isHidden={isHiddenAmount}>{tokenTotalAmount}</HiddenAmount>
+              <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
             </Typography>
             <Typography
               variant="body2"
@@ -94,7 +94,7 @@ const HeaderSection = observer(
           </Stack>
 
           <Typography color="ds.gray_600">
-            <HiddenAmount isHidden={isHiddenAmount}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
+            <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
             <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
           </Typography>
         </Stack>

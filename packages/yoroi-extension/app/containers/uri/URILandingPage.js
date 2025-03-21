@@ -19,10 +19,7 @@ export default class URILandingPage extends Component<StoresProps> {
 
   onConfirm: void => void = () => {
     // this will automatically reroute to the right page if no wallet exists
-    this.props.stores.app.goToRoute({
-      route: ROUTES.WALLETS.SEND,
-      publicDeriverId: this.firstSelectedWalletId(),
-    });
+    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.SEND });
   };
 
   render(): Node {

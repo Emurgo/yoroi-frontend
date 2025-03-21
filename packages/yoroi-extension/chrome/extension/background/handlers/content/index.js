@@ -1,6 +1,7 @@
 // @flow
 import { handleRpc } from './rpc';
 import { handleConnect } from './connect';
+import { handleBringRpc } from './bring';
 import { stringifyError } from '../../../../../app/utils/logging';
 import { sendToInjector } from './utils';
 
@@ -22,6 +23,8 @@ export async function handleInjectorMessage(message: Object, sender: Object) {
     }
   } else if (message.type === 'connector_rpc_request') {
     await handleRpc(message, sender);
+  } else if (message.type === 'bring_rpc_request') {
+    await handleBringRpc(message, sender);
   }
 }
 

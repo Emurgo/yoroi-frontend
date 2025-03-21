@@ -31,6 +31,8 @@ import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import AmountDisplay from '../../../components/common/AmountDisplay';
 import type { WalletState } from '../../../../chrome/extension/background/types';
+import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
+import { ReactComponent as ExclamationIcon } from '../../../assets/images/testnet-exclamation-circle.svg';
 
 const messages = defineMessages({
   subtitle: {
@@ -73,6 +75,26 @@ const messages = defineMessages({
     id: 'connector.connect.hardwareWalletsConnectWithAuthNotSupported',
     defaultMessage: '!!!Connecting to hardware wallet with authentication is not supported',
   },
+  testnetWarningTitle: {
+    id: 'connector.connect.testnetWarningTitle',
+    defaultMessage: '!!!Testnet support',
+  },
+  testnetWarningText: {
+    id: 'connector.connect.testnetWarningText',
+    defaultMessage: '!!!This DApp may not support the Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.',
+  },
+  cashbackApplyAll: {
+    id: 'connector.connect.cashback.apply.all',
+    defaultMessage: '!!!The wallet you select will be applied for all partner websites.'
+  },
+  cashbackDisabledTrezor: {
+    id: 'connector.connect.cashback.trezor.disabled',
+    defaultMessage: '!!!Cashback service doesn’t support Trezor wallet connection',
+  },
+  addWallet: {
+    id: 'connector.connect.cashback.addWallet',
+    defaultMessage: '!!!Add wallet',
+  },
 });
 
 type Props = {|
@@ -91,11 +113,12 @@ type Props = {|
   +message: ?ConnectingMessage,
   +onSelectWallet: (WalletState, ?WalletChecksum) => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +network: string,
+  +networkId: number,
   +shouldHideBalance: boolean,
   +unitOfAccount: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
   +onUpdateHideBalance: void => Promise<void>,
+  +isSelectingCashbackWallet?: boolean,
 |};
 
 @observer
@@ -164,8 +187,10 @@ export default class ConnectPage extends Component<Props> {
   };
 
   onCreateWallet: void => void = () => {
+    const { isSelectingCashbackWallet = false } = this.props;
+    const urlHash = isSelectingCashbackWallet ? '?from=cashback' : '';
     window.chrome.tabs.create({
-      url: `${window.location.origin}/main_window.html#/wallets/add`,
+      url: `${window.location.origin}/main_window.html#/wallets/add${urlHash}`,
     });
 
     this.props.onCancel();
@@ -179,11 +204,12 @@ export default class ConnectPage extends Component<Props> {
       publicDerivers,
       message,
       onSelectWallet,
-      network,
+      networkId,
       shouldHideBalance,
       isAppAuth,
       onUpdateHideBalance,
       selectedWallet,
+      isSelectingCashbackWallet = false,
     } = this.props;
 
     const isNightly = environment.isNightly();
@@ -204,7 +230,7 @@ export default class ConnectPage extends Component<Props> {
             <NoWalletImage />
           </div>
           <div>
-            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound, { network })}</div>
+            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound, { networkId })}</div>
             <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>
@@ -255,7 +281,7 @@ export default class ConnectPage extends Component<Props> {
       <div className={componentClasses}>
         {hasWallets ? (
           <>
-            <ProgressBar step={isAppAuth ? 2 : 1} max={2} />
+            {!isSelectingCashbackWallet && (<ProgressBar step={isAppAuth ? 2 : 1} max={2} />)}
             <Typography
               component="div"
               variant="h4"
@@ -269,19 +295,21 @@ export default class ConnectPage extends Component<Props> {
             >
               {intl.formatMessage(messages.connectWallet)}
             </Typography>
-            <div className={styles.connectWrapper}>
-              <div className={styles.image}>
-                {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
-              </div>
-              <Box marginTop="16px">
-                <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
-                  {intl.formatMessage(messages.subtitle)}{' '}
-                  <Typography as="span" variant="body-1" fontWeight="500">
-                    {url}
+            {!isSelectingCashbackWallet && (
+              <div className={styles.connectWrapper}>
+                <div className={styles.image}>
+                  {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+                </div>
+                <Box marginTop="16px">
+                  <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
+                    {intl.formatMessage(messages.subtitle)}{' '}
+                    <Typography as="span" variant="body-1" fontWeight="500">
+                      {url}
+                    </Typography>
                   </Typography>
-                </Typography>
-              </Box>
-            </div>
+                </Box>
+              </div>
+            )}
           </>
         ) : null}
         <Box flex={1}>
@@ -305,47 +333,99 @@ export default class ConnectPage extends Component<Props> {
                     </button>
                   </div>
 
+                  {(networkId !== networks.CardanoMainnet.NetworkId) && (
+                    <TestnetWarningBox>
+                      <TestnetWarningTitle>
+                        <ExclamationIcon />
+                        {intl.formatMessage(messages.testnetWarningTitle)}
+                      </TestnetWarningTitle>
+                      <Typography>
+                        {intl.formatMessage(messages.testnetWarningText)}
+                      </Typography>
+                    </TestnetWarningBox>
+                  )}
+
+                  {isSelectingCashbackWallet && (
+                    <div className={styles.cashbackApplyAll}>{intl.formatMessage(messages.cashbackApplyAll)}</div>
+                  )}
+
                   <ul className={styles.list}>
-                    {publicDerivers.map((wallet, idx) => (
-                      <li key={wallet.publicDeriverId} className={styles.listItem}>
-                        <WalletButton onClick={() => onSelectWallet(wallet, wallet.plate)}>
-                          <ConnectedWallet
-                            publicDeriver={wallet}
-                            walletBalance={
-                              <Box
-                                sx={{
-                                  ml: 'auto',
-                                  textAlign: 'right',
-                                }}
-                              >
-                                <AmountDisplay
-                                  shouldHideBalance={this.props.shouldHideBalance}
-                                  amount={wallet.balance}
-                                  getTokenInfo={this.props.getTokenInfo}
-                                  unitOfAccountSetting={this.props.unitOfAccount}
-                                  getCurrentPrice={this.props.getCurrentPrice}
-                                  showFiat
-                                  showAmount
-                                  id={'dAppConnector:connect:walletList:walletCard_' + idx}
-                                />
-                              </Box>
-                            }
-                          />
-                        </WalletButton>
-                      </li>
-                    ))}
+                    {publicDerivers.map((wallet, idx) => {
+                      const isTrezor = isSelectingCashbackWallet && wallet.type === 'trezor';
+                      const Btn = isTrezor ? DisabledWalletButton : WalletButton;
+                      return (
+                        <li
+                          key={wallet.publicDeriverId}
+                          className={[styles.listItem, isTrezor ? '' : styles.enabledWallet].join(' ')}
+                        >
+                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)}>
+                            <ConnectedWallet
+                              disabledForReason={
+                                isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null
+                              }
+                              publicDeriver={wallet}
+                              walletBalance={
+                                <Box
+                                  sx={{
+                                    ml: 'auto',
+                                    textAlign: 'right',
+                                  }}
+                                >
+                                  <AmountDisplay
+                                    shouldHideBalance={this.props.shouldHideBalance}
+                                    amount={wallet.balance}
+                                    getTokenInfo={this.props.getTokenInfo}
+                                    unitOfAccountSetting={this.props.unitOfAccount}
+                                    getCurrentPrice={this.props.getCurrentPrice}
+                                    showFiat
+                                    showAmount
+                                    id={'dAppConnector:connect:walletList:walletCard_' + idx}
+                                  />
+                                </Box>
+                              }
+                            />
+                          </Btn>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               ) : null}
             </>
           )}
         </Box>
-        {hasWallets && !isAppAuth ? (
+        {!isSelectingCashbackWallet && hasWallets && !isAppAuth ? (
           <div className={styles.bottom}>
             <div className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</div>
             <div className={styles.infoText}>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
           </div>
         ) : null}
+        {isSelectingCashbackWallet && (
+          <Box sx={{ display: 'flex', gap: '15px', padding: '32px' }}>
+            <Button
+              sx={{ minWidth: 0 }}
+              fullWidth
+              variant="outlined"
+              color="primary"
+              onClick={this.onCancel}
+              id="cancelButton"
+            >
+              {intl.formatMessage(globalMessages.cancel)}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={() => {
+                this.onCreateWallet();
+              }}
+              sx={{ minWidth: 0 }}
+              id="addWalletButton"
+            >
+              {intl.formatMessage(messages.addWallet)}
+            </Button>
+          </Box>
+        )}
       </div>
     );
   }
@@ -357,3 +437,23 @@ const WalletButton = styled('button')({
   fontSize: '1rem',
   padding: '16px',
 });
+const DisabledWalletButton = styled(WalletButton)({
+  cursor: 'default',
+});
+
+const TestnetWarningBox = styled(Box)(({ theme }) => ({
+  background: theme.palette.ds.sys_yellow_100,
+  padding: '16px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+}));
+
+const TestnetWarningTitle = styled(Typography)(({ theme }) => ({
+  color: theme.palette.ds.sys_orange_500,
+  fontWeight: 500,
+  '& svg': {
+    verticalAlign: 'text-bottom',
+    marginRight: '8px',
+  },
+}));

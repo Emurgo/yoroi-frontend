@@ -32,10 +32,13 @@ import {
   type SigningMessage,
 } from '../../../connector/types';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
-import { mergeWitnessSets } from '../../../../../app/api/ada/transactions/utils';
 import { hexToBytes } from '../../../../../app/coreUtils';
 import { Logger } from '../../../../../app/utils/logging';
 import { walletSignData, encodeHardwareWalletSignResult } from '../../../../../app/api/ada';
+import {
+  transactionHexAddSignaturesFromWitnessSetHex,
+  transactionHexToWitnessSet
+} from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 
 type RpcUid = number;
 
@@ -197,36 +200,23 @@ export const UserSignConfirm: HandlerType<
           rpcResponse(request.tabId, request.uid, resp);
         } else {
           const resultWitnessSetHex: string = resp.ok;
+          const fullTxHex: string = RustModule.WasmScope(Scope => {
+            // tx string is either a transaction hex or transaction body hex
+            try {
+              // Try parsing as transaction
+              return Scope.WalletV4.FixedTransaction.from_hex(tx).to_hex();
+            } catch {
+              // Try parsing as transaction body
+              return Scope.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(tx)).to_hex();
+            }
+          });
+          // Securely inject signatures into raw tx (to preserve cbor set tags compatibility)
+          const signedTxHex = transactionHexAddSignaturesFromWitnessSetHex(fullTxHex, resultWitnessSetHex);
           if (returnTx) {
-            const inputWitnessSetHex: string | null = RustModule.WasmScope(Scope => {
-              try {
-                const fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
-                return fullTx.witness_set().to_hex();
-              } catch {
-                // no input witness set
-                return null;
-              }
-            });
-            const isFullTx = inputWitnessSetHex != null;
-            const finalWitnessSetHex = inputWitnessSetHex == null
-                  ? resultWitnessSetHex
-                  : mergeWitnessSets(inputWitnessSetHex, resultWitnessSetHex);
-            RustModule.WasmScope(Scope => {
-              let fullTx;
-              if (isFullTx) {
-                fullTx = Scope.WalletV4.FixedTransaction.from_hex(tx);
-                fullTx.set_witness_set(hexToBytes(finalWitnessSetHex));
-              } else {
-                fullTx = Scope.WalletV4.FixedTransaction.new(
-                  hexToBytes(tx),
-                  hexToBytes(finalWitnessSetHex),
-                  true,
-                );
-              }
-              rpcResponse(request.tabId, request.uid, { ok: fullTx.to_hex() });
-            });
+            rpcResponse(request.tabId, request.uid, { ok: signedTxHex });
           } else {
-            rpcResponse(request.tabId, request.uid, { ok: resultWitnessSetHex });
+            // Extract raw witness set from signed tx carefully (to preserve cbor set tags compatibility)
+            rpcResponse(request.tabId, request.uid, { ok: transactionHexToWitnessSet(signedTxHex) });
           }
         }
       }
@@ -436,19 +426,18 @@ export const ConnectWindowRetrieveData: HandlerType<
   },
 });
 
-export const RemoveWalletFromWhiteList: HandlerType<
-  {| url: string |},
+export const NotifyDAppConnectionRemoved: HandlerType<
+  {| url: string |} | void,
   void
 > = Object.freeze({
-  typeTag: 'remove_wallet_from_whitelist',
+  typeTag: 'notify-dapp-connection-removed',
 
   handle: async (request) => {
     const connectedSites = await getAllConnectedSites();
     for (const tabId of Object.keys(connectedSites)) {
       const site = connectedSites[tabId];
-      if (site.url === request.url) {
+      if (!request || site.url === request.url) {
         sendToInjector(Number(tabId), { type: 'disconnect' });
-        break;
       }
     }
   },

@@ -39,6 +39,16 @@ const SBox = styled(Box)(({ theme }) => ({
   color: 'ds.gray_min',
 }));
 
+const SBoxHWNotes = styled(Box)(({ theme }) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '16px',
+  marginTop: '16px',
+  backgroundImage: theme.palette.ds.bg_gradient_1,
+  borderRadius: '8px',
+}));
+
 type Props = {|
   +staleTx: boolean,
   +selectedExplorer: SelectedExplorer,
@@ -106,6 +116,14 @@ const messages = defineMessages({
   sendUsingTrezorT: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
     defaultMessage: '!!!Send using Trezor',
+  },
+  transactionErrorTitle: {
+    id: 'wallet.send.error.title.transactionError',
+    defaultMessage: '!!!Transaction Error',
+  },
+  transactionErrorMnemonic: {
+    id: 'wallet.send.error.description.mnemonic',
+    defaultMessage: '!!!The transaction cannot be done due to technical reasons. Try again or <link>ask our support team</link>',
   },
 });
 
@@ -340,18 +358,16 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       infoLine2 = globalMessages.txConfirmationLedgerNanoLine2;
     }
     return (
-      <div className={styles.infoBlock}>
-        <ul>
-          <li key="1">
-            <span>{intl.formatMessage(infoLine1)}</span>
-            <br />
-          </li>
-          <li key="2">
-            <span>{intl.formatMessage(infoLine2)}</span>
-            <br />
-          </li>
-        </ul>
-      </div>
+      <SBoxHWNotes>
+        <Box display="flex" flexDirection="row" color="ds.text_gray_max" gap="8px" pl="8px">
+          <Typography variant="body1">&#x2022;</Typography>
+          <Typography variant="body1">{intl.formatMessage(infoLine1)}</Typography>
+        </Box>
+        <Box display="flex" flexDirection="row" color="ds.text_gray_max" gap="8px" pl="8px">
+          <Typography variant="body1">&#x2022;</Typography>
+          <Typography variant="body1">{intl.formatMessage(infoLine2)}</Typography>
+        </Box>
+      </SBoxHWNotes>
     );
   }
 
@@ -393,24 +409,58 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
     if (txError instanceof LocalizableError) {
       return this.renderErrorBanner('Transaction error', intl.formatMessage(txError, txError.values));
     }
-    return this.renderErrorBanner(
-      'Transaction error',
-      <div>
-        The transaction cannot be done due to technical reasons. Try again or
-        <Link
-          className={styles.faq}
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
-          target="_blank"
-          rel="noreferrer"
-          sx={{
-            color: 'ds.text-primary-medium',
-            marginLeft: '4px',
-          }}
-        >
-          Ask our support team
-        </Link>
-      </div>
-    );
+    const txErrorTitle = intl.formatMessage(messages.transactionErrorTitle);
+    if (walletType === 'mnemonic') {
+      if (txError !== null) {
+        const re = /(.*)<link>(.*)<\/link>(.*)/;
+        let m = intl.formatMessage(messages.transactionErrorMnemonic).match(re);
+        if (!m) {
+          // the translation has an error, fall back
+          m = [
+            undefined,
+            'The transaction cannot be done due to technical reasons. Try again or ',
+            'ask our support team',
+            ''
+          ];
+        }
+        return this.renderErrorBanner(
+          txErrorTitle,
+          <div>
+            {m[1]}
+            <Link
+              className={styles.faq}
+              href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+              target="_blank"
+              rel="noreferrer"
+              sx={{
+                color: 'ds.text-primary-medium',
+                marginLeft: '4px',
+              }}
+            >
+              {m[2]}
+            </Link>
+            {m[3]}
+          </div>
+        );
+      }
+      return null;
+    }
+    if (walletType === 'trezor') {
+      const { trezorSendError } = this.props;
+      if (trezorSendError !== null) {
+        return this.renderErrorBanner(txErrorTitle, intl.formatMessage(trezorSendError));
+      }
+      return null;
+    }
+    if (walletType === 'ledger') {
+      const { ledgerSendError } = this.props;
+      if (ledgerSendError !== null) {
+        return this.renderErrorBanner(txErrorTitle, intl.formatMessage(ledgerSendError));
+      }
+      return null;
+    }
+    throw new Error('unexpected wallet type');
+
   }
 
   render(): Node {

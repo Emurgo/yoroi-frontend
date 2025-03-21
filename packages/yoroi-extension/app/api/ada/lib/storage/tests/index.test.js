@@ -126,7 +126,7 @@ test('Can add and fetch address in wallet', async (done) => {
               insert: {},
             },
           ],
-          decryptPrivateDeriverPassword: privateDeriverPassword,
+          decryptPrivateDeriver: { preDerived: false, password: privateDeriverPassword },
           initialDerivations: [
             {
               index: 0, // external chain,

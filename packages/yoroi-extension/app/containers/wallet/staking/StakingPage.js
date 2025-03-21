@@ -13,6 +13,8 @@ import TopBarLayout from '../../../components/layout/TopBarLayout';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { PoolTransitionBanner } from './PoolTransitionBanner';
 import type { StoresProps } from '../../../stores';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
@@ -37,11 +39,7 @@ class StakingPage extends Component<StoresProps> {
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={
-              <NavBarTitle
-                title={this.context.intl.formatMessage(globalMessages.stakingDashboard)}
-              />
-            }
+            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
             pageBanner={
               <PoolTransitionBanner
                 intl={this.context.intl}
@@ -53,6 +51,7 @@ class StakingPage extends Component<StoresProps> {
         showInContainer
       >
         <Suspense fallback={null}>
+          <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
           <StakingPageContent stores={this.props.stores} />
         </Suspense>
       </TopBarLayout>

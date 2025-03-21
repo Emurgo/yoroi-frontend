@@ -13,6 +13,7 @@ import {
   resyncWallet,
   removeAllTransactions,
 } from '../../api/thunk';
+import { ROUTES } from '../../routes-config';
 
 export type WarningList = {|
   publicDeriverId: number,
@@ -110,16 +111,6 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     const { stores } = this;
     stores.wallets.unsetActiveWallet(); // deselect before deleting
 
-    // Remove this wallet from wallet sort list
-    const walletsNavigation = stores.profile.walletsNavigation
-    const newWalletsNavigation = {
-      ...walletsNavigation,
-      // $FlowFixMe[invalid-computed-prop]
-      'cardano': walletsNavigation.cardano.filter(
-        walletId => walletId !== request.publicDeriverId)
-    }
-    await stores.profile.updateSortedWalletList(newWalletsNavigation);
-
     // ==================== Disconnect related dApps ====================
     await this.stores.connector.getConnectorWhitelist();
     const connectorWhitelist = stores.connector.currentConnectorWhitelist;
@@ -136,6 +127,13 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     await this.removeWalletRequest.execute({
       publicDeriverId: request.publicDeriverId,
     }).promise;
+    // In case any more wallets are available
+    // We set the thirst one as selected and redirect ot the wallets root page
+    // This is purely to automatically exit settings at the wallet switch
+    if (this.stores.wallets.wallets.length > 0) {
+      this.stores.wallets.setActiveWallet({ publicDeriverId: this.stores.wallets.wallets[0].publicDeriverId });
+      this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+    }
     // note: it's possible some other function was waiting for a DB lock
     //       and so it may fail if it runs now since underlying data was deleted
     //       to avoid this causing an issue, we just refresh the page

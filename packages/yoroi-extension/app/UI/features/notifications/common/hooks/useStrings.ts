@@ -16,13 +16,11 @@ export const messages = Object.freeze(
   })
 );
 
-export const useStrings = (intl = null) => {
-  const { intl: contextIntl } = useIntl();
-
-  const i = intl || contextIntl;
+export const useStrings = () => {
+  const { intl } = useIntl();
 
   return React.useRef({
-    notifSettingsTitle: i.formatMessage(messages.notifSettingsTitle),
-    notifSettingsDesc: i.formatMessage(messages.notifSettingsDesc),
+    notifSettingsTitle: intl.formatMessage(messages.notifSettingsTitle),
+    notifSettingsDesc: intl.formatMessage(messages.notifSettingsDesc),
   }).current;
 };

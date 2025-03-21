@@ -84,6 +84,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
       await broadcastTransaction({
         publicDeriverId: request.wallet.publicDeriverId,
         signedTxHex,
+        networkId: request.networkId,
       });
 
       return { txId };

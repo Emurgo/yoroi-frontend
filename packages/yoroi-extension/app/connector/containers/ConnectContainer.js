@@ -92,11 +92,14 @@ export default class ConnectContainer extends Component<
     }
 
     const { publicDeriverId } = deriver;
-    const result = stores.connector.currentConnectorWhitelist;
 
-    // Removing any previous whitelisted connections for the same url
-    const whitelist = (result.length ? [...result] : []).filter(
-      e => e.url !== url
+    const currentNetworkWalletIdSet = new Set(
+      stores.connector.wallets.map(w => w.publicDeriverId)
+    );
+    // Removing any previous whitelisted connections for the same url, but keep
+    // the connection of wallets in other networks
+    const whitelist = stores.connector.currentConnectorWhitelist.filter(
+      e => !(e.url === url && currentNetworkWalletIdSet.has(e.publicDeriverId))
     );
 
     whitelist.push({
@@ -170,7 +173,7 @@ export default class ConnectContainer extends Component<
     const wallets = this.props.stores.connector.wallets;
     const error = this.props.stores.connector.errorWallets;
     const loadingWallets = this.props.stores.connector.loadingWallets;
-    const network = 'Cardano';
+    const currentNetworkId = this.props.stores.profile.getCurrentNetworkId();
 
     return (
       <ConnectPage
@@ -184,7 +187,7 @@ export default class ConnectContainer extends Component<
         message={responseMessage}
         publicDerivers={wallets}
         onSelectWallet={this.onSelectWallet}
-        network={network}
+        networkId={currentNetworkId}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         shouldHideBalance={this.props.stores.profile.shouldHideBalance}
         unitOfAccount={this.props.stores.profile.unitOfAccount}
