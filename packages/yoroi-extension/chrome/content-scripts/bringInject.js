@@ -1,5 +1,5 @@
 // @flow
-import { bringInitContentScript } from "@bringweb3/chrome-extension-kit";
+import { bringInitContentScript } from "@emurgo/bringweb3-chrome-extension-kit";
 import {
   getFirstAddress,
   getTheme,

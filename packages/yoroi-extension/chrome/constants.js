@@ -49,6 +49,8 @@ export function genCSP(request: {|
   // Bringweb3
   frameSrc.push('https://*.bringweb3.io/')
   connectSrc.push('https://*.bringweb3.io')
+  // cashback domain whitelist
+  connectSrc.push('https://raw.githubusercontent.com');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
