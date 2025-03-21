@@ -159,6 +159,7 @@ export const GovernanceContextProvider = ({
     stakePoolKeyHash: currentPool?.hash ?? '',
     walletId: currentWallet.walletId,
     stakingKeyHex,
+    networkId,
     checkUserPassword,
     createDrepDelegationTransaction,
     txDelegationResult,
@@ -175,7 +176,6 @@ export const GovernanceContextProvider = ({
     recentTransactions,
     submitedTransactions,
     ampli,
-    networkId: selectedWallet.networkId,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

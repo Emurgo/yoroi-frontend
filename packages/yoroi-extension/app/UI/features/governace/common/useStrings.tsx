@@ -46,6 +46,10 @@ export const messages = Object.freeze(
       id: 'governance.delegateToDRep',
       defaultMessage: '!!!Delegate to a DRep',
     },
+    delegateToYoroiDRep: {
+      id: 'governance.delegateToYoroiDRep',
+      defaultMessage: '!!!Delegate to Yoroi DRep',
+    },
     delegatingToDRep: {
       id: 'governance.delegatingToDRep',
       defaultMessage: '!!!Delegating to a DRep',
@@ -150,6 +154,7 @@ export const useStrings = () => {
 
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),
+    delegateToYoroiDRep: intl.formatMessage(messages.delegateToYoroiDRep),
     delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),

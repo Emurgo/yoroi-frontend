@@ -8,6 +8,7 @@ export const popupConnectorWindowTitle = 'Yoroi Dapp Connector';
 export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
+export const ledgerConnectTabName = 'Ledger Connect | Yoroi';
 export const backgroungTabName = 'background';
 export const serviceWorkersTabName = 'chrome://serviceworker-internals';
 export const serviceWorkersLink = 'chrome://serviceworker-internals';

@@ -414,7 +414,12 @@ export const getProtocolParameters: GetProtocolParametersType = async (
 ) => {
   return await callBackground({ type: GetProtocolParameters.typeTag, request: { networkId } });
 }
-  
+
+
+export function setCashbackWallet(id: number): void {
+  chrome.runtime.sendMessage({ type: 'bring_rpc_request', function: 'set-cashback-wallet', params: id });
+}
+
 // Background -> UI notifications:
 const callbacks = Object.freeze({
   walletStateUpdate: [],

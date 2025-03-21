@@ -1,31 +1,37 @@
 import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 import { useGovernance } from '../module/GovernanceContextProvider';
+import { YOROI_DREP_ID } from './constants';
 
 type Props = {
   title: string;
   titleHover?: string;
   description: string;
   descriptionHover?: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   selected: boolean;
   onClick: () => void;
   pending: boolean;
   loading: boolean;
+  smallCard?: boolean;
+  isVisible?: boolean;
+  extraInfo?: string | null;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  width: '294px',
-  height: '362px',
+  width: smallCard ? '298px' : '612px',
+  paddingTop: '16px',
+  paddingBottom: '16px',
+  maxHeight: '300px',
+  minHeight: '126px',
   borderRadius: '8px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
 
@@ -78,31 +84,41 @@ export const GovernanceVoteingCard = ({
   onClick,
   pending = false,
   loading = false,
+  smallCard,
+  isVisible,
+  extraInfo,
 }: Props) => {
   const [hover, onHover] = React.useState(false);
   const { governanceStatus } = useGovernance();
+  if (isVisible === false) return <></>;
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard
         onClick={pending ? undefined : onClick}
         pending={pending ? 'true' : undefined}
         selected={selected}
-        is_drep_selected={String(governanceStatus.status === 'delegate')}
+        is_drep_selected={String(governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID)}
+        smallCard={smallCard}
       >
         {loading && (
           <SpinnerBox>
             <LoadingSpinner />
           </SpinnerBox>
         )}
-        <CardContent>
+        <Stack direction="column" px="16px">
           <IconContainer>{icon}</IconContainer>
-          <Typography variant="h3" fontWeight="500" mt="16px">
+          <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color={'ds.gray_800'} style={{ wordWrap: 'break-word', maxWidth: '260px' }}>
+          <Description variant="body2" color="ds.gray_800" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
-        </CardContent>
+        </Stack>
+        {extraInfo && (
+          <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium">
+            {extraInfo}
+          </Typography>
+        )}
       </StyledCard>
     </div>
   );

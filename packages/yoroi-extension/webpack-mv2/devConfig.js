@@ -108,4 +108,58 @@ const baseDevConfig = (
   }
 });
 
-module.exports = { baseDevConfig };
+const contentScriptConfig = (
+  networkName /*: string */,
+  isNightly /*: boolean */,
+  isLight /* : ?boolean */ = false
+) /*: * */ => ({
+  mode: 'development',
+  resolve: commonConfig.resolve(),
+  devtool: 'source-map',
+  entry: {
+    contentScript: [
+      path.join(__dirname, '../chrome/content-scripts/bringInject.js'),
+    ]
+  },
+  devServer: {
+    devMiddleware: {
+      writeToDisk: true,
+    },
+    hot: false,
+    liveReload: false,
+    // HTTP is not actually used because injected code must always be written to `dev` dir
+    port: 3001,
+  },
+  output: {
+    path: path.join(__dirname, '../dev/js'),
+    filename: 'bringInject.js',
+  },
+
+  plugins: [
+    new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 1
+    }),
+    new webpack.DefinePlugin(commonConfig.definePlugin(
+      networkName,
+      false,
+      isNightly,
+      Boolean(isLight),
+    )),
+    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+  ],
+  module: {
+    rules: [
+      ...commonConfig.rules(false),
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        options: {
+          presets: []
+        }
+      },
+    ]
+  },
+});
+
+module.exports = { baseDevConfig, contentScriptConfig };

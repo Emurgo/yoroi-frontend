@@ -46,6 +46,12 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
 
+  // Bringweb3
+  frameSrc.push('https://*.bringweb3.io/')
+  connectSrc.push('https://*.bringweb3.io')
+  // cashback domain whitelist
+  connectSrc.push('https://raw.githubusercontent.com');
+
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [
@@ -63,3 +69,5 @@ export const injectedScripts = [
   'cardanoApiInject.js',
   'initialInject.js',
 ];
+
+export const speculosEndpoint = 'http://localhost:5001';
