@@ -88,6 +88,54 @@ export const messages = Object.freeze(
       id: 'connector.signin.reorg.title',
       defaultMessage: '!!!Add collateral',
     },
+    identifyDrep: {
+      id: 'transaction.review.identifyDrep',
+      defaultMessage: '!!!Identify your preferred DRep and enter their ID below to delegate your vote:',
+    },
+    confirmLabel: {
+      id: 'global.labels.confirm',
+      defaultMessage: '!!!confirm',
+    },
+    registerStakingKey: {
+      id: 'transaction.review.registerStakingKey',
+      defaultMessage: '!!!Register Staking key deposit',
+    },
+    trezorConfirm: {
+      id: 'transaction.review.trezorConfirm',
+      defaultMessage: '!!!Confirm using Trezor',
+    },
+    ledgerConfirm: {
+      id: 'transaction.review.ledgerConfirm',
+      defaultMessage: '!!!Confirm using Ledger',
+    },
+    submitLabel: {
+      id: 'global.labels.submit',
+      defaultMessage: '!!!submit',
+    },
+    cancelLabel: {
+      id: 'global.labels.cancel',
+      defaultMessage: '!!!cancel',
+    },
+    transactionReview: {
+      id: 'transaction.review.transactionReview',
+      defaultMessage: '!!!Transaction Review',
+    },
+    walletDetails: {
+      id: 'transaction.review.walletDetails',
+      defaultMessage: '!!!Wallet Details',
+    },
+    submitTransaction: {
+      id: 'transaction.review.submitTransaction',
+      defaultMessage: '!!!Submit Transaction',
+    },
+    chooseDrep: {
+      id: 'governance.chooseDrep',
+      defaultMessage: '!!!Choose your Drep',
+    },
+    operations: {
+      id: 'governance.operations',
+      defaultMessage: '!!!operations',
+    },
   })
 );
 
@@ -115,5 +163,17 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     collateralInfo: intl.formatMessage(messages.collateralInfo),
     addCollateral: intl.formatMessage(messages.addCollateral),
+    identifyDrep: intl.formatMessage(messages.identifyDrep),
+    confirmLabel: intl.formatMessage(messages.confirmLabel),
+    registerStakingKey: intl.formatMessage(messages.registerStakingKey),
+    trezorConfirm: intl.formatMessage(messages.trezorConfirm),
+    ledgerConfirm: intl.formatMessage(messages.ledgerConfirm),
+    submitLabel: intl.formatMessage(messages.submitLabel),
+    cancelLabel: intl.formatMessage(messages.cancelLabel),
+    transactionReview: intl.formatMessage(messages.transactionReview),
+    walletDetails: intl.formatMessage(messages.walletDetails),
+    submitTransaction: intl.formatMessage(messages.submitTransaction),
+    chooseDrep: intl.formatMessage(messages.chooseDrep),
+    operations: intl.formatMessage(messages.operations),
   }).current;
 };

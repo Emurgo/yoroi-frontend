@@ -2,8 +2,10 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack } from '@mui/material';
 import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { useStrings } from '../hooks/useStrings';
 
 export const BottomActions = () => {
+  const strings = useStrings();
   const {
     closeTxReviewModal,
     changeModalView,
@@ -18,12 +20,12 @@ export const BottomActions = () => {
 
   const handleSubmitText = () => {
     if (walletType === 'trezor') {
-      return 'Confirm using Trezor';
+      return strings.trezorConfirm;
     }
     if (walletType === 'ledger') {
-      return 'Confirm using Ledger';
+      return strings.ledgerConfirm;
     }
-    return 'Submit';
+    return strings.submitLabel;
   };
 
   if (modalView === 'submitTx') {
@@ -74,7 +76,7 @@ export const BottomActions = () => {
               closeTxReviewModal();
             }}
           >
-            Cancel
+            {strings.cancelLabel}
           </Button>
           <Button
             sx={{ width: '229px' }}
@@ -84,7 +86,7 @@ export const BottomActions = () => {
               changeModalView({ modalView: 'submitTx', title: 'Submit Transaction' });
             }}
           >
-            Confirm
+            {strings.confirmLabel}
           </Button>
         </Stack>
       </Box>
