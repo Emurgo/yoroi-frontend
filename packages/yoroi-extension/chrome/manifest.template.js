@@ -67,6 +67,8 @@ export default ({
     },
     permissions: [
       'storage',
+      'tabs',
+      'alarms',
       // so that the background service could access `chrome.system.display.width`
       'system.display',
     ],
@@ -78,6 +80,18 @@ export default ({
         matches: ['*://connect.trezor.io/*/popup.html*'],
         js: ['js/trezor-content-script.js'],
       },
+      {
+        matches: [
+          'file://*/*',
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/bringInject.js',
+        ],
+        run_at: 'document_start',
+        all_frames: true,
+      }
     ],
     content_security_policy: {
       extension_pages: contentSecurityPolicy

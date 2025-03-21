@@ -38,7 +38,7 @@ import {
   SignFail,
   SignWindowRetrieveData,
   ConnectWindowRetrieveData,
-  RemoveWalletFromWhiteList,
+  NotifyDAppConnectionRemoved,
   GetConnectedSites,
 } from './connector';
 import { GetProtocolParameters } from './protocolParameters';
@@ -83,7 +83,7 @@ const handlerMap = Object.freeze({
   [SignFail.typeTag]: SignFail.handle,
   [SignWindowRetrieveData.typeTag]: SignWindowRetrieveData.handle,
   [ConnectWindowRetrieveData.typeTag]: ConnectWindowRetrieveData.handle,
-  [RemoveWalletFromWhiteList.typeTag]: RemoveWalletFromWhiteList.handle,
+  [NotifyDAppConnectionRemoved.typeTag]: NotifyDAppConnectionRemoved.handle,
   [GetConnectedSites.typeTag]: GetConnectedSites.handle,
 
   [GetProtocolParameters.typeTag]: GetProtocolParameters.handle,

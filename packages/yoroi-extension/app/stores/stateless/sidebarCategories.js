@@ -1,6 +1,7 @@
 // @flow
 import type { MessageDescriptor } from 'react-intl';
 import { ReactComponent as dappConnectorIcon } from '../../assets/images/dapp-connector/dapp-connector.inline.svg';
+import { ReactComponent as CashbackIcon } from '../../assets/images/sidebar/cashback.inline.svg';
 import { ReactComponent as governanceIcon } from '../../assets/images/sidebar/revamp/governance.inline.svg';
 import { ReactComponent as nftsIcon } from '../../assets/images/sidebar/revamp/nfts.inline.svg';
 import { ReactComponent as portfolioIcon } from '../../assets/images/sidebar/revamp/portfolio.inline.svg';
@@ -15,9 +16,9 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-  selected: ?WalletState,
-  currentRoute: string,
-  isRewardWallet: isRewardWalletFunc,
+    selected: ?WalletState,
+      currentRoute: string,
+        isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
 type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
@@ -25,10 +26,10 @@ type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
-  +icon: string,
-  +label?: MessageDescriptor,
-  +isVisible: isVisibleFunc,
-  +featureFlagName?: string,
+    +icon: string,
+      +label ?: MessageDescriptor,
+      +isVisible: isVisibleFunc,
+        +featureFlagName ?: string,
 |};
 
 const HAS_SELECTED_WALLET = ({ selected }) => selected != null;
@@ -59,7 +60,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: ({ selected }) => !selected?.isTestnet,
+    isVisible: (_request) => true,
   },
   {
     className: 'portfolio',
@@ -81,6 +82,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     isVisible: HAS_SELECTED_WALLET,
+  },
+  {
+    className: 'cashback',
+    route: ROUTES.CASHBACK.ROOT,
+    icon: CashbackIcon,
+    label: globalMessages.sidebarCashback,
+    isVisible: ({ selected }) => selected?.type !== 'trezor',
   },
   {
     className: 'connected-websites',

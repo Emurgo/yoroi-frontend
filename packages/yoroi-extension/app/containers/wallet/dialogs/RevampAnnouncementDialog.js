@@ -10,6 +10,7 @@ import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import semver from 'semver/preload';
 
 const messages = defineMessages({
   title: {
@@ -37,6 +38,14 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.3new',
     defaultMessage: '!!!Trezor Safe 3 and Safe 5 support"',
   },
+  update4: {
+    id: 'wallet.revampAnnouncement.updates.4new',
+    defaultMessage: '!!!Cashback service integration"',
+  },
+  update5: {
+    id: 'wallet.revampAnnouncement.updates.5new',
+    defaultMessage: '!!!Yoroi DRep vote delegation"',
+  },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
     defaultMessage: '!!!Go to the wallet',
@@ -44,6 +53,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
+  lastAnnouncedFeatureVersion: string,
   onClose: void => void,
 |};
 
@@ -55,7 +65,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
 
   render(): Node {
     const { intl } = this.context;
-    const { onClose } = this.props;
+    const { onClose, lastAnnouncedFeatureVersion } = this.props;
     const actions = [
       {
         label: intl.formatMessage(messages.goToWalletLabel),
@@ -63,6 +73,15 @@ export class RevampAnnouncementDialog extends Component<Props> {
         primary: true,
       },
     ];
+
+    const updates = [];
+    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.5.0')) {
+      updates.push(messages.update1, messages.update2, messages.update3);
+    }
+    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.6.0')) {
+      updates.push(messages.update4, messages.update5);
+    }
+
     return (
       <Dialog
         title={intl.formatMessage(messages.title)}
@@ -102,7 +121,7 @@ export class RevampAnnouncementDialog extends Component<Props> {
                   width: '100%',
                 }}
               >
-                {[messages.update1, messages.update2, messages.update3].map(message => (
+                {updates.map(message => (
                   <Typography component="li" variant="body1" color="grayscale.900">
                     {intl.formatMessage(message)}
                   </Typography>

@@ -24,19 +24,24 @@ import {
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { isLedgerNanoWallet, isAnyTrezorWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
-import { isCardanoHaskell, isTestnet, } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isTestnet,
+  getNetworkById
+} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
 import { asAddressedUtxo, cardanoValueFromRemoteFormat, } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
-import { getDb } from '../state/databaseManager';
 // eslint-disable-next-line import/no-cycle
 import { refreshingWalletIdSet } from '../state/refreshScheduler';
 import { loadWalletsFromStorage } from '../../../../app/api/ada/lib/storage/models/load';
 import { getProtocolParameters } from './yoroi/protocolParameters';
+import AdaApi from '../../../../app/api/ada';
+import { getDb, syncWallet } from '../state';
 
-export async function getWalletsState(publicDeriverId: ?number): Promise<Array<WalletState>> {
+export async function getWalletsState(publicDeriverId: ?number, targetNetworkId: ?number): Promise<Array<WalletState>> {
   const db = await getDb();
   let publicDerivers = await loadWalletsFromStorage(db);
   if (publicDeriverId != null) {
@@ -47,7 +52,47 @@ export async function getWalletsState(publicDeriverId: ?number): Promise<Array<W
     publicDerivers = publicDeriver ? [publicDeriver] : [];
   }
 
-  const maybeWalletStates = await Promise.all(publicDerivers.map(async publicDeriver => {
+  let publicDeriversOfNetwork;
+  if (publicDeriverId == null && targetNetworkId != null) {
+    publicDeriversOfNetwork = [];
+    // group wallets by staking key
+    const publicDeriversByPublicKey = new Map<string, Array<PublicDeriver<>>>;
+    for (const publicDeriver of publicDerivers) {
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      const key = (await withPublicKey.getPublicKey()).Hash;
+      let value = publicDeriversByPublicKey.get(key);
+      if (!value) {
+        value = [];
+        publicDeriversByPublicKey.set(key, value);
+      }
+      value.push(publicDeriver);
+    }
+    // for each staking key, either find an existing wallet or clone one
+    for (const value of publicDeriversByPublicKey.values()) {
+      let found = false;
+      for (const publicDeriver of value) {
+        if (publicDeriver.getParent().getNetworkInfo().NetworkId === targetNetworkId) {
+          publicDeriversOfNetwork.push(publicDeriver);
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        const network = getNetworkById(targetNetworkId);
+        const adaApi = new AdaApi();
+        const clonedWallet = await adaApi.cloneWallet(db, value[0], network);
+        publicDeriversOfNetwork.push(clonedWallet);
+        syncWallet(clonedWallet, 'cloned wallet').catch(console.error);
+      }
+    }
+  } else {
+    publicDeriversOfNetwork = publicDerivers;
+  }
+
+  const maybeWalletStates = await Promise.all(publicDeriversOfNetwork.map(async publicDeriver => {
     try {
       return await getWalletState(publicDeriver);
     } catch (err) {

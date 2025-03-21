@@ -18,7 +18,8 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Link, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
+import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -63,11 +64,15 @@ const messages = defineMessages({
   },
   mainnet: {
     id: 'settings.general.aboutYoroi.network.mainnet',
-    defaultMessage: '!!!Mainnet Network',
+    defaultMessage: '!!!Mainnet',
   },
-  testnet: {
-    id: 'settings.general.aboutYoroi.network.testnet',
-    defaultMessage: '!!!Testnet Network',
+  preprod: {
+    id: 'settings.general.aboutYoroi.network.preprod',
+    defaultMessage: '!!!Preprod',
+  },
+  preview: {
+    id: 'settings.general.aboutYoroi.network.preview',
+    defaultMessage: '!!!Preview',
   },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
@@ -76,6 +81,10 @@ const messages = defineMessages({
   branchLabel: {
     id: 'settings.general.aboutYoroi.git.branch',
     defaultMessage: '!!!Branch:',
+  },
+  switchNetwork: {
+    id: 'settings.general.aboutYoroi.switchNetwork',
+    defaultMessage: '!!!SWITCH NETWORK',
   },
 });
 
@@ -130,7 +139,8 @@ const socialMediaLinks = [
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
-  wallet: null | { isTestnet: boolean, ... }
+  wallet: null | { isTestnet: boolean, networkId: number, ... },
+  onSwitchNetwork: () => void,
 |};
 
 @observer
@@ -143,48 +153,76 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
     const { intl } = this.context;
     const { wallet } = this.props;
     const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+    const getNetworkValue = () => {
+      const networkId = wallet && wallet.networkId;
+      switch (networkId) {
+        case networks.CardanoPreprodTestnet.NetworkId:
+          return intl.formatMessage(messages.preprod)
+        case networks.CardanoPreviewTestnet.NetworkId:
+          return intl.formatMessage(messages.preview)
+        default:
+          return intl.formatMessage(messages.mainnet)
+      }
+    };
+
+    const isDevOrNightly = environment.isDev() || environment.isNightly();
 
     return (
       <Box
         sx={{
           pb: '20px',
           mt: '40px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
         }}
       >
         <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
           {intl.formatMessage(messages.aboutYoroiLabel)}
         </Typography>
 
-        {network && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {network && (
+            <LabelWithValue
+              label={intl.formatMessage(messages.networkLabel)}
+              value={getNetworkValue()}
+              componentId={basePageComponentPath + '-networkInfo-text'}
+            />
+          )}
+
           <LabelWithValue
-            label={intl.formatMessage(messages.networkLabel)}
-            value={intl.formatMessage(messages[network])}
-            componentId={basePageComponentPath + '-networkInfo-text'}
+            label={intl.formatMessage(messages.versionLabel)}
+            value={environment.getVersion()}
+            url={baseGithubUrl + 'releases/'}
+            componentId={basePageComponentPath + '-versionInfo-text'}
           />
-        )}
 
-        <LabelWithValue
-          label={intl.formatMessage(messages.versionLabel)}
-          value={environment.getVersion()}
-          url={baseGithubUrl + 'releases/'}
-          componentId={basePageComponentPath + '-versionInfo-text'}
-        />
-
-        <LabelWithValue
-          label={intl.formatMessage(messages.commitLabel)}
-          value={environment.commit}
-          url={baseGithubUrl + 'commit/' + environment.commit}
-          componentId={basePageComponentPath + '-commitInfo-text'}
-        />
-
-        {!environment.isProduction() && (
           <LabelWithValue
-            label={intl.formatMessage(messages.branchLabel)}
-            value={environment.branch}
-            url={baseGithubUrl + 'tree/' + environment.branch}
-            componentId={basePageComponentPath + '-branchInfo-text'}
+            label={intl.formatMessage(messages.commitLabel)}
+            value={environment.commit}
+            url={baseGithubUrl + 'commit/' + environment.commit}
+            componentId={basePageComponentPath + '-commitInfo-text'}
           />
-        )}
+
+          {!environment.isProduction() && (
+            <LabelWithValue
+              label={intl.formatMessage(messages.branchLabel)}
+              value={environment.branch}
+              url={baseGithubUrl + 'tree/' + environment.branch}
+              componentId={basePageComponentPath + '-branchInfo-text'}
+            />
+          )}
+        </Box>
+
+        {isDevOrNightly ? (
+          <Button
+            onClick={this.props.onSwitchNetwork}
+            variant="secondary"
+            style={{ width: '200px' }}
+          >
+            {intl.formatMessage(messages.switchNetwork)}
+          </Button>
+        ) : null}
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

@@ -128,27 +128,27 @@ export const environment = ((
     }
   }
 ): {
-    getNetworkName: void => Network,
-    getVersion: void => string,
-    MOBX_DEV_TOOLS: ?string,
-    commit: string,
-    branch: string,
-    isJest: void => boolean,
-    isDev: void => boolean,
-    isNightly: void => boolean,
-    isTest: void => boolean,
-    isMainnet: void => boolean,
-    isProduction: void => boolean,
-    getWalletRefreshInterval: void => number,
-    getServerStatusRefreshInterval: void => number,
-    isExtension: void => boolean,
-    isFirefox: void => boolean,
-    isChrome: void => boolean,
-    canRegisterProtocol: void => boolean,
-    externalPrivacyPolicyURL: void => ?string,
-    userAgentInfo: UserAgentInfo,
-    isLight: boolean,
-    ...
+  getNetworkName: void => Network,
+  getVersion: void => string,
+  MOBX_DEV_TOOLS: ?string,
+  commit: string,
+  branch: string,
+  isJest: void => boolean,
+  isDev: void => boolean,
+  isNightly: void => boolean,
+  isTest: void => boolean,
+  isMainnet: void => boolean,
+  isProduction: void => boolean,
+  getWalletRefreshInterval: void => number,
+  getServerStatusRefreshInterval: void => number,
+  userAgentInfo: UserAgentInfo,
+  isLight: boolean,
+  isExtension: void => boolean,
+  isFirefox: void => boolean,
+  isChrome: void => boolean,
+  canRegisterProtocol: void => boolean,
+  externalPrivacyPolicyURL: void => ?string,
+  ...
 });
 
 export default environment;

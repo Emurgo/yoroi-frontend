@@ -76,7 +76,7 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           nameValidator={name => isValidWalletName(name)}
         />
         {notifFeatFlagEnabled && (
-          <NotificationsSettings intl={intl}/>
+          <NotificationsSettings />
         )}
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting 

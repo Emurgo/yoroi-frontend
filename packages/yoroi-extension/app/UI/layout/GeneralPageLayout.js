@@ -7,7 +7,6 @@ import SidebarContainer from '../../containers/SidebarContainer';
 import { ModalProvider } from '../components/modals/ModalContext';
 import { ModalManager } from '../components/modals/ModalManager';
 import { IntlProvider } from '../context/IntlProvider';
-import NotificationsManager from '../components/notifications/NotificationsManager'
 
 @observer
 export default class GeneralPageLayout extends React.Component {
@@ -26,7 +25,6 @@ export default class GeneralPageLayout extends React.Component {
 
     return (
       <IntlProvider intl={intl}>
-        <NotificationsManager />
         <ModalProvider>
           <ModalManager />
           <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>

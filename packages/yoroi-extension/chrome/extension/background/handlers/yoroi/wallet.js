@@ -13,7 +13,7 @@ import { getCardanoStateFetcher } from '../../utils';
 import LocalStorageApi, {
   loadSubmittedTransactions, persistSubmittedTransactions
 } from '../../../../../app/api/localStorage';
-import { getPublicDeriverById } from './utils';
+import { getPublicDeriverById, notifyAllTabsCashbackWalletChange } from './utils';
 import { removePublicDeriver } from '../../../../../app/api/ada/lib/storage/bridge/walletBuilder/remove';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import {
@@ -21,6 +21,7 @@ import {
   asGetSigningKey,
   asGetAllAccounting,
   asHasLevels,
+  asGetPublicKey,
 } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
   removeAllTransactions,
@@ -29,6 +30,8 @@ import type { ReferenceTransaction, BaseGetTransactionsRequest } from '../../../
 import WalletTransaction from '../../../../../app/domain/WalletTransaction';
 import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
+import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
+import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -57,16 +60,18 @@ export const CreateWallet: HandlerType<CreateWalletRequest, CreateWalletResponse
       walletPassword: request.walletPassword,
       accountIndex: request.accountIndex,
     });
+    const publicDeriverId = publicDerivers[0].getPublicDeriverId();
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
       params: {
         eventType: 'new',
-        publicDeriverId: publicDerivers[0].getPublicDeriverId(),
+        publicDeriverId,
       }
     });
     // noinspection ES6MissingAwait
     syncWallet(publicDerivers[0], 'new wallet', 1);
+    maybeNotifyCashbackWalletChange(publicDerivers[0]);
     return await getPlaceHolderWalletState(publicDerivers[0]);
   },
 });
@@ -92,8 +97,6 @@ export const CreateHardwareWallet: HandlerType<
 
     const db = await getDb();
 
-    const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
-
     const adaApi = new AdaApi();
     const { publicDeriver } = await adaApi.createHardwareWallet({
       db,
@@ -101,22 +104,32 @@ export const CreateHardwareWallet: HandlerType<
       walletName: request.walletName,
       publicKey: request.publicKey,
       hwFeatures: request.hwFeatures,
-      checkAddressesInUse: stateFetcher.checkAddressesInUse,
       addressing: request.addressing,
     });
+    const publicDeriverId = publicDeriver.getPublicDeriverId();
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
       params: {
         eventType: 'new',
-        publicDeriverId: publicDeriver.getPublicDeriverId(),
+        publicDeriverId,
       }
     });
-    syncWallet(publicDeriver, 'new wallet', 1);
-
+    await syncWallet(publicDeriver, 'new wallet', 1);
+    maybeNotifyCashbackWalletChange(publicDeriver);
     return await getPlaceHolderWalletState(publicDeriver);
   },
 });
+
+function maybeNotifyCashbackWalletChange(newWallet: PublicDeriver<>) {
+  (async () => {
+    const db = await getDb();
+    const publicDerivers = await loadWalletsFromStorage(db);
+    if (publicDerivers.length === 1 && !isAnyTrezorWallet(newWallet.getParent())) {
+      notifyAllTabsCashbackWalletChange();
+    }
+  })().catch(console.error);
+}
 
 export const RemoveWallet: HandlerType<
   {| publicDeriverId: number |},
@@ -125,12 +138,27 @@ export const RemoveWallet: HandlerType<
   typeTag: 'remove-wallet',
 
   handle: async (request) => {
-    const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+    const removeKey = await (async () => {
+      const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      return (await withPublicKey.getPublicKey()).Hash;
+    })();
 
-    await removePublicDeriver({
-      publicDeriver,
-      conceptualWallet: publicDeriver.getParent(),
-    });
+    for (const publicDeriver of await loadWalletsFromStorage(await getDb())) {
+      const withPublicKey = asGetPublicKey(publicDeriver);
+      if (withPublicKey == null) {
+        throw new Error('unexpected missing public key');
+      }
+      if ((await withPublicKey.getPublicKey()).Hash === removeKey) {
+        await removePublicDeriver({
+          publicDeriver,
+          conceptualWallet: publicDeriver.getParent(),
+        });
+      }
+    }
 
     emitUpdateToSubscriptions({
       type: 'wallet-state-update',
@@ -139,6 +167,11 @@ export const RemoveWallet: HandlerType<
         publicDeriverId: request.publicDeriverId,
       }
     });
+
+    const localStorageApi = new LocalStorageApi();
+    if (await localStorageApi.getCashbackWalletId() === request.publicDeriverId) {
+      notifyAllTabsCashbackWalletChange();
+    }
   },
 });
 
@@ -171,13 +204,13 @@ export const RenameConceptualWallet: HandlerType<
 });
 
 export const GetWallets: HandlerType<
-  {| walletId: ?number |},
+  {| networkId: number |},
   Array<WalletState>,
 > = Object.freeze({
   typeTag: 'get-wallets',
 
   handle: async (request) => {
-    return await getWalletsState(request.walletId);
+    return await getWalletsState(undefined, request.networkId);
   },
 });
 

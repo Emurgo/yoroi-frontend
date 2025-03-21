@@ -130,48 +130,6 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
-  CardanoSanchoTestnet: ({
-    NetworkId: 4_50,
-    NetworkName: 'Cardano Sancho Testnet',
-    NetworkFeatureName: 'sanchonet',
-    Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000'
-        : 'https://sanchonet-backend.yoroiwallet.com',
-      TokenInfoService:
-        'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-sanchonet.emurgornd.com',
-    },
-    BaseConfig: ([
-      Object.freeze({
-        StartAt: 0,
-        ChainNetworkId: '0',
-        ByronNetworkId: 4,
-        GenesisDate: '1686789000000',
-        SlotsPerEpoch: 4320,
-        SlotDuration: 20,
-      }),
-      Object.freeze({
-        StartAt: 0,
-        SlotsPerEpoch: 86400,
-        SlotDuration: 1,
-        PerEpochPercentageReward: 69344,
-        LinearFee: {
-          coefficient: '44',
-          constant: '155381',
-        },
-        CoinsPerUtxoWord: '34482',
-        MinimumUtxoVal: '1000000',
-        PoolDeposit: '500000000',
-        KeyDeposit: '2000000',
-      }),
-      Object.freeze({
-        CoinsPerUtxoByte: '4310',
-      }),
-    ]: CardanoHaskellBaseConfig),
-    CoinType: CoinTypes.CARDANO,
-    Fork: CardanoForks.Haskell,
-  }: NetworkRow),
 });
 
 export function listRelevantNetworkNamesForEnvironment(): Array<string> {
@@ -226,8 +184,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
             assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
             ticker:
               network === networks.CardanoPreprodTestnet ||
-              network === networks.CardanoPreviewTestnet ||
-              network === networks.CardanoSanchoTestnet
+              network === networks.CardanoPreviewTestnet
                 ? 'TADA'
                 : 'ADA',
             logo: null, // TODO: maybe put built-in ADA logo as base64 here

@@ -4,7 +4,11 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const tasks = require('./tasks');
 
-const { baseDevConfig, backgroundServiceWorkerConfig } = require(`../webpack/devConfig`);
+const {
+  baseDevConfig,
+  backgroundServiceWorkerConfig,
+  bringContentScriptConfig,
+} = require(`../webpack/devConfig`);
 const { argv, shouldInjectConnector, isNightly, buildAndCopyInjector } = require('./utils');
 
 // override NODE_ENV for ConfigWebpackPlugin
@@ -51,10 +55,25 @@ function devBackgroundServiceWorker() {
   server.start();
 }
 
+function devBringContentScript() {
+  const config = bringContentScriptConfig(
+    argv.env,
+    isNightly,
+    !shouldInjectConnector
+  );
+
+  const compiler = webpack(config);
+
+  const server = new WebpackDevServer(config.devServer, compiler);
+  server.start();
+}
+
 if (argv._[0] === 'main') {
   devMainWindow(argv.env);
 } else if (argv._[0] === 'background') {
   devBackgroundServiceWorker();
+} else if (argv._[0] === 'bring') {
+  devBringContentScript();
 } else {
   console.error('unknown component');
   process.exit(1);

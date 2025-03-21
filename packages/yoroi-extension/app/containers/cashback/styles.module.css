@@ -1,0 +1,44 @@
+.overlay{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    background: #00000031;
+    z-index: 12;
+}
+
+.popup{
+    position: relative;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    align-items: center;
+    height: 400px;
+    width: 480px;
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.close_btn{
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+.form{
+    display: flex;
+    flex-direction: column;
+}
+
+.iframe_overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+}
+
+.iframe{
+    position: relative;
+    z-index: 11;
+}

@@ -1,21 +1,18 @@
 // @flow
-import { action, computed, observable, runInAction } from 'mobx';
+import { computed, observable, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import BaseProfileStore from '../base/BaseProfileStore';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresMap } from '../index';
 import { ComplexityLevels } from '../../types/complexityLevelType';
-import type { WalletsNavigation } from '../../api/localStorage'
+import type { WalletsNavigation } from '../../api/localStorage';
 import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
 import { noop } from '../../coreUtils';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
-  @observable __selectedNetwork: void | $ReadOnly<NetworkRow> = undefined;
-
   /**
    * We only want to redirect users once when the app launches
    */
@@ -106,25 +103,29 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         await stores.memos.loadFromStorage();
         await stores.tokenInfoStore.refreshTokenInfo();
         await stores.coinPriceStore.loadFromStorage();
-
         await wallets.restoreWalletsFromStorage();
-        if (wallets.hasAnyWallets && stores.loading.fromUriScheme) {
-          stores.app.goToRoute({ route: ROUTES.SEND_FROM_URI.ROOT });
-        } else {
-          const firstWallet =
-            wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
-          if (firstWallet == null) {
-            stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
-            return;
-          }
-          const lastSelectedWallet = await this.stores.wallets.getLastSelectedWallet();
-          stores.app.goToRoute({
-            route: ROUTES.WALLETS.ROOT,
-            publicDeriverId: lastSelectedWallet?.publicDeriverId ?? firstWallet.publicDeriverId,
-          });
+
+        const firstWallet = wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
+        if (firstWallet == null) {
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+          return;
         }
-        if (stores.loading.shouldRedirect) {
-          stores.loading.redirect();
+        let wallet;
+        if (stores.loading.shouldGotoCashback) {
+          wallet = await wallets.getCashbackWallet();
+        }
+        if (!wallet) {
+          wallet = await wallets.getLastSelectedWallet();
+        }
+        if (!wallet) {
+          wallet = firstWallet;
+        }
+        stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
+
+        if (stores.loading.landingRoute) {
+          stores.app.goToRoute({ route: stores.loading.landingRoute });
+        } else {
+          stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }
         runInAction(() => {
           this.hasRedirected = true;
@@ -133,40 +134,34 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     },
   ];
 
-  @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getUriSchemeAcceptance);
+  @observable getUriSchemeAcceptanceRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getUriSchemeAcceptance
+  );
 
-  @observable setUriSchemeAcceptanceRequest: Request<(void) => Promise<void>> = new Request<
-    (void) => Promise<void>
-  >(this.api.localStorage.setUriSchemeAcceptance);
+  @observable setUriSchemeAcceptanceRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
+    this.api.localStorage.setUriSchemeAcceptance
+  );
 
-  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<
-    (void) => Promise<boolean>
-  >(this.api.localStorage.getToggleSidebar);
+  @observable getToggleSidebarRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
+    this.api.localStorage.getToggleSidebar
+  );
 
-  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<
-    (boolean) => Promise<void>
-  >(this.api.localStorage.setToggleSidebar);
+  @observable setToggleSidebarRequest: Request<(boolean) => Promise<void>> = new Request<(boolean) => Promise<void>>(
+    this.api.localStorage.setToggleSidebar
+  );
 
-  @observable getWalletsNavigationRequest:
-    Request<(void) => Promise<?WalletsNavigation>> = new Request<
+  @observable getWalletsNavigationRequest: Request<(void) => Promise<?WalletsNavigation>> = new Request<
     (void) => Promise<?WalletsNavigation>
   >(this.api.localStorage.getWalletsNavigation);
 
-  @observable setWalletsNavigationRequest: Request<
-  WalletsNavigation => Promise<void>
-  > = new Request<WalletsNavigation => Promise<void>>(
-    (walletsNavigation) => this.api.localStorage.setWalletsNavigation(walletsNavigation)
-  );
+  @observable setWalletsNavigationRequest: Request<(WalletsNavigation) => Promise<void>> = new Request<
+    (WalletsNavigation) => Promise<void>
+  >(walletsNavigation => this.api.localStorage.setWalletsNavigation(walletsNavigation));
 
   setup(): void {
     super.setup();
-    this.registerReactions([
-      this._checkSetupSteps,
-    ]);
+    this.registerReactions([this._checkSetupSteps]);
     this._getUriSchemeAcceptance(); // eagerly cache
-    noop(this._getSortedWalletList());
   }
 
   teardown(): void {
@@ -180,16 +175,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     });
   };
 
-  // ========== Active API ========== //
-
-  @computed get selectedNetwork(): void | $ReadOnly<NetworkRow> {
-    return this.__selectedNetwork;
-  }
-
-  @action setSelectedNetwork: ($ReadOnly<NetworkRow> | void) => void = type => {
-    this.__selectedNetwork = type;
-  };
-
   // ========== Paper Wallets ========== //
 
   @computed get paperWalletsIntro(): string {
@@ -199,10 +184,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
   // ========== URI Scheme acceptance ========== //
 
   @computed get hasLoadedUriSchemeAcceptance(): boolean {
-    return (
-      this.getUriSchemeAcceptanceRequest.wasExecuted &&
-      this.getUriSchemeAcceptanceRequest.result !== null
-    );
+    return this.getUriSchemeAcceptanceRequest.wasExecuted && this.getUriSchemeAcceptanceRequest.result !== null;
   }
 
   @computed get isUriSchemeAccepted(): boolean {
@@ -247,24 +229,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         return;
       }
     }
-  };
-
-  // ========== Sort wallets - Revamp ========== //
-  @computed get walletsNavigation(): WalletsNavigation {
-    let { result } = this.getWalletsNavigationRequest;
-    if (result == null) {
-      result = this.getWalletsNavigationRequest.execute().result;
-    }
-    return result ?? { cardano: [] };
-  }
-  _getSortedWalletList: void => Promise<void> = async () => {
-    await this.getWalletsNavigationRequest.execute();
-  };
-
-  updateSortedWalletList: WalletsNavigation => Promise<void>
-    = async (walletsNavigation) => {
-    await this.setWalletsNavigationRequest.execute(walletsNavigation);
-    await this.getWalletsNavigationRequest.execute();
   };
 }
 
