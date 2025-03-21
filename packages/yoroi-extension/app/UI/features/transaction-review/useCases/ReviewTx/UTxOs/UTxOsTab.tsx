@@ -48,13 +48,14 @@ export const UTxOsTab: any = ({ tx }) => {
 };
 
 export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
+  const strings = useStrings();
   return (
     <Stack>
       <Collapsible
         expanded={true}
         title={
           <Typography fontWeight="500" variant="h5">
-            Inputs ({inputs.length})
+            {strings.inputsLabel} ({inputs.length})
           </Typography>
         }
         content={
@@ -70,13 +71,14 @@ export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
 };
 
 const Outputs: React.FC<OutputsProps> = ({ outputs }) => {
+  const strings = useStrings();
   return (
     <Stack>
       <Collapsible
         expanded={true}
         title={
           <Typography fontWeight="500" variant="h5">
-            Outputs ({outputs.length})
+            {strings.outputsLabel} ({outputs.length})
           </Typography>
         }
         content={
@@ -111,7 +113,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
       <Stack direction="row" alignItems="center" gap="8px">
         <Icon.Indicator />
         <Typography fontWeight="500" variant="h5" color="ds.text_gray_medium">
-          Your Address
+          {strings.yourAddressLabel}
         </Typography>
       </Stack>
 
@@ -186,12 +188,13 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
 };
 
 const FeeDisplay = ({ fee, primaryTokenInfo }) => {
+  const strings = useStrings();
   return (
     <Stack direction="column" my="24px">
       <Divider />
       <Stack direction="row" justifyContent="space-between" my="24px">
         <Typography variant="body1" fontWeight="500">
-          Fee
+          {strings.feeLabel}
         </Typography>
         <Typography variant="body1">{`-${new BigNumber(fee).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
           primaryTokenInfo.name

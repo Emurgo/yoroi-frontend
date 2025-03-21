@@ -61,12 +61,18 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
           await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
       } else {

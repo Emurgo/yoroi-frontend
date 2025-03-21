@@ -2,8 +2,10 @@ import { Button, Stack, Typography, Link } from '@mui/material';
 import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { Ilustration } from './Ilustration';
+import { useStrings } from '../../common/hooks/useStrings';
 
 export const CollateralCreation = () => {
+  const strings = useStrings();
   const { closeTxReviewModal, changeModalView } = useTxReviewModal();
 
   const learnMoreLink = (
@@ -13,7 +15,7 @@ export const CollateralCreation = () => {
       rel="noreferrer"
       sx={{ textDecoration: 'none' }}
     >
-      Learn more
+      {strings.learnMore}
     </Link>
   );
   return (
@@ -22,8 +24,7 @@ export const CollateralCreation = () => {
         <Ilustration />
 
         <Typography color="ds.text_gray_medium" variant="body1" textAlign="center" mt="16px">
-          Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your
-          collateral if transaction validation fails. {learnMoreLink}
+          {strings.collateralInfo} {learnMoreLink}
         </Typography>
       </Stack>
       <Stack direction="row" justifyContent="space-between" p="24px" gap="24px">
@@ -45,7 +46,7 @@ export const CollateralCreation = () => {
             changeModalView({ modalView: 'transactionReview' });
           }}
         >
-          Add collateral
+          {strings.addCollateral}
         </Button>
       </Stack>
     </Stack>

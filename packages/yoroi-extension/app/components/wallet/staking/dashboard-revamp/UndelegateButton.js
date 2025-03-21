@@ -41,9 +41,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
-                  primaryTokenInfo.name
-                }`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${primaryTokenInfo.name
+                  }`}
               />
             ),
             duplicated: false,
@@ -67,13 +66,21 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
+
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
+
         }
       } else {
         await stores.substores.ada.mnemonicSend.sendMoney({

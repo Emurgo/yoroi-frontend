@@ -2,6 +2,7 @@ import { IconButton, Stack, styled, Typography } from '@mui/material';
 import React from 'react';
 import { Icon } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { useStrings } from '../hooks/useStrings';
 
 const StyledStack = styled(Stack)(() => ({}));
 const StyledButton = styled(IconButton)(({ theme }: any) => ({
@@ -17,28 +18,29 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 
 export const TopActions = ({ onBack }: { onBack?: () => void }) => {
   const { closeTxReviewModal, modalView, extraOverviewDetails } = useTxReviewModal();
+  const strings = useStrings();
   const showOnBackIcon = modalView === 'walletInfo' || modalView === 'submitTx' || modalView === 'extraDetails';
 
   const getModalTitle = () => {
     if (modalView === 'transactionConfiramtion') {
-      return 'Transaction Review';
+      return strings.transactionReview;
     }
     if (modalView === 'walletInfo') {
-      return 'Wallet Details';
+      return strings.walletDetails;
     }
     if (modalView === 'submitTx') {
-      return 'Submit Transaction';
+      return strings.submitTransaction;
     }
     if (modalView === 'chooseDrepId') {
-      return 'Choose your Drep';
+      return strings.chooseDrep;
     }
     if (modalView === 'operations') {
-      return 'Operations';
+      return strings.operations;
     }
     if (modalView === 'extraDetails') {
       return extraOverviewDetails.title;
     }
-    return 'Transaction Review';
+    return strings.transactionReview;
   };
   return (
     <StyledStack direction="row" justifyContent="center">
