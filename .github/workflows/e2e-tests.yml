@@ -129,7 +129,7 @@ jobs:
       - name: Warm up Chrome
         if: matrix.browser=='chrome'
         run: |
-          google-chrome &
+          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
           sleep 5
           pkill chrome
 
@@ -307,6 +307,13 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Warm up Chrome
+        if: matrix.browser=='chrome'
+        run: |
+          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
+          sleep 5
+          pkill chrome
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
