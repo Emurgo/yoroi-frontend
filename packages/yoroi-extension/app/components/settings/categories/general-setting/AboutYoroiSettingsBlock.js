@@ -254,13 +254,15 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         )}
       </Box>
 
-      {isDevOrNightly && <Button
-        onClick={onSwitchNetwork}
-        variant="secondary"
-        style={{ width: '200px' }}
-      >
-        {intl.formatMessage(messages.switchNetwork)}
-      </Button>}
+      {isDevOrNightly &&
+        <Button
+          onClick={onSwitchNetwork}
+          variant="secondary"
+          style={{ width: '200px' }}
+        >
+          {intl.formatMessage(messages.switchNetwork)}
+        </Button>
+      }
 
 
       <div className={styles.aboutSocial}>
