@@ -3,7 +3,7 @@ import { TransactionResult } from '../../../UI/features/transaction-review/commo
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType, closeTxReviewModal } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType } = useTxReviewModal();
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();

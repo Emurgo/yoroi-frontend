@@ -86,7 +86,8 @@ publicDeriverId: number,
 sendUsingLedgerWallet: {|
   params: SendUsingLedgerParams,
     onSuccess ?: void => void,
-      +wallet: {
+      onFail ?: void => void,
+        +wallet: {
     publicDeriverId: number,
       stakingAddressing: Addressing,
         publicKey: string,
@@ -132,7 +133,9 @@ sendUsingLedgerWallet: {|
     Logger.info('SUCCESS: ADA sent using Ledger SignTx');
   } catch (e) {
     this._setError(e);
-    request.onFail();
+    if (request.onFail) {
+      request.onFail();
+    }
   } finally {
     this._setActionProcessing(false);
   }
