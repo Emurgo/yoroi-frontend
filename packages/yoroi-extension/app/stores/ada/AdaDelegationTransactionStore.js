@@ -62,7 +62,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     wallet: WalletState,
     poolRequest?: string,
     drepCredential?: string,
-  |}) => Promise<any> = async request => {
+  |}) => Promise<void> = async request => {
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
     const absSlotNumber = new BigNumber(
@@ -83,20 +83,18 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
       absSlotNumber,
       protocolParameters,
     }).promise;
-
     if (delegationTxPromise == null) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
     await delegationTxPromise;
 
     this.markStale(false);
-    return delegationTxPromise;
   };
 
   @action
   createWithdrawalTxForWallet: ({|
     wallet: WalletState,
-  |}) => any = async request => {
+  |}) => Promise<void> = async request => {
     this.createWithdrawalTx.reset();
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
@@ -127,8 +125,6 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     }).promise;
 
     if (unsignedTx == null) throw new Error(`Should never happen`);
-
-    return unsignedTx;
   };
 
   @action
@@ -137,54 +133,19 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     password?: string,
     dialog?: any,
   |}) => Promise<void> = async request => {
-debugger
-    const result = this.createDelegationTx.result;
-    console.log('resultresult', { result, request });
-    if (result == null) {
+    const signRequest = this.createDelegationTx.result?.signTxRequest;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    const refreshWallet = () => {
-      this.stores.delegation.disablePoolTransitionState(request.wallet);
-      return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
-    };
     try {
-      if (request.wallet.type === 'ledger') {
-        await this.stores.transactionProcessingStore.adaSendAndRefresh({
-          broadcastRequest: {
-            ledger: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      if (request.wallet.type === 'trezor') {
-        await this.stores.transactionProcessingStore.adaSendAndRefresh({
-          broadcastRequest: {
-            trezor: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-      }
-      await this.stores.transactionProcessingStore.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            wallet: request.wallet,
-            password: request.password,
-            signRequest: result.signTxRequest,
-          },
+      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+        wallet: request.wallet,
+        signRequest,
+        password: request.password,
+        callback: () => {
+          this.stores.delegation.disablePoolTransitionState(request.wallet);
+          return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
         },
-        refreshWallet,
       });
     } catch (error) {
       runInAction(() => {
@@ -207,7 +168,7 @@ debugger
 
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
-    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
+    this.stores.wallets.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

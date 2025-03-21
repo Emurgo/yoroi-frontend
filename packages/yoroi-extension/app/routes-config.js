@@ -26,7 +26,6 @@ export const ROUTES = {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
-    DELEGATION_DASHBOARD: '/wallets/delegation-dashboard',
     ADAPOOL_DELEGATION_SIMPLE: '/wallets/delegation-simple',
     CARDANO_DELEGATION: '/wallets/cardano-delegation',
     CATALYST_VOTING: '/wallets/voting',
@@ -54,6 +53,10 @@ export const ROUTES = {
   ASSETS: {
     ROOT: '/assets',
     DETAILS: '/assets/tokens/:tokenId',
+  },
+  // Bringweb3
+  CASHBACK: {
+    ROOT: '/cashback'
   },
   NFTS: {
     ROOT: '/nfts',

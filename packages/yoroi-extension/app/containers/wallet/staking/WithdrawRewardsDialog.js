@@ -29,6 +29,7 @@ import Dialog from '../../../components/widgets/Dialog';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import HorizintallyCenteredLayout from '../../../components/layout/HorizintallyCenteredLayout';
 import type { StoresProps } from '../../../stores';
+import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
@@ -80,44 +81,47 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
     stores.substores.ada.trezorSend.cancel();
   }
 
-  submit: void => Promise<void> = async () => {
+  signAndBroadcast: (?string) => Promise<void>  = async (password) => {
     const { stores } = this.props;
-    const selected = stores.wallets.selected;
-    if (selected == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
-    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
-    if (signRequest == null) return;
+    const wallet = stores.wallets.selected;
+    if (wallet == null) throw new Error(`${nameof(WithdrawRewardsDialog)} no wallet selected`);
 
+    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
+    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
+      throw new Error('Unexpected missing active signing request');
+    }
+
+    await this.props.stores.substores.ada.wallets.adaSendAndRefresh({
+      wallet,
+      signRequest,
+      password,
+      callback: async () => {
+        stores.uiDialogs.closeActiveDialog();
+      },
+    });
+  }
+
+  submit: void => Promise<void> = async () => {
     if (this.spendingPasswordForm == null) {
-      if (selected.type === 'trezor') {
-        await stores.substores.ada.trezorSend.sendUsingTrezor({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (selected.type === 'ledger') {
-        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
+      await this.signAndBroadcast();
     } else {
       this.spendingPasswordForm.submit({
         onSuccess: async form => {
           const { walletPassword } = form.values();
-          await stores.substores.ada.mnemonicSend.sendMoney({
-            signRequest,
-            password: walletPassword,
-            wallet: selected,
-          });
+          await this.signAndBroadcast(walletPassword);
         },
         onError: () => {},
       });
     }
 
+    const { stores } = this.props;
     const { numberOfDecimals } = genLookupOrFail(stores.tokenInfoStore.tokenInfo)({
-      identifier: selected.defaultTokenId,
-      networkId: selected.networkId,
+      identifier: stores.wallets.selectedOrFail.defaultTokenId,
+      networkId: stores.wallets.selectedOrFail.networkId,
     }).Metadata;
+
+    const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
+    if (signRequest == null) return;
 
     ampli.claimAdaTransactionSubmitted({
       reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
@@ -362,7 +366,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
                 mb: '2px',
               }}
             >
-              <Typography component="div" variant="caption1" color="magenta.500">
+              <Typography component="div" variant="caption1" sx={{ color: 'ds.text_error' }}>
                 {intl.formatMessage(error, error.values)}
               </Typography>
             </Box>

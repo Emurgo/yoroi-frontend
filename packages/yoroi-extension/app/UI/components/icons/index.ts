@@ -4,6 +4,7 @@ import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
+import { CloseCircleIcon } from './CloseCircleIcon';
 import { CloseIcon } from './CloseIcon';
 import { Copied } from './Copied';
 import { Copy } from './Copy';
@@ -13,6 +14,7 @@ import { Info } from './Info';
 import { LeftArrow } from './LeftArrow';
 import { Receive } from './Receive';
 import { RightArrow } from './RightArrow';
+import { Receive } from './Receive';
 import { Search } from './Search';
 import { Send } from './Send';
 import { Staking } from './Staking';
@@ -22,6 +24,7 @@ import { VisibilityOn } from './VisibilityOn';
 
 export const Icon = {
   CloseIcon,
+  CloseCircleIcon,
   VisibilityOn,
   VisibilityOff,
   Copy,

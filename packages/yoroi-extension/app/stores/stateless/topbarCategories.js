@@ -6,7 +6,6 @@ import { networks } from '../../api/ada/lib/storage/database/prepackaged/network
 import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
 import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
 import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import { ReactComponent as dashboardIcon } from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
 import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
 import environment from '../../environment';
@@ -63,14 +62,6 @@ function registerCategory(category: TopbarCategory): TopbarCategory {
   return category;
 }
 
-export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
-  className: 'stakeDashboard',
-  route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-  icon: dashboardIcon,
-  label: messages.delegationDashboard,
-  // every wallet is Cardano Shelley wallet now
-  isVisible: _request => true,
-});
 export const SUMMARY: TopbarCategory = registerCategory({
   className: 'summary',
   route: ROUTES.WALLETS.TRANSACTIONS,

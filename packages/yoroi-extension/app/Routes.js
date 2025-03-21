@@ -108,9 +108,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
-const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
-const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
-
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
@@ -131,6 +128,9 @@ const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
 
 const TokensDetailPageRevampPromise = () => import('./containers/wallet/TokenDetailPageRevamp');
 const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
+
+const CashbackPagePromise = () => import('./containers/cashback/CashbackPage');
+const CashbackPage = React.lazy(CashbackPagePromise)
 
 const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
 const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
@@ -167,7 +167,6 @@ export const LazyLoadPromises: Array<() => any> = [
   URILandingPagePromise,
   WalletTransferPagePromise,
   ReceivePromise,
-  StakingDashboardPagePromise,
   CardanoStakingPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
@@ -217,6 +216,10 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
+          <Route
+            path={ROUTES.CASHBACK.ROOT}
+            component={props => <CashbackPage {...props} stores={stores} />}
+          />
           <Route exact path={ROUTES.WALLETS.ADD} component={props => <AddWalletPage {...props} stores={stores} />} />
           <Route
             exact
@@ -274,11 +277,6 @@ const WalletsSubpages = stores => (
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-      component={props => <StakingDashboardPage {...props} stores={stores} />}
     />
     <Route
       exact

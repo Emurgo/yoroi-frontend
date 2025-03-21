@@ -50,8 +50,20 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     }
   }
 
+  get landingRoute(): string | null {
+    const route = this._originRoute.route.replace(/\/$/, '');
+    if (route === '') {
+      return null;
+    }
+    return route;
+  }
+
   @computed get fromUriScheme(): boolean {
     return matchRoute(ROUTES.SEND_FROM_URI.ROOT, this._originRoute.route);
+  }
+
+  get shouldGotoCashback(): boolean {
+    return matchRoute(ROUTES.CASHBACK.ROOT, this._originRoute.route);
   }
 
   @computed get uriParams(): ?UriParams {
@@ -107,5 +119,9 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
 
   getTabIdKey(): string {
     return TabIdKeys.Primary;
+  }
+
+  isFromCashback(): boolean {
+    return /\?from=cashback$/.test(this._originRoute.location);
   }
 }

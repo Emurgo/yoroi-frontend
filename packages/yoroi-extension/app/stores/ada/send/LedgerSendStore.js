@@ -1,27 +1,18 @@
 // @flow
 import { action, observable } from 'mobx';
-
 import type { SignTransactionResponse as LedgerSignTxResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-
 import Store from '../../base/Store';
-
-import LocalizableError from '../../../i18n/LocalizableError';
-
 import { convertToLocalizableError } from '../../../domain/LedgerLocalizedError';
-
 import { Logger, stringifyData, stringifyError, } from '../../../utils/logging';
-
-import {
-  buildConnectorSignedTransaction,
-  buildSignedTransaction,
-} from '../../../api/ada/transactions/shelley/ledgerTx';
-
+import { buildConnectorSignedTransaction } from '../../../api/ada/transactions/shelley/ledgerTx';
 import { LedgerConnect } from '../../../utils/hwConnectHandler';
-import { ROUTES } from '../../../routes-config';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
-import { HaskellShelleyTxSignRequest } from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import type { Addressing, } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type {
+  HaskellShelleyTxSignRequest,
+  LedgerNanoCatalystRegistrationTxSignData,
+} from '../../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import type { Addressing, Address, Value } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { genAddressingLookup } from '../../stateless/addressStores';
 import type { StoresMap } from '../../index';
 import {
@@ -30,9 +21,10 @@ import {
 } from '../../../api/ada/lib/cardanoCrypto/catalyst';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { broadcastTransaction } from '../../../api/thunk';
-import { transactionHexToBodyHex, transactionHexToHash } from '../../../api/ada/lib/cardanoCrypto/utils';
+import { transactionHexToBodyHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { fail } from '../../../coreUtils';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+import type { CardanoAddressedUtxo } from '../../../api/ada/transactions/types';
 
 export type SendUsingLedgerParams = {|
   signRequest: ISignRequest<any>,
@@ -43,7 +35,6 @@ export default class LedgerSendStore extends Store<StoresMap> {
   // =================== VIEW RELATED =================== //
   // TODO: consider getting rid of both of these
   @observable isActionProcessing: boolean = false;
-  @observable error: ?LocalizableError;
   // =================== VIEW RELATED =================== //
 
   /** setup() is called when stores are being created
@@ -54,86 +45,12 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
   _reset(): void {
     this._setActionProcessing(false);
-    this._setError(null);
   }
 
   _preSendValidation: void => void = () => {
     if (this.isActionProcessing) {
       // this Error will be converted to LocalizableError()
       throw new Error('Can\'t send another transaction if one transaction is in progress.');
-    }
-  }
-
-  sendUsingLedgerKey: {|
-    signRequest: HaskellShelleyTxSignRequest,
-    publicKey: {|
-      key: RustModule.WalletV4.Bip32PublicKey,
-      ...Addressing,
-    |},
-    publicDeriverId: number,
-    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    expectedSerial: string | void,
-    networkId: number,
-  |} => Promise<void> = async (request) => {
-    await this.stores.transactionProcessingStore.sendAndRefresh({
-      publicDeriverId: undefined,
-      plateTextPart: undefined,
-      broadcastRequest: async () => await this.signAndBroadcast(request),
-      refreshWallet: async () => {}
-    })
-  }
-
-  sendUsingLedgerWallet: {|
-    params: SendUsingLedgerParams,
-    onSuccess?: void => void,
-    +wallet: {
-      publicDeriverId: number,
-      stakingAddressing: Addressing,
-      publicKey: string,
-      pathToPublic: Array<number>,
-      networkId: number,
-      hardwareWalletDeviceId: ?string,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-  |} => Promise<void> = async (request) => {
-    try {
-      if (this.isActionProcessing) {
-        // this Error will be converted to LocalizableError()
-        throw new Error('Can’t send another transaction if one transaction is in progress.');
-      }
-      if (!(request.params.signRequest instanceof HaskellShelleyTxSignRequest)) {
-        throw new Error(`${nameof(this.sendUsingLedgerWallet)} wrong tx sign request`);
-      }
-      const { signRequest } = request.params;
-
-      this._setError(null);
-      this._setActionProcessing(true);
-
-      const { stores } = this;
-      await stores.transactionProcessingStore.adaSendAndRefresh({
-        broadcastRequest: {
-          ledger: {
-            signRequest,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-
-      this.stores.uiDialogs.closeActiveDialog();
-      stores.transactionProcessingStore.sendMoneyRequest.reset();
-      if (request.onSuccess) {
-        request.onSuccess();
-      } else {
-        stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
-      }
-
-      Logger.info('SUCCESS: ADA sent using Ledger SignTx');
-    } catch (e) {
-      this._setError(e);
-    } finally {
-      this._setActionProcessing(false);
     }
   }
 
@@ -152,6 +69,54 @@ export default class LedgerSendStore extends Store<StoresMap> {
     try {
       Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} called: ` + stringifyData(request));
 
+      const { signedTxHex, txId, metadata } = await this.signRawTxFromWallet({
+        rawTxHex: request.signRequest.self().build_tx().to_hex(),
+        wallet: request.wallet,
+        catalystData: request.signRequest.ledgerNanoCatalystRegistrationTxSignData,
+        changeAddrs: request.signRequest.changeAddr,
+        additionalSenderUtxos: request.signRequest.senderUtxos,
+      });
+
+      if (metadata) {
+        request.signRequest.self().set_auxiliary_data(metadata);
+      }
+
+      await broadcastTransaction({
+        publicDeriverId: request.wallet.publicDeriverId,
+        signedTxHex,
+        networkId: request.networkId,
+      });
+
+      return { txId };
+    } catch (error) {
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
+      throw new convertToLocalizableError(error);
+    }
+  };
+
+  signRawTxFromWallet: {|
+    rawTxHex: string,
+    +wallet: {
+      publicDeriverId: number,
+      publicKey: string,
+      pathToPublic: Array<number>,
+      networkId: number,
+      hardwareWalletDeviceId: ?string,
+      ...
+    },
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
+    // The purpose of this parameter is to support transfering from Byron address when initializing
+   //  Ledger wallets. It is needed because the wallet's utxos property no longer contains Byron UTxOs.
+    additionalSenderUtxos?: Array<CardanoAddressedUtxo>,
+    catalystData?: LedgerNanoCatalystRegistrationTxSignData,
+  |} => Promise<{|
+    signedTxHex: string,
+    txId: string,
+    metadata: ?RustModule.WalletV4.AuxiliaryData
+  |}> = async (request) => {
+    try {
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} called: ` + stringifyData(request));
+
       const publicKeyInfo = {
         key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
         addressing: {
@@ -162,64 +127,86 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
       const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
 
-      const signRequest = request.signRequest;
-
       const addressingMap = genAddressingLookup(
         request.wallet.networkId,
-        this.stores.addresses.addressSubgroupMap
+        this.stores.addresses.addressSubgroupMap,
       );
 
-      return this.signAndBroadcast({
-        signRequest,
+      return this.signRawTx({
+        rawTxHex: request.rawTxHex,
         publicKey: publicKeyInfo,
-        publicDeriverId: request.wallet.publicDeriverId,
         addressingMap,
+        changeAddrs: request.changeAddrs,
         expectedSerial,
         networkId: request.wallet.networkId,
+        catalystData: request.catalystData,
+        additionalSenderUtxos: request.additionalSenderUtxos,
       });
 
     } catch (error) {
-      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcastFromWallet)} error: ` + stringifyError(error));
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);
     }
-  };
+  }
 
-  signAndBroadcast: {|
-    signRequest: HaskellShelleyTxSignRequest,
+  signRawTx: {|
+    rawTxHex: string,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
     |},
     addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    publicDeriverId: number,
+    changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     networkId: number,
     expectedSerial: string | void,
-  |} => Promise<{| txId: string |}> = async (request) => {
+    additionalSenderUtxos?: Array<CardanoAddressedUtxo>,
+    catalystData?: LedgerNanoCatalystRegistrationTxSignData,
+  |} => Promise<{|
+    signedTxHex: string,
+    txId: string,
+    metadata: ?RustModule.WalletV4.AuxiliaryData
+  |}> = async (request) => {
+
     let ledgerConnect: ?LedgerConnect;
     try {
-      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
+      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signRawTx)} called: ` + stringifyData(request));
 
       ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
       });
 
-      let cip36: boolean = false;
-      if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+      let ledgerSupportsCip36: boolean = false;
+      if (request.catalystData) {
         const getVersionResponse = await ledgerConnect.getVersion({
           serial: request.expectedSerial,
           dontCloseTab: true,
         });
-        cip36 = getVersionResponse.compatibility.supportsCIP36Vote === true;
+        ledgerSupportsCip36 = getVersionResponse.compatibility.supportsCIP36Vote === true;
       }
+
+      const { rawTxHex } = request;
 
       const network = getNetworkById(request.networkId);
 
-      const { ledgerSignTxPayload } = this.api.ada.createLedgerSignTxData({
-        signRequest: request.signRequest,
+      const txBodyHex = transactionHexToBodyHex(rawTxHex);
+
+      const addressedUtxos = [
+        ...await this.stores.wallets.getAddressedUtxos(),
+        ...(request.additionalSenderUtxos || [])
+      ];
+
+      const response = this.api.ada.createHwSignTxDataFromRawTx('ledger', {
+        txBodyHex,
         network,
         addressingMap: request.addressingMap,
-        cip36,
+        senderUtxos: addressedUtxos,
+        ledgerSupportsCip36,
+        catalystData: request.catalystData,
+        changeAddrs: request.changeAddrs,
       });
+
+      const ledgerSignTxPayload = response.hw === 'ledger' ? response.result.ledgerSignTxPayload
+        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for ledger: ' + JSON.stringify(response));
 
       const ledgerSignTxResp: LedgerSignTxResponse =
         await ledgerConnect.signTransaction({
@@ -235,26 +222,25 @@ export default class LedgerSendStore extends Store<StoresMap> {
       ledgerConnect.dispose();
 
       let metadata;
-
-      if (request.signRequest.ledgerNanoCatalystRegistrationTxSignData) {
+      if (request.catalystData) {
         const {
           votingPublicKey,
           stakingKey,
           paymentAddress,
           nonce,
-        } = request.signRequest.ledgerNanoCatalystRegistrationTxSignData;
+        } = request.catalystData;
 
         if (
           !ledgerSignTxResp.auxiliaryDataSupplement ||
             (ledgerSignTxResp.auxiliaryDataSupplement.type !==
               TxAuxiliaryDataSupplementType.CIP36_REGISTRATION)
         ) {
-          throw new Error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} unexpected Ledger sign transaction response`);
+          throw new Error(`${nameof(LedgerSendStore)}::${nameof(this.signRawTx)} unexpected Ledger sign transaction response`);
         }
         const { cip36VoteRegistrationSignatureHex } =
           ledgerSignTxResp.auxiliaryDataSupplement;
 
-        if (cip36) {
+        if (ledgerSupportsCip36) {
           metadata = generateRegistrationMetadata(
             votingPublicKey,
             stakingKey,
@@ -280,145 +266,21 @@ export default class LedgerSendStore extends Store<StoresMap> {
         //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')
         //  ).toString('hex') ===
         // ledgerSignTxResp.auxiliaryDataSupplement.auxiliaryDataHashaHex
-      } else {
-        metadata = request.signRequest.metadata;
       }
 
-      if (metadata) {
-        request.signRequest.self().set_auxiliary_data(metadata);
-      }
-
-      const tx = request.signRequest.self().build_tx();
-      const txId = transactionHexToHash(tx.to_hex());
-
-      const signedTx = buildSignedTransaction(
-        tx,
-        request.signRequest.senderUtxos,
-        ledgerSignTxResp.witnesses,
-        request.publicKey,
-        metadata,
-      );
-
-      await broadcastTransaction({
-        publicDeriverId: request.publicDeriverId,
-        signedTxHex: signedTx.to_hex(),
-        networkId: request.networkId,
-      });
-
-      return { txId };
-    } catch (error) {
-      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
-    } finally {
-      if (ledgerConnect != null) {
-        ledgerConnect.dispose();
-      }
-    }
-  };
-
-
-  signRawTxFromWallet: {|
-    rawTxHex: string,
-    +wallet: {
-      publicDeriverId: number,
-      publicKey: string,
-      pathToPublic: Array<number>,
-      networkId: number,
-      hardwareWalletDeviceId: ?string,
-      ...
-    },
-  |} => Promise<{| signedTxHex: string |}> = async (request) => {
-    try {
-      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} called: ` + stringifyData(request));
-
-      const publicKeyInfo = {
-        key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
-        addressing: {
-          startLevel: 1,
-          path: request.wallet.pathToPublic,
-        },
-      };
-
-      const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
-
-      const addressingMap = genAddressingLookup(
-        request.wallet.networkId,
-        this.stores.addresses.addressSubgroupMap,
-      );
-
-      return this.signRawTx({
-        rawTxHex: request.rawTxHex,
-        publicKey: publicKeyInfo,
-        addressingMap,
-        expectedSerial,
-        networkId: request.wallet.networkId,
-      });
-
-    } catch (error) {
-      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signRawTxFromWallet)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
-    }
-  }
-
-  signRawTx: {|
-    rawTxHex: string,
-    publicKey: {|
-      key: RustModule.WalletV4.Bip32PublicKey,
-      ...Addressing,
-    |},
-    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    networkId: number,
-    expectedSerial: string | void,
-  |} => Promise<{| signedTxHex: string |}> = async (request) => {
-
-    let ledgerConnect: ?LedgerConnect;
-    try {
-      Logger.debug(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} called: ` + stringifyData(request));
-
-      ledgerConnect = new LedgerConnect({
-        locale: this.stores.profile.currentLocale,
-      });
-
-      const { rawTxHex } = request;
-
-      const network = getNetworkById(request.networkId);
-
-      const txBodyHex = transactionHexToBodyHex(rawTxHex);
-
-      const addressedUtxos = await this.stores.wallets.getAddressedUtxos();
-
-      const response = this.api.ada.createHwSignTxDataFromRawTx('ledger', {
-        txBodyHex,
-        network,
-        addressingMap: request.addressingMap,
-        senderUtxos: addressedUtxos,
-      });
-
-      const ledgerSignTxPayload = response.hw === 'ledger' ? response.result.ledgerSignTxPayload
-        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for ledger: ' + JSON.stringify(response));
-
-      const ledgerSignTxResp: LedgerSignTxResponse =
-        await ledgerConnect.signTransaction({
-          serial: request.expectedSerial,
-          params: ledgerSignTxPayload,
-          useOpenTab: true,
-        });
-
-      // There is no need of ledgerConnect after this line.
-      // UI was getting blocked for few seconds
-      // because _prepareAndBroadcastSignedTx takes time.
-      // Disposing here will fix the UI issue.
-      ledgerConnect.dispose();
-
-      const signedTxHex = buildConnectorSignedTransaction(
+      const { txHex, txId } = buildConnectorSignedTransaction(
         rawTxHex,
         ledgerSignTxResp.witnesses,
         request.publicKey,
+        metadata,
+        new Map((request.additionalSenderUtxos || []).map(
+          ({ addressing, receiver }) => [addressing.path.join('/'), receiver]
+        )),
       );
 
-      return { signedTxHex };
+      return { signedTxHex: txHex, txId, metadata };
     } catch (error) {
-      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signAndBroadcast)} error: ` + stringifyError(error));
+      Logger.error(`${nameof(LedgerSendStore)}::${nameof(this.signRawTx)} error: ` + stringifyError(error));
       throw new convertToLocalizableError(error);
     } finally {
       if (ledgerConnect != null) {
@@ -436,9 +298,5 @@ export default class LedgerSendStore extends Store<StoresMap> {
 
   @action _setActionProcessing: boolean => void = (processing) => {
     this.isActionProcessing = processing;
-  }
-
-  @action _setError: ?LocalizableError => void = (error) => {
-    this.error = error;
   }
 }

@@ -14,7 +14,7 @@ import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/P
 import type { StoresMap } from '../index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { getWallets, subscribe, listenForWalletStateUpdate } from '../../api/thunk';
+import { getWallets, subscribe, listenForWalletStateUpdate, setCashbackWallet } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
@@ -67,6 +67,10 @@ export default class WalletStore extends Store<StoresMap> {
 
   flagStorage: StorageAPI;
   absoluteSlotGetters: { [string]: () => Promise<number> } = {};
+
+  @observable getCashbackWalletRequest: Request<
+    () => Promise<?WalletState>
+  > = new Request(this.getCashbackWallet.bind(this));
 
   setup(): void {
     super.setup();
@@ -155,21 +159,31 @@ export default class WalletStore extends Store<StoresMap> {
 
   @action
   _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
-    this.showWalletCreatedNotification();
+    if (this.stores.loading.isFromCashback()) {
+      noop(this.api.localStorage.setSelectedWalletPublicKey(
+        newWallet.publicKey
+      ));
+      setCashbackWallet(newWallet.publicDeriverId);
+      setTimeout(() => {
+        window.close();
+      }, 50);
+    } else {
+      this.showWalletCreatedNotification();
 
-    this.registerObserversForNewWallet({
-      publicDeriver: newWallet,
-      lastSyncInfo: newWallet.lastSyncInfo,
-    });
-
-    runInAction(() => {
-      this.wallets.push(newWallet);
-      this.setActiveWallet({
-        publicDeriverId: newWallet.publicDeriverId,
+      this.registerObserversForNewWallet({
+        publicDeriver: newWallet,
+        lastSyncInfo: newWallet.lastSyncInfo,
       });
-      this.stores.uiDialogs.closeActiveDialog();
-      this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
-    });
+
+      runInAction(() => {
+        this.wallets.push(newWallet);
+        this.setActiveWallet({
+          publicDeriverId: newWallet.publicDeriverId,
+        });
+        this.stores.uiDialogs.closeActiveDialog();
+        this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+      });
+    }
   };
 
   // =================== PUBLIC API ==================== //
@@ -373,6 +387,24 @@ export default class WalletStore extends Store<StoresMap> {
       wallet.allUtxoAddresses,
       submittedTxs,
     );
+  }
+
+  async getCashbackWallet(): Promise<?WalletState> {
+    const savedCashbackWalletId = await this.api.localStorage.getCashbackWalletId();
+    if (typeof savedCashbackWalletId !== 'number') {
+      return null;
+    }
+    for (const wallet of this.wallets) {
+      if (wallet.publicDeriverId === savedCashbackWalletId) {
+        return wallet;
+      }
+    }
+    return null;
+  }
+
+  setCashbackWallet(id: number): void {
+    setCashbackWallet(id);
+    this.getCashbackWalletRequest.patch(() => this.wallets.find(w => w.publicDeriverId === id));
   }
 
   async reorderWallets(from: number, to: number): Promise<void> {
