@@ -105,7 +105,7 @@ export const SwapTxInfo = ({ defaultTokenInfo, getTokenInfo, priceImpactState, s
   );
 };
 
-const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
+export const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
   <Box display="flex" alignItems="center" justifyContent="space-between">
     <Box display="flex" alignItems="center">
       <Typography variant="body1" color="ds.text_gray_low">

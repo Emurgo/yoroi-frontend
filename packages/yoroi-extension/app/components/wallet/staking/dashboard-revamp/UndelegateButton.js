@@ -14,7 +14,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
-    networkId,
   } = useTxReviewModal();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -32,9 +31,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     stores.substores.ada.delegationTransaction.setShouldDeregister(true);
     const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
 
-    const txBodyjson = await unsignedTx.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
-
     openTxReviewModal({
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
@@ -45,9 +41,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
-                  primaryTokenInfo.name
-                }`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${primaryTokenInfo.name
+                  }`}
               />
             ),
             duplicated: false,
@@ -55,7 +50,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
         ],
         kind: 'undelegate',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: unsignedTx.unsignedTx,
     });
   };
 
@@ -71,13 +66,21 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
+
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
+
         }
       } else {
         await stores.substores.ada.mnemonicSend.sendMoney({

@@ -3,24 +3,24 @@ import BigNumber from 'bignumber.js';
 import { toSvg } from 'jdenticon';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { observer } from 'mobx-react';
 
-export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, poolName, poolID }) => {
+export const DelegateButton = observer(({ stores, label, disabled, poolName, poolID }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
-    networkId,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
+    networkId,
   } = useTxReviewModal();
+  const isTestnet = networkId !== 0;
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
   const onDelegate = async () => {
-    const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
+    const id = isTestnet ? poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
-    const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -42,7 +42,7 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         ],
         kind: 'delegate',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: signTxRequest.unsignedTx,
     });
   };
 
@@ -75,12 +75,12 @@ export const DelegateButton = ({ stores, isTestnet, label, isWalletWithNoFunds, 
         },
       }}
       onClick={onDelegate}
-      disabled={isWalletWithNoFunds}
+      disabled={disabled}
     >
       {label}
     </Button>
   );
-};
+});
 
 const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
   return (

@@ -12,6 +12,7 @@ import { Quantities } from '../../../../../utils/quantities';
 import { useWarningSection } from '../../../common/hooks/useWarningSection';
 import { useOperations } from '../../../common/operations';
 import { useTxReviewModal } from '../../../module/ReviewTxProvider';
+import { useStrings } from '../../../common/hooks/useStrings';
 
 export interface SubMenuOption {
   label: string;
@@ -137,11 +138,12 @@ const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) 
 
 const ExternalPartySection = ({ receiverCustomTitle, output }) => {
   const address = output?.rewardAddress ?? output?.address ?? '-';
+  const strings = useStrings();
 
   return (
     <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
       <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-        To:
+        {strings.addressToLabel}:
       </Typography>
       <Typography variant="body1" color="ds.text_gray_medium">
         {receiverCustomTitle ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
@@ -177,6 +179,7 @@ const OperationsSection = ({ operations }) => {
 };
 
 const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
+  const strings = useStrings();
   const { primaryTokenInfo } = useTxReviewModal();
   const totalPrimaryTokenSent = React.useMemo(
     () =>
@@ -211,7 +214,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
           <IconWrapper>
             <Icon.Send />
           </IconWrapper>
-          <Typography fontWeight="500">Send</Typography>
+          <Typography fontWeight="500">{strings.sendLabel}</Typography>
         </Stack>
         <Stack direction="row" gap="8px" justifyContent="flex-end" flexWrap="wrap">
           <Box
@@ -227,7 +230,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
 
               return (
                 <Box sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_100', borderRadius: '8px', flexWrap: 'nowrap' }}>
-                  <Typography color="ds.white_static">
+                  <Typography color="ds.text_primary_medium">
                     {new BigNumber(item.quantity).shiftedBy(-decimals).toString()} {item.tokenInfo.info.name}
                   </Typography>
                 </Box>

@@ -87,9 +87,7 @@ export const GovernanceStatusSelection = () => {
         try {
           startLoadingTxReview();
           const txSignRequest: any = await createDrepDelegationTransaction(value);
-          const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
-          const parsedUnsignedTx = JSON.parse(txBodyjson);
-          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: parsedUnsignedTx });
+          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: txSignRequest.signTxRequest });
         } finally {
           stopLoadingTxReview();
         }
@@ -127,12 +125,9 @@ export const GovernanceStatusSelection = () => {
       setTimeout(async () => {
         const txSignRequest: any = await createDrepDelegationTransaction(kind);
 
-        const txBodyjson = await txSignRequest.signTxRequest.unsignedTx.build_tx().to_json();
-        const parsedUnsignedTx = JSON.parse(txBodyjson);
-
         openTxReviewModal({
           modalView: 'transactionReview',
-          unsignedTx: parsedUnsignedTx,
+          unsignedTx: txSignRequest.signTxRequest.unsignedTx,
           submitTx: password => {
             signGovernanceTx(password);
           },

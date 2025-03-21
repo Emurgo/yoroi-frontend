@@ -4,12 +4,14 @@ import { Drawer, styled } from '@mui/material';
 import { BottomActions } from '../common/BottomActions/BottomActions';
 import { TopActions } from '../common/TopActionSection/TopActions';
 import { ChooseDrepId } from '../useCases/ChooseDrepId/ChooseDrepId';
+import { CollateralCreation } from '../useCases/CollateralCreation/CollateralCreation';
 import { ExtraDetails } from '../useCases/ExtraDetails/ExtraDetails';
 import { Operations } from '../useCases/Operations/Operations';
 import { ReviewTxSection } from '../useCases/ReviewTx/ReviewTxSection';
 import { SubmitInput } from '../useCases/SubmitTx/SubmitInput';
 import { WalletInfoSection } from '../useCases/WalletInfo/WalletInfoSection';
 import { useTxReviewModal } from './ReviewTxProvider';
+import { useStrings } from '../common/hooks/useStrings';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
@@ -25,7 +27,7 @@ export const ReviewTxManager = () => {
     bottom: false,
     right: false,
   });
-
+  const strings = useStrings();
   const { isOpen, closeTxReviewModal, modalView, changeModalView, setInputError, changePasswordInputValue } = useTxReviewModal();
 
   const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -42,15 +44,15 @@ export const ReviewTxManager = () => {
 
   const handleOnBack = () => {
     if (modalView === 'walletInfo') {
-      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+      return changeModalView({ modalView: 'transactionReview', title: strings.transactionReview });
     }
     if (modalView === 'extraDetails') {
-      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+      return changeModalView({ modalView: 'transactionReview', title: strings.transactionReview });
     }
     if (modalView === 'submitTx') {
       setInputError({ type: 'setInputError', inputError: false });
       changePasswordInputValue({ type: 'passswordInput', passswordInput: '' });
-      return changeModalView({ modalView: 'transactionReview', title: 'Transaction Review' });
+      return changeModalView({ modalView: 'transactionReview', title: strings.transactionReview });
     }
     return undefined;
   };
@@ -64,6 +66,7 @@ export const ReviewTxManager = () => {
       {modalView === 'chooseDrepId' && <ChooseDrepId />}
       {modalView === 'operations' && <Operations />}
       {modalView === 'extraDetails' && <ExtraDetails />}
+      {modalView === 'collateralCreation' && <CollateralCreation />}
       <BottomActions />
     </StyledDrawer>
   );

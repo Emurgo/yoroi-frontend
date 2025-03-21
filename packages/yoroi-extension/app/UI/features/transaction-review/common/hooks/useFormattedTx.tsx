@@ -12,11 +12,12 @@ import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, networkId } = useTxReviewModal();
+
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
+  const collateral = data?.collateral ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
-
-  const inputUtxos = useUtxos(inputs, walletUtxos);
+  const inputUtxos = useUtxos(inputs, walletUtxos, collateral);
 
   const formattedFee = formatFee(primaryTokenInfo, data);
 
@@ -68,7 +69,7 @@ const formatInputs = async (inputUtxos, allAssetList, networkId, primaryTokenInf
       const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
 
       const addressKind = address != null ? await getAddressKind(address) : null;
-      const rewardAddress = address != null && addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
+      const rewardAddress = address !== null && addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
       const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
       const primaryAssets =
         coin != null
@@ -184,24 +185,40 @@ const getAddressKind = async (addressBech32: string): Promise<any> => {
   }
 };
 
-export const useUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
-  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos), {
+export const useUtxos = (inputs: TransactionInputs, walletUtxos: any, collateral?: any) => {
+  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos, collateral), {
     suspense: true,
   });
   if (!query.data) throw new Error('invalid formatted inputs');
   return query.data;
 };
 
-const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any) => {
+const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any, collateral) => {
+  if (collateral?.length > 0) {
+    return Promise.all(collateral.map(c => getUtxo(walletUtxos, c?.transaction_id, c.index))) ?? [];
+  }
   return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index))) ?? [];
 };
 
 const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
-  const internalUtxo = utxos.find(
-    u => u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex
-  );
+  let internalUtxo = utxos.find(u => {
+    return u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex;
+  });
 
-  const hexAddr = RustModule.WalletV4.Address.from_hex(internalUtxo.address).to_bech32();
+  if (internalUtxo === undefined) {
+    const hexAddr = RustModule.WalletV4.Address.from_hex(utxos[0].address).to_bech32();
+    internalUtxo = {
+      address: hexAddr,
+      amount: utxos[0].output?.tokens[0].TokenList.Amount,
+      assets: utxos[0].output?.tokens,
+      tx_hash: utxos[0].output?.Transaction?.Hash,
+      tx_index: utxos[0].output.UtxoTransactionOutput.OutputIndex,
+      utxo_id: `${utxos[0].output?.Transaction?.Hash}:${utxos[0].output.UtxoTransactionOutput.OutputIndex}`,
+    };
+    return internalUtxo;
+  }
+
+  const hexAddr = RustModule.WalletV4.Address.from_hex(internalUtxo?.address).to_bech32();
   return {
     amount: internalUtxo.output?.tokens[0].TokenList.Amount,
     assets: internalUtxo.output?.tokens,

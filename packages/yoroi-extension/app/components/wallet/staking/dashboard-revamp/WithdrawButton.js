@@ -34,9 +34,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
     stores.substores.ada.delegationTransaction.setShouldDeregister(false);
     const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
 
-    const txBodyjson = await unsignedTx.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
-
     openTxReviewModal({
       modalView: 'transactionReview',
       submitTx: passswordInput => submitTx(passswordInput),
@@ -49,7 +46,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         ],
         kind: 'withdraw',
       },
-      unsignedTx: parsedUnsignedTx, // Ensure it stays in sync with the store
+      unsignedTx: unsignedTx.unsignedTx,
     });
   };
 
@@ -64,12 +61,18 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
           await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
       } else {

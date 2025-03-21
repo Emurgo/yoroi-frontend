@@ -12,8 +12,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(poolID);
     const selectedPool = await stores.delegation.getLocalPoolInfo(networkId, poolID);
-    const txBodyjson = await signTxRequest.unsignedTx.build_tx().to_json();
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -27,7 +25,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
         ],
         kind: 'delegate',
       },
-      unsignedTx: parsedUnsignedTx,
+      unsignedTx: signTxRequest.unsignedTx,
     });
   };
 

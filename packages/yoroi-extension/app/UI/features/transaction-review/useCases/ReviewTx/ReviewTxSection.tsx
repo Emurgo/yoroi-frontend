@@ -5,6 +5,7 @@ import { Box, Divider } from '@mui/material';
 import Menu from '../../../portfolio/common/components/Menu';
 import { useFormattedMetadata } from '../../common/hooks/useFormatMetadata';
 import { useFormattedTx } from '../../common/hooks/useFormattedTx';
+import { useTxBody } from '../../common/hooks/usetxBody';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { MetadataTab } from './Metadata/MetadataTab';
 import { OverviewTab } from './Overview/OverviewTab';
@@ -25,10 +26,12 @@ export interface SubMenuOption {
 
 export const ReviewTxSection = () => {
   const theme = useTheme();
+  const { unsignedTx, cborTx, receiverCustomTitle } = useTxReviewModal();
 
-  const { unsignedTx, receiverCustomTitle } = useTxReviewModal();
-  const formattedTx = useFormattedTx(unsignedTx?.body);
-  const formattedMetadata = useFormattedMetadata({ txBody: unsignedTx?.body, unsignedTx, cbor: null });
+  const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
+  const formatedTxJsonBody = cborTx ? txBody : txBody?.body;
+  const formattedTx = useFormattedTx(formatedTxJsonBody);
+  const formattedMetadata = useFormattedMetadata({ txBody: formatedTxJsonBody, unsignedTx: txBody, cbor: null });
 
   const subMenuOptions: SubMenuOption[] = [
     {

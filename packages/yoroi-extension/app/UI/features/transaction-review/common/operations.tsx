@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import React from 'react';
 import { asQuantity, Quantities } from '../../../utils/quantities';
 import { CertificateType, FormattedTx } from './types';
+import { useStrings } from './hooks/useStrings';
 
 type OperationsCount = Record<CertificateType, number>;
 export type Operations = {
@@ -115,11 +116,12 @@ const updateOperationsCount = (operation: CertificateType, operationsCount: Oper
 };
 
 export const AbstainOperation = ({ label, fee }: { label: string; fee: string | null }) => {
+  const strings = useStrings();
   return (
     <Stack direction="column" spacing={2}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
-          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
           <Typography color="ds.text_gray_medium">{fee}</Typography>
         </Stack>
       )}
@@ -130,11 +132,12 @@ export const AbstainOperation = ({ label, fee }: { label: string; fee: string | 
   );
 };
 export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: string | null }) => {
+  const strings = useStrings();
   return (
     <Stack direction="column" spacing={2}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
-          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
           <Typography color="ds.text_gray_medium">{fee}</Typography>
         </Stack>
       )}
@@ -145,13 +148,12 @@ export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: stri
   );
 };
 export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash?: string; fee: string | null }) => {
-  // const label = formatDrepHash(hash, type)  TODO format it when package is available in NPM
-
+  const strings = useStrings();
   return (
     <Stack direction="column" spacing={2}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
-          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
           <Typography color="ds.text_gray_medium">{fee}</Typography>
         </Stack>
       )}

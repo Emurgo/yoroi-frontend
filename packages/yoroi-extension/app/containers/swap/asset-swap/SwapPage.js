@@ -99,7 +99,7 @@ function SwapPage(props: StoresProps & Intl): Node {
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
-  const [parsedSignRequest, setParsedSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
+  const [parsedSignRequest, setParsedSignRequest] = useState(null);
 
   // useEffect(() => {
   //   userPasswordState?.update(passwordInputValue);
@@ -210,7 +210,6 @@ function SwapPage(props: StoresProps & Intl): Node {
         handleInitialStep();
       } else if (orderStep === 1) {
         const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
-
         openTxReviewModal({
           title: 'Transaction confirmation',
           modalView: 'transactionReview',
@@ -365,14 +364,12 @@ function SwapPage(props: StoresProps & Intl): Node {
       ptFees,
       poolProvider,
     };
-    const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const txSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
     const unsigned = txSignRequest;
-    const txBodyjson = await unsigned.unsignedTx.build_tx().to_json();
-
-    const parsedUnsignedTx = JSON.parse(txBodyjson);
+    const txBodyjson = unsigned.unsignedTx;
 
     runInAction(() => {
-      setParsedSignRequest(parsedUnsignedTx);
+      setParsedSignRequest(txBodyjson);
       setSignRequest(txSignRequest);
     });
   };
