@@ -2,23 +2,20 @@
 /* eslint-disable  import/no-unused-modules */
 
 import buildManifest from './manifest.template';
-import {
-  Ports,
-  portToPermission,
-} from '../scripts/connections';
-import {
-  genCSP,
-} from './constants';
+import { Servers, serverToPermission } from '../scripts/connections';
+import { genCSP, speculosEndpoint } from './constants';
 import pkg from '../package.json';
 
 export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
-  description: '[localhost] Cardano ADA wallet',
-  defaultTitle: '[localhost] Yoroi',
+  description: 'e2e test Cardano ADA wallet',
+  defaultTitle: 'e2e test Yoroi',
   contentSecurityPolicy: genCSP({
     isDev: isDebug,
     additional: {
       'connect-src': [
-        portToPermission(Ports.DevBackendServer),
+        serverToPermission(Servers.Primary),
+        serverToPermission(Servers.Testnet),
+        speculosEndpoint,
       ],
     },
   }),
