@@ -3,7 +3,7 @@ import { TransactionResult } from '../../../UI/features/transaction-review/commo
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -18,45 +18,18 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
     });
   };
 
-  const submitTx = async (passswordInput, signTxRequest) => {
-    const selectedWallet = stores.wallets.selected;
-
+  const submitTx = async (password, signRequest) => {
     try {
       startLoadingTxReview();
-      if (isHardwareWallet) {
-        if (walletType === 'ledger') {
-          const ledgerSendStore = stores.substores.ada.ledgerSend;
-          ledgerSendStore.sendUsingLedgerWallet({
-            params: { signRequest: signTxRequest },
-            onSuccess: () => {
-              onSuccess();
-              showTxResultModal(TransactionResult.SUCCESS);
-            },
-            wallet: selectedWallet,
-          });
-        }
-        if (walletType === 'trezor') {
-          const trezorSendStore = stores.substores.ada.trezorSend;
-          trezorSendStore.sendUsingTrezor({
-            params: { signRequest: signTxRequest },
-            onSuccess: () => {
-              onSuccess();
-              showTxResultModal(TransactionResult.SUCCESS);
-            },
-            wallet: selectedWallet,
-          });
-        }
-      } else {
-        await stores.substores.ada.mnemonicSend.sendMoney({
-          signRequest: signTxRequest,
-          password: passswordInput,
-          wallet: selectedWallet,
-          onSuccess: () => {
-            onSuccess();
-            showTxResultModal(TransactionResult.SUCCESS);
-          },
-        });
-      }
+      stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: stores.wallets.selected,
+        signRequest,
+        password,
+        callback: async () => {
+          onSuccess();
+          showTxResultModal(TransactionResult.SUCCESS);
+        },
+      });
     } catch (error) {
       console.warn('Delegation error', error);
       showTxResultModal(TransactionResult.FAIL);

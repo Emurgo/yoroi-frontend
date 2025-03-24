@@ -14,7 +14,6 @@ import { Info } from './Info';
 import { LeftArrow } from './LeftArrow';
 import { Receive } from './Receive';
 import { RightArrow } from './RightArrow';
-import { Receive } from './Receive';
 import { Search } from './Search';
 import { Send } from './Send';
 import { Staking } from './Staking';
