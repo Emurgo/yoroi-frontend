@@ -26,7 +26,7 @@ describe('Downloading logs for support', function () {
     cleanDownloads();
   });
 
-  it('Go to Settings -> Support', async function () {
+  it('Go to Settings Support', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToSettingsTab();
     const settingsPage = new SettingsTab(webdriver, logger);
