@@ -33,8 +33,8 @@ export type SidebarCategoryRevamp = {|
 |};
 
 const HAS_SELECTED_WALLET = ({ selected }) => selected != null;
-const IS_MAINNET = ({ selected }) => selected && !selected.isTestnet;
-const NON_TREZOR = ({ selected }) => selected?.type !== 'trezor';
+const IS_MAINNET = ({ selected }): boolean => selected != null && !selected.isTestnet;
+const NON_TREZOR = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
