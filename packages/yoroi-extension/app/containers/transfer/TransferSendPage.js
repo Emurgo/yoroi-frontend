@@ -25,6 +25,7 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -81,7 +82,11 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     if (signRequest == null) return;
 
     const send = (password) => {
-      this.stores.transactionProcessingStore.adaSendAndRefresh({
+      if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
+        throw new Error('unexpected signRequest type');
+      }
+
+      stores.transactionProcessingStore.adaSendAndRefresh({
         wallet: selected,
         signRequest,
         password,
@@ -95,6 +100,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     if (this.spendingPasswordForm == null) {
       send(null);
     } else {
+      // why do we have to submit the form
       this.spendingPasswordForm.submit({
         onSuccess: async (form) => {
           send(form.values().walletPassword);

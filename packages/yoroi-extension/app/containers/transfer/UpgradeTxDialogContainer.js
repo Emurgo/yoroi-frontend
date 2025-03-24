@@ -145,7 +145,10 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
           trigger: async () => {
-            await this.props.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
+            if (selected.type !== 'ledger') {
+              throw new Error('unexpected wallet type');
+            }
+            await this.props.stores.transactionProcessingStore.adaSendAndRefresh({
               signRequest: tentativeTx.signRequest,
               wallet: {
                  ...selected,
@@ -154,6 +157,8 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
                  publicKey: tentativeTx.publicKey.key.to_hex(),
                  pathToPublic: tentativeTx.publicKey.addressing.path,
               },
+              password: null,
+              callback: async () => {},
             });
             this.props.onSubmit();
           },

@@ -77,8 +77,6 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
     const { stores } = this.props;
     stores.transactionProcessingStore.sendMoneyRequest.reset();
     stores.substores.ada.delegationTransaction.createWithdrawalTx.reset();
-    stores.substores.ada.ledgerSend.cancel();
-    stores.substores.ada.trezorSend.cancel();
   }
 
   signAndBroadcast: (?string) => Promise<void>  = async (password) => {
@@ -91,7 +89,7 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
       throw new Error('Unexpected missing active signing request');
     }
 
-    await this.props.stores.substores.ada.wallets.adaSendAndRefresh({
+    await this.props.stores.transactionProcessingStore.adaSendAndRefresh({
       wallet,
       signRequest,
       password,
