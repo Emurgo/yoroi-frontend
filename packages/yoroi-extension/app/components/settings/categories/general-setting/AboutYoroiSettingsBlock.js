@@ -219,6 +219,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             onClick={this.props.onSwitchNetwork}
             variant="secondary"
             style={{ width: '200px' }}
+            id={basePageComponentPath + '-switchNetwork-button'}
           >
             {intl.formatMessage(messages.switchNetwork)}
           </Button>
