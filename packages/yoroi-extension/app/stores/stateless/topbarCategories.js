@@ -2,14 +2,6 @@
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
 import { defineMessages } from 'react-intl';
-import { networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { ReactComponent as transactionsIcon } from '../../assets/images/wallet-nav/tab-transactions.inline.svg';
-import { ReactComponent as sendIcon } from '../../assets/images/wallet-nav/tab-send.inline.svg';
-import { ReactComponent as receiveIcon } from '../../assets/images/wallet-nav/tab-receive.inline.svg';
-import { ReactComponent as dashboardIcon } from '../../assets/images/wallet-nav/tab-dashboard.inline.svg';
-import { ReactComponent as votingIcon } from '../../assets/images/wallet-nav/voting.inline.svg';
-import { ReactComponent as assetsIcon } from '../../assets/images/assets-page/assets.inline.svg';
-import environment from '../../environment';
 import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -56,57 +48,6 @@ export type TopbarCategory = {|
   isHiddenButAllowed?: boolean,
 |};
 
-export const allCategories: Array<TopbarCategory> = [];
-
-function registerCategory(category: TopbarCategory): TopbarCategory {
-  allCategories.push(category);
-  return category;
-}
-
-export const STAKE_DASHBOARD: TopbarCategory = registerCategory({
-  className: 'stakeDashboard',
-  route: ROUTES.WALLETS.DELEGATION_DASHBOARD,
-  icon: dashboardIcon,
-  label: messages.delegationDashboard,
-  // every wallet is Cardano Shelley wallet now
-  isVisible: _request => true,
-});
-export const SUMMARY: TopbarCategory = registerCategory({
-  className: 'summary',
-  route: ROUTES.WALLETS.TRANSACTIONS,
-  icon: transactionsIcon,
-  label: globalMessages.transactions,
-  isVisible: _request => true,
-});
-export const SEND: TopbarCategory = registerCategory({
-  className: 'send',
-  route: ROUTES.WALLETS.SEND,
-  icon: sendIcon,
-  label: messages.send,
-  isVisible: _request => true,
-});
-export const ASSETS: TopbarCategory = registerCategory({
-  className: 'assets',
-  route: ROUTES.WALLETS.ASSETS,
-  icon: assetsIcon,
-  label: messages.assets,
-  isVisible: ({ walletHasAssets }) => walletHasAssets,
-});
-export const RECEIVE: TopbarCategory = registerCategory({
-  className: 'receive',
-  route: ROUTES.WALLETS.RECEIVE.ROOT,
-  icon: receiveIcon,
-  label: messages.receive,
-  isVisible: _request => true,
-});
-export const VOTING: TopbarCategory = registerCategory({
-  className: 'voting',
-  route: ROUTES.WALLETS.CATALYST_VOTING,
-  icon: votingIcon,
-  label: messages.voting,
-  isVisible: _request => true,
-});
-
 /** Revamp Wallet categoriess */
 export const allSubcategoriesRevamp: Array<TopbarCategory> = [
   {
@@ -126,18 +67,5 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     route: ROUTES.WALLETS.RECEIVE.ROOT,
     label: messages.receive,
     isVisible: _request => true,
-  },
-  {
-    className: 'cardanoStake',
-    route: ROUTES.WALLETS.CARDANO_DELEGATION,
-    label: messages.delegationById,
-    isVisible: request => {
-      const { networkId } = request;
-      return environment.isTest()
-        || environment.isDev()
-        || environment.isNightly()
-        || networkId === networks.CardanoPreprodTestnet.NetworkId
-        || networkId === networks.CardanoPreviewTestnet.NetworkId;
-    },
   },
 ];

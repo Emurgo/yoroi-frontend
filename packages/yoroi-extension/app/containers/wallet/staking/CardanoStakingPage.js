@@ -31,6 +31,7 @@ import { Box } from '@mui/system';
 import { getNetworkById, isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../../stores';
 import { ampli } from '../../../../ampli/index';
+import environment from '../../../environment';
 
 type Props = {|
   urlTemplate: ?string,
@@ -89,88 +90,89 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
 
+    const isDevTestOrNightly =
+      environment.isDev() || environment.isTest() || environment.isNightly();
+
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
 
-    const delegatedPoolId = this.props.stores.delegation.getDelegatedPoolId(
+    const delegatedPoolId =
+      this.props.stores.delegation.getDelegatedPoolId(selectedWallet.publicDeriverId);
+
+    const totalAda = this._getTotalAda();
+    const locale = this.props.stores.profile.currentLocale;
+
+    const balance = selectedWallet.balance;
+    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
       selectedWallet.publicDeriverId
     );
-    if (urlTemplate != null) {
-      const totalAda = this._getTotalAda();
-      const locale = this.props.stores.profile.currentLocale;
-
-      const balance = selectedWallet.balance;
-      const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
-        selectedWallet.publicDeriverId
-      );
-      const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
-      const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
-      const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
-
-      return (
-        <>
-          {(!selectedWallet.isTestnet && !isCurrentlyDelegating) ? (
-            <WalletDelegationBanner
-              isOpen={this.props.stores.transactions.showDelegationBanner}
-              onDelegateClick={async poolId => {
-                this.setState({ selectedPoolId: poolId });
-                await this.props.stores.delegation.createDelegationTransaction(poolId);
-              }}
-              poolInfo={this.state.firstPool}
-              isWalletWithNoFunds={isWalletWithNoFunds}
-              ticker={truncateToken(
-                getTokenName(
-                  this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-                    selectedWallet.networkId
-                  )
-                )
-              )}
-              isTestnet={isTestnet(getNetworkById(selectedWallet.networkId))}
-            />
-          ) : null}
-
-          {!selectedWallet.isTestnet && (
-            <Box sx={{ iframe: { minHeight: '60vh' } }}>
-              {this.getDialog()}
-              <SeizaFetcher
-                urlTemplate={urlTemplate}
-                locale={locale}
-                bias={stakingListBias}
-                totalAda={totalAda}
-                poolList={poolList}
-                setFirstPool={pool => {
-                  this.setState({ firstPool: pool });
-                }}
-                stakepoolSelectedAction={async poolId => {
-                  this.setState({ selectedPoolId: poolId });
-                  await this.props.stores.delegation.createDelegationTransaction(poolId);
-                  ampli.stakingCenterDelegationInitiated();
-                }}
-              />
-            </Box>
-          )}
-        </>
-      );
-    }
+    const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
+    const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
+    const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
     return (
-      <div>
-        {this.getDialog()}
-        <DelegationSendForm
-          hasAnyPending={this.props.stores.transactions.hasAnyPending}
-          poolQueryError={this.props.stores.delegation.poolInfoQuery.error}
-          isProcessing={this.props.stores.delegation.poolInfoQuery.isExecuting}
-          updatePool={poolId => {
-            this.setState({ selectedPoolId: poolId });
-          }}
-          onNext={async () => {
-            if (this.state.selectedPoolId != null) {
-              return this.props.stores.delegation.createDelegationTransaction(this.state.selectedPoolId);
-            }
-          }}
-        />
-        {this._displayPoolInfo()}
-      </div>
+      <>
+        {(!selectedWallet.isTestnet && !isCurrentlyDelegating) ? (
+          <WalletDelegationBanner
+            isOpen={this.props.stores.transactions.showDelegationBanner}
+            onDelegateClick={async poolId => {
+              this.setState({ selectedPoolId: poolId });
+              await this.props.stores.delegation.createDelegationTransaction(poolId);
+            }}
+            poolInfo={this.state.firstPool}
+            isWalletWithNoFunds={isWalletWithNoFunds}
+            ticker={truncateToken(
+              getTokenName(
+                this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+                  selectedWallet.networkId
+                )
+              )
+            )}
+            isTestnet={isTestnet(getNetworkById(selectedWallet.networkId))}
+          />
+        ) : null}
+
+        <Box sx={{ iframe: { minHeight: '60vh' } }}>
+          {this.getDialog()}
+          {(isDevTestOrNightly || selectedWallet.isTestnet) && (
+            <>
+              <DelegationSendForm
+                hasAnyPending={this.props.stores.transactions.hasAnyPending}
+                poolQueryError={this.props.stores.delegation.poolInfoQuery.error}
+                isProcessing={this.props.stores.delegation.poolInfoQuery.isExecuting}
+                updatePool={poolId => {
+                  this.setState({ selectedPoolId: poolId });
+                }}
+                onNext={async () => {
+                  if (this.state.selectedPoolId != null) {
+                    return this.props.stores.delegation.createDelegationTransaction(this.state.selectedPoolId);
+                  }
+                }}
+              />
+              {this._displayPoolInfo()}
+              <br/>
+            </>
+          )}
+          {!selectedWallet.isTestnet && (
+            <SeizaFetcher
+              urlTemplate={urlTemplate}
+              locale={locale}
+              bias={stakingListBias}
+              totalAda={totalAda}
+              poolList={poolList}
+              setFirstPool={pool => {
+                this.setState({ firstPool: pool });
+              }}
+              stakepoolSelectedAction={async poolId => {
+                this.setState({ selectedPoolId: poolId });
+                await this.props.stores.delegation.createDelegationTransaction(poolId);
+                ampli.stakingCenterDelegationInitiated();
+              }}
+            />
+
+          )}
+        </Box>
+      </>
     );
   }
 

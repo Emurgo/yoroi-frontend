@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Box } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -115,9 +115,11 @@ export default class DelegationSendForm extends Component<Props> {
       this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
 
     return (
-      <Box className={styles.component}>
+      <Box className={styles.component} style={{ border: '1px solid grey', borderRadius: '8px' }}>
         {this.props.hasAnyPending && pendingTxWarningComponent}
-
+        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+          {intl.formatMessage(globalMessages.delegationById)}
+        </Typography>
         <BorderedBox>
           <div className={styles.poolInput}>
             <TextField
@@ -126,25 +128,16 @@ export default class DelegationSendForm extends Component<Props> {
               error={poolIdField.error || poolQueryError}
               done={poolIdField.isValid}
             />
+            <Button
+              variant="primary"
+              onClick={this.props.onNext}
+              disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
+            >
+              {intl.formatMessage(globalMessages.delegateLabel)}
+            </Button>
           </div>
-          {this._makeInvokeConfirmationButton()}
         </BorderedBox>
       </Box>
-    );
-  }
-
-  _makeInvokeConfirmationButton(): Node {
-    const { intl } = this.context;
-
-    return (
-      <Button
-        variant="primary"
-        onClick={this.props.onNext}
-        disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
-        sx={{ margin: '30px auto 0', display: 'block' }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>
     );
   }
 }

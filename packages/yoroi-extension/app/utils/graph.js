@@ -1,5 +1,5 @@
 // @flow
-import type { GraphData } from '../components/wallet/staking/dashboard/StakingDashboard';
+import type { GraphData } from '../components/wallet/staking/dashboard-revamp/StakingDashboard';
 import type { GraphItems } from '../components/wallet/staking/dashboard/GraphWrapper';
 import {
   getCardanoHaskellBaseConfig,
