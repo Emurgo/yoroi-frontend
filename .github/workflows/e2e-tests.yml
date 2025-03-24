@@ -38,7 +38,7 @@ jobs:
 
       - name: Build the test mainnet version
         working-directory: ./packages/yoroi-extension
-        run: npm run test:build:mainnet
+        run: npm run test:build
 
       - name: Check if the app is built correctly
         working-directory: ./packages/yoroi-extension/build/js
