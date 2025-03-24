@@ -235,8 +235,8 @@ export const GovernanceStatusSelection = () => {
         >
           To participate in governance you need to have ADA in your wallet.
         </Typography>
-        {/* @ts-ignore */}
         <Button
+          // @ts-ignore
           variant="primary"
           sx={{ marginTop: '16px' }}
           onClick={() => {
