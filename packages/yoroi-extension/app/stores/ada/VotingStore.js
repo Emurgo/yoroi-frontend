@@ -308,7 +308,7 @@ export default class VotingStore extends Store<StoresMap> {
     if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
+    await this.stores.transactionProcessingStore.adaSendAndRefresh({
       wallet: request.wallet,
       signRequest,
       password: request.password,
@@ -346,7 +346,7 @@ export default class VotingStore extends Store<StoresMap> {
       stepState: StepState.LOAD,
     };
     this.error = null;
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createVotingRegTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

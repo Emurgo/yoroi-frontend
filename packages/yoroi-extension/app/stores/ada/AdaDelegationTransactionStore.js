@@ -138,7 +138,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
     try {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
+      await this.stores.transactionProcessingStore.adaSendAndRefresh({
         wallet: request.wallet,
         signRequest,
         password: request.password,
@@ -168,7 +168,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
 
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

@@ -53,7 +53,6 @@ import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import type { SendMoneyRequest } from '../../../stores/toplevel/TransactionProcessingStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
@@ -209,17 +208,6 @@ type Props = {|
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: SendMoneyRequest,
-  +sendMoney: (params: {|
-    password: string,
-    +wallet: {
-      publicDeriverId: number,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-    signRequest: ISignRequest<any>,
-    onSuccess?: void => void,
-  |}) => Promise<void>,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({

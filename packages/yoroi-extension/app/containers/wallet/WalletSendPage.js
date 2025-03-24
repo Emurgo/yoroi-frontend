@@ -214,12 +214,6 @@ export default class WalletSendPage extends Component<StoresProps> {
               maxSendableAmount={transactionBuilderStore.maxSendableAmount}
               signRequest={transactionBuilderStore.tentativeTx}
               staleTx={transactionBuilderStore.txMismatch}
-              sendMoneyRequest={stores.transactionProcessingStore.sendMoneyRequest}
-              sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
-              ledgerSendError={stores.substores.ada.ledgerSend.error || null}
-              trezorSendError={stores.substores.ada.trezorSend.error || null}
-              ledgerSend={stores.substores.ada.ledgerSend}
-              trezorSend={stores.substores.ada.trezorSend}
             />
             {this.renderDialog()}
           </ReviewTxProvider>
