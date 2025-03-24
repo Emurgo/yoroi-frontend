@@ -165,7 +165,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       }
     };
 
-    const isDevOrNightly = environment.isDev() || environment.isNightly();
+    const isDevOrNightly = environment.isDev() || environment.isNightly() || environment.isE2EBuild();
 
     return (
       <Box
