@@ -4,17 +4,14 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
-import globalMessages from '../../i18n/global-messages';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
@@ -33,25 +30,6 @@ import { ModalProvider } from '../../UI/components/modals/ModalContext';
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
-
-const messages = defineMessages({
-  txConfirmationLedgerNanoLine1: {
-    id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
-  },
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  txConfirmationTrezorTLine1: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {

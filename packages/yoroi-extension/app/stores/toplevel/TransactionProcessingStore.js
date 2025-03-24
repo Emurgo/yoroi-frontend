@@ -14,16 +14,12 @@ import {
 import { observable } from 'mobx';
 import Request from '../lib/LocalizedRequest';
 import { Logger, stringifyError, stringifyData, fullErrStr } from '../../utils/logging';
-import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
-import { convertToLocalizableError as ledgerConvertToLocalizableError } from '../../domain/LedgerLocalizedError';
-import LocalizableError from '../../i18n/LocalizableError';
 import {
   buildConnectorSignedTransaction as ledgerBuildConnectorSignedTransaction
 } from '../../api/ada/transactions/shelley/ledgerTx';
 import {
   buildConnectorSignedTransaction as trezorBuildConnectorSignedTransaction
 } from '../../api/ada/transactions/shelley/trezorTx';
-import { convertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import type { Addressing, Address, Value } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   generateCip15RegistrationMetadata,
@@ -267,10 +263,8 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     try {
       Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} called: ` + stringifyData(request));
 
-      const { rawTxHex, wallet, catalystData } = request;
-
       const addressingMap = genAddressingLookup(
-        wallet.networkId,
+        request.wallet.networkId,
         this.stores.addresses.addressSubgroupMap,
       );
 
