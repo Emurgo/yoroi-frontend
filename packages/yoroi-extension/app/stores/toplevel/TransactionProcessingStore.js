@@ -20,6 +20,7 @@ import {
 import {
   buildConnectorSignedTransaction as trezorBuildConnectorSignedTransaction
 } from '../../api/ada/transactions/shelley/trezorTx';
+import { convertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import type { Addressing, Address, Value } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   generateCip15RegistrationMetadata,
