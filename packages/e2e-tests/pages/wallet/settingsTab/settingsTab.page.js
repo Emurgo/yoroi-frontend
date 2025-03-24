@@ -1,4 +1,5 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
+import GeneralSubTab from './generalSubTab.page.js';
 
 class SettingsTab extends WalletCommonBase {
   // locators
@@ -42,6 +43,7 @@ class SettingsTab extends WalletCommonBase {
   async goToGeneralSubMenu() {
     this.logger.info(`SettingsTab::goToGeneralSubMenu is called`);
     await this.click(this.generalSubmenuItemLocator);
+    return new GeneralSubTab(this.driver, this.logger);
   }
   async goToBlockchainSubMenu() {
     this.logger.info(`SettingsTab::goToBlockchainSubMenu is called`);
