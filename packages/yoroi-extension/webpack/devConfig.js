@@ -10,7 +10,8 @@ const customPath = path.join(__dirname, './customPublicPath');
 const baseDevConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  isLight /* : ?boolean */ = false
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
@@ -53,7 +54,8 @@ const baseDevConfig = (
       networkName,
       false,
       isNightly,
-      Boolean(isLight)
+      Boolean(isLight),
+      Boolean(isE2E),
     )),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
@@ -91,7 +93,8 @@ const baseDevConfig = (
 const backgroundServiceWorkerConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  isLight /* : ?boolean */ = false
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
   experiments: { asyncWebAssembly: true },
@@ -127,7 +130,8 @@ const backgroundServiceWorkerConfig = (
       networkName,
       false,
       isNightly,
-      Boolean(isLight)
+      Boolean(isLight),
+      Boolean(isE2E),
     )),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
@@ -173,7 +177,8 @@ const backgroundServiceWorkerConfig = (
 const bringContentScriptConfig = (
   networkName /*: string */,
   isNightly /*: boolean */,
-  isLight /* : ?boolean */ = false
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
 ) /*: * */ => ({
   mode: 'development',
   resolve: commonConfig.resolve(),
@@ -206,6 +211,7 @@ const bringContentScriptConfig = (
       false,
       isNightly,
       Boolean(isLight),
+      Boolean(isE2E),
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
