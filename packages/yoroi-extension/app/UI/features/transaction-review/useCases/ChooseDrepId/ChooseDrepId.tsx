@@ -4,9 +4,11 @@ import React, { useEffect } from 'react';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
+import { useStrings } from '../../common/hooks/useStrings';
 
 export const ChooseDrepId = () => {
   const { drepId, isLoading, changeModalView, createUnsignedTx } = useTxReviewModal();
+  const strings = useStrings();
   const [error, setError] = React.useState(false);
   const [drepIdInput, setDrepId] = React.useState('');
 
@@ -29,7 +31,7 @@ export const ChooseDrepId = () => {
     <Stack direction="column" justifyContent="space-between" sx={{ height: '100%' }}>
       <Stack sx={{ height: '100%', mt: '24px', p: '24px' }} direction="column">
         <Typography variant="body1" color="ds.text_gray_medium" mb="16px">
-          Identify your preferred DRep and enter their ID below to delegate your vote:
+          {strings.identifyDrep}
         </Typography>
         <Box>
           <TextInput
@@ -58,7 +60,7 @@ export const ChooseDrepId = () => {
           disabled={drepIdInput === undefined || drepIdInput.length === 0}
           loading={isLoading}
         >
-          Confirm
+          {strings.confirmLabel}
         </LoadingButton>
       </Stack>
     </Stack>

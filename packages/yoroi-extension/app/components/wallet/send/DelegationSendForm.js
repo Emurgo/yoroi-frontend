@@ -1,8 +1,7 @@
-// @flow
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -16,6 +15,7 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
+import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -27,9 +27,10 @@ const messages = defineMessages({
 type Props = {|
   +hasAnyPending: boolean,
   +updatePool: (void | string) => void,
-  +poolQueryError: ?LocalizableError,
-  +onNext: void => Promise<void>,
-  +isProcessing: boolean,
+    +poolQueryError: ?LocalizableError,
+      +isProcessing: boolean,
+        +poolName: string,
+          +selectedPoolId: string,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -58,93 +59,107 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 @observer
 export default class DelegationSendForm extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
+  intl: intlShape.isRequired,
   };
 
-  // FORM VALIDATION
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        poolId: {
-          label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
-          placeholder: '',
-          value: '',
-          validators: [
-            ({ field }) => {
-              const poolIdValue = field.value;
-              if (poolIdValue === '') {
-                this.props.updatePool(undefined);
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-              }
-              const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
-              if (this.props.poolQueryError != null) {
-                return [false]; // no error message since container already displays one
-              }
-              return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
-            },
-          ],
-        },
+// FORM VALIDATION
+form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+  {
+    fields: {
+      poolId: {
+        label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
+        placeholder: '',
+        value: '',
+        validators: [
+          ({ field }) => {
+            const poolIdValue = field.value;
+            if (poolIdValue === '') {
+              this.props.updatePool(undefined);
+              return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+            }
+            const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
+            if (this.props.poolQueryError != null) {
+              return [false]; // no error message since container already displays one
+            }
+            return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
+          },
+        ],
       },
     },
-    {
-      options: {
-        showErrorsOnInit: false, // TODO: support URI
-        validateOnBlur: false,
-        validateOnChange: true,
-        validationDebounceWait: 0,
-      },
-      plugins: {
-        vjf: vjf(),
-      },
-    }
+  },
+  {
+    options: {
+      showErrorsOnInit: false, // TODO: support URI
+      validateOnBlur: false,
+      validateOnChange: true,
+      validationDebounceWait: 0,
+    },
+    plugins: {
+      vjf: vjf(),
+    },
+  }
+);
+
+render(): Node {
+  const { form } = this;
+  const { intl } = this.context;
+
+  const poolIdField = form.$('poolId');
+
+  const pendingTxWarningComponent = (
+    <div className={styles.warningBox}>
+      <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
+    </div>
   );
 
-  render(): Node {
-    const { form } = this;
-    const { intl } = this.context;
+  const poolQueryError =
+    this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
 
-    const poolIdField = form.$('poolId');
+  return (
+    <Box className={styles.component}>
+      {this.props.hasAnyPending && pendingTxWarningComponent}
 
-    const pendingTxWarningComponent = (
-      <div className={styles.warningBox}>
-        <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
-      </div>
-    );
-
-    const poolQueryError =
-      this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
-
-    return (
-      <Box className={styles.component}>
-        {this.props.hasAnyPending && pendingTxWarningComponent}
-
-        <BorderedBox>
-          <div className={styles.poolInput}>
-            <TextField
-              className="poolId"
-              {...poolIdField.bind()}
-              error={poolIdField.error || poolQueryError}
-              done={poolIdField.isValid}
-            />
-          </div>
-          {this._makeInvokeConfirmationButton()}
-        </BorderedBox>
-      </Box>
-    );
-  }
-
-  _makeInvokeConfirmationButton(): Node {
-    const { intl } = this.context;
-
-    return (
-      <Button
-        variant="primary"
-        onClick={this.props.onNext}
-        disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
-        sx={{ margin: '30px auto 0', display: 'block' }}
-      >
-        {intl.formatMessage(globalMessages.nextButtonLabel)}
-      </Button>
-    );
-  }
+      <BorderedBox>
+        <div className={styles.poolInput}>
+          <TextField
+            className="poolId"
+            {...poolIdField.bind()}
+            error={poolIdField.error || poolQueryError}
+            done={poolIdField.isValid}
+          />
+        </div>
+        <CreateInvokeConfirmationButton
+          intl={intl}
+          btnDisabled={
+            this.props.hasAnyPending ||
+            this.props.isProcessing ||
+            this.props.poolQueryError != null ||
+            poolIdField.error != null ||
+            poolIdField.value?.length === 0
+          }
+          hasAnyPending={this.props.hasAnyPending}
+          isProcessing={this.props.isProcessing}
+          poolQueryError={this.props.poolQueryError}
+          selectedPoolId={this.props.selectedPoolId}
+          poolName={this.props.poolName}
+          stores={this.props.stores}
+        />
+      </BorderedBox>
+    </Box>
+  );
 }
+}
+
+const CreateInvokeConfirmationButton = observer(({ intl, btnDisabled, selectedPoolId, poolName, stores }) => {
+  return (
+    <Stack alignItems="center" justifyContent="center">
+      <DelegateButton
+        stores={stores}
+        label={intl.formatMessage(globalMessages.nextButtonLabel)}
+        disabled={btnDisabled}
+        poolName={poolName}
+        poolID={selectedPoolId}
+      />
+    </Stack>
+  );
+});

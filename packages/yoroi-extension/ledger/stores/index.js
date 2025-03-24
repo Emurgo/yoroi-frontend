@@ -10,6 +10,9 @@ import type { URLParams } from '../types/cmn';
 import type { TransportIdType } from '../types/enum';
 import { TRANSPORT_ID } from '../types/enum';
 import packageInfo from '../../package.json';
+import { NetworkType, type ConfigType } from '../../config/config-types';
+
+declare var CONFIG: ConfigType;
 
 const appVersion = packageInfo.version;
 
@@ -32,8 +35,11 @@ export default class RootStore {
 
     // Parse Transport
     let transportId: TransportIdType;
-    const urlTransportId = urlParams.get('transport') || DEFAULT_TRANSPORT_PROTOCOL;
-    switch (urlTransportId) {
+    if (CONFIG.network.name === NetworkType.TEST) {
+      transportId = TRANSPORT_ID.SPECULOS_HTTP;
+    } else {
+      const urlTransportId = urlParams.get('transport') || DEFAULT_TRANSPORT_PROTOCOL;
+      switch (urlTransportId) {
       case TRANSPORT_ID.U2F:
         transportId = TRANSPORT_ID.U2F;
         break;
@@ -43,6 +49,7 @@ export default class RootStore {
       default:
         transportId = DEFAULT_TRANSPORT_PROTOCOL;
         break;
+      }
     }
 
     // Parse Locale

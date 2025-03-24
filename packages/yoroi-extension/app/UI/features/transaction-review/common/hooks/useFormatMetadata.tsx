@@ -6,7 +6,7 @@ export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): 
   try {
     const hash = txBody.auxiliary_data_hash ?? null;
     const decodedMetadata = await unsignedTx.auxiliary_data.metadata;
-    const parsedMetadata = parseMetadata222(decodedMetadata);
+    const parsedMetadata = parseMetadata(decodedMetadata);
 
     return {
       hash,
@@ -17,31 +17,37 @@ export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): 
   }
 };
 
-const parseMetadata222 = (metadata: Record<string, string>) => {
+const parseMetadata = (metadata: Record<string, string>) => {
   try {
     const parsed = metadata['674'] ? JSON.parse(metadata['674']) : {};
     const mapArray = parsed.map[0];
     const key = mapArray.k.string;
 
     const rawList = mapArray.v.list.map((item: any) => item.string);
+    let jsonString = rawList.join('').replace(/\\/g, '');
 
-    let jsonString = rawList.join('');
-    jsonString = jsonString.replace(/\\/g, ''); //
+    // Safer way to extract multiple JSON objects
+    const jsonFragments: object[] = [];
+    let braceCount = 0;
+    let currentFragment = '';
 
-    let jsonFragments = jsonString.match(/\{.*?\}/g) || []; // Extract JSON objects
-
-    const list = jsonFragments
-      .map(fragment => {
-        try {
-          return JSON.parse(fragment);
-        } catch (e) {
-          console.error('Error parsing JSON fragment:', fragment, e);
-          return null;
+    for (const char of jsonString) {
+      if (char === '{') braceCount++;
+      if (braceCount > 0) currentFragment += char;
+      if (char === '}') {
+        braceCount--;
+        if (braceCount === 0) {
+          try {
+            jsonFragments.push(JSON.parse(currentFragment));
+          } catch (e) {
+            console.error('Error parsing JSON fragment:', currentFragment, e);
+          }
+          currentFragment = '';
         }
-      })
-      .filter(Boolean);
+      }
+    }
 
-    const mergedObject = list.reduce((acc, obj) => ({ ...acc, ...obj }), {});
+    const mergedObject = jsonFragments.reduce((acc, obj) => ({ ...acc, ...obj }), {});
 
     Object.keys(mergedObject).forEach(key => {
       if (mergedObject[key] === '') {
@@ -49,7 +55,7 @@ const parseMetadata222 = (metadata: Record<string, string>) => {
       }
     });
 
-    return { [key]: [mergedObject] }; // Return properly structured output
+    return { [key]: [mergedObject] };
   } catch (error) {
     console.error('Error parsing metadata:', error);
     return {};

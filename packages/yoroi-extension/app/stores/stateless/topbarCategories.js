@@ -45,14 +45,14 @@ const messages = defineMessages({
 export type TopbarCategory = {|
   +className: string,
   +route: string,
-  +icon?: string,
-  +label?: MessageDescriptor,
-  +isVisible: ({|
-    selected: number,
-    networkId: number,
-    walletHasAssets: boolean,
+    +icon ?: string,
+    +label ?: MessageDescriptor,
+    +isVisible: ({|
+      selected: number,
+        networkId: number,
+          walletHasAssets: boolean,
   |}) => boolean | {| disabledReason: MessageDescriptor |},
-  isHiddenButAllowed?: boolean,
+isHiddenButAllowed ?: boolean,
 |};
 
 export const allCategories: Array<TopbarCategory> = [];

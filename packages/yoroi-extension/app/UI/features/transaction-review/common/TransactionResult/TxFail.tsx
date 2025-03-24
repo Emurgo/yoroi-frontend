@@ -2,9 +2,12 @@ import { Button, Stack, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigateTo } from '../hooks/useNavigateTo';
 import { FailedIlustration } from './FailedIlustration';
+import { useModal } from '../../../../components/modals/ModalContext';
 
 export const TxFail = () => {
   const navigate = useNavigateTo();
+  const { closeModal } = useModal();
+
   return (
     <Stack width="100%" alignItems="center">
       <FailedIlustration />
@@ -20,6 +23,7 @@ export const TxFail = () => {
         fullWidth
         onClick={() => {
           navigate.walletTransactions();
+          closeModal();
         }}
       >
         Close

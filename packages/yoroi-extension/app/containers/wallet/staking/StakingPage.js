@@ -23,8 +23,10 @@ import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../../UI/components/modals/ModalManager';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
-export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
+export const StakingPageContentPromise: void => Promise < any > = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
 
 // populated by ConfigWebpackPlugin
@@ -33,44 +35,45 @@ declare var CONFIG: ConfigType;
 @observer
 class StakingPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
+  intl: intlShape.isRequired,
   };
 
-  render(): Node {
-    const { stores } = this.props;
-    const sidebarContainer = <SidebarContainer stores={stores} />;
-    const selectedWallet = stores.wallets.selected;
-    return (
-      <TopBarLayout
-        banner={<BannerContainer stores={stores} />}
-        sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainerRevamp
-            stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
-            pageBanner={
-              <PoolTransitionBanner
-                intl={this.context.intl}
-                showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
-              />
-            }
-          />
-        }
-        showInContainer
-      >
-        <Suspense fallback={null}>
-          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <ModalProvider>
-              <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
-                <ReviewTxModal />
-                <StakingPageContent stores={this.props.stores} />
-              </ReviewTxProvider>
-            </ModalProvider>
-          </CurrencyProvider>
-        </Suspense>
-      </TopBarLayout>
-    );
-  }
+render(): Node {
+  const { stores } = this.props;
+  const sidebarContainer = <SidebarContainer stores={stores} />;
+  const selectedWallet = stores.wallets.selected;
+  return (
+    <TopBarLayout
+      banner={<BannerContainer stores={stores} />}
+      sidebar={sidebarContainer}
+      navbar={
+        <NavBarContainerRevamp
+          stores={stores}
+          title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
+          pageBanner={
+            <PoolTransitionBanner
+              intl={this.context.intl}
+              showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
+            />
+          }
+        />
+      }
+      showInContainer
+    >
+      <Suspense fallback={null}>
+        <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+          <ModalProvider>
+            <ModalManager />
+            <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxModal />
+              <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
+              <StakingPageContent stores={this.props.stores} />
+            </ReviewTxProvider>
+          </ModalProvider>
+        </CurrencyProvider>
+      </Suspense >
+    </TopBarLayout >
+  );
+}
 }
 export default StakingPage;

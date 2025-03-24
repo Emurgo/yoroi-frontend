@@ -31,7 +31,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
         },
       });
     } catch (error) {
-      console.warn('Delegation error', error);
+      console.log('Send Sign Error', error);
       showTxResultModal(TransactionResult.FAIL);
     }
   };

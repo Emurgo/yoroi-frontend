@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { ampli } from '../../../../../ampli/index';
 
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
   const {
@@ -26,7 +27,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       return;
     }
     createWithdrawalTx();
-    // ampli.claimAdaPageViewed();
+    ampli.claimAdaPageViewed();
   };
 
   const createWithdrawalTx = async () => {
@@ -61,12 +62,18 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
           await stores.substores.ada.trezorSend.sendUsingTrezor({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
             params: { signRequest },
             wallet: selected,
+            onFail: () => {
+              showTxResultModal(TransactionResult.FAIL);
+            },
           });
         }
       } else {

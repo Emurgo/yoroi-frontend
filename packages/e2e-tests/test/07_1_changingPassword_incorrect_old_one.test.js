@@ -24,7 +24,7 @@ describe('Changing wallet password. Negative. Incorrect old one.', function () {
     await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
-  it('Go to Settings -> Wallet', async function () {
+  it('Go to Settings Wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;

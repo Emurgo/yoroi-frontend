@@ -49,188 +49,189 @@ const messages = defineMessages({
 
 type Props = {|
   /** need this since we need to show the ticker names while spinner is still showing */
-  +defaultTokenInfo: $ReadOnly<TokenRow>,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
-  +totalSum: void | MultiToken,
-  +totalRewards: void | MultiToken,
-  +isDelegated: boolean,
-  +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
-  +shouldHideBalance: boolean,
+  +defaultTokenInfo: $ReadOnly < TokenRow >,
+  +getTokenInfo: ($ReadOnly < Inexact < TokenLookupKey >>) => $ReadOnly < TokenRow >,
+    +totalSum: void | MultiToken,
+      +totalRewards: void | MultiToken,
+        +isDelegated: boolean,
+          +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
++shouldHideBalance: boolean,
   +openLearnMore: void => void,
-  +canUnmangleSum: MultiToken,
-  +cannotUnmangleSum: MultiToken,
-  +onUnmangle: void => void,
-  +withdrawRewards: void | (void => void),
+    +canUnmangleSum: MultiToken,
+      +cannotUnmangleSum: MultiToken,
+        +onUnmangle: void => void,
+          +withdrawRewards: void | (void => void),
 |};
 
 @observer
 export default class UserSummary extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
+  intl: intlShape.isRequired,
   };
 
-  render(): Node {
-    const { intl } = this.context;
-    return (
-      <Card title={intl.formatMessage(messages.title)}>
-        <div className={styles.wrapper}>
-          {this.getTotal()}
-          {this.getTotalRewards()}
-        </div>
-      </Card>
-    );
-  }
-
-  getTotal: void => Node = () => {
-    const { intl } = this.context;
-
-    return (
-      <div className={styles.card}>
-        {!this.props.totalSum ? (
-          this.getCardSkeleton('total')
-        ) : (
-          <div className={styles.cardContent}>
-            <div>
-              <h3 className={styles.label}>
-                <span>
-                  {intl.formatMessage(globalMessages.totalTokenLabel, {
-                    ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
-                  })}
-                  :{this.props.isDelegated && <span className={styles.delegated}>{intl.formatMessage(messages.delegated)}</span>}
-                </span>
-              </h3>
-              {this.renderAmount(this.props.totalSum)}
-            </div>
-            <div className={styles.amountNote}>{intl.formatMessage(messages.adaAmountNote)}</div>
-          </div>
-        )}
-        <div className={styles.icon}>
-          <IconAda />
-        </div>
+render(): Node {
+  const { intl } = this.context;
+  return (
+    <Card title={intl.formatMessage(messages.title)}>
+      <div className={styles.wrapper}>
+        {this.getTotal()}
+        {this.getTotalRewards()}
       </div>
-    );
-  };
+    </Card>
+  );
+}
 
-  getTotalRewards: void => Node = () => {
-    const { intl } = this.context;
-    return (
-      <div className={styles.card}>
-        {!this.props.totalRewards ? (
-          this.getCardSkeleton('rewards')
-        ) : (
-          <div className={styles.cardContent}>
-            <div>
-              <h3 className={styles.label}>
-                <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
-                <button className={styles.infoIcon} type="button" onClick={this.props.openLearnMore}>
-                  <InfoIcon />
-                </button>
-              </h3>
-              {this.renderAmount(this.props.totalRewards)}
-            </div>
-            <div className={styles.footer}>
-              {this.props.withdrawRewards != null && (
-                <Button
-                  className="withdrawButton"
-                  variant="secondary"
-                  onClick={this.props.withdrawRewards}
-                  sx={{ height: '46px', width: '144px' }}
-                >
-                  {intl.formatMessage(globalMessages.withdrawLabel)}
-                </Button>
-              )}
-            </div>
+getTotal: void => Node = () => {
+  const { intl } = this.context;
+
+  return (
+    <div className={styles.card}>
+      <div>SDSDSDDSDSDSDS</div>
+      {!this.props.totalSum ? (
+        this.getCardSkeleton('total')
+      ) : (
+        <div className={styles.cardContent}>
+          <div>
+            <h3 className={styles.label}>
+              <span>
+                {intl.formatMessage(globalMessages.totalTokenLabel, {
+                  ticker: truncateToken(getTokenName(this.props.defaultTokenInfo)),
+                })}
+                :{this.props.isDelegated && <span className={styles.delegated}>{intl.formatMessage(messages.delegated)}</span>}
+              </span>
+            </h3>
+            {this.renderAmount(this.props.totalSum)}
           </div>
-        )}
-
-        <div className={styles.icon}>
-          <IconRewards />
+          <div className={styles.amountNote}>{intl.formatMessage(messages.adaAmountNote)}</div>
         </div>
+      )}
+      <div className={styles.icon}>
+        <IconAda />
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  getSkeleton(
-    layout: {|
-      width: string,
-      height: string,
-      marginBottom: string,
+getTotalRewards: void => Node = () => {
+  const { intl } = this.context;
+  return (
+    <div className={styles.card}>
+      {!this.props.totalRewards ? (
+        this.getCardSkeleton('rewards')
+      ) : (
+        <div className={styles.cardContent}>
+          <div>
+            <h3 className={styles.label}>
+              <span>{intl.formatMessage(globalMessages.totalRewardsLabel)}:</span>
+              <button className={styles.infoIcon} type="button" onClick={this.props.openLearnMore}>
+                <InfoIcon />
+              </button>
+            </h3>
+            {this.renderAmount(this.props.totalRewards)}
+          </div>
+          <div className={styles.footer}>
+            {this.props.withdrawRewards != null && (
+              <Button
+                className="withdrawButton"
+                variant="secondary"
+                onClick={this.props.withdrawRewards}
+                sx={{ height: '46px', width: '144px' }}
+              >
+                {intl.formatMessage(globalMessages.withdrawLabel)}
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className={styles.icon}>
+        <IconRewards />
+      </div>
+    </div>
+  );
+};
+
+getSkeleton(
+  layout: {|
+width: string,
+  height: string,
+  marginBottom: string,
     |},
-    _index: number
-  ): Node {
-    return (
-      <Skeleton
-        variant="rectangular"
-        width={layout.width}
-        height={layout.height}
-        animation="wave"
-        sx={{
-          backgroundColor: 'var(--yoroi-palette-gray-50)',
-          borderRadius: '4px',
-          marginBottom: layout.marginBottom,
-        }}
-      />
-    );
-  }
+  _index: number
+): Node {
+  return (
+    <Skeleton
+      variant="rectangular"
+      width={layout.width}
+      height={layout.height}
+      animation="wave"
+      sx={{
+        backgroundColor: 'var(--yoroi-palette-gray-50)',
+        borderRadius: '4px',
+        marginBottom: layout.marginBottom,
+      }}
+    />
+  );
+}
 
-  getCardSkeleton(card: 'rewards' | 'total'): Node {
-    const skeletons = [
-      { width: '50%', height: '15px', marginBottom: '5px' }, // Label
-      { width: '85%', height: '32px', marginBottom: card === 'rewards' ? '25px' : '16px' }, // Amount
-      { width: card === 'rewards' ? '43%' : '70%', height: '57px', marginBottom: '0px' }, // Text / Button
-    ];
-    return <Box>{skeletons.map(this.getSkeleton)}</Box>;
-  }
+getCardSkeleton(card: 'rewards' | 'total'): Node {
+  const skeletons = [
+    { width: '50%', height: '15px', marginBottom: '5px' }, // Label
+    { width: '85%', height: '32px', marginBottom: card === 'rewards' ? '25px' : '16px' }, // Amount
+    { width: card === 'rewards' ? '43%' : '70%', height: '57px', marginBottom: '0px' }, // Text / Button
+  ];
+  return <Box>{skeletons.map(this.getSkeleton)}</Box>;
+}
 
-  renderAmount: (void | MultiToken) => Node = token => {
-    if (!token) throw new Error('Token is not defined - Should never happend');
-    const unitOfAccount = this.props.unitOfAccount(token.getDefaultEntry());
+renderAmount: (void | MultiToken) => Node = token => {
+  if (!token) throw new Error('Token is not defined - Should never happend');
+  const unitOfAccount = this.props.unitOfAccount(token.getDefaultEntry());
 
-    const entryNode = <div className={styles.value}>{this.formatTokenEntry(token.getDefaultEntry())}</div>;
-    const unitOfAccountNode = unitOfAccount ? (
-      <div className={styles.value}>
-        {unitOfAccount.amount} {unitOfAccount.currency}
-      </div>
-    ) : (
-      <></>
-    );
+  const entryNode = <div className={styles.value}>{this.formatTokenEntry(token.getDefaultEntry())}</div>;
+  const unitOfAccountNode = unitOfAccount ? (
+    <div className={styles.value}>
+      {unitOfAccount.amount} {unitOfAccount.currency}
+    </div>
+  ) : (
+    <></>
+  );
 
-    return (
-      <>
-        {unitOfAccountNode}
-        {entryNode}
-      </>
-    );
-  };
+  return (
+    <>
+      {unitOfAccountNode}
+      {entryNode}
+    </>
+  );
+};
 
-  formatWithAmount: ($npm$ReactIntl$MessageDescriptor, TokenEntry) => Node = (message, tokenEntry) => {
-    const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    const amount = tokenEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .toFormat(tokenInfo.Metadata.numberOfDecimals);
-    return (
-      <FormattedMessage
-        {...message}
-        values={{
-          ticker: truncateToken(getTokenName(tokenInfo)),
-          adaAmount: this.props.shouldHideBalance ? hiddenAmount : amount,
-        }}
-      />
-    );
-  };
+formatWithAmount: ($npm$ReactIntl$MessageDescriptor, TokenEntry) => Node = (message, tokenEntry) => {
+  const tokenInfo = this.props.getTokenInfo(tokenEntry);
+  const amount = tokenEntry.amount
+    .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+    .toFormat(tokenInfo.Metadata.numberOfDecimals);
+  return (
+    <FormattedMessage
+      {...message}
+      values={{
+        ticker: truncateToken(getTokenName(tokenInfo)),
+        adaAmount: this.props.shouldHideBalance ? hiddenAmount : amount,
+      }}
+    />
+  );
+};
 
-  formatTokenEntry: TokenEntry => Node = tokenEntry => {
-    const tokenInfo = this.props.getTokenInfo(tokenEntry);
-    const tokenAmount = tokenEntry.amount
-      .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-      .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
-      .toString();
-    const amountNode = this.props.shouldHideBalance ? <>{hiddenAmount}</> : <>{tokenAmount}</>;
-    return (
-      <>
-        <span>{amountNode} </span>
-        {truncateToken(getTokenName(tokenInfo))}
-      </>
-    );
-  };
+formatTokenEntry: TokenEntry => Node = tokenEntry => {
+  const tokenInfo = this.props.getTokenInfo(tokenEntry);
+  const tokenAmount = tokenEntry.amount
+    .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+    .decimalPlaces(tokenInfo.Metadata.numberOfDecimals)
+    .toString();
+  const amountNode = this.props.shouldHideBalance ? <>{hiddenAmount}</> : <>{tokenAmount}</>;
+  return (
+    <>
+      <span>{amountNode} </span>
+      {truncateToken(getTokenName(tokenInfo))}
+    </>
+  );
+};
 }
