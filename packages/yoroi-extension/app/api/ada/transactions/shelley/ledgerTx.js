@@ -885,7 +885,7 @@ export function buildConnectorSignedTransaction(
     if (witness.path[0] === WalletTypePurpose.BIP44) {
       const receiver = pathToReceiverMapping.get(witness.path.join('/'));
       if (!receiver) {
-        throw new Error('unexpectedly missing Byron path');
+        continue;
       }
       const bootstrapWit = RustModule.WalletV4.BootstrapWitness.new(
         RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
