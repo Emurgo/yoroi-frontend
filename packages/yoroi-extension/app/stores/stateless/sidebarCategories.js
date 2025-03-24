@@ -33,6 +33,8 @@ export type SidebarCategoryRevamp = {|
 |};
 
 const HAS_SELECTED_WALLET = ({ selected }) => selected != null;
+const IS_MAINNET = ({ selected }) => selected && !selected.isTestnet;
+const NON_TREZOR = ({ selected }) => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
@@ -60,7 +62,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: (_request) => true,
+    isVisible: IS_MAINNET,
   },
   {
     className: 'portfolio',
@@ -88,7 +90,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: ({ selected }) => selected?.type !== 'trezor',
+    isVisible: params => IS_MAINNET(params) && NON_TREZOR(params),
   },
   {
     className: 'connected-websites',
