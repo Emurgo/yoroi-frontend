@@ -1,39 +1,7 @@
 // @flow
 import { ROUTES } from '../../routes-config';
 import type { MessageDescriptor } from 'react-intl';
-import { defineMessages } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-
-const messages = defineMessages({
-  send: {
-    id: 'wallet.navigation.send',
-    defaultMessage: '!!!Send',
-  },
-  receive: {
-    id: 'wallet.navigation.receive',
-    defaultMessage: '!!!Receive',
-  },
-  delegationDashboard: {
-    id: 'wallet.navigation.delegationDashboard',
-    defaultMessage: '!!!Dashboard',
-  },
-  delegationById: {
-    id: 'wallet.navigation.delegationById',
-    defaultMessage: '!!!Delegation by Id',
-  },
-  delegationList: {
-    id: 'wallet.navigation.delegationList',
-    defaultMessage: '!!!Delegation List',
-  },
-  voting: {
-    id: 'wallet.navigation.voting',
-    defaultMessage: '!!!Voting',
-  },
-  assets: {
-    id: 'wallet.navigation.assets',
-    defaultMessage: '!!!Assets',
-  },
-});
 
 export type TopbarCategory = {|
   +className: string,
@@ -59,13 +27,13 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
   {
     className: 'send',
     route: ROUTES.WALLETS.SEND,
-    label: messages.send,
+    label: globalMessages.send,
     isVisible: _request => true,
   },
   {
     className: 'receive',
     route: ROUTES.WALLETS.RECEIVE.ROOT,
-    label: messages.receive,
+    label: globalMessages.receive,
     isVisible: _request => true,
   },
 ];
