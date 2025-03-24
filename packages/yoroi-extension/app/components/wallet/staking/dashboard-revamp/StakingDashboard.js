@@ -1,8 +1,8 @@
 // @flow
 import { defineMessages } from 'react-intl';
 
-import type { GraphItems } from '../dashboard/GraphWrapper';
 import LocalizableError from '../../../../i18n/LocalizableError';
+import type { GraphItems } from './RewardGraphClean';
 
 export const emptyDashboardMessages: Object = defineMessages({
   title: {

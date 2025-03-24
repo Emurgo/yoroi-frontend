@@ -1,9 +1,6 @@
 import React from 'react';
-import { Box, Button } from "@mui/material";
-import { environment } from '../../../../environment';
 import { ToastContainer } from 'react-toastify'
 import NotificationsStyles, { FadeInOut } from './NotificationsStyles';
-import { useNotifications } from '../module/NotificationsProvider';
 
 export default function NotificationsManager() {
   // const { showRandomToast } = useNotifications();

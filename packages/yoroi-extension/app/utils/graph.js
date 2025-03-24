@@ -1,6 +1,5 @@
 // @flow
 import type { GraphData } from '../components/wallet/staking/dashboard-revamp/StakingDashboard';
-import type { GraphItems } from '../components/wallet/staking/dashboard/GraphWrapper';
 import {
   getCardanoHaskellBaseConfig,
   isCardanoHaskell,
@@ -9,6 +8,7 @@ import {
 import { MultiToken } from '../api/common/lib/MultiToken';
 import type { PoolMeta, DelegationRequests } from '../stores/toplevel/DelegationStore';
 import type { TokenInfoMap } from '../stores/toplevel/TokenInfoStore';
+import type { GraphItems } from '../components/wallet/staking/dashboard-revamp/RewardGraphClean';
 
 const generateRewardGraphData: ({|
   delegationRequests: DelegationRequests,
