@@ -108,9 +108,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
-const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
-const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
-
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
@@ -170,7 +167,6 @@ export const LazyLoadPromises: Array<() => any> = [
   URILandingPagePromise,
   WalletTransferPagePromise,
   ReceivePromise,
-  StakingDashboardPagePromise,
   CardanoStakingPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
@@ -281,11 +277,6 @@ const WalletsSubpages = stores => (
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-      component={props => <StakingDashboardPage {...props} stores={stores} />}
     />
     <Route
       exact

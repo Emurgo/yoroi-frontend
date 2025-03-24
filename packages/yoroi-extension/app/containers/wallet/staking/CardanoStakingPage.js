@@ -140,7 +140,7 @@ render(): null | Node {
           this.setState({ selectedPoolId: poolId });
         }}
         selectedPoolId={this.state.selectedPoolId}
-        poolName={selectedPoolInfo.info?.name !== null ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
+        poolName={selectedPoolInfo?.info?.name !== null ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
         stores={this.props.stores}
       />
       {this._displayPoolInfo()}

@@ -21,13 +21,10 @@ import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
-import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import type { StoresProps } from '../../../stores';
 // import { ampli } from '../../../../ampli/index';
 
@@ -81,16 +78,6 @@ getEpochLengthInDays: ({ publicDeriverId: number, ... }) => ? number = publicDer
   const { currentEpochLength, currentSlotLength } = timeCalcRequests.requests;
   const epochLengthInSeconds = currentEpochLength() * currentSlotLength();
   return epochLengthInSeconds / (60 * 60 * 24);
-};
-
-createWithdrawalTx: (shouldDeregister: boolean) => void = shouldDeregister => {
-  const { stores } = this.props;
-  const wallet = stores.wallets.selectedOrFail;
-  stores.substores.ada.delegationTransaction.setShouldDeregister(shouldDeregister);
-  noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-  stores.uiDialogs.open({
-    dialog: WithdrawRewardsDialog,
-  });
 };
 
 getStakePoolMeta: ({ publicDeriverId: number, networkId: number, ... }) => Node = publicDeriver => {
@@ -213,6 +200,8 @@ render(): Node {
   const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(wallet.publicDeriverId);
   const delegatedRewards = stores.delegation.getRewardBalanceOrZero(wallet);
 
+  const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
+
   return (
     <Box>
       {isWalletWithNoFunds ? (
@@ -294,43 +283,11 @@ render(): Node {
           }
         />
       ) : null}
-      {uiDialogs.isOpen(DeregisterDialogContainer) ? (
-        <DeregisterDialogContainer
-          stores={stores}
-          alwaysShowDeregister
-          onNext={() => {
-            // note: purposely don't await since the next dialog will properly render the spinner
-            noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-            this.props.stores.uiDialogs.open({
-              // dialog: WithdrawalTxDialogContainer,
-              dialog: WithdrawRewardsDialog,
-            });
-          }}
-        />
-      ) : null}
       {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
         <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context.intl} />
       ) : null}
       {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
         <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />
-      ) : null}
-      {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
-        <WithdrawalTxDialogContainer
-          stores={stores}
-          onClose={() => {
-            stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-            this.props.stores.uiDialogs.closeActiveDialog();
-          }}
-        />
-      ) : null}
-      {uiDialogs.isOpen(WithdrawRewardsDialog) ? (
-        <WithdrawRewardsDialog
-          stores={stores}
-          onClose={() => {
-            stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-            this.props.stores.uiDialogs.closeActiveDialog();
-          }}
-        />
       ) : null}
       {uiDialogs.isOpen(RewardHistoryDialog) ? (
         <RewardHistoryDialog

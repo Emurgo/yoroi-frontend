@@ -14,9 +14,9 @@ import { UndelegateButton } from './UndelegateButton';
 
 type Props = {|
   delegatedPool: PoolData,
-  poolTransition: ?PoolTransition,
-  delegateToSpecificPool: (id: ?string) => void,
-  stores: any,
+    poolTransition: ?PoolTransition,
+      delegateToSpecificPool: (id: ?string) => void,
+        stores: any,
 |};
 
 type Intl = {|
@@ -27,34 +27,6 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
   const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const theme = useTheme();
   const avatarGenerated = getAvatarFromPoolId(id);
-
-  // const renderDelegationBtn = () => {
-  //   if (poolTransition?.shouldShowTransitionFunnel) {
-  //     return (
-  //       <UpdatePoolButton variant="danger" onClick={() => delegateToSpecificPool(poolTransition.suggestedPool?.hash ?? '')}>
-  //         {intl.formatMessage(globalMessages.updatePool)}
-  //       </UpdatePoolButton>
-  //     );
-  //   }
-
-  //   return (
-  //     <UndelegateButton
-  //       variant="tertiary"
-  //       color="primary"
-  //       onClick={undelegate}
-  //       disabled={!undelegate}
-  //       sx={{
-  //         lineHeight: '21px',
-  //         '&.MuiButton-sizeMedium': {
-  //           height: 'unset',
-  //           p: '9px 15px',
-  //         },
-  //       }}
-  //     >
-  //       {intl.formatMessage(globalMessages.undelegateLabel)}
-  //     </UndelegateButton>
-  //   );
-  // };
 
   return (
     <Card
@@ -152,7 +124,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
     </Card>
   );
 }
-export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType<Props>);
+export default (injectIntl(observer(DelegatedStakePoolCard)): ComponentType < Props >);
 
 const Card = styled(Box)({
   borderRadius: '8px',

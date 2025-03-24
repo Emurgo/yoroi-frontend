@@ -40,7 +40,6 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
   const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
-  // const ownedOutputs = React.useMemo(() => tx.outputs.filter(output => output.ownAddress), [tx.outputs]);
 
   const operationsCerts = useOperations(tx.certificates, isStakeRegistered, stakeKeyDeposit, primaryTokenInfo, operations);
 
@@ -204,12 +203,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
 
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
-      <Stack
-        direction="row"
-        justifyContent={notPrimaryTokenSent.length === 0 ? 'space-between' : 'space-between'}
-        width="100%"
-        alignItems="flex-start"
-      >
+      <Stack direction="row" justifyContent="space-between" width="100%" alignItems="flex-start">
         <Stack direction="row" gap="4px" alignItems="flex-start">
           <IconWrapper>
             <Icon.Send />
