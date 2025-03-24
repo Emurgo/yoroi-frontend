@@ -5,16 +5,28 @@ export function splitAmount(amount: BigNumber, decimalPlaces: number): [string, 
   if (decimalPlaces === 0) {
     return [amount.toFormat(0), ''];
   }
+
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
+
   let beforeDecimal = valString.substring(0, startIndex);
-  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '');
-  // Remove the dots if no decimals
+  let afterDecimal = valString.substring(startIndex);
+
+  // Remove trailing zeros safely without regex
+  let i = afterDecimal.length;
+  while (i > 0 && afterDecimal[i - 1] === '0') {
+    i--;
+  }
+  afterDecimal = afterDecimal.substring(0, i);
+
+  // Remove the dot if there's no decimal part left
   if (!afterDecimal) {
     beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1);
   }
+
   return [beforeDecimal, afterDecimal];
 }
+
 
 export const maxNameLengthBeforeTruncation = 15;
 
