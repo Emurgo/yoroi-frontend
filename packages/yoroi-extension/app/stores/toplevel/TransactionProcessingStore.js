@@ -106,14 +106,14 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     let broadcastRequest;
     if (wallet.type === 'ledger') {
       broadcastRequest = async () => {
-        return await this.stores.substores.ada.ledgerSend.signAndBroadcastFromWallet({
+        return await this.ledgerWalletSignAndBroadcast({
           signRequest,
           wallet,
         });
       };
     } else if (wallet.type === 'trezor') {
       broadcastRequest = async () => {
-        return await this.stores.substores.ada.trezorSend.signAndBroadcastFromWallet({
+        return await this.trezorSignAndBroadcast({
           signRequest,
           wallet,
         });
@@ -123,7 +123,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         throw new Error('missing password for hardware wallet');
       }
       broadcastRequest = async () => {
-        return await this.stores.substores.ada.mnemonicSend.signAndBroadcast({
+        return await this.mnemonicWalletSignAndBroadcast({
           signRequest,
           password,
           publicDeriverId: wallet.publicDeriverId,
@@ -167,7 +167,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       });
       result = { signedTxHex };
     } else if (wallet.type === 'trezor') {
-      result = await this.stores.substores.ada.trezorSend.signRawTxFromWallet({
+      result = await this.trezorSignRawTx({
         rawTxHex: transactionHex,
         wallet,
         // by happenstance the use case of this function is not to send
@@ -175,7 +175,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         changeAddrs: [],
       });
     } else if (wallet.type === 'ledger') {
-      result = await this.stores.substores.ada.ledgerSend.signRawTxFromWallet({
+      result = await this.ledgerWalletSignRawTx({
         rawTxHex: transactionHex,
         wallet,
         // by happenstance the use case of this function is not to send

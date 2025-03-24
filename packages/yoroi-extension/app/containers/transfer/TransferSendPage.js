@@ -69,8 +69,6 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     const { stores } = this.props;
     stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
-    stores.substores.ada.ledgerSend.cancel();
-    stores.substores.ada.trezorSend.cancel();
   }
 
   submit: void => Promise<void> = async () => {
@@ -81,34 +79,25 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     }
     const signRequest = this.props.transactionRequest.result;
     if (signRequest == null) return;
-    if (this.spendingPasswordForm == null) {
-      if (selected.type === 'trezor') {
-        await stores.substores.ada.trezorSend.sendUsingTrezor({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (selected.type === 'ledger') {
-        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (stores.transactionProcessingStore.sendMoneyRequest.error == null) {
-        this.props.onSubmit.trigger();
-      }
-    } else {
-      this.spendingPasswordForm.submit({
-        onSuccess: async (form) => {
-          const { walletPassword } = form.values();
-          await stores.substores.ada.mnemonicSend.sendMoney({
-            signRequest,
-            password: walletPassword,
-            wallet: selected,
-          });
+
+    const send = (password) => {
+      this.stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: selected,
+        signRequest,
+        password,
+        callback: async () => {
           if (stores.transactionProcessingStore.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();
           }
+        },
+      });
+    }
+    if (this.spendingPasswordForm == null) {
+      send(null);
+    } else {
+      this.spendingPasswordForm.submit({
+        onSuccess: async (form) => {
+          send(form.values().walletPassword);
         },
         onError: () => {}
       });

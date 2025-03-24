@@ -283,15 +283,16 @@ function SwapPage(props: StoresProps & Intl): Node {
     validateSignRequestAndUserPassword(passswordInput);
 
     setOpenedDialog('loadingOverlay');
+    const password = userPasswordState?.value;
 
-    const baseBroadcastRequest = { wallet, signRequest };
-    const broadcastRequest = isHardwareWallet
-      ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password: passswordInput } };
     try {
-      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
-      // $FlowIgnore[incompatible-call]
-      await stores.transactionProcessingStore.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
+
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);
 

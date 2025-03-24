@@ -57,8 +57,6 @@ import type { SendMoneyRequest } from '../../../stores/toplevel/TransactionProce
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
-import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
-import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 import { SendTokensButton } from './SendTokensButton';
 
 const messages = defineMessages({
@@ -222,10 +220,6 @@ type Props = {|
     signRequest: ISignRequest<any>,
     onSuccess?: void => void,
   |}) => Promise<void>,
-  +ledgerSendError: null | LocalizableError,
-  +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendStore,
-  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
