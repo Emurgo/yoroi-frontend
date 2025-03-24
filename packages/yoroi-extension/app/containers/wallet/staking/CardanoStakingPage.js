@@ -34,7 +34,7 @@ import { ampli } from '../../../../ampli/index';
 import environment from '../../../environment';
 
 type Props = {|
-  urlTemplate: ?string,
+  urlTemplate: string,
   poolTransition: ?PoolTransition,
 |};
 
