@@ -8,6 +8,7 @@ import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/m
 import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
 import { getBoundsForTabWindow, popupProps, sendToInjector } from './utils';
 import { CoreAddressTypes } from '../../../../../app/api/ada/lib/storage/database/primitives/enums';
+import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 
 declare var chrome;
 
@@ -42,8 +43,12 @@ const handlers = Object.freeze({
     if (!publicDeriver) {
       return { ok: publicDeriver };
     }
-    const { address } = (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0];
-    return { ok: address };
+    const address = RustModule.WalletV4.Address.from_hex(
+      (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address
+    );
+    const result = address.to_bech32();
+    address.free();
+    return { ok: result };
   },
 
   'get-wallets': async () => {
