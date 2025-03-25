@@ -90,7 +90,7 @@ render(): Node {
           },
         }}
       >
-        {intl.formatMessage(globalMessages.sidebarFaq)}sss
+        {intl.formatMessage(globalMessages.sidebarFaq)}
       </Button>
     </Wrapper>
   );
