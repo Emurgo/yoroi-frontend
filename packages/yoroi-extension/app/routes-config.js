@@ -21,15 +21,11 @@ export const ROUTES = {
     RESTORE_WALLET: '/wallets/restore',
     TRANSACTIONS: '/wallets/transactions',
     SEND: '/wallets/send',
-    ASSETS: '/wallets/assets',
     RECEIVE: {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
-    DELEGATION_DASHBOARD: '/wallets/delegation-dashboard',
-    ADAPOOL_DELEGATION_SIMPLE: '/wallets/delegation-simple',
     CARDANO_DELEGATION: '/wallets/cardano-delegation',
-    CATALYST_VOTING: '/wallets/voting',
   },
   SETTINGS: {
     ROOT: '/settings',
