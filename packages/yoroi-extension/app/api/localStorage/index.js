@@ -21,6 +21,7 @@ const storageKeys = {
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
+  TESTNET_MODAL_DISPLAYED: 'TESTNET_MODAL_DISPLAYED',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
@@ -34,7 +35,6 @@ const storageKeys = {
   PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
-  TESTNET_MODAL_INFO: networkForLocalStorage + '-TESTNET_MODAL_INFO',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
@@ -143,11 +143,11 @@ setBuySellDisclaimer: string => Promise < void> = accepted => setLocalItem(stora
 unsetBuySellDisclaimer: void => Promise < void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
 // ========== Testnet Modal Info  ========== //
-getTestnetModalInfo: void => Promise <? string > = () => getLocalItem(storageKeys.TESTNET_MODAL_INFO);
+getTestnetModalDisplayed: void => Promise<boolean> = async () => (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
 
-setTestnetModalInfo: string => Promise < void> = accepted => setLocalItem(storageKeys.TESTNET_MODAL_INFO, accepted);
+setTestnetModalDisplayed: boolean => Promise<void> = accepted => setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
 
-unsetTestnetModalInfo: void => Promise < void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_INFO);
+unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
 
 // ========== Theme Migration ========== //
 

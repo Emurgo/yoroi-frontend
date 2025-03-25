@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 
@@ -14,7 +14,7 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Button, IconButton, Link, Typography, styled } from '@mui/material';
+import { Box, Button, IconButton, Link, styled, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
@@ -168,32 +168,23 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
   const isDevOrNightly = environment.isDev() || environment.isNightly();
 
   useEffect(() => {
-    const getModalInfo = async () => {
-      const lsModalInfoStr = await localStorageApi.getTestnetModalInfo();
-      const selectedWalletId = wallet.publicDeriverId;
-      const networkId = wallet.networkId;
-      const lsModalInfoSettings = JSON.parse(lsModalInfoStr || '{}');
-      const modalSettings = lsModalInfoSettings[selectedWalletId];
-
-      if (modalSettings === undefined && networkId === networks.CardanoMainnet.NetworkId) {
+    // eslint-disable-next-line
+    (async () => {
+      const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
+      if (!wallet.isTestnet && !isTestnetModalDisplayed) {
         openModal({
           title: intl.formatMessage(messages.modalTitle),
-          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
+          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
           width: '648px',
           height: '360px',
         });
       }
-    }
-    getModalInfo()
+    })()
   }, [])
 
 
   const onCloseModalInfo = useCallback(async () => {
-    const lsModalInfoStr = await localStorageApi.getTestnetModalInfo();
-    const selectedWalletId = wallet.publicDeriverId;
-    const modalSettings = JSON.parse(lsModalInfoStr || '{}');
-
-    localStorageApi.setTestnetModalInfo(JSON.stringify(Object.assign(modalSettings, { [selectedWalletId]: true })));
+    await localStorageApi.setTestnetModalDisplayed(true);
     closeModal()
   }, [localStorageApi]);
 
