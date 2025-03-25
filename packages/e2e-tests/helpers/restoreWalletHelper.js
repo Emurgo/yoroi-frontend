@@ -17,8 +17,9 @@ import {
   WindowManager,
 } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
+import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 
-export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true) => {
+export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true, switchToPreprod = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
   await addNewWalletPage.selectRestoreWallet();
   const restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
@@ -39,6 +40,19 @@ export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModal
   expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet.plate);
   await walletDetailsPage.continue();
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet, shouldBeModalWindow);
+  if (switchToPreprod) {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    const settingsPage = await transactionsPage.goToSettingsTab();
+    const generalSettingsPage = await settingsPage.goToGeneralSubMenu();
+    // scroll switch network button into the view
+    // press the button
+    // find the switch network modal
+    // open the dropdown
+    // select network
+    // apply changes
+    // wait network is changed
+    // go to Wallet Transactions
+  }
 };
 
 export const checkCorrectWalletIsDisplayed = async (
