@@ -107,6 +107,9 @@ export const makeTransport = async (transportId: TransportIdType): any => {
     case TRANSPORT_ID.WEB_HID:
       transportFactory = require('@ledgerhq/hw-transport-webhid').default;
       break;
+    case TRANSPORT_ID.SPECULOS_HTTP:
+      transportFactory = require('./speculosHttpTransport').default;
+      break;
     default:
       throw new Error('Transport protocol not supported');
   }
