@@ -87,6 +87,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const profileStore = stores.profile;
     const coinPriceStore = stores.coinPriceStore;
     const { wallets, getCashbackWalletRequest } = stores.wallets;
+    const selectedWallet = stores.wallets.selected;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -123,20 +124,22 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           currentLocale={profileStore.currentLocale}
           error={profileStore.setProfileLocaleRequest.error}
         />
-        <BringCashbackSettings
-          onSelect={this.onSelectBringCashbackWallet}
-          isSubmitting={false}
-          // $FlowFixMe this is apparently correct, flow is out of its mind
-          cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
-          // $FlowFixMe this is apparently correct, flow is out of its mind
-          currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
-          isUseSandbox={profileStore.getBringSandboxRequest.result}
-          onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
-            await profileStore.setBringSandboxRequest.execute(useSandbox);
-            await profileStore.getBringSandboxRequest.execute();
-          }) : null}
-          error={null}
-        />
+        {selectedWallet && !selectedWallet.isTestnet && (
+          <BringCashbackSettings
+            onSelect={this.onSelectBringCashbackWallet}
+            isSubmitting={false}
+            // $FlowFixMe this is apparently correct, flow is out of its mind
+            cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
+            // $FlowFixMe this is apparently correct, flow is out of its mind
+            currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
+            isUseSandbox={profileStore.getBringSandboxRequest.result}
+            onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
+              await profileStore.setBringSandboxRequest.execute(useSandbox);
+              await profileStore.getBringSandboxRequest.execute();
+            }) : null}
+            error={null}
+          />
+        )}
         <UnitOfAccountSettings
           onSelect={this.onSelectUnitOfAccount}
           isSubmitting={isSubmittingUnitOfAccount}
@@ -147,7 +150,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
         />
         <ThemeSettingsBlock />
         <AboutYoroiSettingsBlock
-          wallet={stores.wallets.selected}
+          wallet={selectedWallet}
           onSwitchNetwork={() =>
             stores.uiDialogs.open({
               dialog: SwitchNetworkDialogContainer,
