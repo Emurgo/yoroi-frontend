@@ -5,7 +5,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import { Box, Link, styled } from '@mui/material';
+import { Box, Button, styled } from '@mui/material';
 import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
@@ -75,7 +75,7 @@ render(): Node {
           })
           : null}
       </ScrollableCategoriesWrapper>
-      <Link
+      <Button
         className={styles.faq}
         href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
         target="_blank"
@@ -90,8 +90,8 @@ render(): Node {
           },
         }}
       >
-        {intl.formatMessage(globalMessages.sidebarFaq)}
-      </Link>
+        {intl.formatMessage(globalMessages.sidebarFaq)}sss
+      </Button>
     </Wrapper>
   );
 }
