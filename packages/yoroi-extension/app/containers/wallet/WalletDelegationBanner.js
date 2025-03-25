@@ -8,7 +8,7 @@ import { ReactComponent as StakingIllustration } from '../../assets/images/dashb
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
+import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard-revamp/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
 import { SocialMediaStakePool, HelperTooltip } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';

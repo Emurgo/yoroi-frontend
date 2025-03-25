@@ -97,9 +97,6 @@ const WalletSummaryPage = React.lazy(WalletSummaryPagePromise);
 const WalletSendPagePromise = () => import('./containers/wallet/WalletSendPage');
 const WalletSendPage = React.lazy(WalletSendPagePromise);
 
-const WalletAssetsPagePromise = () => import('./containers/wallet/WalletAssetsPage');
-const WalletAssetsPage = React.lazy(WalletAssetsPagePromise);
-
 const WalletReceivePagePromise = () => import('./containers/wallet/WalletReceivePage');
 const WalletReceivePage = React.lazy(WalletReceivePagePromise);
 
@@ -108,9 +105,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
-
-const StakingDashboardPagePromise = () => import('./containers/wallet/staking/StakingDashboardPage');
-const StakingDashboardPage = React.lazy(StakingDashboardPagePromise);
 
 const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
 const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
@@ -166,12 +160,10 @@ export const LazyLoadPromises: Array<() => any> = [
   NightlyPagePromise,
   WalletSummaryPagePromise,
   WalletSendPagePromise,
-  WalletAssetsPagePromise,
   WalletReceivePagePromise,
   URILandingPagePromise,
   WalletTransferPagePromise,
   ReceivePromise,
-  StakingDashboardPagePromise,
   CardanoStakingPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
@@ -264,27 +256,15 @@ const WalletsSubpages = stores => (
   <Switch>
     <Route exact path={ROUTES.WALLETS.TRANSACTIONS} component={props => <WalletSummaryPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.WALLETS.SEND} component={props => <WalletSendPage {...props} stores={stores} />} />
-    <Route path={ROUTES.WALLETS.ASSETS} component={props => <WalletAssetsPage {...props} stores={stores} />} />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
     />
     <Route
       exact
-      path={ROUTES.WALLETS.DELEGATION_DASHBOARD}
-      component={props => <StakingDashboardPage {...props} stores={stores} />}
-    />
-    <Route
-      exact
-      path={ROUTES.WALLETS.ADAPOOL_DELEGATION_SIMPLE}
-      component={props => <CardanoStakingPage {...props} stores={stores} urlTemplate={CONFIG.poolExplorer.simpleTemplate} />}
-    />
-    <Route
-      exact
       path={ROUTES.WALLETS.CARDANO_DELEGATION}
       component={props => <CardanoStakingPage {...props} stores={stores} />}
     />
-    <Route exact path={ROUTES.WALLETS.CATALYST_VOTING} component={props => <VotingPage {...props} stores={stores} />} />
   </Switch>
 );
 
