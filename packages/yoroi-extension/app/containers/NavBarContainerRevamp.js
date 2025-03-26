@@ -240,6 +240,10 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     }
 
     if (this.props.stores.uiDialogs.isOpen(SwitchNetworkDialogContainer)) {
+      // we need it to avoid double rendering when opening the Network Switch Modal on Settings -> General
+      if (this.props.stores.app.currentRoute === ROUTES.SETTINGS.GENERAL) {
+        return null;
+      }
       return <SwitchNetworkDialogContainer stores={this.props.stores} />;
     }
 
