@@ -250,12 +250,12 @@ export const Cashback = () => {
           y2="226.915"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_2098_2402"
@@ -265,12 +265,12 @@ export const Cashback = () => {
           y2="168.322"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_2098_2402"
@@ -280,12 +280,12 @@ export const Cashback = () => {
           y2="155.674"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_2098_2402"
@@ -295,12 +295,12 @@ export const Cashback = () => {
           y2="143.045"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_2098_2402"
@@ -310,12 +310,12 @@ export const Cashback = () => {
           y2="130.394"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_2098_2402"
@@ -325,12 +325,12 @@ export const Cashback = () => {
           y2="117.744"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_2098_2402"
@@ -340,12 +340,12 @@ export const Cashback = () => {
           y2="107.445"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_2098_2402"
@@ -355,12 +355,12 @@ export const Cashback = () => {
           y2="104.491"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_2098_2402"
@@ -370,12 +370,12 @@ export const Cashback = () => {
           y2="191.797"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_2098_2402"
@@ -385,12 +385,12 @@ export const Cashback = () => {
           y2="179.146"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_2098_2402"
@@ -400,12 +400,12 @@ export const Cashback = () => {
           y2="179.797"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_2098_2402"
@@ -415,12 +415,12 @@ export const Cashback = () => {
           y2="167.146"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_2098_2402"
@@ -430,12 +430,12 @@ export const Cashback = () => {
           y2="167.797"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_2098_2402"
@@ -445,12 +445,12 @@ export const Cashback = () => {
           y2="155.146"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_2098_2402"
@@ -460,12 +460,12 @@ export const Cashback = () => {
           y2="155.322"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_2098_2402"
@@ -475,12 +475,12 @@ export const Cashback = () => {
           y2="142.674"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_2098_2402"
@@ -490,12 +490,12 @@ export const Cashback = () => {
           y2="130.045"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint17_linear_2098_2402"
@@ -505,12 +505,12 @@ export const Cashback = () => {
           y2="117.394"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint18_linear_2098_2402"
@@ -520,12 +520,12 @@ export const Cashback = () => {
           y2="104.744"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint19_linear_2098_2402"
@@ -535,12 +535,12 @@ export const Cashback = () => {
           y2="94.445"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint20_linear_2098_2402"
@@ -550,12 +550,12 @@ export const Cashback = () => {
           y2="91.491"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint21_linear_2098_2402"
@@ -565,12 +565,12 @@ export const Cashback = () => {
           y2="191.687"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint22_linear_2098_2402"
@@ -580,12 +580,12 @@ export const Cashback = () => {
           y2="221.268"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint23_linear_2098_2402"
@@ -595,12 +595,12 @@ export const Cashback = () => {
           y2="211.852"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint24_linear_2098_2402"
@@ -610,12 +610,12 @@ export const Cashback = () => {
           y2="229.885"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint25_linear_2098_2402"
@@ -625,12 +625,12 @@ export const Cashback = () => {
           y2="152.017"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
         <linearGradient
           id="paint26_linear_2098_2402"
@@ -640,12 +640,12 @@ export const Cashback = () => {
           y2="167.276"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#17D1AA" />
-          <stop offset="0.15" stop-color="#1ACBAF" />
-          <stop offset="0.37" stop-color="#21B8BC" />
-          <stop offset="0.62" stop-color="#2E9BD3" />
-          <stop offset="0.89" stop-color="#3F71F1" />
-          <stop offset="1" stop-color="#475FFF" />
+          <stop stopColor="#17D1AA" />
+          <stop offset="0.15" stopColor="#1ACBAF" />
+          <stop offset="0.37" stopColor="#21B8BC" />
+          <stop offset="0.62" stopColor="#2E9BD3" />
+          <stop offset="0.89" stopColor="#3F71F1" />
+          <stop offset="1" stopColor="#475FFF" />
         </linearGradient>
       </defs>
     </svg>
