@@ -8,7 +8,6 @@ import {
   quarterSecond,
 } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
-import SettingsTab from './wallet/settingsTab/settingsTab.page.js';
 
 class WalletCommonBase extends BasePage {
   // locators
@@ -236,7 +235,6 @@ class WalletCommonBase extends BasePage {
     await this.setImplicitTimeout(oneSecond, this.goToSettingsTab.name);
     await this.click(this.settingTabButtonLocator);
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
-    return new SettingsTab(this.driver, this.logger);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);
