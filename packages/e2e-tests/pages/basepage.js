@@ -72,7 +72,6 @@ class BasePage {
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
     let element = await this.driver.findElement(getByLocator(locator));
-    await this.highlightElement(element);
     try {
       await element.click();
     } catch (error) {
