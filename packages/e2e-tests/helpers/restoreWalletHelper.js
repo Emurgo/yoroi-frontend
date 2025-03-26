@@ -4,7 +4,10 @@ import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/res
 import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { getPassword } from '../helpers/constants.js';
+import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
+import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
+import SwitchNetworkModal from '../pages/wallet/switchNetworkModal.page.js';
+import { CardanoNetworks, getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
@@ -17,7 +20,6 @@ import {
   WindowManager,
 } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
-import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 
 export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true, switchToPreprod = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
@@ -42,14 +44,22 @@ export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModal
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet, shouldBeModalWindow);
   if (switchToPreprod) {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    const settingsPage = await transactionsPage.goToSettingsTab();
-    const generalSettingsPage = await settingsPage.goToGeneralSubMenu();
+    await transactionsPage.goToSettingsTab();
+    const settingsPage = new SettingsTab(webdriver, logger);
+    await settingsPage.goToGeneralSubMenu();
+    const generalSettingsPage = new GeneralSubTab(webdriver, logger);
     // scroll switch network button into the view
     // press the button
+    await generalSettingsPage.openSwitchNetworkModal();
+    const networkSwitchModal = new SwitchNetworkModal(webdriver, logger);
     // find the switch network modal
+    const networkSwitchModalIsDisplayed = await networkSwitchModal.isDisplayed();
+    expect(networkSwitchModalIsDisplayed, 'The network switch modal is not displayed').to.be.true;
     // open the dropdown
     // select network
     // apply changes
+    await networkSwitchModal.selectNetwork(CardanoNetworks.PP);
+    await networkSwitchModal.sleep(10000);
     // wait network is changed
     // go to Wallet Transactions
   }

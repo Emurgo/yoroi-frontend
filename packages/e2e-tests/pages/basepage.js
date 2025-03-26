@@ -72,6 +72,7 @@ class BasePage {
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
     let element = await this.driver.findElement(getByLocator(locator));
+    await this.highlightElement(element);
     try {
       await element.click();
     } catch (error) {
@@ -89,11 +90,16 @@ class BasePage {
     const element = await this.findElement(locator);
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
+  async focus(locator) {
+    this.logger.info(`BasePage::focus is called. Locator: ${JSON.stringify(locator)}`);
+    const element = await this.findElement(locator);
+    await this.driver.executeScript("arguments[0].focus();", element);
+  }
   async dispatchMouseDownEvent(locator) {
-    this.logger.info(`BasePage::clickByScript is called. Locator: ${JSON.stringify(locator)}`);
+    this.logger.info(`BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     await this.driver.executeScript(
-      `arguments[0].dispatchEvent(new MouseEvent('mousedown', {view: window, 'bubbles' : true, cancelable: true}))`,
+      `arguments[0].dispatchEvent(new MouseEvent('mousedown', {view: window, bubbles : true, cancelable: true}))`,
       element
     );
   }

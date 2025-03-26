@@ -28,7 +28,7 @@ class SwitchNetworkModal extends BasePage {
     locator: 'switchNetworkDialog-selectNetwork_0-menuItem',
     method: 'id',
   }
-  preprodtMenuItemLocator = {
+  preprodMenuItemLocator = {
     locator: 'switchNetworkDialog-selectNetwork_250-menuItem',
     method: 'id',
   }
@@ -67,14 +67,14 @@ class SwitchNetworkModal extends BasePage {
   // * select network
   async selectNetwork(networkName, applySelection = true) {
     this.logger.info(`SwitchNetworkModal::selectNetwork is called`);
-    await this.dispatchMouseDownEvent(this.switchNetworkDropdownLocator);
+    await this.click(this.switchNetworkDropdownLocator);
     let networkLocator = null;
     switch (networkName) {
       case CardanoNetworks.MN:
         networkLocator = this.mainnetMenuItemLocator;
         break;
       case CardanoNetworks.PP:
-        networkLocator = this.preprodtMenuItemLocator;
+        networkLocator = this.preprodMenuItemLocator;
         break;
       case CardanoNetworks.PV:
         networkLocator = this.previewMenuItemLocator;
