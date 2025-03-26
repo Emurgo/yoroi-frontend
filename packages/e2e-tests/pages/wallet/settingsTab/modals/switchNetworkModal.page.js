@@ -1,5 +1,5 @@
-import { CardanoNetworks } from '../../helpers/constants.js';
-import BasePage from '../basepage.js';
+import { CardanoNetworks } from '../../../../helpers/constants.js';
+import BasePage from '../../../basepage.js';
 
 class SwitchNetworkModal extends BasePage {
   // locators
@@ -60,8 +60,8 @@ class SwitchNetworkModal extends BasePage {
     }
   }
   // * close memo modal
-  async closeMemoModal() {
-    this.logger.info(`SwitchNetworkModal::closeMemoModal is called`);
+  async closeSwitchNetworkModal() {
+    this.logger.info(`SwitchNetworkModal::closeSwitchNetworkModal is called`);
     await this.click(this.switchNetworkCloseBtnLocator);
   }
   // * select network
