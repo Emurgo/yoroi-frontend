@@ -27,7 +27,7 @@ describe('Changing wallet password. Positive', function () {
   const oldPassword = getPassword();
   const newPassword = getPassword(10, true);
 
-  it('Go to Settings -> Wallet', async function () {
+  it('Go to Settings Wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;

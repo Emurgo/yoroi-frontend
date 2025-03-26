@@ -54,7 +54,7 @@ describe('Connect Trezor HW wallet', function () {
     await addNewWalletPage.selectCardanoNetwork();
     await addNewWalletPage.selectTrezorHW();
     await addNewWalletPage.confirmChecking();
-    await addNewWalletPage.connectTrezor();
+    await addNewWalletPage.connectHardwareWallet();
   });
 
   it('Approve connection', async function () {

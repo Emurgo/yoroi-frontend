@@ -25,7 +25,7 @@ describe('Changing wallet password. Negative. Wrong repeated password', function
   const newPass1 = getPassword(10);
   const newPass2 = getPassword(10);
 
-  it('Go to Settings -> Wallet', async function () {
+  it('Go to Settings Wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
