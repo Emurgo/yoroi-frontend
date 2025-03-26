@@ -1,3 +1,4 @@
+import { CardanoNetworks } from '../../helpers/constants.js';
 import BasePage from '../basepage.js';
 
 class SwitchNetworkModal extends BasePage {
@@ -19,13 +20,6 @@ class SwitchNetworkModal extends BasePage {
   };
   // dropdown
   // * it should be called by the .dispatchEvent(mouseDownEvent);
-  // * const mouseDownEvent = new MouseEvent(
-  // * "mousedown", {
-  // *		view: window, 
-  // *		bubbles: true, 
-  // *		cancelable: true,
-  // *	}
-  // * );
   switchNetworkDropdownLocator = {
     locator: 'switchNetworkDialog-selectNetwork-dropdown',
     method: 'id',
@@ -54,6 +48,57 @@ class SwitchNetworkModal extends BasePage {
   };
 
   // methods
+  // * isDisplayed
+  async isDisplayed() {
+    this.logger.info(`SwitchNetworkModal::isDisplayed is called`);
+    try {
+      await this.waitForElement(this.switchNetworkModalLocator);
+      await this.waitForElement(this.switchNetworkTitleLocator);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  // * close memo modal
+  async closeMemoModal() {
+    this.logger.info(`SwitchNetworkModal::closeMemoModal is called`);
+    await this.click(this.switchNetworkCloseBtnLocator);
+  }
+  // * select network
+  async selectNetwork(networkName, applySelection = true) {
+    this.logger.info(`SwitchNetworkModal::selectNetwork is called`);
+    await this.dispatchMouseDownEvent(this.switchNetworkDropdownLocator);
+    let networkLocator = null;
+    switch (networkName) {
+      case CardanoNetworks.MN:
+        networkLocator = this.mainnetMenuItemLocator;
+        break;
+      case CardanoNetworks.PP:
+        networkLocator = this.preprodtMenuItemLocator;
+        break;
+      case CardanoNetworks.PV:
+        networkLocator = this.previewMenuItemLocator;
+        break;
+      default:
+        throw new Error("Unknokwn network to select");
+    }
+    await this.click(networkLocator);
+    if (applySelection) {
+      await this.applySelection();
+    } else {
+      await this.cancelSelection();
+    }
+  }
+  // * apply selection
+  async applySelection() {
+    this.logger.info(`SwitchNetworkModal::applySelection is called`);
+    await this.click(this.switchNetworkApplyBtnLocator);
+  }
+  // * cancel selection
+  async cancelSelection() {
+    this.logger.info(`SwitchNetworkModal::cancelSelection is called`);
+    await this.click(this.switchNetworkCancelBtnLocator);
+  }
 }
 
 export default SwitchNetworkModal;
