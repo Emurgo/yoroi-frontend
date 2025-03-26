@@ -1,4 +1,3 @@
-import SwitchNetworkModal from '../switchNetworkModal.page.js';
 import SettingsTab from './settingsTab.page.js';
 
 class GeneralSubTab extends SettingsTab {
@@ -112,7 +111,6 @@ class GeneralSubTab extends SettingsTab {
     this.logger.info(`GeneralSubTab::openSwitchNetworkModal is called.`);
     await this.scrollIntoView(this.switchNetworkBtnLocator);
     await this.click(this.switchNetworkBtnLocator);
-    return new SwitchNetworkModal(this.driver, this.logger);
   }
   async getNetworkText() {
     this.logger.info(`GeneralSubTab::getNetworkText is called`);
