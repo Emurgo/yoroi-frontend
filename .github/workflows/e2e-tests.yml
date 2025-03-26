@@ -40,6 +40,14 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: npm run test:build:mainnet
 
+      - name: Check if the app is built correctly
+        working-directory: ./packages/yoroi-extension/build/js
+        run: |
+          if [ ! -f inject.js ]; then
+            echo "Build failed: files not found"
+            exit 1
+          fi
+
       - name: Archive built app
         uses: actions/upload-artifact@v4
         with:
@@ -125,6 +133,13 @@ jobs:
         run: |
             export DISPLAY=:99
             sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+
+      - name: Warm up Chrome
+        if: matrix.browser=='chrome'
+        run: |
+          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
+          sleep 5
+          pkill chrome
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -300,6 +315,13 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
+
+      - name: Warm up Chrome
+        if: matrix.browser=='chrome'
+        run: |
+          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
+          sleep 5
+          pkill chrome
 
       - name: Run tests
         working-directory: ./packages/e2e-tests

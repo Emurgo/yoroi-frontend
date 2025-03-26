@@ -15,9 +15,7 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Mainnet',
     NetworkFeatureName: 'mainnet',
     Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000'
-        : 'https://api.yoroiwallet.com',
+      BackendService: 'https://api.yoroiwallet.com',
       TokenInfoService:
         'https://cdn.yoroiwallet.com',
       BackendServiceZero: 'https://zero.yoroiwallet.com',
@@ -58,9 +56,7 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preprod Testnet',
     NetworkFeatureName: 'preprod',
     Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000'
-        : 'https://preprod-backend.yoroiwallet.com',
+      BackendService: 'https://preprod-backend.yoroiwallet.com',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: 'https://yoroi-backend-zero-preprod.emurgornd.com',
@@ -100,9 +96,7 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preview Testnet',
     NetworkFeatureName: 'preview',
     Backend: {
-      BackendService: environment.isTest()
-        ? 'http://localhost:21000'
-        : 'https://preview-backend.emurgornd.com',
+      BackendService: 'https://preview-backend.emurgornd.com',
       TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: 'https://yoroi-backend-zero-preview.emurgornd.com',
     },

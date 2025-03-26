@@ -16,9 +16,12 @@ import OverviewModal from '../../../components/wallet/staking/dashboard-revamp/O
 import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
 import SummaryCard from '../../../components/wallet/staking/dashboard-revamp/SummaryCard';
 import { compose, maybe, noop } from '../../../coreUtils';
-import globalMessages from '../../../i18n/global-messages';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
+import {
+  formatLovelacesHumanReadableShort,
+  roundOneDecimal,
+  roundTwoDecimal,
+} from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
@@ -100,12 +103,14 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     const poolMeta = delegationStore.getLocalPoolInfo(publicDeriver.networkId, currentPool);
     const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(publicDeriver.networkId, currentPool) ?? {};
-    if (poolMeta == null) {
-      // server hasn't returned information about the stake pool yet
-      return null;
-    }
-    const { intl } = this.context;
-    const name = poolMeta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+
+
+
+    // if (poolMeta == null) {
+    //   // server hasn't returned information about the stake pool yet
+    //   return null;
+    // }
+    const name = poolMeta?.info?.name;
     const delegatedPool = {
       id: String(currentPool),
       name,
@@ -113,8 +118,8 @@ export default class StakingPageContent extends Component<StoresProps, State> {
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
       share: maybe(saturation, s => roundOneDecimal(Number(s) * 100)),
-      websiteUrl: poolMeta.info?.homepage,
-      ticker: poolMeta.info?.ticker,
+      websiteUrl: poolMeta?.info?.homepage,
+      ticker: poolMeta?.info?.ticker,
     };
 
     return (
@@ -268,8 +273,8 @@ export default class StakingPageContent extends Component<StoresProps, State> {
               }
             />
             <RightCardsWrapper>
-              {!errorIfPresent && this.getStakePoolMeta(wallet)}
-              {!errorIfPresent && this.getEpochProgress(wallet)}
+              {this.getStakePoolMeta(wallet)}
+              {this.getEpochProgress(wallet)}
             </RightCardsWrapper>
           </WrapperCards>
         ) : null}

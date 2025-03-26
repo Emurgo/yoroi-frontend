@@ -56,12 +56,22 @@ export default class OptionBlock extends Component<Props, State> {
 
     const learnMoreButtonClasses = classnames([styles.learnMoreButton, this.state.showLearnMore && styles.arrowUp]);
 
+    const getNetworkNameForId = () => {
+      const nameArr = title.split(' ');
+      return nameArr.length === 1 ? 'Mainnet' : nameArr[1]
+    };
+
     return (
       <GradientBox className={styles.optionBlockWrapper}>
         <li className={styles.optionBlockListItem}>
           <div className={styles.optionBlockWrapper}>
             {/* Submit button block */}
-            <button onClick={onSubmit} type="button" className={classnames([styles.optionSubmitButton, `${parentName}_${type}`])}>
+            <button
+              onClick={onSubmit}
+              type="button"
+              className={classnames([styles.optionSubmitButton, `${parentName}_${type}`])}
+              id={'connectHWWallet-select' + getNetworkNameForId() +'Network-button'}
+            >
               <div className={`${styles.optionImage} ${styles[type]}`} />
               <Typography className={styles.optionTitle} color="ds.text_gray_medium">
                 {title}
