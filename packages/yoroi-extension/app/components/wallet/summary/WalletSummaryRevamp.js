@@ -22,8 +22,7 @@ import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/tran
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 // $FlowIgnore: supressing this error
-import { BringBanner } from '../../../UI/components/Banners';
-// import { UsdaBanner } from '../../../UI/components/Banners';
+import { BringBanner, UsdaBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
@@ -216,6 +215,22 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     );
   }
 
+  renderUsdaBanner(): Node {
+    const { goToRoute } = this.props;
+
+    // <TODO:UNBLOCK_LATER>
+    // noinspection PointlessBooleanExpressionJS
+    if (true) return null;
+
+    // noinspection UnreachableCodeJS
+    return (
+      <UsdaBanner
+        onClose={() => {}}
+        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
+      />
+    );
+  }
+
   render(): Node {
     const {
       pendingAmount,
@@ -280,7 +295,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
-          {/* <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} /> */}
+          {this.renderUsdaBanner()}
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
