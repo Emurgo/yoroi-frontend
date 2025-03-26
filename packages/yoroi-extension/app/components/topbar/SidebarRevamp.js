@@ -12,89 +12,89 @@ import styles from './SidebarRevamp.scss';
 import globalMessages from '../../i18n/global-messages';
 
 type Props = {|
-  +children ?: ? Node,
-  +categories ?: Array < SidebarCategoryRevamp >,
-  +isActiveCategory ?: SidebarCategoryRevamp => boolean,
-  +onCategoryClicked ?: SidebarCategoryRevamp => void,
-  +onLogoClick ?: void => void,
+  +children?: ?Node,
+  +categories?: Array<SidebarCategoryRevamp>,
+  +isActiveCategory?: SidebarCategoryRevamp => boolean,
+  +onCategoryClicked?: SidebarCategoryRevamp => void,
+  +onLogoClick?: void => void,
 |};
 
 @observer
 export default class SidebarRevamp extends Component<Props> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-    };
+    intl: intlShape.isRequired,
+  };
 
-    static defaultProps: {|
-  categories: void,
+  static defaultProps: {|
+    categories: void,
     children: void,
-      isActiveCategory: void,
-        onCategoryClicked: void,
-          onLogoClick: void,
-    |} = {
-  children: undefined,
+    isActiveCategory: void,
+    onCategoryClicked: void,
+    onLogoClick: void,
+  |} = {
+    children: undefined,
     categories: undefined,
-      isActiveCategory: undefined,
-        onCategoryClicked: undefined,
-          onLogoClick: undefined,
-    };
+    isActiveCategory: undefined,
+    onCategoryClicked: undefined,
+    onLogoClick: undefined,
+  };
 
-render(): Node {
-  const { intl } = this.context;
-  const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
+  render(): Node {
+    const { intl } = this.context;
+    const { categories, isActiveCategory, onCategoryClicked, onLogoClick } = this.props;
 
-  return (
-    <Wrapper className={styles.wrapper}>
-      {this.props.children}
-      <div className={styles.header}>
-        {onLogoClick ? (
-          <button type="button" onClick={onLogoClick}>
+    return (
+      <Wrapper className={styles.wrapper}>
+        {this.props.children}
+        <div className={styles.header}>
+          {onLogoClick ? (
+            <button type="button" onClick={onLogoClick}>
+              <YoroiLogo />
+            </button>
+          ) : (
             <YoroiLogo />
-          </button>
-        ) : (
-          <YoroiLogo />
-        )}
-      </div>
-      <ScrollableCategoriesWrapper className={styles.categories}>
-        {categories
-          ? categories.map(category => {
-            return (
-              <SideBarCategoryRevamp
-                key={category.className}
-                icon={category.icon}
-                route={category.route}
-                active={isActiveCategory !== undefined && isActiveCategory(category)}
-                label={category.label}
-                onClick={() => {
-                  if (onCategoryClicked) {
-                    onCategoryClicked(category);
-                  }
-                }}
-              />
-            );
-          })
-          : null}
-      </ScrollableCategoriesWrapper>
-      <Button
-        className={styles.faq}
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
-        target="_blank"
-        rel="noreferrer"
-        sx={{
-          color: 'ds.bg_color_contrast_high',
-          bgcolor: 'ds.el_primary_max',
-          '&:hover': {
-            bgcolor: 'ds.primary_800',
-            color: 'ds.bg_color_contrast_min',
-            textDecoration: 'none',
-          },
-        }}
-      >
-        {intl.formatMessage(globalMessages.sidebarFaq)}
-      </Button>
-    </Wrapper>
-  );
-}
+          )}
+        </div>
+        <ScrollableCategoriesWrapper className={styles.categories}>
+          {categories
+            ? categories.map(category => {
+                return (
+                  <SideBarCategoryRevamp
+                    key={category.className}
+                    icon={category.icon}
+                    route={category.route}
+                    active={isActiveCategory !== undefined && isActiveCategory(category)}
+                    label={category.label}
+                    onClick={() => {
+                      if (onCategoryClicked) {
+                        onCategoryClicked(category);
+                      }
+                    }}
+                  />
+                );
+              })
+            : null}
+        </ScrollableCategoriesWrapper>
+        <Button
+          className={styles.faq}
+          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+          target="_blank"
+          rel="noreferrer"
+          sx={{
+            color: 'ds.bg_color_contrast_high',
+            bgcolor: 'ds.el_primary_max',
+            '&:hover': {
+              bgcolor: 'ds.primary_800',
+              color: 'ds.bg_color_contrast_min',
+              textDecoration: 'none',
+            },
+          }}
+        >
+          {intl.formatMessage(globalMessages.sidebarFaq)}sss
+        </Button>
+      </Wrapper>
+    );
+  }
 }
 
 const Wrapper = styled(Box)(({ theme }) => ({
