@@ -89,6 +89,14 @@ class BasePage {
     const element = await this.findElement(locator);
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
+  async dispatchMouseDownEvent(locator) {
+    this.logger.info(`BasePage::clickByScript is called. Locator: ${JSON.stringify(locator)}`);
+    const element = await this.findElement(locator);
+    await this.driver.executeScript(
+      `arguments[0].dispatchEvent(new MouseEvent('mousedown', {view: window, 'bubbles' : true, cancelable: true}))`,
+      element
+    );
+  }
   async hover(locator) {
     this.logger.info(`BasePage::hoverOnElement is called. Locator: ${JSON.stringify(locator)}`);
     const webElement = await this.findElement(locator);
