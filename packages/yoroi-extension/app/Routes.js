@@ -60,6 +60,9 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
+import { ModalProvider } from './UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
+import { ModalManager } from './UI/components/modals/ModalManager'
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -125,7 +128,7 @@ const TokensDetailPageRevampPromise = () => import('./containers/wallet/TokenDet
 const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
 
 const CashbackPagePromise = () => import('./containers/cashback/CashbackPage');
-const CashbackPage = React.lazy(CashbackPagePromise)
+const CashbackPage = React.lazy(CashbackPagePromise);
 
 const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
 const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
@@ -210,10 +213,7 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
-          <Route
-            path={ROUTES.CASHBACK.ROOT}
-            component={props => <CashbackPage {...props} stores={stores} />}
-          />
+          <Route path={ROUTES.CASHBACK.ROOT} component={props => <CashbackPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.WALLETS.ADD} component={props => <AddWalletPage {...props} stores={stores} />} />
           <Route
             exact
@@ -278,25 +278,32 @@ const SwapSubpages = stores => (
 );
 
 const SettingsSubpages = stores => (
-  <Switch>
-    <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.SETTINGS.TERMS_OF_USE} component={props => <TermsOfUseSettingsPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
-    <Route
-      exact
-      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-      component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
-    />
-    <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
-    <Route
-      exact
-      path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-      component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
-    />
-    <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
-    <Redirect to={ROUTES.SETTINGS.GENERAL} />
-  </Switch>
+  <ModalProvider>
+    <ModalManager />
+    <Switch>
+      <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
+      <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
+      <Route
+        exact
+        path={ROUTES.SETTINGS.TERMS_OF_USE}
+        component={props => <TermsOfUseSettingsPage {...props} stores={stores} />}
+      />
+      <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
+      <Route
+        exact
+        path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+        component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
+      />
+      <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
+      <Route
+        exact
+        path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
+        component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
+      />
+      <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
+      <Redirect to={ROUTES.SETTINGS.GENERAL} />
+    </Switch>
+  </ModalProvider>
 );
 
 const PortfolioSubpages = stores =>

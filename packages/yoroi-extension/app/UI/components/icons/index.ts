@@ -31,6 +31,7 @@ import { Export } from './Export';
 import { Eye } from './Eye';
 import { EyeOff } from './EyeOff';
 import { Image } from './Image';
+import { Info } from './Info';
 import { InfoCircle } from './InfoCircle';
 import { LastSeen } from './LastSeen';
 import { Ledger } from './Ledger';
@@ -114,6 +115,7 @@ export const Icon = {
   Eye,
   EyeOff,
   Image,
+  Info,
   InfoCircle,
   LastSeen,
   Ledger,
