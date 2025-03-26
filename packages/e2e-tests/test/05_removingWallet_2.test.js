@@ -34,7 +34,7 @@ describe('Removing the first wallet, two wallets is added', function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
     const pageIsDisplayed = await addNewWalletPage.isDisplayed();
     expect(pageIsDisplayed, 'Adding a new wallet is not displayed').to.be.true;
-    await restoreWallet(webdriver, logger, testWallet2, false);
+    await restoreWallet(webdriver, logger, testWallet2, false, false);
   });
 
   // switch back to first wallet
