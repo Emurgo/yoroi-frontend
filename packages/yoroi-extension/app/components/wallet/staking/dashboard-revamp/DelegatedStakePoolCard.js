@@ -10,6 +10,8 @@ import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
+import { truncateAddress } from '../../../../utils/formatters';
+import { poolIdHexToBech32 } from '../../../../api/ada/lib/cardanoCrypto/utils';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -88,9 +90,10 @@ function DelegatedStakePoolCard({ delegatedPool, undelegate, intl, poolTransitio
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
           <Typography component="div" color={theme.palette.ds.text_gray_medium} variant="body1" fontWeight="medium" mb="3px">
-            {ticker !== undefined ? `[${ticker}]` : ''} {name}
+            {ticker != null ? `[${ticker}]` : ''} {name ?? truncateAddress(poolIdHexToBech32(id))}
           </Typography>
           <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
+          <br/>
         </Box>
       </Wrapper>
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>

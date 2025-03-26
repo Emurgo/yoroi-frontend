@@ -10,14 +10,14 @@ import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as StakingIcon } from '../../../../assets/images/dashboard/staking-active.inline.svg';
 import { ReactComponent as TotalDelegatedIcon } from '../../../../assets/images/dashboard/total-delegated.inline.svg';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import styles from '../dashboard/UserSummary.scss';
+import styles from './UserSummary.scss';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { TokenEntry, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { GraphData } from '../dashboard/StakingDashboard';
+import type { GraphData } from './StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
 import { maybe } from '../../../../coreUtils';
 

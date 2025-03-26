@@ -37,7 +37,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (lastAnnouncedVersion == null) {
       return;
     }
-    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.5.0')) {
+    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.6.0')) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
     }
 
@@ -206,8 +206,10 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
       return (
         <RevampAnnouncementDialog
           // $FlowIgnore[incompatible-type]
+          lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
+          // $FlowIgnore[incompatible-type]
           onClose={async () => {
-            await stores.profile.setLastAnnouncedFeatureVersion('5.5.0');
+            await stores.profile.setLastAnnouncedFeatureVersion('5.6.0');
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
