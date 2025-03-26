@@ -158,14 +158,6 @@ render(): Node {
           })
         }
       />
-      {/* pop up dialogs */}
-      {
-        stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && (
-          <SwitchNetworkDialogContainer
-            stores={stores}
-          />
-        )
-      }
     </Box>
   );
 }
