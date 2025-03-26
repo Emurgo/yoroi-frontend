@@ -136,15 +136,15 @@ setNotificationsSetting: string => Promise < void> = allowed => setLocalItem(sto
 
 unsetNotificationsSetting: void => Promise < void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
-  // ========== Bring Banner ========== //
-  getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+// ========== Bring Banner ========== //
+getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
 
-  unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== Buy/Sell Disclaimer ========== //
-  getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+// ========== Buy/Sell Disclaimer ========== //
+getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
 setBuySellDisclaimer: string => Promise < void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
 
