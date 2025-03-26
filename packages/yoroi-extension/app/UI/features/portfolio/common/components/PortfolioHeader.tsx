@@ -84,7 +84,7 @@ const PortfolioHeader = observer(
     const handleCurrencyChange = async () => {
       const pair = {
         from: {
-          name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
+           name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
           value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
         },
         to: {
@@ -135,11 +135,14 @@ const PortfolioHeader = observer(
             ) : (
               <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
                 <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
-                  {showADA ? Number(primaryBalance) : String(accountPair?.from.value)}
+                  {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
                 </HiddenAmount>
               </Typography>
             )}
-            <CurrencyDisplay from={accountPair?.from?.name} handleCurrencyChange={handleCurrencyChange} />
+            <CurrencyDisplay
+              from={showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR }
+              handleCurrencyChange={handleCurrencyChange}
+            />
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
