@@ -6,7 +6,7 @@ import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
-import SwitchNetworkModal from '../pages/wallet/switchNetworkModal.page.js';
+import SwitchNetworkModal from '../pages/wallet/settingsTab/modals/switchNetworkModal.page.js';
 import { CardanoNetworks, getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
@@ -20,8 +20,15 @@ import {
   WindowManager,
 } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
+import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
 
-export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModalWindow = true, switchToPreprod = true) => {
+export const restoreWallet = async (
+  webdriver,
+  logger,
+  testWallet,
+  shouldBeModalWindow = true,
+  switchToPreprod = true
+) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
   await addNewWalletPage.selectRestoreWallet();
   const restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
@@ -43,25 +50,7 @@ export const restoreWallet = async (webdriver, logger, testWallet, shouldBeModal
   await walletDetailsPage.continue();
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet, shouldBeModalWindow);
   if (switchToPreprod) {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.goToSettingsTab();
-    const settingsPage = new SettingsTab(webdriver, logger);
-    await settingsPage.goToGeneralSubMenu();
-    const generalSettingsPage = new GeneralSubTab(webdriver, logger);
-    // scroll switch network button into the view
-    // press the button
-    await generalSettingsPage.openSwitchNetworkModal();
-    const networkSwitchModal = new SwitchNetworkModal(webdriver, logger);
-    // find the switch network modal
-    const networkSwitchModalIsDisplayed = await networkSwitchModal.isDisplayed();
-    expect(networkSwitchModalIsDisplayed, 'The network switch modal is not displayed').to.be.true;
-    // open the dropdown
-    // select network
-    // apply changes
-    await networkSwitchModal.selectNetwork(CardanoNetworks.PP);
-    await networkSwitchModal.sleep(10000);
-    // wait network is changed
-    // go to Wallet Transactions
+    await switchToPreprod(webdriver, logger, shouldBeModalWindow)
   }
 };
 
@@ -129,6 +118,27 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   return walletInfo;
 };
 
+export const switchToPreprod = async (webdriver, logger, shouldBeModalWindow) => {
+  const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToSettingsTab();
+    if (shouldBeModalWindow) {
+      const networkInfoModal = new NetworksInfoModal(webdriver, logger);
+      const infoModalIsDisplayed = await networkInfoModal.isDisplayed();
+      expect(infoModalIsDisplayed, 'The networks info modal is not displayed').to.be.true;
+      await networkInfoModal.understand();
+    }
+    const settingsPage = new SettingsTab(webdriver, logger);
+    await settingsPage.goToGeneralSubMenu();
+    const generalSettingsPage = new GeneralSubTab(webdriver, logger);
+    await generalSettingsPage.openSwitchNetworkModal();
+    const networkSwitchModal = new SwitchNetworkModal(webdriver, logger);
+    const networkSwitchModalIsDisplayed = await networkSwitchModal.isDisplayed();
+    expect(networkSwitchModalIsDisplayed, 'The network switch modal is not displayed').to.be.true;
+    await networkSwitchModal.selectNetwork(CardanoNetworks.PP);
+    await generalSettingsPage.waitPrepareWalletBannerIsClosed();
+    await generalSettingsPage.goToWalletTab();
+}
+
 export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
@@ -194,9 +204,9 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
 export const prepareWallet = async (webdriver, logger, testWalletName, mochaContext) => {
   try {
     await preloadDBAndStorage(webdriver, logger, testWalletName);
-    await waitTxPage(webdriver, logger); 
+    await waitTxPage(webdriver, logger);
   } catch (error) {
     await collectInfo(mochaContext, webdriver, logger);
     throw new Error(error);
   }
-}
+};
