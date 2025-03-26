@@ -27,7 +27,7 @@ export const restoreWallet = async (
   logger,
   testWallet,
   shouldBeModalWindow = true,
-  switchToPreprod = true
+  switchToPP = true
 ) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
   await addNewWalletPage.selectRestoreWallet();
@@ -49,8 +49,8 @@ export const restoreWallet = async (
   expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet.plate);
   await walletDetailsPage.continue();
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet, shouldBeModalWindow);
-  if (switchToPreprod) {
-    await switchToPreprod(webdriver, logger, shouldBeModalWindow)
+  if (switchToPP) {
+    await switchToPreprod(webdriver, logger, shouldBeModalWindow);
   }
 };
 
@@ -120,24 +120,24 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
 
 export const switchToPreprod = async (webdriver, logger, shouldBeModalWindow) => {
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
-    await transactionsPage.goToSettingsTab();
-    if (shouldBeModalWindow) {
-      const networkInfoModal = new NetworksInfoModal(webdriver, logger);
-      const infoModalIsDisplayed = await networkInfoModal.isDisplayed();
-      expect(infoModalIsDisplayed, 'The networks info modal is not displayed').to.be.true;
-      await networkInfoModal.understand();
-    }
-    const settingsPage = new SettingsTab(webdriver, logger);
-    await settingsPage.goToGeneralSubMenu();
-    const generalSettingsPage = new GeneralSubTab(webdriver, logger);
-    await generalSettingsPage.openSwitchNetworkModal();
-    const networkSwitchModal = new SwitchNetworkModal(webdriver, logger);
-    const networkSwitchModalIsDisplayed = await networkSwitchModal.isDisplayed();
-    expect(networkSwitchModalIsDisplayed, 'The network switch modal is not displayed').to.be.true;
-    await networkSwitchModal.selectNetwork(CardanoNetworks.PP);
-    await generalSettingsPage.waitPrepareWalletBannerIsClosed();
-    await generalSettingsPage.goToWalletTab();
-}
+  await transactionsPage.goToSettingsTab();
+  if (shouldBeModalWindow) {
+    const networkInfoModal = new NetworksInfoModal(webdriver, logger);
+    const infoModalIsDisplayed = await networkInfoModal.isDisplayed();
+    expect(infoModalIsDisplayed, 'The networks info modal is not displayed').to.be.true;
+    await networkInfoModal.understand();
+  }
+  const settingsPage = new SettingsTab(webdriver, logger);
+  await settingsPage.goToGeneralSubMenu();
+  const generalSettingsPage = new GeneralSubTab(webdriver, logger);
+  await generalSettingsPage.openSwitchNetworkModal();
+  const networkSwitchModal = new SwitchNetworkModal(webdriver, logger);
+  const networkSwitchModalIsDisplayed = await networkSwitchModal.isDisplayed();
+  expect(networkSwitchModalIsDisplayed, 'The network switch modal is not displayed').to.be.true;
+  await networkSwitchModal.selectNetwork(CardanoNetworks.PP);
+  await generalSettingsPage.waitPrepareWalletBannerIsClosed();
+  await generalSettingsPage.goToWalletTab();
+};
 
 export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
