@@ -36,6 +36,7 @@ const storageKeys = {
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
+  BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -135,8 +136,15 @@ setNotificationsSetting: string => Promise < void> = allowed => setLocalItem(sto
 
 unsetNotificationsSetting: void => Promise < void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
+// ========== Bring Banner ========== //
+getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
+setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+
+unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
 // ========== Buy/Sell Disclaimer ========== //
-getBuySellDisclaimer: void => Promise <? string > = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
 setBuySellDisclaimer: string => Promise < void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
 
@@ -257,14 +265,11 @@ unsetToggleSidebar: void => Promise < void> = () => removeLocalItem(storageKeys.
 
 // ========== Expand / retract Sidebar ========== //
 
-getBringSandbox: void => Promise < boolean > = () =>
-  getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+  getBringSandbox: void => Promise<boolean> = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
 
-setBringSandbox: boolean => Promise < void> = flag => {
-  return flag
-    ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
-    : this.unsetBringSandbox();
-};
+  setBringSandbox: boolean => Promise<void> = flag => {
+    return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
+  };
 
 unsetBringSandbox: void => Promise < void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
 
@@ -399,35 +404,32 @@ saveIsAnalysticsAllowed: (flag: boolean) => Promise < void> = async flag => {
 
 unsetIsAnalyticsAllowed: void => Promise < void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
-saveCashbackWalletId: (number) => Promise < void> = (id) => setLocalItem(
-  storageKeys.CASHBACK_WALLET_ID,
-  String(id)
-);
+  saveCashbackWalletId: number => Promise<void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
 
-getCashbackWalletId: () => Promise < number | null > = async () => {
-  const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
-  if (!v) {
-    return null;
-  }
-  return Number(v);
-}
+  getCashbackWalletId: () => Promise<number | null> = async () => {
+    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    if (!v) {
+      return null;
+    }
+    return Number(v);
+  };
 
-_getShownDisclaimerObject: () => Promise < Object > = async () => {
-  const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
-  const val = raw ? JSON.parse(raw) : {};
-  return val;
-}
+  _getShownDisclaimerObject: () => Promise<Object> = async () => {
+    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+    const val = raw ? JSON.parse(raw) : {};
+    return val;
+  };
 
-setShownDisclaimer: (Disclaimer) => Promise < void> = async (which) => {
-  const val = await this._getShownDisclaimerObject();
-  val[which] = true;
-  await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
-};
+  setShownDisclaimer: Disclaimer => Promise<void> = async which => {
+    const val = await this._getShownDisclaimerObject();
+    val[which] = true;
+    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+  };
 
-isDisclaimerShown: (Disclaimer) => Promise < boolean > = async (which) => {
-  const val = await this._getShownDisclaimerObject();
-  return val[which] === true;
-}
+  isDisclaimerShown: Disclaimer => Promise<boolean> = async which => {
+    const val = await this._getShownDisclaimerObject();
+    return val[which] === true;
+  };
 
 loadCurrentNetworkId: () => Promise <? number > = async () => {
   const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
