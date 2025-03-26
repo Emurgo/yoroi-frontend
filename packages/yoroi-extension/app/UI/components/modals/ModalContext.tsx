@@ -38,6 +38,7 @@ export const ModalProvider = ({ children, initialState }: { children: React.Reac
         content: payload.content,
         height: payload.height,
         width: payload.width,
+        modalId: payload.modalId,
       });
     },
     startLoading: () => dispatch({ type: 'startLoading' }),
@@ -60,6 +61,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         height: action.height ?? defaultState.height,
         width: action.width ?? defaultState.width,
         title: action.title,
+        modalId: action.modalId,
         isOpen: true,
         isLoading: false,
       };

@@ -177,6 +177,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
           content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
           width: '648px',
           height: '360px',
+          modalId: 'testNetworkInfoModal',
         });
       }
     })()
