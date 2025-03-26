@@ -84,7 +84,7 @@ const PortfolioHeader = observer(
     const handleCurrencyChange = async () => {
       const pair = {
         from: {
-           name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
+          name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
           value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
         },
         to: {
