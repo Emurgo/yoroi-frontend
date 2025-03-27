@@ -13,6 +13,7 @@ import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShel
 import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 import { maybe } from '../../coreUtils';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { networks } from '../ada/lib/storage/database/prepackaged/networks';
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -32,7 +33,7 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
-  PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  PORTFOLIO_FIAT_PAIR: '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
@@ -122,11 +123,11 @@ unsetDrepYoroiBanerTimestamp: void => Promise < void> = () => removeLocalItem(st
 
 // ========== Portfolio FIAT Pair ========== //
 
-getPortfolioFiatPair: void => Promise <? string > = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+getPortfolioFiatPair: number => Promise <?string> = networkId => getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-setSetPortfolioFiatPair: string => Promise < void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+setSetPortfolioFiatPair: (number, string) => Promise <void> = (networkId, pair) => setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-unsetPortfolioFiatPair: void => Promise < void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+unsetPortfolioFiatPair: number => Promise <void> = networkId => removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
 // ========== Notifications Setting ========== //
 
@@ -455,7 +456,7 @@ saveWalletListOrder: (Array < string >) => Promise < void> = async publicKeyList
   await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
 };
 
-  async reset(): Promise < void> {
+async reset(): Promise < void> {
   await this.unsetUserLocale();
   await this.unsetComplexityLevel();
   await this.unsetLastLaunchVersion();
@@ -466,8 +467,10 @@ saveWalletListOrder: (Array < string >) => Promise < void> = async publicKeyList
   await this.unsetToggleSidebar();
   await this.unsetAcceptedTosVersion();
   await this.unsetIsAnalyticsAllowed();
-  await this.unsetPortfolioFiatPair();
   await this.unsetBringSandbox();
+  for (const network of Object.values(networks)) {
+    await this.unsetPortfolioFiatPair(network.NetworkId);
+  }
 }
 
 getItem: string => Promise <? string > = key => getLocalItem(key);

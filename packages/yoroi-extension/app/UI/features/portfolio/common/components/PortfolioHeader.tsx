@@ -59,6 +59,7 @@ const PortfolioHeader = observer(
     // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
     const { wallets, delegation } = stores;
     const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
+    const networkId = selectedWallet.networkId;
     const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
     const balance = selectedWallet.balance;
     const totalBalanceAmount = getTotalAmount(balance, rewards);
@@ -92,35 +93,39 @@ const PortfolioHeader = observer(
           value: showADA ? walletBalance.ada : totalTokenPrice,
         },
       };
-      localStorageApi.setSetPortfolioFiatPair(pair);
+      localStorageApi.setSetPortfolioFiatPair(networkId, pair);
       changeUnitOfAccountPair(pair);
     };
 
     React.useEffect(() => {
       const setFiatPair = async () => {
         setLoading(true);
-        const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair();
-        const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
-
-        const pair = {
-          from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
-          to: { name: unitOfAccount || DEFAULT_FIAT_PAIR, value: !showADA ? walletBalance.ada : totalTokenPrice || '0' },
-        };
-
-        if (portfolioStoragePairObj !== undefined) {
-          changeUnitOfAccountPair({
-            from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
-            to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
-          });
-        } else {
-          changeUnitOfAccountPair(pair);
-          localStorageApi.setSetPortfolioFiatPair(pair);
+        try {
+          const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair(networkId);
+          const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
+          if (portfolioStoragePairObj !== undefined) {
+            changeUnitOfAccountPair({
+              from: {name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value},
+              to: {name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice},
+            });
+          } else {
+            const pair = {
+              from: {name: primaryTokenInfo.name, value: walletBalance?.ada || '0'},
+              to: {
+                name: unitOfAccount || DEFAULT_FIAT_PAIR,
+                value: !showADA ? walletBalance.ada : totalTokenPrice || '0'
+              },
+            };
+            changeUnitOfAccountPair(pair);
+            localStorageApi.setSetPortfolioFiatPair(networkId, pair);
+          }
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
       };
 
       setFiatPair();
-    }, [totalTokenPrice, walletBalance, showADA]);
+    }, [totalTokenPrice, walletBalance, showADA, networkId]);
 
     if (!accountPair) {
       return <LoadingSkeleton />;
@@ -140,7 +145,7 @@ const PortfolioHeader = observer(
               </Typography>
             )}
             <CurrencyDisplay
-              from={showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR }
+              from={showADA ? primaryTokenInfo.name : (unitOfAccount ?? DEFAULT_FIAT_PAIR)}
               handleCurrencyChange={handleCurrencyChange}
             />
           </Stack>

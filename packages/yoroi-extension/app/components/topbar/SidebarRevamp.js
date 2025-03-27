@@ -90,7 +90,7 @@ export default class SidebarRevamp extends Component<Props> {
             },
           }}
         >
-          {intl.formatMessage(globalMessages.sidebarFaq)}sss
+          {intl.formatMessage(globalMessages.sidebarFaq)}
         </Button>
       </Wrapper>
     );
