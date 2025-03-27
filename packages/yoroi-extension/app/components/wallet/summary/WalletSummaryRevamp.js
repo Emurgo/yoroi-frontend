@@ -21,6 +21,11 @@ import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
+// $FlowIgnore: supressing this error
+import { BringBanner, UsdaBanner } from '../../../UI/components/Banners';
+import { ROUTES } from '../../../routes-config';
+import LocalStorageApi from '../../../api/localStorage';
+import type { WalletState } from '../../../../chrome/extension/background/types';
 
 const messages = defineMessages({
   transactionType: {
@@ -160,6 +165,35 @@ export default class WalletSummaryRevamp extends Component<Props> {
     );
   }
 
+  renderBringBanner(): Node {
+    const { goToRoute, selectedWallet } = this.props;
+    const { isBannerVisible } = this.state;
+
+    if (selectedWallet.isTestnet || !isBannerVisible) return null;
+
+    return (
+      <BringBanner
+        onClose={() => {
+          this.setState({ isBannerVisible: false });
+          localStorage.setBringBannerClosed('true');
+        }}
+        onClick={() => goToRoute({ route: ROUTES.CASHBACK.ROOT })}
+        displayIllustration={false}
+      />
+    );
+  }
+
+  renderUsdaBanner(): Node {
+    const { goToRoute } = this.props;
+
+    // <TODO:UNBLOCK_LATER>
+    // noinspection PointlessBooleanExpressionJS
+    if (true) return null;
+
+    // noinspection UnreachableCodeJS
+    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
+  }
+
   render(): Node {
     const {
       pendingAmount,
@@ -221,6 +255,10 @@ export default class WalletSummaryRevamp extends Component<Props> {
           <Typography component="div" variant="body1">
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
+          {this.renderBringBanner()}
+          {this.renderUsdaBanner()}
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (

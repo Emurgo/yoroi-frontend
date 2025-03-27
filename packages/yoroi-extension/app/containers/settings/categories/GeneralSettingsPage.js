@@ -127,14 +127,18 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           onSelect={this.onSelectBringCashbackWallet}
           isSubmitting={false}
           // $FlowFixMe this is apparently correct, flow is out of its mind
-          cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
+          cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
           // $FlowFixMe this is apparently correct, flow is out of its mind
           currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
           isUseSandbox={profileStore.getBringSandboxRequest.result}
-          onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
-            await profileStore.setBringSandboxRequest.execute(useSandbox);
-            await profileStore.getBringSandboxRequest.execute();
-          }) : null}
+          onSetUseSandbox={
+            canUseSandbox
+              ? async useSandbox => {
+                  await profileStore.setBringSandboxRequest.execute(useSandbox);
+                  await profileStore.getBringSandboxRequest.execute();
+                }
+              : null
+          }
           error={null}
         />
         <UnitOfAccountSettings
@@ -155,13 +159,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           }
         />
         {/* pop up dialogs */}
-        {
-          stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && (
-            <SwitchNetworkDialogContainer
-              stores={stores}
-            />
-          )
-        }
+        {stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && <SwitchNetworkDialogContainer stores={stores} />}
       </Box>
     );
   }

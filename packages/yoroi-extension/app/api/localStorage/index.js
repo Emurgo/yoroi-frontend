@@ -134,6 +134,13 @@ export default class LocalStorageApi {
 
   unsetNotificationsSetting: void => Promise<void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
+  // ========== Bring Banner ========== //
+  getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
+  setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+
+  unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
@@ -249,13 +256,10 @@ export default class LocalStorageApi {
 
   // ========== Expand / retract Sidebar ========== //
 
-  getBringSandbox: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+  getBringSandbox: void => Promise<boolean> = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
 
   setBringSandbox: boolean => Promise<void> = flag => {
-    return flag
-      ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
-      : this.unsetBringSandbox();
+    return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
   };
 
   unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
@@ -391,10 +395,7 @@ export default class LocalStorageApi {
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
-  saveCashbackWalletId: (number) => Promise<void> = (id) => setLocalItem(
-    storageKeys.CASHBACK_WALLET_ID,
-    String(id)
-  );
+  saveCashbackWalletId: number => Promise<void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
 
   getCashbackWalletId: () => Promise<number | null> = async () => {
     const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
@@ -402,24 +403,24 @@ export default class LocalStorageApi {
       return null;
     }
     return Number(v);
-  }
+  };
 
   _getShownDisclaimerObject: () => Promise<Object> = async () => {
     const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
     const val = raw ? JSON.parse(raw) : {};
     return val;
-  }
+  };
 
-  setShownDisclaimer: (Disclaimer) => Promise<void> = async (which) => {
+  setShownDisclaimer: Disclaimer => Promise<void> = async which => {
     const val = await this._getShownDisclaimerObject();
     val[which] = true;
     await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
   };
 
-  isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
+  isDisclaimerShown: Disclaimer => Promise<boolean> = async which => {
     const val = await this._getShownDisclaimerObject();
     return val[which] === true;
-  }
+  };
 
   loadCurrentNetworkId: () => Promise<?number> = async () => {
     const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
