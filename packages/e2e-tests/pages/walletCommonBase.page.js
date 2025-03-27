@@ -41,6 +41,10 @@ class WalletCommonBase extends BasePage {
     locator: 'sidebar.settings',
     method: 'id',
   };
+  navBarPageTitleLocator = {
+    locator: 'topBar-pageTitle-text',
+    method: 'id',
+  }
   // selected wallet panel
   selectedWalletButtonLocator = {
     locator: '.NavWalletDetailsRevamp_contentWrapper',
@@ -328,6 +332,14 @@ class WalletCommonBase extends BasePage {
     );
 
     return adaBalanceIsHidden && fiatBalanceIsHidden;
+  }
+  /**
+   * Getting the page title displayed at the top-left corner
+   * @returns {Promise<string>}
+   */
+  async getPageTitle() {
+    this.logger.info(`WalletCommonBase::getPageTitle is called`);
+    return await this.getText(this.navBarPageTitleLocator);
   }
 }
 
