@@ -36,7 +36,7 @@ import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import { ChainDerivations, } from '../../../../config/numbersConfig';
+import { ChainDerivations, HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import {
   bytesToHex,
@@ -48,7 +48,6 @@ import {
   maybe
 } from '../../../../coreUtils';
 import { mergeWitnessSets } from '../utils';
-import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 
 // ==================== LEDGER ==================== //
 /** Generate a payload for Ledger SignTx */
