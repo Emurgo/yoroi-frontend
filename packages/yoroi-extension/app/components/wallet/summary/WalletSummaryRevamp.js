@@ -56,12 +56,31 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
+  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
+  +selectedWallet: WalletState,
 |};
 
+type State = {|
+  isBannerVisible: boolean,
+|};
+
+const localStorage = new LocalStorageApi();
+
 @observer
-export default class WalletSummaryRevamp extends Component<Props> {
+export default class WalletSummaryRevamp extends Component<Props, State> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
     intl: intlShape.isRequired,
+  };
+
+  state: State = {
+    isBannerVisible: false,
+  };
+
+  UNSAFE_componentWillMount: void => Promise<void> = async () => {
+    const wasClosed = await localStorage.getBringBannerClosed();
+    if (!wasClosed) {
+      this.setState({ isBannerVisible: true });
+    }
   };
 
   renderAmountDisplay: ({|
@@ -91,6 +110,19 @@ export default class WalletSummaryRevamp extends Component<Props> {
         {balanceDisplay} {truncateToken(getTokenName(tokenInfo))}
       </>
     );
+  };
+
+  getWalletBalance: ({|
+    shouldHideBalance: boolean,
+    amount: MultiToken,
+  |}) => Node = request => {
+    const defaultEntry = request.amount.getDefaultEntry();
+    const tokenInfo = this.props.getTokenInfo(defaultEntry);
+
+    const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+    const [beforeDecimal] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
+
+    return beforeDecimal;
   };
 
   renderPendingAmount(timestampedAmount: Array<{| amount: MultiToken, timestamp: number |}>, label: string): Node {
