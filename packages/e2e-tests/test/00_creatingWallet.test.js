@@ -124,6 +124,13 @@ describe('Creating wallet', function () {
     expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;
   });
 
+  // check banners on Transactions page
+  // Portfolio Start your crypto jounrney banner
+  // No NFTs banner on nfts page
+  // Not enough funds for voting
+  // "You don't have any websites connected yet" banner on Connector page
+  // Governance
+
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);
     done();
