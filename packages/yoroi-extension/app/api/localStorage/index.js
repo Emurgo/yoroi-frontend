@@ -469,6 +469,7 @@ async reset(): Promise < void> {
   await this.unsetIsAnalyticsAllowed();
   await this.unsetBringSandbox();
   for (const network of Object.values(networks)) {
+    // $FlowIgnore[incompatible-use]
     await this.unsetPortfolioFiatPair(network.NetworkId);
   }
 }
