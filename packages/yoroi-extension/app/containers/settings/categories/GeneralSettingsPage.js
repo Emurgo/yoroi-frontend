@@ -68,11 +68,11 @@ componentDidMount() {
   request.execute();
 }
 
-onSelectUnitOfAccount: string => Promise < void> = async value => {
+onSelectUnitOfAccount: (number, string) => Promise <void> = async (networkId, value) => {
   const localStorageApi = new LocalStorageApi();
 
   const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
-  localStorageApi.unsetPortfolioFiatPair();
+  await localStorageApi.unsetPortfolioFiatPair(networkId);
   await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
   await this.props.stores.transactions.updateUnitOfAccount();
 };
@@ -140,14 +140,16 @@ render(): Node {
           error={null}
         />
       )}
-      <UnitOfAccountSettings
-        onSelect={this.onSelectUnitOfAccount}
-        isSubmitting={isSubmittingUnitOfAccount}
-        currencies={currencies}
-        currentValue={unitOfAccountValue}
-        error={profileStore.setUnitOfAccountRequest.error}
-        lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
-      />
+      {selectedWallet && (
+        <UnitOfAccountSettings
+          onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
+          isSubmitting={isSubmittingUnitOfAccount}
+          currencies={currencies}
+          currentValue={unitOfAccountValue}
+          error={profileStore.setUnitOfAccountRequest.error}
+          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+        />
+      )}
       <ThemeSettingsBlock />
       <AboutYoroiSettingsBlock
         intl={intl}

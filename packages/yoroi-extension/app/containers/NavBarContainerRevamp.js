@@ -57,7 +57,10 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
   addNewWallet: void => Promise<void> = async () => {
     this.props.stores.uiDialogs.closeActiveDialog();
     this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
-    await localStorage.unsetPortfolioFiatPair();
+    const selectedWallet = this.props.stores.wallets.selected;
+    if (selectedWallet) {
+      await localStorage.unsetPortfolioFiatPair(selectedWallet.networkId);
+    }
   };
 
   onSelectWallet: number => Promise<void> = async newWalletId => {
@@ -65,8 +68,11 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = app.currentRoute === ROUTES.STAKING;
-    await localStorage.unsetPortfolioFiatPair();
     this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
+    const selectedWallet = this.props.stores.wallets.selected;
+    if (selectedWallet) {
+      await localStorage.unsetPortfolioFiatPair(selectedWallet.networkId);
+    }
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
     this.props.stores.app.goToRoute({ route });
   };
