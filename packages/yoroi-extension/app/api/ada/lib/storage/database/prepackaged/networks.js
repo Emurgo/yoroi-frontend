@@ -4,6 +4,8 @@ import { CoinTypes } from '../../../../../../config/numbersConfig';
 import environment from '../../../../../../environment';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import type { CardanoHaskellBaseConfig, CardanoHaskellConfig, NetworkRow, TokenInsert } from '../primitives/tables';
+import { fail } from '../../../../../../coreUtils';
+import type { WalletState } from '../../../../../../../chrome/extension/background/types';
 
 export const CardanoForks = Object.freeze({
   Haskell: 0,
@@ -196,6 +198,15 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
     }
     throw new Error(`Missing default asset for network type ${JSON.stringify(network)}`);
   });
+
+export function getDefaultAssetByNetworkId(id: number): $Diff<TokenInsert, {| Digest: number |}> {
+  return defaultAssets.find(asset => asset.NetworkId === id)
+    ?? fail('No default asset found for network ID: ' + id);
+}
+
+export function getDefaultAssetByWallet(wallet: WalletState): $Diff<TokenInsert, {| Digest: number |}> {
+  return getDefaultAssetByNetworkId(wallet.networkId);
+}
 
 export function getNetworkById(id: number): $ReadOnly<NetworkRow> {
   const networkKey = Object.keys(networks).find(k => networks[k].NetworkId === id);
