@@ -1,5 +1,5 @@
 import type { Node, ComponentType } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { injectIntl, defineMessages } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ReactComponent as CoverBg } from '../../assets/images/dashboard/staking-illustration.inline.svg';
