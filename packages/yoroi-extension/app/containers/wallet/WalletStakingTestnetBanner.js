@@ -31,7 +31,7 @@ function WalletStakingTestnet({ intl }: Intl): Node {
           overflowY: 'hidden',
           position: 'relative',
           padding: '16px',
-          height: '156px',
+          height: '138px',
         }}
         id="staking-suppotYoroiTestnetBanner-box"
       >
@@ -41,15 +41,15 @@ function WalletStakingTestnet({ intl }: Intl): Node {
             right: '0.5%',
             top: '-10px',
             '& svg': {
-              width: '265px',
-              height: '266px',
+              width: '230px',
+              height: '232px',
             },
           }}
         >
           <CoverBg />
         </Box>
         <Box>
-          <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
+          <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px" lineHeight="26px">
             {intl.formatMessage(messages.stakingTestnetSupportYoroiTitle)}
           </Typography>
           <Typography component="div" variant="body1" color="ds.gray_max" width="512px">
