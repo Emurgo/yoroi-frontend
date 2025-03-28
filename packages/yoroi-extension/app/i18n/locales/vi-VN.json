@@ -120,7 +120,7 @@
   "connector.connect.info": "Tùy chọn kết nối của bạn sẽ được lưu vào danh sách dApp Yoroi.",
   "connector.connect.noWalletsFound": "Không có {network}.",
   "connector.connect.noWebsitesConnected": "Bạn chưa có bất kỳ trang web nào được kết nối",
-  "connector.connect.testnetWarningText": "This DApp may not support the Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.",
+  "connector.connect.testnetWarningText": "This DApp may not support Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.",
   "connector.connect.testnetWarningTitle": "Testnet support",
   "connector.connected-dapps.cardanoLabel": "Cardano, ADA",
   "connector.connected-dapps.dappsLabel": "Dapps",
