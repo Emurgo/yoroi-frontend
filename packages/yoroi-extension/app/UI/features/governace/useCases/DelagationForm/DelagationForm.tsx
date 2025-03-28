@@ -16,7 +16,7 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
 import { maybe } from '../../../../../coreUtils'
 import { truncateToken } from '../../../../../utils/formatters';
-import { getDefaultAssetByNetworkId } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { getDefaultAssetByWallet } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -65,7 +65,7 @@ export const DelagationForm = () => {
     isHardwareWallet,
   } = useGovernance();
 
-  const defaultAsset = getDefaultAssetByNetworkId(selectedWallet?.networkId ?? 0);
+  const defaultAsset = getDefaultAssetByWallet(selectedWallet);
   const defaultTokenName = truncateToken(getTokenName(defaultAsset));
 
   React.useEffect(() => {
