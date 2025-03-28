@@ -77,6 +77,8 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     this.props.stores.app.goToRoute({ route });
   };
 
+  // <TODO:GENERALIZE> This is a weird function to have for governance feature only.
+  // This should be changed to some generic mechanic that drops user back to TOP routes
   checkAndResetGovRoutes: void => void = () => {
     const { stores } = this.props;
     const currentRoute = stores.app.currentRoute;
