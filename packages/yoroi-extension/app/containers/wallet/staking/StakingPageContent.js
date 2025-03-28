@@ -33,6 +33,7 @@ import CardanoStakingPage from './CardanoStakingPage';
 import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import type { StoresProps } from '../../../stores';
 import { ampli } from '../../../../ampli/index';
+import WalletStakingTestnetBanner from '../WalletStakingTestnetBanner';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -231,7 +232,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     return (
       <Box>
-        {isWalletWithNoFunds ? (
+        {wallet.isTestnet ? (<WalletStakingTestnetBanner/>) : isWalletWithNoFunds ? (
           <WalletEmptyBanner
             onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })}
             isTestnet={wallet.isTestnet}

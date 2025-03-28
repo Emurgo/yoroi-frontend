@@ -1044,6 +1044,8 @@
   "wallet.staking.pool.share": "Share",
   "wallet.staking.pool.size": "Pool size",
   "wallet.staking.pool.unknownLabel": "Unknown pool",
+  "wallet.staking.testnet.supportYoroiTitle": "Stake test ADA and support Yoroi",
+  "wallet.staking.testnet.supportYoroiMessage": "Stake your test ADA and support Yoroi by participating in our testnet staking program. Experience the mechanism of staking firsthand and help us improve Yoroi's functionality and user experience.",
   "wallet.staking.rewards.openRewardHistory": "Open Reward History",
   "wallet.staking.rewards.rewardHistory": "Reward History",
   "wallet.staking.rewards.rewardHistory.epochNum": "Epoch {number}",
