@@ -19,6 +19,7 @@ import { updateProtocolParametersCacheFromNetwork } from '../handlers/yoroi/prot
 import {
   getCardanoHaskellBaseConfig,
   getNetworkById,
+  networks,
 } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 registerCallback(params => {
@@ -50,8 +51,13 @@ async function refreshThreadMain(): Promise<void> {
 
 async function refreshAll(): Promise<void> {
   // this function should not have unhandled exception
+  const localStorageApi = new LocalStorageApi();
+  const currentNetworkId = await localStorageApi.loadCurrentNetworkId() ?? networks.CardanoMainnet.NetworkId;
+
   const db = await getDb();
-  const publicDerivers = await getWallets({ db });
+  const publicDerivers = (await getWallets({ db })).filter(publicDeriver =>
+    publicDeriver.getParent().getNetworkInfo().NetworkId === currentNetworkId
+  );
 
   for (let i = 0; i < publicDerivers.length; i++) {
     try {
