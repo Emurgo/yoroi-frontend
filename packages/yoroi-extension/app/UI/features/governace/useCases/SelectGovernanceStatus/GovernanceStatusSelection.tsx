@@ -127,6 +127,8 @@ export const GovernanceStatusSelection = () => {
     }
   };
 
+  const isParticipatingInGovernance = governanceStatus.status != null;
+
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
   const statusDelegating = governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID;
@@ -186,7 +188,7 @@ export const GovernanceStatusSelection = () => {
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
-  if (walletAdaBalance !== null && walletAdaBalance === 0) {
+  if (!isParticipatingInGovernance && (walletAdaBalance !== null && walletAdaBalance === 0)) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
     return (
@@ -230,7 +232,7 @@ export const GovernanceStatusSelection = () => {
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
-        {governanceStatus.status !== null
+        {isParticipatingInGovernance
           ? optionsList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
@@ -252,7 +254,7 @@ export const GovernanceStatusSelection = () => {
           : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} />)}
       </Stack>
       <Stack direction="row" gap="16px" mt="16px">
-        {governanceStatus.status !== null
+        {isParticipatingInGovernance
           ? bottomList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
