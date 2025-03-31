@@ -81,7 +81,7 @@ const messages = defineMessages({
   },
   testnetWarningText: {
     id: 'connector.connect.testnetWarningText',
-    defaultMessage: '!!!This DApp may not support the Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.',
+    defaultMessage: '!!!This DApp may not support Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.',
   },
   cashbackApplyAll: {
     id: 'connector.connect.cashback.apply.all',

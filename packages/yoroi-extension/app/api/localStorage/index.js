@@ -13,6 +13,7 @@ import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShel
 import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 import { maybe } from '../../coreUtils';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { networks } from '../ada/lib/storage/database/prepackaged/networks';
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -32,10 +33,11 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
-  PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  PORTFOLIO_FIAT_PAIR: '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
+  BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -121,11 +123,11 @@ unsetDrepYoroiBanerTimestamp: void => Promise < void> = () => removeLocalItem(st
 
 // ========== Portfolio FIAT Pair ========== //
 
-getPortfolioFiatPair: void => Promise <? string > = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+getPortfolioFiatPair: number => Promise <?string> = networkId => getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-setSetPortfolioFiatPair: string => Promise < void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+setSetPortfolioFiatPair: (number, string) => Promise <void> = (networkId, pair) => setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-unsetPortfolioFiatPair: void => Promise < void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+unsetPortfolioFiatPair: number => Promise <void> = networkId => removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
 // ========== Notifications Setting ========== //
 
@@ -135,8 +137,15 @@ setNotificationsSetting: string => Promise < void> = allowed => setLocalItem(sto
 
 unsetNotificationsSetting: void => Promise < void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
+// ========== Bring Banner ========== //
+getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
+setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+
+unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
 // ========== Buy/Sell Disclaimer ========== //
-getBuySellDisclaimer: void => Promise <? string > = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
 setBuySellDisclaimer: string => Promise < void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
 
@@ -257,14 +266,11 @@ unsetToggleSidebar: void => Promise < void> = () => removeLocalItem(storageKeys.
 
 // ========== Expand / retract Sidebar ========== //
 
-getBringSandbox: void => Promise < boolean > = () =>
-  getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+  getBringSandbox: void => Promise<boolean> = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
 
-setBringSandbox: boolean => Promise < void> = flag => {
-  return flag
-    ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
-    : this.unsetBringSandbox();
-};
+  setBringSandbox: boolean => Promise<void> = flag => {
+    return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
+  };
 
 unsetBringSandbox: void => Promise < void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
 
@@ -399,35 +405,32 @@ saveIsAnalysticsAllowed: (flag: boolean) => Promise < void> = async flag => {
 
 unsetIsAnalyticsAllowed: void => Promise < void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
-saveCashbackWalletId: (number) => Promise < void> = (id) => setLocalItem(
-  storageKeys.CASHBACK_WALLET_ID,
-  String(id)
-);
+  saveCashbackWalletId: number => Promise<void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
 
-getCashbackWalletId: () => Promise < number | null > = async () => {
-  const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
-  if (!v) {
-    return null;
-  }
-  return Number(v);
-}
+  getCashbackWalletId: () => Promise<number | null> = async () => {
+    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+    if (!v) {
+      return null;
+    }
+    return Number(v);
+  };
 
-_getShownDisclaimerObject: () => Promise < Object > = async () => {
-  const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
-  const val = raw ? JSON.parse(raw) : {};
-  return val;
-}
+  _getShownDisclaimerObject: () => Promise<Object> = async () => {
+    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+    const val = raw ? JSON.parse(raw) : {};
+    return val;
+  };
 
-setShownDisclaimer: (Disclaimer) => Promise < void> = async (which) => {
-  const val = await this._getShownDisclaimerObject();
-  val[which] = true;
-  await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
-};
+  setShownDisclaimer: Disclaimer => Promise<void> = async which => {
+    const val = await this._getShownDisclaimerObject();
+    val[which] = true;
+    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+  };
 
-isDisclaimerShown: (Disclaimer) => Promise < boolean > = async (which) => {
-  const val = await this._getShownDisclaimerObject();
-  return val[which] === true;
-}
+  isDisclaimerShown: Disclaimer => Promise<boolean> = async which => {
+    const val = await this._getShownDisclaimerObject();
+    return val[which] === true;
+  };
 
 loadCurrentNetworkId: () => Promise <? number > = async () => {
   const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
@@ -453,7 +456,7 @@ saveWalletListOrder: (Array < string >) => Promise < void> = async publicKeyList
   await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
 };
 
-  async reset(): Promise < void> {
+async reset(): Promise < void> {
   await this.unsetUserLocale();
   await this.unsetComplexityLevel();
   await this.unsetLastLaunchVersion();
@@ -464,8 +467,11 @@ saveWalletListOrder: (Array < string >) => Promise < void> = async publicKeyList
   await this.unsetToggleSidebar();
   await this.unsetAcceptedTosVersion();
   await this.unsetIsAnalyticsAllowed();
-  await this.unsetPortfolioFiatPair();
   await this.unsetBringSandbox();
+  for (const network of Object.values(networks)) {
+    // $FlowIgnore[incompatible-use]
+    await this.unsetPortfolioFiatPair(network.NetworkId);
+  }
 }
 
 getItem: string => Promise <? string > = key => getLocalItem(key);

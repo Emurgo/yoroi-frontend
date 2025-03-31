@@ -827,7 +827,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 />
 
                 <Typography component="div" variant="button2" color="ds.text_gray_low" fontWeight={500} mr="12px">
-                  ADA
+                  {truncateToken(getTokenName(this.props.defaultToken))}
                 </Typography>
 
                 <Button

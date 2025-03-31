@@ -28,13 +28,15 @@ import {
   TxOutputDestinationType,
   TxOutputFormat,
   TxRequiredSignerType,
+  VoterType,
+  VoteOption,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import type { Address, Addressing, Value, } from '../../lib/storage/models/PublicDeriver/interfaces';
 import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { toHexOrBase58 } from '../../lib/storage/bridge/utils';
 import { Bip44DerivationLevels, } from '../../lib/storage/database/walletTypes/bip44/api/utils';
-import { ChainDerivations, } from '../../../../config/numbersConfig';
+import { ChainDerivations, HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import {
   bytesToHex,
@@ -1089,6 +1091,101 @@ export function toLedgerSignRequest(
     formattedReferenceInputs = formatInputs(referenceInputs);
   }
 
+  let formattedVotingProcedures = null;
+  const votingProcedures = txBody.voting_procedures();
+  if (votingProcedures) {
+    formattedVotingProcedures = [];
+    const voters = votingProcedures.get_voters();
+    for (let i = 0; i < voters.len(); i++) {
+      const voter = voters.get(i);
+      if (!voter) {
+        throw new Error('unexpectedly missing voter');
+      }
+      let formattedVoter;
+
+      const dRepCred = voter.to_drep_credential();
+      if (dRepCred) {
+        const dRepCredKeyHash = dRepCred.to_keyhash();
+        if (dRepCredKeyHash) {
+          formattedVoter = {
+            type: VoterType.DREP_KEY_PATH,
+            // fixme
+            keyPath: [
+              1852 + HARD_DERIVATION_START,
+              1815 + HARD_DERIVATION_START,
+              0 + HARD_DERIVATION_START,
+              3,
+              0
+            ],
+          };
+        }
+        // else
+        const dRepCredScriptHash = dRepCred.to_scripthash();
+        if (dRepCredScriptHash) {
+          formattedVoter = {
+            type: VoterType.DREP_SCRIPT_HASH,
+            scriptHashHex: dRepCredScriptHash.to_hex(),
+          };
+        }
+      }
+      // else
+      const stakePoolKeyHash = voter.to_stake_pool_key_hash();
+      if (stakePoolKeyHash) {
+        // todo: support key path for friendly UI
+        formattedVoter = {
+          type: VoterType.STAKE_POOL_KEY_HASH,
+          keyHashHex: stakePoolKeyHash.to_hex(),
+        };
+      }
+      // don't support cc hot credential for now
+      
+      if (!formattedVoter) {
+        throw new Error('unexpected voter');
+      }
+      formattedVotingProcedures.push({
+        voter: formattedVoter,
+        votes: [],
+      });
+      const govActionIds = votingProcedures.get_governance_action_ids_by_voter(voter);
+      for (let j = 0; j < govActionIds.len(); j++) {
+        const govActionId = govActionIds.get(j);
+        if (!govActionId) {
+          throw new Error('unexpectedly missing gov action id')
+        }
+        const votingProcedure = votingProcedures.get(voter, govActionId);
+        if (!votingProcedure) {
+          throw new Error('unexpectedly missing voting procedure')
+        }
+        const voteKind = votingProcedure.vote_kind();
+        let formattedVoteKind;
+        if (voteKind === 0) {
+          formattedVoteKind = VoteOption.NO;
+        } else if (voteKind === 1) {
+          formattedVoteKind = VoteOption.YES;
+        } else if (voteKind === 2) {
+          formattedVoteKind = VoteOption.ABSTAIN;
+        } else {
+          throw new Error(`unexpected vote kind ${voteKind}`);
+        }
+        const anchor = votingProcedure.anchor();
+
+        formattedVotingProcedures[formattedVotingProcedures.length - 1].votes.push({
+          govActionId: {
+            txHashHex: govActionId.transaction_id().to_hex(),
+            govActionIndex: govActionId.index(),
+          },
+          votingProcedure: {
+            vote: formattedVoteKind,
+            anchor: anchor ? {
+              url: anchor.url().url(),
+              hashHex: anchor.anchor_data_hash().to_hex(),
+            } : null,
+          },
+        });
+      }
+    }
+  }
+
   let signingMode = TransactionSigningMode.ORDINARY_TRANSACTION;
   if (formattedCollateral) {
     signingMode = TransactionSigningMode.PLUTUS_TRANSACTION;
@@ -1123,11 +1220,12 @@ export function toLedgerSignRequest(
       collateralOutput: formattedCollateralReturn,
       totalCollateral: txBody.total_collateral()?.to_str() ?? null,
       referenceInputs: formattedReferenceInputs,
+      votingProcedures: formattedVotingProcedures,
     },
     additionalWitnessPaths,
     options: {
       tagCborSets: txHasSetTags,
-    }
+    },
   };
 }
 
