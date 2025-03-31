@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, useTheme, Typography } from '@mui/material';
-import { Icon, IconWrapper } from '../icons/index';
+import { Box, Typography } from '@mui/material';
+import { IconWrapper } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
 import { Theme, toast } from 'react-toastify';
 import { noop } from 'lodash';
