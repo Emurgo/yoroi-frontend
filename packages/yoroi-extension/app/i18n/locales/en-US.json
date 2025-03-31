@@ -120,7 +120,7 @@
   "connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
   "connector.connect.noWalletsFound": "Ooops, no {network} wallets found.",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
-  "connector.connect.testnetWarningText": "This DApp may not support Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.",
+  "connector.connect.testnetWarningText": "This DApp may not support Cardano {networkName} (test blockchain network). Ensure it supports {networkName} before connecting.",
   "connector.connect.testnetWarningTitle": "Testnet support",
   "connector.connected-dapps.cardanoLabel": "Cardano, ADA",
   "connector.connected-dapps.dappsLabel": "Dapps",
