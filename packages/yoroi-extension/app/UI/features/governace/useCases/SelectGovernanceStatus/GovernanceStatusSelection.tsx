@@ -201,7 +201,7 @@ export const GovernanceStatusSelection = () => {
           textAlign="center"
           color="ds.text_gray_medium"
         >
-          To participate in governance you need to have ADA in your wallet.
+          {strings.needAdaForParticipation}
         </Typography>
         {/* @ts-ignore */}
         <Button variant="primary"
