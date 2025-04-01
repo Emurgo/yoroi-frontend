@@ -17,9 +17,9 @@ export const testWallet2 = Object.freeze({
 });
 export const testWallet3 = Object.freeze({
   name: 'TW_Chrome',
-  plate: 'XZHD-1651',
+  plate: 'HEJT-3361',
   mnemonic: process.env.SECOND_SMOKE_TEST_WALLET,
-  minTxs: 100,
+  minTxs: 29,
 });
 export const testWallet4 = Object.freeze({
   name: 'TW_FF',
