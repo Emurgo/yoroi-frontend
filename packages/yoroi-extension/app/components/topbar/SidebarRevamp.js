@@ -5,7 +5,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
 import { intlShape } from 'react-intl';
-import { Box, Link, styled } from '@mui/material';
+import { Box, Button, styled } from '@mui/material';
 import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
 import styles from './SidebarRevamp.scss';
@@ -55,7 +55,7 @@ export default class SidebarRevamp extends Component<Props> {
             <YoroiLogo />
           )}
         </div>
-        <div className={styles.categories}>
+        <ScrollableCategoriesWrapper className={styles.categories}>
           {categories
             ? categories.map(category => {
                 return (
@@ -74,8 +74,8 @@ export default class SidebarRevamp extends Component<Props> {
                 );
               })
             : null}
-        </div>
-        <Link
+        </ScrollableCategoriesWrapper>
+        <Button
           className={styles.faq}
           href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
           target="_blank"
@@ -91,7 +91,7 @@ export default class SidebarRevamp extends Component<Props> {
           }}
         >
           {intl.formatMessage(globalMessages.sidebarFaq)}
-        </Link>
+        </Button>
       </Wrapper>
     );
   }
@@ -99,4 +99,28 @@ export default class SidebarRevamp extends Component<Props> {
 
 const Wrapper = styled(Box)(({ theme }) => ({
   background: theme.palette.ds.bg_gradient_3,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  width: '72px',
+  height: '100vh',
 }));
+
+const ScrollableCategoriesWrapper = styled(Box)({
+  flex: 1,
+  width: '100%',
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  marginBottom: '24px',
+
+  /* Hide scrollbar for WebKit (Chrome, Safari) */
+  '&::-webkit-scrollbar': {
+    display: 'none',
+  },
+
+  /* Hide scrollbar for Firefox */
+  scrollbarWidth: 'none',
+
+  /* Hide scrollbar for Edge/IE */
+  msOverflowStyle: 'none',
+});

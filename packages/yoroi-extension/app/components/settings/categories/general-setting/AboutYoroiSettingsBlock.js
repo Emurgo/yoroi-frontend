@@ -165,8 +165,6 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
     }
   };
 
-  const isDevOrNightly = environment.isDev() || environment.isNightly() || environment.isE2EBuild();
-
   useEffect(() => {
     // eslint-disable-next-line
     (async () => {
@@ -246,17 +244,14 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         )}
       </Box>
 
-      {isDevOrNightly &&
-        <Button
-          onClick={onSwitchNetwork}
-          variant="secondary"
-          style={{ width: '200px' }}
-          id={basePageComponentPath + '-switchNetwork-button'}
-        >
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
-      }
-
+      <Button
+        onClick={onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+        id={basePageComponentPath + '-switchNetwork-button'}
+      >
+        {intl.formatMessage(messages.switchNetwork)}
+      </Button>
 
       <div className={styles.aboutSocial}>
         <GridFlexContainer rowSize={socialMediaLinks.length}>
