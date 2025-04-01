@@ -80,6 +80,10 @@ export const messages = Object.freeze(
       id: 'governance.statusPending',
       defaultMessage: '!!!You have chosen your governance status, this process may take a while.',
     },
+    needAdaForParticipation: {
+      id: 'governance.needAdaForParticipation',
+      defaultMessage: '!!!To participate in governance you need to have ADA in your wallet.',
+    },
     thanksForParticipation: {
       id: 'governance.thanksForParticipation',
       defaultMessage: '!!!Thank you for participating in Governance.',
@@ -183,10 +187,12 @@ export const useStrings = () => {
     identifyDrep: intl.formatMessage(messages.identifyDrep),
     incorectFormat: intl.formatMessage(messages.incorectFormat),
     statusPending: intl.formatMessage(messages.statusPending),
+    needAdaForParticipation: intl.formatMessage(messages.needAdaForParticipation),
     thanksForParticipation: intl.formatMessage(messages.thanksForParticipation),
     theTransactionCanTake: intl.formatMessage(messages.theTransactionCanTake),
     participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
     goToGovernance: intl.formatMessage(messages.goToGovernance),
     goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
+    notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
   }).current;
 };
