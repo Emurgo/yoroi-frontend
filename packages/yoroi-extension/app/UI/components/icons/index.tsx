@@ -254,10 +254,10 @@ enum Icons {
 }
 
 interface IconWrapperProps {
-  readonly icon: Icons | React.ReactNode;
-  readonly iconProps?: React.SVGProps<SVGSVGElement>;
-  readonly asButton?: boolean;
-  readonly [key: string]: any;
+  icon: Icons | React.ReactNode;
+  iconProps?: React.SVGProps<SVGSVGElement>;
+  asButton?: boolean;
+  [key: string]: any;
 }
 
 export function IconWrapper({
@@ -266,7 +266,7 @@ export function IconWrapper({
   asButton = false,
   buttonProps = {},
   ...props
-}: IconWrapperProps): React.ReactNode {
+}: Readonly<IconWrapperProps>): React.ReactNode {
   const IconComponent = typeof icon === 'string' ? Icon[icon] : icon;
 
   if (asButton) {
