@@ -22,6 +22,7 @@ const storageKeys = {
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
+  TESTNET_MODAL_DISPLAYED: 'TESTNET_MODAL_DISPLAYED',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
@@ -150,7 +151,14 @@ export default class LocalStorageApi {
 
   unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
-  // ========== Theme Migration ========== //
+// ========== Testnet Modal Info  ========== //
+getTestnetModalDisplayed: void => Promise<boolean> = async () => (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
+
+setTestnetModalDisplayed: boolean => Promise<void> = accepted => setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
+
+unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
+
+// ========== Theme Migration ========== //
 
   getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
     (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';

@@ -87,6 +87,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const profileStore = stores.profile;
     const coinPriceStore = stores.coinPriceStore;
     const { wallets, getCashbackWalletRequest } = stores.wallets;
+    const selectedWallet = stores.wallets.selected;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -141,28 +142,26 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           }
           error={null}
         />
-      )}
-      {selectedWallet && (
-        <UnitOfAccountSettings
-          onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
-          isSubmitting={isSubmittingUnitOfAccount}
-          currencies={currencies}
-          currentValue={unitOfAccountValue}
-          error={profileStore.setUnitOfAccountRequest.error}
-          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+        {selectedWallet && (
+          <UnitOfAccountSettings
+            onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
+            isSubmitting={isSubmittingUnitOfAccount}
+            currencies={currencies}
+            currentValue={unitOfAccountValue}
+            error={profileStore.setUnitOfAccountRequest.error}
+            lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+          />
+        )}
+        <ThemeSettingsBlock />
+        <AboutYoroiSettingsBlock
+          wallet={stores.wallets.selected}
+          onSwitchNetwork={() =>
+            stores.uiDialogs.open({
+              dialog: SwitchNetworkDialogContainer,
+            })
+          }
         />
-      )}
-      <ThemeSettingsBlock />
-      <AboutYoroiSettingsBlock
-        intl={intl}
-        wallet={stores.wallets.selected}
-        onSwitchNetwork={() =>
-          stores.uiDialogs.open({
-            dialog: SwitchNetworkDialogContainer,
-          })
-        }
-      />
-    </Box>
-  );
+      </Box>
+    );
 }
 }
