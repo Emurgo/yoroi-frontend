@@ -193,5 +193,6 @@ export const useStrings = () => {
     participatingInGovernance: intl.formatMessage(messages.participatingInGovernance),
     goToGovernance: intl.formatMessage(messages.goToGovernance),
     goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
+    notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
   }).current;
 };

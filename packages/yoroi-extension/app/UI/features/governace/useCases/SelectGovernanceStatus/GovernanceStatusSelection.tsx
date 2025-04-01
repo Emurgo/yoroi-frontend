@@ -20,6 +20,7 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
 import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 import links from '../../../../../links';
+import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -114,20 +115,22 @@ export const GovernanceStatusSelection = () => {
     try {
       setLoadingUnsignTx(true);
       startLoading();
-      setTimeout(async () => {
-        await createDrepDelegationTransaction(kind);
-        navigateTo.delegationForm();
-        setLoadingUnsignTx(false);
-        setError(null);
-      }, 200);
+      await createDrepDelegationTransaction(kind);
+      navigateTo.delegationForm();
+      setError(null);
     } catch (e) {
-      setError('Error trying to Vote. Please try again later');
+      if (e instanceof NotEnoughMoneyToSendError) {
+        setError(strings.notEnoughMoneyToSendError);
+      } else {
+        setError('Error trying to Vote. Please try again later');
+      }
       closeModal();
+    } finally {
       setLoadingUnsignTx(false);
     }
   };
 
-  const isParticipatingInGovernance = governanceStatus.status != null;
+  const isParticipatingInGovernance = governanceStatus.status != null && governanceStatus.status !== 'none';
 
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
@@ -232,7 +235,7 @@ export const GovernanceStatusSelection = () => {
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
-        {isParticipatingInGovernance
+        {governanceStatus.status !== null
           ? optionsList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
@@ -254,7 +257,7 @@ export const GovernanceStatusSelection = () => {
           : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} />)}
       </Stack>
       <Stack direction="row" gap="16px" mt="16px">
-        {isParticipatingInGovernance
+        {governanceStatus.status !== null
           ? bottomList.map((option, index) => {
               return (
                 <GovernanceVoteingCard
