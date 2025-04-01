@@ -278,7 +278,7 @@ export default class ConnectPage extends Component<Props> {
       </Box>
     );
 
-    const networkName = NETWORK_BADGES[networkId].text;
+    const networkName = NETWORK_BADGES[networkId]?.text;
 
     return (
       <div className={componentClasses}>
