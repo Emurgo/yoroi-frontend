@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, styled, Button, Stack, ButtonProps, StackProps } from '@mui/material';
-import { IconWrapper } from '../icons';
+import { IconWrapper, Icons } from '../icons';
 
 const Container = styled(Stack)(({ theme }: any) => ({
   backgroundImage: theme.palette.ds.bg_gradient_1,
@@ -38,7 +38,13 @@ export const BaseBanner = ({
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative', flex: 1 }}>
       <Stack sx={{ position: 'absolute', zIndex: 20, right: 10, top: 10 }}>
-        <IconWrapper onClick={handleClose} icon="CloseCircleIcon" color="ds.el_gray_max" borderColor="ds.el_gray_max" asButton />
+        <IconWrapper
+          onClick={handleClose}
+          icon={Icons.CloseCircleIcon}
+          color="ds.el_gray_max"
+          borderColor="ds.el_gray_max"
+          asButton
+        />
       </Stack>
       <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">

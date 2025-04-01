@@ -4,7 +4,7 @@ import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { IconWrapper } from '../icons/index';
+import { IconWrapper, Icons } from '../icons/index';
 
 const Accordion: any = styled(MuiAccordion)(({ theme }: any) => ({
   '&:not(:last-child)': {
@@ -52,7 +52,7 @@ export const Collapsible = ({ title, content, expanded: startExpanded }: Props) 
       <AccordionSummary
         aria-controls="panel1d-content"
         id="panel1d-header"
-        expandIcon={<IconWrapper icon="ChevronDown" asButton />}
+        expandIcon={<IconWrapper icon={Icons.ChevronDown} asButton />}
       >
         <Typography variant="body1" fontWeight="500">
           {title}

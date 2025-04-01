@@ -168,7 +168,7 @@ export const Icon = {
   Wallets,
 };
 
-enum Icons {
+export enum Icons {
   Assets = 'Assets',
   Assets1 = 'Assets1',
   AssetsFilled = 'AssetsFilled',
@@ -254,7 +254,7 @@ enum Icons {
 }
 
 interface IconWrapperProps {
-  icon: Icons | React.ReactNode;
+  icon: Icons;
   iconProps?: React.SVGProps<SVGSVGElement>;
   asButton?: boolean;
   [key: string]: any;

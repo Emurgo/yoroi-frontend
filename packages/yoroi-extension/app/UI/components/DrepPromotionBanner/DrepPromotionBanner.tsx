@@ -7,7 +7,7 @@ import LocalStorageApi from '../../../api/localStorage/index';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import { YOROI_DREP_ID } from '../../features/governace/common/constants';
-import { IconWrapper } from '../icons';
+import { IconWrapper, Icons } from '../icons';
 import { Ilustration } from './Ilustration';
 
 const Container = styled(Stack)(({ theme }: any) => ({
@@ -99,7 +99,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
       <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
         <IconWrapper
           onClick={dismissBanner}
-          icon="CloseCircleIcon"
+          icon={Icons.CloseCircleIcon}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
           asButton

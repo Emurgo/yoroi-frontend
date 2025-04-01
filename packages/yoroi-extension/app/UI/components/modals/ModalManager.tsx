@@ -4,7 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { IconWrapper } from '../icons/index';
+import { IconWrapper, Icons } from '../icons/index';
 import { useModal } from './ModalContext';
 
 const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: string; height: string; theme: any }) => ({
@@ -47,7 +47,7 @@ export const ModalManager = () => {
       <IconWrapper
         aria-label="close"
         onClick={closeModal}
-        icon="CloseIcon"
+        icon={Icons.CloseIcon}
         color="ds.el_gray_max"
         borderColor="ds.el_gray_max"
         asButton

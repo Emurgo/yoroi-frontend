@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { IconWrapper } from '../icons/index';
+import { IconWrapper, Icons } from '../icons/index';
 import { NotificationTypes } from '../../types/notifications';
 import { Theme, toast } from 'react-toastify';
 import { noop } from 'lodash';
@@ -40,7 +40,7 @@ export const NotificationCloseButton = ({ closeToast, ...props }) => {
       }}
       onClick={handleClose}
       color="ds.el_gray_medium"
-      icon="CloseIcon"
+      icon={Icons.CloseIcon}
     />
   );
 };
@@ -66,25 +66,25 @@ const NotificationIcon = ({ type }: IconProps) => {
     case NotificationTypes.Rewards:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <IconWrapper color="ds.static_green" icon="Staking" />
+          <IconWrapper color="ds.static_green" icon={Icons.Staking} />
         </IconContainer>
       );
     case NotificationTypes.Income:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <IconWrapper color="ds.static_green" icon="Receive" />
+          <IconWrapper color="ds.static_green" icon={Icons.Receive} />
         </IconContainer>
       );
     case NotificationTypes.Outcome:
       return (
         <IconContainer bgcolor="ds.primary_100">
-          <IconWrapper color="ds.primary_600" icon="Send" />
+          <IconWrapper color="ds.primary_600" icon={Icons.Send} />
         </IconContainer>
       );
     case NotificationTypes.Cancelled:
       return (
         <IconContainer bgcolor="ds.sys_magenta_100">
-          <IconWrapper color="ds.sys_magenta_500" icon="Cancel" />
+          <IconWrapper color="ds.sys_magenta_500" icon={Icons.Cancel} />
         </IconContainer>
       );
     default:

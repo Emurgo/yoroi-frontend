@@ -23,6 +23,7 @@ import { IconWrapper } from '../../../../UI/components';
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Icons } from '../../../../UI/components/icons';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -280,7 +281,7 @@ const LabelWithValue = ({ label, value, url, componentId, showInfoToolTip, handl
       >
         {value}
       </Typography>
-      {showInfoToolTip && <IconWrapper icon="InfoCircle" onClick={handleTooltip} asButton />}
+      {showInfoToolTip && <IconWrapper icon={Icons.InfoCircle} onClick={handleTooltip} asButton />}
     </Box>
   );
 };
