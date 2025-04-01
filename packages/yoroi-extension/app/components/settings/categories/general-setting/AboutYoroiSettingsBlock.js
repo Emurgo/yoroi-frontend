@@ -165,21 +165,41 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       }
     };
 
-    const isDevOrNightly = environment.isDev() || environment.isNightly();
+  useEffect(() => {
+    // eslint-disable-next-line
+    (async () => {
+      const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
+      if (!wallet.isTestnet && !isTestnetModalDisplayed) {
+        openModal({
+          title: intl.formatMessage(messages.modalTitle),
+          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
+          width: '648px',
+          height: '360px',
+        });
+      }
+    })()
+  }, [])
 
-    return (
-      <Box
-        sx={{
-          pb: '20px',
-          mt: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
-          {intl.formatMessage(messages.aboutYoroiLabel)}
-        </Typography>
+
+  const onCloseModalInfo = useCallback(async () => {
+    await localStorageApi.setTestnetModalDisplayed(true);
+    closeModal()
+  }, [localStorageApi]);
+
+
+  return (
+    <Box
+      sx={{
+        pb: '20px',
+        mt: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
+        {intl.formatMessage(messages.aboutYoroiLabel)}
+      </Typography>
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {network && (
@@ -214,15 +234,13 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           )}
         </Box>
 
-        {isDevOrNightly ? (
-          <Button
-            onClick={this.props.onSwitchNetwork}
-            variant="secondary"
-            style={{ width: '200px' }}
-          >
-            {intl.formatMessage(messages.switchNetwork)}
-          </Button>
-        ) : null}
+      <Button
+        onClick={this.props.onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+      >
+        {intl.formatMessage(messages.switchNetwork)}
+      </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

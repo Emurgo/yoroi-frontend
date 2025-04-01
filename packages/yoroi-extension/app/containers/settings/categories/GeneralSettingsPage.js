@@ -68,11 +68,11 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     request.execute();
   }
 
-  onSelectUnitOfAccount: string => Promise<void> = async value => {
+  onSelectUnitOfAccount: (number, string) => Promise<void> = async (networkId, value) => {
     const localStorageApi = new LocalStorageApi();
 
     const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
-    localStorageApi.unsetPortfolioFiatPair();
+    await localStorageApi.unsetPortfolioFiatPair(networkId);
     await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
     await this.props.stores.transactions.updateUnitOfAccount();
   };
@@ -141,26 +141,28 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           }
           error={null}
         />
+      )}
+      {selectedWallet && (
         <UnitOfAccountSettings
-          onSelect={this.onSelectUnitOfAccount}
+          onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
           isSubmitting={isSubmittingUnitOfAccount}
           currencies={currencies}
           currentValue={unitOfAccountValue}
           error={profileStore.setUnitOfAccountRequest.error}
           lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
         />
-        <ThemeSettingsBlock />
-        <AboutYoroiSettingsBlock
-          wallet={stores.wallets.selected}
-          onSwitchNetwork={() =>
-            stores.uiDialogs.open({
-              dialog: SwitchNetworkDialogContainer,
-            })
-          }
-        />
-        {/* pop up dialogs */}
-        {stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && <SwitchNetworkDialogContainer stores={stores} />}
-      </Box>
-    );
-  }
+      )}
+      <ThemeSettingsBlock />
+      <AboutYoroiSettingsBlock
+        intl={intl}
+        wallet={stores.wallets.selected}
+        onSwitchNetwork={() =>
+          stores.uiDialogs.open({
+            dialog: SwitchNetworkDialogContainer,
+          })
+        }
+      />
+    </Box>
+  );
+}
 }
