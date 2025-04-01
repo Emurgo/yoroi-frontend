@@ -268,7 +268,9 @@ export function IconWrapper({
   ...props
 }: Readonly<IconWrapperProps>): React.ReactNode {
   const IconComponent = typeof icon === 'string' ? Icon[icon] : icon;
-
+  if (IconComponent == null) {
+    throw new Error('A proper icon component or reference was expected but got: ' + icon);
+  }
   if (asButton) {
     return (
       <IconButton {...buttonProps}>
