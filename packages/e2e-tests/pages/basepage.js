@@ -1,4 +1,4 @@
-import { until, Key, logging } from 'selenium-webdriver';
+import { until, Key, logging, WebElement } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
@@ -126,6 +126,11 @@ class BasePage {
     this.logger.info(`BasePage::findElement is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElement(getByLocator(locator));
   }
+  /**
+   * 
+   * @param {{locator: string, method: string}} locator 
+   * @returns {Promise<WebElement[]>}
+   */
   async findElements(locator) {
     this.logger.info(`BasePage::findElements is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElements(getByLocator(locator));
