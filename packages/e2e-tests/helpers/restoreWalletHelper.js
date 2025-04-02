@@ -139,12 +139,17 @@ export const switchToPreprod = async (webdriver, logger, shouldBeModalWindow) =>
   await generalSettingsPage.goToWalletTab();
 };
 
-export const preloadDBAndStorage = async (webdriver, logger, templateName) => {
+export const preloadDBAndStorage = async (
+  webdriver,
+  logger,
+  templateName,
+  useGeneralStorageInfo = true
+) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
   expect(state, 'The Add new wallet page is not displayed').to.be.true;
-  await addWalletPage.prepareDBAndStorage(templateName);
+  await addWalletPage.prepareDBAndStorage(templateName, useGeneralStorageInfo);
   // It is necessary to re-run the service worker after loading info into the indexedDB
   if (isChrome()) {
     await restartServiceWorker(webdriver, logger);
@@ -201,9 +206,15 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
   logger.info(`--------------------- collectInfo END ---------------------`);
 };
 
-export const prepareWallet = async (webdriver, logger, testWalletName, mochaContext) => {
+export const prepareWallet = async (
+  webdriver,
+  logger,
+  testWalletName,
+  mochaContext,
+  useGeneralStorageInfo = true
+) => {
   try {
-    await preloadDBAndStorage(webdriver, logger, testWalletName);
+    await preloadDBAndStorage(webdriver, logger, testWalletName, useGeneralStorageInfo);
     await waitTxPage(webdriver, logger);
   } catch (error) {
     await collectInfo(mochaContext, webdriver, logger);

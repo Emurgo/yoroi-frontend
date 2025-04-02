@@ -722,13 +722,13 @@ class BasePage {
     }
     // set info into the chrome local storage
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
-    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName);
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
     // set info into regular storage
-    const commonStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.localStorage.json`;
-    const commonStorageSnaphot = getSnapshotObjectFromJSON(commonStorageFileName);
+    const commonStorageFileName = 'general.localStorage.json';
+    const commonStorageSnaphot = getSnapshotObjectFromJSON(commonStorageFileName, true);
     for (const commonStorageKey in commonStorageSnaphot) {
       await this.saveToLocalStorage(commonStorageKey, commonStorageSnaphot[commonStorageKey]);
     }
