@@ -16,6 +16,15 @@ export const NotificationTopics = {
   REWARDS: 'REWARDS_RECEIVED',
 };
 
+type TransactionType = 'self' | 'multi' | 'expend' | 'income';
+
+const TransactionTypeMap: Record<TransactionType, NotificationTypes> = {
+  self: NotificationTypes.Outcome,
+  multi: NotificationTypes.Income,
+  expend: NotificationTypes.Outcome,
+  income: NotificationTypes.Income,
+};
+
 const initialValue = {
   showRandomToast(): null | Promise<any> {
     return null;
@@ -130,6 +139,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
       [NotificationTopics.REWARDS]: NotificationTypes.Rewards,
     };
 
+    let notifType = notifTypeByTopic[topic] || NotificationTypes.Cancelled;
+
     // We only have epoch for rewards notifications
     if (topic === NotificationTopics.REWARDS) {
       const epoch = data.reward[0];
@@ -143,9 +154,12 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
       }
     } else if (data.slot < notifLimitSlots[data.networkId]) {
       return;
+    } else if (topic === NotificationTopics.NEW_TX) {
+      const txType = data.tx.type as TransactionType;
+      notifType = TransactionTypeMap[txType] || NotificationTypes.Cancelled;
     }
 
-    createNotification(notifTypeByTopic[topic] || NotificationTypes.Cancelled, data.txid);
+    createNotification(notifType, data.txid);
   };
 
   const showRandomToast = async () => {

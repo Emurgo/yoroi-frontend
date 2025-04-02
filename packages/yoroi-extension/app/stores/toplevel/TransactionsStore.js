@@ -64,11 +64,11 @@ export default class TransactionsStore extends Store<StoresMap> {
    *
    * NOT PERSISTED
    */
-  @observable _processedWithdrawals: Set<number> = new Set;
+  @observable _processedWithdrawals: Set<number> = new Set();
 
-  getTransactionRowsToExportRequest: LocalizedRequest<
-  ((void) => Promise<void>) => Promise<void>
-  > = new LocalizedRequest<((void) => Promise<void>) => Promise<void>>(func => func());
+  getTransactionRowsToExportRequest: LocalizedRequest<((void) => Promise<void>) => Promise<void>> = new LocalizedRequest<
+    ((void) => Promise<void>) => Promise<void>
+  >(func => func());
   exportTransactions: LocalizedRequest<ExportTransactionsFunc> = new LocalizedRequest<ExportTransactionsFunc>(
     this.api.export.exportTransactions
   );
@@ -177,6 +177,7 @@ export default class TransactionsStore extends Store<StoresMap> {
       // trigger notification for new tx
       PubSub.publish(NotificationTopics.NEW_TX, {
         txid,
+        tx,
         slot: publicDeriver.lastSyncInfo.SlotNum,
         networkId: publicDeriver.networkId,
       });
