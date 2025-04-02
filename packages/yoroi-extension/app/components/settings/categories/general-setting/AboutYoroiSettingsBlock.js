@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Component } from 'react';
+import { Component, useCallback, useEffect } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -19,6 +19,12 @@ import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
 import { Box, Button, Link, Typography } from '@mui/material';
+// $FlowIgnore: suppressing this error
+import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
+// $FlowIgnore: suppressing this error
+// $FlowIgnore: suppressing this error
+import { useModal } from '../../../../UI/components/modals/ModalContext';
+import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const messages = defineMessages({
@@ -86,6 +92,10 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.switchNetwork',
     defaultMessage: '!!!SWITCH NETWORK',
   },
+  modalTitle: {
+    id: 'settings.general.testnetModal.title',
+    defaultMessage: '!!!What are the test networks?',
+  },
 });
 
 const basePageComponentPath = 'settings:general';
@@ -150,9 +160,12 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
   };
 
   render(): Node {
+    const { openModal, closeModal } = useModal()
+    const localStorageApi = new LocalStorageApi();
     const { intl } = this.context;
     const { wallet } = this.props;
-    const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+    const isTestnet = wallet != null && wallet.isTestnet;
+    const network = isTestnet ? 'testnet' : 'mainnet';
     const getNetworkValue = () => {
       const networkId = wallet && wallet.networkId;
       switch (networkId) {
@@ -165,7 +178,26 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       }
     };
 
-    const isDevOrNightly = environment.isDev() || environment.isNightly();
+    useEffect(() => {
+      // eslint-disable-next-line
+      (async () => {
+        const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
+        if (!isTestnet && !isTestnetModalDisplayed) {
+          openModal({
+            title: intl.formatMessage(messages.modalTitle),
+            content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
+            width: '648px',
+            height: '360px',
+          });
+        }
+      })()
+    }, [])
+
+    const onCloseModalInfo = useCallback(async () => {
+      await localStorageApi.setTestnetModalDisplayed(true);
+      closeModal()
+    }, [localStorageApi]);
+
 
     return (
       <Box
@@ -214,15 +246,13 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           )}
         </Box>
 
-        {isDevOrNightly ? (
-          <Button
-            onClick={this.props.onSwitchNetwork}
-            variant="secondary"
-            style={{ width: '200px' }}
-          >
-            {intl.formatMessage(messages.switchNetwork)}
-          </Button>
-        ) : null}
+        <Button
+          onClick={this.props.onSwitchNetwork}
+          variant="secondary"
+          style={{ width: '200px' }}
+        >
+          {intl.formatMessage(messages.switchNetwork)}
+        </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

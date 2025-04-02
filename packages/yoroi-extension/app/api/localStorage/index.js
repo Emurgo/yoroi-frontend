@@ -13,6 +13,7 @@ import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShel
 import { deserializeTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
 import { maybe } from '../../coreUtils';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
+import { networks } from '../ada/lib/storage/database/prepackaged/networks';
 
 const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
@@ -21,6 +22,7 @@ const storageKeys = {
   COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
+  TESTNET_MODAL_DISPLAYED: 'TESTNET_MODAL_DISPLAYED',
   VERSION: networkForLocalStorage + '-LAST-LAUNCH-VER',
   HIDE_BALANCE: networkForLocalStorage + '-HIDE-BALANCE',
   UNIT_OF_ACCOUNT: networkForLocalStorage + '-UNIT-OF-ACCOUNT',
@@ -31,10 +33,11 @@ const storageKeys = {
   CATALYST_ROUND_INFO: networkForLocalStorage + '-CATALYST_ROUND_INFO',
   FLAGS: networkForLocalStorage + '-FLAGS',
   USER_THEME: networkForLocalStorage + '-USER-THEME',
-  PORTFOLIO_FIAT_PAIR: networkForLocalStorage + '-PORTFOLIO_FIAT_PAIR',
+  PORTFOLIO_FIAT_PAIR: '-PORTFOLIO_FIAT_PAIR',
   NOTIFICATIONS_ENABLED: networkForLocalStorage + '-NOTIFICATIONS_ENABLED_PER_WALLET',
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
+  BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -120,11 +123,11 @@ export default class LocalStorageApi {
 
   // ========== Portfolio FIAT Pair ========== //
 
-  getPortfolioFiatPair: void => Promise<?string> = () => getLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+  getPortfolioFiatPair: number => Promise <?string> = networkId => getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-  setSetPortfolioFiatPair: string => Promise<void> = pair => setLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+  setSetPortfolioFiatPair: (number, string) => Promise <void> = (networkId, pair) => setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-  unsetPortfolioFiatPair: void => Promise<void> = () => removeLocalItem(storageKeys.PORTFOLIO_FIAT_PAIR);
+  unsetPortfolioFiatPair: number => Promise <void> = networkId => removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
   // ========== Notifications Setting ========== //
 
@@ -134,6 +137,13 @@ export default class LocalStorageApi {
 
   unsetNotificationsSetting: void => Promise<void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
+  // ========== Bring Banner ========== //
+  getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
+  setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+
+  unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
@@ -141,7 +151,14 @@ export default class LocalStorageApi {
 
   unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
-  // ========== Theme Migration ========== //
+// ========== Testnet Modal Info  ========== //
+getTestnetModalDisplayed: void => Promise<boolean> = async () => (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
+
+setTestnetModalDisplayed: boolean => Promise<void> = accepted => setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
+
+unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
+
+// ========== Theme Migration ========== //
 
   getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
     (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
@@ -249,13 +266,10 @@ export default class LocalStorageApi {
 
   // ========== Expand / retract Sidebar ========== //
 
-  getBringSandbox: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+  getBringSandbox: void => Promise<boolean> = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
 
   setBringSandbox: boolean => Promise<void> = flag => {
-    return flag
-      ? setLocalItem(storageKeys.BRING_SANDBOX, 'true')
-      : this.unsetBringSandbox();
+    return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
   };
 
   unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
@@ -391,10 +405,7 @@ export default class LocalStorageApi {
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
 
-  saveCashbackWalletId: (number) => Promise<void> = (id) => setLocalItem(
-    storageKeys.CASHBACK_WALLET_ID,
-    String(id)
-  );
+  saveCashbackWalletId: number => Promise<void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
 
   getCashbackWalletId: () => Promise<number | null> = async () => {
     const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
@@ -402,24 +413,24 @@ export default class LocalStorageApi {
       return null;
     }
     return Number(v);
-  }
+  };
 
   _getShownDisclaimerObject: () => Promise<Object> = async () => {
     const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
     const val = raw ? JSON.parse(raw) : {};
     return val;
-  }
+  };
 
-  setShownDisclaimer: (Disclaimer) => Promise<void> = async (which) => {
+  setShownDisclaimer: Disclaimer => Promise<void> = async which => {
     const val = await this._getShownDisclaimerObject();
     val[which] = true;
     await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
   };
 
-  isDisclaimerShown: (Disclaimer) => Promise<boolean> = async (which) => {
+  isDisclaimerShown: Disclaimer => Promise<boolean> = async which => {
     const val = await this._getShownDisclaimerObject();
     return val[which] === true;
-  }
+  };
 
   loadCurrentNetworkId: () => Promise<?number> = async () => {
     const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
@@ -445,7 +456,7 @@ export default class LocalStorageApi {
     await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   };
 
-  async reset(): Promise<void> {
+  async reset(): Promise < void> {
     await this.unsetUserLocale();
     await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
@@ -456,8 +467,11 @@ export default class LocalStorageApi {
     await this.unsetToggleSidebar();
     await this.unsetAcceptedTosVersion();
     await this.unsetIsAnalyticsAllowed();
-    await this.unsetPortfolioFiatPair();
     await this.unsetBringSandbox();
+    for (const network of Object.values(networks)) {
+      // $FlowIgnore[incompatible-use]
+      await this.unsetPortfolioFiatPair(network.NetworkId);
+    }
   }
 
   getItem: string => Promise<?string> = key => getLocalItem(key);

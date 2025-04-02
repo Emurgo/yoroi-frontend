@@ -68,11 +68,11 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     request.execute();
   }
 
-  onSelectUnitOfAccount: string => Promise<void> = async value => {
+  onSelectUnitOfAccount: (number, string) => Promise<void> = async (networkId, value) => {
     const localStorageApi = new LocalStorageApi();
 
     const unitOfAccount = value === 'ADA' ? unitOfAccountDisabledValue : { enabled: true, currency: value };
-    localStorageApi.unsetPortfolioFiatPair();
+    await localStorageApi.unsetPortfolioFiatPair(networkId);
     await this.props.stores.profile.updateUnitOfAccount(unitOfAccount);
     await this.props.stores.transactions.updateUnitOfAccount();
   };
@@ -87,6 +87,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const profileStore = stores.profile;
     const coinPriceStore = stores.coinPriceStore;
     const { wallets, getCashbackWalletRequest } = stores.wallets;
+    const selectedWallet = stores.wallets.selected;
 
     const isSubmittingLocale = profileStore.setProfileLocaleRequest.isExecuting;
     const isSubmittingUnitOfAccount = profileStore.setUnitOfAccountRequest.isExecuting;
@@ -127,24 +128,30 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           onSelect={this.onSelectBringCashbackWallet}
           isSubmitting={false}
           // $FlowFixMe this is apparently correct, flow is out of its mind
-          cardanoWallets={wallets.filter(w=>w.type !== 'trezor')}
+          cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
           // $FlowFixMe this is apparently correct, flow is out of its mind
           currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
           isUseSandbox={profileStore.getBringSandboxRequest.result}
-          onSetUseSandbox={canUseSandbox ? (async (useSandbox) => {
-            await profileStore.setBringSandboxRequest.execute(useSandbox);
-            await profileStore.getBringSandboxRequest.execute();
-          }) : null}
+          onSetUseSandbox={
+            canUseSandbox
+              ? async useSandbox => {
+                  await profileStore.setBringSandboxRequest.execute(useSandbox);
+                  await profileStore.getBringSandboxRequest.execute();
+                }
+              : null
+          }
           error={null}
         />
-        <UnitOfAccountSettings
-          onSelect={this.onSelectUnitOfAccount}
-          isSubmitting={isSubmittingUnitOfAccount}
-          currencies={currencies}
-          currentValue={unitOfAccountValue}
-          error={profileStore.setUnitOfAccountRequest.error}
-          lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
-        />
+        {selectedWallet && (
+          <UnitOfAccountSettings
+            onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
+            isSubmitting={isSubmittingUnitOfAccount}
+            currencies={currencies}
+            currentValue={unitOfAccountValue}
+            error={profileStore.setUnitOfAccountRequest.error}
+            lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
+          />
+        )}
         <ThemeSettingsBlock />
         <AboutYoroiSettingsBlock
           wallet={stores.wallets.selected}
@@ -154,15 +161,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             })
           }
         />
-        {/* pop up dialogs */}
-        {
-          stores.uiDialogs.isOpen(SwitchNetworkDialogContainer) && (
-            <SwitchNetworkDialogContainer
-              stores={stores}
-            />
-          )
-        }
       </Box>
     );
-  }
+}
 }
