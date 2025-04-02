@@ -7,6 +7,7 @@ import type { CardanoHaskellBaseConfig, CardanoHaskellConfig, NetworkRow, TokenI
 import { fail } from '../../../../../../coreUtils';
 import type { WalletState } from '../../../../../../../chrome/extension/background/types';
 
+// <TODO:PENDING_REMOVAL>
 export const CardanoForks = Object.freeze({
   Haskell: 0,
 });
@@ -51,7 +52,6 @@ export const networks = Object.freeze({
     ]: CardanoHaskellBaseConfig),
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
-    isInProduction: true,
   }: NetworkRow),
   CardanoPreprodTestnet: ({
     NetworkId: 2_50,
@@ -134,12 +134,12 @@ export const networks = Object.freeze({
   }: NetworkRow),
 });
 
-export function listRelevantNetworkNamesForEnvironment(): Array<string> {
-  const keys = Object.keys(networks);
-  if (environment.isProduction() && !environment.isNightly()) {
-    return keys.filter(k => networks[k].isInProduction);
-  }
-  return keys;
+export function listRelevantNetworksForEnvironment(): Array<{| networkId: number, key: string |}> {
+  const isProduction = environment.isProduction() && !environment.isNightly();
+  const keys = isProduction
+    ? ['CardanoMainnet', 'CardanoPreprodTestnet']
+    : ['CardanoMainnet', 'CardanoPreprodTestnet', 'CardanoPreviewTestnet'];
+  return keys.map(key => ({ key, networkId: networks[key].NetworkId }))
 }
 
 export function isTestnet(
