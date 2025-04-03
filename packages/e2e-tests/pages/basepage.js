@@ -71,17 +71,25 @@ class BasePage {
   }
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
-    let element = await this.driver.findElement(getByLocator(locator));
-    try {
-      await element.click();
-    } catch (error) {
-      if (error.name === 'StaleElementReferenceError') {
-        this.logger.info(`BasePage::click Re-try because of StaleElementReferenceError`);
-        element = await this.driver.findElement(getByLocator(locator));
+    let success = false;
+    for (let clickAttempt = 0; clickAttempt < 5; clickAttempt++) {
+      const element = await this.driver.findElement(getByLocator(locator));
+      this.logger.info(`BasePage::click Attemp ${clickAttempt} to click`);
+      try {
         await element.click();
-      } else {
-        throw error;
+        success = true;
+        break;
+      } catch (error) {
+        if (error.name === 'StaleElementReferenceError') {
+          await this.sleep(150);
+          continue;
+        } else {
+          throw error;
+        }
       }
+    }
+    if (!success) {
+      throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`)
     }
   }
   async clickByScript(locator) {
