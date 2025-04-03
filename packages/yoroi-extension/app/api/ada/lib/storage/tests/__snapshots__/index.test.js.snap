@@ -1250,7 +1250,6 @@ Object {
       "NetworkFeatureName": "mainnet",
       "NetworkId": 0,
       "NetworkName": "Cardano Mainnet",
-      "isInProduction": true,
     },
     Object {
       "Backend": Object {

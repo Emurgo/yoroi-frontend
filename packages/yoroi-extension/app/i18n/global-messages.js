@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  notEnoughMoneyToSendError: {
+    id: 'api.errors.NotEnoughMoneyToSendError',
+    defaultMessage: '!!!Insufficient funds to complete this transaction.',
+  },
   receive: {
     id: 'global.receive',
     defaultMessage: '!!!Receive',
@@ -653,6 +657,10 @@ const globalMessages: * = defineMessages({
   txGeneration: {
     id: 'wallet.delegation.transaction.generation',
     defaultMessage: '!!!Generating transaction',
+  },
+  delegationById: {
+    id: 'wallet.navigation.delegationById',
+    defaultMessage: '!!!Delegation by Id',
   },
   poolFetching: {
     id: 'wallet.delegation.poolInfo.fetching',

@@ -4,7 +4,7 @@ import type { StoresProps } from '../../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import SwitchNetworkDialog from '../../../components/wallet/settings/SwitchNetworkDialog';
-import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks';
+import { listRelevantNetworksForEnvironment } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import globalMessages from '../../../i18n/global-messages';
 import { notifyDAppConnectionRemoved } from '../../../api/thunk';
 
@@ -17,13 +17,18 @@ const networkNames = Object.freeze({
   CardanoPreprodTestnet: globalMessages.preprod,
   CardanoPreviewTestnet: globalMessages.preview,
 });
-// type assertion to ensure we have all names:
-(networks: {| [$Keys<typeof networkNames>]: any |});
 
 @observer
 export default class SwitchNetworkDialogContainer extends Component<Props> {
   render(): Node {
     const profileStore = this.props.stores.profile;
+
+    const availableNetworks =
+      listRelevantNetworksForEnvironment()
+        .map(({ key, networkId }) => ({
+          id: networkId,
+          name: networkNames[key],
+        }));
 
     return (
       <SwitchNetworkDialog
@@ -37,10 +42,7 @@ export default class SwitchNetworkDialogContainer extends Component<Props> {
             window.location.reload();
           }
         }}
-        networks={Object.keys(networks).map(network => ({
-          id: networks[network].NetworkId,
-          name: networkNames[network],
-        }))}
+        networks={availableNetworks}
         currentNetworkId={profileStore.getCurrentNetworkId()}
       />
     );

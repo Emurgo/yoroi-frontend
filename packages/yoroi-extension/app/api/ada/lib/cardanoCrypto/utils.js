@@ -10,6 +10,11 @@ export function v4PublicToV2(
   return RustModule.WalletV2.PublicKey.from_hex(bytesToHex(v4Key.as_bytes()));
 }
 
+export function poolIdHexToBech32(hex: string): string {
+  return RustModule.WasmScope(Module =>
+    Module.WalletV4.Ed25519KeyHash.from_hex(hex).to_bech32('pool'));
+}
+
 export function addressHexToBech32(hex: string): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.Address.from_hex(hex).to_bech32());
