@@ -36,15 +36,23 @@ const messages = defineMessages({
   },
   update3: {
     id: 'wallet.revampAnnouncement.updates.3new',
-    defaultMessage: '!!!Trezor Safe 3 and Safe 5 support"',
+    defaultMessage: '!!!Trezor Safe 3 and Safe 5 support',
   },
   update4: {
     id: 'wallet.revampAnnouncement.updates.4new',
-    defaultMessage: '!!!Cashback service integration"',
+    defaultMessage: '!!!Cashback service integration',
   },
   update5: {
     id: 'wallet.revampAnnouncement.updates.5new',
-    defaultMessage: '!!!Yoroi DRep vote delegation"',
+    defaultMessage: '!!!Yoroi DRep vote delegation',
+  },
+  update6: {
+    id: 'wallet.revampAnnouncement.updates.6new',
+    defaultMessage: '!!!Network Switch feature (can use wallets on Cardano Preprod testing network with test TADA)',
+  },
+  update7: {
+    id: 'wallet.revampAnnouncement.updates.7new',
+    defaultMessage: '!!!Side menu scroll',
   },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
@@ -56,6 +64,19 @@ type Props = {|
   lastAnnouncedFeatureVersion: string,
   onClose: void => void,
 |};
+
+const ANNOUNCEMENT_MESSAGES: Array<[string, Object]> = [
+  ['5.5.0', messages.update1],
+  ['5.5.0', messages.update2],
+  ['5.5.0', messages.update3],
+  ['5.6.0', messages.update4],
+  ['5.6.0', messages.update5],
+  ['5.7.0', messages.update6],
+  ['5.7.0', messages.update7],
+];
+
+export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =
+  ANNOUNCEMENT_MESSAGES[ANNOUNCEMENT_MESSAGES.length-1][0];
 
 @observer
 export class RevampAnnouncementDialog extends Component<Props> {
@@ -74,13 +95,12 @@ export class RevampAnnouncementDialog extends Component<Props> {
       },
     ];
 
-    const updates = [];
-    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.5.0')) {
-      updates.push(messages.update1, messages.update2, messages.update3);
-    }
-    if (lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, '5.6.0')) {
-      updates.push(messages.update4, messages.update5);
-    }
+    /*
+     * Take only announcement messages not announced yet
+     */
+    const updates = ANNOUNCEMENT_MESSAGES
+      .filter(([v]) => lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, v))
+      .map(([,msg]) => msg);
 
     return (
       <Dialog
