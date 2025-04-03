@@ -269,6 +269,7 @@ export async function getConnectedWallet(
   tabId: number, syncConnectedWallet: boolean
 ): Promise<PublicDeriver<>> {
   const db = await getDb();
+  // should we filter by current network?
   const wallets = await getWallets({ db });
   const connected = await getConnectedSite(tabId);
   if (!connected) {

@@ -91,7 +91,6 @@ export type NetworkRow = {|
    * To differentiate these, we need some identifier of the fork
    */
   Fork: number,
-  isInProduction?: boolean,
 |};
 export const NetworkSchema: {|
   +name: 'Network',

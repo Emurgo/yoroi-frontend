@@ -39,7 +39,10 @@ export default class WalletStore extends Store<StoresMap> {
   ON_VISIBLE_DEBOUNCE_WAIT: number = 1000;
 
   @observable wallets: Array<WalletState> = [];
+
+  // <TODO:PENDING_REMOVAL> should always use pubkey for wallet selection
   @observable selectedIndex: null | number = null;
+
   // mobx is not smart enough to update the wallet name on the nav bar without this
   @observable selectedWalletName: null | string = null;
 

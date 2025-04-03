@@ -20,6 +20,7 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
 import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 import links from '../../../../../links';
+import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -114,18 +115,22 @@ export const GovernanceStatusSelection = () => {
     try {
       setLoadingUnsignTx(true);
       startLoading();
-      setTimeout(async () => {
-        await createDrepDelegationTransaction(kind);
-        navigateTo.delegationForm();
-        setLoadingUnsignTx(false);
-        setError(null);
-      }, 200);
+      await createDrepDelegationTransaction(kind);
+      navigateTo.delegationForm();
+      setError(null);
     } catch (e) {
-      setError('Error trying to Vote. Please try again later');
+      if (e instanceof NotEnoughMoneyToSendError) {
+        setError(strings.notEnoughMoneyToSendError);
+      } else {
+        setError('Error trying to Vote. Please try again later');
+      }
       closeModal();
+    } finally {
       setLoadingUnsignTx(false);
     }
   };
+
+  const isParticipatingInGovernance = governanceStatus.status != null && governanceStatus.status !== 'none';
 
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
@@ -186,7 +191,7 @@ export const GovernanceStatusSelection = () => {
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
-  if (walletAdaBalance !== null && walletAdaBalance === 0) {
+  if (!isParticipatingInGovernance && (walletAdaBalance !== null && walletAdaBalance === 0)) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
     return (
@@ -201,7 +206,7 @@ export const GovernanceStatusSelection = () => {
           textAlign="center"
           color="ds.text_gray_medium"
         >
-          To participate in governance you need to have ADA in your wallet.
+          {strings.needAdaForParticipation}
         </Typography>
         {/* @ts-ignore */}
         <Button variant="primary"

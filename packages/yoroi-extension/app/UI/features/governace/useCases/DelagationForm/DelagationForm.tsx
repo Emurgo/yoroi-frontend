@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
-import { genFormatTokenAmount, genLookupOrFail } from '../../../../../stores/stateless/tokenHelpers';
+import { genFormatTokenAmount, genLookupOrFail, getTokenName } from '../../../../../stores/stateless/tokenHelpers';
 import { Collapsible } from '../../../../components/Collapsible/Collapsible';
 import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
@@ -15,6 +15,8 @@ import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
 import { maybe } from '../../../../../coreUtils'
+import { truncateToken } from '../../../../../utils/formatters';
+import { getDefaultAssetByWallet } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 const Container = styled(Box)(() => ({
   paddingTop: '23px',
@@ -62,6 +64,9 @@ export const DelagationForm = () => {
     getFormattedPairingAmount,
     isHardwareWallet,
   } = useGovernance();
+
+  const defaultAsset = getDefaultAssetByWallet(selectedWallet);
+  const defaultTokenName = truncateToken(getTokenName(defaultAsset));
 
   React.useEffect(() => {
     if (txDelegationResult != null) {
@@ -130,7 +135,7 @@ export const DelagationForm = () => {
           </Typography>
           <Box textAlign="right">
             <Typography variant="h4" fontWeight="500" color="ds.white_static">
-              {txFee} ADA
+              {txFee} {defaultTokenName}
             </Typography>
             <Typography variant="body2" color="ds.white_static" sx={{ opacity: '0.5' }}>
               {String(getFormattedPairingAmount(String(Number(txFee) * 1000000)))}
@@ -147,29 +152,41 @@ export const DelagationForm = () => {
             content={
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
-                  <OperationInfo label={(
-                    <>
-                      <Typography variant="body1" color="ds.text_gray_medium">
-                        Delegate voting to DRep (CIP 129): {normalizedDrep}
-                      </Typography>
-                      {specifiedDrep !== normalizedDrep ? (
+                  <OperationInfo
+                    label={(
+                      <>
                         <Typography variant="body1" color="ds.text_gray_medium">
-                          Specified as: {specifiedDrep}
+                          Delegate voting to DRep (CIP 129): {normalizedDrep}
                         </Typography>
-                      ) : null}
-                      {isHardwareWallet && (preCip129Drep !== specifiedDrep) ? (
-                        <Typography variant="body1" color="ds.text_gray_medium">
-                          On a Hardware device this DRep ID might be displayed in old format: {preCip129Drep}
-                        </Typography>
-                      ) : null}
-                    </>
-                  )} fee={txFee} />
+                        {specifiedDrep !== normalizedDrep ? (
+                          <Typography variant="body1" color="ds.text_gray_medium">
+                            Specified as: {specifiedDrep}
+                          </Typography>
+                        ) : null}
+                        {isHardwareWallet && (preCip129Drep !== specifiedDrep) ? (
+                          <Typography variant="body1" color="ds.text_gray_medium">
+                            On a Hardware device this DRep ID might be displayed in old format: {preCip129Drep}
+                          </Typography>
+                        ) : null}
+                      </>
+                    )}
+                    fee={txFee}
+                    defaultTokenName={defaultTokenName}
+                  />
                 )}
                 {governanceVote.kind === DREP_ALWAYS_ABSTAIN && (
-                  <OperationInfo label={strings.selectAbstein} fee={txFee} />
+                  <OperationInfo
+                    label={strings.selectAbstein}
+                    fee={txFee}
+                    defaultTokenName={defaultTokenName}
+                  />
                 )}
                 {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
-                  <OperationInfo label={strings.selectNoConfidence} fee={txFee} />
+                  <OperationInfo
+                    label={strings.selectNoConfidence}
+                    fee={txFee}
+                    defaultTokenName={defaultTokenName}
+                  />
                 )}
               </TransactionDetails>
             }
@@ -211,9 +228,10 @@ export const DelagationForm = () => {
 type OperationInfoProps = {
   label: string | JSX.Element;
   fee: string;
+  defaultTokenName: string;
 };
 
-const OperationInfo = ({ label, fee }: OperationInfoProps) => {
+const OperationInfo = ({ label, fee, defaultTokenName }: OperationInfoProps) => {
   return (
     <>
       {typeof label === 'string' ? (
@@ -226,7 +244,7 @@ const OperationInfo = ({ label, fee }: OperationInfoProps) => {
           Transaction fee
         </Typography>
         <Typography variant="body1" color="ds.text_gray_max">
-          {fee} ADA
+          {fee} {defaultTokenName}
         </Typography>
       </Stack>
     </>

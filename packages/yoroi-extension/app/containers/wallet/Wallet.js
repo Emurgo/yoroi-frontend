@@ -14,7 +14,7 @@ import globalMessages from '../../i18n/global-messages';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SubMenu from '../../components/topbar/SubMenu';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
-import { RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
+import { TOP_RECENT_ANNOUNCEMENT_VERSION, RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
@@ -37,7 +37,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     if (lastAnnouncedVersion == null) {
       return;
     }
-    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, '5.6.0')) {
+    if (lastAnnouncedVersion === '' || semver.lt(lastAnnouncedVersion, TOP_RECENT_ANNOUNCEMENT_VERSION)) {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
     }
 
@@ -209,7 +209,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
           lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
           // $FlowIgnore[incompatible-type]
           onClose={async () => {
-            await stores.profile.setLastAnnouncedFeatureVersion('5.6.0');
+            await stores.profile.setLastAnnouncedFeatureVersion(TOP_RECENT_ANNOUNCEMENT_VERSION);
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
         />
