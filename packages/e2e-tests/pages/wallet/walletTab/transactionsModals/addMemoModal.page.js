@@ -1,3 +1,4 @@
+import { fiveSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
 import BasePage from '../../../basepage.js';
 
 class AddMemoDialog extends BasePage {
@@ -67,6 +68,14 @@ class AddMemoDialog extends BasePage {
   async pressAdd() {
     this.logger.info(`AddMemoDialog::pressAdd is called.`);
     await this.click(this.addMemoDialogAddButtonLocator);
+  }
+  async modalIsClosed() {
+    this.logger.info(`AddMemoDialog::modalIsClosed is called.`);
+    return await this.customWaitIsNotPresented(
+      this.addMemoDialogWindowLocator,
+      fiveSeconds,
+      quarterSecond
+    );
   }
 }
 

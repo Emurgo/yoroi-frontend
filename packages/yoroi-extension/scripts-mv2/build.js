@@ -19,6 +19,7 @@ process.env.NODE_CONFIG_ENV = argv.env;
 // this is hack to prevent `config` from loading `test.json` when the host name is "test"
 process.env.HOST = 'no such named config file';
 const isNightly = argv.nightly != null;
+const isE2E = argv.isE2E != null;
 const shouldInjectConnector = argv.dontInjectConnector === undefined;
 
 export function buildProd(env: string) {
@@ -33,7 +34,7 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`npx webpack --config webpack-mv2/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()}`);
+  exec(`npx webpack --config webpack-mv2/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()}`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');
@@ -98,7 +99,8 @@ export function buildDev(env: string) {
   const webpackConfig = config.contentScriptConfig(
     argv.env,
     isNightly,
-    !shouldInjectConnector
+    !shouldInjectConnector,
+    isE2E,
   );
   const server = new WebpackDevServer(webpackConfig.devServer, Webpack(webpackConfig));
   server.start();

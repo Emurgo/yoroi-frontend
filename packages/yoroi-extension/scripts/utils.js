@@ -7,6 +7,7 @@ const { injectedScripts } = require('../chrome/constants');
 
 const shouldInjectConnector: boolean = argv.dontInjectConnector === undefined;
 const isNightly: boolean = argv.nightly != null;
+const isE2E: boolean = argv.isE2E != null;
 
 const exec: string => void = cmd => {
   const r = shell.exec(cmd);
@@ -39,4 +40,4 @@ const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
   }
 };
 
-module.exports = { exec, argv, shouldInjectConnector, isNightly, buildAndCopyInjector };
+module.exports = { exec, argv, shouldInjectConnector, isNightly, isE2E, buildAndCopyInjector };

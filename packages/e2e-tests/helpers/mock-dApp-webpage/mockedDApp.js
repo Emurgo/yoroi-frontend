@@ -209,6 +209,10 @@ export class MockDAppWebpage {
     this.logger.info(`MockDApp::addOnDisconnect onDisconnect hook is set`);
   }
 
+  /**
+   * Wallet connection to the MockedDApp is enabled
+   * @returns {Promise<{success: boolean, retValue: any, errMsg: any}>}
+   */
   async isEnabled() {
     await this.driver.sleep(100);
     this.logger.info(`MockDApp::isEnabled Checking is a wallet enabled`);

@@ -14,15 +14,16 @@ import { ReactComponent as mediumSvg } from '../../../../assets/images/social/me
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
 import { handleExternalLinkClick } from '../../../../utils/routing';
-import { Box, Button, IconButton, Link, styled, Typography } from '@mui/material';
+import { Box, Button, Link, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
-import { Icon } from '../../../../UI/components';
+import { IconWrapper } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Icons } from '../../../../UI/components/icons';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -146,22 +147,19 @@ const socialMediaLinks = [
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
-
-
-
 export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
-  const { openModal, closeModal } = useModal()
+  const { openModal, closeModal } = useModal();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
   const getNetworkValue = () => {
     const networkId = wallet && wallet.networkId;
     switch (networkId) {
       case networks.CardanoPreprodTestnet.NetworkId:
-        return intl.formatMessage(messages.preprod)
+        return intl.formatMessage(messages.preprod);
       case networks.CardanoPreviewTestnet.NetworkId:
-        return intl.formatMessage(messages.preview)
+        return intl.formatMessage(messages.preview);
       default:
-        return intl.formatMessage(messages.mainnet)
+        return intl.formatMessage(messages.mainnet);
     }
   };
 
@@ -172,20 +170,19 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
       if (!wallet.isTestnet && !isTestnetModalDisplayed) {
         openModal({
           title: intl.formatMessage(messages.modalTitle),
-          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
+          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
           width: '648px',
           height: '360px',
+          modalId: 'testNetworkInfoModal',
         });
       }
-    })()
-  }, [])
-
+    })();
+  }, []);
 
   const onCloseModalInfo = useCallback(async () => {
     await localStorageApi.setTestnetModalDisplayed(true);
-    closeModal()
+    closeModal();
   }, [localStorageApi]);
-
 
   return (
     <Box
@@ -247,6 +244,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         onClick={onSwitchNetwork}
         variant="secondary"
         style={{ width: '200px' }}
+        id={basePageComponentPath + '-switchNetwork-button'}
       >
         {intl.formatMessage(messages.switchNetwork)}
       </Button>
@@ -265,26 +263,9 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
       </div>
     </Box>
   );
+};
 
-}
-
-const IconWrapper = styled(IconButton)(({ theme }) => ({
-  cursor: 'pointer',
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_medium,
-    },
-  },
-}));
-
-const LabelWithValue = ({
-  label,
-  value,
-  url,
-  componentId,
-  showInfoToolTip,
-  handleTooltip,
-}) => {
+const LabelWithValue = ({ label, value, url, componentId, showInfoToolTip, handleTooltip }) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -294,10 +275,10 @@ const LabelWithValue = ({
         component="div"
         {...(url
           ? {
-            as: Link,
-            href: url,
-            target: '_blank',
-          }
+              as: Link,
+              href: url,
+              target: '_blank',
+            }
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
@@ -306,13 +287,7 @@ const LabelWithValue = ({
       >
         {value}
       </Typography>
-      {
-        showInfoToolTip &&
-        <IconWrapper onClick={handleTooltip}>
-          <Icon.Info />
-        </IconWrapper>
-      }
-    </Box >
+      {showInfoToolTip && <IconWrapper icon={Icons.InfoCircle} onClick={handleTooltip} asButton />}
+    </Box>
   );
-}
-
+};
