@@ -1,4 +1,4 @@
-import { Button, IconButton, Stack, Typography, styled } from '@mui/material';
+import { Button, Stack, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -7,7 +7,7 @@ import LocalStorageApi from '../../../api/localStorage/index';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import { YOROI_DREP_ID } from '../../features/governace/common/constants';
-import { Icon } from '../icons';
+import { IconWrapper, Icons } from '../icons';
 import { Ilustration } from './Ilustration';
 
 const Container = styled(Stack)(({ theme }: any) => ({
@@ -15,16 +15,6 @@ const Container = styled(Stack)(({ theme }: any) => ({
   borderRadius: '8px',
   height: '154px',
   marginBottom: '24px',
-}));
-
-const IconWrapper = styled(IconButton)(({ theme }: any) => ({
-  borderColor: theme.palette.ds.el_gray_max,
-
-  '& svg': {
-    '& path': {
-      fill: theme.palette.ds.el_gray_max,
-    },
-  },
 }));
 
 const HIDE_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 1 month in milliseconds
@@ -107,9 +97,13 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
       <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
-        <IconWrapper onClick={dismissBanner}>
-          <Icon.CloseCircleIcon />
-        </IconWrapper>
+        <IconWrapper
+          onClick={dismissBanner}
+          icon={Icons.CloseCircleIcon}
+          color="ds.el_gray_max"
+          borderColor="ds.el_gray_max"
+          asButton
+        />
       </Stack>
 
       <Stack direction="column" p="16px" alignItems="flex-start">

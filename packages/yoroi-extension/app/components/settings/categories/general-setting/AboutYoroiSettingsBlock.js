@@ -22,10 +22,12 @@ import { Box, Button, Link, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
+import { IconWrapper } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { Icons } from '../../../../UI/components/icons';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -276,6 +278,8 @@ function LabelWithValue({
   value,
   url,
   componentId,
+  showInfoToolTip,
+  handleTooltip,
 }: {|
   label: string,
   value: string,
@@ -303,6 +307,7 @@ function LabelWithValue({
       >
         {value}
       </Typography>
+      {showInfoToolTip && <IconWrapper icon={Icons.InfoCircle} onClick={handleTooltip} asButton />}
     </Box>
   );
 }

@@ -33,6 +33,7 @@ import AmountDisplay from '../../../components/common/AmountDisplay';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { ReactComponent as ExclamationIcon } from '../../../assets/images/testnet-exclamation-circle.svg';
+import { NETWORK_BADGES } from '../../../containers/NavBarContainerRevamp';
 
 const messages = defineMessages({
   subtitle: {
@@ -81,7 +82,7 @@ const messages = defineMessages({
   },
   testnetWarningText: {
     id: 'connector.connect.testnetWarningText',
-    defaultMessage: '!!!This DApp may not support Cardano Preprod (test blockhain network). Ensure it supports Preprod before connecting.',
+    defaultMessage: '!!!This DApp may not support Cardano {networkName} (test blockchain network). Ensure it supports {networkName} before connecting.',
   },
   cashbackApplyAll: {
     id: 'connector.connect.cashback.apply.all',
@@ -277,6 +278,8 @@ export default class ConnectPage extends Component<Props> {
       </Box>
     );
 
+    const networkName = NETWORK_BADGES[networkId]?.text;
+
     return (
       <div className={componentClasses}>
         {hasWallets ? (
@@ -340,7 +343,7 @@ export default class ConnectPage extends Component<Props> {
                         {intl.formatMessage(messages.testnetWarningTitle)}
                       </TestnetWarningTitle>
                       <Typography>
-                        {intl.formatMessage(messages.testnetWarningText)}
+                        {intl.formatMessage(messages.testnetWarningText, { networkName })}
                       </Typography>
                     </TestnetWarningBox>
                   )}
