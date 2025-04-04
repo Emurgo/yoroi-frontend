@@ -4,14 +4,6 @@ import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
-    copyToClipboard: {
-      id: 'widgets.copyableaddress.addressCopyTooltipMessage',
-      defaultMessage: '!!!Copy to clipboard',
-    },
-    copied: {
-      id: 'widgets.copyableaddress.copied',
-      defaultMessage: '!!!Copied',
-    },
     tolatValue: {
       id: 'transaction.review.tolatValue',
       defaultMessage: '!!!Total wallet value',
@@ -142,8 +134,6 @@ export const messages = Object.freeze(
 export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
-    copyToClipboard: intl.formatMessage(messages.copyToClipboard),
-    copied: intl.formatMessage(messages.copied),
     tolatValue: intl.formatMessage(messages.tolatValue),
     confirmHardware: intl.formatMessage(messages.confirmHardware),
     takeHardwareWallet: intl.formatMessage(messages.takeHardwareWallet),
