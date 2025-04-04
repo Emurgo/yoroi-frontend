@@ -179,20 +179,21 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
       }
     };
 
-    useEffect(() => {
-      // eslint-disable-next-line
-      (async () => {
-        const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
-        if (!isTestnet && !isTestnetModalDisplayed) {
-          openModal({
-            title: intl.formatMessage(messages.modalTitle),
-            content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
-            width: '648px',
-            height: '360px',
-          });
-        }
-      })()
-    }, [])
+  useEffect(() => {
+    // eslint-disable-next-line
+    (async () => {
+      const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
+      if (!wallet.isTestnet && !isTestnetModalDisplayed) {
+        openModal({
+          title: intl.formatMessage(messages.modalTitle),
+          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
+          width: '648px',
+          height: '360px',
+          modalId: 'testNetworkInfoModal',
+        });
+      }
+    })();
+  }, []);
 
     const onCloseModalInfo = useCallback(async () => {
       await localStorageApi.setTestnetModalDisplayed(true);
@@ -256,13 +257,14 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
           )}
         </Box>
 
-        <Button
-          onClick={this.props.onSwitchNetwork}
-          variant="secondary"
-          style={{ width: '200px' }}
-        >
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
+      <Button
+        onClick={this.props.onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+        id={basePageComponentPath + '-switchNetwork-button'}
+      >
+        {intl.formatMessage(messages.switchNetwork)}
+      </Button>
 
         <div className={styles.aboutSocial}>
           <GridFlexContainer rowSize={socialMediaLinks.length}>

@@ -183,12 +183,12 @@ export class TransactionsSubTab extends WalletTab {
     this.logger.info(`TransactionsSubTab::isDisplayed is called`);
     const submenuStatePromise = this.customWaitIsPresented(
       this.transactionsSubmenuItemLocator,
-      fiveSeconds,
+      defaultWaitTimeout,
       quarterSecond
     );
     const summaryStatePromise = this.customWaitIsPresented(
       this.walletSummaryBoxLocator,
-      fiveSeconds,
+      defaultWaitTimeout,
       quarterSecond
     );
     const [submenuState, summaryState] = await Promise.all([
