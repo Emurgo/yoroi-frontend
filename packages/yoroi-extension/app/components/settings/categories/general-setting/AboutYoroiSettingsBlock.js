@@ -22,12 +22,11 @@ import { Box, Button, Link, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
-import { IconWrapper } from '../../../../UI/components';
+import { IconWrapper, Icons } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-import { Icons } from '../../../../UI/components/icons';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -220,6 +219,15 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
             <LabelWithValue
               label={intl.formatMessage(messages.networkLabel)}
               value={getNetworkValue()}
+              showInfoToolTip
+              handleTooltip={() => {
+                openModal({
+                  title: intl.formatMessage(messages.modalTitle),
+                  content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal()} />,
+                  width: '648px',
+                  height: '360px',
+                });
+              }}
               componentId={basePageComponentPath + '-networkInfo-text'}
             />
           )}
@@ -285,6 +293,8 @@ function LabelWithValue({
   value: string,
   url?: string,
   componentId?: string,
+  showInfoToolTip?: boolean,
+  handleTooltip?: () => void,
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -314,4 +324,7 @@ function LabelWithValue({
 
 LabelWithValue.defaultProps = {
   url: undefined,
+  componentId: undefined,
+  showInfoToolTip: undefined,
+  handleTooltip: undefined,
 };

@@ -110,7 +110,7 @@ export default class DelegationStore extends Store<StoresMap> {
         }
       }
     }
-  });
+  );
 
   @observable poolInfo: Array<{|
     // it's possible somebody creates a pool with the same ID on a testnet, etc. so we need this key
