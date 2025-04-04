@@ -28,18 +28,19 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 }));
 
 export const ModalManager = () => {
-  const { height, width, closeModal, content, title, isOpen } = useModal();
+  const { height, width, closeModal, content, title, isOpen, modalId } = useModal();
 
   return (
     <BootstrapDialog
       onClose={closeModal}
-      aria-labelledby={`${title}-dialog-title`}
+      aria-labelledby={`${modalId}-dialogWindow-modalWindow`}
       open={isOpen}
       fullWidth
       width={width}
       height={height}
+      id={`${modalId}-dialogWindow-presentation`}
     >
-      <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${title}-dialog-title`}>
+      <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${modalId}-modalTitle-text`}>
         <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900">
           {title}
         </Typography>
@@ -58,6 +59,7 @@ export const ModalManager = () => {
             top: 22,
           },
         }}
+        id={`${modalId}-closeModal-button`}
       />
       <DialogContent>{content}</DialogContent>
     </BootstrapDialog>

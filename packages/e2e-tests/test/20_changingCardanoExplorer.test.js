@@ -17,7 +17,7 @@ describe('Changing explorer', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await prepareWallet(webdriver, logger, 'testWallet1', this)
+    await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false)
   });
 
   const testData = [

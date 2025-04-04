@@ -39,33 +39,37 @@ class SettingsTab extends WalletCommonBase {
   };
 
   // functions
+  async scrollAndClick(elementLocator) {
+    await this.scrollIntoView(elementLocator);
+    await this.click(elementLocator);
+  }
   async goToGeneralSubMenu() {
     this.logger.info(`SettingsTab::goToGeneralSubMenu is called`);
     await this.click(this.generalSubmenuItemLocator);
   }
   async goToBlockchainSubMenu() {
     this.logger.info(`SettingsTab::goToBlockchainSubMenu is called`);
-    await this.click(this.blockchainSubmenuItemLocator);
+    await this.scrollAndClick(this.blockchainSubmenuItemLocator);
   }
   async goToWalletSubMenu() {
     this.logger.info(`SettingsTab::goToWalletSubMenu is called`);
-    await this.click(this.walletSubmenuItemLocator);
+    await this.scrollAndClick(this.walletSubmenuItemLocator);
   }
   async goToTOSSubMenu() {
     this.logger.info(`SettingsTab::goToTOSSubMenu is called`);
-    await this.click(this.tosSubmenuItemLocator);
+    await this.scrollAndClick(this.tosSubmenuItemLocator);
   }
   async goToSupportSubMenu() {
     this.logger.info(`SettingsTab::goToSupportSubMenu is called`);
-    await this.click(this.supportSubmenuItemLocator);
+    await this.scrollAndClick(this.supportSubmenuItemLocator);
   }
   async goToComplexitySubMenu() {
     this.logger.info(`SettingsTab::goToComplexitySubMenu is called`);
-    await this.click(this.complexitySubmenuItemLocator);
+    await this.scrollAndClick(this.complexitySubmenuItemLocator);
   }
   async goToAnalyticsSubMenu() {
     this.logger.info(`SettingsTab::goToAnalyticsSubMenu is called`);
-    await this.click(this.analyticsSubmenuItemLocator);
+    await this.scrollAndClick(this.analyticsSubmenuItemLocator);
   }
   /**
    * Returns text from the General tab from Settings

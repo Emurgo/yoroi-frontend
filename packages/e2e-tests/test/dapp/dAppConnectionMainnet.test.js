@@ -1,77 +1,54 @@
 import BasePage from '../../pages/basepage.js';
-import { getDriver } from '../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../utils/customHooks.js';
-import InitialStepsPage from '../../pages/initialSteps.page.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
-import { restoreWallet } from '../../helpers/restoreWalletHelper.js';
-import {
-  WindowManager,
-  extensionTabName,
-  mockDAppName,
-  popupConnectorName,
-} from '../../helpers/windowManager.js';
+import { WindowManager, extensionTabName, mockDAppName } from '../../helpers/windowManager.js';
 import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
-import DAppConnectWallet from '../../pages/dapp/dAppConnectWallet.page.js';
-import { collectInfo } from '../../helpers/restoreWalletHelper.js';
+import driversPoolsManager from '../../utils/driversPool.js';
+import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
-describe('dApp, connection, no wallets', function () {
+describe('dApp, mainnet, connection in extension,', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
 
   before(async function () {
     try {
-      webdriver = getDriver();
       mockServer = await getMockServer({});
       logger = getTestLogger(this.test.parent.title);
+      webdriver = await driversPoolsManager.getDriverFromPool();
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-      const dappLogger = getTestLogger('dApp', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
-      const basePage = new BasePage(webdriver, logger);
-      // first open the dapp page
-      basePage.goToUrl(mockDAppUrl);
       await windowManager.init();
+      const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      await preloadDBAndStorage(webdriver, logger, 'testWallet1Mainnet', false);
+      await waitTxPage(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
     }
   });
 
-  it('Request connection', async function () {
-    await mockedDApp.requestAccess();
-    const dappConnectPage = new DAppConnectWallet(webdriver, logger);
-    const popUpAppeared = await dappConnectPage.popUpIsDisplayed(windowManager);
-    expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
+  it('Open a dapp page', async function () {
+    await windowManager.openNewTab(mockDAppName, mockDAppUrl);
   });
 
-  it('No wallets are displayed', async function () {
-    const dappConnectPage = new DAppConnectWallet(webdriver, logger);
-    const warningIsDisplayed = await dappConnectPage.noWalletsWarningIsDisplayed();
-    expect(warningIsDisplayed).to.be.true;
-    await dappConnectPage.clickCreateWallet();
-    const popUpIsClosed = await windowManager.isClosed(popupConnectorName);
-    expect(popUpIsClosed).to.be.true;
-  });
-
-  it('Pass initials steps and restore a wallet', async function () {
-    await windowManager.findNewWindowAndSwitchTo(extensionTabName);
-    const initialStepsPage = new InitialStepsPage(webdriver, logger);
-    await initialStepsPage.skipInitialSteps();
-    await restoreWallet(webdriver, logger, testWallet1);
-  });
-
-  it('Try to connect the dapp the wallet again', async function () {
-    await windowManager.switchTo(mockDAppName);
+  it('Connect the wallet to the dapp', async function () {
     await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet1);
   });
 
@@ -85,6 +62,19 @@ describe('dApp, connection, no wallets', function () {
     const connectedWalletInfo = await connectorTabPage.getConnectedWalletInfo(testWallet1.name);
     expect(connectedWalletInfo.walletBalance).to.equal(testWallet1.balance);
     expect(connectedWalletInfo.dappUrl).to.equal('localhost');
+  });
+
+  it('Disconnect the wallet', async function () {
+    const connectorTabPage = new ConnectorTab(webdriver, logger);
+    await connectorTabPage.disconnectWallet(testWallet1.name, 'localhost');
+    const connectedWalletsAmount = (await connectorTabPage.getAllConnectedWallets()).length;
+    expect(connectedWalletsAmount).to.equal(0);
+  });
+
+  it('Check connection state in the dApp', async function () {
+    await windowManager.switchTo(mockDAppName);
+    const connectionSate = await mockedDApp.isEnabled();
+    expect(connectionSate.retValue, 'Wallet is still connected').to.be.false;
   });
 
   afterEach(function (done) {

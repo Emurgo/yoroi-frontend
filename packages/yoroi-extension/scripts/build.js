@@ -3,7 +3,7 @@
 const tasks = require('./tasks');
 const {
   exec, argv, shouldInjectConnector,
-  isNightly, buildAndCopyInjector,
+  isNightly, isE2E, buildAndCopyInjector,
 } = require('./utils');
 
 // override NODE_ENV for ConfigWebpackPlugin
@@ -21,7 +21,7 @@ function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()}`);
+  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()}`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');

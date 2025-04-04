@@ -13,6 +13,7 @@ import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import StakingTab from '../pages/wallet/stakingTab/stakingTab.page.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
+import { pageTitle } from '../helpers/pageTitles.js';
 
 describe('Creating wallet', function () {
   this.timeout(2 * oneMinute);
@@ -83,6 +84,8 @@ describe('Creating wallet', function () {
     await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
+    const titleIsCorrect = await transactionsPage.titleIsCorrect();
+    expect(titleIsCorrect, `Title is different from "${pageTitle.wallet}"`).to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
     expect(walletInfo.balance, 'The wallet balance should be 0 (zero)').to.equal(0);
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
@@ -111,13 +114,24 @@ describe('Creating wallet', function () {
     expect(interAddrsAmount, 'A wrong amount of internal addresses').to.equal(1);
   });
 
-  it('Check wallet is not delegated', async function () {
+  it('Check Staking page', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToStakingTab();
     const stakingPage = new StakingTab(webdriver, logger);
-    const walletIsNotDelegatedState = await stakingPage.walletIsNotDelegated();
-    expect(walletIsNotDelegatedState, 'There is no banner "Wallet is not delegated"').to.be.true;
+    const titleIsCorrect = await stakingPage.titleIsCorrect();
+    expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
+    const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
+    expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;
   });
+
+  // check banners on Transactions page
+  // Portfolio Start your crypto jounrney banner
+  // No NFTs banner on nfts page
+  // Not enough funds for voting
+  // "You don't have any websites connected yet" banner on Connector page
+  // Governance
+  // Cashback banner
+  // Settings testnets banner
 
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);

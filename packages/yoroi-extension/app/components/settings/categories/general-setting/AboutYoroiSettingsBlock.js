@@ -173,6 +173,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
           content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
           width: '648px',
           height: '360px',
+          modalId: 'testNetworkInfoModal',
         });
       }
     })();
@@ -239,7 +240,12 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
         )}
       </Box>
 
-      <Button onClick={onSwitchNetwork} variant="secondary" style={{ width: '200px' }}>
+      <Button
+        onClick={onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+        id={basePageComponentPath + '-switchNetwork-button'}
+      >
         {intl.formatMessage(messages.switchNetwork)}
       </Button>
 
