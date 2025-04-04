@@ -130,6 +130,8 @@ describe('Creating wallet', function () {
   // Not enough funds for voting
   // "You don't have any websites connected yet" banner on Connector page
   // Governance
+  // Cashback banner
+  // Settings testnets banner
 
   afterEach(function (done) {
     customAfterEach(this, webdriver, logger);

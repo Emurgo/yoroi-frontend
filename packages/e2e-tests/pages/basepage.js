@@ -741,6 +741,18 @@ class BasePage {
       await this.saveToLocalStorage(commonStorageKey, commonStorageSnaphot[commonStorageKey]);
     }
   }
+  /**
+   * Setting info into the browser local storage
+   * @param {string} templateName 
+   * @param {boolean} useGeneralStorageInfo 
+   */
+  async prepareBrowserLocalStorage(templateName, useGeneralStorageInfo) {
+    const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
+    for (const storageKey in browserStorageSnapshot) {
+      await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
+    }
+  }
 }
 
 export default BasePage;

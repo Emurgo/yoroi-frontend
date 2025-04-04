@@ -41,7 +41,7 @@ describe('Removing the first wallet, two wallets is added', function () {
   it('Switch back to the test wallet 1', async function () {
     const walletCommonBasePage = new WalletCommonBase(webdriver, logger);
     await walletCommonBasePage.switchToFirstWallet();
-    checkCorrectWalletIsDisplayed(webdriver, logger, testWallet1, false);
+    checkCorrectWalletIsDisplayed(webdriver, logger, testWallet1);
   });
 
   it('Remove wallet', async function () {
@@ -57,7 +57,7 @@ describe('Removing the first wallet, two wallets is added', function () {
 
   // check that we are returned to the second wallet
   it('Checking the app state after removing the wallet', async function () {
-    await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet2, false);
+    await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet2);
   });
 
   afterEach(function (done) {
