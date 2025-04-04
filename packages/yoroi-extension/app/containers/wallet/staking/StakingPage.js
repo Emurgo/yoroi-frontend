@@ -29,9 +29,6 @@ import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/
 export const StakingPageContentPromise: void => Promise < any > = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
 
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
-
 @observer
 class StakingPage extends Component<StoresProps> {
   static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
