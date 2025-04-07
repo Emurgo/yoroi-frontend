@@ -14,7 +14,8 @@ type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
   publicPath?: string,
-  isLight: "true" | "false"
+  isLight: "true" | "false",
+  isE2E: "true" | "false",
 |};
 */
 const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
@@ -48,7 +49,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      JSON.parse(env.isLight)
+      JSON.parse(env.isLight),
+      JSON.parse(env.isE2E),
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
@@ -101,7 +103,8 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      JSON.parse(env.isLight)
+      JSON.parse(env.isLight),
+      JSON.parse(env.isE2E),
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
     new webpack.optimize.LimitChunkCountPlugin({
@@ -167,7 +170,8 @@ const bringContentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      JSON.parse(env.isLight)
+      JSON.parse(env.isLight),
+      JSON.parse(env.isE2E),
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

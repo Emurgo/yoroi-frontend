@@ -2,6 +2,7 @@
 
 import { defineMessages } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
+import globalMessages from '../../i18n/global-messages';
 
 const messages = defineMessages({
   serverStatusError: {
@@ -39,10 +40,6 @@ const messages = defineMessages({
   walletAlreadyImportedError: {
     id: 'api.errors.WalletAlreadyImportedError',
     defaultMessage: '!!!Wallet you are trying to import already exists.',
-  },
-  notEnoughMoneyToSendError: {
-    id: 'api.errors.NotEnoughMoneyToSendError',
-    defaultMessage: '!!!Insufficient funds to complete this transaction.',
   },
   cannotSendBelowMinimumValueError: {
     id: 'api.errors.CannotSendBelowMinimumValueError',
@@ -251,8 +248,8 @@ export class WalletAlreadyImportedError extends LocalizableError {
 export class NotEnoughMoneyToSendError extends LocalizableError {
   constructor() {
     super({
-      id: messages.notEnoughMoneyToSendError.id,
-      defaultMessage: messages.notEnoughMoneyToSendError.defaultMessage || '',
+      id: globalMessages.notEnoughMoneyToSendError.id,
+      defaultMessage: globalMessages.notEnoughMoneyToSendError.defaultMessage || '',
     });
   }
 }

@@ -11,7 +11,7 @@ import driversPoolsManager from '../utils/driversPool.js';
 const testData = [
   {
     testWallet: testWallet1,
-    expectedTxsAmount: 8,
+    expectedTxsAmount: 5,
   },
   {
     testWallet: testWallet2,

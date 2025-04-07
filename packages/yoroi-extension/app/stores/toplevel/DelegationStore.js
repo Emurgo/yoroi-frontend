@@ -7,7 +7,7 @@ import Store from '../base/Store';
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
 import CachedRequest from '../lib/LocalizedCachedRequest';
 import LocalizableError from '../../i18n/LocalizableError';
-import { PoolMissingApiError } from '../../api/common/errors';
+import { PoolMissingApiError, GetPoolInfoApiError } from '../../api/common/errors';
 import type { MangledAmountFunc, MangledAmountsResponse } from '../stateless/mangledAddresses';
 import type { StoresMap } from '../index';
 import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
@@ -23,6 +23,7 @@ import type {
 } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { Logger, stringifyError } from '../../utils/logging';
 
 export type DelegationRequests = {|
   publicDeriverId: number,
@@ -95,10 +96,15 @@ export default class DelegationStore extends Store<StoresMap> {
       const { selected } = this.stores.wallets;
       if (selected == null) throw new Error(`${nameof(DelegationStore)} no wallet selected`);
       const network = getNetworkById(selected.networkId);
-      await this.stores.substores.ada.delegation.updatePoolInfo({
-        network,
-        allPoolIds: poolIds,
-      });
+      try {
+        await this.stores.substores.ada.delegation.updatePoolInfo({
+          network,
+          allPoolIds: poolIds,
+        });
+      } catch (error) {
+        Logger.error(`${nameof(this.poolInfoQuery)} error: ` + stringifyError(error));
+        throw new GetPoolInfoApiError();
+      }
       // make sure all the pools were found or throw an error
       for (const poolId of poolIds) {
         if (this.getLocalPoolInfo(selected.networkId, poolId) == null) {

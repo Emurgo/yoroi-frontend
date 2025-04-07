@@ -8,6 +8,10 @@ import { defineMessages } from 'react-intl';
  */
 
 const globalMessages: * = defineMessages({
+  notEnoughMoneyToSendError: {
+    id: 'api.errors.NotEnoughMoneyToSendError',
+    defaultMessage: '!!!Insufficient funds to complete this transaction.',
+  },
   receive: {
     id: 'global.receive',
     defaultMessage: '!!!Receive',

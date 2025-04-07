@@ -33,12 +33,14 @@ describe('Adding a memo to a completed Tx', function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoWarningModal = await transactionsPage.clickAddMemo(0, 0);
     const warningIsDisplayed = await memoWarningModal.isDisplayed();
-    expect(warningIsDisplayed).to.be.true;
+    expect(warningIsDisplayed, 'Add memo warning is not shown').to.be.true;
     const addMemoModal = await memoWarningModal.understandAdding();
     const addMemoModalIsDisplayed = await addMemoModal.isDisplayed();
-    expect(addMemoModalIsDisplayed).to.be.true;
+    expect(addMemoModalIsDisplayed, 'Add memo modal is not displayed').to.be.true;
     await addMemoModal.enterMemo(testMemoMessage);
     await addMemoModal.pressAdd();
+    const addMemoModalIsClosed = await addMemoModal.modalIsClosed();
+    expect(addMemoModalIsClosed, 'Add memo modal is still displayed').to.be.true;
   });
   // check the memo displayed message
   it('Check added memo', async function () {

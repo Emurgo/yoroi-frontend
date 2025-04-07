@@ -271,10 +271,23 @@ export const diffIsLessPerc = (valueA, valueB, percDiff) => {
   return valueB >= valueA - valueA1Perc && valueB <= valueA + valueA1Perc;
 };
 
-export const getSnapshotObjectFromJSON = dbSnapshotName => {
+/**
+ * Getting a JS object from json files stored in the snapshots folder
+ * @param {string} dbSnapshotName 
+ * @param {boolean} useGeneralStorageInfo 
+ * @returns {Object}
+ */
+export const getSnapshotObjectFromJSON = (dbSnapshotName, useGeneralStorageInfo) => {
   const dbSnapshotPath = path.resolve(dbSnapshotsDir, dbSnapshotName);
   const fileContent = getFileContent(dbSnapshotPath);
-  return JSON.parse(fileContent);
+  if (useGeneralStorageInfo) {
+    return JSON.parse(fileContent);
+  }
+  const generalSnapshotName = 'general.browserLocalStorage.json';
+  const generalSnapshotPath = path.resolve(dbSnapshotsDir, generalSnapshotName);
+  const generalFileContent = getFileContent(generalSnapshotPath);
+  const joinedObject = Object.assign(JSON.parse(generalFileContent), JSON.parse(fileContent));
+  return joinedObject;
 };
 
 export const getCurrenciesPrices = async () => {

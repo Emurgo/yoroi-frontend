@@ -57,7 +57,7 @@ export const TestNetworkInfoModal = ({ intl, onClose }) => {
       </Stack>
       {/* <Link mt="8px">{intl.formatMessage(messages.learnMore)}</Link> */}
       {/* @ts-ignore */}
-      <Button variant="primary" onClick={onClose} sx={{ mt: '28px' }}>
+      <Button variant="primary" onClick={onClose} sx={{ mt: '28px' }} id="testNetworkInfoModal-understand-button">
         {intl.formatMessage(messages.understand)}
       </Button>
     </Stack>

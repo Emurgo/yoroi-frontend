@@ -1,3 +1,4 @@
+import { pageTitle } from '../../../helpers/pageTitles.js';
 import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import WalletCommonBase from '../../walletCommonBase.page.js';
 
@@ -15,7 +16,9 @@ class StakingTab extends WalletCommonBase {
   };
   // stake pools list
   // methods
-  // walletIsEmpty
+  /**
+   * @returns {Promise<boolean>}
+   */
   async walletIsEmpty() {
     this.logger.info(`StakingTab::walletIsEmpty is called`);
     const emptyBannerIsDisplayed = await (
@@ -23,7 +26,9 @@ class StakingTab extends WalletCommonBase {
     ).isDisplayed();
     return emptyBannerIsDisplayed;
   }
-  // walletIsNotDelegated
+  /**
+   * @returns {Promise<boolean>}
+   */
   async walletIsNotDelegated() {
     this.logger.info(`StakingTab::walletIsNotDelegated is called`);
     const bannerState = await this.customWaitIsPresented(
@@ -32,6 +37,14 @@ class StakingTab extends WalletCommonBase {
       quarterSecond
     );
     return bannerState;
+  }
+  /**
+   * @returns {Promise<string>}
+   */
+  async titleIsCorrect() {
+    this.logger.info(`StakingTab::titleIsCorrect is called`);
+    const displayedTitle = await this.getPageTitle();
+    return displayedTitle === pageTitle.staking;
   }
 }
 

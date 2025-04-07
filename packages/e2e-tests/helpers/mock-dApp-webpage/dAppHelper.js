@@ -57,7 +57,6 @@ export const connectNonAuth = async (
   const requestAccessResult = await mockedDApp.checkAccessRequest();
   expect(requestAccessResult.success, `Request access failed: ${requestAccessResult.errMsg}`).to.be
     .true;
-  await mockedDApp.addOnDisconnect();
 };
 
 /**
