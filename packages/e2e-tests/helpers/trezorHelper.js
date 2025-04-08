@@ -1,5 +1,11 @@
 import { expect } from 'chai';
+import { TrezorEmulatorController } from './trezorEmulatorController.js';
 
+/**
+ * Setting up the trezor emulator.
+ * @param {TrezorEmulatorController} trezorController Trezor emulator controller object
+ * @param {string} trezorMnemonic 12-word mnemonic seed phrase of a wallet
+ */
 export const runAndPrepareTrezor = async (trezorController, trezorMnemonic) => {
   await trezorController.connect();
   const result = await trezorController.getLastEvent();
