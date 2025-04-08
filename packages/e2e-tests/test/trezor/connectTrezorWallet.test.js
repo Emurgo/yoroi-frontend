@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { getDriver } from '../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import { TrezorEmulatorController } from '../../helpers/trezorEmulatorController.js';
@@ -11,37 +10,33 @@ import {
 } from '../../helpers/windowManager.js';
 import { testWalletTrezor } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
-import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import TrezorConnect from '../../pages/trezorConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
+import driversPoolsManager from '../../utils/driversPool.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Connect Trezor HW wallet', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
-  let trezorLogger = null;
+  /** @type {TrezorEmulatorController} */
   let trezorController = null;
-  let wmLogger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
 
-  before(function (done) {
-    webdriver = getDriver();
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    trezorLogger = getTestLogger('trezor', this.test.parent.title);
+    const trezorLogger = getTestLogger('trezor', this.test.parent.title);
     trezorController = new TrezorEmulatorController(trezorLogger);
-    wmLogger = getTestLogger('windowManager', this.test.parent.title);
+    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
-    const basePage = new BasePage(webdriver, logger);
-    basePage.goToExtension();
-    done();
-  });
-
-  it('Initials steps', async function () {
     await windowManager.init();
-    const initialStepsPage = new InitialStepsPage(webdriver, logger);
-    await initialStepsPage.skipInitialSteps();
   });
 
   it('Trezor initialization', async function () {
@@ -51,7 +46,6 @@ describe('Connect Trezor HW wallet', function () {
   it('Selecting Connect HW wallet', async function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectConnectHW();
-    await addNewWalletPage.selectCardanoNetwork();
     await addNewWalletPage.selectTrezorHW();
     await addNewWalletPage.confirmChecking();
     await addNewWalletPage.connectHardwareWallet();
@@ -79,16 +73,15 @@ describe('Connect Trezor HW wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.walletBalance, 'The wallet balance is different').to.equal(
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
       testWalletTrezor.balance
     );
-    expect(walletInfo.walletName, `The wallet name should be "${testWalletTrezor.name}"`).to.equal(
+    expect(walletInfo.name, `The wallet name should be "${testWalletTrezor.name}"`).to.equal(
       testWalletTrezor.name
     );
-    expect(
-      walletInfo.walletPlate,
-      `The wallet plate should be "${testWalletTrezor.plate}"`
-    ).to.equal(testWalletTrezor.plate);
+    expect(walletInfo.plate, `The wallet plate should be "${testWalletTrezor.plate}"`).to.equal(
+      testWalletTrezor.plate
+    );
   });
 
   afterEach(function (done) {
