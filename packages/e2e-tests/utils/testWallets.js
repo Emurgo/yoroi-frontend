@@ -9,6 +9,14 @@ export const testWallet1 = Object.freeze({
   receiveAddress:
     'addr_test1qp8tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsc4l6ve',
 });
+export const testWallet1Mainnet = Object.freeze({
+  name: 'TestWallet1',
+  plate: 'JPAX-4675',
+  mnemonic: process.env.FIRST_SMOKE_TEST_WALLET,
+  balance: 5.828823,
+  receiveAddress:
+    'addr_test1qp8tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsc4l6ve',
+});
 export const testWallet2 = Object.freeze({
   name: 'TestWallet2Static',
   plate: 'XONT-4910',
