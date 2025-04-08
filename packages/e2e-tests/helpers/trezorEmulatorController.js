@@ -101,7 +101,8 @@ export class TrezorEmulatorController {
   emulatorStart() {
     const requestJson = {
       type: 'emulator-start',
-      version: '2-master',
+      version: '2-main',
+      model: 'T2T1', // T2T1 - Trezor Model T
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
@@ -181,7 +182,7 @@ export class TrezorEmulatorController {
   bridgeStart(bridgeVersion) {
     const requestJson = {
       type: 'bridge-start',
-      version: bridgeVersion || '2.0.31',
+      version: bridgeVersion || '2.0.33',
     };
 
     return this._customPromise(requestJson, 'bridgeStart');
