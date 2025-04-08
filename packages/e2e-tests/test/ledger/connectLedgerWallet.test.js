@@ -53,7 +53,6 @@ describe('Connect Ledger HW wallet', function () {
   it('Selecting Connect HW wallet', async function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectConnectHW();
-    await addNewWalletPage.selectCardanoNetwork();
     await addNewWalletPage.selectLedgerHW();
     await addNewWalletPage.confirmChecking();
     await addNewWalletPage.connectHardwareWallet();
