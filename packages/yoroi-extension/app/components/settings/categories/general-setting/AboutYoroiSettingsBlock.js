@@ -183,7 +183,7 @@ export default class AboutYoroiSettingsBlock extends Component<Props> {
     // eslint-disable-next-line
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
-      if (!wallet.isTestnet && !isTestnetModalDisplayed) {
+      if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
