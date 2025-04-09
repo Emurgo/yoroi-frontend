@@ -175,9 +175,10 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
       if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
+        console.log('should open testnet info modal')
         openModal({
           title: intl.formatMessage(messages.modalTitle),
-          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
+          content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
           width: '648px',
           height: '360px',
           modalId: 'testNetworkInfoModal',
@@ -214,7 +215,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
             handleTooltip={() => {
               openModal({
                 title: intl.formatMessage(messages.modalTitle),
-                content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal()} />,
+                content: <TestNetworkInfoModal onClose={() => closeModal()} />,
                 width: '648px',
                 height: '360px',
               });
