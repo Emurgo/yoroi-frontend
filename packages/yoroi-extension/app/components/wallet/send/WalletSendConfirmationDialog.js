@@ -1,9 +1,9 @@
 // @flow
 
-/* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
+/* eslint react/jsx-one-expression-per-line: 0 */  // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import React, { Component } from 'react';
+import React, { Component, } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../../common/TextField';
@@ -22,9 +22,15 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import WarningBox from '../../widgets/WarningBox';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { truncateAddress, truncateToken } from '../../../utils/formatters';
-import { MultiToken } from '../../../api/common/lib/MultiToken';
-import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
+import {
+  truncateAddress, truncateToken,
+} from '../../../utils/formatters';
+import {
+  MultiToken,
+} from '../../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey, TokenEntry,
+} from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName, genFormatTokenAmount } from '../../../stores/stateless/tokenHelpers';
 import { Box } from '@mui/system';
@@ -43,121 +49,136 @@ type Props = {|
   +isSubmitting: boolean,
   +error: ?LocalizableError,
   +unitOfAccountSetting: UnitOfAccountSettingType,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
   +getCurrentPrice: (from: string, to: string) => ?string,
 |};
 
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
+
+  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
     intl: intlShape.isRequired,
   };
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        walletPassword: {
-          type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: '',
-          value: '',
-          validators: [
-            ({ field }) => {
-              if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
-              }
-              return [true];
-            },
-          ],
-        },
-      },
-    },
-    {
-      options: {
-        validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-      },
-      plugins: {
-        vjf: vjf(),
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
+    fields: {
+      walletPassword: {
+        type: 'password',
+        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
+        placeholder: '',
+        value: '',
+        validators: [({ field }) => {
+          if (field.value === '') {
+            return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          }
+          return [true];
+        }],
       },
     }
-  );
+  }, {
+    options: {
+      validateOnChange: true,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
+    },
+  });
 
   submit(): void {
     this.form.submit({
-      onSuccess: async form => {
+      onSuccess: async (form) => {
         const { walletPassword } = form.values();
         const transactionData = {
           password: walletPassword,
         };
         await this.props.onSubmit(transactionData);
       },
-      onError: () => {},
+      onError: () => {}
     });
   }
 
-  renderSingleAmount: TokenEntry => Node = entry => {
+  renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    return (
-      <div className={styles.amount}>
-        {formatValue(entry)}
-        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
+    return  (
+      <div className={styles.amount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
       </div>
     );
-  };
-  renderTotalAmount: TokenEntry => Node = entry => {
+  }
+  renderTotalAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    return (
-      <div className={styles.totalAmount}>
-        {formatValue(entry)}
-        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
+    return  (
+      <div className={styles.totalAmount}>{formatValue(entry)}
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(entry)))
+        }
+        </span>
       </div>
     );
-  };
-  renderSingleFee: TokenEntry => Node = entry => {
+  }
+  renderSingleFee: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
-    return (
+    return  (
       <div className={styles.fees}>
         +{formatValue(entry)}
-        <span className={styles.currencySymbol}>&nbsp;{truncateToken(getTokenName(this.props.getTokenInfo(entry)))}</span>
+        <span className={styles.currencySymbol}>&nbsp;{
+          truncateToken(getTokenName(this.props.getTokenInfo(
+            entry
+          )))
+        }
+        </span>
       </div>
     );
-  };
+  }
 
-  renderBundle: ({|
+  renderBundle: {|
     amount: MultiToken,
     render: TokenEntry => Node,
-  |}) => Node = request => {
+  |} => Node = (request) => {
     return (
       <>
         {request.render(request.amount.getDefaultEntry())}
         {request.amount.nonDefaultEntries().map(entry => (
-          <React.Fragment key={entry.identifier}>{request.render(entry)}</React.Fragment>
+          <React.Fragment key={entry.identifier}>
+            {request.render(entry)}
+          </React.Fragment>
         ))}
       </>
     );
-  };
+  }
 
   render(): Node {
     const { form } = this;
     const { intl } = this.context;
     const walletPasswordField = form.$('walletPassword');
-    const { onCancel, amount, receivers, isSubmitting, error } = this.props;
+    const {
+      onCancel,
+      amount,
+      receivers,
+      isSubmitting,
+      error,
+    } = this.props;
 
     const staleTxWarning = (
       <div className={styles.warningBox}>
         <WarningBox>
-          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}
-          <br />
+          {intl.formatMessage(globalMessages.staleTxnWarningLine1)}<br />
           {intl.formatMessage(globalMessages.staleTxnWarningLine2)}
         </WarningBox>
       </div>
     );
 
-    const confirmButtonClasses = classnames(['confirmButton', isSubmitting ? styles.submitButtonSpinning : null]);
+    const confirmButtonClasses = classnames([
+      'confirmButton',
+      isSubmitting ? styles.submitButtonSpinning : null,
+    ]);
 
     const actions = [
       {
@@ -189,7 +210,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
         <div className={styles.walletPasswordFields}>
           <div className={styles.addressToLabelWrapper}>
             <div className={styles.addressToLabel}>
-              {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}sdsdsdsds
+              {intl.formatMessage(globalMessages.walletSendConfirmationAddressToLabel)}
             </div>
             {[...new Set(receivers)].map((receiver, i) => (
               <Box>
@@ -201,7 +222,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
                   linkType="address"
                 >
                   <RawHash light>
-                    <span className={styles.addressTo}>{truncateAddress(this.props.addressToDisplayString(receiver))}</span>
+                    <span className={styles.addressTo}>
+                      {truncateAddress(this.props.addressToDisplayString(receiver))}
+                    </span>
                   </RawHash>
                 </ExplorableHashContainer>
               </Box>
@@ -210,14 +233,20 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
           {this.props.transactionSize != null ? (
             <div className={styles.addressToLabelWrapper}>
-              <div className={styles.addressToLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}</div>
-              <span className={styles.txSize}>{this.props.transactionSize}</span>
+              <div className={styles.addressToLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationTxSizeLabel)}
+              </div>
+              <span className={styles.txSize}>
+                {this.props.transactionSize}
+              </span>
             </div>
           ) : null}
 
           <div className={styles.amountFeesWrapper}>
             <div className={styles.amountWrapper}>
-              <div className={styles.amountLabel}>{intl.formatMessage(globalMessages.amountLabel)}</div>
+              <div className={styles.amountLabel}>
+                {intl.formatMessage(globalMessages.amountLabel)}
+              </div>
               {this.renderBundle({
                 amount,
                 render: this.renderSingleAmount,
@@ -225,7 +254,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
             </div>
 
             <div className={styles.feesWrapper}>
-              <div className={styles.feesLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}</div>
+              <div className={styles.feesLabel}>
+                {intl.formatMessage(globalMessages.walletSendConfirmationFeesLabel)}
+              </div>
               {this.renderBundle({
                 amount: this.props.transactionFee,
                 render: this.renderSingleFee,
@@ -234,7 +265,9 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           </div>
 
           <div className={styles.totalAmountWrapper}>
-            <div className={styles.totalAmountLabel}>{intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}</div>
+            <div className={styles.totalAmountLabel}>
+              {intl.formatMessage(globalMessages.walletSendConfirmationTotalLabel)}
+            </div>
             {this.renderBundle({
               amount: this.props.totalAmount,
               render: this.renderTotalAmount,
@@ -250,7 +283,15 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
           />
         </div>
 
-        {error ? <div className={styles.error}>{intl.formatMessage(error, error.values)}</div> : null}
+        {error
+          ? (
+            <div className={styles.error}>
+              {intl.formatMessage(error, error.values)}
+            </div>
+          )
+          : null
+        }
+
       </Dialog>
     );
   }
