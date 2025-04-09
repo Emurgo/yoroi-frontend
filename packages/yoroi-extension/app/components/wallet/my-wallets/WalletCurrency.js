@@ -6,8 +6,6 @@ import styles from './WalletCurrency.scss';
 
 import { ReactComponent as SymbolADA } from '../../../assets/images/my-wallets/symbol_ada.inline.svg';
 import { ReactComponent as SymbolTADA } from '../../../assets/images/my-wallets/symbol_adaTestnet.inline.svg';
-import { ReactComponent as SymbolBTC } from '../../../assets/images/my-wallets/symbol_bitcoin.inline.svg';
-import { ReactComponent as SymbolETH } from '../../../assets/images/my-wallets/symbol_ethereum.inline.svg';
 
 type Props = {|
   +currency: string,
