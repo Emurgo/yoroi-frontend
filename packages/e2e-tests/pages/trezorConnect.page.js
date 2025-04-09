@@ -31,7 +31,7 @@ class TrezorConnect extends BasePage {
     if (result) {
       const allCheckboxes = await this.findElements(this.dontAskAgainCheckboxLocator);
       // this conditions was found empirically
-      await allCheckboxes[0].click();
+      await this.clickElementByScript(allCheckboxes[0]);
     } else {
       this.logger.error(`TrezorConnect::tickCheckbox A correct checkbox is not found`);
       throw new Error('A correct checkbox is not found');
