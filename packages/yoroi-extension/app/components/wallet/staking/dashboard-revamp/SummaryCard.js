@@ -10,7 +10,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as StakingIcon } from '../../../../assets/images/dashboard/staking-active.inline.svg';
 import { ReactComponent as TotalDelegatedIcon } from '../../../../assets/images/dashboard/total-delegated.inline.svg';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import styles from '../dashboard/UserSummary.scss';
+import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { TokenEntry, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../../utils/strings';
@@ -173,7 +173,7 @@ function SummaryCard({
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
-              <div className={styles.loadingSpinner}>
+              <div className={loadingSpinnerStyles.loadingSpinner}>
                 <LoadingSpinner small />
               </div>
             )}
