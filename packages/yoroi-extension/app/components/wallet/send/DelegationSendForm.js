@@ -17,6 +17,7 @@ import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
 import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
+import type { StoresMap } from '../../../stores';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -29,8 +30,10 @@ type Props = {|
   +hasAnyPending: boolean,
   +updatePool: (void | string) => void,
   +poolQueryError: ?LocalizableError,
-  +onNext: void => Promise<void>,
   +isProcessing: boolean,
+  +poolName: string,
+  +selectedPoolId: ?string,
+  +stores: StoresMap,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
