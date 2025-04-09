@@ -837,7 +837,7 @@
   "wallet.receive.page.generatedAddressesSectionTitle": "Adresses générées",
   "wallet.receive.page.internal.learnMore": "https://emurgo.io/en/blog/understanding-unspent-transaction-outputs-in-cardano",
   "wallet.receive.page.internalWarning1": "Les adresses internes (ou adresses de \"change\") préservent votre vie privée en masquant les adresses qui vous appartiennent sur la blockchain",
-  "wallet.receive.page.internalWarning2": ": ces adresses sont indiquées ici à des fins d'audit personnel et ne doivent <strong>jamais</strong> être utilisées.",
+  "wallet.receive.page.internalWarning2": ": ces adresses sont indiquées ici à des fins d'audit personnel et ne doivent jamais être utilisées.",
   "wallet.receive.page.label": "Étiquette",
   "wallet.receive.page.mangledWarning1": "Les adresses mélangées contribuent à votre solde en {ticker}, mais elles ont une préférence de délégation incorrecte",
   "wallet.receive.page.noResultsFoundLabel": "Pas de résultats trouvés",
