@@ -272,7 +272,7 @@ jobs:
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 21325:21325 -p 21324:21324 -v logs:/trezor-user-env/logs/ -v src/binaries/firmware/bin:/trezor-user-env/src/binaries/firmware/bin/ -v src/binaries/trezord-go/bin:/trezor-user-env/src/binaries/trezord-go/bin -d trezor/trezor-user-env:latest
+        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 21325:21325 -p 21324:21324 -v logs:/trezor-user-env/logs/ -v src/binaries/firmware/bin:/trezor-user-env/src/binaries/firmware/bin/ -v src/binaries/trezord-go/bin:/trezor-user-env/src/binaries/trezord-go/bin -d ghcr.io/trezor/trezor-user-env:latest
 
       - name: Forcefully update Chrome browser
         id: chrome-version
