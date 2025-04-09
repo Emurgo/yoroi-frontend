@@ -26,19 +26,19 @@ const messages = defineMessages({
 
 export type GraphRewardData = {|
   error: ?LocalizableError,
-    items: Array < {|
-      name: string,
-        primary: number,
-          poolName: string,
-            poolId: string,
-              currency: string,
-                date: string,
+  items: Array<{|
+    name: string,
+    primary: number,
+    poolName: string,
+    poolId: string,
+    currency: string,
+    date: string,
   |}>,
 |};
 
 type Props = {|
   graphData: GraphData,
-    onClose: () => void,
+  onClose: () => void,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -100,4 +100,4 @@ function RewardHistoryDialog({ graphData, onClose, intl }: Props & Intl): Node {
     </Dialog>
   );
 }
-export default (injectIntl(observer(RewardHistoryDialog)): ComponentType < Props >);
+export default (injectIntl(observer(RewardHistoryDialog)): ComponentType<Props>);
