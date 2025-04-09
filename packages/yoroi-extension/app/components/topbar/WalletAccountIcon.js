@@ -28,7 +28,9 @@ const saturation = (color, factor: number = 0) => {
   }
   let tcol = tinycolor(color);
   for (let i = 0; i < Math.abs(factor); i++) {
-    tcol = factor < 0 ? tcol.desaturate() : tcol.saturate();
+    tcol = factor < 0 ?
+      tcol.desaturate()
+      : tcol.saturate();
   }
   return tcol.toHexString();
 };
@@ -36,28 +38,26 @@ const saturation = (color, factor: number = 0) => {
 /** Dynamically generated title for the topbar when a wallet is selected */
 @observer
 export default class WalletAccountIcon extends Component<Props> {
-  static defaultProps: {| saturationFactor: number, scalePx: number, size: number |} = {
+  static defaultProps: {|saturationFactor: number, scalePx: number, size: number|} = {
     scalePx: 5,
     saturationFactor: 0,
-    size: 7,
+    size: 7
   };
 
   render(): Node {
     const { iconSeed, scalePx, size, saturationFactor } = this.props;
     if (iconSeed === '') {
-      return <div style={{ width: '42px', height: '42px' }} />;
+      return (<div style={{ width: '42px', height: '42px' }} />);
     }
     const colorIdx = hexToBytes(iconSeed)[0] % COLORS.length;
     const color = COLORS[colorIdx];
-    return (
-      <Blockies
-        seed={iconSeed}
-        size={size}
-        scale={scalePx != null ? scalePx : 5}
-        bgColor={saturation(color.primary, saturationFactor)}
-        color={saturation(color.secondary, saturationFactor)}
-        spotColor={saturation(color.spots, saturationFactor)}
-      />
-    );
+    return (<Blockies
+      seed={iconSeed}
+      size={size}
+      scale={scalePx != null ? scalePx : 5}
+      bgColor={saturation(color.primary, saturationFactor)}
+      color={saturation(color.secondary, saturationFactor)}
+      spotColor={saturation(color.spots, saturationFactor)}
+    />);
   }
 }
