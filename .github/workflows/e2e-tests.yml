@@ -14,7 +14,8 @@ jobs:
       github.event.review.state == 'approved' ||
       contains(github.event.review.body, '/check') ||
       contains(github.event.review.body, '/ext-general') ||
-      contains(github.event.review.body, '/dapp-general')
+      contains(github.event.review.body, '/dapp-general') ||
+      contains(github.event.review.body, '/trezor')
       )
     runs-on: ubuntu-latest
 
