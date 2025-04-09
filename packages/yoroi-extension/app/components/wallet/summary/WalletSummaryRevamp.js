@@ -227,7 +227,12 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     if (true) return null;
 
     // noinspection UnreachableCodeJS
-    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
+    return (
+      <UsdaBanner
+        onClose={() => {}}
+        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
+      />
+    );
   }
 
   render(): Node {
