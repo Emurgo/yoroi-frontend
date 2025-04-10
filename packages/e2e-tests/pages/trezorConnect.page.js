@@ -15,6 +15,14 @@ class TrezorConnect extends BasePage {
     locator: '.confirm',
     method: 'css',
   };
+  exportAddressTitleTextLocator = {
+    locator: '#container > div > div:nth-child(1) > h3',
+    method: 'css',
+  }
+  exportAddressButtonLocator = {
+    locator: 'button.confirm[data-testid="@export-address/confirm-button"]',
+    css: 'css',
+  }
   // functions
   async tickCheckbox() {
     this.logger.info(`TrezorConnect::tickCheckbox is called`);
@@ -46,6 +54,14 @@ class TrezorConnect extends BasePage {
     this.logger.info(`TrezorConnect::allowPubKeysExport is called`);
     await this.waitForElement(this.exportTrezorButtonLocator);
     await this.clickByScript(this.exportTrezorButtonLocator);
+  }
+  async exportAddressPageIsDisplayed() {
+    this.logger.info(`TrezorConnect::exportAddressPageIsDisplayed is called`);
+    return await this.customWaitIsPresented(this.exportAddressTitleTextLocator);
+  }
+  async confirmExportAddress() {
+    this.logger.info(`TrezorConnect::exportAddressPageIsDisplayed is called`);
+    await this.clickByScript(this.exportAddressButtonLocator);
   }
 }
 
