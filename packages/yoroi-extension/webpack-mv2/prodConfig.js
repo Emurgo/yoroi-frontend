@@ -14,7 +14,8 @@ type EnvParams = {|
   networkName: string,
   nightly: "true" | "false",
   publicPath?: string,
-  isLight: "true" | "false"
+  isLight: "true" | "false",
+  isE2E: "true" | "false",
 |};
 */
 const contentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
@@ -41,7 +42,8 @@ const contentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      JSON.parse(env.isLight)
+      JSON.parse(env.isLight),
+      JSON.parse(env.isE2E)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],
@@ -95,7 +97,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       env.networkName,
       true,
       JSON.parse(env.nightly),
-      JSON.parse(env.isLight)
+      JSON.parse(env.isLight),
+      JSON.parse(env.isE2E)
     )),
     new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
   ],

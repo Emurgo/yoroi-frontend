@@ -4,8 +4,6 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
-import links from '../../../../../links';
 import { useLocation } from 'react-router-dom';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
@@ -18,6 +16,9 @@ import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
+import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import links from '../../../../../links';
+import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -121,25 +122,29 @@ export const GovernanceStatusSelection = () => {
   const createUnsignTx = async kind => {
     try {
       setLoadingUnsignTx(true);
+      const txSignRequest: any = await createDrepDelegationTransaction(kind);
 
-      setTimeout(async () => {
-        const txSignRequest: any = await createDrepDelegationTransaction(kind);
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        unsignedTx: txSignRequest.signTxRequest.unsignedTx,
+        submitTx: password => {
+          signGovernanceTx(password);
+        },
+      });
 
-        openTxReviewModal({
-          modalView: 'transactionReview',
-          unsignedTx: txSignRequest.signTxRequest.unsignedTx,
-          submitTx: password => {
-            signGovernanceTx(password);
-          },
-        });
-        setLoadingUnsignTx(false);
-        setError(null);
-      }, 200);
+      setError(null);
     } catch (e) {
-      setError('Error trying to Vote. Please try again later');
+      if (e instanceof NotEnoughMoneyToSendError) {
+        setError(strings.notEnoughMoneyToSendError);
+      } else {
+        setError('Error trying to Vote. Please try again later');
+      }
+    } finally {
       setLoadingUnsignTx(false);
     }
   };
+
+  const isParticipatingInGovernance = governanceStatus.status != null && governanceStatus.status !== 'none';
 
   const signGovernanceTx = async password => {
     try {
@@ -218,7 +223,7 @@ export const GovernanceStatusSelection = () => {
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
-  if (walletAdaBalance !== null && walletAdaBalance === 0) {
+  if (!isParticipatingInGovernance && (walletAdaBalance !== null && walletAdaBalance === 0)) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
     return (
@@ -233,7 +238,7 @@ export const GovernanceStatusSelection = () => {
           textAlign="center"
           color="ds.text_gray_medium"
         >
-          To participate in governance you need to have ADA in your wallet.
+          {strings.needAdaForParticipation}
         </Typography>
         <Button
           // @ts-ignore

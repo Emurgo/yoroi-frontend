@@ -4,14 +4,6 @@ import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
-    copyToClipboard: {
-      id: 'widgets.copyableaddress.addressCopyTooltipMessage',
-      defaultMessage: '!!!Copy to clipboard',
-    },
-    copied: {
-      id: 'widgets.copyableaddress.copied',
-      defaultMessage: '!!!Copied',
-    },
     tolatValue: {
       id: 'transaction.review.tolatValue',
       defaultMessage: '!!!Total wallet value',
@@ -136,14 +128,20 @@ export const messages = Object.freeze(
       id: 'governance.operations',
       defaultMessage: '!!!operations',
     },
+    attentionLabel: {
+      id: 'transfer.instructions.attention.title.label',
+      defaultMessage: '!!!Attention',
+    },
+    rewardsWithdraw: {
+      id: 'transaction.review.rewardsWithdraw',
+      defaultMessage: '!!!Our rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
+    },
   })
 );
 
 export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
-    copyToClipboard: intl.formatMessage(messages.copyToClipboard),
-    copied: intl.formatMessage(messages.copied),
     tolatValue: intl.formatMessage(messages.tolatValue),
     confirmHardware: intl.formatMessage(messages.confirmHardware),
     takeHardwareWallet: intl.formatMessage(messages.takeHardwareWallet),
@@ -175,5 +173,7 @@ export const useStrings = () => {
     submitTransaction: intl.formatMessage(messages.submitTransaction),
     chooseDrep: intl.formatMessage(messages.chooseDrep),
     operations: intl.formatMessage(messages.operations),
+    attentionLabel: intl.formatMessage(messages.attentionLabel),
+    rewardsWithdraw: intl.formatMessage(messages.rewardsWithdraw),
   }).current;
 };

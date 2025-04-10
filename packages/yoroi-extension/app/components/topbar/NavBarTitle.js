@@ -14,7 +14,7 @@ export default class NavBarTitle extends Component<Props> {
   render(): Node {
     const { title } = this.props;
     return (
-      <Box id="navBarTitle" className={styles.titleRevamp} sx={{ color: 'ds.el_gray_medium' }}>
+      <Box id="topBar-pageTitle-text" className={styles.titleRevamp} sx={{ color: 'ds.el_gray_medium' }}>
         {title}
       </Box>
     );

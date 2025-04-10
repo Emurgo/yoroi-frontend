@@ -1,9 +1,9 @@
-import { Box, Typography, useTheme } from '@mui/material';
-import { noop } from 'lodash';
 import React from 'react';
+import { Box, Typography } from '@mui/material';
+import { noop } from 'lodash';
+import { IconWrapper, Icons } from '../icons/index';
 import { Theme, toast } from 'react-toastify';
 import { NotificationTypes } from '../../types/notifications';
-import { Icon } from '../icons/index';
 
 const NOTIFICATION_TIMEOUT = 4000; // 4s
 
@@ -21,17 +21,14 @@ type IconProps = {
 };
 
 export const NotificationCloseButton = ({ closeToast, ...props }) => {
-  const theme = useTheme();
-
   const handleClose = e => {
     e.stopPropagation();
     const { onClose } = props.data;
-    onClose && onClose(props);
+    onClose?.(props);
   };
 
   return (
-    <Box
-      onClick={handleClose}
+    <IconWrapper
       sx={{
         padding: 0,
         width: '24px',
@@ -41,9 +38,10 @@ export const NotificationCloseButton = ({ closeToast, ...props }) => {
         justifyContent: 'center',
         cursor: 'pointer',
       }}
-    >
-      <Icon.CloseIcon fill={theme.palette['ds'].el_gray_medium} />
-    </Box>
+      onClick={handleClose}
+      color="ds.el_gray_medium"
+      icon={Icons.CloseIcon}
+    />
   );
 };
 
@@ -64,30 +62,29 @@ const IconContainer = ({ children, ...props }) => (
 );
 
 const NotificationIcon = ({ type }: IconProps) => {
-  const theme = useTheme();
   switch (type) {
     case NotificationTypes.Rewards:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <Icon.Staking fill={theme.palette['ds'].static_green} />
+          <IconWrapper color="ds.static_green" icon={Icons.Staking} />
         </IconContainer>
       );
     case NotificationTypes.Income:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <Icon.Receive fill={theme.palette['ds'].static_green} />
+          <IconWrapper color="ds.static_green" icon={Icons.Receive} />
         </IconContainer>
       );
     case NotificationTypes.Outcome:
       return (
         <IconContainer bgcolor="ds.primary_100">
-          <Icon.Send fill={theme.palette['ds'].primary_600} />
+          <IconWrapper color="ds.primary_600" icon={Icons.Send} />
         </IconContainer>
       );
     case NotificationTypes.Cancelled:
       return (
         <IconContainer bgcolor="ds.sys_magenta_100">
-          <Icon.Cancel fill={theme.palette['ds'].sys_magenta_500} />
+          <IconWrapper color="ds.sys_magenta_500" icon={Icons.Cancel} />
         </IconContainer>
       );
     default:
@@ -100,7 +97,7 @@ const NotificationBody = ({ toastProps }: any) => {
   const { title, subtitle, onClick } = data;
 
   const handleClick = () => {
-    onClick && onClick(toastProps);
+    onClick?.(toastProps);
   };
 
   return (

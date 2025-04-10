@@ -4,8 +4,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { Icon } from '../icons/index';
-import { IconButtonWrapper } from '../wrappers/IconButtonWrapper';
+import { IconWrapper, Icons } from '../icons/index';
 import { useModal } from './ModalContext';
 
 const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: string; height: string; theme: any }) => ({
@@ -29,33 +28,39 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 }));
 
 export const ModalManager = () => {
-  const { height, width, closeModal, content, title, isOpen } = useModal();
+  const { height, width, closeModal, content, title, isOpen, modalId } = useModal();
 
   return (
     <BootstrapDialog
       onClose={closeModal}
-      aria-labelledby={`${title}-dialog-title`}
+      aria-labelledby={`${modalId}-dialogWindow-modalWindow`}
       open={isOpen}
       fullWidth
       width={width}
       height={height}
+      id={`${modalId}-dialogWindow-presentation`}
     >
-      <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${title}-dialog-title`}>
+      <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${modalId}-modalTitle-text`}>
         <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900">
           {title}
         </Typography>
       </DialogTitle>
-      <IconButtonWrapper
+      <IconWrapper
         aria-label="close"
         onClick={closeModal}
-        sx={{
-          position: 'absolute',
-          right: 18,
-          top: 22,
+        icon={Icons.CloseIcon}
+        color="ds.el_gray_max"
+        borderColor="ds.el_gray_max"
+        asButton
+        buttonProps={{
+          sx: {
+            position: 'absolute',
+            right: 18,
+            top: 22,
+          },
         }}
-      >
-        <Icon.CloseIcon />
-      </IconButtonWrapper>
+        id={`${modalId}-closeModal-button`}
+      />
       <DialogContent>{content}</DialogContent>
     </BootstrapDialog>
   );

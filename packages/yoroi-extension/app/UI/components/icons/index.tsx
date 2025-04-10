@@ -1,3 +1,5 @@
+import React from 'react';
+import { Box, IconButton } from '@mui/material';
 import { Back } from './Back';
 import { Assets } from './Assets';
 import { Assets1 } from './Assets1';
@@ -171,5 +173,125 @@ export const Icon = {
   VisibilityOn,
   Voting,
   Wallet,
-  Wallets
+  Wallets,
 };
+
+export enum Icons {
+  Assets = 'Assets',
+  Assets1 = 'Assets1',
+  AssetsFilled = 'AssetsFilled',
+  Bio = 'Bio',
+  Bug = 'Bug',
+  BurgerMenu = 'BurgerMenu',
+  BuyCoins = 'BuyCoins',
+  Cancel = 'Cancel',
+  CheckmarkFilled = 'CheckmarkFilled',
+  CheckmarkOutlined = 'CheckmarkOutlined',
+  ChevronDown = 'ChevronDown',
+  ChevronUp = 'ChevronUp',
+  ChipArrowDown = 'ChipArrowDown',
+  ChipArrowUp = 'ChipArrowUp',
+  CloseCircleIcon = 'CloseCircleIcon',
+  CloseIcon = 'CloseIcon',
+  Coins = 'Coins',
+  Copied = 'Copied',
+  Copy = 'Copy',
+  CopySuccess = 'CopySuccess',
+  Cross = 'Cross',
+  CrossCircle = 'CrossCircle',
+  DappConnector = 'DappConnector',
+  Delete = 'Delete',
+  Device = 'Device',
+  Drag = 'Drag',
+  ExclamationCircle = 'ExclamationCircle',
+  Expand = 'Expand',
+  Explore = 'Explore',
+  Export = 'Export',
+  Eye = 'Eye',
+  EyeOff = 'EyeOff',
+  Image = 'Image',
+  Info = 'Info',
+  InfoCircle = 'InfoCircle',
+  LastSeen = 'LastSeen',
+  Ledger = 'Ledger',
+  Lightning = 'Lightning',
+  Link = 'Link',
+  Loader = 'Loader',
+  Lock = 'Lock',
+  MenuCategories = 'MenuCategories',
+  MenuLaunchpad = 'MenuLaunchpad',
+  Message = 'Message',
+  More = 'More',
+  NftAsset = 'NftAsset',
+  Pin = 'Pin',
+  Placeholder = 'Placeholder',
+  PlateNumber = 'PlateNumber',
+  Plus = 'Plus',
+  Qr = 'Qr',
+  QuestionCircle = 'QuestionCircle',
+  Receive = 'Receive',
+  Reporting = 'Reporting',
+  Sandbox = 'Sandbox',
+  Script = 'Script',
+  Search = 'Search',
+  Send = 'Send',
+  Settings = 'Settings',
+  SliderSettings = 'SliderSettings',
+  SocialMediaFacebook = 'SocialMediaFacebook',
+  SocialMediaGithub = 'SocialMediaGithub',
+  SocialMediaTelegram = 'SocialMediaTelegram',
+  SocialMediaX = 'SocialMediaX',
+  SortTable = 'SortTable',
+  SpecialYoroiNightly = 'SpecialYoroiNightly',
+  Staking = 'Staking',
+  StarFilled = 'StarFilled',
+  StarOutlined = 'StarOutlined',
+  Support = 'Support',
+  Switch = 'Switch',
+  Table = 'Table',
+  TermsOfUse = 'TermsOfUse',
+  ThumbUp = 'ThumbUp',
+  Tick = 'Tick',
+  Tokens = 'Tokens',
+  Updates = 'Updates',
+  VisibilityOff = 'VisibilityOff',
+  VisibilityOn = 'VisibilityOn',
+  Voting = 'Voting',
+  Wallet = 'Wallet',
+  Wallets = 'Wallets',
+}
+
+interface IconWrapperProps {
+  icon: Icons;
+  iconProps?: React.SVGProps<SVGSVGElement>;
+  asButton?: boolean;
+  [key: string]: any;
+}
+
+export function IconWrapper({
+  icon,
+  iconProps = {},
+  asButton = false,
+  buttonProps = {},
+  ...props
+}: Readonly<IconWrapperProps>): React.ReactNode {
+  const IconComponent = typeof icon === 'string' ? Icon[icon] : icon;
+  if (IconComponent == null) {
+    throw new Error('A proper icon component or reference was expected but got: ' + icon);
+  }
+  if (asButton) {
+    return (
+      <IconButton {...buttonProps}>
+        <Box component="span" display="inline-flex" color="ds.el_gray_medium" {...props}>
+          <IconComponent {...iconProps} />
+        </Box>
+      </IconButton>
+    );
+  }
+
+  return (
+    <Box color="ds.el_gray_medium" {...props}>
+      <IconComponent {...iconProps} />
+    </Box>
+  );
+}

@@ -43,13 +43,16 @@ function Select({
   const handleOpen = () => {
     setOpen(true);
   };
+  const formControlId = `${labelId}-selectForm-component`;
+  const inputLabelId = `${labelId}-inputLabel-text`;
+  const selectId = `${labelId}-select-component`;
   return (
-    <FormControl disabled={disabled} {...formControlProps}>
-      <InputLabel shrink={shrink} id={labelId} {...labelProps}>
+    <FormControl disabled={disabled} {...formControlProps} id={formControlId}>
+      <InputLabel shrink={shrink} id={inputLabelId} {...labelProps}>
         {label}
       </InputLabel>
       <SelectBase
-        labelId={labelId}
+        labelId={selectId}
         IconComponent={isDark ? ArrowIconDT : ArrowIcon}
         label={label}
         onChange={e => onChange(e.target.value)}

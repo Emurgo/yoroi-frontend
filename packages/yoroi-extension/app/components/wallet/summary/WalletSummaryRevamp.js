@@ -26,6 +26,7 @@ import { BringBanner, UsdaBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   transactionType: {
@@ -201,6 +202,9 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const { goToRoute, selectedWallet } = this.props;
     const { isBannerVisible } = this.state;
 
+    // <TODO:UNFLAG_LATER>
+    if (!environment.isDev()) return null;
+
     if (selectedWallet.isTestnet || !isBannerVisible) return null;
 
     return (
@@ -223,7 +227,12 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     if (true) return null;
 
     // noinspection UnreachableCodeJS
-    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
+    return (
+      <UsdaBanner
+        onClose={() => {}}
+        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
+      />
+    );
   }
 
   render(): Node {

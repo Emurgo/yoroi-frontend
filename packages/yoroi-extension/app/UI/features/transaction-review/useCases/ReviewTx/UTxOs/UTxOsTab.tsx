@@ -121,7 +121,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
         <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="450px">
           {input.address}
         </Typography>
-        <CopyButton textToCopy={input.address} strings={strings} />
+        <CopyButton textToCopy={input.address} />
       </Stack>
 
       <Stack direction="row" gap="8px" alignItems="flex-start">
@@ -133,7 +133,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
             {`#${input.txIndex}`}
           </Typography>
         </Stack>
-        <CopyButton textToCopy={input.txHash} strings={strings} />
+        <CopyButton textToCopy={input.txHash} />
       </Stack>
 
       {input.assets.length > 0 && (
@@ -146,7 +146,6 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
 };
 
 const Output: React.FC<OutputProps> = ({ output }: any) => {
-  const strings = useStrings();
   const isOwnAdddress = output.ownAddress;
   const renderAssets = () => {
     if (!output.assets.length) return null;
@@ -175,7 +174,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
         <Typography sx={{ wordWrap: 'break-word' }} variant="body1" maxWidth="450px">
           {output.address}
         </Typography>
-        <CopyButton textToCopy={output.address} strings={strings} />
+        <CopyButton textToCopy={output.address} />
       </Stack>
 
       {output.assets.length > 0 && (

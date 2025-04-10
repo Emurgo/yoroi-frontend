@@ -292,6 +292,12 @@ async function batchLoadSubmittedTransactions(walletStates: Array<WalletState>) 
 export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   const publicDeriverId = publicDeriver.getPublicDeriverId();
 
+  const withPublicKey = asGetPublicKey(publicDeriver);
+  if (withPublicKey == null) {
+    throw new Error('unexpected missing public key');
+  }
+  const publicKey = (await withPublicKey.getPublicKey()).Hash;
+
   const conceptualWalletInfo = await publicDeriver.getParent().getFullConceptualWalletInfo();
   const network = publicDeriver.getParent().getNetworkInfo();
 
@@ -331,7 +337,7 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     isHardware,
     hardwareWalletDeviceId: publicDeriver.getParent().hardwareInfo?.DeviceId,
     plate: { ImagePart: '', TextPart: '' },
-    publicKey: '',
+    publicKey,
     receiveAddress: {
       addr: { AddressId: 0, Digest: 0, Type: 0, Hash: '', IsUsed: false },
       row: { CanonicalAddressId: 0, KeyDerivationId: 0 },

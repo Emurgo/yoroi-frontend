@@ -1,9 +1,9 @@
-import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
 import React from 'react';
-import NavBarTitle from '../../../components/topbar/NavBarTitle';
-import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
-import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
+import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
+import NavBarTitle from '../../../components/topbar/NavBarTitle';
+import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
+import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 
 type Props = {
   stores: any;

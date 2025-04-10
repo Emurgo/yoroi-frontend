@@ -55,7 +55,6 @@ interface Props {
 }
 
 export const TokenChartInterval = ({ tokenInfo }: Props): JSX.Element => {
-  console.log('tokenInfo', tokenInfo);
   const isPrimaryToken: boolean = tokenInfo.id === '-';
 
   const chartHeight = isPrimaryToken ? 153 : 257;

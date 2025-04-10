@@ -7,7 +7,7 @@ export const testWallet1 = Object.freeze({
   mnemonic: process.env.FIRST_SMOKE_TEST_WALLET,
   balance: 5.828823,
   receiveAddress:
-    'addr1q98tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsmrz6qx',
+    'addr_test1qp8tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsc4l6ve',
 });
 export const testWallet2 = Object.freeze({
   name: 'TestWallet2Static',
@@ -17,9 +17,9 @@ export const testWallet2 = Object.freeze({
 });
 export const testWallet3 = Object.freeze({
   name: 'TW_Chrome',
-  plate: 'XZHD-1651',
+  plate: 'HEJT-3361',
   mnemonic: process.env.SECOND_SMOKE_TEST_WALLET,
-  minTxs: 100,
+  minTxs: 29,
 });
 export const testWallet4 = Object.freeze({
   name: 'TW_FF',

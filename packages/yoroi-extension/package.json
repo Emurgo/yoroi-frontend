@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.6.200",
+  "version": "5.7.0",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -35,9 +35,7 @@
     "eslint": "npm run eslint-loud -- --quiet",
     "eslint-loud": "eslint app chrome scripts scripts-mv2 webpack/*.js webpack-mv2/*.js",
     "test:build-mv2": "npm run prod:build-mv2 -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
-    "test:build:mainnet-mv2": "npm run prod:build-mv2 -- --env 'mainnet' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
-    "test:build": "npm run prod:build -- --env 'test' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
-    "test:build:mainnet": "npm run prod:build -- --env 'mainnet' && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
+    "test:build": "npm run prod:build -- --env 'test' --isE2E && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
     "metrics:pull": "ampli pull extension",

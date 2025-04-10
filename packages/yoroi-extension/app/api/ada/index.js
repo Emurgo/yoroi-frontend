@@ -523,7 +523,7 @@ export type GetTransactionRowsToExportFunc = (
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
-const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
+const MIN_REORG_OUTPUT_AMOUNT = '1000000';
 const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
 export default class AdaApi {

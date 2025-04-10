@@ -9,10 +9,10 @@ import { truncateAddress, truncateAddressShort, truncateLongName } from '../../.
 import { Collapsible, Icon } from '../../../../../components';
 import CopyableText from '../../../../../components/CopyableText';
 import { Quantities } from '../../../../../utils/quantities';
-import { useWarningSection } from '../../../common/hooks/useWarningSection';
 import { useOperations } from '../../../common/operations';
 import { useTxReviewModal } from '../../../module/ReviewTxProvider';
 import { useStrings } from '../../../common/hooks/useStrings';
+import { useWarningSection } from '../../../../../common/hooks/useWarningSection';
 
 export interface SubMenuOption {
   label: string;
@@ -28,6 +28,7 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
 }));
 
 export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
+  const strings = useStrings();
   const {
     currentWalletDetails,
     changeModalView,
@@ -42,8 +43,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
 
   const operationsCerts = useOperations(tx.certificates, isStakeRegistered, stakeKeyDeposit, primaryTokenInfo, operations);
-
-  const warningComp = useWarningSection(operations);
+  const warningComp = useWarningSection({ warning: operations, title: strings.attentionLabel, content: strings.rewardsWithdraw });
 
   const { plate } = selected;
   const currentWalletIcon = <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={0} size={8} scalePx={4} />;

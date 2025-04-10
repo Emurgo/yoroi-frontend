@@ -1,7 +1,6 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -28,9 +27,6 @@ import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/
 
 export const StakingPageContentPromise: void => Promise < any > = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 @observer
 class StakingPage extends Component<StoresProps> {

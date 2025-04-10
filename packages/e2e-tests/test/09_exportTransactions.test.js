@@ -22,9 +22,9 @@ describe('Export transactions, positive', function () {
   let webdriver = null;
   let logger = null;
   // mm/dd/yyyy - 11/13/2023, it is only for testWallet1
-  const startDate = '11132023';
+  const startDate = '03262025';
   // mm/dd/yyyy - 03/08/2024, it is only for testWallet1
-  const endDate = '03082024';
+  const endDate = '03262025';
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
@@ -62,13 +62,13 @@ describe('Export transactions, positive', function () {
     // check file name
     const fileName = allDownloadedFiles[0];
     const todayStr = getTodayStr();
-    const expectedFileName = `Yoroi-Transaction-History_ADA-${testWallet1.plate}_${todayStr}.csv`;
+    const expectedFileName = `Yoroi-Transaction-History_TADA-${testWallet1.plate}_${todayStr}.csv`;
     expect(fileName, 'Exported file name is different').to.equal(expectedFileName);
     // check exported file content
     const fileContent = getDownloadedFileContent(fileName);
     const parsedFileContent = parseExportedCSV(fileContent);
     // get txs info from the transactions page <list of objects>
-    expect(parsedFileContent.length, 'Something wrong in the exported file').to.equal(2);
+    expect(parsedFileContent.length, 'Something wrong in the exported file').to.equal(5);
   });
 
   it('Compare displayed txs with the exported txs', async function () {

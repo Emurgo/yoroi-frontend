@@ -1,10 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import { Component, useCallback, useEffect } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { useCallback, useEffect } from 'react';
+import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
-import { observer } from 'mobx-react';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
 import { ReactComponent as githubSvg } from '../../../../assets/images/social/github.inline.svg';
@@ -22,10 +20,12 @@ import { Box, Button, Link, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
+import { IconWrapper, Icons } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { useIntl } from '../../../../UI/context/IntlProvider';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -153,134 +153,142 @@ type Props = {|
   onSwitchNetwork: () => void,
 |};
 
-@observer
-export default class AboutYoroiSettingsBlock extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
+const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
+  const { openModal, closeModal } = useModal();
+  const { intl } = useIntl();
+  const localStorageApi = new LocalStorageApi();
+  const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+  const getNetworkValue = () => {
+    const networkId = wallet && wallet.networkId;
+    switch (networkId) {
+      case networks.CardanoPreprodTestnet.NetworkId:
+        return intl.formatMessage(messages.preprod);
+      case networks.CardanoPreviewTestnet.NetworkId:
+        return intl.formatMessage(messages.preview);
+      default:
+        return intl.formatMessage(messages.mainnet);
+    }
   };
 
-  render(): Node {
-    const { openModal, closeModal } = useModal()
-    const localStorageApi = new LocalStorageApi();
-    const { intl } = this.context;
-    const { wallet } = this.props;
-    const isTestnet = wallet != null && wallet.isTestnet;
-    const network = isTestnet ? 'testnet' : 'mainnet';
-    const getNetworkValue = () => {
-      const networkId = wallet && wallet.networkId;
-      switch (networkId) {
-        case networks.CardanoPreprodTestnet.NetworkId:
-          return intl.formatMessage(messages.preprod)
-        case networks.CardanoPreviewTestnet.NetworkId:
-          return intl.formatMessage(messages.preview)
-        default:
-          return intl.formatMessage(messages.mainnet)
+  useEffect(() => {
+    // eslint-disable-next-line
+    (async () => {
+      const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
+      if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
+        console.log('should open testnet info modal')
+        openModal({
+          title: intl.formatMessage(messages.modalTitle),
+          content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
+          width: '648px',
+          height: '360px',
+          modalId: 'testNetworkInfoModal',
+        });
       }
-    };
+    })();
+  }, []);
 
-    useEffect(() => {
-      // eslint-disable-next-line
-      (async () => {
-        const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
-        if (!isTestnet && !isTestnetModalDisplayed) {
-          openModal({
-            title: intl.formatMessage(messages.modalTitle),
-            content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo}/>,
-            width: '648px',
-            height: '360px',
-          });
-        }
-      })()
-    }, [])
+  const onCloseModalInfo = useCallback(async () => {
+    await localStorageApi.setTestnetModalDisplayed(true);
+    closeModal();
+  }, [localStorageApi]);
 
-    const onCloseModalInfo = useCallback(async () => {
-      await localStorageApi.setTestnetModalDisplayed(true);
-      closeModal()
-    }, [localStorageApi]);
+  return (
+    <Box
+      sx={{
+        pb: '20px',
+        mt: '40px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
+        {intl.formatMessage(messages.aboutYoroiLabel)}
+      </Typography>
 
-
-    return (
-      <Box
-        sx={{
-          pb: '20px',
-          mt: '40px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}
-      >
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
-          {intl.formatMessage(messages.aboutYoroiLabel)}
-        </Typography>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {network && (
-            <LabelWithValue
-              label={intl.formatMessage(messages.networkLabel)}
-              value={getNetworkValue()}
-              componentId={basePageComponentPath + '-networkInfo-text'}
-            />
-          )}
-
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {network && (
           <LabelWithValue
-            label={intl.formatMessage(messages.versionLabel)}
-            value={environment.getVersion()}
-            url={baseGithubUrl + 'releases/'}
-            componentId={basePageComponentPath + '-versionInfo-text'}
+            label={intl.formatMessage(messages.networkLabel)}
+            value={getNetworkValue()}
+            showInfoToolTip
+            handleTooltip={() => {
+              openModal({
+                title: intl.formatMessage(messages.modalTitle),
+                content: <TestNetworkInfoModal onClose={() => closeModal()} />,
+                width: '648px',
+                height: '360px',
+              });
+            }}
+            componentId={basePageComponentPath + '-networkInfo-text'}
           />
+        )}
 
+        <LabelWithValue
+          label={intl.formatMessage(messages.versionLabel)}
+          value={environment.getVersion()}
+          url={baseGithubUrl + 'releases/'}
+          componentId={basePageComponentPath + '-versionInfo-text'}
+        />
+
+        <LabelWithValue
+          label={intl.formatMessage(messages.commitLabel)}
+          value={environment.commit}
+          url={baseGithubUrl + 'commit/' + environment.commit}
+          componentId={basePageComponentPath + '-commitInfo-text'}
+        />
+
+        {!environment.isProduction() && (
           <LabelWithValue
-            label={intl.formatMessage(messages.commitLabel)}
-            value={environment.commit}
-            url={baseGithubUrl + 'commit/' + environment.commit}
-            componentId={basePageComponentPath + '-commitInfo-text'}
+            label={intl.formatMessage(messages.branchLabel)}
+            value={environment.branch}
+            url={baseGithubUrl + 'tree/' + environment.branch}
+            componentId={basePageComponentPath + '-branchInfo-text'}
           />
-
-          {!environment.isProduction() && (
-            <LabelWithValue
-              label={intl.formatMessage(messages.branchLabel)}
-              value={environment.branch}
-              url={baseGithubUrl + 'tree/' + environment.branch}
-              componentId={basePageComponentPath + '-branchInfo-text'}
-            />
-          )}
-        </Box>
-
-        <Button
-          onClick={this.props.onSwitchNetwork}
-          variant="secondary"
-          style={{ width: '200px' }}
-        >
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
-
-        <div className={styles.aboutSocial}>
-          <GridFlexContainer rowSize={socialMediaLinks.length}>
-            {socialMediaLinks.map(link => (
-              <LinkButton
-                key={link.url}
-                {...link}
-                textClassName={styles.socialMediaLinkText}
-                onExternalLinkClick={handleExternalLinkClick}
-              />
-            ))}
-          </GridFlexContainer>
-        </div>
+        )}
       </Box>
-    );
-  }
-}
+
+      <Button
+        onClick={onSwitchNetwork}
+        variant="secondary"
+        style={{ width: '200px' }}
+        id={basePageComponentPath + '-switchNetwork-button'}
+      >
+        {intl.formatMessage(messages.switchNetwork)}
+      </Button>
+
+      <div className={styles.aboutSocial}>
+        <GridFlexContainer rowSize={socialMediaLinks.length}>
+          {socialMediaLinks.map(link => (
+            <LinkButton
+              key={link.url}
+              {...link}
+              textClassName={styles.socialMediaLinkText}
+              onExternalLinkClick={handleExternalLinkClick}
+            />
+          ))}
+        </GridFlexContainer>
+      </div>
+    </Box>
+  );
+};
+
+export default AboutYoroiSettingsBlock;
 
 function LabelWithValue({
   label,
   value,
   url,
   componentId,
+  showInfoToolTip,
+  handleTooltip,
 }: {|
   label: string,
   value: string,
   url?: string,
   componentId?: string,
+  showInfoToolTip?: boolean,
+  handleTooltip?: () => void,
 |}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -303,10 +311,14 @@ function LabelWithValue({
       >
         {value}
       </Typography>
+      {showInfoToolTip && <IconWrapper icon={Icons.InfoCircle} onClick={handleTooltip} asButton />}
     </Box>
   );
 }
 
 LabelWithValue.defaultProps = {
   url: undefined,
+  componentId: undefined,
+  showInfoToolTip: undefined,
+  handleTooltip: undefined,
 };
