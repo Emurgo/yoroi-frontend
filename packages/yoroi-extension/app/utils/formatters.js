@@ -11,17 +11,10 @@ export function splitAmount(
   }
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
-  let beforeDecimal = valString.substring(0, startIndex);
-  let afterDecimal = valString.substring(startIndex);
-
-  // Remove trailing zeros safely without regex
-  let i = afterDecimal.length;
-  while (i > 0 && afterDecimal[i - 1] === '0') {
-    i--;
-  }
-  afterDecimal = afterDecimal.substring(0, i);
-
-  // Remove the dot if there's no decimal part left
+  let beforeDecimal = valString.substring(0, startIndex)
+  // TODO: see if an alternative method without a regex is needed?
+  const afterDecimal = valString.substring(startIndex).replace(/0+$/, '')
+  // Remove the dots if no decimals
   if (!afterDecimal) {
     beforeDecimal = beforeDecimal.slice(0, beforeDecimal.length - 1)
   }
