@@ -98,6 +98,24 @@ export class SpeculosDockerController {
     }
   }
 
+  async killContainer() {
+    if (!this.containerId) {
+      this.logger.error('killContainer: No container to kill');
+      throw new SpeculosDockerControllerError('No container to kill');
+    }
+    try {
+      this.logger.info(`killContainer: Killing container with Id: ${this.containerId}`);
+      const container = await this.docker.getContainer(this.containerId);
+      await container.kill();
+      this.logger.info(`killContainer: Container is killed`);
+      this.containerId = '';
+    } catch (error) {
+      console.log(error);
+      this.logger.error('Error occurred when trying to kill the container');
+      throw new SpeculosDockerControllerError(error.message);
+    }
+  }
+
   async isContainerRunning() {
     if (!this.containerId) return false;
     try {
