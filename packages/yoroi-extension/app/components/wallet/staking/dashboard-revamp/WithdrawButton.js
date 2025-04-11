@@ -26,8 +26,8 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       });
       return;
     }
-    createWithdrawalTx();
     ampli.claimAdaPageViewed();
+    return createWithdrawalTx();
   };
 
   const createWithdrawalTx = async () => {
@@ -105,7 +105,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         },
       }}
       onClick={isStakeRegistered && govStatusFetched ? handleRewardsWithdrawal : undefined}
-      disabled={isDisabled || !handleRewardsWithdrawal}
+      disabled={isDisabled}
     >
       {label}
     </Button>
