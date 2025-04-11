@@ -42,6 +42,12 @@ export const testWalletTrezor = Object.freeze({
   deviceId: '6495958994A4025BB5EE1DB0',
   balance: 0,
 });
+export const testWalletLedger = Object.freeze({
+  name: 'LedgerEmul',
+  plate: 'XDPH-3069',
+  mnemonic: 'canal program butter sell isolate say doll document miss burger join owner fabric behave stomach theory sing math school force inhale vast sunset trouble',
+  balance: 0,
+});
 
 export const getSpendableWallet = () => {
   const browserName = getTargetBrowser();
