@@ -1,4 +1,4 @@
-import { sleep } from '../utils/utils';
+import { sleep } from '../utils/utils.js';
 
 const SPECULOS_ENDPOINT = 'http://localhost:5001';
 
