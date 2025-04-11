@@ -32,7 +32,9 @@ export type SidebarCategoryRevamp = {|
         +featureFlagName ?: string,
 |};
 
-const HAS_SELECTED_WALLET = ({ selected }) => selected != null;
+const existsSelectedWallet = ({ selected }) => selected != null;
+const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
+const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
@@ -53,42 +55,42 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.STAKING,
     icon: stakingIcon,
     label: globalMessages.sidebarStaking,
-    isVisible: HAS_SELECTED_WALLET,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: (_request) => true,
+    isVisible: isOnMainnet,
   },
   {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
     label: globalMessages.sidebarPortfolio,
-    isVisible: HAS_SELECTED_WALLET,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'nfts',
     route: ROUTES.NFTS.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: HAS_SELECTED_WALLET,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'voting',
     route: ROUTES.REVAMP.CATALYST_VOTING,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
-    isVisible: HAS_SELECTED_WALLET,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'cashback',
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: ({ selected }) => selected?.type !== 'trezor',
+    isVisible: params => isOnMainnet(params) && nonTrezorWallet(params),
   },
   {
     className: 'connected-websites',
@@ -102,7 +104,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
-    isVisible: HAS_SELECTED_WALLET,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'settings',
