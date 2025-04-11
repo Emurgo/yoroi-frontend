@@ -96,7 +96,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @action
   createWithdrawalTxForWallet: ({|
     wallet: WalletState,
-  |}) => any = async request => {
+  |}) => Promise<any> = async request => {
     this.createWithdrawalTx.reset();
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
@@ -138,7 +138,6 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     dialog?: any,
   |}) => Promise<void> = async request => {
     const result = this.createDelegationTx.result;
-    console.log('resultresult', { result, request });
     if (result == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
