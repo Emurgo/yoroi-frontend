@@ -1,3 +1,5 @@
+// @flow
+import type { Node } from 'react';
 import { useCallback, useEffect } from 'react';
 import { defineMessages } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
@@ -18,12 +20,13 @@ import { Box, Button, Link, Typography } from '@mui/material';
 // $FlowIgnore: suppressing this error
 import { TestNetworkInfoModal } from '../../../../UI/components/TestNetworkInfoModal/TestNetworkInfoModal';
 // $FlowIgnore: suppressing this error
-import { IconWrapper } from '../../../../UI/components';
+import { IconWrapper, Icons } from '../../../../UI/components';
 // $FlowIgnore: suppressing this error
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-import { Icons } from '../../../../UI/components/icons';
+// $FlowIgnore[cannot-resolve-module]
+import { useIntl } from '../../../../UI/context/IntlProvider';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -90,7 +93,6 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.switchNetwork',
     defaultMessage: '!!!SWITCH NETWORK',
   },
-
   modalTitle: {
     id: 'settings.general.testnetModal.title',
     defaultMessage: '!!!What are the test networks?',
@@ -147,8 +149,14 @@ const socialMediaLinks = [
 
 const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
-export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
+type Props = {|
+  wallet: null | { isTestnet: boolean, networkId: number, ... },
+  onSwitchNetwork: () => void,
+|};
+
+const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
   const { openModal, closeModal } = useModal();
+  const { intl } = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
   const getNetworkValue = () => {
@@ -167,10 +175,11 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
     // eslint-disable-next-line
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
-      if (!wallet.isTestnet && !isTestnetModalDisplayed) {
+      if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
+        console.log('should open testnet info modal')
         openModal({
           title: intl.formatMessage(messages.modalTitle),
-          content: <TestNetworkInfoModal intl={intl} onClose={onCloseModalInfo} />,
+          content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
           width: '648px',
           height: '360px',
           modalId: 'testNetworkInfoModal',
@@ -207,7 +216,7 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
             handleTooltip={() => {
               openModal({
                 title: intl.formatMessage(messages.modalTitle),
-                content: <TestNetworkInfoModal intl={intl} onClose={() => closeModal()} />,
+                content: <TestNetworkInfoModal onClose={() => closeModal()} />,
                 width: '648px',
                 height: '360px',
               });
@@ -265,7 +274,23 @@ export const AboutYoroiSettingsBlock = ({ intl, wallet, onSwitchNetwork }) => {
   );
 };
 
-const LabelWithValue = ({ label, value, url, componentId, showInfoToolTip, handleTooltip }) => {
+export default AboutYoroiSettingsBlock;
+
+function LabelWithValue({
+  label,
+  value,
+  url,
+  componentId,
+  showInfoToolTip,
+  handleTooltip,
+}: {|
+  label: string,
+  value: string,
+  url?: string,
+  componentId?: string,
+  showInfoToolTip?: boolean,
+  handleTooltip?: () => void,
+|}): Node {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
       <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -290,4 +315,11 @@ const LabelWithValue = ({ label, value, url, componentId, showInfoToolTip, handl
       {showInfoToolTip && <IconWrapper icon={Icons.InfoCircle} onClick={handleTooltip} asButton />}
     </Box>
   );
+}
+
+LabelWithValue.defaultProps = {
+  url: undefined,
+  componentId: undefined,
+  showInfoToolTip: undefined,
+  handleTooltip: undefined,
 };

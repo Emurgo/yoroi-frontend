@@ -231,7 +231,7 @@ export const AssetAndAmountRow = ({
       sx={{
         display: 'grid',
         columnGap: '8px',
-        p: '8px',
+        py: '8px',
         borderRadius: '8px',
         gridColumn: '1/-1',
         gridTemplateColumns: isFrom ? fromTemplateColumns : toTemplateColumns,

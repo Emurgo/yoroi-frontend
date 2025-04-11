@@ -3,6 +3,7 @@ export * from './buttons/CopyButton';
 export * from './Card';
 export * from './Chip';
 export * from './Collapsible/Collapsible';
+export * from './CopyableText';
 export * from './icons';
 export * from './Input/PasswordInput';
 export * from './Input/SearchInput';

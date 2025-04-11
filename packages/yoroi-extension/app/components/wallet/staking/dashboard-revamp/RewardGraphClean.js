@@ -1,18 +1,13 @@
 // @flow
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { Box, Stack, Typography, useTheme } from '@mui/material';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import type { GraphItems } from '../dashboard/GraphWrapper';
+import { Stack, Typography, Box, useTheme } from '@mui/material';
 
 const graphVars = {
   barWidth: 10,
   fontSize: '14px',
   lineHeight: 16,
 };
-
-export type GraphItems = {|
-  +name: number,
-  +primary: number,
-  +poolName: string,
-|};
 
 type Props = {|
   data: Array<GraphItems>,

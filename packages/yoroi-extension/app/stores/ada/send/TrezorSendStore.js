@@ -47,6 +47,7 @@ export default class TrezorSendStore extends Store<StoresMap> {
   sendUsingTrezor: {|
     params: SendUsingTrezorParams,
     onSuccess?: void => void,
+    onFail ?: void => void,
     +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
@@ -94,6 +95,9 @@ export default class TrezorSendStore extends Store<StoresMap> {
       Logger.info('SUCCESS: ADA sent using Trezor SignTx');
     } catch (e) {
       this._setError(e);
+      if (request.onFail) {
+        request.onFail();
+      }
     } finally {
       this._setActionProcessing(false);
     }
