@@ -80,7 +80,9 @@ export default class DelegationStore extends Store<StoresMap> {
     );
   }
 
-  @action setPoolTransitionConfig: (?{ publicDeriverId: number, ... }, PoolTransitionModal) => void = (publicDeriver, config) => {
+  @action setPoolTransitionConfig: (?{ publicDeriverId: number, ... }, PoolTransitionModal) => void = (
+    publicDeriver, config
+  ) => {
     if (publicDeriver != null) {
       this.poolTransitionConfig[publicDeriver.publicDeriverId] = {
         show: config.show,
@@ -143,30 +145,38 @@ export default class DelegationStore extends Store<StoresMap> {
     this.selectedPage = 0;
   };
 
-  getDelegationRequests: number => void | DelegationRequests = publicDeriverId => {
+  getDelegationRequests: number => void | DelegationRequests = (publicDeriverId) => {
     return find(this.delegationRequests, { publicDeriverId });
-  };
+  }
 
-  _getDelegatedBalanceResult: number => ?GetDelegatedBalanceResponse = publicDeriverId => {
+  _getDelegatedBalanceResult: number => ?GetDelegatedBalanceResponse = (publicDeriverId) => {
     const delegationRequest = this.getDelegationRequests(publicDeriverId);
     return delegationRequest?.getDelegatedBalance.result || null;
   };
 
   // <TODO:PENDING_REMOVAL> legacy after removing bip44
-  isRewardWallet: number => boolean = publicDeriverId => {
+  isRewardWallet: number => boolean = (publicDeriverId) => {
     return this.getDelegationRequests(publicDeriverId) != null;
-  };
+  }
 
-  canUnmangleSomeUtxo: number => boolean = publicDeriverId => {
-    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriverId)?.mangledAmounts.result?.canUnmangle;
+  canUnmangleSomeUtxo: number => boolean = (publicDeriverId) => {
+    const canUnmangleAmount: ?MultiToken = this.getDelegationRequests(publicDeriverId)
+      ?.mangledAmounts.result?.canUnmangle;
     return maybe(canUnmangleAmount, t => t.getDefault().gt(0)) ?? false;
   };
 
-  getMangledAmountsOrZero: (number, number, string) => MangledAmountsResponse = (publicDeriverId, networkId, defaultTokenId) => {
-    const defaultMultiToken = new MultiToken([], {
-      defaultNetworkId: networkId,
-      defaultIdentifier: defaultTokenId,
-    });
+  getMangledAmountsOrZero: (number, number, string) => MangledAmountsResponse = (
+    publicDeriverId,
+    networkId,
+    defaultTokenId,
+  ) => {
+    const defaultMultiToken = new MultiToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
     const resp: ?MangledAmountsResponse = this.getDelegationRequests(publicDeriverId)?.mangledAmounts.result;
     return {
       canUnmangle: resp?.canUnmangle ?? defaultMultiToken,
@@ -174,24 +184,27 @@ export default class DelegationStore extends Store<StoresMap> {
     };
   };
 
-  hasRewardHistory: number => boolean = publicDeriverId => {
+  hasRewardHistory: number => boolean = (publicDeriverId) => {
     return this.getDelegationRequests(publicDeriverId)?.rewardHistory.result != null;
-  };
+  }
 
-  isExecutedDelegatedBalance: number => boolean = publicDeriverId => {
+  isExecutedDelegatedBalance: number => boolean = (publicDeriverId) => {
     return this.getDelegationRequests(publicDeriverId)?.getDelegatedBalance.wasExecuted === true;
-  };
+  }
 
   getRewardBalanceOrZero: ({
     publicDeriverId: number,
     networkId: number,
     defaultTokenId: string,
     ...
-  }) => MultiToken = ({ publicDeriverId, networkId, defaultTokenId }) => {
-    const defaultMultiToken = new MultiToken([], {
-      defaultNetworkId: networkId,
-      defaultIdentifier: defaultTokenId,
-    });
+  }) => MultiToken = ({ publicDeriverId, networkId, defaultTokenId, }) => {
+    const defaultMultiToken = new MultiToken(
+      [],
+      {
+        defaultNetworkId: networkId,
+        defaultIdentifier: defaultTokenId,
+      }
+    );
 
     if (this.stores.transactions.hasProcessedWithdrawals({ publicDeriverId })) {
       // In case we have a processed withdrawal for the wallet
@@ -199,31 +212,31 @@ export default class DelegationStore extends Store<StoresMap> {
       return defaultMultiToken;
     }
     return this._getDelegatedBalanceResult(publicDeriverId)?.accountPart ?? defaultMultiToken;
-  };
+  }
 
-  getDelegatedUtxoBalance: number => ?MultiToken = publicDeriverId => {
+  getDelegatedUtxoBalance: number => ?MultiToken = (publicDeriverId) => {
     return this._getDelegatedBalanceResult(publicDeriverId)?.utxoPart ?? null;
-  };
+  }
 
-  getDelegatedPoolId: number => ?string = publicDeriverId => {
+  getDelegatedPoolId: number => ?string = (publicDeriverId) => {
     return this._getDelegatedBalanceResult(publicDeriverId)?.delegation ?? null;
-  };
+  }
 
-  isCurrentlyDelegating: number => boolean = publicDeriverId => {
+  isCurrentlyDelegating: number => boolean = (publicDeriverId) => {
     return this.getDelegatedPoolId(publicDeriverId) != null;
-  };
+  }
 
-  isStakeRegistered: number => ?boolean = publicDeriverId => {
+  isStakeRegistered: number => ?boolean = (publicDeriverId) => {
     return this._getDelegatedBalanceResult(publicDeriverId)?.stakeRegistered ?? null;
-  };
+  }
 
   getLocalPoolInfo: (number, string) => void | PoolMeta = (networkId, poolId) => {
     return find(this.poolInfo, { networkId, poolId })?.poolInfo;
-  };
+  }
 
   getLocalRemotePoolInfo: (number, string) => void | PoolInfo = (networkId, poolId) => {
     return find(this.poolInfo, { networkId, poolId })?.poolRemoteInfo ?? undefined;
-  };
+  }
 
   getPoolTransitionInfo(wallet: ?{ publicDeriverId: number, ... }): ?PoolTransition {
     return maybe(wallet, w => this.poolTransitionRequestInfo[w.publicDeriverId]);
@@ -284,7 +297,7 @@ export default class DelegationStore extends Store<StoresMap> {
 
       runInAction(() => {
         this.poolTransitionRequestInfo[publicDeriver.publicDeriverId] = { ...response };
-      });
+      })
     } catch (error) {
       console.warn('Failed to check pool transition', error);
     }
@@ -300,7 +313,7 @@ export default class DelegationStore extends Store<StoresMap> {
     return result;
   };
 
-  createDrepDelegationTransaction: string => Promise<void> = async drepCredential => {
+  createDrepDelegationTransaction: string => Promise<any> = async drepCredential => {
     return await this.stores.substores.ada.delegationTransaction.createTransaction({
       drepCredential,
       wallet: this.stores.wallets.selectedOrFail,
@@ -308,16 +321,14 @@ export default class DelegationStore extends Store<StoresMap> {
   };
 
   checkGovernanceStatus: ({
-    stakingAddress: string,
-    networkId: number,
-    ...
+    stakingAddress: string, networkId: number, ...
   }) => Promise<void> = async publicDeriver => {
     try {
       const skey = unwrapStakingKey(publicDeriver.stakingAddress).to_keyhash()?.to_hex();
       if (skey == null) {
         throw new Error('Cannot get staking key from the wallet!');
       }
-      const { Backend } = getNetworkById(publicDeriver.networkId);
+      const { Backend }  = getNetworkById(publicDeriver.networkId);
       const { BackendService, BackendServiceZero } = Backend;
       if (!BackendService || !BackendServiceZero) {
         throw new Error('unexpectedly missing backend');
