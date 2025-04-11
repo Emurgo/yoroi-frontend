@@ -16,33 +16,39 @@ import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 import { oneMinute, quarterSecond, threeSeconds } from '../../helpers/timeConstants.js';
+import { SpeculosDockerController } from '../../helpers/speculos/speculosDockerController.js';
+import { LedgerModels } from '../../helpers/ledgerHelper.js';
+import { testWalletLedger } from '../../utils/testWallets.js';
 
 describe('Connect Ledger HW wallet', function () {
   this.timeout(2 * oneMinute);
+  /** @type {SpeculosDockerController} */
+  let speculosDockerController = null;
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
-  let ledgerLogger = null;
+  /** @type {LedgerEmulatorController} */
   let ledgerController = null;
-  let wmLogger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
 
-  before(function (done) {
-    webdriver = getDriver();
-    logger = getTestLogger(this.test.parent.title);
-    ledgerLogger = getTestLogger('ledger', this.test.parent.title);
-    ledgerController = new LedgerEmulatorController(ledgerLogger);
-    wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    const basePage = new BasePage(webdriver, logger);
-    basePage.goToExtension();
-    done();
-  });
+  before(async function () {
+    const speculosDockerLogger = getTestLogger('speculosDocker', this.test.parent.title);
+    speculosDockerController = new SpeculosDockerController(speculosDockerLogger, LedgerModels.NanoSPlus, testWalletLedger.mnemonic);
+    await speculosDockerController.runContainer();
 
-  it('Initials steps', async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    logger = getTestLogger(this.test.parent.title);
+    
+    const ledgerLogger = getTestLogger('ledger', this.test.parent.title);
+    ledgerController = new LedgerEmulatorController(ledgerLogger);
+
+    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+    windowManager = new WindowManager(webdriver, wmLogger);
     await windowManager.init();
-    const initialStepsPage = new InitialStepsPage(webdriver, logger);
-    await initialStepsPage.skipInitialSteps();
   });
 
   it('Ledger is ready', async function () {
@@ -70,7 +76,7 @@ describe('Connect Ledger HW wallet', function () {
 
   it('Enter wallet details', async function () {
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
-    await addNewWalletPage.enterHWWalletName('Speculos');
+    await addNewWalletPage.enterHWWalletName(testWalletLedger.name);
     await addNewWalletPage.saveHWInfo();
   });
 
@@ -81,9 +87,9 @@ describe('Connect Ledger HW wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(0);
-    expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal('Speculos');
-    expect(walletInfo.plate, `The wallet plate should be PAXX-9560`).to.equal('PAXX-9560');
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWalletLedger.balance);
+    expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal(testWalletLedger.name);
+    expect(walletInfo.plate, `The wallet plate is different`).to.equal(testWalletLedger.plate);
   });
 
   afterEach(function (done) {
@@ -94,5 +100,6 @@ describe('Connect Ledger HW wallet', function () {
   after(async function () {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
+    await speculosDockerController.killContainer();
   });
 });
