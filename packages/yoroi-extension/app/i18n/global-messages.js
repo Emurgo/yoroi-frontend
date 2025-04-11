@@ -658,6 +658,10 @@ const globalMessages: * = defineMessages({
     id: 'wallet.delegation.transaction.generation',
     defaultMessage: '!!!Generating transaction',
   },
+  delegationById: {
+    id: 'wallet.navigation.delegationById',
+    defaultMessage: '!!!Delegation by Id',
+  },
   poolFetching: {
     id: 'wallet.delegation.poolInfo.fetching',
     defaultMessage: '!!!Fetching pool information',
