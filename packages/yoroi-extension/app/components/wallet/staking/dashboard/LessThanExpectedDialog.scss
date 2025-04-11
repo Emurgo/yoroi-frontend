@@ -1,0 +1,17 @@
+@import '../../../../themes/mixins/unordered-list';
+
+:global(.YoroiModern), :global(.YoroiRevamp) {
+  .component {
+    min-width: var(--yoroi-comp-dialog-min-width-lg);
+    max-width: var(--yoroi-comp-dialog-min-width-lg);
+  }
+}
+
+.component {
+  font-weight: 400;
+  @include unordered-list;
+
+  .header {
+    margin-bottom: 20px;
+  }
+}

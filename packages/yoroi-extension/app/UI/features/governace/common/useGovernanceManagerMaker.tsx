@@ -1,5 +1,5 @@
-import React from 'react';
 import { governanceApiMaker, governanceManagerMaker } from '@yoroi/staking';
+import React from 'react';
 // @ts-ignore
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -11,7 +11,8 @@ export const useGovernanceManagerMaker = (walletId: string, networkId: string): 
       governanceManagerMaker({
         walletId,
         networkId: Number(networkId),
-        api: governanceApiMaker({ networkId: Number(networkId) }),
+        // @ts-ignore
+        api: governanceApiMaker({ network: networkId }),
         cardano: RustModule.CrossCsl.init('any'),
         // @ts-ignore
         storage: 'wallet/${walletId}/staking-governance/',

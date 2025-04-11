@@ -23,7 +23,7 @@ export type SocialLinks = {|
 |};
 export type PoolData = {|
   +id: string,
-  +name?: string,
+  +name: string,
   +ticker?: string,
   +avatar?: ?string,
   +roa?: ?string,

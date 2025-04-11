@@ -35,7 +35,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }: any) => ({
 }));
 
 type Props = {
-  title: string;
+  title: string | React.ReactNode;
   content: React.ReactNode;
   expanded?: boolean;
 };
