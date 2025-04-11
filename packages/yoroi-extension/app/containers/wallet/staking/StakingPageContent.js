@@ -86,10 +86,9 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     const poolMeta = delegationStore.getLocalPoolInfo(publicDeriver.networkId, currentPool);
     const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(publicDeriver.networkId, currentPool) ?? {};
 
-    const name = poolMeta?.info?.name;
     const delegatedPool = {
       id: String(currentPool),
-      name,
+      name: poolMeta?.info?.name ?? '',
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),

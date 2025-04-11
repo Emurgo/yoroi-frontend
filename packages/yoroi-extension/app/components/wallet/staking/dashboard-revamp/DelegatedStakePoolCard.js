@@ -16,9 +16,9 @@ import { poolIdHexToBech32 } from '../../../../api/ada/lib/cardanoCrypto/utils';
 
 type Props = {|
   delegatedPool: PoolData,
-    poolTransition: ?PoolTransition,
-    delegateToSpecificPool: (id: ?string) => void,
-    stores: any,
+  poolTransition: ?PoolTransition,
+  delegateToSpecificPool: (id: ?string) => void,
+  stores: any,
 |};
 
 type Intl = {|
