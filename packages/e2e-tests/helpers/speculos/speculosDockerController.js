@@ -87,7 +87,7 @@ export class SpeculosDockerController {
     }
     try {
       this.logger.info(`stopContainer: Stoping container with Id: ${this.containerId}`);
-      const container = await this.docker.getContainer(this.containerId);
+      const container = this.docker.getContainer(this.containerId);
       await container.stop();
       this.logger.info(`stopContainer: Container is stopped`);
       this.containerId = '';
@@ -105,7 +105,7 @@ export class SpeculosDockerController {
     }
     try {
       this.logger.info(`killContainer: Killing container with Id: ${this.containerId}`);
-      const container = await this.docker.getContainer(this.containerId);
+      const container = this.docker.getContainer(this.containerId);
       await container.kill();
       this.logger.info(`killContainer: Container is killed`);
       this.containerId = '';

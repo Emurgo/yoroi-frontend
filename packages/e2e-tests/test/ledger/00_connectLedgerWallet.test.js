@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { getDriver } from '../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import {
@@ -12,12 +11,13 @@ import {
   ledgerConnectTabName,
 } from '../../helpers/windowManager.js';
 import BasePage from '../../pages/basepage.js';
-import InitialStepsPage from '../../pages/initialSteps.page.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { oneMinute, quarterSecond, threeSeconds } from '../../helpers/timeConstants.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 import { SpeculosDockerController } from '../../helpers/speculos/speculosDockerController.js';
 import { LedgerModels } from '../../helpers/ledgerHelper.js';
 import { testWalletLedger } from '../../utils/testWallets.js';
