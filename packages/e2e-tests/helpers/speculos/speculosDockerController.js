@@ -27,7 +27,6 @@ export class SpeculosDockerController {
         PortBindings: {
           '5001/tcp': [
             {
-              HostIp: '0.0.0.0',
               HostPort: '5001',
             },
           ],

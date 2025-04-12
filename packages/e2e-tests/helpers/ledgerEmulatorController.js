@@ -1,6 +1,5 @@
 import { sleep } from '../utils/utils.js';
-
-const SPECULOS_ENDPOINT = 'http://localhost:5001';
+import {hostname} from 'os';
 
 class LedgerEmulatorControllerError extends Error {}
 
@@ -9,11 +8,13 @@ export const CARDANO_IS_READY = 'Cardano is ready';
 export class LedgerEmulatorController {
   constructor(logger) {
     this.logger = logger;
+    this.speculosEndpoint = `http://${hostname()}:5001`;
+    this.logger.info(`LedgerEmulator::constructor speculos endpoint: ${this.speculosEndpoint}`);
   }
 
   async _click(button) {
     this.logger.info(`LedgerEmulator::_click is called. Button: ${button}`);
-    await fetch(`${SPECULOS_ENDPOINT}/button/${button}`, {
+    await fetch(`${this.speculosEndpoint}/button/${button}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export class LedgerEmulatorController {
   async readScreen() {
     this.logger.info(`LedgerEmulator::readScreen is called`);
     try {
-      const eventsResponse = await fetch(`${SPECULOS_ENDPOINT}/events?currentscreenonly=true`);
+      const eventsResponse = await fetch(`${this.speculosEndpoint}/events?currentscreenonly=true`);
       if (!eventsResponse.ok) {
         this.logger.error(`LedgerEmulator::readScreen Not able to receive events for the current screen`)
         throw new LedgerEmulatorControllerError('Not able to receive events for the current screen');
