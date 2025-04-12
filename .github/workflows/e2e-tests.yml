@@ -15,7 +15,8 @@ jobs:
       contains(github.event.review.body, '/check') ||
       contains(github.event.review.body, '/ext-general') ||
       contains(github.event.review.body, '/dapp-general') ||
-      contains(github.event.review.body, '/trezor')
+      contains(github.event.review.body, '/trezor') ||
+      contains(github.event.review.body, '/ledger')
       )
     runs-on: ubuntu-latest
 
@@ -342,6 +343,7 @@ jobs:
           path: |
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_chrome
+
   Ledger:
     if: github.event.review &&
       (
