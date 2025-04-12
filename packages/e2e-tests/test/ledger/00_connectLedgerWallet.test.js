@@ -100,6 +100,6 @@ describe('Connect Ledger HW wallet', function () {
   after(async function () {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
-    await speculosDockerController.killContainer();
+    await speculosDockerController.killAndRemove();
   });
 });
