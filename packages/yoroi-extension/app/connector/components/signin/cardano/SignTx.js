@@ -1,7 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl, Cip95Info } from '../../../types';
-import type { SummaryAssetsData } from '../CardanoSignTxPage';
+import type { SummaryAssetsData, AssetInfo, } from '../CardanoSignTxPage';
 import BigNumber from 'bignumber.js';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography } from '@mui/material';
@@ -23,8 +23,7 @@ const messages: Object = defineMessages({
 
 
 type AssetDisplayValueProps = {|
-  amount: BigNumber,
-  tokenInfo: any,
+  ...AssetInfo,
   renderExplorerHashLink: Function,
 |};
 
@@ -32,12 +31,20 @@ export const getAssetDisplayValue = ({
   amount,
   tokenInfo,
   renderExplorerHashLink,
-}: AssetDisplayValueProps): Node => (
-  <>
-    {amount.toNumber() === 1 && tokenInfo.IsNFT ? null : <span>{amount.toNumber() + ' '}</span>}
-    {renderExplorerHashLink(tokenInfo)}
-  </>
-);
+}: AssetDisplayValueProps): Node => {
+  let amountDisplay;
+  if (amount.eq('1') && tokenInfo.IsNFT) {
+    amountDisplay = null;
+  } else {
+    amountDisplay = (<span>{amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).toString() + ' '}</span>);
+  }
+  return (
+    <>
+      {amountDisplay}
+      {renderExplorerHashLink(tokenInfo)}
+    </>
+  );
+}
 
 type Props = {|
   txAssetsData: SummaryAssetsData,
