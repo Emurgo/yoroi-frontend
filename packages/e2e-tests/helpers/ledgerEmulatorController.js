@@ -43,7 +43,8 @@ export class LedgerEmulatorController {
     try {
       const eventsResponse = await fetch(`${SPECULOS_ENDPOINT}/events?currentscreenonly=true`);
       if (!eventsResponse.ok) {
-        throw new LedgerEmulatorController('Not able to receive events for the current screen');
+        this.logger.error(`LedgerEmulator::readScreen Not able to receive events for the current screen`)
+        throw new LedgerEmulatorControllerError('Not able to receive events for the current screen');
       }
       const eventsObj = await eventsResponse.json();
       const eventsText = eventsObj.events.map(evt => evt.text).join(' ');
@@ -52,7 +53,9 @@ export class LedgerEmulatorController {
       return eventsText;
     } catch (error) {
       console.error(error);
-      throw new LedgerEmulatorController('Some error happen: ', error);
+      this.logger.error(`LedgerEmulator::readScreen error`);
+      this.logger.error(JSON.stringify(error, null, 2));
+      throw new LedgerEmulatorControllerError('Some error happen: ', error);
     }
   }
 

@@ -354,9 +354,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build-Extension]
     steps:
-      - name: Pull speculos docker image
-        run: docker pull ghcr.io/ledgerhq/speculos:5d508ef13706c302604c0d44c09374cc4117bb23
-
       - name: Forcefully update Chrome browser
         id: chrome-version
         run: |
@@ -401,9 +398,11 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
-      - name: Run tests
+      - name: Pull speculos docker image and Run tests
         working-directory: ./packages/e2e-tests
-        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:ledger
+        run: |
+          docker pull ghcr.io/ledgerhq/speculos:5d508ef13706c302604c0d44c09374cc4117bb23
+          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:ledger
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
