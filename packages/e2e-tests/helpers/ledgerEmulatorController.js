@@ -36,7 +36,7 @@ export class LedgerEmulatorController {
 
   /**
    * The function reads a text from the current ledger screen
-   * @returns {string}
+   * @returns {Promise<string>}
    */
   async readScreen() {
     this.logger.info(`LedgerEmulator::readScreen is called`);
