@@ -401,7 +401,7 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
-      - name: Pull speculos docker image and Run tests
+      - name: Run tests
         working-directory: ./packages/e2e-tests
         run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:ledger
 
