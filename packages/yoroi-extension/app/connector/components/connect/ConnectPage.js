@@ -1,20 +1,20 @@
 // @flow
 import type { Node } from 'react';
-/* eslint-disable no-nested-ternary */
-import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
+import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
+import type { WalletState } from '../../../../chrome/extension/background/types';
+/* eslint-disable no-nested-ternary */
+import { Component } from 'react';
+import { defineMessages, intlShape } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
-import ConnectedWallet from './ConnectedWallet';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
-import type { ConnectingMessage } from '../../../../chrome/extension/connector/types';
 import { LoadingWalletStates } from '../../types';
 import ProgressBar from '../ProgressBar';
 import { environment } from '../../../environment';
@@ -29,10 +29,11 @@ import { ReactComponent as NoDappIcon } from '../../../assets/images/dapp-connec
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
 import AmountDisplay from '../../../components/common/AmountDisplay';
-import type { WalletState } from '../../../../chrome/extension/background/types';
 import { networks } from '../../../api/ada/lib/storage/database/prepackaged/networks.js';
 import { ReactComponent as ExclamationIcon } from '../../../assets/images/testnet-exclamation-circle.svg';
 import { NETWORK_BADGES } from '../../../containers/NavBarContainerRevamp';
+// $FlowIgnore: suppressing this error
+import ConnectedWallet from '../../../UI/features/connector/useCases/ConnectedWallet';
 
 const messages = defineMessages({
   subtitle: {
@@ -460,6 +461,7 @@ const TestnetWarningBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: '8px',
+  marginBottom: '16px',
 }));
 
 const TestnetWarningTitle = styled(Typography)(({ theme }) => ({
