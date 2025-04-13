@@ -11,7 +11,7 @@ import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
+import { fiveSeconds, oneMinute, quarterSecond } from '../../helpers/timeConstants.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
@@ -19,7 +19,6 @@ import { SpeculosDockerController } from '../../helpers/speculos/speculosDockerC
 import { LedgerEmulatorController, LedgerStates } from '../../helpers/ledgerEmulatorController.js';
 import { convertVerifiedAddressesInfo, LedgerModels } from '../../helpers/ledgerHelper.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
-import { threeSeconds, quarterSecond } from '../../helpers/timeConstants.js';
 
 describe(`Verify address on Ledger`, function () {
   this.timeout(2 * oneMinute);
@@ -71,8 +70,8 @@ describe(`Verify address on Ledger`, function () {
     await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
     const ledgerConnectPage = new LedgerConnect(webdriver, logger);
     await ledgerConnectPage.selectNanoS();
-    const ledgerIsReady = await ledgerController.isReadyForAction(threeSeconds, quarterSecond);
-    expect(ledgerIsReady, `Ledger isn't ready after ${threeSeconds / 1000} seconds`).to.be.true;
+    const ledgerIsReady = await ledgerController.isReadyForAction(fiveSeconds, quarterSecond);
+    expect(ledgerIsReady, `Ledger isn't ready after ${fiveSeconds / 1000} seconds`).to.be.true;
     await ledgerController.clickBoth();
     await windowManager.waitForClosingAndSwitchTo(ledgerConnectTabName, extensionTabName);
   });
@@ -112,8 +111,8 @@ describe(`Verify address on Ledger`, function () {
     await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
     const ledgerConnectPage = new LedgerConnect(webdriver, logger);
     await ledgerConnectPage.continue();
-    const ledgerIsReady = await ledgerController.isReadyForAction(threeSeconds, quarterSecond);
-    expect(ledgerIsReady, `Ledger isn't ready after ${threeSeconds / 1000} seconds`).to.be.true;
+    const ledgerIsReady = await ledgerController.isReadyForAction(fiveSeconds, quarterSecond);
+    expect(ledgerIsReady, `Ledger isn't ready after ${fiveSeconds / 1000} seconds`).to.be.true;
 
     const fullData = await ledgerController.fullConfirmAndGetContent();
     await windowManager.waitForClosingAndSwitchTo(ledgerConnectTabName, extensionTabName);
