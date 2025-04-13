@@ -53,7 +53,7 @@ const ConnectorLayout = observer(({ networkId, children }) => {
   return (
     <Box
       sx={{
-        width: '480px',
+        width: '484px',
         minHeight: '100vh',
         borderRadius: '2px',
         bgcolor: 'ds.bg_color_max',

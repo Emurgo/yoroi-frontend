@@ -8,7 +8,6 @@ import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import classNames from 'classnames';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
 import ConnectedWallet from './ConnectedWallet';
@@ -82,11 +81,12 @@ const messages = defineMessages({
   },
   testnetWarningText: {
     id: 'connector.connect.testnetWarningText',
-    defaultMessage: '!!!This DApp may not support Cardano {networkName} (test blockchain network). Ensure it supports {networkName} before connecting.',
+    defaultMessage:
+      '!!!This DApp may not support Cardano {networkName} (test blockchain network). Ensure it supports {networkName} before connecting.',
   },
   cashbackApplyAll: {
     id: 'connector.connect.cashback.apply.all',
-    defaultMessage: '!!!The wallet you select will be applied for all partner websites.'
+    defaultMessage: '!!!The wallet you select will be applied for all partner websites.',
   },
   cashbackDisabledTrezor: {
     id: 'connector.connect.cashback.trezor.disabled',
@@ -214,7 +214,6 @@ export default class ConnectPage extends Component<Props> {
     } = this.props;
 
     const isNightly = environment.isNightly();
-    const componentClasses = classNames([styles.component, isNightly && styles.isNightly]);
 
     const isLoading = loading === LoadingWalletStates.IDLE || loading === LoadingWalletStates.PENDING;
     const isSuccess = loading === LoadingWalletStates.SUCCESS;
@@ -253,13 +252,7 @@ export default class ConnectPage extends Component<Props> {
           )}
         </div>
         <Stack direction="row" spacing={4} mt="15px">
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={this.hidePasswordForm}
-            sx={{ minWidth: 'auto' }}
-            id="backButton"
-          >
+          <Button fullWidth variant="outlined" onClick={this.hidePasswordForm} sx={{ minWidth: 'auto' }} id="backButton">
             {intl.formatMessage(globalMessages.backButtonLabel)}
           </Button>
           {!isSelectWalletHardware && (
@@ -281,14 +274,22 @@ export default class ConnectPage extends Component<Props> {
     const networkName = NETWORK_BADGES[networkId]?.text;
 
     return (
-      <div className={componentClasses}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          height: isNightly ? 'calc(100vh - 138px)' : 'calc(100vh - 52px)',
+          overflow: 'auto',
+          backgroundColor: 'ds.bg_color_high_contrast',
+        }}
+      >
         {hasWallets ? (
           <>
-            {!isSelectingCashbackWallet && (<ProgressBar step={isAppAuth ? 2 : 1} max={2} />)}
+            {!isSelectingCashbackWallet && <ProgressBar step={isAppAuth ? 2 : 1} max={2} />}
             <Typography
               component="div"
               variant="h4"
-              color="gray.900"
+              color="ds.gray_900"
               marginTop="32px"
               paddingX="32px"
               fontWeight="500"
@@ -304,7 +305,7 @@ export default class ConnectPage extends Component<Props> {
                   {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
                 </div>
                 <Box marginTop="16px">
-                  <Typography component="div" variant="body-1" fontWeight="400" color="gray.900">
+                  <Typography component="div" variant="body-1" fontWeight="400" color="ds.gray_900">
                     {intl.formatMessage(messages.subtitle)}{' '}
                     <Typography as="span" variant="body-1" fontWeight="500">
                       {url}
@@ -328,23 +329,21 @@ export default class ConnectPage extends Component<Props> {
               ) : hasWallets ? (
                 <div className={styles.walletsContainer}>
                   <div className={styles.titleWallet}>
-                    <Typography component="div" variant="body-1" lineHeight="24px" color="gray.900">
+                    <Typography component="div" variant="body1" lineHeight="24px" color="ds.gray_900">
                       {intl.formatMessage(messages.yourWallets)}
                     </Typography>
-                    <button type="button" className={styles.toggleButton} onClick={onUpdateHideBalance}>
+                    <button type="button" style={{ cursor: 'pointer' }} onClick={onUpdateHideBalance}>
                       {shouldHideBalance ? <IconEyeClosed /> : <IconEyeOpen />}
                     </button>
                   </div>
 
-                  {(networkId !== networks.CardanoMainnet.NetworkId) && (
+                  {networkId !== networks.CardanoMainnet.NetworkId && (
                     <TestnetWarningBox>
                       <TestnetWarningTitle>
                         <ExclamationIcon />
                         {intl.formatMessage(messages.testnetWarningTitle)}
                       </TestnetWarningTitle>
-                      <Typography>
-                        {intl.formatMessage(messages.testnetWarningText, { networkName })}
-                      </Typography>
+                      <Typography>{intl.formatMessage(messages.testnetWarningText, { networkName })}</Typography>
                     </TestnetWarningBox>
                   )}
 
@@ -357,15 +356,23 @@ export default class ConnectPage extends Component<Props> {
                       const isTrezor = isSelectingCashbackWallet && wallet.type === 'trezor';
                       const Btn = isTrezor ? DisabledWalletButton : WalletButton;
                       return (
-                        <li
+                        <Box
+                          component="li"
                           key={wallet.publicDeriverId}
-                          className={[styles.listItem, isTrezor ? '' : styles.enabledWallet].join(' ')}
+                          sx={{
+                            border: '1px solid',
+                            borderColor: 'ds.gray_700',
+                            borderRadius: '8px',
+                            ...(!isTrezor && {
+                              '&:hover': {
+                                borderColor: 'ds.gray_300',
+                              },
+                            }),
+                          }}
                         >
                           <Btn onClick={() => onSelectWallet(wallet, wallet.plate)}>
                             <ConnectedWallet
-                              disabledForReason={
-                                isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null
-                              }
+                              disabledForReason={isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null}
                               publicDeriver={wallet}
                               walletBalance={
                                 <Box
@@ -388,7 +395,7 @@ export default class ConnectPage extends Component<Props> {
                               }
                             />
                           </Btn>
-                        </li>
+                        </Box>
                       );
                     })}
                   </ul>
@@ -398,21 +405,24 @@ export default class ConnectPage extends Component<Props> {
           )}
         </Box>
         {!isSelectingCashbackWallet && hasWallets && !isAppAuth ? (
-          <div className={styles.bottom}>
-            <div className={styles.infoText}>{intl.formatMessage(messages.connectInfo)}</div>
-            <div className={styles.infoText}>{intl.formatMessage(connectorMessages.messageReadOnly)}</div>
-          </div>
+          <Box
+            sx={{
+              borderTop: '1px solid',
+              borderColor: 'ds.gray_200',
+              padding: '15px 32px',
+            }}
+          >
+            <Typography color="ds.gray_600" sx={{ fontSize: '12px', lineHeight: '20px' }}>
+              {intl.formatMessage(messages.connectInfo)}
+            </Typography>
+            <Typography color="ds.gray_600" sx={{ fontSize: '12px', lineHeight: '20px' }}>
+              {intl.formatMessage(connectorMessages.messageReadOnly)}
+            </Typography>
+          </Box>
         ) : null}
         {isSelectingCashbackWallet && (
           <Box sx={{ display: 'flex', gap: '15px', padding: '32px' }}>
-            <Button
-              sx={{ minWidth: 0 }}
-              fullWidth
-              variant="outlined"
-              color="primary"
-              onClick={this.onCancel}
-              id="cancelButton"
-            >
+            <Button sx={{ minWidth: 0 }} fullWidth variant="outlined" color="primary" onClick={this.onCancel} id="cancelButton">
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
             <Button
@@ -429,7 +439,7 @@ export default class ConnectPage extends Component<Props> {
             </Button>
           </Box>
         )}
-      </div>
+      </Box>
     );
   }
 }
