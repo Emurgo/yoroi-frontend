@@ -1,7 +1,6 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import type { ConfigType } from '../../../../config/config-types';
 import { intlShape } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
@@ -14,13 +13,20 @@ import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { PoolTransitionBanner } from './PoolTransitionBanner';
 import type { StoresProps } from '../../../stores';
 // $FlowIgnore: suppressing this error
+import { ReviewTxProvider } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
+import { ReviewTxModal } from '../../../UI/features/transaction-review/useCases/ReviewTx';
+// $FlowIgnore: suppressing this error
+import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
+// $FlowIgnore: suppressing this error
+import { ModalProvider } from '../../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
+import { ModalManager } from '../../../UI/components/modals/ModalManager';
+// $FlowIgnore: suppressing this error
 import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 @observer
 class StakingPage extends Component<StoresProps> {
@@ -51,10 +57,18 @@ class StakingPage extends Component<StoresProps> {
         showInContainer
       >
         <Suspense fallback={null}>
-          <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
-          <StakingPageContent stores={this.props.stores} />
-        </Suspense>
-      </TopBarLayout>
+          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+            <ModalProvider>
+              <ModalManager />
+              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                <ReviewTxModal />
+                <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
+                <StakingPageContent stores={this.props.stores} />
+              </ReviewTxProvider>
+            </ModalProvider>
+          </CurrencyProvider>
+        </Suspense >
+      </TopBarLayout >
     );
   }
 }

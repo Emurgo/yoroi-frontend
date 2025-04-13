@@ -4,7 +4,7 @@ import React from 'react';
 
 interface Props extends TooltipProps {
   children: JSX.Element;
-  title: JSX.Element;
+  title: JSX.Element | string;
 }
 
 export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {

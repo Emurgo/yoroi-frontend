@@ -25,7 +25,6 @@ export const ROUTES = {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
-    CARDANO_DELEGATION: '/wallets/cardano-delegation',
   },
   SETTINGS: {
     ROOT: '/settings',
@@ -86,5 +85,9 @@ export const ROUTES = {
     ROOT: '/portfolio',
     DAPPS: '/portfolio/dapps',
     DETAILS: '/portfolio/details/:tokenId',
+  },
+  TX_REVIEW: {
+    FAIL: '/tx-review/failed',
+    SUCCESS: '/tx-review/success',
   },
 };

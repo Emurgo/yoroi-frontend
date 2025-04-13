@@ -1,6 +1,6 @@
 import BasePage from '../../pages/basepage.js';
 import { customAfterEach } from '../../utils/customHooks.js';
-import { testWallet1 } from '../../utils/testWallets.js';
+import { testWallet1Mainnet } from '../../utils/testWallets.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
@@ -49,7 +49,7 @@ describe('dApp, mainnet, connection in extension,', function () {
   });
 
   it('Connect the wallet to the dapp', async function () {
-    await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet1);
+    await connectNonAuth(webdriver, logger, windowManager, mockedDApp, testWallet1Mainnet);
   });
 
   it('Connection is displayed in the extension', async function () {
@@ -59,14 +59,14 @@ describe('dApp, mainnet, connection in extension,', function () {
     const connectorTabPage = new ConnectorTab(webdriver, logger);
     await connectorTabPage.goToConnectorTab();
     // check displayed info
-    const connectedWalletInfo = await connectorTabPage.getConnectedWalletInfo(testWallet1.name);
-    expect(connectedWalletInfo.walletBalance).to.equal(testWallet1.balance);
+    const connectedWalletInfo = await connectorTabPage.getConnectedWalletInfo(testWallet1Mainnet.name);
+    expect(connectedWalletInfo.walletBalance).to.equal(testWallet1Mainnet.balance);
     expect(connectedWalletInfo.dappUrl).to.equal('localhost');
   });
 
   it('Disconnect the wallet', async function () {
     const connectorTabPage = new ConnectorTab(webdriver, logger);
-    await connectorTabPage.disconnectWallet(testWallet1.name, 'localhost');
+    await connectorTabPage.disconnectWallet(testWallet1Mainnet.name, 'localhost');
     const connectedWalletsAmount = (await connectorTabPage.getAllConnectedWallets()).length;
     expect(connectedWalletsAmount).to.equal(0);
   });

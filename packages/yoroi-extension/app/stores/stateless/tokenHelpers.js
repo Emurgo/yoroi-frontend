@@ -77,10 +77,8 @@ export function getTokenIdentifierIfExists(
   if (tokenRow.IsDefault) return undefined;
   if (tokenRow.Metadata.type === 'Cardano') {
     const { policyId, assetName } = tokenRow.Metadata;
-    const assetFingerprint = new AssetFingerprint(
-      hexToBytes(policyId),
-      hexToBytes(assetName),
-    );
+    const assetFingerprint = AssetFingerprint
+      .fromParts(hexToBytes(policyId), hexToBytes(assetName));
     return assetFingerprint.fingerprint();
   }
 
@@ -102,9 +100,7 @@ export function genLookupOrFail(
   map: TokenInfoMap,
 ): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>) {
   return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> => {
-    const tokenRow = map
-      .get(lookup.networkId.toString())
-      ?.get(lookup.identifier);
+    const tokenRow = map.get(lookup.networkId.toString())?.get(lookup.identifier);
     if (tokenRow == null) throw new Error(`${nameof(genLookupOrFail)} no token info for ${JSON.stringify(lookup)}`);
     return tokenRow;
   };
@@ -114,10 +110,8 @@ export function genLookupOrNull(
   map: TokenInfoMap,
 ): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null) {
   return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> | null => {
-    const tokenRow = map
-      .get(lookup.networkId.toString())
-      ?.get(lookup.identifier);
-    if (tokenRow == null) return null
+    const tokenRow = map.get(lookup.networkId.toString())?.get(lookup.identifier);
+    if (tokenRow == null) return null;
     return tokenRow;
   };
 }

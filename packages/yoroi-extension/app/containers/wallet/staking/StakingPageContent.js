@@ -17,22 +17,14 @@ import RewardHistoryDialog from '../../../components/wallet/staking/dashboard-re
 import SummaryCard from '../../../components/wallet/staking/dashboard-revamp/SummaryCard';
 import { compose, maybe, noop } from '../../../coreUtils';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
-import {
-  formatLovelacesHumanReadableShort,
-  roundOneDecimal,
-  roundTwoDecimal,
-} from '../../../utils/formatters';
+import { formatLovelacesHumanReadableShort, roundOneDecimal, roundTwoDecimal } from '../../../utils/formatters';
 import { generateGraphData } from '../../../utils/graph';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
-import DeregisterDialogContainer from '../../transfer/DeregisterDialogContainer';
 import UnmangleTxDialogContainer from '../../transfer/UnmangleTxDialogContainer';
-import WithdrawalTxDialogContainer from '../../transfer/WithdrawalTxDialogContainer';
 import WalletEmptyBanner from '../WalletEmptyBanner';
 import { GovernanceParticipateDialog } from '../dialogs/GovernanceParticipateDialog';
 import CardanoStakingPage from './CardanoStakingPage';
-import WithdrawRewardsDialog from './WithdrawRewardsDialog';
 import type { StoresProps } from '../../../stores';
-import { ampli } from '../../../../ampli/index';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -86,16 +78,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     return epochLengthInSeconds / (60 * 60 * 24);
   };
 
-  createWithdrawalTx: (shouldDeregister: boolean) => void = shouldDeregister => {
-    const { stores } = this.props;
-    const wallet = stores.wallets.selectedOrFail;
-    stores.substores.ada.delegationTransaction.setShouldDeregister(shouldDeregister);
-    noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-    stores.uiDialogs.open({
-      dialog: WithdrawRewardsDialog,
-    });
-  };
-
   getStakePoolMeta: ({ publicDeriverId: number, networkId: number, ... }) => Node = publicDeriver => {
     const delegationStore = this.props.stores.delegation;
     const currentPool = delegationStore.getDelegatedPoolId(publicDeriver.publicDeriverId);
@@ -104,16 +86,9 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     const poolMeta = delegationStore.getLocalPoolInfo(publicDeriver.networkId, currentPool);
     const { stake, roa, saturation, pic } = delegationStore.getLocalRemotePoolInfo(publicDeriver.networkId, currentPool) ?? {};
 
-
-
-    // if (poolMeta == null) {
-    //   // server hasn't returned information about the stake pool yet
-    //   return null;
-    // }
-    const name = poolMeta?.info?.name;
     const delegatedPool = {
       id: String(currentPool),
-      name,
+      name: poolMeta?.info?.name ?? '',
       avatar: pic,
       roa: maybe(roa, compose(Number, roundTwoDecimal)),
       poolSize: maybe(stake, formatLovelacesHumanReadableShort),
@@ -124,9 +99,9 @@ export default class StakingPageContent extends Component<StoresProps, State> {
 
     return (
       <DelegatedStakePoolCard
+        stores={this.props.stores}
         poolTransition={delegationStore.getPoolTransitionInfo(publicDeriver)}
         delegatedPool={delegatedPool}
-        undelegate={async () => this.createWithdrawalTx(true)} // shouldDeregister=true
         delegateToSpecificPool={async (poolId): any => {
           if (poolId != null) {
             return this.props.stores.delegation.createDelegationTransaction(poolId);
@@ -218,16 +193,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(wallet);
 
     const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
-    const handleRewardsWithdrawal = async () => {
-      if (!isParticipatingToGovernance) {
-        this.props.stores.uiDialogs.open({
-          dialog: GovernanceParticipateDialog,
-        });
-        return;
-      }
-      this.createWithdrawalTx(false); // shouldDeregister=false
-      ampli.claimAdaPageViewed();
-    };
 
     return (
       <Box>
@@ -241,12 +206,13 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         {currentlyDelegating ? (
           <WrapperCards>
             <SummaryCard
+              stores={stores}
+              govStatusFetched={this.state.govStatusFetched}
               onOverviewClick={() =>
                 stores.uiDialogs.open({
                   dialog: OverviewModal,
                 })
               }
-              withdrawRewards={isStakeRegistered && this.state.govStatusFetched ? handleRewardsWithdrawal : undefined}
               unitOfAccount={this.toUnitOfAccount}
               getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
               shouldHideBalance={stores.profile.shouldHideBalance}
@@ -295,32 +261,18 @@ export default class StakingPageContent extends Component<StoresProps, State> {
             withdrawRewards={
               isParticipatingToGovernance === false
                 ? () => {
-                    this.props.stores.uiDialogs.open({
-                      dialog: GovernanceParticipateDialog,
-                    });
-                  }
+                  this.props.stores.uiDialogs.open({
+                    dialog: GovernanceParticipateDialog,
+                  });
+                }
                 : isStakeRegistered
-                ? () => {
+                  ? () => {
                     this.props.stores.uiDialogs.open({
                       dialog: GovernanceParticipateDialog,
                     });
                   }
-                : undefined
+                  : undefined
             }
-          />
-        ) : null}
-        {uiDialogs.isOpen(DeregisterDialogContainer) ? (
-          <DeregisterDialogContainer
-            stores={stores}
-            alwaysShowDeregister
-            onNext={() => {
-              // note: purposely don't await since the next dialog will properly render the spinner
-              noop(stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet }));
-              this.props.stores.uiDialogs.open({
-                // dialog: WithdrawalTxDialogContainer,
-                dialog: WithdrawRewardsDialog,
-              });
-            }}
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
@@ -328,24 +280,6 @@ export default class StakingPageContent extends Component<StoresProps, State> {
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />
-        ) : null}
-        {uiDialogs.isOpen(WithdrawalTxDialogContainer) ? (
-          <WithdrawalTxDialogContainer
-            stores={stores}
-            onClose={() => {
-              stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-              this.props.stores.uiDialogs.closeActiveDialog();
-            }}
-          />
-        ) : null}
-        {uiDialogs.isOpen(WithdrawRewardsDialog) ? (
-          <WithdrawRewardsDialog
-            stores={stores}
-            onClose={() => {
-              stores.substores.ada.delegationTransaction.reset({ justTransaction: false });
-              this.props.stores.uiDialogs.closeActiveDialog();
-            }}
-          />
         ) : null}
         {uiDialogs.isOpen(RewardHistoryDialog) ? (
           <RewardHistoryDialog

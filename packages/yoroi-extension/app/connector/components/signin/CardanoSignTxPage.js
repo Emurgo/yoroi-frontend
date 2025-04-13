@@ -51,11 +51,30 @@ const messages = defineMessages({
   },
 });
 
+export type AssetInfo = {|
+  amount: BigNumber,
+  tokenInfo: $ReadOnly<{
+    Identifier: string,
+    IsDefault: boolean,
+    IsNFT?: boolean,
+    Metadata: $ReadOnly<{
+      type: 'Cardano',
+      policyId: string,
+      assetName: string,
+      numberOfDecimals: number,
+      ticker: string | null,
+      longName: string | null,
+      ...
+    }>,
+    ...
+  }>,
+|};
+
 export type SummaryAssetsData = {|
   total: DisplayAmount | Object,
   isOnlyTxFee: boolean,
-  sent: Array<any>,
-  received: Array<any>,
+  sent: Array<AssetInfo>,
+  received: Array<AssetInfo>,
 |};
 
 type TokenEntryWithFee = {|
@@ -274,6 +293,7 @@ class SignTxPage extends Component<Props, State> {
           tokenInfo: this.props.getTokenInfo(asset) ?? {
             Identifier: asset.identifier,
             IsDefault: false,
+            IsNFT: false,
             Metadata: {
               type: 'Cardano',
               policyId: asset.identifier.split('.')[0],

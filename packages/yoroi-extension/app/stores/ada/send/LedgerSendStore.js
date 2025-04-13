@@ -86,6 +86,7 @@ export default class LedgerSendStore extends Store<StoresMap> {
   sendUsingLedgerWallet: {|
     params: SendUsingLedgerParams,
     onSuccess?: void => void,
+    onFail ?: void => void,
     +wallet: {
       publicDeriverId: number,
       stakingAddressing: Addressing,
@@ -132,6 +133,9 @@ export default class LedgerSendStore extends Store<StoresMap> {
       Logger.info('SUCCESS: ADA sent using Ledger SignTx');
     } catch (e) {
       this._setError(e);
+      if (request.onFail) {
+        request.onFail();
+      }
     } finally {
       this._setActionProcessing(false);
     }
