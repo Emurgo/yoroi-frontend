@@ -15,7 +15,18 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import { SwapFormProvider } from './context/swap-form';
 import { IntlProvider } from './context/intl/IntlProvider.js';
 import { ROUTES } from '../../routes-config';
+
+// $FlowIgnore: suppressing this error
+import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
+import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
 import type { StoresProps } from '../../stores';
+// $FlowIgnore: suppressing this error
+import { CurrencyProvider } from '../../UI/context/CurrencyContext';
+// $FlowIgnore: suppressing this error
+import { ModalProvider } from '../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
+import { ModalManager } from '../../UI/components/modals/ModalManager';
 import TestnetDisabledSwap from '../../components/swap/TestnetDisabledSwap';
 import SwitchNetworkDialogContainer from '../settings/categories/SwitchNetworkDialogContainer';
 
@@ -60,38 +71,43 @@ export default class SwapPageContainer extends Component<AllProps> {
     const { isTestnet } = stores.wallets.selectedOrFail;
 
     const menu = isTestnet ? null : (
-      <SwapMenu
-        onItemClick={route => stores.app.goToRoute({ route })}
-        isActiveItem={this.isActivePage}
-      />
+      <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />
     );
 
     return (
-        <IntlProvider intl={intl}>
-          <TopBarLayout
-            banner={<BannerContainer stores={stores} />}
-            sidebar={sidebarContainer}
-            isErrorPage={isErrorPage}
-            navbar={
-              <NavBarContainerRevamp
-                stores={stores}
-                title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
-                menu={menu}
-                isErrorPage={isErrorPage}
-              />
-            }
-            showInContainer
-            withPadding={false}
-          >
-            {isTestnet ? (
-              <TestnetDisabledSwap
-                onSwitch={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })}
-              />
-            ): (
-              <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>{children}</SwapFormProvider>
-            )}
-          </TopBarLayout>
-        </IntlProvider>
+      <IntlProvider intl={intl}>
+        <TopBarLayout
+          banner={<BannerContainer stores={stores} />}
+          sidebar={sidebarContainer}
+          isErrorPage={isErrorPage}
+          navbar={
+            <NavBarContainerRevamp
+              stores={stores}
+              title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+              menu={menu}
+              isErrorPage={isErrorPage}
+            />
+          }
+          showInContainer
+          withPadding={false}
+        >
+          {isTestnet ? (
+            <TestnetDisabledSwap onSwitch={() => stores.uiDialogs.open({ dialog: SwitchNetworkDialogContainer })} />
+          ) : (
+            <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+              <ModalProvider>
+                <ModalManager />
+                <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
+                  <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                    <ReviewTxModal />
+                    {children}
+                  </ReviewTxProvider>
+                </SwapFormProvider>
+              </ModalProvider>
+            </CurrencyProvider>
+          )}
+        </TopBarLayout>
+      </IntlProvider>
     );
   }
 }

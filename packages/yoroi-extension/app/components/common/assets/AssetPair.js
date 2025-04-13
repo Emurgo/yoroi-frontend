@@ -20,13 +20,13 @@ function tokenImgSrc(token, defaultTokenInfo): string {
     : urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage;
 }
 
-function tokenImg(token, defaultTokenInfo): React$Node {
+export const tokenImg = (token: any, defaultTokenInfo: any, width?: any, height?: any): React$Node => {
   const theme = useTheme();
   const defaultImage = theme.name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
   return (
     <Box
-      width="24px"
-      height="24px"
+      width={width ?? '24px'}
+      height={height ?? '24px'}
       sx={{
         overflowY: 'hidden',
         '& > svg': { width: '100%', height: '100%' },
@@ -43,7 +43,7 @@ function tokenImg(token, defaultTokenInfo): React$Node {
       />
     </Box>
   );
-}
+};
 
 export default function AssetPair({ from, to, defaultTokenInfo, sx = {} }: Props): React$Node {
   return (

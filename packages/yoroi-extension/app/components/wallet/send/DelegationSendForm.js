@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Box, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -16,6 +16,8 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
+import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
+import type { StoresMap } from '../../../stores';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -28,8 +30,10 @@ type Props = {|
   +hasAnyPending: boolean,
   +updatePool: (void | string) => void,
   +poolQueryError: ?LocalizableError,
-  +onNext: void => Promise<void>,
   +isProcessing: boolean,
+  +poolName: string,
+  +selectedPoolId: ?string,
+  +stores: StoresMap,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -115,7 +119,7 @@ export default class DelegationSendForm extends Component<Props> {
       this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
 
     return (
-      <Box className={styles.component} style={{ border: '1px solid grey', borderRadius: '8px' }}>
+      <Box className={styles.component}>
         {this.props.hasAnyPending && pendingTxWarningComponent}
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(globalMessages.delegationById)}
@@ -128,16 +132,39 @@ export default class DelegationSendForm extends Component<Props> {
               error={poolIdField.error || poolQueryError}
               done={poolIdField.isValid}
             />
-            <Button
-              variant="primary"
-              onClick={this.props.onNext}
-              disabled={this.props.hasAnyPending || this.props.isProcessing || this.props.poolQueryError != null}
-            >
-              {intl.formatMessage(globalMessages.delegateLabel)}
-            </Button>
           </div>
+          <CreateInvokeConfirmationButton
+            intl={intl}
+            btnDisabled={
+              this.props.hasAnyPending ||
+              this.props.isProcessing ||
+              this.props.poolQueryError != null ||
+              poolIdField.error != null ||
+              poolIdField.value?.length === 0
+            }
+            hasAnyPending={this.props.hasAnyPending}
+            isProcessing={this.props.isProcessing}
+            poolQueryError={this.props.poolQueryError}
+            selectedPoolId={this.props.selectedPoolId}
+            poolName={this.props.poolName}
+            stores={this.props.stores}
+          />
         </BorderedBox>
       </Box>
     );
   }
 }
+
+const CreateInvokeConfirmationButton = observer(({ intl, btnDisabled, selectedPoolId, poolName, stores }) => {
+  return (
+    <Stack alignItems="center" justifyContent="center">
+      <DelegateButton
+        stores={stores}
+        label={intl.formatMessage(globalMessages.nextButtonLabel)}
+        disabled={btnDisabled}
+        poolName={poolName}
+        poolID={selectedPoolId}
+      />
+    </Stack>
+  );
+});

@@ -1873,7 +1873,7 @@ export default class AdaApi {
         network,
       });
     }
-  
+
     const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
       db,
       wallet.cip1852WrapperRow,

@@ -12,7 +12,7 @@ import { Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HelperTooltip } from './StakePool/StakePool';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import styles from './UserSummary.scss';
+import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { TokenEntry, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../../utils/strings';
@@ -150,7 +150,7 @@ export default class OverviewModal extends Component<Props> {
   renderAmount: (void | MultiToken) => Node = token => {
     if (token == null) {
       return (
-        <div className={styles.loadingSpinner}>
+        <div className={loadingSpinnerStyles.loadingSpinner}>
           <LoadingSpinner small />
         </div>
       );

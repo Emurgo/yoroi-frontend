@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, IconButton } from '@mui/material';
+import { Back } from './Back';
 import { Assets } from './Assets';
 import { Assets1 } from './Assets1';
 import { AssetsFilled } from './AssetsFilled';
@@ -28,12 +29,15 @@ import { Device } from './Device';
 import { Drag } from './Drag';
 import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
+import { Indicator } from './Indicator';
+import { Info } from './Info';
+import { LeftArrow } from './LeftArrow';
+import { RightArrow } from './RightArrow';
 import { Explore } from './Explore';
 import { Export } from './Export';
 import { Eye } from './Eye';
 import { EyeOff } from './EyeOff';
 import { Image } from './Image';
-import { Info } from './Info';
 import { InfoCircle } from './InfoCircle';
 import { LastSeen } from './LastSeen';
 import { Ledger } from './Ledger';
@@ -117,7 +121,6 @@ export const Icon = {
   Eye,
   EyeOff,
   Image,
-  Info,
   InfoCircle,
   LastSeen,
   Ledger,
@@ -155,6 +158,11 @@ export const Icon = {
   StarOutlined,
   Support,
   Switch,
+  Indicator,
+  Info,
+  Back,
+  LeftArrow,
+  RightArrow,
   Table,
   TermsOfUse,
   ThumbUp,

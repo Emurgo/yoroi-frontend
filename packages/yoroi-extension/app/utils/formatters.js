@@ -12,6 +12,7 @@ export function splitAmount(
   const valString = amount.toFormat(decimalPlaces);
   const startIndex = valString.length - decimalPlaces;
   let beforeDecimal = valString.substring(0, startIndex)
+  // TODO: see if an alternative method without a regex is needed?
   const afterDecimal = valString.substring(startIndex).replace(/0+$/, '')
   // Remove the dots if no decimals
   if (!afterDecimal) {
@@ -21,10 +22,12 @@ export function splitAmount(
 }
 
 export const maxNameLengthBeforeTruncation = 15;
-export const truncateLongName: string => string = (walletName) => {
-  return walletName.length > maxNameLengthBeforeTruncation
-    ? walletName.substring(0, maxNameLengthBeforeTruncation - 3) + '...'
-    : walletName;
+
+export const truncateLongName = (walletName: string, maxLength?: number): string => {
+  if (typeof walletName !== 'string' || walletName.length === 0) return '';
+
+  const effectiveLength = Math.max(maxLength ?? maxNameLengthBeforeTruncation, 4);
+  return walletName.length > effectiveLength ? walletName.substring(0, effectiveLength - 3) + '...' : walletName;
 };
 
 /** removes commas */

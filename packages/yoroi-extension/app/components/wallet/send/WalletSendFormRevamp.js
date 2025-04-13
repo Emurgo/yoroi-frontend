@@ -60,6 +60,7 @@ import type { WalletState } from '../../../../chrome/extension/background/types'
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
 import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
+import { SendTokensButton } from './SendTokensButton';
 
 const messages = defineMessages({
   receiverLabel: {
@@ -158,6 +159,7 @@ const messages = defineMessages({
 
 // <TODO:REORGANISE> too many props
 type Props = {|
+  +stores: any,
   +resolveDomainAddress: ?DomainResolverFunc,
   +supportedAddressDomainBannerState: {|
     isDisplayed: boolean,
@@ -419,10 +421,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 }
                 const updateReceiver = (isValid: boolean) => {
                   if (isValid) {
-                    this.props.updateReceiver(
-                      getAddressPayload(receiverValue, this.props.selectedNetwork),
-                      handle,
-                    );
+                    this.props.updateReceiver(getAddressPayload(receiverValue, this.props.selectedNetwork), handle);
                   } else {
                     this.props.updateReceiver();
                   }
@@ -869,13 +868,13 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     }
                   }}
                 >
-                  {
-                    maxSendableAmount.isExecuting
-                      ? <LoadingSpinner small />
-                      : <Typography variant='body2' fontWeight={500} >
-                          {intl.formatMessage(messages.max)}
-                        </Typography>
-                  }
+                  {maxSendableAmount.isExecuting ? (
+                    <LoadingSpinner small />
+                  ) : (
+                    <Typography variant="body2" fontWeight={500}>
+                      {intl.formatMessage(messages.max)}
+                    </Typography>
+                  )}
                 </Button>
               </Box>
               {showFiat && (
@@ -1020,7 +1019,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             >
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </ActionButton>
-            <ActionButton
+            {/* <ActionButton
               key="amount-next"
               variant="primary"
               size="medium"
@@ -1031,8 +1030,16 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               disabled={!this.props.fee || this.props.hasAnyPending || invalidMemo || maxSendableAmount.isExecuting}
               id="wallet:send:addAssetsStep-nextToConfirmTransaction-button"
             >
-              {intl.formatMessage(globalMessages.nextButtonLabel)}
-            </ActionButton>
+              {intl.formatMessage(globalMessages.nextButtonLabel)}ss
+            </ActionButton>  */}
+            <SendTokensButton
+              stores={this.props.stores}
+              disabled={!this.props.fee || this.props.hasAnyPending || invalidMemo || maxSendableAmount.isExecuting}
+              label={intl.formatMessage(globalMessages.nextButtonLabel)}
+              onSuccess={() => {
+                this.onUpdateStep(SEND_FORM_STEP.RECEIVER);
+              }}
+            />
           </>
         );
       default:

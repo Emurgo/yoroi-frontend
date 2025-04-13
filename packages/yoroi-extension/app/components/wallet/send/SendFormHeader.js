@@ -28,7 +28,7 @@ const messages = defineMessages({
 const TABS = [
   { message: messages.receiver, stepId: '1' },
   { message: messages.addAssets, stepId: '2' },
-  { message: messages.confirmTx, stepId: '3' },
+  // { message: messages.confirmTx, stepId: '3' },
 ];
 
 @observer

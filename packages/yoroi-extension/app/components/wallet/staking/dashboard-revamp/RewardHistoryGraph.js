@@ -14,7 +14,7 @@ import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
-import type { GraphData } from './StakingDashboard';
+import type { GraphData } from '../dashboard/StakingDashboard';
 
 type RewardHistoryItemProps = {|
   poolId: string,
