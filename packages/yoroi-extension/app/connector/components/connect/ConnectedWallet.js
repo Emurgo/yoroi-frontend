@@ -13,19 +13,11 @@ type Props = {|
   +disabledForReason?: ?string,
 |};
 
-function constructPlate(
-  plate: WalletChecksum,
-  saturationFactor: number,
-  divClass: string
-): [string, React$Element<'div'>] {
+function constructPlate(plate: WalletChecksum, saturationFactor: number, divClass: string): [string, React$Element<'div'>] {
   return [
     plate.TextPart,
     <div className={divClass}>
-      <WalletAccountIcon
-        iconSeed={plate.ImagePart}
-        saturationFactor={saturationFactor}
-        scalePx={6}
-      />
+      <WalletAccountIcon iconSeed={plate.ImagePart} saturationFactor={saturationFactor} scalePx={6} />
     </div>,
   ];
 }
@@ -38,9 +30,7 @@ export default class WalletCard extends Component<Props> {
   render(): Node {
     const { publicDeriver, walletBalance, disabledForReason } = this.props;
     // eslint-disable-next-line no-unused-vars
-    const [_, iconComponent] = publicDeriver.plate
-      ? constructPlate(publicDeriver.plate, 0, styles.icon)
-      : [];
+    const [_, iconComponent] = publicDeriver.plate ? constructPlate(publicDeriver.plate, 0, styles.icon) : [];
 
     const checksum = this.props.publicDeriver.plate?.TextPart;
 
@@ -52,7 +42,7 @@ export default class WalletCard extends Component<Props> {
             <div className={styles.nameWrapper}>
               <Typography
                 component="div"
-                color="#242838"
+                color="ds.gray_900"
                 fontWeight="500"
                 variant="b1"
                 fontSize={16}
@@ -60,12 +50,14 @@ export default class WalletCard extends Component<Props> {
               >
                 {this.props.publicDeriver.name}
               </Typography>
-              <div className={styles.checksum} id="connectedWalletPlate">{checksum}</div>
+              <Box sx={{ color: 'ds.gray_600', marginTop: '8px', fontSize: '14px' }} id="connectedWalletPlate">
+                {checksum}
+              </Box>
             </div>
             {walletBalance != null && <Box sx={{ ml: 'auto' }}>{walletBalance}</Box>}
           </div>
         </Box>
-        {disabledForReason && (<div className={styles.disabledReason}>{disabledForReason}</div>)}
+        {disabledForReason && <div className={styles.disabledReason}>{disabledForReason}</div>}
       </>
     );
   }

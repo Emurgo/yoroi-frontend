@@ -41,6 +41,7 @@ const ConnectorLayout = observer(({ networkId, children }) => {
           paddingRight: '8px',
           height: '24px',
           lineHeight: '24px', // vertically center text
+          color: 'ds.black_static',
         }}
         style={{ backgroundColor: badge.color }}
       >
@@ -67,7 +68,7 @@ const ConnectorLayout = observer(({ networkId, children }) => {
       <Stack
         direction="row"
         alignItems="center"
-        sx={{ height: '56px', color: 'ds.gray_min', backgroundImage: theme.palette.ds.bg_gradient_3, padding: '16px 32px' }}
+        sx={{ height: '56px', color: 'ds.white_static', backgroundImage: theme.palette.ds.bg_gradient_3, padding: '16px 32px' }}
       >
         <Stack direction="row" alignItems="center" sx={{ flex: 1 }}>
           <YoroiConnectorLogo />
@@ -87,7 +88,7 @@ const ConnectorLayout = observer(({ networkId, children }) => {
           </Stack>
           <Stack direction="row" alignItems="center" sx={{ flex: 1 }}>
             <IconWrapper
-              color="ds.gray_min"
+              color="ds.white_static"
               icon={Icons.DappConnector}
               iconProps={{ width: '20px', height: '20px', marginLeft: '10px' }}
             />
