@@ -1,10 +1,7 @@
 import { expect } from 'chai';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
-import {
-  CARDANO_IS_READY,
-  LedgerEmulatorController,
-} from '../../helpers/ledgerEmulatorController.js';
+import { LedgerEmulatorController, LedgerStates } from '../../helpers/ledgerEmulatorController.js';
 import {
   WindowManager,
   extensionTabName,
@@ -37,12 +34,16 @@ describe('Connect Ledger HW wallet', function () {
 
   before(async function () {
     const speculosDockerLogger = getTestLogger('speculosDocker', this.test.parent.title);
-    speculosDockerController = new SpeculosDockerController(speculosDockerLogger, LedgerModels.NanoSPlus, testWalletLedger.mnemonic);
+    speculosDockerController = new SpeculosDockerController(
+      speculosDockerLogger,
+      LedgerModels.NanoSPlus,
+      testWalletLedger.mnemonic
+    );
     await speculosDockerController.runContainer();
 
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    
+
     const ledgerLogger = getTestLogger('ledger', this.test.parent.title);
     ledgerController = new LedgerEmulatorController(ledgerLogger);
 
@@ -53,7 +54,7 @@ describe('Connect Ledger HW wallet', function () {
 
   it('Ledger is ready', async function () {
     const ledgerState = await ledgerController.readScreen();
-    expect(ledgerState, 'Cardano app is not ready').to.equal(CARDANO_IS_READY);
+    expect(ledgerState, 'Cardano app is not ready').to.equal(LedgerStates.cardanoIsReady);
   });
 
   it('Selecting Connect HW wallet', async function () {
@@ -87,7 +88,9 @@ describe('Connect Ledger HW wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWalletLedger.balance);
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
+      testWalletLedger.balance
+    );
     expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal(testWalletLedger.name);
     expect(walletInfo.plate, `The wallet plate is different`).to.equal(testWalletLedger.plate);
   });
