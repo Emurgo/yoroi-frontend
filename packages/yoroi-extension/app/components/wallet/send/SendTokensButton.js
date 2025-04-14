@@ -6,7 +6,7 @@ import CopyableText from '../../../UI/components/CopyableText';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType } = useTxReviewModal();
-  const { resolvedAddress, resolvedNameServer, loading } = useDomainResolver(receiverHandler);
+  const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
