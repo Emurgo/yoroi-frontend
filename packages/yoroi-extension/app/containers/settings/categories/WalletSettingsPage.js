@@ -33,6 +33,8 @@ export default class WalletSettingsPage extends Component <StoresProps> {
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
 
+    const selectedWalletId: ?number = stores.wallets.selected?.publicDeriverId;
+
     const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
     if (selectedWallet == null) {
       return (
@@ -72,9 +74,11 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
-        <NotificationsSettings />
+        {selectedWalletId != null ? (
+          <NotificationsSettings selectedWalletId={selectedWalletId} />
+        ) : null}
         {selectedWallet.type === 'mnemonic' && (
-          <SpendingPasswordSetting 
+          <SpendingPasswordSetting
             openDialog={() =>
               stores.uiDialogs.open({
                 dialog: ChangeWalletPasswordDialogContainer,
