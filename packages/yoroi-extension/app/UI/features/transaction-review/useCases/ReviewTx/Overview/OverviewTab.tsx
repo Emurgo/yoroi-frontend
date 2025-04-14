@@ -140,14 +140,27 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
   const strings = useStrings();
 
   return (
-    <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
-      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-        {strings.addressToLabel}:
-      </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {receiverCustomTitle ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
-      </Typography>
-    </Stack>
+    <>
+      <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
+        <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+          {strings.addressToLabel}:
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {receiverCustomTitle?.to ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
+        </Typography>
+      </Stack>
+
+      {receiverCustomTitle?.associatedAddress && (
+        <Stack mt="8px" direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+            {strings.associatedAddress}
+          </Typography>
+          <Typography variant="body1" color="ds.text_gray_medium">
+            {<CopyableText value={output.address}>{truncateAddressShort(address, 30)}</CopyableText>}
+          </Typography>
+        </Stack>
+      )}
+    </>
   );
 };
 
@@ -165,11 +178,9 @@ const OperationsSection = ({ operations }) => {
         title="Operations"
         content={
           <Box>
-            {[...componentsNotDuplicated].map((operation, index) => {
-              if (index === 0) return operation;
-
-              return <>{operation}</>;
-            })}
+            {componentsNotDuplicated.map((operation, index) => (
+              <React.Fragment key={operation.key || index}>{operation}</React.Fragment>
+            ))}
           </Box>
         }
       />

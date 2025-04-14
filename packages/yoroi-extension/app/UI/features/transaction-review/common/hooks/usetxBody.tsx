@@ -9,32 +9,39 @@ export const useTxBody = ({
 }: {
   cbor?: string | null;
   unsignedTx?: YoroiUnsignedTx | null;
-}): TransactionBody => {
-  const query = useQuery(['useTxBody', cbor, unsignedTx], async () => {
-    if (unsignedTx === null) {
-      return getCborTxBody(cbor);
-    } else if (cbor === null) {
-      return getUnsignedTxTxBody(unsignedTx);
-    } else {
-      throw new Error('useTxBody: missing cbor and unsignedTx');
+}): TransactionBody | undefined => {
+  const query = useQuery(
+    ['useTxBody', cbor, unsignedTx],
+    async () => {
+      if (cbor && typeof cbor === 'string') {
+        return getCborTxBody(cbor);
+      }
+
+      if (unsignedTx != null) {
+        return getUnsignedTxTxBody(unsignedTx);
+      }
+
+      throw new Error('useTxBody: missing both cbor and unsignedTx');
+    },
+    {
+      enabled: Boolean(cbor || unsignedTx),
     }
-  });
+  );
 
   return query.data;
 };
 
-const getCborTxBody = async (cbor: any) => {
+const getCborTxBody = async (cbor: string) => {
   try {
     const txBody = RustModule.WalletV4.FixedTransaction.from_hex(cbor).body().to_json();
-    const parsed = JSON.parse(txBody);
-    return parsed;
+    return JSON.parse(txBody);
   } catch (e) {
-    console.warn('getCborTxBody', e);
+    console.warn('getCborTxBody failed:', e);
+    throw e; // Let the query fail if it's a critical error
   }
 };
 
-const getUnsignedTxTxBody = async (unsignedTx: any) => {
+const getUnsignedTxTxBody = async (unsignedTx: YoroiUnsignedTx) => {
   const txBodyjson = await unsignedTx.build_tx().to_json();
-  const parsedUnsignedTx = JSON.parse(txBodyjson);
-  return parsedUnsignedTx;
+  return JSON.parse(txBodyjson);
 };
