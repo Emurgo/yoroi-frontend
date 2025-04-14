@@ -37,7 +37,7 @@ const getCborTxBody = async (cbor: string) => {
     return JSON.parse(txBody);
   } catch (e) {
     console.warn('getCborTxBody failed:', e);
-    throw e; // Let the query fail if it's a critical error
+    throw e;
   }
 };
 
