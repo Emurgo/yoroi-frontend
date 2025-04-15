@@ -48,6 +48,30 @@ export const messages = Object.freeze(
       id: 'banners.usda.button',
       defaultMessage: '!!!Go to swap',
     },
+    receiverFieldLabelUnresolvedAddress: {
+      id: 'wallet.send.form.receiver.label.unresolvedAddress',
+      defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
+    },
+    receiverFieldLabelForbiddenAccess: {
+      id: 'wallet.send.form.receiver.label.forbiddenAccess',
+      defaultMessage: '!!!access forbidden, you might need a VPN',
+    },
+    receiverFieldLabelUnexpectedError: {
+      id: 'wallet.send.form.receiver.label.unexpectedError',
+      defaultMessage: '!!!unexpected error',
+    },
+    adaHandle: {
+      id: 'global.label.adaHandle',
+      defaultMessage: '!!!ADA Handle',
+    },
+    cardanoCNS: {
+      id: 'global.label.CardanoCNS',
+      defaultMessage: '!!!Cardano Name Service (CNS)',
+    },
+    unstoppableDomains: {
+      id: 'global.label.unstoppableDomains',
+      defaultMessage: '!!!Unstoppable Domains',
+    },
   })
 );
 
@@ -66,5 +90,11 @@ export const useStrings = () => {
     usdaBannerTitle: intl.formatMessage(messages.usdaBannerTitle),
     usdaBannerDesc: intl.formatMessage(messages.usdaBannerDesc),
     usdaBannerButton: intl.formatMessage(messages.usdaBannerButton),
+    receiverFieldLabelUnresolvedAddress: intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress),
+    receiverFieldLabelForbiddenAccess: intl.formatMessage(messages.receiverFieldLabelForbiddenAccess),
+    receiverFieldLabelUnexpectedError: intl.formatMessage(messages.receiverFieldLabelUnexpectedError),
+    adaHandle: intl.formatMessage(messages.adaHandle),
+    cardanoCNS: intl.formatMessage(messages.cardanoCNS),
+    unstoppableDomains: intl.formatMessage(messages.unstoppableDomains),
   }).current;
 };

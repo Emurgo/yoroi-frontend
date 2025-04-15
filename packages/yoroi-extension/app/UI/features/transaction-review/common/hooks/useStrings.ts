@@ -136,6 +136,10 @@ export const messages = Object.freeze(
       id: 'transaction.review.rewardsWithdraw',
       defaultMessage: '!!!Our rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
     },
+    associatedAddress: {
+      id: 'transaction.review.associatedAddress',
+      defaultMessage: '!!!Associated address',
+    },
   })
 );
 
@@ -175,5 +179,6 @@ export const useStrings = () => {
     operations: intl.formatMessage(messages.operations),
     attentionLabel: intl.formatMessage(messages.attentionLabel),
     rewardsWithdraw: intl.formatMessage(messages.rewardsWithdraw),
+    associatedAddress: intl.formatMessage(messages.associatedAddress),
   }).current;
 };

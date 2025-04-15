@@ -166,10 +166,11 @@ export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => 
   };
 };
 
-const deriveAddress = async (address: string, chainId: number) => {
+const deriveAddress = async (address: string, networkId: number) => {
   try {
-    return await deriveRewardAddressFromAddress(address, chainId);
-  } catch {
+    return await deriveRewardAddressFromAddress(address, networkId);
+  } catch (e) {
+    console.error('Failed to derive reward address from: ' + address, e);
     return null;
   }
 };

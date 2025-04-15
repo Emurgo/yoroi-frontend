@@ -1,18 +1,24 @@
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { getNetworkById, getCardanoHaskellBaseConfigCombined } from '../../api/ada/lib/storage/database/prepackaged/networks'
 
-export const deriveRewardAddressFromAddress = async (address: string, chainId: number): Promise<string> => {
+export const deriveRewardAddressFromAddress = async (address: string, networkId: number): Promise<string> => {
   try {
+
+    const network = getNetworkById(networkId);
+    const networkConfig = getCardanoHaskellBaseConfigCombined(network);
+
     const from_bech32 = await RustModule.WalletV4.Address.from_bech32(address);
     const baseAddress = RustModule.WalletV4.BaseAddress.from_address(from_bech32);
     const stakeCred = baseAddress?.stake_cred();
-    const stakeCredential = RustModule.WalletV4.RewardAddress.new(chainId, stakeCred);
+    const stakeCredential = RustModule.WalletV4.RewardAddress.new(networkConfig.ChainNetworkId, stakeCred);
     const rewardAddress = stakeCredential.to_address();
     const rewardAddrAsAddress = rewardAddress.to_bech32();
 
     if (typeof rewardAddrAsAddress !== 'string') throw new Error('Its not possible to derive reward address');
     return rewardAddrAsAddress;
   } catch (error) {
-    throw new Error('Its not possible to derive reward address');
+    console.error('[deriveRewardAddressFromAddress] input=' + address, error);
+    throw error;
   }
 };
 
