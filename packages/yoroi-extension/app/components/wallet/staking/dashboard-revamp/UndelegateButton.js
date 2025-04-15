@@ -121,7 +121,7 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl })
   return (
     <Stack gap="8px">
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.deregisteringStakingKey)}</Typography>
+        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.undelegatePool)}</Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{
@@ -137,7 +137,7 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl })
         </Stack>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.undelegatePool)}</Typography>
+        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.deregisteringStakingKey)}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
     </Stack>
