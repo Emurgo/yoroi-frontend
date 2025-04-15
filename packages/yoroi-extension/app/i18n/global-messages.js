@@ -1080,6 +1080,14 @@ const globalMessages: * = defineMessages({
     id: 'wallet.emptyWalletMessageSubtitle.testnet',
     defaultMessage: "!!!Get started with Cardano's test currency, TADA. It's your key to testing a new world of possibilities.",
   },
+  undelegatePool: {
+    id: 'transaction.review.undelegatePool',
+    defaultMessage: '!!!Undelegating from the pool',
+  },
+  deregisteringStakingKey: {
+    id: 'transaction.review.deregisteringStakingKey',
+    defaultMessage: '!!!Undelegating from the pool',
+  },
 });
 export default globalMessages;
 
