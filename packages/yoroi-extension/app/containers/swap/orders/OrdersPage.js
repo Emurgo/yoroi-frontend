@@ -27,11 +27,12 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
-// $FlowIgnore: suppressing this error
+// $FlowIgnore[cannot-resolve-module]
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { SummaryRow } from '../asset-swap/SwapTxInfo';
-// $FlowIgnore: suppressing this error
+// $FlowIgnore[cannot-resolve-module]
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
+// $FlowIgnore[cannot-resolve-module]
 import { asQuantity } from '../../../UI/utils/createCurrentWalletInfo';
 
 type ColumnContext = {|
