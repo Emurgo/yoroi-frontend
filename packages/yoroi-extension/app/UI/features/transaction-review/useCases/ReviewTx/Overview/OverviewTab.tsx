@@ -164,7 +164,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
             {strings.associatedAddress}
           </Typography>
           <Typography variant="body1" color="ds.text_gray_medium">
-            {<CopyableText value={output.address}>{truncateAddressShort(address, 25)}</CopyableText>}
+            {<CopyableText value={address}>{truncateAddressShort(address, 25)}</CopyableText>}
           </Typography>
         </Stack>
       )}
