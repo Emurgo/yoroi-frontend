@@ -66,10 +66,10 @@ function SupportedAddressDomainsBanner({ onClose, intl }: Props & Intl): Node {
           </Typography>
           <Typography component="div" fontWeight={500} paddingLeft="10px">
             {nameServerNames.map((name, idx) => (
-              <>
+              <div key={idx}>
                 <span>• {name}</span>
                 {idx < nameServerNames.length - 1 ? <br /> : null}
-              </>
+              </div>
             ))}
           </Typography>
         </Box>

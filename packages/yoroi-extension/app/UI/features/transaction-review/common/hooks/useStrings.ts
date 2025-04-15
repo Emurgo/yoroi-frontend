@@ -138,7 +138,7 @@ export const messages = Object.freeze(
     },
     associatedAddress: {
       id: 'transaction.review.associatedAddress',
-      defaultMessage: '!!!Associated Address',
+      defaultMessage: '!!!Associated address',
     },
   })
 );

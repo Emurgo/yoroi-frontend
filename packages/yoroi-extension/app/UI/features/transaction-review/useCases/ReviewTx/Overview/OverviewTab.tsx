@@ -104,14 +104,20 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 };
 
 const InfoInline = ({ label, value }) => {
+  const isString = typeof value === 'string' || typeof value === 'number';
+
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Typography variant="body1" color="ds.text_gray_low">
         {label}
       </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {value}
-      </Typography>
+      {isString ? (
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {value}
+        </Typography>
+      ) : (
+        value
+      )}
     </Stack>
   );
 };
@@ -146,7 +152,9 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
           {strings.addressToLabel}:
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium">
-          {receiverCustomTitle?.to ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
+          {receiverCustomTitle?.to ?? (
+            <CopyableText value={output.address}>{truncateAddressShort(output.address, 40)}</CopyableText>
+          )}
         </Typography>
       </Stack>
 
@@ -156,7 +164,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
             {strings.associatedAddress}
           </Typography>
           <Typography variant="body1" color="ds.text_gray_medium">
-            {<CopyableText value={output.address}>{truncateAddressShort(address, 30)}</CopyableText>}
+            {<CopyableText value={output.address}>{truncateAddressShort(address, 25)}</CopyableText>}
           </Typography>
         </Stack>
       )}

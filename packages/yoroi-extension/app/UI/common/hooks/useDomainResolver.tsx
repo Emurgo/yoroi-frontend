@@ -32,14 +32,14 @@ type DomainResolverResponse = {
   error: 'forbidden' | 'unexpected' | null;
 };
 
-const resolveAddressDomainNameServerName = (nameServerTag: string): string => {
+const resolveAddressDomainNameServerName = (nameServerTag: string, strings: any): string => {
   switch (nameServerTag) {
     case Resolver.NameServer.Handle:
-      return 'ADA Handle';
+      return strings.adaHandle;
     case Resolver.NameServer.Cns:
-      return 'Cardano Name Service (CNS)';
+      return strings.cardanoCNS;
     case Resolver.NameServer.Unstoppable:
-      return 'Unstoppable Domains';
+      return strings.unstoppableDomains;
     default:
       return nameServerTag;
   }
@@ -48,36 +48,37 @@ const resolveAddressDomainNameServerName = (nameServerTag: string): string => {
 export const useDomainResolver = (handle: string) => {
   const strings = useStrings();
 
-  const isDomainResolvable = isResolvableDomain(handle);
-
   const [loading, setLoading] = useState(false);
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);
   const [resolvedNameServer, setResolvedNameServer] = useState<string | null>(null);
   const [domainResolverMessage, setDomainResolverMessage] = useState<string | null>(null);
 
+  const normalizedHandle = handle.trim().toLowerCase();
+  const isDomainResolvable = isResolvableDomain(normalizedHandle);
+
   useEffect(() => {
     const resolve = async () => {
-      if (!isDomainResolvable) {
-        setResolvedAddress(null);
-        setResolvedNameServer(null);
-        setDomainResolverMessage(null);
-        return;
-      }
-
       setLoading(true);
+      setResolvedAddress(null);
+      setResolvedNameServer(null);
+      setDomainResolverMessage(null);
 
       try {
+        if (!isResolvableDomain(normalizedHandle)) {
+          return;
+        }
+
         const resolverApi = await getInitializedResolverApi();
         const { getCardanoAddresses } = resolverApi;
 
         if (!getCardanoAddresses) throw new Error('Resolver API is not available');
 
-        const results = await getCardanoAddresses({ resolve: handle });
+        const results = await getCardanoAddresses({ resolve: normalizedHandle });
 
         let fallback: DomainResolverResponse | null = null;
 
         for (const { nameServer, address, error } of results) {
-          const resolvedNameServer = nameServer ? resolveAddressDomainNameServerName(nameServer) : 'Unknown';
+          const resolvedNameServer = nameServer ? resolveAddressDomainNameServerName(nameServer, strings) : 'Unknown';
 
           if (address) {
             setResolvedAddress(address);
@@ -86,17 +87,19 @@ export const useDomainResolver = (handle: string) => {
             return;
           }
 
+          if (error?.name === 'InvalidDomain') {
+            setDomainResolverMessage(strings.receiverFieldLabelUnresolvedAddress);
+            return;
+          }
+
           if (error instanceof Api.Errors.Forbidden && !fallback) {
             fallback = { nameServer: resolvedNameServer, address: null, error: 'forbidden' };
           } else if (!fallback) {
             fallback = { nameServer: resolvedNameServer, address: null, error: 'unexpected' };
-            console.error(`Domain resolve error: ${error?.constructor?.name}`, error);
           }
         }
 
         if (fallback) {
-          setResolvedAddress(null);
-          setResolvedNameServer(null);
           setDomainResolverMessage(
             `${fallback.nameServer}: ${
               fallback.error === 'forbidden'
@@ -105,14 +108,10 @@ export const useDomainResolver = (handle: string) => {
             }`
           );
         } else {
-          setResolvedAddress(null);
-          setResolvedNameServer(null);
           setDomainResolverMessage(strings.receiverFieldLabelUnresolvedAddress);
         }
       } catch (err) {
-        console.error('Domain resolution failed:', err);
-        setResolvedAddress(null);
-        setResolvedNameServer(null);
+        console.error(`Domain resolution failed for "${normalizedHandle}":`, err);
         setDomainResolverMessage(strings.receiverFieldLabelUnexpectedError);
       } finally {
         setLoading(false);
@@ -120,7 +119,7 @@ export const useDomainResolver = (handle: string) => {
     };
 
     resolve();
-  }, [handle, isDomainResolvable]);
+  }, [normalizedHandle, strings]);
 
   return {
     isDomainResolvable,

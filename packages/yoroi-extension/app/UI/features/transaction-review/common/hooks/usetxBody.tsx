@@ -41,7 +41,7 @@ const getCborTxBody = async (cbor: string) => {
   }
 };
 
-const getUnsignedTxTxBody = async (unsignedTx: YoroiUnsignedTx) => {
+const getUnsignedTxTxBody = async (unsignedTx: any) => {
   const txBodyjson = await unsignedTx.build_tx().to_json();
   return JSON.parse(txBodyjson);
 };

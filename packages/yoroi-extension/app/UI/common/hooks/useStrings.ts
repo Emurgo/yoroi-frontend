@@ -60,6 +60,18 @@ export const messages = Object.freeze(
       id: 'wallet.send.form.receiver.label.unexpectedError',
       defaultMessage: '!!!unexpected error',
     },
+    adaHandle: {
+      id: 'global.label.adaHandle',
+      defaultMessage: '!!!ADA Handle',
+    },
+    cardanoCNS: {
+      id: 'global.label.CardanoCNS',
+      defaultMessage: '!!!Cardano Name Service (CNS)',
+    },
+    unstoppableDomains: {
+      id: 'global.label.unstoppableDomains',
+      defaultMessage: '!!!Unstoppable Domains',
+    },
   })
 );
 
@@ -81,5 +93,8 @@ export const useStrings = () => {
     receiverFieldLabelUnresolvedAddress: intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress),
     receiverFieldLabelForbiddenAccess: intl.formatMessage(messages.receiverFieldLabelForbiddenAccess),
     receiverFieldLabelUnexpectedError: intl.formatMessage(messages.receiverFieldLabelUnexpectedError),
+    adaHandle: intl.formatMessage(messages.adaHandle),
+    cardanoCNS: intl.formatMessage(messages.cardanoCNS),
+    unstoppableDomains: intl.formatMessage(messages.unstoppableDomains),
   }).current;
 };
