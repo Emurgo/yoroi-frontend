@@ -162,32 +162,26 @@ export default class TransactionsStore extends Store<StoresMap> {
   };
 
   // various actions that need to be performed after getting new transactions
-  _afterLoadingNewTxs: (Array<WalletTransaction>, WalletState) => Promise<void> = async (result, publicDeriver) => {
+  _afterLoadingNewTxs: (Array<WalletTransaction>, WalletState) => Promise<void> = async (result, wallet) => {
     const timestamps: Set<number> = new Set();
-    const remoteTransactionIds: Set<string> = new Set();
-    const withdrawalIds = new Set<string>();
     for (const tx of result) {
       const { txid, date } = tx;
       timestamps.add(date.valueOf());
-      remoteTransactionIds.add(txid);
-      if (tx instanceof CardanoShelleyTransaction && tx.withdrawals.length > 0) {
-        withdrawalIds.add(txid);
-      }
-
       // trigger notification for new tx
       PubSub.publish(NotificationTopics.NEW_TX, {
         txid,
         tx,
-        slot: publicDeriver.lastSyncInfo.SlotNum,
-        networkId: publicDeriver.networkId,
+        slot: wallet.lastSyncInfo.SlotNum,
+        networkId: wallet.networkId,
+        walletId: wallet.publicDeriverId,
       });
     }
-    await this._updateTransactionPriceData(publicDeriver, timestamps);
+    await this._updateTransactionPriceData(wallet, timestamps);
     await Promise.all([
       // reload token info cache
       // todo: use fetchMissingTokenInfo to fetch only missing tokens
       this.stores.tokenInfoStore.refreshTokenInfo(),
-      this.stores.addresses.refreshAddressesFromDb(publicDeriver),
+      this.stores.addresses.refreshAddressesFromDb(wallet),
     ]);
   };
 
