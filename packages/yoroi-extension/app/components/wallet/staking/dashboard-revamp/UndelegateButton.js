@@ -70,6 +70,10 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             wallet: selected,
             onFail: () => {
               showTxResultModal(TransactionResult.FAIL);
+              return;
+            },
+            onSuccess: () => {
+              showTxResultModal(TransactionResult.SUCCESS);
             },
           });
         }
@@ -79,6 +83,10 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             wallet: selected,
             onFail: () => {
               showTxResultModal(TransactionResult.FAIL);
+              return;
+            },
+            onSuccess: () => {
+              showTxResultModal(TransactionResult.SUCCESS);
             },
           });
         }
@@ -88,8 +96,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           password: passswordInput,
           wallet: selected,
         });
+        showTxResultModal(TransactionResult.SUCCESS);
       }
-      showTxResultModal(TransactionResult.SUCCESS);
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });

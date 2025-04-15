@@ -1372,7 +1372,7 @@
   "transaction.review.walletDetails": "Wallet Details",
   "transaction.review.submitTransaction": "Submit Transaction",
   "transaction.review.associatedAddress": "Associated address",
-  "transaction.review.undelegatePool": "Undelegating from the pool",
+  "transaction.review.undelegatePool": "Unstake entire wallet balance from",
   "transaction.review.deregisteringStakingKey": "Deregistering staking key deposit",
   "transaction.review.identifyDrep": "Identify your preferred DRep and enter their ID below to delegate your vote:",
   "transaction.review.collateralInfo": "Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.",

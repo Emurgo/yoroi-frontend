@@ -1082,7 +1082,7 @@ const globalMessages: * = defineMessages({
   },
   undelegatePool: {
     id: 'transaction.review.undelegatePool',
-    defaultMessage: '!!!Undelegating from the pool',
+    defaultMessage: '!!!Unstake entire wallet balance from',
   },
   deregisteringStakingKey: {
     id: 'transaction.review.deregisteringStakingKey',
