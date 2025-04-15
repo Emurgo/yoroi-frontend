@@ -104,14 +104,14 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 };
 
 const InfoInline = ({ label, value }) => {
-  const isString = typeof value === 'string' || typeof value === 'number';
+  const isText = typeof value === 'string' || typeof value === 'number';
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Typography variant="body1" color="ds.text_gray_low">
         {label}
       </Typography>
-      {isString ? (
+      {isText ? (
         <Typography variant="body1" color="ds.text_gray_medium">
           {value}
         </Typography>
