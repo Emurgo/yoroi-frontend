@@ -69,11 +69,10 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             params: { signRequest },
             wallet: selected,
             onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-              return;
+              return showTxResultModal(TransactionResult.FAIL);
             },
             onSuccess: () => {
-              showTxResultModal(TransactionResult.SUCCESS);
+              return showTxResultModal(TransactionResult.SUCCESS);
             },
           });
         }
@@ -83,7 +82,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             wallet: selected,
             onFail: () => {
               showTxResultModal(TransactionResult.FAIL);
-              return;
             },
             onSuccess: () => {
               showTxResultModal(TransactionResult.SUCCESS);
