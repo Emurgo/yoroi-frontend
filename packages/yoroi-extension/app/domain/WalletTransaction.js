@@ -31,7 +31,6 @@ export type WalletTransactionCtorData = {|
 export default class WalletTransaction {
   @observable txid: string;
 
-  // TODO: remove and make as a map
   @observable block: ?$ReadOnly<BlockRow>;
   @observable type: TransactionDirectionType;
   @observable amount: MultiToken; // fee included
@@ -40,7 +39,6 @@ export default class WalletTransaction {
   @observable ordinal: ?number;
   @observable addresses: TransactionAddresses = { from: [], to: [] };
 
-  // TODO: remove and turn it into a map
   @observable state: TxStatusCodesType;
   @observable errorMsg: null | string;
 

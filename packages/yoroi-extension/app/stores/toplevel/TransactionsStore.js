@@ -167,14 +167,16 @@ export default class TransactionsStore extends Store<StoresMap> {
     for (const tx of result) {
       const { txid, date } = tx;
       timestamps.add(date.valueOf());
-      // trigger notification for new tx
-      PubSub.publish(NotificationTopics.NEW_TX, {
-        txid,
-        tx,
-        slot: wallet.lastSyncInfo.SlotNum,
-        networkId: wallet.networkId,
-        walletId: wallet.publicDeriverId,
-      });
+      if (tx.block != null) {
+        // trigger notification for new tx
+        PubSub.publish(NotificationTopics.NEW_TX, {
+          txid,
+          tx,
+          slot: tx.block.SlotNum,
+          networkId: wallet.networkId,
+          walletId: wallet.publicDeriverId,
+        });
+      }
     }
     await this._updateTransactionPriceData(wallet, timestamps);
     await Promise.all([
