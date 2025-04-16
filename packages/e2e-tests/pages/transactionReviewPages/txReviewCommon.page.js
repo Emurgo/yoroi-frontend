@@ -24,7 +24,7 @@ class TxReviewCommon extends BasePage {
   };
 
   confirmBtnLocator = {
-    locator: 'txReview-confrim-button',
+    locator: 'txReview-confirm-button',
     method: 'id',
   };
 
