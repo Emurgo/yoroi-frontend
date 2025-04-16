@@ -171,7 +171,7 @@ export default class TransactionsStore extends Store<StoresMap> {
       PubSub.publish(NotificationTopics.NEW_TX, {
         txid,
         tx,
-        slot: wallet.lastSyncInfo.SlotNum,
+        slot: tx.block.SlotNum,
         networkId: wallet.networkId,
         walletId: wallet.publicDeriverId,
       });
