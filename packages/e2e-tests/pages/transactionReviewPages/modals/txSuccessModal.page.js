@@ -1,5 +1,5 @@
-import BasePage from '../../basepage';
-import { defaultWaitTimeout, quarterSecond } from '../../../helpers/timeConstants';
+import BasePage from '../../basepage.js';
+import { defaultWaitTimeout, quarterSecond } from '../../../helpers/timeConstants.js';
 
 class TxSuccessModal extends BasePage {
   // locators

@@ -1,4 +1,4 @@
-import TxReviewCommon from './txReviewCommon.page';
+import TxReviewCommon from './txReviewCommon.page.js';
 
 class TxReviewSubmit extends TxReviewCommon {
   // locators
