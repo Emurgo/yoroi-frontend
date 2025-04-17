@@ -16,10 +16,13 @@ import { settingsMenuMessages } from '../../../components/settings/menu/Settings
 import LocalStorageApi from '../../../api/localStorage/index';
 import environment from '../../../environment';
 import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
-
 import type { StoresProps } from '../../../stores';
+
+// $FlowIgnore[cannot-resolve-module]
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
+// $FlowIgnore[cannot-resolve-module]
 import { IntlProvider } from '../../../UI/context/IntlProvider';
+// $FlowIgnore[cannot-resolve-module]
 import { ModalManager } from '../../../UI/components/modals/ModalManager';
 
 const currencyLabels = defineMessages({

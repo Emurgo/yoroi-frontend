@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import TextField from '../../common/TextField';
 import { defineMessages, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -121,7 +121,9 @@ export default class DelegationSendForm extends Component<Props> {
     return (
       <Box className={styles.component}>
         {this.props.hasAnyPending && pendingTxWarningComponent}
-
+        <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
+          {intl.formatMessage(globalMessages.delegationById)}
+        </Typography>
         <BorderedBox>
           <div className={styles.poolInput}>
             <TextField

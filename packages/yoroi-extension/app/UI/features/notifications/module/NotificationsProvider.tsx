@@ -1,16 +1,28 @@
 import React from 'react';
+import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
-import LocalStorageApi from '../../../../api/localStorage';
-import PubSub from 'pubsub-js';
 import { useHistory } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
 import { ampli } from '../../../../../ampli/index';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import LocalStorageApi from '../../../../api/localStorage';
+import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
+  REWARDS: 'REWARDS_RECEIVED',
+};
+
+type TransactionType = 'self' | 'multi' | 'expend' | 'income';
+
+const TransactionTypeMap: Record<TransactionType, NotificationTypes> = {
+  self: NotificationTypes.Outcome,
+  multi: NotificationTypes.Income,
+  expend: NotificationTypes.Outcome,
+  income: NotificationTypes.Income,
 };
 
 const initialValue = {
@@ -42,8 +54,9 @@ function getRandomNotification() {
 
 const Context = React.createContext(initialValue);
 
-export default function NotificationsProvider({ children }) {
+export default function NotificationsProvider({ children, appLoadedSlots = {} }) {
   const lsApi = new LocalStorageApi();
+  const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
   const history = useHistory();
@@ -123,9 +136,30 @@ export default function NotificationsProvider({ children }) {
   const handleSubscription = async (topic, data) => {
     const notifTypeByTopic = {
       [NotificationTopics.NEW_TX]: NotificationTypes.Income,
+      [NotificationTopics.REWARDS]: NotificationTypes.Rewards,
     };
 
-    createNotification(notifTypeByTopic[topic] || NotificationTypes.Cancelled, data.txid);
+    let notifType = notifTypeByTopic[topic] || NotificationTypes.Cancelled;
+
+    // We only have epoch for rewards notifications
+    if (topic === NotificationTopics.REWARDS) {
+      const epoch = data.reward[0];
+      const network = getNetworkById(data.networkId);
+      const config = getCardanoHaskellBaseConfig(network);
+      const localTimeSlot = notifLimitSlots[data.networkId];
+      const relativeSlot = TimeUtils.toRelativeSlotNumber(config, localTimeSlot);
+      // If the local epoch is greater, reward is old and we don't show it
+      if (relativeSlot.epoch > epoch) {
+        return;
+      }
+    } else if (data.slot < notifLimitSlots[data.networkId]) {
+      return;
+    } else if (topic === NotificationTopics.NEW_TX) {
+      const txType = data.tx.type as TransactionType;
+      notifType = TransactionTypeMap[txType] || NotificationTypes.Cancelled;
+    }
+
+    createNotification(notifType, data.txid);
   };
 
   const showRandomToast = async () => {
@@ -161,9 +195,11 @@ export default function NotificationsProvider({ children }) {
   // subscribe to event topics on mount
   React.useEffect(() => {
     PubSub.subscribe(NotificationTopics.NEW_TX, handleSubscription);
+    PubSub.subscribe(NotificationTopics.REWARDS, handleSubscription);
 
     return () => {
       PubSub.unsubscribe(NotificationTopics.NEW_TX);
+      PubSub.unsubscribe(NotificationTopics.REWARDS);
     };
   }, []);
 

@@ -5,7 +5,7 @@ import RestoreWalletStepOne from '../pages/newWalletPages/restoreWalletSteps/res
 import RestoreWalletStepTwo from '../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
 import WalletDetails from '../pages/newWalletPages/walletDetails.page.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1 } from '../utils/testWallets.js';
+import { testWallet1Mainnet } from '../utils/testWallets.js';
 import { getPassword } from '../helpers/constants.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
@@ -31,7 +31,7 @@ describe('Restoring 15-wallet', function () {
 
   it('Enter the wallet seed phrase', async function () {
     const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
-    await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet1.mnemonic);
+    await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet1Mainnet.mnemonic);
     await restoreWalletStepTwoPage.sleep(100);
     const phraseIsVerified = await restoreWalletStepTwoPage.recoveryPhraseIsVerified();
     expect(phraseIsVerified, 'The recovery phrase is not verified').to.be.true;
@@ -44,14 +44,14 @@ describe('Restoring 15-wallet', function () {
     await walletDetailsPage.closeTipsModalWindow();
     // enter wallet details
     const walletPassword = getPassword();
-    await walletDetailsPage.enterWalletName(testWallet1.name);
+    await walletDetailsPage.enterWalletName(testWallet1Mainnet.name);
     await walletDetailsPage.enterWalletPassword(walletPassword);
     await walletDetailsPage.repeatWalletPassword(walletPassword);
 
     const walletPlate = await walletDetailsPage.getWalletPlate();
-    expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1.plate);
+    expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1Mainnet.plate);
 
-    await walletDetailsPage.saveToLocalStorage('walletName', testWallet1.name);
+    await walletDetailsPage.saveToLocalStorage('walletName', testWallet1Mainnet.name);
     await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
 
     const noWalletNameErrors = await walletDetailsPage.checkWalletNameHasNoError();
@@ -71,7 +71,7 @@ describe('Restoring 15-wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet1.balance);
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet1Mainnet.balance);
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
     const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
     expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);

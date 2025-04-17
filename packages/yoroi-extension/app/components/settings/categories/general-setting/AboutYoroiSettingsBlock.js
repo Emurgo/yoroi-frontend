@@ -25,6 +25,7 @@ import { IconWrapper, Icons } from '../../../../UI/components';
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+// $FlowIgnore[cannot-resolve-module]
 import { useIntl } from '../../../../UI/context/IntlProvider';
 
 const messages = defineMessages({
