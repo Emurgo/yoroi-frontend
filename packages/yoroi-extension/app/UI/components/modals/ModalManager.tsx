@@ -59,7 +59,7 @@ export const ModalManager = () => {
             top: 22,
           },
         }}
-        id={`${modalId}-closeModal-button`}
+        iconButtonId={`${modalId}-closeModal-crossIconbutton`}
       />
       <DialogContent>{content}</DialogContent>
     </BootstrapDialog>

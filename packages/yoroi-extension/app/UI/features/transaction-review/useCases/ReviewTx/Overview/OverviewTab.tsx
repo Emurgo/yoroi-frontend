@@ -27,6 +27,8 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
   },
 }));
 
+const commonIdPath = 'txReview:overview';
+
 export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   const strings = useStrings();
   const {
@@ -65,8 +67,15 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
         onClick={() => {
           changeModalView({ modalView: 'walletInfo', title: 'Wallet Details' });
         }}
+        id={commonIdPath + "-walletInfo-button"}
       >
-        <Typography variant="body1" color="ds.text_primary_medium" fontWeight={500}>{`${truncateLongName(
+        <Typography
+          variant="body1"
+          color="ds.text_primary_medium"
+          fontWeight={500}
+          id={commonIdPath + "-walletNameAndPlate-text"}
+        >
+          {`${truncateLongName(
           selectedWalletName,
           29
         )} | ${plate.TextPart}`}</Typography>
@@ -112,7 +121,7 @@ const InfoInline = ({ label, value }) => {
         {label}
       </Typography>
       {isText ? (
-        <Typography variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + "-info" + label + "-text"}>
           {value}
         </Typography>
       ) : (
@@ -131,7 +140,7 @@ const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) 
         content={
           <Stack gap="12px">
             <CopyableText value={stakingAddress}>
-              <Typography>{truncateAddress(stakingAddress)}</Typography>
+              <Typography id={commonIdPath + ":yourAddress-truncatedAddress-text"}>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
             <MyWalletTokens tx={tx} notOwnedOutputs={notOwnedOutputs} operationFee={operationFee} />
           </Stack>
@@ -151,7 +160,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {strings.addressToLabel}:
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":to-receiver-text"}>
           {receiverCustomTitle?.to ?? (
             <CopyableText value={output.rewardAddress}>{truncateAddressShort(output.rewardAddress, 40)}</CopyableText>
           )}
@@ -163,7 +172,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
           <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
             {strings.associatedAddress}
           </Typography>
-          <Typography variant="body1" color="ds.text_gray_medium">
+          <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":associatedAddress-truncatedAddress-text"}>
             {<CopyableText value={address}>{truncateAddressShort(address, 25)}</CopyableText>}
           </Typography>
         </Stack>
@@ -233,7 +242,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
           <Box
             sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px', flexWrap: 'nowrap', ml: '40px' }}
           >
-            <Typography color="ds.white_static">
+            <Typography color="ds.white_static" id={commonIdPath + "-txSendAmount-text"}>
               {formatedFee} {primaryTokenInfo.name}
             </Typography>
           </Box>
