@@ -173,6 +173,7 @@
   "global.label.allow": "Allow",
   "global.label.assets": "assets",
   "global.label.choose": "Choose",
+  "global.label.yourWallet": "Your Wallet",
   "global.label.adaHandle": "ADA Handle",
   "global.label.CardanoCNS": "Cardano Name Service (CNS)",
   "global.label.unstoppableDomains": "Unstoppable Domains",
