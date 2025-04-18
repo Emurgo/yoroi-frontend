@@ -8,6 +8,10 @@ export const messages = Object.freeze(
       id: 'notifications.description.clickToView',
       defaultMessage: '!!!Click to view',
     },
+    intrwalletTxConfirmed: {
+      id: 'notifications.title.intrawallet',
+      defaultMessage: '!!!Intrawallet transaction confirmed',
+    },
     assetsReceived: {
       id: 'notifications.title.income',
       defaultMessage: '!!!Assets received',
@@ -80,6 +84,7 @@ export const useStrings = () => {
 
   return React.useRef({
     clickToView: intl.formatMessage(messages.clickToView),
+    intrawalletTxConfirmed: intl.formatMessage(messages.intrwalletTxConfirmed),
     assetsReceived: intl.formatMessage(messages.assetsReceived),
     txFailed: intl.formatMessage(messages.txFailed),
     assetsSent: intl.formatMessage(messages.assetsSent),

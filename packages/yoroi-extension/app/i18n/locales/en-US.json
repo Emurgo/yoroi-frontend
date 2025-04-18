@@ -281,6 +281,7 @@
   "nightly.banner.label.message": "YOU ARE ON YOROI NIGHTLY.",
   "notprod.label.message": "WARNING: this is a non-production build. If something unusual occurs, double-check Yoroi's installation.",
   "notifications.description.clickToView": "Click to view",
+  "notifications.title.intrawallet": "Intrawallet transaction confirmed",
   "notifications.title.income": "Assets received",
   "notifications.title.cancelled": "Transaction failed",
   "notifications.title.outcome": "Assets sent",
