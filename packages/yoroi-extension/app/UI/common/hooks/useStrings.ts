@@ -72,6 +72,10 @@ export const messages = Object.freeze(
       id: 'global.label.unstoppableDomains',
       defaultMessage: '!!!Unstoppable Domains',
     },
+    transactionReview: {
+      id: 'transaction.review.transactionReview',
+      defaultMessage: '!!!Transaction Review',
+    },
   })
 );
 
@@ -96,5 +100,6 @@ export const useStrings = () => {
     adaHandle: intl.formatMessage(messages.adaHandle),
     cardanoCNS: intl.formatMessage(messages.cardanoCNS),
     unstoppableDomains: intl.formatMessage(messages.unstoppableDomains),
+    transactionReview: intl.formatMessage(messages.transactionReview),
   }).current;
 };

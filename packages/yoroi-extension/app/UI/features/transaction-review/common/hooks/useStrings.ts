@@ -65,7 +65,7 @@ export const messages = Object.freeze(
       defaultMessage: '!!!fee',
     },
     interactWithOperations: {
-      id: 'wallet.transaction.fee',
+      id: 'transaction.review.interactWithOperations',
       defaultMessage: '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
     },
     learnMore: {
@@ -140,6 +140,10 @@ export const messages = Object.freeze(
       id: 'transaction.review.associatedAddress',
       defaultMessage: '!!!Associated address',
     },
+    yourWallet: {
+      id: 'global.label.yourWallet',
+      defaultMessage: '!!!Your Wallet',
+    },
   })
 );
 
@@ -180,5 +184,6 @@ export const useStrings = () => {
     attentionLabel: intl.formatMessage(messages.attentionLabel),
     rewardsWithdraw: intl.formatMessage(messages.rewardsWithdraw),
     associatedAddress: intl.formatMessage(messages.associatedAddress),
+    yourWallet: intl.formatMessage(messages.yourWallet),
   }).current;
 };
