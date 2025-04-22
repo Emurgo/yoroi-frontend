@@ -1,13 +1,12 @@
 // @flow
 import type { Node } from 'react';
-import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
+import { HashRouter } from 'react-router';
 import { addLocaleData } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
-import { Routes } from './Routes';
+import { YoroiRoutes } from './Routes';
 import { locales, translations } from './i18n/translations';
 import { Logger } from './utils/logging';
 import { ColorModeProvider } from './styles/context/mode';
@@ -31,7 +30,6 @@ addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
-  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,
@@ -106,7 +104,7 @@ class App extends Component<Props, State> {
   }
 
   getContent: void => ?Node = () => {
-    const { stores, history } = this.props;
+    const { stores } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
@@ -114,17 +112,17 @@ class App extends Component<Props, State> {
       return <MaintenancePage stores={stores} />;
     }
     return (
-      <Router history={history}>
+      <HashRouter>
         <IntlContextProvider>
           <NotificationsProvider appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}>
             <NotificationsManager />
             <div style={{ height: '100%' }}>
               <Support />
-              {Routes(stores)}
+              {YoroiRoutes(stores)}
             </div>
           </NotificationsProvider>
         </IntlContextProvider>
-      </Router>
+      </HashRouter>
     );
   };
 }

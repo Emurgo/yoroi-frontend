@@ -1,16 +1,16 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../../../routes-config';
 
 export const useNavigateTo = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return React.useRef({
-    portfolio: () => history.push(ROUTES.PORTFOLIO.ROOT),
-    portfolioDapps: () => history.push(ROUTES.PORTFOLIO.DAPPS),
-    portfolioDetail: (tokenId: string) => history.push(`${ROUTES.PORTFOLIO.ROOT}/details/${tokenId}`),
-    swapPage: (tokenId?: string) => history.push(`${ROUTES.SWAP.ROOT}?tokenId=${tokenId}`),
-    sendPage: () => history.push(ROUTES.WALLETS.SEND),
-    receivePage: () => history.push(ROUTES.WALLETS.RECEIVE.ROOT),
+    portfolio: () => navigate(ROUTES.PORTFOLIO.ROOT),
+    portfolioDapps: () => navigate(ROUTES.PORTFOLIO.DAPPS),
+    portfolioDetail: (tokenId: string) => navigate(`${ROUTES.PORTFOLIO.ROOT}/details/${tokenId}`),
+    swapPage: (tokenId?: string) => navigate(`${ROUTES.SWAP.ROOT}?tokenId=${tokenId}`),
+    sendPage: () => navigate(ROUTES.WALLETS.SEND),
+    receivePage: () => navigate(ROUTES.WALLETS.RECEIVE.ROOT),
   }).current;
 };

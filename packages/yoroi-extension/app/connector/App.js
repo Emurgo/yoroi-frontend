@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { RouterHistory } from 'react-router-dom';
-import { Router } from 'react-router-dom';
+import { Router } from 'react-router';
 import { addLocaleData, IntlProvider } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -21,7 +20,7 @@ import tr from 'react-intl/locale-data/tr';
 import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
 import { autorun, observable, runInAction } from 'mobx';
-import { Routes } from './Routes';
+import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
 import type { StoresMap } from './stores';
 import ThemeManager from '../ThemeManager';
@@ -53,7 +52,6 @@ addLocaleData([
 
 type Props = {|
   +stores: StoresMap,
-  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,
@@ -120,13 +118,13 @@ class App extends Component<Props, State> {
   }
 
   getContent: void => ?Node = () => {
-    const { stores, history } = this.props;
+    const { stores } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
     return (
-      <Router history={history}>
-        <Routes stores={stores} />
+      <Router>
+        <YoroiRoutes stores={stores} />
       </Router>
     );
   };

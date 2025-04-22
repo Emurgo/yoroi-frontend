@@ -19,12 +19,7 @@ import RootStore from './stores';
 
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 
-import {
-  HashRouter,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
+import { Navigate, HashRouter, Routes, Route } from 'react-router';
 
 import { translations } from './i18n/translations';
 import { DEFAULT_LOCALE } from './const';
@@ -82,12 +77,12 @@ export default class App extends React.Component<Props> {
         <Suspense fallback={loadingSpinner}>
           <StyleVariableLoader variables={styleVariables} />
           <HashRouter basename={process.env.PUBLIC_URL}>
-            <Switch>
+            <Routes>
               <Route exact path="/">
                 <ConnectPage rootStore={this.props.rootStore} />
               </Route>
-              <Redirect to="/" />
-            </Switch>
+              <Navigate to="/" />
+            </Routes>
           </HashRouter>
         </Suspense>
       </IntlProvider>

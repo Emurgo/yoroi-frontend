@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router';
+import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
 import { useStrings } from '../../features/governace/common/useStrings';
@@ -21,7 +21,7 @@ const GovernanceTransactionSubmittedPage = (props: Props): any => {
 };
 
 const TransactionSubmittedWrapper = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const strings = useStrings();
 
   const { ampli } = useGovernance();
@@ -36,7 +36,7 @@ const TransactionSubmittedWrapper = () => {
       subtitle={strings.theTransactionCanTake}
       content={strings.participatingInGovernance}
       btnText={strings.goToGovernance}
-      onPress={() => history.push(ROUTES.Governance.ROOT)}
+      onPress={() => navigate(ROUTES.Governance.ROOT)}
     />
   );
 };

@@ -16,7 +16,7 @@ import SubMenu from '../../components/topbar/SubMenu';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { TOP_RECENT_ANNOUNCEMENT_VERSION, RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
-import { Redirect } from 'react-router';
+import { Navigate } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
 // $FlowIgnore: suppressing this error
@@ -108,7 +108,7 @@ render(): Node {
   // abort rendering if the page isn't valid for this wallet
   const newRoute = this.checkRoute();
   if (newRoute != null) {
-    return <Redirect to={newRoute} />;
+    return <Navigate to={newRoute} />;
   }
   const { intl } = this.context;
   const selectedWallet = stores.wallets.selectedOrFail;

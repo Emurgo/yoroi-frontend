@@ -6,7 +6,7 @@ import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';

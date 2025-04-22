@@ -60,7 +60,7 @@ const initializeDappConnector: void => Promise<void> = async () => {
     },
   }: LoadOptionsWithEnvironment)).promise;
 
-  render(<App stores={stores} history={history} />, root);
+  render(<App stores={stores} />, root);
 };
 
 addCloseListener(TabIdKeys.YoroiConnector);

@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
-import { useHistory } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
 import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -59,7 +59,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const notificationTexts = {
     [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
@@ -88,7 +89,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
     ampli.inAppNotificationOpened({ type: analyticsTypeValue });
     // redirect after analytics
     const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
-    history.push(redirectTo);
+    navigate(redirectTo);
   };
 
   const handleToastExpired = () => {
@@ -112,12 +113,12 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:
-        if (history.location.pathname === ROUTES.WALLETS.TRANSACTIONS) {
+        if (location.pathname === ROUTES.WALLETS.TRANSACTIONS) {
           return;
         }
         break;
       case NotificationTypes.Rewards:
-        if (history.location.pathname === ROUTES.STAKING) {
+        if (location.pathname === ROUTES.STAKING) {
           return;
         }
     }

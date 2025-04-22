@@ -2,7 +2,7 @@
 
 import type { Node } from 'react';
 import React, { Suspense } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import AddWalletPage from './containers/wallet/AddWalletPage';
@@ -176,12 +176,12 @@ export const LazyLoadPromises: Array<() => any> = [
   ExchangeEndPagePromise,
 ];
 
-export const Routes = (stores: StoresMap): Node => {
+export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
-        <Switch>
+        <Routes>
           <Route exact path={ROUTES.ROOT} component={props => <LoadingPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.NIGHTLY_INFO} component={props => <NightlyPage {...props} stores={stores} />} />
           <Route
@@ -247,35 +247,35 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
           />
 
-          <Redirect to={ROUTES.WALLETS.ROOT} />
-        </Switch>
+          <Navigate to={ROUTES.WALLETS.ROOT} />
+        </Routes>
       </Suspense>
     </QueryClientProvider>
   );
 };
 
 const WalletsSubpages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.WALLETS.TRANSACTIONS} component={props => <WalletSummaryPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.WALLETS.SEND} component={props => <WalletSendPage {...props} stores={stores} />} />
     <Route
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
     />
-  </Switch>
+  </>
 );
 
 const SwapSubpages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.SWAP.ROOT} component={props => <SwapPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.SWAP.ORDERS} component={props => <SwapOrdersPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.SWAP.ERROR} component={props => <PagePreparation {...props} stores={stores} />} />
-    <Redirect to={ROUTES.SWAP.ROOT} />
-  </Switch>
+    <Navigate to={ROUTES.SWAP.ROOT} />
+  </>
 );
 
 const SettingsSubpages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.SETTINGS.TERMS_OF_USE} component={props => <TermsOfUseSettingsPage {...props} stores={stores} />} />
@@ -292,36 +292,36 @@ const SettingsSubpages = stores => (
       component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
     />
     <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
-    <Redirect to={ROUTES.SETTINGS.GENERAL} />
-  </Switch>
+    <Navigate to={ROUTES.SETTINGS.GENERAL} />
+  </>
 );
 
 const PortfolioSubpages = stores =>
   WrapPortfolio(
     { stores },
-    <Switch>
+    <>
       <Route exact path={ROUTES.PORTFOLIO.ROOT} component={props => <PortfolioPage {...props} stores={stores} />} />
       <Route exact path={ROUTES.PORTFOLIO.DAPPS} component={props => <PortfolioDappsPage {...props} stores={stores} />} />
       <Route exact path={ROUTES.PORTFOLIO.DETAILS} component={props => <PortfolioDetailPage {...props} stores={stores} />} />
-    </Switch>
+    </>
   );
 
 const NFTsSubPages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.NFTS.ROOT} component={props => <NFTsPageRevamp {...props} stores={stores} />} />
     <Route exact path={ROUTES.NFTS.DETAILS} component={props => <NFTDetailPageRevamp {...props} stores={stores} />} />
-  </Switch>
+  </>
 );
 
 const AssetsSubpages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.ASSETS.ROOT} component={props => <TokensPageRevamp {...props} stores={stores} />} />
     <Route exact path={ROUTES.ASSETS.DETAILS} component={props => <TokensDetailPageRevamp {...props} stores={stores} />} />
-  </Switch>
+  </>
 );
 
 const GovernanceSubpages = stores => (
-  <Switch>
+  <>
     <Route exact path={ROUTES.Governance.ROOT} component={props => <GovernanceStatusPage {...props} stores={stores} />} />
     <Route
       exact
@@ -338,7 +338,7 @@ const GovernanceSubpages = stores => (
       path={ROUTES.Governance.FAIL}
       component={props => <GovernanceTransactionFailedPage {...props} stores={stores} />}
     />
-  </Switch>
+  </>
 );
 
 export function wrapSwap(swapProps: StoresProps, children: Node): Node {

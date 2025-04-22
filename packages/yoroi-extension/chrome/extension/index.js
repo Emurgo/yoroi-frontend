@@ -73,7 +73,7 @@ const initializeYoroi: void => Promise<void> = async () => {
     }
   }
 
-  render(<App stores={stores} history={history} />, root);
+  render(<App stores={stores}/>, root);
 
   history.listen(({ pathname }) => {
     if (pathname === ROUTES.ASSETS.ROOT) {

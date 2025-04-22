@@ -4,7 +4,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useParams } from 'react-router';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { TransactionResult } from '../../../transaction-review/common/types';
@@ -66,7 +66,7 @@ export const GovernanceStatusSelection = () => {
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-  const params: any = useLocation();
+  const params: any = useParams();
 
   React.useEffect(() => {
     if (params?.delegateToYoroiDrep) {

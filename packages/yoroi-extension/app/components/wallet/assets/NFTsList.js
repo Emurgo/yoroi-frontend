@@ -11,7 +11,7 @@ import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import globalMessages from '../../../i18n/global-messages';

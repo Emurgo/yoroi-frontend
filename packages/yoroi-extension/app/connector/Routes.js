@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router';
 import type { StoresMap } from './stores/index';
 import { ROUTES } from './routes-config';
 import Helmet from 'react-helmet';
@@ -17,7 +17,7 @@ import SelectCashbackWalletContainer from './containers/SelectCashbackWalletCont
 
 type Props = {| stores: StoresMap |};
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
-export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: Props & Intl) => {
+export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((props: Props & Intl) => {
   const { stores, intl } = props;
   const title = intl.formatMessage(
     useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ?
@@ -37,7 +37,7 @@ export const Routes: React$ComponentType<Props>  = injectIntl(observer((props: P
 }));
 
 const getContent = (stores) => (
-  <Switch>
+  <Routes>
     <Route
       exact
       path={ROUTES.ROOT}
@@ -53,7 +53,7 @@ const getContent = (stores) => (
       path={ROUTES.SELECT_CASHBACK_WALLET}
       component={props => <SelectCashbackWalletContainer {...props} stores={stores} />}
     />
-  </Switch>
+  </Routes>
 );
 
 function wrapPages(children: Node, stores: StoresMap): Node {

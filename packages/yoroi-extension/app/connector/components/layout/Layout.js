@@ -1,7 +1,6 @@
 // @flow
-import { Component } from 'react';
+import { Component, useContext } from 'react';
 import type { Node, ComponentType } from 'react';
-import { withRouter, type Location } from 'react-router-dom';
 import { ReactComponent as YoroiLogo } from '../../assets/images/yoroi-logo.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
@@ -12,13 +11,11 @@ import { ReactComponent as DappConnectorIcon } from '../../../assets/images/dapp
 import environment from '../../../environment';
 import { NETWORK_BADGES } from '../../../containers/NavBarContainerRevamp';
 import { ROUTES } from '../../routes-config';
+import { useLocation } from 'react-router';
 
 type Props = {|
   children: Node,
   networkId: number,
-|};
-type LocationProp = {|
-  location: Location,
 |};
 
 export const messages: Object = defineMessages({
@@ -32,46 +29,42 @@ export const messages: Object = defineMessages({
   },
 });
 
-@observer
-class Layout extends Component<Props & LocationProp> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+function Layout(props: Props, context: {| intl: $npm$ReactIntl$IntlFormat |}) {
+  const { intl } = context;
+  const location = useLocation();
+  const title = intl.formatMessage(
+    location.pathname === ROUTES.SELECT_CASHBACK_WALLET ?
+      messages.yoroiConnector : messages.yoroiDappConnector
+  );
 
-  render(): Node {
-    const { intl } = this.context;
-    const title = intl.formatMessage(
-      this.props.location.pathname === ROUTES.SELECT_CASHBACK_WALLET ?
-        messages.yoroiConnector : messages.yoroiDappConnector
-    );
-
-    let testnetBadge = null;
-    const badge = NETWORK_BADGES[this.props.networkId];
-    if (badge) {
-      testnetBadge = (
-        <div className={styles.badge} style={{ backgroundColor: badge.color }}>{badge.text}</div>
-      );
-    }
-
-    return (
-      <div className={styles.layout}>
-        <TestnetWarningBanner isTestnet={environment.isTest()} />
-        <div className={styles.header}>
-          <div className={styles.menu}>
-            <YoroiLogo />
-            <div className={styles.logo}>
-              <h3>{title}</h3>
-            </div>
-            <div className={styles.connectorLogoContainer}>
-              <DappConnectorIcon className={styles.connectorLogo} />
-            </div>
-            {testnetBadge}
-          </div>
-        </div>
-        <div className={styles.content}>{this.props.children}</div>
-      </div>
+  let testnetBadge = null;
+  const badge = NETWORK_BADGES[props.networkId];
+  if (badge) {
+    testnetBadge = (
+      <div className={styles.badge} style={{ backgroundColor: badge.color }}>{badge.text}</div>
     );
   }
+
+  return (
+    <div className={styles.layout}>
+      <TestnetWarningBanner isTestnet={environment.isTest()} />
+      <div className={styles.header}>
+        <div className={styles.menu}>
+          <YoroiLogo />
+          <div className={styles.logo}>
+            <h3>{title}</h3>
+          </div>
+          <div className={styles.connectorLogoContainer}>
+            <DappConnectorIcon className={styles.connectorLogo} />
+          </div>
+          {testnetBadge}
+        </div>
+      </div>
+      <div className={styles.content}>{props.children}</div>
+    </div>
+  );
 }
 
-export default (withRouter(Layout): ComponentType<Props>);
+Layout.contextTypes = { intl: intlShape.isRequired };
+
+export default (observer(Layout): ComponentType<Props>);
