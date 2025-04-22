@@ -19,7 +19,7 @@ export const NotificationTopics = {
 type TransactionType = 'self' | 'multi' | 'expend' | 'income';
 
 const TransactionTypeMap: Record<TransactionType, NotificationTypes> = {
-  self: NotificationTypes.Outcome,
+  self: NotificationTypes.Intrawallet,
   multi: NotificationTypes.Income,
   expend: NotificationTypes.Outcome,
   income: NotificationTypes.Income,
@@ -71,6 +71,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     () => walletsStore.selected?.publicDeriverId;
 
   const notificationTexts = {
+    [NotificationTypes.Intrawallet]: strings.intrawalletTxConfirmed,
     [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
     [NotificationTypes.Income]: strings.assetsReceived,
     [NotificationTypes.Outcome]: strings.assetsSent,
@@ -121,6 +122,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     if (!notifyWallet) return;
     // return if we're on the same route as the event redirection
     switch (type) {
+      case NotificationTypes.Intrawallet:
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:

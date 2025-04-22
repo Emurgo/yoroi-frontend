@@ -50,6 +50,7 @@ export const BottomActions = () => {
               : passswordInput === undefined || passswordInput.length === 0
           }
           loading={isLoading}
+          id="txReview-submit-button"
         >
           {handleSubmitText()}
         </LoadingButton>
@@ -75,6 +76,7 @@ export const BottomActions = () => {
             onClick={() => {
               closeTxReviewModal();
             }}
+            id="txReview-cancel-button"
           >
             {strings.cancelLabel}
           </Button>
@@ -85,6 +87,7 @@ export const BottomActions = () => {
             onClick={() => {
               changeModalView({ modalView: 'submitTx', title: 'Submit Transaction' });
             }}
+            id="txReview-confirm-button"
           >
             {strings.confirmLabel}
           </Button>
