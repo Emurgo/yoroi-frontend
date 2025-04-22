@@ -40,41 +40,39 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 };
 
 const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
-  return Promise.all(
-    inputUtxos.map(async (utxo, index) => {
-      const address = utxo?.receiver;
-      const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
+  return inputUtxos.map(async (utxo, index) => {
+    const address = utxo?.receiver;
+    const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
 
-      const addressKind = address != null ? getAddressKind(address) : null;
-      const rewardAddress = address !== null && addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
-      const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
-      const primaryAssets =
-        coin != null
-          ? [
-              {
-                tokenInfo: primaryTokenInfo,
-                quantity: coin,
-              },
-            ]
-          : [];
-      const multiAssets = allAssetList.map(a => {
-        return {
-          tokenInfo: a,
-          quantity: a.quantity,
-        };
-      });
-
+    const addressKind = address != null ? getAddressKind(address) : null;
+    const rewardAddress = address !== null && addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
+    const primaryAssets =
+      coin != null
+        ? [
+          {
+            tokenInfo: primaryTokenInfo,
+            quantity: coin,
+          },
+        ]
+        : [];
+    const multiAssets = allAssetList.map(a => {
       return {
-        assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
-        address,
-        addressKind,
-        rewardAddress,
-        ownAddress: isOwnAddress,
-        txIndex: utxo.tx_index,
-        txHash: utxo.tx_hash,
+        tokenInfo: a,
+        quantity: a.quantity,
       };
-    })
-  );
+    });
+
+    return {
+      assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
+      address,
+      addressKind,
+      rewardAddress,
+      ownAddress: isOwnAddress,
+      txIndex: utxo.tx_index,
+      txHash: utxo.tx_hash,
+    };
+  });
 };
 
 const formatOutputs = (
@@ -84,45 +82,43 @@ const formatOutputs = (
   walletAddresses: any,
   allAssetList: any
 ): any => {
-  return Promise.all(
-    outputs.map(async output => {
-      const address = output.address;
-      const coin: any = output.amount.coin;
+  return outputs.map(async output => {
+    const address = output.address;
+    const coin: any = output.amount.coin;
 
-      const addressKind = getAddressKind(address);
-      const rewardAddress = addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
-      const primaryAssets = [
-        {
-          tokenInfo: primaryTokenInfo,
-          quantity: asQuantity(coin.toString()),
-        },
-      ];
+    const addressKind = getAddressKind(address);
+    const rewardAddress = addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const primaryAssets = [
+      {
+        tokenInfo: primaryTokenInfo,
+        quantity: asQuantity(coin.toString()),
+      },
+    ];
 
-      const multiAssets = output.amount.multiasset
-        ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
-            return Object.entries(assets).map(([assetId, amount]) => {
-              const tokenInfo: any = allAssetList.filter(asset => asset.info.id === `${policyId}.${assetId}`);
-              if (tokenInfo == null) return null;
-              const quantity: any = asQuantity(String(amount));
+    const multiAssets = output.amount.multiasset
+      ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
+        return Object.entries(assets).map(([assetId, amount]) => {
+          const tokenInfo: any = allAssetList.filter(asset => asset.info.id === `${policyId}.${assetId}`);
+          if (tokenInfo == null) return null;
+          const quantity: any = asQuantity(String(amount));
 
-              return {
-                tokenInfo: tokenInfo[0],
-                quantity,
-              };
-            });
-          })
-        : [];
-      const assets = [...primaryAssets, ...multiAssets];
+          return {
+            tokenInfo: tokenInfo[0],
+            quantity,
+          };
+        });
+      })
+      : [];
+    const assets = [...primaryAssets, ...multiAssets];
 
-      return {
-        assets,
-        address,
-        addressKind,
-        rewardAddress,
-        ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
-      };
-    })
-  );
+    return {
+      assets,
+      address,
+      addressKind,
+      rewardAddress,
+      ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
+    };
+  });
 };
 
 export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => {
