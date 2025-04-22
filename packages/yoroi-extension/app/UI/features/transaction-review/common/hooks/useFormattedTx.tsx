@@ -16,8 +16,8 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const outputs = data?.outputs ?? [];
   // const collateral = data?.collateral ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
-  const inputUtxos = getAllUtxos(inputs, walletUtxos);
 
+  const inputUtxos = getAllUtxos(inputs, walletUtxos);
 
   // TODO: collateral utxos are not used in tx details for now, but maybe should be in the future
   // const collateralUtxos = getAllUtxos(collateral, walletUtxos);
@@ -40,12 +40,13 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 };
 
 const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
-  return inputUtxos.map(async (utxo, index) => {
+  return inputUtxos.map((utxo, index) => {
     const address = utxo?.receiver;
     const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
 
-    const addressKind = address != null ? getAddressKind(address) : null;
-    const rewardAddress = address !== null && addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const { resolvedAddress, paymentCredKind } = resolveAddress(address);
+
+    const rewardAddress = address !== null && paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
     const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
     const primaryAssets =
       coin != null
@@ -65,8 +66,8 @@ const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, wal
 
     return {
       assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
-      address,
-      addressKind,
+      address: resolvedAddress,
+      addressKind: paymentCredKind,
       rewardAddress,
       ownAddress: isOwnAddress,
       txIndex: utxo.tx_index,
@@ -82,12 +83,13 @@ const formatOutputs = (
   walletAddresses: any,
   allAssetList: any
 ): any => {
-  return outputs.map(async output => {
+  return outputs.map(output => {
     const address = output.address;
     const coin: any = output.amount.coin;
 
-    const addressKind = getAddressKind(address);
-    const rewardAddress = addressKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const { resolvedAddress, paymentCredKind } = resolveAddress(address);
+
+    const rewardAddress = paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
     const primaryAssets = [
       {
         tokenInfo: primaryTokenInfo,
@@ -98,14 +100,10 @@ const formatOutputs = (
     const multiAssets = output.amount.multiasset
       ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
         return Object.entries(assets).map(([assetId, amount]) => {
-          const tokenInfo: any = allAssetList.filter(asset => asset.info.id === `${policyId}.${assetId}`);
+          const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
           if (tokenInfo == null) return null;
           const quantity: any = asQuantity(String(amount));
-
-          return {
-            tokenInfo: tokenInfo[0],
-            quantity,
-          };
+          return { tokenInfo, quantity };
         });
       })
       : [];
@@ -113,8 +111,8 @@ const formatOutputs = (
 
     return {
       assets,
-      address,
-      addressKind,
+      address: resolvedAddress,
+      addressKind: paymentCredKind,
       rewardAddress,
       ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
     };
@@ -138,17 +136,25 @@ const deriveAddress = (address: string, networkId: number) => {
   }
 };
 
-const getAddressKind = (addressBech32: string): any => {
-  try {
-    const address = RustModule.WalletV4.Address.from_bech32(addressBech32);
-    if (address.kind() === RustModule.WalletV4.AddressKind.Byron) {
-      return null;
-    }
-    return address.payment_cred().kind() ?? null;
-  } catch {
-    return null;
+const resolveAddress = (addressBech32: string | undefined): {
+  resolvedAddress: string | undefined,
+  paymentCredKind: number | null,
+} => {
+  if (addressBech32 == null) {
+    return { resolvedAddress: addressBech32, paymentCredKind: null };
   }
-};
+  const address = RustModule.WalletV4.Address.from_bech32(addressBech32);
+  if (address.kind() === RustModule.WalletV4.AddressKind.Byron) {
+    return {
+      resolvedAddress: RustModule.WalletV4.ByronAddress.from_address(address).to_base58(),
+      paymentCredKind: null,
+    };
+  }
+  return {
+    resolvedAddress: addressBech32,
+    paymentCredKind: address.payment_cred().kind() ?? null,
+  };
+}
 
 export const getAllUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
   // noinspection JSIncompatibleTypesComparison
