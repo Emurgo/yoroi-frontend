@@ -405,7 +405,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
               onError={() => {
-                stores.app.goToRoute({ route: ROUTES.SWAP.ERROR });
+                stores.routing.goToRoute({ route: ROUTES.SWAP.ERROR });
               }}
             />
           )}
@@ -414,7 +414,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               txSubmitErrorState={txSubmitErrorState}
               onTryAgain={processBackToStart}
               onSuccess={() => {
-                stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+                stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
               }}
               onDownloadLogs={downloadLogs}
             />
@@ -473,7 +473,7 @@ function SwapPage(props: StoresProps & Intl): Node {
         <SwapDisclaimerDialog
           onDialogConfirm={onAcceptDisclaimer}
           onDialogRefuse={() => {
-            stores.app.redirect({ route: ROUTES.WALLETS.ROOT });
+            stores.routing.replaceRoute({ route: ROUTES.WALLETS.ROOT });
           }}
         />
       )}

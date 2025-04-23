@@ -123,7 +123,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             addressLookup={genAddressLookup(
               selected.networkId,
               intl,
-              route => stores.app.goToRoute({ route }),
+              route => stores.routing.goToRoute({ route }),
               stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
@@ -188,7 +188,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             />
           }
           selectedWallet={selected}
-          goToRoute={stores.app.goToRoute}
+          goToRoute={stores.routing.goToRoute}
         />
 
         {walletTransactions}
@@ -216,7 +216,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             onCancel={stores.memos.closeMemoDialog}
             addExternal={() => {
               stores.memos.closeMemoDialog();
-              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+              stores.routing.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
               stores.uiDialogs.getParam<(void) => void>('continuation')?.();

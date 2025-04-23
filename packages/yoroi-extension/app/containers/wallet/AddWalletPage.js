@@ -33,7 +33,7 @@ export default class AddWalletPage extends Component<StoresProps> {
 
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
-      this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+      this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
     }
     this.props.stores.uiDialogs.closeActiveDialog();
   };
@@ -145,7 +145,7 @@ export default class AddWalletPage extends Component<StoresProps> {
     }
 
     const { hasAnyWallets } = this.props.stores.wallets;
-    const goToRoute = stores.app.goToRoute;
+    const goToRoute = stores.routing.goToRoute;
     const addWalletPageComponent = (
       <>
         <AddWalletPageRevamp
@@ -176,7 +176,7 @@ export default class AddWalletPage extends Component<StoresProps> {
   }
 
   _goToSettingsRoot: () => void = () => {
-    this.props.stores.app.goToRoute({
+    this.props.stores.routing.goToRoute({
       route: ROUTES.SETTINGS.ROOT,
     });
   };

@@ -68,7 +68,7 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
 checkRoute(): void | string {
   const categories = allSubcategoriesRevamp;
-  if (this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
+  if (this.props.stores.routing.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
     return ROUTES.WALLETS.TRANSACTIONS;
   }
 
@@ -80,7 +80,9 @@ checkRoute(): void | string {
   const spendableBalance = this.props.stores.transactions.balance;
   const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-  const activeCategory = categories.find(category => this.props.stores.app.currentRoute.startsWith(category.route));
+  const activeCategory = categories.find(
+    category => this.props.stores.routing.currentRoute.startsWith(category.route)
+  );
 
   // if we're on a page that isn't applicable for the currently selected wallet
   // ex: a cardano-only page for an Ergo wallet
@@ -100,7 +102,7 @@ checkRoute(): void | string {
 }
 
 navigateToMyWallets: string => void = destination => {
-  this.props.stores.app.goToRoute({ route: destination });
+  this.props.stores.routing.goToRoute({ route: destination });
 };
 
 render(): Node {
@@ -138,8 +140,8 @@ render(): Node {
           label: intl.formatMessage(category.label),
           route: category.route,
         }))}
-      onItemClick={route => stores.app.goToRoute({ route })}
-      isActiveItem={route => stores.app.currentRoute.startsWith(route)}
+      onItemClick={route => stores.routing.goToRoute({ route })}
+      isActiveItem={route => stores.routing.currentRoute.startsWith(route)}
       locationId="wallet"
     />
   );
@@ -214,7 +216,7 @@ getDialogs: (any, any) => Node = (intl, currentPool) => {
             show: 'idle',
             shouldUpdatePool: true,
           });
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: ROUTES.STAKING,
           });
         }}

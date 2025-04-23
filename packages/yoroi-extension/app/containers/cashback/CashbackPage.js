@@ -364,7 +364,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
   useEffect(() => {
     if (environment.isLight) {
-      stores.app.goToRoute({
+      stores.routing.goToRoute({
         route: ROUTES.WALLETS.ROOT,
       });
     }

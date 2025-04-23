@@ -47,17 +47,17 @@ export default class SwapPageContainer extends Component<AllProps> {
   };
 
   isActivePage: string => boolean = route => {
-    const { location } = this.props.stores.router;
-    if (location) {
-      return location.pathname === buildRoute(route);
+    const { currentRoute } = this.props.stores.routing;
+    if (currentRoute) {
+      return currentRoute === buildRoute(route);
     }
     return false;
   };
 
   isErrorPage: void => boolean = () => {
-    const { location } = this.props.stores.router;
-    if (location) {
-      return location.pathname.endsWith(ROUTES.PAGE_ERROR);
+    const { currentRoute } = this.props.stores.routing;
+    if (currentRoute) {
+      return currentRoute.endsWith(ROUTES.PAGE_ERROR);
     }
     return false;
   };
@@ -71,7 +71,7 @@ export default class SwapPageContainer extends Component<AllProps> {
     const { isTestnet } = stores.wallets.selectedOrFail;
 
     const menu = isTestnet ? null : (
-      <SwapMenu onItemClick={route => stores.app.goToRoute({ route })} isActiveItem={this.isActivePage} />
+      <SwapMenu onItemClick={route => stores.routing.goToRoute({ route })} isActiveItem={this.isActivePage} />
     );
 
     return (

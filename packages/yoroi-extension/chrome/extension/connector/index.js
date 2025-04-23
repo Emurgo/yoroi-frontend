@@ -3,8 +3,6 @@
 import { render } from 'react-dom';
 // eslint-disable-next-line no-unused-vars
 import { action, configure } from 'mobx';
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { createHashHistory } from 'history';
 import { setupApi } from '../../../app/api/index';
 import createStores from '../../../app/connector/stores/index';
 // eslint-disable-next-line no-unused-vars
@@ -26,9 +24,6 @@ BigNumber.DEBUG = true;
 // Entry point into our application
 const initializeDappConnector: void => Promise<void> = async () => {
   const api = await setupApi();
-  const router = new RouterStore();
-  const hashHistory = createHashHistory();
-  const history = syncHistoryWithStore(hashHistory, router);
   const stores = createStores(api);
 
   window.yoroi = {

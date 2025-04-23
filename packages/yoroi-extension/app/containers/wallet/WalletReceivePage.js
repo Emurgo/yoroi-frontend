@@ -359,7 +359,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
       if (!addressStore.isRelated()) {
         continue;
       }
-      if (this.props.stores.app.currentRoute.startsWith(routeForStore(addressStore.name))) {
+      if (this.props.stores.routing.currentRoute.startsWith(routeForStore(addressStore.name))) {
         const request = this.props.stores.addresses.addressSubgroupMap.get(addressStore.class);
         if (request == null) throw new Error('Should never happen');
         return {

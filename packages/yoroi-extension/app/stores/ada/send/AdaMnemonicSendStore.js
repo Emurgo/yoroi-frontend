@@ -45,7 +45,7 @@ export default class AdaMnemonicSendStore extends Store<StoresMap> {
     if (request.onSuccess) {
       request.onSuccess();
     } else {
-      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 

@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import type { StoresMap } from './stores';
-import { Component } from 'react';
+import { Component, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter } from 'react-router';
 import { addLocaleData } from 'react-intl';
@@ -24,6 +24,10 @@ import NotificationsProvider from './UI/features/notifications/module/Notificati
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
 // $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
+import { useLocation } from 'react-router';
+import { ampli } from '../ampli/index';
+import { ROUTES } from './routes-config';
+import { pathToRegexp } from 'path-to-regexp';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
@@ -34,6 +38,52 @@ type Props = {|
 type State = {|
   crashed: boolean,
 |};
+
+function RoutingHelper(props: Props) {
+  const location = useLocation();
+
+  useEffect(() => {
+    const { pathname } = location;
+
+    runInAction(() => {
+      props.stores.routing.currentRoute = pathname;
+    });
+
+    if (pathname === ROUTES.ASSETS.ROOT) {
+      ampli.assetsPageViewed();
+    } else if (pathname === ROUTES.TRANSFER) {
+      ampli.claimAdaPageViewed();
+    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      ampli.createWalletLanguagePageViewed();
+    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
+      ampli.connectorPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ADD) {
+      ampli.createWalletSelectMethodPageViewed();
+    } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
+      ampli.receivePageViewed();
+    } else if (pathname === ROUTES.SETTINGS.ROOT) {
+      ampli.settingsPageViewed();
+    } else if (pathname === ROUTES.REVAMP.CATALYST_VOTING) {
+      ampli.votingPageViewed();
+    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
+      ampli.transactionsPageViewed();
+    } else if (pathname === ROUTES.STAKING) {
+      ampli.stakingCenterPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ROOT) {
+      ampli.walletPageViewed();
+    } else if (pathname === ROUTES.Governance.ROOT) {
+      ampli.governanceDashboardPageViewed();
+    } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
+      const TAB = 'Wallet Token';
+      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
+    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
+      const TAB = 'Overview';
+      ampli.portfolioTokenDetails({ token_details_tab: TAB });
+    }
+  }, [location]);
+
+  return null;
+}
 
 @observer
 class App extends Component<Props, State> {
@@ -119,6 +169,7 @@ class App extends Component<Props, State> {
             <div style={{ height: '100%' }}>
               <Support />
               {YoroiRoutes(stores)}
+              <RoutingHelper stores={stores}/>
             </div>
           </NotificationsProvider>
         </IntlContextProvider>

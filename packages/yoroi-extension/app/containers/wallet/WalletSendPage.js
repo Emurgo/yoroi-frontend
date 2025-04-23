@@ -77,7 +77,7 @@ export default class WalletSendPage extends Component<StoresProps> {
       window.document.location = redirect;
     } else {
       this.props.stores.uiDialogs.closeActiveDialog();
-      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 
@@ -411,7 +411,7 @@ export default class WalletSendPage extends Component<StoresProps> {
         onCancel={stores.memos.closeMemoDialog}
         addExternal={() => {
           stores.memos.closeMemoDialog();
-          stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+          stores.routing.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
         }}
         onAcknowledge={() => {
           this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();
