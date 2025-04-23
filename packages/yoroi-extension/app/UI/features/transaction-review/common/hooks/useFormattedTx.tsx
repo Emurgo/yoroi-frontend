@@ -28,7 +28,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const formattedCertificates = formatCertificates(data?.certs);
 
   const formattedInputs = formatInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses);
-  const formattedOutputs = formatOutputs(outputs, networkId, primaryTokenInfo, walletAddresses, allAssetList);
+  const formattedOutputs = formatOutputs(outputs, allAssetList, networkId, primaryTokenInfo, walletAddresses);
 
   return {
     inputs: formattedInputs,
@@ -40,32 +40,26 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 };
 
 const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
-  return inputUtxos.map((utxo, index) => {
-    const address = utxo?.receiver;
-    const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
+  return inputUtxos.map((utxo) => {
 
+    const address = utxo?.receiver;
     const { resolvedAddress, paymentCredKind } = resolveAddress(address);
 
     const rewardAddress = address !== null && paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
     const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
-    const primaryAssets =
-      coin != null
-        ? [
-          {
-            tokenInfo: primaryTokenInfo,
-            quantity: coin,
-          },
-        ]
-        : [];
-    const multiAssets = allAssetList.map(a => {
-      return {
-        tokenInfo: a,
-        quantity: a.quantity,
-      };
-    });
+
+    const assets = (utxo.assets??[]).map(asset => {
+      const tokenDetails = allAssetList.find(a => a.info.id === asset.Token?.Identifier);
+      const amount = asset.TokenList?.Amount;
+      if (tokenDetails == null || amount == null) {
+        return null
+      }
+      const tokenInfo = tokenDetails.info.id === '' ? primaryTokenInfo : tokenDetails;
+      return { tokenInfo, quantity: asQuantity(amount) }
+    }).filter(isNonNullable)
 
     return {
-      assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
+      assets,
       address: resolvedAddress,
       addressKind: paymentCredKind,
       rewardAddress,
@@ -78,10 +72,10 @@ const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, wal
 
 const formatOutputs = (
   outputs: TransactionOutputsJSON,
+  allAssetList: any,
   networkId: number,
   primaryTokenInfo: any,
   walletAddresses: any,
-  allAssetList: any
 ): any => {
   return outputs.map(output => {
     const address = output.address;
@@ -97,16 +91,14 @@ const formatOutputs = (
       },
     ];
 
-    const multiAssets = output.amount.multiasset
-      ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
-        return Object.entries(assets).map(([assetId, amount]) => {
-          const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
-          if (tokenInfo == null) return null;
-          const quantity: any = asQuantity(String(amount));
-          return { tokenInfo, quantity };
-        });
-      })
-      : [];
+    const multiAssets = Object.entries(output.amount.multiasset ?? []).flatMap(([policyId, assets]: any) => {
+      return Object.entries(assets).map(([assetId, amount]) => {
+        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
+        if (tokenInfo == null) return null;
+        const quantity: any = asQuantity(String(amount));
+        return {tokenInfo, quantity};
+      });
+    });
     const assets = [...primaryAssets, ...multiAssets];
 
     return {
