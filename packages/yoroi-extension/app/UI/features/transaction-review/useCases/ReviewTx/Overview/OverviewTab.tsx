@@ -163,7 +163,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":to-receiver-text"}>
           {receiverCustomTitle?.to ?? (
-            <CopyableText value={output.rewardAddress}>{truncateAddressShort(output.rewardAddress, 40)}</CopyableText>
+            <CopyableText value={address}>{truncateAddressShort(address, 40)}</CopyableText>
           )}
         </Typography>
       </Stack>

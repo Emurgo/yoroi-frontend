@@ -1,13 +1,13 @@
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getNetworkById, getCardanoHaskellBaseConfigCombined } from '../../api/ada/lib/storage/database/prepackaged/networks'
 
-export const deriveRewardAddressFromAddress = async (address: string, networkId: number): Promise<string> => {
+export const deriveRewardAddressFromAddress = (address: string, networkId: number): string => {
   try {
 
     const network = getNetworkById(networkId);
     const networkConfig = getCardanoHaskellBaseConfigCombined(network);
 
-    const from_bech32 = await RustModule.WalletV4.Address.from_bech32(address);
+    const from_bech32 = RustModule.WalletV4.Address.from_bech32(address);
     const baseAddress = RustModule.WalletV4.BaseAddress.from_address(from_bech32);
     const stakeCred = baseAddress?.stake_cred();
     const stakeCredential = RustModule.WalletV4.RewardAddress.new(networkConfig.ChainNetworkId, stakeCred);
