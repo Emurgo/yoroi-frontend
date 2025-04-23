@@ -132,11 +132,12 @@ const InfoInline = ({ label, value }) => {
 };
 
 const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) => {
+  const strings = useStrings();
   return (
     <Box>
       <Collapsible
         expanded={true}
-        title="Your Wallet"
+        title={strings.yourWallet}
         content={
           <Stack gap="12px">
             <CopyableText value={stakingAddress}>
@@ -182,6 +183,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
 };
 
 const OperationsSection = ({ operations }) => {
+  const strings = useStrings();
   const componentsNotDuplicated = operations?.components
     .filter(component => !component.duplicated)
     .map(({ component }) => component);
@@ -192,7 +194,7 @@ const OperationsSection = ({ operations }) => {
 
       <Collapsible
         expanded={true}
-        title="Operations"
+        title={strings.operations}
         content={
           <Box>
             {componentsNotDuplicated.map((operation, index) => (
