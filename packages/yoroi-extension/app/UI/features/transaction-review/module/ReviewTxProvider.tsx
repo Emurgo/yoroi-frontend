@@ -18,12 +18,14 @@ type ModalState = {
   isLoading: boolean;
   modalView: 'transactionReview' | 'walletInfo';
   unsignedTx: YoroiUnsignedTx | null;
+  drepID: string;
   cborTx: YoroiUnsignedTx | null;
 };
 type ModalActions = {
   openTxReviewModal: any;
   changeModalView: any;
   changePasswordInputValue: any;
+  setDrepId: any;
   setInputError: any;
   setUnsignedTx: any;
   setCborTx: any;
@@ -127,6 +129,12 @@ export const ReviewTxProvider = ({
         inputError: payload.inputError,
       });
     },
+    setDrepId: (payload: any) => {
+      dispatch({
+        type: 'setDrepId',
+        drepID: payload.drepID,
+      });
+    },
     setUnsignedTx: (payload: any) => {
       dispatch({
         type: 'setUnsignedTx',
@@ -207,6 +215,9 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
     case 'setInputError':
       return { ...state, inputError: action.inputError };
 
+    case 'setDrepId':
+      return { ...state, drepID: action.drepID };
+
     case 'setUnsignedTx':
       return { ...state, unsignedTx: action.unsignedTx };
 
@@ -240,4 +251,5 @@ const defaultState: ModalState = Object.freeze({
   passswordInput: '',
   inputError: null,
   extraDetails: null,
+  drepID: '',
 });

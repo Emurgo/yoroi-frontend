@@ -21,7 +21,8 @@ export const useOperations = (
   isStakeRegistered: boolean,
   stakeKeyDeposit: any,
   primaryTokenInfo: any,
-  operations: { kind: 'delegate' }
+  operations: { kind: 'delegate' },
+  drepID: string | null
 ) => {
   const operationCount: any = {};
   if (certificates === null)
@@ -81,12 +82,18 @@ export const useOperations = (
               totalFee: isStakeRegistered ? 0 : asQuantity(stakeKeyDeposit),
             };
 
-          const hash = ('KeyHash' in drep ? drep.KeyHash : drep.ScriptHash) ?? '';
           return {
             components: [
               ...acc.components,
               {
-                component: <VoteDelegationOperation key={index} hash={hash} label="Delegate voting to" fee={keyDepositFee} />,
+                component: (
+                  <VoteDelegationOperation
+                    key={index}
+                    hash={drepID ?? undefined}
+                    label="Delegate voting to"
+                    fee={keyDepositFee}
+                  />
+                ),
                 duplicated: isNotFirstElementDuplicated,
                 type: CertificateType.VoteDelegation,
               },
@@ -149,6 +156,10 @@ export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: stri
 };
 export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash?: string; fee: string | null }) => {
   const strings = useStrings();
+  console.log('hash', hash);
+  // const test = addressHexToBech32(hash ?? '');
+  // console.log('test', test);
+
   return (
     <Stack direction="column" spacing={2}>
       {fee && (
