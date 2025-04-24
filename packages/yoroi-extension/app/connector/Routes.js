@@ -28,7 +28,7 @@ export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((pro
     <>
       <Helmet><title>{title}</title></Helmet>
       {stores.loading.isLoading ? (
-        <LoadingPage stores={stores} />
+        <LoadingPage stores={(stores: StoresMap)} />
       ) : (
         wrapPages(getContent(stores), stores)
       )}
