@@ -13,7 +13,6 @@ export const ROUTES = {
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
-  SWITCH: '/switch',
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',

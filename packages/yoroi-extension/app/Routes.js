@@ -113,9 +113,6 @@ const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
 const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
 const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 
-const WalletSwitchPromise = () => import('./containers/WalletSwitch');
-const WalletSwitch = React.lazy(WalletSwitchPromise);
-
 const TokensPageRevampPromise = () => import('./containers/wallet/TokensPageRevamp');
 const TokensPageRevamp = React.lazy(TokensPageRevampPromise);
 
@@ -163,7 +160,6 @@ export const LazyLoadPromises: Array<() => any> = [
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
-  WalletSwitchPromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
   NFTsPageRevampPromise,
@@ -260,7 +256,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route path={ROUTES.TRANSFER.ROOT} element={<Transfer stores={stores} />} />
           <Route path={ROUTES.SEND_FROM_URI.ROOT} element={<URILandingPage stores={stores} />} />
-          <Route path={ROUTES.SWITCH} element={<WalletSwitch stores={stores} />} />
           <Route path={ROUTES.REVAMP.CATALYST_VOTING} element={<VotingPage stores={stores} />} />
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
