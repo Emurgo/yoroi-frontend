@@ -358,6 +358,7 @@ export default class ConnectPage extends Component<Props> {
                       return (
                         <Box
                           component="li"
+                          className="ConnectPage_listItem"
                           key={wallet.publicDeriverId}
                           sx={{
                             border: '1px solid',
