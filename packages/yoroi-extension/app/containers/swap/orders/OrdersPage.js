@@ -27,11 +27,13 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
-// $FlowIgnore: suppressing this error
+// $FlowIgnore[cannot-resolve-module]
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { SummaryRow } from '../asset-swap/SwapTxInfo';
-// $FlowIgnore: suppressing this error
+// $FlowIgnore[cannot-resolve-module]
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
+// $FlowIgnore[cannot-resolve-module]
+import { asQuantity } from '../../../UI/utils/createCurrentWalletInfo';
 
 type ColumnContext = {|
   completedOrders: boolean,
@@ -523,7 +525,11 @@ const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
     type === 'from'
       ? tokenImg(order.from.token, defaultTokenInfo, '48px', '48px')
       : tokenImg(order.to.token, defaultTokenInfo, '48px', '48px');
-  const assetAmount = type === 'from' ? Number(order.from.quantity) : Number(order.to.quantity);
+
+  const assetAmount =
+    type === 'from'
+      ? asQuantity(order.from.quantity).shiftedBy(-order.from.token.decimals)
+      : asQuantity(order.to.quantity).shiftedBy(-order.to.token.decimals);
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -542,7 +548,7 @@ const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
       </Stack>
       <Stack>
         <Typography variant="body1" color="ds.gray_max">
-          {assetAmount} {assetName}
+          {String(assetAmount)} {assetName}
         </Typography>
       </Stack>
     </Stack>

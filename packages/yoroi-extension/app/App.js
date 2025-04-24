@@ -116,7 +116,10 @@ class App extends Component<Props, State> {
     return (
       <Router history={history}>
         <IntlContextProvider>
-          <NotificationsProvider appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+          >
             <NotificationsManager />
             <div style={{ height: '100%' }}>
               <Support />
