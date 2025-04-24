@@ -24,7 +24,7 @@ import NotificationsProvider from './UI/features/notifications/module/Notificati
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
 // $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
@@ -41,6 +41,10 @@ type State = {|
 
 function RoutingHelper(props: Props) {
   const location = useLocation();
+  const navigate = useNavigate();
+  if (!props.stores.routing.navigate) {
+    props.stores.routing.navigate = navigate;
+  }
 
   useEffect(() => {
     const { pathname } = location;
@@ -164,14 +168,18 @@ class App extends Component<Props, State> {
     return (
       <HashRouter>
         <IntlContextProvider>
+        {/*
           <NotificationsProvider appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}>
             <NotificationsManager />
+         */}
             <div style={{ height: '100%' }}>
               <Support />
               {YoroiRoutes(stores)}
               <RoutingHelper stores={stores}/>
             </div>
+        {/*
           </NotificationsProvider>
+         */}
         </IntlContextProvider>
       </HashRouter>
     );

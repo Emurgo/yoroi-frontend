@@ -6,14 +6,15 @@ import { redirect, replace } from 'react-router';
 import { observable } from 'mobx';
 
 export default class RoutingStore extends Store<StoresMap> {
-  @observable currentRoute: string;
-
+  @observable currentRoute: string = '';
+  navigate: Function;
+  
   replaceRoute: ({|
     route: string,
     params?: Object,
   |}) => void = options => {
     const routePath = buildRoute(options.route, options.params);
-    replace(routePath);
+    this.navigate(routePath, { replace: true });
   };
 
   goToRoute: ({|
@@ -23,10 +24,10 @@ export default class RoutingStore extends Store<StoresMap> {
   |}) => void = options => {
     const routePath = buildRoute(options.route, options.params);
 
-    if (typeof options.delegateToYoroiDrep !== 'undefined') {
-      window.history.pushState({ delegateToYoroiDrep: options.delegateToYoroiDrep }, '', routePath);
+    if (this.navigate) {
+      this.navigate(routePath);
     } else {
-      redirect(routePath);
+      window.history.pushState({ delegateToYoroiDrep: options.delegateToYoroiDrep }, '', '#' + routePath);
     }
   }
 }

@@ -21,7 +21,7 @@ const PortfolioLayout = ({ stores, actions, children }: Props): JSX.Element => {
   //   }
   //   return false;
   // };
-  const isDetailPage = stores.router.location.pathname.startsWith(`${ROUTES.PORTFOLIO.ROOT}/details`);
+  const isDetailPage = stores.routing.currentRoute.startsWith(`${ROUTES.PORTFOLIO.ROOT}/details`);
   // const menu =
   //   isDetailPage || mockData.dapps.liquidityList.length + mockData.dapps.orderList.length === 0 ? null : (
   //     <PortfolioMenu onItemClick={(route: string) => actions.router.goToRoute.trigger({ route })} isActiveItem={isActivePage} />
