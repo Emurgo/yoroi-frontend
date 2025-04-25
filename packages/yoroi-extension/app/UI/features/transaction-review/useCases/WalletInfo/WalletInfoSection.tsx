@@ -10,6 +10,7 @@ import { AssetCarousel } from '../../common/AssetCarousel/AssetCarousel';
 import { formatValue } from '../../common/utils';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
+import { fontWeight } from '../../../../../styles/themes/tokens/tokens';
 
 export const WalletInfoSection = () => {
   const { currentWalletDetails } = useTxReviewModal();
@@ -118,7 +119,9 @@ const WalletAssetsSection = ({ data, label }) => {
         {label}
       </Typography>
       <Stack direction="column" justifyContent="space-between" gap="8px">
-        <Typography variant="h3">{data.length > 0 ? data.length : '-'}</Typography>
+        <Typography variant="h3" fontSize="28px" fontWeight={500}>
+          {data.length > 0 ? data.length : '-'}
+        </Typography>
         <AssetCarousel data={data} />
       </Stack>
     </Stack>
