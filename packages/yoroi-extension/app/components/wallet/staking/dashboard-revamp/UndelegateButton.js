@@ -128,7 +128,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
 const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, socialMediaInfo }) => {
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
   const urls = getSocialMediaLinks(socialLinks, websiteUrl);
-  const link = websiteUrl ?? urls[0]; // safe fallback
+  const link = websiteUrl ?? urls[0];
 
   return (
     <Stack gap="8px">
