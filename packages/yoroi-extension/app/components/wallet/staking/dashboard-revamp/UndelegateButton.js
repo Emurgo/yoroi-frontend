@@ -4,8 +4,9 @@ import { toSvg } from 'jdenticon';
 import globalMessages from '../../../../i18n/global-messages';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { StyledLink } from './StakePool/StakePool.styles';
 
-export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores }) => {
+export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores, socialMediaInfo }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
@@ -45,6 +46,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
                 stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
                   primaryTokenInfo.name
                 }`}
+                socialMediaInfo={socialMediaInfo}
               />
             ),
             duplicated: false,
@@ -123,11 +125,16 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   );
 };
 
-const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl }) => {
+const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, socialMediaInfo }) => {
+  const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
+  const urls = getSocialMediaLinks(socialLinks, websiteUrl);
+  const link = websiteUrl ?? urls[0]; // safe fallback
+
   return (
     <Stack gap="8px">
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.undelegatePool)}</Typography>
+
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{
@@ -139,15 +146,52 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl })
             component="img"
             src={avatarGenerated}
           />
-          <Typography color="ds.text_gray_medium">{poolName}</Typography>
+
+          {link && (
+            <StyledLink href={link} target="_blank" rel="noreferrer noopener">
+              <Typography color="ds.text_gray_medium">{poolName}</Typography>
+            </StyledLink>
+          )}
         </Stack>
       </Stack>
+
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.deregisteringStakingKey)}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
     </Stack>
   );
+};
+
+export const getSocialMediaLink = (platform, handle) => {
+  const baseUrls = {
+    twitter: 'https://twitter.com/',
+    telegram: 'https://t.me/',
+    facebook: 'https://fb.me/',
+    youtube: 'https://youtube.com/',
+    twitch: 'https://twitch.com/',
+    discord: 'https://discord.gg/',
+    github: 'https://github.com/',
+  };
+
+  const baseUrl = baseUrls[platform];
+  return baseUrl ? `${baseUrl}${handle}` : '';
+};
+
+export const getSocialMediaLinks = (socialLinks, websiteUrl) => {
+  const urls = [];
+
+  if (socialLinks?.tw) urls.push(getSocialMediaLink('twitter', socialLinks.tw));
+  if (socialLinks?.tg) urls.push(getSocialMediaLink('telegram', socialLinks.tg));
+  if (socialLinks?.fb) urls.push(getSocialMediaLink('facebook', socialLinks.fb));
+  if (socialLinks?.yt) urls.push(getSocialMediaLink('youtube', socialLinks.yt));
+  if (socialLinks?.tc) urls.push(getSocialMediaLink('twitch', socialLinks.tc));
+  if (socialLinks?.di) urls.push(getSocialMediaLink('discord', socialLinks.di));
+  if (socialLinks?.gh) urls.push(getSocialMediaLink('github', socialLinks.gh));
+
+  if (websiteUrl) urls.push(websiteUrl);
+
+  return urls;
 };
 
 const UpdatePoolButton = styled(Button)(({ theme }) => ({
