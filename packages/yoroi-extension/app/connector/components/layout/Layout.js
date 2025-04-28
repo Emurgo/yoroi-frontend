@@ -4,7 +4,7 @@ import type { Node, ComponentType } from 'react';
 import { ReactComponent as YoroiLogo } from '../../assets/images/yoroi-logo.inline.svg';
 import styles from './Layout.scss';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TestnetWarningBanner from '../../../components/topbar/banners/TestnetWarningBanner';
 import { ReactComponent as DappConnectorIcon } from '../../../assets/images/dapp-connector/dapp-connector.inline.svg';
@@ -16,6 +16,7 @@ import { useLocation } from 'react-router';
 type Props = {|
   children: Node,
   networkId: number,
+  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 export const messages: Object = defineMessages({
@@ -29,10 +30,9 @@ export const messages: Object = defineMessages({
   },
 });
 
-function Layout(props: Props, context: {| intl: $npm$ReactIntl$IntlFormat |}) {
-  const { intl } = context;
+function Layout(props: Props) {
   const location = useLocation();
-  const title = intl.formatMessage(
+  const title = props.intl.formatMessage(
     location.pathname === ROUTES.SELECT_CASHBACK_WALLET ?
       messages.yoroiConnector : messages.yoroiDappConnector
   );
@@ -64,7 +64,5 @@ function Layout(props: Props, context: {| intl: $npm$ReactIntl$IntlFormat |}) {
     </div>
   );
 }
-
-Layout.contextTypes = { intl: intlShape.isRequired };
 
 export default (observer(Layout): ComponentType<Props>);

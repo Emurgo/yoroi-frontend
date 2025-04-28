@@ -30,7 +30,12 @@ export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((pro
       {stores.loading.isLoading ? (
         <LoadingPage stores={(stores: StoresMap)} />
       ) : (
-        wrapPages(getContent(stores), stores)
+        <Layout
+          networkId={stores.profile.getCurrentNetworkId()}
+          intl={intl}
+        >
+          {getContent(stores)}
+        </Layout>
       )}
     </>
   );
@@ -39,23 +44,16 @@ export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((pro
 const getContent = (stores) => (
   <Routes>
     <Route
-      exact
       path={ROUTES.ROOT}
-      component={props => <ConnectContainer {...props} stores={stores} />}
+      element={<ConnectContainer stores={stores} />}
     />
     <Route
-      exact
       path={ROUTES.SIGNIN_TRANSACTION}
-      component={props => <SignTxContainer {...props} stores={stores} />}
+      element={<SignTxContainer stores={stores} />}
     />
     <Route
-      exact
       path={ROUTES.SELECT_CASHBACK_WALLET}
-      component={props => <SelectCashbackWalletContainer {...props} stores={stores} />}
+      element={<SelectCashbackWalletContainer stores={stores} />}
     />
   </Routes>
 );
-
-function wrapPages(children: Node, stores: StoresMap): Node {
-  return <Layout networkId={stores.profile.getCurrentNetworkId()}>{children}</Layout>;
-}
