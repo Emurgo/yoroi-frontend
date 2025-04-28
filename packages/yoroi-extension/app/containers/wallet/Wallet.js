@@ -66,52 +66,12 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     });
 }
 
-checkRoute(): void | string {
-  const categories = allSubcategoriesRevamp;
-  if (this.props.stores.routing.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
-    return ROUTES.WALLETS.TRANSACTIONS;
-  }
-
-  // void -> this route is fine for this wallet type
-  // string -> what you should be redirected to
-  const wallet = this.props.stores.wallets.selected;
-  if (wallet == null) return;
-
-  const spendableBalance = this.props.stores.transactions.balance;
-  const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
-
-  const activeCategory = categories.find(
-    category => this.props.stores.routing.currentRoute.startsWith(category.route)
-  );
-
-  // if we're on a page that isn't applicable for the currently selected wallet
-  // ex: a cardano-only page for an Ergo wallet
-  // or no category is selected yet (wallet selected for the first time)
-  const visibilityContext = {
-    selected: wallet.publicDeriverId,
-    networkId: wallet.networkId,
-    walletHasAssets,
-  };
-  if (!activeCategory?.isVisible(visibilityContext) && activeCategory?.isHiddenButAllowed !== true) {
-    const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
-    if (firstValidCategory == null) {
-      throw new Error(`Selected wallet has no valid category`);
-    }
-    return firstValidCategory.route;
-  }
-}
-
 navigateToMyWallets: string => void = destination => {
   this.props.stores.routing.goToRoute({ route: destination });
 };
 
 render(): Node {
   const { stores } = this.props;
-  // abort rendering if the page isn't valid for this wallet
-  const newRoute = this.checkRoute();
-  if (newRoute != null) {
-    return <Navigate to={newRoute} />;
-  }
   const { intl } = this.context;
   const selectedWallet = stores.wallets.selectedOrFail;
   const warning = this.getWarning(selectedWallet.publicDeriverId);
