@@ -3,6 +3,7 @@ import React from 'react';
 import { usePortfolio } from '../../features/portfolio/module/PortfolioContextProvider';
 import TokenDetails from './../../features/portfolio/useCases/TokenDetails/TokenDetails';
 import PortfolioLayout from './layout';
+import { useParams } from 'react-router';
 
 type Props = {
   stores: any;
@@ -10,8 +11,8 @@ type Props = {
   match: any;
 };
 
-const PortfolioDetailPage = observer(({ match, stores, ...props }: Props) => {
-  const tokenId = match.params.tokenId;
+const PortfolioDetailPage = observer(({ stores, ...props }: Props) => {
+  const { tokenId } = useParams();
 
   const { ftAssetList } = usePortfolio();
 

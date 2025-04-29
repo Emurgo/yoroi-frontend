@@ -126,9 +126,9 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
             },
           }}
           onClick={() => {
-            stores.app.goToRoute({
+            stores.routing.goToRoute({
               route: ROUTES.Governance.ROOT,
-              delegateToYoroiDrep: true,
+              query: { delegateToYoroiDrep: true },
             });
           }}
         >

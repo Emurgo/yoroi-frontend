@@ -20,14 +20,21 @@ export default class RoutingStore extends Store<StoresMap> {
   goToRoute: ({|
     route: string,
     params?: Object,
-    delegateToYoroiDrep?: null | boolean,
+    query?: {| [string]: string |},
   |}) => void = options => {
-    const routePath = buildRoute(options.route, options.params);
-
+    let routePath = buildRoute(options.route, options.params);
+    if (options.query) {
+      const query = new URLSearchParams();
+      Object.entries(options.query).forEach(([k, v]) => {
+        query.set(k, String(v));
+      });
+      routePath += '?';
+      routePath += query.toString();
+    }
     if (this.navigate) {
       this.navigate(routePath);
     } else {
-      window.history.pushState({ delegateToYoroiDrep: options.delegateToYoroiDrep }, '', '#' + routePath);
+      window.history.pushState({}, '', '#' + routePath);
     }
   }
 }

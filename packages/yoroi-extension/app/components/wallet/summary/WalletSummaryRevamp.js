@@ -57,7 +57,7 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
-  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
+  +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
 |};
 
