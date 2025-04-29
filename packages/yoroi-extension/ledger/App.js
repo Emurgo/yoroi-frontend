@@ -78,10 +78,7 @@ export default class App extends React.Component<Props> {
           <StyleVariableLoader variables={styleVariables} />
           <HashRouter basename={process.env.PUBLIC_URL}>
             <Routes>
-              <Route exact path="/">
-                <ConnectPage rootStore={this.props.rootStore} />
-              </Route>
-              <Navigate to="/" />
+              <Route path="/" element={<ConnectPage rootStore={this.props.rootStore} />}/>
             </Routes>
           </HashRouter>
         </Suspense>
