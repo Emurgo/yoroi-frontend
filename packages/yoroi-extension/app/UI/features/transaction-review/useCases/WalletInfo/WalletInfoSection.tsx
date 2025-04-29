@@ -10,7 +10,6 @@ import { AssetCarousel } from '../../common/AssetCarousel/AssetCarousel';
 import { formatValue } from '../../common/utils';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
-import { fontWeight } from '../../../../../styles/themes/tokens/tokens';
 
 export const WalletInfoSection = () => {
   const { currentWalletDetails } = useTxReviewModal();
