@@ -4,7 +4,7 @@
   "api.errors.GenericApiError": "已發生錯誤，請稍候再試一次。",
   "api.errors.IncorrectPasswordError": "密碼不正確，請重新輸入。",
   "api.errors.NotEnoughMoneyToSendError": "餘額不足",
-  "api.errors.PromiseNotCalledYetError": "Result accessed before execution finished.",
+  "api.errors.PromiseNotCalledYetError": "執行結束前就存取結果。",
   "api.errors.ReportRequestError": "傳送支援要求時出現問題。",
   "api.errors.WalletAlreadyImportedError": "您嘗試匯入的錢包已存在。",
   "api.errors.WalletAlreadyRestoredError": "您嘗試還原的錢包已存在。",
