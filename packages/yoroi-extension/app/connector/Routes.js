@@ -1,5 +1,4 @@
 // @flow
-import type { Node } from 'react';
 import { Route, Routes, useLocation } from 'react-router';
 import type { StoresMap } from './stores/index';
 import { ROUTES } from './routes-config';

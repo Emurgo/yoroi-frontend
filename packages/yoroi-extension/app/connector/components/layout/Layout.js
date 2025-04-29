@@ -1,5 +1,4 @@
 // @flow
-import { Component, useContext } from 'react';
 import type { Node, ComponentType } from 'react';
 import { ReactComponent as YoroiLogo } from '../../assets/images/yoroi-logo.inline.svg';
 import styles from './Layout.scss';

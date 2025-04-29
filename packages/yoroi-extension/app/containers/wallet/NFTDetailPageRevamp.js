@@ -1,8 +1,7 @@
 // @flow
 import { Box } from '@mui/system';
 import { observer } from 'mobx-react';
-import type { ComponentType, Node } from 'react';
-import { Component } from 'react';
+import type { ComponentType } from 'react';
 import NFTDetails from '../../components/wallet/assets/NFTDetails';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';

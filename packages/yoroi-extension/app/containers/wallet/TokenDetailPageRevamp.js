@@ -1,7 +1,6 @@
 // @flow
 import { observer } from 'mobx-react';
-import { Component } from 'react';
-import type { ComponentType, Node } from 'react';
+import type { ComponentType } from 'react';
 import {
   genLookupOrFail,
   getTokenIdentifierIfExists,

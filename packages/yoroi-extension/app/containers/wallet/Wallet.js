@@ -16,7 +16,6 @@ import SubMenu from '../../components/topbar/SubMenu';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { TOP_RECENT_ANNOUNCEMENT_VERSION, RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
-import { Navigate } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
 // $FlowIgnore: suppressing this error

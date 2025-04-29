@@ -2,7 +2,6 @@
 import Store from '../base/Store';
 import type { StoresMap } from '../index';
 import { buildRoute } from '../../utils/routing';
-import { redirect, replace } from 'react-router';
 import { observable } from 'mobx';
 
 export default class RoutingStore extends Store<StoresMap> {
