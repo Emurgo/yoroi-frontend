@@ -213,7 +213,7 @@ const OperationsSection = ({ operations }) => {
 
 const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
   const strings = useStrings();
-  const { primaryTokenInfo, operations, stakeKeyDeposit } = useTxReviewModal();
+  const { primaryTokenInfo, operations, stakeKeyDeposit, stakingRewards } = useTxReviewModal();
   const isReceiving = operations?.kind === 'undelegate';
   const undelegateOperation = operations?.kind === 'undelegate';
 
@@ -236,7 +236,8 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
     [notOwnedOutputs]
   );
   const formatedFee = new BigNumber(totalPrimaryTokenSpent).shiftedBy(-primaryTokenInfo.decimals).toString();
-  const undelegateFormatedFee = new BigNumber(Quantities.diff(stakeKeyDeposit, totalPrimaryTokenSpent))
+  const undelegateFee = Quantities.diff(stakeKeyDeposit, totalPrimaryTokenSpent);
+  const undelegateFormatedFee = new BigNumber(Quantities.diff(undelegateFee, stakingRewards))
     .shiftedBy(-primaryTokenInfo.decimals)
     .toString();
 

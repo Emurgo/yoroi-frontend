@@ -171,6 +171,7 @@ export const ReviewTxProvider = ({
       isStakeRegistered: currentWalletInfo?.isStakeRegistered,
       stakeKeyDeposit,
       showTxResultModal: result => handleTxResult(result),
+      stakingRewards: currentWalletInfo?.stakingRewards,
       ...actions,
     }),
     [state, actions, stakeKeyDeposit]

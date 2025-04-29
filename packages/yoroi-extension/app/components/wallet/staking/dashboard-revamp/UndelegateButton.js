@@ -5,6 +5,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { StyledLink } from './StakePool/StakePool.styles';
+import { asQuantity } from '../../../../UI/utils/createCurrentWalletInfo';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores, socialMediaInfo }) => {
   const {
@@ -15,6 +16,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
+    stakingRewards,
   } = useTxReviewModal();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -46,6 +48,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
                 stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
                   primaryTokenInfo.name
                 }`}
+                stakingRewards={`${asQuantity(stakingRewards)} ${primaryTokenInfo.name}`}
                 socialMediaInfo={socialMediaInfo}
               />
             ),
@@ -125,7 +128,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   );
 };
 
-const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, socialMediaInfo }) => {
+const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, socialMediaInfo, stakingRewards }) => {
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
   const urls = getSocialMediaLinks(socialLinks, websiteUrl);
   const link = websiteUrl ?? urls[0];
@@ -158,6 +161,10 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, s
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.deregisteringStakingKey)}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
+      </Stack>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.totalRewardsLabel)}</Typography>
+        <Typography color="ds.text_gray_medium">{stakingRewards}</Typography>
       </Stack>
     </Stack>
   );
