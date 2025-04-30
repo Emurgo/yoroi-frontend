@@ -19,6 +19,10 @@ import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 import Support from './components/widgets/Support';
 // $FlowIgnore: suppressing this error
+import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
+// $FlowIgnore: suppressing this error
+import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
+// $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
