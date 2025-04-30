@@ -4,8 +4,10 @@ import { TargetBrowser } from '../helpers/constants.js';
 import BasePage from '../pages/basepage.js';
 import InitialStepsPage from '../pages/initialSteps.page.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
+import { WebDriver } from 'selenium-webdriver';
 
 let instance = null;
+/** @type {Array<{driver: WebDriver, driverId: number}>} */
 const poolOfDrivers = [];
 let driverGlobalCounter = 0;
 

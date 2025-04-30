@@ -110,6 +110,7 @@ export const environment = ((
       }
       return CONFIG.network.name === NetworkType.TEST;
     },
+    isE2EBuild: () => (Boolean(process.env.IS_E2E)),
     isMainnet: () => environment.getNetworkName() === NetworkType.MAINNET,
     /** Environment used during webpack build */
     isProduction: () => process.env.NODE_ENV === 'production',
@@ -137,6 +138,7 @@ export const environment = ((
   isDev: void => boolean,
   isNightly: void => boolean,
   isTest: void => boolean,
+  isE2EBuild: void => boolean,
   isMainnet: void => boolean,
   isProduction: void => boolean,
   getWalletRefreshInterval: void => number,

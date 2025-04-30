@@ -1,5 +1,6 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
 import { isFirefox } from '../../../utils/utils.js';
+import { pageTitle } from '../../../helpers/pageTitles.js';
 
 class WalletTab extends WalletCommonBase {
   //locators
@@ -33,6 +34,11 @@ class WalletTab extends WalletCommonBase {
     if (isFirefox()) {
       await this.sleep(500);
     }
+  }
+  async titleIsCorrect() {
+    this.logger.info(`WalletTab::titleIsCorrect is called`);
+    const displayedTitle = await this.getPageTitle();
+    return displayedTitle === pageTitle.wallet;
   }
 }
 
