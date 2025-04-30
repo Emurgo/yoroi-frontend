@@ -163,18 +163,17 @@ class App extends Component<Props, State> {
     return (
       <HashRouter>
         <IntlContextProvider>
-        {/*
-          <NotificationsProvider appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+          >
             <NotificationsManager />
-         */}
             <div style={{ height: '100%' }}>
               <Support />
               {YoroiRoutes(stores)}
               <RoutingHelper stores={stores}/>
             </div>
-        {/*
           </NotificationsProvider>
-         */}
         </IntlContextProvider>
       </HashRouter>
     );

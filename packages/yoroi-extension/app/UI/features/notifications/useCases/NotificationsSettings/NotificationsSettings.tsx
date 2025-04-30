@@ -4,50 +4,48 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
 import LocalStorageApi from '../../../../../api/localStorage';
 import { ampli } from '../../../../../../ampli';
+import { noop } from '../../../../../coreUtils'
 
-const NotificationsSettings = () => {
+type Props = {
+  selectedWalletId: number;
+}
+
+const NotificationsSettings = ({ selectedWalletId }: Props) => {
   const strings = useStrings();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-  const [selectedWalletId, setSelectedWalletId] = React.useState("");
 
   const lsApi = new LocalStorageApi();
 
-  async function getNotificationsSetting(checkCurrentWallet: boolean = false) {
+  async function getNotificationsSetting() {
     const notifSettingsStr = await lsApi.getNotificationsSetting();
-    const notifSettings = JSON.parse(notifSettingsStr || "{}");
-
-    if (checkCurrentWallet) {
-      const selectedWalletId = await lsApi.getSelectedWalletId();
-      setSelectedWalletId(selectedWalletId);
-
-      return notifSettings[selectedWalletId] !== undefined ? notifSettings[selectedWalletId] : true;
-    }
-
-    return notifSettings;
+    return JSON.parse(notifSettingsStr ?? '{}');
   }
 
   async function setNotificationsSetting(enabled: boolean) {
     const notifSettings = await getNotificationsSetting();
-    lsApi.setNotificationsSetting(JSON.stringify({ ...notifSettings, [selectedWalletId]: enabled }));
+    const newState = JSON.stringify({ ...notifSettings, [selectedWalletId]: enabled });
+    await lsApi.setNotificationsSetting(newState);
   }
 
   // get initial state from localstorage
   React.useEffect(() => {
     async function initialNotifStatus() {
-      const notifEnabled = await getNotificationsSetting(true);
+      const notifSettings = await getNotificationsSetting();
+      const notifEnabled = notifSettings[selectedWalletId] ?? true;
       setNotificationsEnabled(notifEnabled);
     }
-
-    initialNotifStatus();
+    // eslint-disable-next-line
+    noop(initialNotifStatus());
   }, [])
 
   // handle checkbox change event
   const handleNotificationsChange = async (event) => {
     const enabled = event.target.checked;
     setNotificationsEnabled(enabled);
-    setNotificationsSetting(enabled);
+    await setNotificationsSetting(enabled);
+    // noinspection TypeScriptUnresolvedFunction
     ampli.settingsInAppNotificationsStatusUpdated({
-      status: event.target.checked ? "enabled" : "disabled"
+      status: event.target.checked ? 'enabled' : 'disabled'
     })
   }
 

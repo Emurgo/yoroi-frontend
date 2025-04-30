@@ -213,7 +213,9 @@ function SwapPage(props: StoresProps & Intl): Node {
         openTxReviewModal({
           title: 'Transaction confirmation',
           modalView: 'transactionReview',
-          receiverCustomTitle: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
+          receiverCustomTitle: {
+            to: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
+          },
           submitTx: pasword => {
             handleSubmitTransaction(pasword);
           },

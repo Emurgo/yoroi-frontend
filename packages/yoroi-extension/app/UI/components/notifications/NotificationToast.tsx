@@ -75,6 +75,7 @@ const NotificationIcon = ({ type }: IconProps) => {
           <IconWrapper color="ds.static_green" icon={Icons.Receive} />
         </IconContainer>
       );
+    case NotificationTypes.Intrawallet:
     case NotificationTypes.Outcome:
       return (
         <IconContainer bgcolor="ds.primary_100">

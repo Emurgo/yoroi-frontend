@@ -281,7 +281,7 @@ export function IconWrapper({
   }
   if (asButton) {
     return (
-      <IconButton {...buttonProps}>
+      <IconButton {...buttonProps} id={props.iconButtonId ?? 'icon-button'}>
         <Box component="span" display="inline-flex" color="ds.el_gray_medium" {...props}>
           <IconComponent {...iconProps} />
         </Box>

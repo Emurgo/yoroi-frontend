@@ -88,7 +88,7 @@ export const GovernanceStatusSelection = () => {
         try {
           startLoadingTxReview();
           const txSignRequest: any = await createDrepDelegationTransaction(value);
-          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: txSignRequest.signTxRequest });
+          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: txSignRequest.signTxRequest.unsignedTx });
         } finally {
           stopLoadingTxReview();
         }
@@ -223,7 +223,7 @@ export const GovernanceStatusSelection = () => {
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
-  if (!isParticipatingInGovernance && (walletAdaBalance !== null && walletAdaBalance === 0)) {
+  if (!isParticipatingInGovernance && walletAdaBalance !== null && walletAdaBalance === 0) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
     return (
