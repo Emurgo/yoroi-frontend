@@ -1,7 +1,7 @@
 // @flow
 import { useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box, Link } from '@mui/material';
@@ -48,7 +48,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1">
-          <FormattedHTMLMessage {...messages.description} />
+          <FormattedMessage {...messages.description} />
           <Box
             component="span"
             sx={{
@@ -135,7 +135,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1" color="ds.text_gray_medium">
-          <FormattedHTMLMessage {...text.shortDescription} />
+          <FormattedMessage {...text.shortDescription} />
         </Typography>
 
         <Stack
@@ -156,7 +156,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
                 <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
-                  <FormattedHTMLMessage {...tip} />
+                  <FormattedMessage {...tip} />
                 </Typography>
               </Box>
             ))}

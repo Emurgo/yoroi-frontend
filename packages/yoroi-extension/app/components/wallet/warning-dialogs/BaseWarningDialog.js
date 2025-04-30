@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
@@ -57,7 +57,7 @@ export default class BaseWarningDialog extends Component<Props> {
         <div className={styles.component}>
           <div className={styles.header}>
             {this.props.explanationHeader}
-            <FormattedHTMLMessage {...messages.explanation2} />
+            <FormattedMessage {...messages.explanation2} />
           </div>
           <FormattedMessage {...messages.explanation3} values={{ contactSupportLink }} />
         </div>

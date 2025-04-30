@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import { Box, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
@@ -110,7 +110,7 @@ export default class GeneratePinDialog extends Component<Props> {
               variant="body1"
               color="ds.text_gray_medium"
             >
-              <FormattedHTMLMessage {...messages.line1} />
+              <FormattedMessage {...messages.line1} />
             </Typography>
           </>
         )}

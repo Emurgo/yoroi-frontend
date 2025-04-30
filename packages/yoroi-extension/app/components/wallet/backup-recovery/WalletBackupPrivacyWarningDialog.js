@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import CheckboxLabel from '../../common/CheckboxLabel'
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
@@ -78,7 +78,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       >
         <span className={styles.recoveryImage}><RecoveryWatchingSvg/></span>
         <WalletRecoveryInstructions
-          instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
+          instructionsText={<FormattedMessage {...messages.recoveryPhraseInstructions} />}
         />
         <div className={styles.checkbox}>
           <CheckboxLabel

@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './OptForAnalyticsForm.scss';
 import tosStyles from './TermsOfUseText.scss';
@@ -189,7 +189,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                     <Icon />
                   </Box>
                   <Typography component="div" color="ds.text_gray_medium">
-                    <FormattedHTMLMessage {...msg} />
+                    <FormattedMessage {...msg} />
                   </Typography>
                 </Box>
               ))}

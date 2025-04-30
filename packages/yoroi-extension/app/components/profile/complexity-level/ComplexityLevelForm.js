@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexity-level/advanced-level.inline.svg';
@@ -150,7 +150,7 @@ export default class ComplexityLevel extends Component<Props> {
               },
             }}
           >
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...messages.selectedLevelLabel}
               values={{
                 level: intl.formatMessage(

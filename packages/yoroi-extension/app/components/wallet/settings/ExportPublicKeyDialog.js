@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
@@ -75,10 +75,10 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         >
           <Box marginBottom="20px">
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...messages.publicKeyExplanationLine1} />
+              <FormattedMessage {...messages.publicKeyExplanationLine1} />
             </Typography>
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...globalMessages.publicKeyExplanation} />
+              <FormattedMessage {...globalMessages.publicKeyExplanation} />
             </Typography>
             <Typography variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.whyUse)}

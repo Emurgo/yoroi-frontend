@@ -4,7 +4,7 @@ import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { Box, Typography, styled } from '@mui/material';
@@ -147,7 +147,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Box>
 
             <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
-              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
+              <FormattedMessage {...messages.walletReceiveInstructions} />
             </Typography>
 
             {generateAddressForm}

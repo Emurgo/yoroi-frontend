@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { defineMessages, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { useIntl } from '../context/intl/IntlProvider.js';
 
 export const messages = Object.freeze(
@@ -431,8 +431,8 @@ export const useStrings = () => {
     marketPriceTooltip: intl.formatMessage(messages.marketPriceTooltip),
     priceImpact: intl.formatMessage(messages.priceImpact),
     priceImpactTooltip: intl.formatMessage(messages.priceImpactTooltip),
-    priceImpactSevere: <FormattedHTMLMessage {...messages.priceImpactSevere} />,
-    priceImpactNotSevere: <FormattedHTMLMessage {...messages.priceImpactNotSevere} />,
+    priceImpactSevere: <FormattedMessage {...messages.priceImpactSevere} />,
+    priceImpactNotSevere: <FormattedMessage {...messages.priceImpactNotSevere} />,
     numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num }),
     numAssetsAvailable: num => intl.formatMessage(messages.numAssetsAvailable, { num }),
     noAssetFoundWithTerm: term => intl.formatMessage(messages.noAssetFoundWithTerm, { searchTerm: term }),

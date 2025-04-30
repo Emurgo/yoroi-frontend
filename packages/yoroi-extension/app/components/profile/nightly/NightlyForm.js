@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as NightlyIconRevamp } from '../../../assets/images/yoroi-nightly-icon-dark.inline.svg';
 
@@ -104,7 +104,7 @@ export default class NightlyForm extends Component<Props, State> {
             }}
           >
             <Typography component="div" variant="body1" lineHeight="24px">
-              <FormattedHTMLMessage {...messages.header} />
+              <FormattedMessage {...messages.header} />
             </Typography>
 
             <Box>

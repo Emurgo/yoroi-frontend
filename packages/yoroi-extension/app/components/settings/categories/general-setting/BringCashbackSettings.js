@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { MenuItem, Typography, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -153,7 +153,7 @@ class BringCashbackSettings extends Component<Props> {
             {mainnetWallets.map(option => optionRenderer(option))}
           </Select>
           <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700">
-            <FormattedHTMLMessage {...messages.note} />
+            <FormattedMessage {...messages.note} />
           </Typography>
         </Box>
         {onSetUseSandbox != null ? (

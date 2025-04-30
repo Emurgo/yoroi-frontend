@@ -1,7 +1,7 @@
 // @flow
 import { useState, useMemo } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Box, Typography, Button, styled } from '@mui/material';
@@ -86,7 +86,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedHTMLMessage {...messages.description} />
+          <FormattedMessage {...messages.description} />
         </Typography>
 
         <Box

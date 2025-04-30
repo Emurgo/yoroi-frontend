@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletType } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import { Box, Button, Typography, styled } from '@mui/material';
 import { ReactComponent as AppStoreBadge } from '../../../assets/images/app-store-badge.inline.svg';
 import { ReactComponent as PlayStoreBadge } from '../../../assets/images/google-play-badge.inline.svg';
@@ -108,7 +108,7 @@ export default class Voting extends Component<Props, State> {
             <span>3</span>
           </div>
           <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedHTMLMessage {...messages.trezorTRequirement} />
+            <FormattedMessage {...messages.trezorTRequirement} />
           </div>
         </div>
       );
@@ -120,7 +120,7 @@ export default class Voting extends Component<Props, State> {
             <span>3</span>
           </div>
           <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedHTMLMessage {...messages.ledgerNanoRequirement} />
+            <FormattedMessage {...messages.ledgerNanoRequirement} />
           </div>
         </div>
       );
@@ -205,7 +205,7 @@ export default class Voting extends Component<Props, State> {
                 label="Step 3"
                 imageSrc={walletType === 'ledgerNano' ? LedgerStepImage : TrezorStepImage}
                 description={
-                  <FormattedHTMLMessage
+                  <FormattedMessage
                     {...(walletType === 'ledgerNano' ? messages.ledgerNanoRequirement : messages.trezorTRequirement)}
                   />
                 }

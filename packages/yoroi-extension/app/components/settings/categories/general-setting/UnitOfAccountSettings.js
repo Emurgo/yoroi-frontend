@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -187,7 +187,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
           {(
             <>
               <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
-                <FormattedHTMLMessage {...messages.noteRevamp} />
+                <FormattedMessage {...messages.noteRevamp} />
               </Typography>
               <Typography
                 component="div"
@@ -200,7 +200,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                 mb="35px"
                 color="ds.text_gray_medium"
               >
-                <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+                <FormattedMessage {...messages.lastUpdated} values={{ lastUpdated }} />
               </Typography>
             </>
           )}

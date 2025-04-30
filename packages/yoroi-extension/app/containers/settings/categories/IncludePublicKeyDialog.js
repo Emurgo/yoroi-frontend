@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
@@ -71,8 +71,8 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
         }}
         id="includePublicKeyDialog"
       >
-        <div><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
-        <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>
+        <div><FormattedMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
+        <div><FormattedMessage {...globalMessages.publicKeyExplanation} /></div>
       </DangerousActionDialog>
     );
   }

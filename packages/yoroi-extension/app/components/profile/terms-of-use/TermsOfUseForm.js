@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, intlShape } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';
 import globalMessages from '../../../i18n/global-messages';
@@ -110,7 +110,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
                     },
                   }}
                 >
-                  <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+                  <FormattedMessage {...globalMessages.tosAgreement} />
                 </Box>
               }
               control={

@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
@@ -100,7 +100,7 @@ export default class ConfirmPinDialog extends Component<Props> {
               variant="body1"
               color="grayscale.900"
             >
-              <FormattedHTMLMessage {...messages.line1} />
+              <FormattedMessage {...messages.line1} />
             </Typography>
           </>
         )}

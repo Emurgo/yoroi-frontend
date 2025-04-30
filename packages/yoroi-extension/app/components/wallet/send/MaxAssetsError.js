@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
@@ -36,7 +36,7 @@ export default class MaxAssetsError extends Component<Props> {
           </Typography>
         </Stack>
         <Typography component="div" variant="body1" color="grayscale.900">
-          <FormattedHTMLMessage {...messages.maxNumberAllowed} values={{ number: this.props.maxAssetsAllowed }} />
+          <FormattedMessage {...messages.maxNumberAllowed} values={{ number: this.props.maxAssetsAllowed }} />
         </Typography>
       </Box>
     );

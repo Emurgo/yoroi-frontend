@@ -6,7 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, Typography } from '@mui/material';
 import Select from '../../common/Select';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { FormattedHTMLMessage, intlShape } from 'react-intl';
+import { FormattedMessage, intlShape } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -157,7 +157,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                   },
                 }}
               >
-                <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+                <FormattedMessage {...globalMessages.tosAgreement} />
               </Box>
             }
             control={
