@@ -3,22 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter as Router } from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
+import { IntlProvider } from 'react-intl';
 import { autorun, observable, runInAction } from 'mobx';
 import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
@@ -30,25 +15,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...nl,
-  ...pt,
-  ...id,
-  ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
-]);
 
 type Props = {|
   +stores: StoresMap,

@@ -4,10 +4,9 @@ import type { StoresMap } from './stores';
 import { Component, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter, useLocation, useNavigate } from 'react-router';
-import { addLocaleData } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { YoroiRoutes } from './Routes';
-import { locales, translations } from './i18n/translations';
+import { translations } from './i18n/translations';
 import { Logger } from './utils/logging';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
@@ -27,9 +26,6 @@ import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/In
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
