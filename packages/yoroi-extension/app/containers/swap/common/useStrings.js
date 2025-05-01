@@ -1,6 +1,5 @@
 import { useRef } from 'react';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import { useIntl } from '../context/intl/IntlProvider.js';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -382,7 +381,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
 
   return useRef({
     back: intl.formatMessage(messages.back),
