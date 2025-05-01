@@ -17,7 +17,7 @@ type Props = {|
 export default class CreateTxExecutingDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}

@@ -62,7 +62,7 @@ export default class SwapPageContainer extends Component<AllProps> {
   render(): Node {
     const { children } = this.props;
     const { stores } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const isErrorPage = this.isErrorPage();
     const { isTestnet } = stores.wallets.selectedOrFail;

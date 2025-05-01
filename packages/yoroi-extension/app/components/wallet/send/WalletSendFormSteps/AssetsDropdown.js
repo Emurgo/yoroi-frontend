@@ -209,7 +209,7 @@ export default class AssetsDropdown extends Component<Props, State> {
   render(): Node {
     const { tokens, nfts } = this.props;
     const { isTokensOpen, isNftsOpen } = this.state;
-    const { intl } = this.context;
+    const intl = this.context;
     const tokensToggleBoxTitle = `${intl.formatMessage(globalMessages.tokens)} (${tokens.length})`;
     const nftsToggleBoxTitle = `${intl.formatMessage(globalMessages.nfts)} (${nfts.length})`;
     return (

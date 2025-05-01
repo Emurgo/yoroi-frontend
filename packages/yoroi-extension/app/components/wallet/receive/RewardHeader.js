@@ -31,7 +31,7 @@ type Props = {|
 export default class RewardHeader extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Box>
         <Typography

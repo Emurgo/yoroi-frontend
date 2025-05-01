@@ -85,7 +85,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -135,7 +135,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     // CardanoMainnet.NetworkId is hardcoded here because the functionality is available only on mainnet
     const network = getNetworkById(networks.CardanoMainnet.NetworkId);
 
-    const { intl } = this.context;
+    const intl = this.context;
     const header = (
       <div>
         {intl.formatMessage(messages.explanation, {

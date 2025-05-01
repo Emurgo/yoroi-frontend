@@ -49,7 +49,7 @@ export default class ConfirmPinDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       stepsList,
       progressInfo,

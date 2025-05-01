@@ -483,7 +483,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const data = this.props.data;
     const { state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
-    const { intl } = this.context;
+    const intl = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
     const isFailedTransaction = state < 0 && !isSubmittedTransaction;
     const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
@@ -836,7 +836,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = address => {
-    const { intl } = this.context;
+    const intl = this.context;
     const addressInfo = this.props.addressLookup(address);
     if (addressInfo == null) {
       return (
@@ -865,7 +865,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
+    const intl = this.context;
     const kind = certificate.Kind;
     return RustModule.WasmScope(Scope => {
       switch (kind) {
@@ -911,7 +911,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getWithdrawals: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
-    const { intl } = this.context;
+    const intl = this.context;
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
     }
@@ -969,7 +969,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getCertificate: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
       <Box display="flex" flexDirection="column" gap="8px" mb="16px">
@@ -1003,7 +1003,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getMetadata: WalletTransaction => ?Node = data => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata != null) {
       let metadata;

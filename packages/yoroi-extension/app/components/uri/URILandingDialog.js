@@ -48,7 +48,7 @@ export default class URILandingDialog extends Component<Props> {
 
   render(): Node {
     const { onClose } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const dialogClasses = classnames([
       styles.component,

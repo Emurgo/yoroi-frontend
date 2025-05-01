@@ -17,7 +17,7 @@ type Props = {|
 export default class DeprecatedCurrencyBanner extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onSubmit } = this.props;
 
     return (

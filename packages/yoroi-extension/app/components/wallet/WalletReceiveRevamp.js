@@ -116,7 +116,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
     if (this.props.addressBook) {
       return { header: undefined, body: () => undefined };
     }
-    const { intl } = this.context;
+    const intl = this.context;
 
     const header = (
       <Typography component="h2" variant="body2" color="grayscale.500" textAlign="right">
@@ -139,7 +139,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
 
   render(): Node {
     const { walletAddresses, onVerifyAddress, onGeneratePaymentURI, onCopyAddressTooltip, notification } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const valueBlock = this.getValueBlock();
     const walletReceiveContent = (
       <div className={styles.generatedAddresses}>

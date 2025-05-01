@@ -240,7 +240,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
       shouldShowEmptyBanner,
       emptyBannerComponent,
     } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
 

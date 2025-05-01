@@ -236,7 +236,7 @@ export default class GraphWrapper extends Component<Props, State> {
   }
 
   _getEpochLengthLabel: void => string = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { epochLength } = this.props;
     if (epochLength == null) {
       return intl.formatMessage(globalMessages.epochLabel);
@@ -248,7 +248,7 @@ export default class GraphWrapper extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { tabs } = this.props;
 
     return (

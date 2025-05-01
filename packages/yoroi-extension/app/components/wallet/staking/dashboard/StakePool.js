@@ -101,7 +101,7 @@ type Props = {|
 export default class StakePool extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { hash, poolName } = this.props;
 
@@ -219,7 +219,7 @@ export default class StakePool extends Component<Props> {
   }
 
   getMoreInfoButton: (?MoreInfoProp) => Node = info => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <>

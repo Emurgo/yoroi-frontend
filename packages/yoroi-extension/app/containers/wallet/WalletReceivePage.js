@@ -78,7 +78,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const { hwVerifyAddress } = this.props.stores.substores.ada;

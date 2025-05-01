@@ -98,7 +98,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
   };
 
   renderPrivacyNotice(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const privacyNotice = this.props.privacyNotice;
     return (
       <>
@@ -126,7 +126,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { variant, isOptedIn } = this.props;
 
     if (this.state.showPrivacyNotice) {

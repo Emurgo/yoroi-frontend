@@ -28,7 +28,7 @@ export default class BaseTransferPage extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onBack, step0 } = this.props;
 
     const actions = [

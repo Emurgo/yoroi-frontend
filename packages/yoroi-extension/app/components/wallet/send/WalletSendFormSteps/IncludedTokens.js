@@ -177,7 +177,7 @@ export default class IncludedTokens extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { tokens, nfts } = this.props;
     return (
       <Box mt="24px">

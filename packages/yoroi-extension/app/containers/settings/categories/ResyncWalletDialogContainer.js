@@ -39,7 +39,7 @@ export default class ResyncWalletDialogContainer extends Component<{| ...Props, 
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const settingsStore = this.props.stores.walletSettings;
 
     return (

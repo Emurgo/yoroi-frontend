@@ -280,7 +280,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
   _amountLabel: void => Node = () => {
     const { selectedNetwork, plannedTxInfoMap, minAda } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const isCardano = isCardanoHaskell(selectedNetwork);
 
     if (isCardano) {
@@ -340,7 +340,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
   };
 
   renderHWWalletInfo(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { walletType } = this.props;
     if (walletType === 'mnemonic') {
       return null;
@@ -399,7 +399,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
   renderError(): Node {
     const { walletType } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const txErrorTitle = intl.formatMessage(messages.transactionErrorTitle);
     if (walletType === 'mnemonic') {
       const { txError } = this.state;
@@ -456,7 +456,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const walletPasswordField = form.$('walletPassword');
     const { amount, receiver, isSubmitting, walletType } = this.props;
     const { passwordError } = this.state;

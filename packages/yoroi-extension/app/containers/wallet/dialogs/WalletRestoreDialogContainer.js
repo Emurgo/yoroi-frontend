@@ -213,7 +213,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
     const { yoroiTransfer } = this.props.stores;
 
     const walletRestore = this.props.stores.substores.ada.walletRestore;
-    const { intl } = this.context;
+    const intl = this.context;
 
     switch (yoroiTransfer.status) {
       // we have to verify briefly go through this step

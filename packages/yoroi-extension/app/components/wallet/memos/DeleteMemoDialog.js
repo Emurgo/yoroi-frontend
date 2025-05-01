@@ -46,7 +46,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isSubmitting } = this.state;
     const {
       error,

@@ -46,7 +46,7 @@ type Props = {|
 export default class AddWalletPageHeader extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { goToCurrentWallet, hasAnyWallets } = this.props;
 
     return (

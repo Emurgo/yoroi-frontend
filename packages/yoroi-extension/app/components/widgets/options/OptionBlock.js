@@ -46,7 +46,7 @@ export default class OptionBlock extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { parentName, type, title, learnMoreText, onSubmit } = this.props;
 
     const learnMoreTextBlockClasses = classnames([styles.learnMoreTextBlock, this.state.showLearnMore && styles.showlearnMore]);

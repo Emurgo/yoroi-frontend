@@ -89,7 +89,7 @@ export default class YoroiPaperWalletFormPage extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <BaseTransferPage
         onSubmit={this.submit}

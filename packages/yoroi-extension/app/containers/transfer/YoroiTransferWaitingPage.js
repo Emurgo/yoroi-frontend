@@ -38,7 +38,7 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { status } = this.props;
 
     return (

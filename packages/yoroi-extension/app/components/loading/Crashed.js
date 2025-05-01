@@ -24,7 +24,7 @@ type Props = {|
 export default class Crashed extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <UnavailableDialog title={intl.formatMessage(messages.title)}>
@@ -40,7 +40,7 @@ export default class Crashed extends Component<Props> {
   }
 
   _getErrorMessageComponent: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onDownloadLogs } = this.props;
 
     const downloadLogsLink = (

@@ -18,7 +18,7 @@ type Props = {|
 export default class ErrorBlock extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { error, parentId } = this.props;
 
     const localId = parentId ?? 'somewhere';

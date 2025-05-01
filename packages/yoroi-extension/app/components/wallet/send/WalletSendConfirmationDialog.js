@@ -153,7 +153,7 @@ export default class WalletSendConfirmationDialog extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const walletPasswordField = form.$('walletPassword');
     const {
       onCancel,

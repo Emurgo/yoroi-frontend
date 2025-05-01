@@ -93,7 +93,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   };
 
   renderForm(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
@@ -216,7 +216,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   }
 
   renderMarkdown(markdown: string): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">

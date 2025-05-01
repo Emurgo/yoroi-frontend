@@ -93,7 +93,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const settingsStore = this.props.stores.walletSettings;
 
     const { warning1Text, warning2Text, acceptText } = this.state;

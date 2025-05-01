@@ -213,7 +213,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   // recoveryPhraseInput: Autocomplete;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const {
       validWords,

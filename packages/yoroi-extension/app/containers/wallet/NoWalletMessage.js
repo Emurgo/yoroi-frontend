@@ -24,7 +24,7 @@ type Props = {|
 export default class NoWalletMessage extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <FullscreenMessage

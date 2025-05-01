@@ -22,7 +22,7 @@ export const messages: Object = defineMessages({
 export default class MinAda extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { minAda } = this.props;
 
     return (

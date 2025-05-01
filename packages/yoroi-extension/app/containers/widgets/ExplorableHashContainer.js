@@ -35,7 +35,7 @@ export default class ExplorableHashContainer extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const explorerInfo = this.props.selectedExplorer.getOrDefault(this.props.linkType);
     if (explorerInfo == null) {

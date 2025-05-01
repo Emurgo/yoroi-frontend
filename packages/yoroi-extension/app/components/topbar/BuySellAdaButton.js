@@ -28,7 +28,7 @@ const buttonText = (environment.isDev() || environment.isNightly()) ?
 export default class BuySellAdaButton extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Button
         sx={{

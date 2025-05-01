@@ -185,7 +185,7 @@ class CardanoUtxoDetails extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { txData } = this.props;
     const foreignOutputs = txData.outputs.filter(o => o.isForeign);
 

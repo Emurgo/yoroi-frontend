@@ -58,7 +58,7 @@ export default class GeneralSettings extends Component<Props> {
 
   render(): Node {
     const { languages, isSubmitting, error } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({

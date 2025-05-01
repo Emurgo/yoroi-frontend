@@ -329,7 +329,7 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   renderDisclaimerDialog: () => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel } = this.props;
     return (
       <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} intl={intl} />
@@ -337,7 +337,7 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   renderBuySell(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
 
     const [providerLogo, providerName] = state.isBuying ? [banxaPng, 'Banxa'] : [encryptusPng, 'Encryptus'];
@@ -404,7 +404,7 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
     const { urlGenerationError, showDisclaimer } = state;
 

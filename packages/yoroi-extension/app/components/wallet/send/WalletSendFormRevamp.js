@@ -574,7 +574,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
 
   renderCurrentStep(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const {
       shouldSendAll,
@@ -982,7 +982,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
 
   renderCurrentFooter(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const { maxSendableAmount } = this.props;
 

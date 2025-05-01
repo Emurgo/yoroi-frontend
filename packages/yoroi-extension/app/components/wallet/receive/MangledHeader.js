@@ -30,7 +30,7 @@ type Props = {|
 export default class MangledHeader extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <>

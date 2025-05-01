@@ -57,7 +57,7 @@ export default class SupportSettings extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const faqLink = (
       <Link

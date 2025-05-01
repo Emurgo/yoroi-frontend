@@ -17,7 +17,7 @@ type Props = {|
 export default class WarningBox extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { children } = this.props;
     return (
       <Box sx={{ backgroundColor: 'ds.sys_yellow_100', borderRadius: '8px', mb: '24px', p: '24px' }} className={styles.component}>

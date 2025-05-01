@@ -57,7 +57,7 @@ export default class URIInvalidDialog extends Component<Props> {
       'URIInvalidDialog'
     ]);
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     const actions = [
       {

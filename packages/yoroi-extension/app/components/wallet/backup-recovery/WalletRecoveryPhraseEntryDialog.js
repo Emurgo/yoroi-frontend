@@ -75,7 +75,7 @@ type Props = {|
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       recoveryPhraseSorted,
       enteredPhrase,

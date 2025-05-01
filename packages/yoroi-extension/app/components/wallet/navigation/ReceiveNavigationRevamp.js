@@ -39,12 +39,12 @@ export type Props = {|
 export default class ReceiveNavigationRevamp extends Component<Props> {
   static contextType = IntlContext;
   genTooltip: AddressStoreSubset => Node = store => {
-    const { intl } = this.context;
+    const intl = this.context;
     return <InfoTooltip content={intl.formatMessage(addressGroupsTooltip[store.name.group])}/>
   };
 
   createAccordionForGroup: ($PropertyType<Props, 'addressStores'>) => Node = stores => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const store = stores[0];
     if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
@@ -118,7 +118,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
   };
 
   generateFilterSection: void => ?Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { activeFilter } = this.props;
 

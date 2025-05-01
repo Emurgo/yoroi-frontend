@@ -102,7 +102,7 @@ export default class DelegationSendForm extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const poolIdField = form.$('poolId');
 

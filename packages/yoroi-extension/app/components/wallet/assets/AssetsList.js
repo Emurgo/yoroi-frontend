@@ -199,7 +199,7 @@ export default class AssetsList extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { assetsList } = this.state;
     const { assetDeposit, network } = this.props;
 

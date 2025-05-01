@@ -47,7 +47,7 @@ export default class NFTsWrapper extends Component<Props> {
     const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(NFTsWrapper)}.`);
 
-    const { intl } = this.context;
+    const intl = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     return (
       <TopBarLayout

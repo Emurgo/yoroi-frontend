@@ -83,7 +83,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const profileStore = stores.profile;
     const coinPriceStore = stores.coinPriceStore;

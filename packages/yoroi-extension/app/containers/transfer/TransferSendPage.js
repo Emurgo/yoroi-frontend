@@ -129,7 +129,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -160,7 +160,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
         />
       ) : null;
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <TransferSummaryPage

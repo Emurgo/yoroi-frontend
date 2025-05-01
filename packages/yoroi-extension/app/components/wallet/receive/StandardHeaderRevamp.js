@@ -60,7 +60,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
 
   render(): Node {
     const { walletAddress, isSubmitting, error, isWalletAddressUsed, onCopyAddressTooltip, notification } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
     const locationId = 'wallet:receive:infoPanel:header';
 

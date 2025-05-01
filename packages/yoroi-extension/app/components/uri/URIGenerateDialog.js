@@ -111,7 +111,7 @@ export default class URIGenerateDialog extends Component<Props> {
     const dialogClasses = classnames([styles.component, 'URIGenerateDialog']);
 
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const receiverField = form.$('receiver');
     const amountField = form.$('amount');

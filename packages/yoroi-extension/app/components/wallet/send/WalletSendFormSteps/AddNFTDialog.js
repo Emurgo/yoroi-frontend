@@ -168,7 +168,7 @@ export default class AddNFTDialog extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentNftsList, fullNftsList, selectedTokens } = this.state;
     const shouldAddMore = shouldAddMoreTokens(selectedTokens);

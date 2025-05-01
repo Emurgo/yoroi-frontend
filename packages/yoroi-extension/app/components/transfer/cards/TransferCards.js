@@ -42,7 +42,7 @@ type Props = {|
 export default class TransferCards extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <Box display="flex">

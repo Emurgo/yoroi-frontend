@@ -48,7 +48,7 @@ const SListItem = styled(ListItem)(({ theme }) => ({
 export default class ExportPublicKeyDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const walletInfo = {
       publicKeyHex: this.props.publicKeyHex,
@@ -125,7 +125,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
   };
 
   renderKey: string => Node = key => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -138,7 +138,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
   };
 
   renderPath: (Array<number>) => Node = addressing => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">

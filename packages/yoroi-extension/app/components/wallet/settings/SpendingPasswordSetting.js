@@ -39,7 +39,7 @@ type Props = {|
 export default class SpendingPasswordSetting extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Box mt="13px">
         <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900" mb="16px">

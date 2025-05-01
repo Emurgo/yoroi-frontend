@@ -19,7 +19,7 @@ export default class ProgressStepBlock extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo } = this.props;
 
     const currentStep = stepsList.findIndex(({ step }) => step === progressInfo.currentStep);

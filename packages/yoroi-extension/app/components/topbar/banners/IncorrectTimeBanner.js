@@ -32,7 +32,7 @@ export default class IncorrectTimeBanner extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const currentTime = moment(new Date());
 

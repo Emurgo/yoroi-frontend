@@ -55,7 +55,7 @@ const QR_ID = 'qr-vote';
 export default class QrCodeDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo, submit, cancel, votingKey } = this.props;
 
     const dialogActions = [

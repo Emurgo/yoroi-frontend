@@ -40,7 +40,7 @@ export default class ExternalStorageSettings extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
     const { onConnect, onDisconnect, externalStorageProviders, selectedExternalStorage } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {

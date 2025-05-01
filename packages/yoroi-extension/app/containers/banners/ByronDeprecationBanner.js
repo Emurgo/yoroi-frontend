@@ -27,7 +27,7 @@ export default class ByronDeprecationBanner extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <DeprecatedCurrencyBanner
         onSubmit={this.props.onUpgrade}

@@ -22,7 +22,7 @@ type Props = {|
 export default class MaxAssetsError extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <Box sx={{ backgroundColor: 'ds.sys_magenta_100', padding: '12px 16px', borderRadius: '8px' }}>

@@ -55,7 +55,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
   }
 
   _errorDialog: LocalizableError => Node = error => {
-    const { intl } = this.context;
+    const intl = this.context;
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),

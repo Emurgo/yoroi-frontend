@@ -107,7 +107,7 @@ export default class WalletListDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const {
       shouldHideBalance,

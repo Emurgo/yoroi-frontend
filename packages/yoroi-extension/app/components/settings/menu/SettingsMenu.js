@@ -41,7 +41,7 @@ type Props = {|
 export default class SettingsMenu extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onItemClick, isActiveItem } = this.props;
     const isProduction = environmnent.isProduction();
     const settingOptions: Array<SubMenuOption> = [

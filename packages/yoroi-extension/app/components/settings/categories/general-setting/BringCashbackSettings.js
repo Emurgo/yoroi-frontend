@@ -63,7 +63,7 @@ class BringCashbackSettings extends Component<Props> {
 
   render(): Node {
     const { cardanoWallets, error, currentValue, onSetUseSandbox } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const cashbackWalletId = form.$('cashbackWalletId');
     const componentClassNames = classNames([styles.component, 'currency']);

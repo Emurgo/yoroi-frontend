@@ -40,7 +40,7 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresProp
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const wallets = this.props.stores.wallets.wallets;
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <TopBarLayout

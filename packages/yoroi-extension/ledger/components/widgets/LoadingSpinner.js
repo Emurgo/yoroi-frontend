@@ -28,7 +28,7 @@ export default class LoadingSpinner extends Component<Props> {
   root: ?HTMLElement;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { showText } = this.props;
     const textComp = (
       <div className={styles.text}>

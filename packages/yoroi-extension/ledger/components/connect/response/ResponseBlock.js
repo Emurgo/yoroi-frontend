@@ -29,7 +29,7 @@ export default class ResponseBlock extends Component<Props> {
   root: ?HTMLElement;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const title = (
       <div className={styles.title}>
         {intl.formatMessage(messages.title)}

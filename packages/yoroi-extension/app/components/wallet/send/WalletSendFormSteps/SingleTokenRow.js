@@ -72,7 +72,7 @@ export default class SingleTokenRow extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { token, isValidAmount } = this.props;
     const isNotValid = !isValidAmount(token.info);
 

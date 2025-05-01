@@ -124,7 +124,7 @@ render(): Node {
 }
 
 _displayGraph: RewardsGraphData => Node = graphData => {
-  const { intl } = this.context;
+  const intl = this.context;
   if (graphData.error) {
     return (
       <div className={styles.poolError}>
@@ -166,7 +166,7 @@ displayStakePools: boolean => Node = isUnregistered => {
     !isUnregistered ? styles.stakePoolMaxWidth : null,
     styles.stakePool,
   ]);
-  const { intl } = this.context;
+  const intl = this.context;
   if (this.props.stakePools.error) {
     return (
       <div className={styles.poolError}>

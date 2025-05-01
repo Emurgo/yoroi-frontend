@@ -32,7 +32,7 @@ export default class Loading extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       isLoadingDataForNextScreen,
       hasLoadedCurrentLocale,
@@ -76,7 +76,7 @@ export default class Loading extends Component<Props> {
   }
 
   _getErrorMessageComponent: (void => Node) = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       onExternalLinkClick,
       downloadLogs

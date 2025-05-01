@@ -33,7 +33,7 @@ type Props = {|
 export default class InternalHeader extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const blogLink = (
       <Link

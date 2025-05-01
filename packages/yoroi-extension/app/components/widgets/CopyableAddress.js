@@ -62,7 +62,7 @@ export default class CopyableAddress extends Component<Props> {
 
   render(): Node {
     const { hash, elementId, sx, onCopyAddress, notification, darkVariant, id } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const Icon = notification && notification.id === elementId ? IconCopied : IconCopy;
     const tooltipComponent = (

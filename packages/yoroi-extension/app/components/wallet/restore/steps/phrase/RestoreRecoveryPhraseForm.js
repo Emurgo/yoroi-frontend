@@ -130,7 +130,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isValidMnemonic, numberOfMnemonics } = this.props;
     const { form } = this;
     const { recoveryPhrase } = form.values();

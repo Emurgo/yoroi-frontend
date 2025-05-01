@@ -139,7 +139,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
         if (transferTx == null) {
           return null; // don't care since this is pending removal
         }
-        const { intl } = this.context;
+        const intl = this.context;
         return (
           <TransferSummaryPage
             form={null}

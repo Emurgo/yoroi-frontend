@@ -62,7 +62,7 @@ export default class OperationBlock extends React.Component<Props> {
   loadingSpinner: ?LoadingSpinner;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       deviceCode,
       currentOperationName,

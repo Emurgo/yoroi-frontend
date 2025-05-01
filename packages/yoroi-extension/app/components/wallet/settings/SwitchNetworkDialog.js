@@ -54,7 +54,7 @@ export default class Switch extends Component<Props> {
   });
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, onApply, networks } = this.props;
     const baseComponentPath = 'switchNetworkDialog';
 

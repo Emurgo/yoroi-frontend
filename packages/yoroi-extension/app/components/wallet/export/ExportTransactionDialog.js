@@ -59,7 +59,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (

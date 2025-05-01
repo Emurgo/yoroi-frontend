@@ -91,7 +91,7 @@ export default class ComplexityLevel extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { complexityLevel } = this.props;
 
     const levels = [

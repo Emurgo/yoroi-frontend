@@ -22,7 +22,7 @@ export default class VotingPage extends Component<StoresProps> {
 
   render(): Node {
     const { stores } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const content = (
       <Suspense fallback={null}>

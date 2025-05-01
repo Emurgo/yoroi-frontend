@@ -87,7 +87,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
   renderInfoBlock(): Node {
     const { walletType } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (walletType === 'mnemonic') {
       return (
@@ -126,7 +126,7 @@ export default class VotingRegTxDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const spendingPasswordForm =
       this.props.walletType === 'mnemonic' ? (

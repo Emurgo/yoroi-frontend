@@ -25,7 +25,7 @@ export default class ErrorPage extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { error, onCancel, title, backButtonLabel } = this.props;
 
     const actions = [

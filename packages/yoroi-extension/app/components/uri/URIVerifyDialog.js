@@ -57,7 +57,7 @@ export default class URIVerifyDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
     const { onCancel, onSubmit, unitOfAccountSetting, } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const dialogClasses = classnames([
       styles.dialog,

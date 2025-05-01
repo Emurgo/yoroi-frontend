@@ -28,7 +28,7 @@ const ItemWrapper = styled(Box)(({ theme, active }) => ({
 export default class SideBarCategoryRevamp extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { icon, active, onClick, label, route } = this.props;
 

@@ -64,7 +64,7 @@ type Props = {|
 export default class VerifyAddressDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const dialogActions =
       !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
@@ -100,7 +100,7 @@ export default class VerifyAddressDialog extends Component<Props> {
   }
 
   renderAddressBlock: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const notificationId = 'verify-address-notification';
     return (
       <>
@@ -157,7 +157,7 @@ export default class VerifyAddressDialog extends Component<Props> {
    *  because hardware wallets will display the staking key on the device
    */
   renderStakingKey: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { type: addrType, address } = this.props.addressInfo;
 
     const getStakingKey = (WasmScope: typeof RustModule) => {
@@ -187,7 +187,7 @@ export default class VerifyAddressDialog extends Component<Props> {
   };
 
   renderSpendingKey: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     // this is useful for querying servers & debugging. Not so useful for the average user.
     if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
@@ -224,7 +224,7 @@ export default class VerifyAddressDialog extends Component<Props> {
 
   /** hardware wallets display the pointer information on the device */
   renderPointer: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (this.props.addressInfo.type !== CoreAddressTypes.CARDANO_PTR) {
       return null;
@@ -260,7 +260,7 @@ export default class VerifyAddressDialog extends Component<Props> {
 
   renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = addressing => {
     if (addressing == null) return null;
-    const { intl } = this.context;
+    const intl = this.context;
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>

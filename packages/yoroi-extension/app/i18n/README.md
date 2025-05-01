@@ -60,7 +60,7 @@ export default class TestText extends Component {
   };
 
   render() {
-    const { intl } = this.context;
+    const intl = this.context;
     return (<div>{intl.formatMessage(messages.testText)}</div>);
   }
 }

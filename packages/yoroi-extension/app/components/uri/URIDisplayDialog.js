@@ -55,7 +55,7 @@ export default class URIDisplayDialog extends Component<Props> {
   render(): Node {
     const { onClose, onBack, notification, onCopyAddressTooltip, address, amount } = this.props;
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     const uri = buildURI(address, amount);
     const uriNotificationId = 'uri-copyNotification';

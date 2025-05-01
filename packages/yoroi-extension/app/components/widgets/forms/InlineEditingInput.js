@@ -136,7 +136,7 @@ export default class InlineEditingInput extends Component<Props, State> {
   render(): Node {
     const { validator } = this;
     const { className, inputFieldLabel, isActive, successfullyUpdated, id } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,

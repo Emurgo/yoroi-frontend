@@ -72,7 +72,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   };
 
   renderForm(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isSubmitting, error } = this.props;
     const { areTermsOfUseAccepted } = this.state;
     return (
@@ -150,7 +150,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   }
 
   renderMarkdown(markdown: string): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">

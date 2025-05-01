@@ -90,7 +90,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 export default class CheckDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;
 
     const middleBlock = (

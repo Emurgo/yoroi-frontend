@@ -25,7 +25,7 @@ import NotificationsSettings from '../../../UI/features/notifications/useCases/N
 export default class WalletSettingsPage extends Component <StoresProps> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;

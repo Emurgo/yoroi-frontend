@@ -99,7 +99,7 @@ export default class AddMemoDialog extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const { memoContent } = form.values();
     const { isSubmitting } = this.state;

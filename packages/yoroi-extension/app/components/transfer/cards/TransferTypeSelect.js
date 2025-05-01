@@ -33,7 +33,7 @@ const messages = defineMessages({
 export default class TransferTypeSelect extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const faqLink = (
       <Link
         href={intl.formatMessage(globalMessages.faqLinkUrl)}

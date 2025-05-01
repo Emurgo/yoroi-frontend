@@ -115,7 +115,7 @@ export default class HWSendConfirmationDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       amount,
       receivers,

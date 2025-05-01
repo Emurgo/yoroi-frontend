@@ -40,7 +40,7 @@ type Props = {|
 export default class GeneratePinDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo, next, cancel, pin } = this.props;
 
     const dialogActions = [

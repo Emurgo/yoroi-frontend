@@ -74,7 +74,7 @@ type Props = {|
 export default class ExchangeEndPageContent extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <PageContent>
         <Illustration style={{ margin: 'auto', display: 'block' }} />

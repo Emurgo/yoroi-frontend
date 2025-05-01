@@ -48,7 +48,7 @@ export default class TitleBlock extends React.Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { currentOperationName } = this.props;
 
     let title;

@@ -65,7 +65,7 @@ export default class SaveDialog extends Component<Props> {
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    const { intl } = this.context;
+    const intl = this.context;
     const { defaultWalletName } = this.props;
 
     this.form = new ReactToolboxMobxForm({
@@ -95,7 +95,7 @@ export default class SaveDialog extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { walletName } = form.values();
     const {

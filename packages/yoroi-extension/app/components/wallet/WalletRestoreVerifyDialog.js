@@ -128,7 +128,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { error, isSubmitting, onCancel, onNext, onCopyAddressTooltip, notification } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);

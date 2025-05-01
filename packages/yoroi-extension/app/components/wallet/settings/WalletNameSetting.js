@@ -48,7 +48,7 @@ export default class WalletNameSetting extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       walletName,
       error,

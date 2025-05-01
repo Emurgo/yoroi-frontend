@@ -38,7 +38,7 @@ type Props = {|
 export default class DangerousActionDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isSubmitting, error, id } = this.props;
 
     const dialogClasses = classnames(['removeWalletDialog', styles.dialog]);

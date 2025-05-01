@@ -79,7 +79,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
 
   render(): Node {
     const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
     const componentClassNames = classNames([styles.component, 'currency']);

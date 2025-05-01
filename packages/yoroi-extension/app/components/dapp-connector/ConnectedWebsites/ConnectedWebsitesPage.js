@@ -53,7 +53,7 @@ const messages = defineMessages({
 export default class ConnectedWebsitesPage extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const genNoResult = () => (
       <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center">
         <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">

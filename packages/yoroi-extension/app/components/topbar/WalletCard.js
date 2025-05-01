@@ -112,7 +112,7 @@ export default class WalletCard extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
 
     const [walletPlate, iconComponent] = maybe(this.props.plate, constructPlate40) ?? [];

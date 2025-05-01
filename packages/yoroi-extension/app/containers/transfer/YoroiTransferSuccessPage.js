@@ -25,7 +25,7 @@ type Props = {|
 export default class YoroiTransferSuccessPage extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (<SuccessPage
       title={intl.formatMessage(messages.title)}

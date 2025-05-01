@@ -95,7 +95,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
   }
 
   localizedDate(date: string): string {
-    const { intl } = this.context;
+    const intl = this.context;
     const today = moment().format(dateFormat);
     if (date === today) return intl.formatMessage(globalMessages.dateToday);
     const yesterday = moment().subtract(1, 'days').format(dateFormat);
@@ -114,7 +114,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       transactions,
       isLoadingTransactions,

@@ -308,7 +308,7 @@ export default class AddTokenDialog extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onClose, calculateMinAda, shouldAddMoreTokens } = this.props;
     const { currentTokensList, fullTokensList, selectedTokens } = this.state;
     const shouldAddMore = shouldAddMoreTokens(selectedTokens.map(({ token, included }) => ({ token, included })));

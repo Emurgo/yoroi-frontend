@@ -126,7 +126,7 @@ export default class Voting extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { walletType } = this.props;
     const { showDisclamer } = this.state;
     const pendingTxWarningComponent = this.props.hasAnyPending ? (

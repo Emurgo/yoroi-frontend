@@ -63,7 +63,7 @@ export default class MnemonicInput extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const {
       validWords,

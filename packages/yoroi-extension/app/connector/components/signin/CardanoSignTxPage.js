@@ -362,7 +362,7 @@ class SignTxPage extends Component<Props, State> {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
-    const { intl } = this.context;
+    const intl = this.context;
     const { txData, onCancel, connectedWebsite, signData } = this.props;
 
     const { isSubmitting } = this.state;

@@ -79,7 +79,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
   render(): null | Node {
     const { urlTemplate } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -186,7 +186,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _displayPoolInfo: void => void | Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) return null;
 
@@ -261,7 +261,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _errorDialog: LocalizableError => Node = error => {
-    const { intl } = this.context;
+    const intl = this.context;
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),

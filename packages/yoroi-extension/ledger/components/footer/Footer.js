@@ -30,7 +30,7 @@ export default class Footer extends React.Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       appVersion,
       transportId

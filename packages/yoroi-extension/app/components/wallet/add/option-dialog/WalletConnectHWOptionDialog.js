@@ -37,7 +37,7 @@ type Props = {|
 export default class WalletConnectHWOptionDialog extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, onTrezor, onLedger, } = this.props;
 
     return (

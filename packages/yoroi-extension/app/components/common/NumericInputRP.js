@@ -454,7 +454,7 @@ class AmountInput extends Component<AmountInputProps> {
   static contextType = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <Box sx={{ position: 'relative' }}>
@@ -503,7 +503,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
   static contextType = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <Box

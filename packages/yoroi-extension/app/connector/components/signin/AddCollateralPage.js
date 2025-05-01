@@ -207,7 +207,7 @@ class AddCollateralPage extends Component<Props, State> {
     const { txData, onCancel, submissionError } = this.props;
     if (!txData) return null;
 
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
     const { isSubmitting } = this.state;

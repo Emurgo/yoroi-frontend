@@ -54,7 +54,7 @@ type Props = {|
 export default class OverviewModal extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { withdrawRewards, onClose, totalRewards } = this.props;
 
     const actions = [

@@ -47,7 +47,7 @@ export default class NavPlate extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const [accountPlateId, iconComponent] = maybe(this.props.plate, constructPlate40) ?? [];
 

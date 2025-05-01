@@ -144,7 +144,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([

@@ -70,7 +70,7 @@ export default class NightlyForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onSubmit } = this.props;
 
     return (

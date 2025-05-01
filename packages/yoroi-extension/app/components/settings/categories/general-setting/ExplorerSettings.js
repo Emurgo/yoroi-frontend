@@ -54,7 +54,7 @@ export default class ExplorerSettings extends Component<Props> {
 
   render(): Node {
     const { isSubmitting, error } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const explorerId = form.$('explorerId');
     const componentClassNames = classNames([styles.component, 'explorer']);

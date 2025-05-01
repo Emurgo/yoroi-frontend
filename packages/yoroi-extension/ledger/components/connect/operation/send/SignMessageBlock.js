@@ -37,7 +37,7 @@ export default class SendTxHintBlock extends React.Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <div className={styles.component}>

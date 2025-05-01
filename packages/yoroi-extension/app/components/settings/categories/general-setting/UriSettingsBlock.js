@@ -19,7 +19,7 @@ export default class UriSettingsBlock extends Component<Props> {
 
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     // On firefox since there is no prompt,
     // We need to give the user feedback that they pressed the button

@@ -129,7 +129,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const { prevStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog, selectedNetwork, isRecovery } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
-    const { intl } = this.context;
+    const intl = this.context;
 
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');

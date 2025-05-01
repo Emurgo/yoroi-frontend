@@ -23,7 +23,7 @@ export default class BlockchainSettingsPage extends Component<StoresProps> {
       return <NoWalletMessage />;
 
     }
-    const { intl } = this.context;
+    const intl = this.context;
 
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 

@@ -41,7 +41,7 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <DangerousActionDialog

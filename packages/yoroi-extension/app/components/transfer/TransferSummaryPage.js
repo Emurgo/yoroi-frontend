@@ -119,7 +119,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   getHeader: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { transferTx, } = this.props;
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
@@ -295,7 +295,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { transferTx, isSubmitting, error, unitOfAccountSetting, } = this.props;
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
@@ -450,7 +450,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   _getTxIdNode: string => Node = (txId) => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Box mb="20px">
         <STypography variant="body2">

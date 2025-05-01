@@ -42,7 +42,7 @@ export default class RegisterDialog extends Component<Props> {
     this.spendingPasswordForm = form;
   }
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo, cancel, isProcessing } = this.props;
 
     const dailogActions = [

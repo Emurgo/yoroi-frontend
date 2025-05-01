@@ -68,7 +68,7 @@ navigateToMyWallets: string => void = destination => {
 
 render(): Node {
   const { stores } = this.props;
-  const { intl } = this.context;
+  const intl = this.context;
   const selectedWallet = stores.wallets.selectedOrFail;
   const warning = this.getWarning(selectedWallet.publicDeriverId);
   const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;

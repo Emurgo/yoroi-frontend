@@ -27,7 +27,7 @@ type Props = {|
 export default class RemoveWallet extends Component<Props> {
   static contextType = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { openDialog } = this.props;
 
     return (

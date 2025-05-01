@@ -128,7 +128,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, isSubmitting, dialogData, error } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);

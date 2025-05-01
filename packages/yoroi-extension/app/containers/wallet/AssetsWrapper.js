@@ -29,7 +29,7 @@ export default class AssetsWrapper extends Component<Props> {
     const publicDeriver = this.props.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`Active wallet required for ${nameof(AssetsWrapper)}.`);
 
-    const { intl } = this.context;
+    const intl = this.context;
     const sidebarContainer = <SidebarContainer stores={stores} />;
 
     return (
