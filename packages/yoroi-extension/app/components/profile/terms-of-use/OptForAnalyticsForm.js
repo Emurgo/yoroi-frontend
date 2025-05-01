@@ -85,7 +85,7 @@ type State = {|
 
 @observer
 export default class OptForAnalyticsForm extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = { isSubmitting: false, showPrivacyNotice: false };
 
   onOpt: boolean => void = isOptIn => {

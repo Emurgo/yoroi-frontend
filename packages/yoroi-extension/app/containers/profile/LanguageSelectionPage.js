@@ -16,7 +16,7 @@ import type { StoresProps } from '../../stores';
 @observer
 export default class LanguageSelectionPage extends Component<StoresProps> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   async componentDidMount() {
     const profileStore = this.props.stores.profile;
     // if user uses back button to get back to this page

@@ -68,7 +68,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {

@@ -23,7 +23,7 @@ export default class ErrorPage extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { error, onCancel, title, backButtonLabel } = this.props;

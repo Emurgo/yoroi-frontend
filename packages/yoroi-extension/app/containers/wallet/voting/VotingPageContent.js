@@ -58,7 +58,7 @@ const messages: * = defineMessages({
 
 @observer
 class VotingPageContent extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   onClose: void => void = () => {
     this.props.stores.uiDialogs.closeActiveDialog();

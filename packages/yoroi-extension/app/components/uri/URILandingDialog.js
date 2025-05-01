@@ -41,7 +41,7 @@ type Props = {|
 @observer
 export default class URILandingDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   submit: (() => void) = () => {
     this.props.onSubmit();
   };

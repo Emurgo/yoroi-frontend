@@ -52,7 +52,7 @@ type Props = {|
 
 @observer
 export default class OperationBlock extends React.Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   static defaultProps: {| showPerformActionText: boolean |} = {
     showPerformActionText: false

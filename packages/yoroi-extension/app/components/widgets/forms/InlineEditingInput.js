@@ -55,7 +55,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     isActive: false,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   validator: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {

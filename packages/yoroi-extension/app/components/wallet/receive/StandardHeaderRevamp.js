@@ -53,7 +53,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   submit: void => Promise<void> = async () => {
     await this.props.onGenerateAddress();
   };

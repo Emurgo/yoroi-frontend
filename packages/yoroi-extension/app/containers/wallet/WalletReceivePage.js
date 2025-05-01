@@ -45,7 +45,10 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletReceivePage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
+
+  @observable notificationElementId: string = '';
+
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();

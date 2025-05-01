@@ -86,7 +86,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     introMessage: '',
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   getInitRecoveryPhrase: void => Array<string> = () => {
     if (this.props.initValues) {
       const str: string = (this.props.initValues.recoveryPhrase || '').trim();

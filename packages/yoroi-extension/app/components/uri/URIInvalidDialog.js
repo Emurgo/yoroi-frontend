@@ -48,7 +48,7 @@ type Props = {|
 @observer
 export default class URIInvalidDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { onClose, onSubmit, address } = this.props;
 

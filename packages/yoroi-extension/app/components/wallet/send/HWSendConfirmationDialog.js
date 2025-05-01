@@ -57,7 +57,7 @@ type Props = {|
 @observer
 export default class HWSendConfirmationDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   renderSingleAmount: TokenEntry => Node = (entry) => {
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 

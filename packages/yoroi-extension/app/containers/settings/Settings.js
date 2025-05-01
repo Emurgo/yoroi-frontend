@@ -26,7 +26,7 @@ export default class Settings extends Component<AllProps> {
     children: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   isActivePage: string => boolean = route => {
     const { currentRoute } = this.props.stores.routing;
     if (route && currentRoute) {

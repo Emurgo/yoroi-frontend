@@ -87,7 +87,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddNFTDialog extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount(): void {
     const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
     const nftsList = getNFTs(spendableBalance, getTokenInfo);

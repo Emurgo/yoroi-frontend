@@ -21,7 +21,7 @@ type Props = {|
 
 @observer
 export default class SuccessPage extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|closeInfo: void|} = {
     closeInfo: undefined
   };

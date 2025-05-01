@@ -31,7 +31,9 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletSummaryPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
+
+  @observable notificationElementId: string = '';
 
   render(): Node {
     const intl = this.context;

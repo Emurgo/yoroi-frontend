@@ -26,7 +26,7 @@ export default class UriPromptPage extends Component<StoresProps> {
   @observable
   isAccepted: boolean = false;
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   onAccept: void => void = () => {
     registerProtocols();
     runInAction(() => {

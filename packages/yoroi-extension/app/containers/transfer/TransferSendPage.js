@@ -50,7 +50,7 @@ type LocalProps = {|
 @observer
 export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };

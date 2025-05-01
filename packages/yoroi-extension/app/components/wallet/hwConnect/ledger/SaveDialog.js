@@ -60,7 +60,7 @@ type Props = {|
 @observer
 export default class SaveDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm;
 
   // eslint-disable-next-line camelcase

@@ -62,7 +62,7 @@ const canUseSandbox = environment.isDev() || environment.isNightly();
 
 @observer
 export default class GeneralSettingsPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount() {
     const request = this.props.stores.wallets.getCashbackWalletRequest;
     request.reset();

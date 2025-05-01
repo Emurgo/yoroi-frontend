@@ -72,7 +72,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     initialRecoveryPhrase: '',
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     mounted: false,
   };

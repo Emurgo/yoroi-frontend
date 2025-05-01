@@ -57,7 +57,7 @@ type Props = {|
 
 @observer
 export default class WalletTransactionsListRevamp extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount(): void {
     this.localizedDateFormat = moment.localeData().longDateFormat('LL');

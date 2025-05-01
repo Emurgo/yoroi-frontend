@@ -24,7 +24,7 @@ export default class PaperPasswordInput extends Component<Props> {
     initValues: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     return (<PasswordInput
       setForm={this.props.setForm}

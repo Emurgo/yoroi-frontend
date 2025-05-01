@@ -41,7 +41,7 @@ const messages = defineMessages({
 @observer
 export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   submit: {|
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|

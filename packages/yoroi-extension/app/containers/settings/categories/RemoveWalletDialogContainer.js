@@ -56,7 +56,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
     acceptText: null,
   }
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.removeWalletRequest.reset();
   }

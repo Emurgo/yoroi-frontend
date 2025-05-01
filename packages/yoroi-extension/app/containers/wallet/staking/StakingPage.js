@@ -30,7 +30,7 @@ const StakingPageContent = lazy(StakingPageContentPromise);
 
 @observer
 class StakingPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;

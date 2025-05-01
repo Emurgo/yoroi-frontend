@@ -43,7 +43,7 @@ type Props = {|
 
 @observer
 export default class Switch extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       selectedNetwork: {

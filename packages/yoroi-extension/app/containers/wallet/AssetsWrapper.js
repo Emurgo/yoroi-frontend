@@ -18,7 +18,7 @@ type Props = {|
 |};
 @observer
 export default class AssetsWrapper extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   static defaultProps: {| children: void |} = {
     children: undefined,

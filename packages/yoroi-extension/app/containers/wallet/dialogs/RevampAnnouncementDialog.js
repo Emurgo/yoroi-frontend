@@ -80,7 +80,7 @@ export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =
 
 @observer
 export class RevampAnnouncementDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { onClose, lastAnnouncedFeatureVersion } = this.props;

@@ -83,7 +83,7 @@ type Props = {|
 @observer
 export default class TransferSummaryPage extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };

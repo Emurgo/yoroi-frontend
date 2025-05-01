@@ -38,7 +38,7 @@ type Props = {|
 
 @observer
 class CardanoUtxoDetails extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);

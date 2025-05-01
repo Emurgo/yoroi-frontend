@@ -41,7 +41,7 @@ export default class WalletNameSetting extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentWillUnmount(): void {
     // This call is used to prevent display of old successfully-updated messages
     this.props.onCancelEditing();

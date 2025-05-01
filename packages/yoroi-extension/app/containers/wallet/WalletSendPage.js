@@ -63,7 +63,7 @@ const messages = defineMessages({
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   @observable showMemo: boolean = false;
   @observable showSupportedAddressDomainBanner: boolean = true;
 

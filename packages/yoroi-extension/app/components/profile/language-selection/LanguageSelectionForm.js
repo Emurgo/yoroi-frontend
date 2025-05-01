@@ -40,7 +40,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   selectLanguage: string => void = locale => {
     this.props.onSelectLanguage({ locale });
   };

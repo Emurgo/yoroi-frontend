@@ -26,7 +26,7 @@ type Props = {|
 @observer
 export default class TestnetWarningBanner extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): null | Node {
     if (environment.isNightly()) {
       return (

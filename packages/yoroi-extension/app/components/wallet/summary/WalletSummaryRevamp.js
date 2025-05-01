@@ -69,7 +69,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isBannerVisible: false,
   };

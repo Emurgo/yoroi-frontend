@@ -31,7 +31,7 @@ export default class WalletDetails extends Component<Props> {
     infoText: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const {

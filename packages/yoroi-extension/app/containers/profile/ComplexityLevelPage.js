@@ -22,7 +22,7 @@ const messages = defineMessages({
 
 @observer
 export default class ComplexityLevelPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;

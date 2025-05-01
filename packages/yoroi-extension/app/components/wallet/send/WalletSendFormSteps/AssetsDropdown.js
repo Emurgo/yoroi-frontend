@@ -115,7 +115,7 @@ type State = {|
 |};
 
 export default class AssetsDropdown extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isTokensOpen: false,
     isNftsOpen: false,

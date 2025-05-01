@@ -38,7 +38,7 @@ export default class ExplorerSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   selectExplorer: (string) => Promise<void> = async explorerId => {
     await this.props.onSelectExplorer({ explorerId });
   };

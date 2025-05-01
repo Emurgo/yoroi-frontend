@@ -51,7 +51,7 @@ type Props = {|
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   getAmountLabel: () => string = (): string => {
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
       currency: truncateToken(getTokenName(this.props.tokenInfo)),

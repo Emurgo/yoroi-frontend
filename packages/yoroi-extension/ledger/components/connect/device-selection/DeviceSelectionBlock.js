@@ -79,7 +79,7 @@ type Props = {|
 
 @observer
 export default class DeviceSelectionBlock extends React.Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   onExecuteActionClicked: (DeviceCodeType) => void  = (deviceCode) => {
     this.props.executeAction(deviceCode);
   };

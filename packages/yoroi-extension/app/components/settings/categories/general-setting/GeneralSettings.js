@@ -42,7 +42,7 @@ export default class GeneralSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   selectLanguage: string => Promise<void> = async locale => {
     await this.props.onSelectLanguage({ locale });
   };

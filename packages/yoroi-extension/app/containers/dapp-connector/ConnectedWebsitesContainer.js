@@ -20,7 +20,7 @@ const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
 @observer
 export default class ConnectedWebsitesPageContainer extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   async componentDidMount() {
     await this.props.stores.connector.refreshActiveSites();
     await this.props.stores.connector.getConnectorWhitelist();

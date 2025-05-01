@@ -65,7 +65,7 @@ type Props = {|
 export default class VotingRegTxDialog extends Component<Props> {
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
     this.spendingPasswordForm = form;

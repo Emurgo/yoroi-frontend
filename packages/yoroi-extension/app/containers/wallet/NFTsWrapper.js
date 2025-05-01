@@ -26,7 +26,7 @@ const messages = defineMessages({
 });
 @observer
 export default class NFTsWrapper extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   static defaultProps: {| children: void |} = {
     children: undefined,

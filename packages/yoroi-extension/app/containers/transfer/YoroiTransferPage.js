@@ -28,7 +28,7 @@ const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 @observer
 export default class YoroiTransferPage extends Component<StoresProps> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   goToCreateWallet: void => void = () => {
     this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
   }

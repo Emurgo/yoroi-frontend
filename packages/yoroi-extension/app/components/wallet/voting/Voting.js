@@ -87,7 +87,7 @@ const WarningWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class Voting extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     showDisclamer: true,
   };

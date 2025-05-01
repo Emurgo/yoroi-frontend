@@ -22,7 +22,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class TransactionDialogContainer extends Component<AllProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stepsList, submit, cancel, goBack, onError, walletType, stores } = this.props;
     const wallet = stores.wallets.selected;

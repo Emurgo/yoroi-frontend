@@ -230,7 +230,7 @@ type State = {|
 
 @observer
 export default class GraphWrapper extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     selectedTab: 0,
   }

@@ -15,7 +15,7 @@ type Props = {|
 
 @observer
 export default class ExportWalletDialogContainer extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { selected } = this.props.stores.wallets;
     if (selected == null) {

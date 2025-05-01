@@ -38,7 +38,7 @@ type Props = {|
 
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {

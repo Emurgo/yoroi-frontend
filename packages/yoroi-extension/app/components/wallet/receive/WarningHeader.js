@@ -24,7 +24,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class WarningHeader extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| children: void |} = {
     children: undefined,
   };

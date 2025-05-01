@@ -43,7 +43,7 @@ type State = {|
 @observer
 export default class CardanoStakingPage extends Component<AllProps, State> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     firstPool: undefined,
     selectedPoolId: undefined,

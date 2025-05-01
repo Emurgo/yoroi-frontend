@@ -23,7 +23,7 @@ import NotificationsSettings from '../../../UI/features/notifications/useCases/N
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stores } = this.props;

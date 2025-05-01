@@ -41,7 +41,9 @@ type Props = {|
 
 @observer
 export default class ConfirmPinDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
+
+  @observable pinForm: void | ReactToolboxMobxForm;
 
   @action
   setPinForm(form: ReactToolboxMobxForm) {

@@ -20,7 +20,7 @@ export default class SpendingPasswordInput extends Component<Props> {
     initValues: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 

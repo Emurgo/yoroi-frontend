@@ -87,7 +87,9 @@ type Props = {|
 
 @observer
 export default class WalletReceiveRevamp extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
+
+  locationId: string = 'wallet:receive:infoPanel:footer';
 
   getAmount: TokenEntry => ?Node = tokenEntry => {
     if (this.props.shouldHideBalance) {

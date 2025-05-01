@@ -104,7 +104,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class WalletCard extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|
     isCurrentWallet: boolean,
   |} = {

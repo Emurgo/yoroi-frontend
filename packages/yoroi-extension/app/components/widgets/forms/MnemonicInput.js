@@ -21,7 +21,7 @@ type Props = {|
 @observer
 export default class MnemonicInput extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {

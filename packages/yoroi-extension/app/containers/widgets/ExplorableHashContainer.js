@@ -33,7 +33,7 @@ export default class ExplorableHashContainer extends Component<Props> {
     light: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 

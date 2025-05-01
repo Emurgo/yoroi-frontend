@@ -52,7 +52,7 @@ class BringCashbackSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       cashbackWalletId: {

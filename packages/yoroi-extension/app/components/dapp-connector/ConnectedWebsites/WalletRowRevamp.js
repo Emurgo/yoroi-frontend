@@ -33,7 +33,7 @@ type State = {|
 |};
 
 export default class WalletRowRevamp extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     showDeleteIcon: false,
   };

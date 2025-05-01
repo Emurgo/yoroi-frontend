@@ -32,7 +32,7 @@ type Props = {|
 
 @observer
 export default class MemoNoExternalStorageDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { onCancel, onAcknowledge } = this.props;

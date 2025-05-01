@@ -12,7 +12,7 @@ import OptForAnalyticsForm from '../../components/profile/terms-of-use/OptForAna
 
 @observer
 export default class OptForAnalyticsPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
 
     return (

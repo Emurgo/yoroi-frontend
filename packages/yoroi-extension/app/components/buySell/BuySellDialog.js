@@ -187,7 +187,7 @@ const dialogTitle = environment.isDev() || environment.isNightly() ? messages.di
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isBuying: true,
     inputError: null,

@@ -20,7 +20,7 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount() {
     const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;

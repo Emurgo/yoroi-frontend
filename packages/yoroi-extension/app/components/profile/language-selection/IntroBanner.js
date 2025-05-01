@@ -17,7 +17,7 @@ type Props = {|
 
 @observer
 export default class IntroBanner extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   getRevampLogo: void => string = () => {
     if (this.props.isNightly) return YoroiRevampNightlyLogo;
     return YoroiRevampLogo;

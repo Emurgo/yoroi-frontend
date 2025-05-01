@@ -80,7 +80,7 @@ type Props = {|
 
 @observer
 export default class StakingDashboard extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 render(): Node {
   const { graphData, isUnregistered } = this.props;
 

@@ -42,7 +42,7 @@ export default class PasswordInput extends Component<Props> {
     done: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       [this.props.fieldName]: {

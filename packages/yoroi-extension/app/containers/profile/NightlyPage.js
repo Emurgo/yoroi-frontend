@@ -19,7 +19,7 @@ const messages = defineMessages({
 
 @observer
 export default class NightlyPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   acceptNightly: void => void = () => {
     this.props.stores.profile.acceptNightly();
   };

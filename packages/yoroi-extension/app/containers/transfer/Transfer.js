@@ -24,7 +24,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class Transfer extends Component<AllProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| children: void |} = {
     children: undefined,
   };

@@ -104,7 +104,7 @@ export function compareNumbers(x: string, y: string, newSortDirection: string): 
 }
 @observer
 export default class AssetsList extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     assetsList: [...this.props.assetsList],
     sortingDirection: null,

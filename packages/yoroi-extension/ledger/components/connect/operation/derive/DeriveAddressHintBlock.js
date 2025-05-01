@@ -42,7 +42,7 @@ type Props = {|
 
 @observer
 export default class DeriveAddressHintBlock extends React.Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const {
       deviceCode,

@@ -51,7 +51,7 @@ const messages = defineMessages({
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   constructor(props: Props) {
     super(props);
     // eslint-disable-next-line react/state-in-constructor

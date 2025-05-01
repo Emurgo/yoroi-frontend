@@ -131,7 +131,7 @@ const messages = defineMessages({
 
 @observer
 export default class WalletSendPreviewStep extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     passwordError: null,
     txError: null,

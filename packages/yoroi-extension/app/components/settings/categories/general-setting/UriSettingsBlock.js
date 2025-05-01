@@ -17,7 +17,7 @@ type Props = {|
 export default class UriSettingsBlock extends Component<Props> {
   @observable hasPressed: boolean = false;
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 

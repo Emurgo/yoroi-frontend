@@ -46,7 +46,7 @@ const SListItem = styled(ListItem)(({ theme }) => ({
 
 @observer
 export default class ExportPublicKeyDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 

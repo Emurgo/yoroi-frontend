@@ -60,7 +60,7 @@ type State = {|
 
 @observer
 export default class NightlyForm extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     acknowledgedRisks: false,
   };

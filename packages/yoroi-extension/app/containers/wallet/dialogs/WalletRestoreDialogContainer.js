@@ -43,7 +43,7 @@ type LocalProps = {|
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| introMessage: void |} = {
     introMessage: undefined,
   };

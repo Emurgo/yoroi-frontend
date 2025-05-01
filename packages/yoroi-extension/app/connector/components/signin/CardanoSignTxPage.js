@@ -132,7 +132,7 @@ type DisplayAmount = {|
 
 @observer
 class SignTxPage extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };

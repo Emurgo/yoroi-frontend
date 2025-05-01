@@ -67,7 +67,7 @@ type Props = {|
 
 @observer
 export default class AddWalletDetailsStep extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount(): void {
     if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
       this.props.openDialog(WalletNameAndPasswordTipsDialog);

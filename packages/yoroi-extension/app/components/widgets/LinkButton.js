@@ -23,7 +23,7 @@ export default class LinkButton extends Component<Props> {
     svgClass: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { url, svg, message, svgClass, onExternalLinkClick, componentId } = this.props;

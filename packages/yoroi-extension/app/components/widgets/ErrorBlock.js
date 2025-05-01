@@ -16,7 +16,7 @@ type Props = {|
 
 @observer
 export default class ErrorBlock extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { error, parentId } = this.props;

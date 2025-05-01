@@ -65,7 +65,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   generatePlate(title: string, plate: WalletChecksum): Node {
     return (
       <Box key={title}>

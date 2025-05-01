@@ -61,7 +61,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {

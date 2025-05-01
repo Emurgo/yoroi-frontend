@@ -265,7 +265,7 @@ type State = {|
 
 @observer
 export default class WalletSendFormRevamp extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,

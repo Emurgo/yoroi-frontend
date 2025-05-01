@@ -123,7 +123,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddTokenDialog extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     currentTokensList: [],
     fullTokensList: [],

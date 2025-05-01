@@ -21,7 +21,7 @@ type Props = {|
 
 @observer
 export default class SidebarRevamp extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|
     categories: void,
     children: void,

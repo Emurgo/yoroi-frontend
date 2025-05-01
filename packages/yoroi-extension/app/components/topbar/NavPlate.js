@@ -25,7 +25,7 @@ type Props = {|
 @observer
 export default class NavPlate extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = (walletType) => {
     if (walletType === 'ledger') {
       return globalMessages.ledgerWallet;

@@ -34,7 +34,7 @@ type Props = {|
 @observer
 export default class YoroiPaperWalletFormPage extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   @observable mnemonicForm: void | ReactToolboxMobxForm;
   @observable paperPasswordForm: void | ReactToolboxMobxForm;
 

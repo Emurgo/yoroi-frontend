@@ -20,7 +20,7 @@ type Props = {|
 
 @observer
 export default class LoadingSpinner extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   root: ?HTMLElement;
 

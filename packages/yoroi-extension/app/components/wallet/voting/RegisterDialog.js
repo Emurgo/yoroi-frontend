@@ -35,7 +35,9 @@ type Props = {|
 
 @observer
 export default class RegisterDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
+
+  @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {

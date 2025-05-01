@@ -251,7 +251,7 @@ type State = {|
 
 @observer
 export default class Transaction extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isExpanded: false,
   };

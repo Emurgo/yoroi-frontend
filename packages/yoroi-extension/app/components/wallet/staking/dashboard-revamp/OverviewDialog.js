@@ -52,7 +52,7 @@ type Props = {|
 
 @observer
 export default class OverviewModal extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { withdrawRewards, onClose, totalRewards } = this.props;

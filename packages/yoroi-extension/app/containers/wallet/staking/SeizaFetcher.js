@@ -121,7 +121,7 @@ export default class SeizaFetcher extends Component<Props> {
     window.removeEventListener('message', this.messageHandler);
   }
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { urlTemplate, locale, bias, totalAda } = this.props;
 

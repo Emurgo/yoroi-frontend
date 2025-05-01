@@ -25,7 +25,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class ResyncWalletDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.clearHistory.reset();
   }

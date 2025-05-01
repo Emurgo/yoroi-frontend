@@ -32,7 +32,7 @@ type State = {|
 
 @observer
 export default class OptionBlock extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| learnMoreText: void |} = {
     learnMoreText: undefined,
   };

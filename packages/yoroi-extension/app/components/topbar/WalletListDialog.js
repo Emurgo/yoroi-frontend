@@ -76,7 +76,7 @@ type State = {|
 
 @observer
 export default class WalletListDialog extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   state: State = {
     selectedWalletId: null,

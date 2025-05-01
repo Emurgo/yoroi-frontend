@@ -70,7 +70,7 @@ type State = {|
 
 @observer
 class AddCollateralPage extends Component<Props, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };

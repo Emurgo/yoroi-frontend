@@ -18,7 +18,7 @@ const VotingPageContent = lazy(VotingPageContentPromise);
 
 @observer
 export default class VotingPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { stores } = this.props;

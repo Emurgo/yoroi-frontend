@@ -17,7 +17,7 @@ type Props = {|
 @observer
 export default class ProgressStepBlock extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stepsList, progressInfo } = this.props;

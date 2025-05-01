@@ -54,7 +54,7 @@ type Props = {|
 @observer
 export default class URIVerifyDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { onCancel, onSubmit, unitOfAccountSetting, } = this.props;
     const intl = this.context;

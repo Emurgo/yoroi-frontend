@@ -22,7 +22,7 @@ type Props = {|
 
 @observer
 export default class NoWalletMessage extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 

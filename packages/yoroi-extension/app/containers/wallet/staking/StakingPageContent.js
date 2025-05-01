@@ -35,7 +35,7 @@ type State = {|
 
 @observer
 export default class StakingPageContent extends Component<StoresProps, State> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     govStatusFetched: false,
   };

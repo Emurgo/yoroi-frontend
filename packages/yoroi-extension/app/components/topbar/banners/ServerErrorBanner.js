@@ -26,7 +26,7 @@ type Props = {| +errorType: ServerStatusErrorType, |};
 @observer
 export default class ServerErrorBanner extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const {
       errorType

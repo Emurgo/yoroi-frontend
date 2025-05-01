@@ -37,7 +37,7 @@ export type Props = {|
 
 @observer
 export default class ReceiveNavigationRevamp extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   genTooltip: AddressStoreSubset => Node = store => {
     const intl = this.context;
     return <InfoTooltip content={intl.formatMessage(addressGroupsTooltip[store.name.group])}/>

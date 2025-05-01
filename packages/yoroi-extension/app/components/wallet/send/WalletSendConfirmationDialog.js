@@ -56,7 +56,7 @@ type Props = {|
 @observer
 export default class WalletSendConfirmationDialog extends Component<Props> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletPassword: {

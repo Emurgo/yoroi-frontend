@@ -32,7 +32,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   @observable isChecked: boolean = false;
 
   @action

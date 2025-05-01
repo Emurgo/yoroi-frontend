@@ -42,7 +42,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| menu: void |} = {
     menu: undefined,
   };

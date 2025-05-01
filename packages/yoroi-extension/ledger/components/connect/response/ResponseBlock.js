@@ -22,7 +22,7 @@ type Props = {|
 
 @observer
 export default class ResponseBlock extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   root: ?HTMLElement;
 
   render(): Node {

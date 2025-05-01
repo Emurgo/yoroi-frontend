@@ -38,7 +38,7 @@ type Props = {|
 
 @observer
 export default class GeneratePinDialog extends Component<Props> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stepsList, progressInfo, next, cancel, pin } = this.props;

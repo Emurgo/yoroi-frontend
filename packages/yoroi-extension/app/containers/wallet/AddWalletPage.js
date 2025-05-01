@@ -27,7 +27,7 @@ import { ampli } from '../../../ampli/index';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
       this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });

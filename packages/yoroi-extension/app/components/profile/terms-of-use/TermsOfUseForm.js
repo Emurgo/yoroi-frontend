@@ -44,7 +44,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     areTermsOfUseAccepted: false,
     showing: 'form',

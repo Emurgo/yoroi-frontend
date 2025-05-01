@@ -451,7 +451,7 @@ class AmountInput extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const intl = this.context;
@@ -500,7 +500,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const intl = this.context;

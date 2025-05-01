@@ -22,7 +22,7 @@ type Props = {|
 @observer
 export default class UnmangleTxDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
-  static contextType = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount() {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) {
