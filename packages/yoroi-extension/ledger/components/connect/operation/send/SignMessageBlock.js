@@ -2,7 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import yoroiIcon from '../../../../assets/img/yoroi.svg';
 import hardwareWalletsIllustration from '../../../../assets/img/illustration-hardware-extension.svg';
@@ -32,10 +32,7 @@ type Props = {|
 
 @observer
 export default class SendTxHintBlock extends React.Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const intl = this.context;
 
