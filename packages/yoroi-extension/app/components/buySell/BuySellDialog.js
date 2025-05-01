@@ -6,7 +6,7 @@ import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import { Box, Typography, styled } from '@mui/material';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
@@ -187,10 +187,7 @@ const dialogTitle = environment.isDev() || environment.isNightly() ? messages.di
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     isBuying: true,
     inputError: null,

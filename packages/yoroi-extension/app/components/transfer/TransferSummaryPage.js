@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import styles from './TransferSummaryPage.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -83,10 +83,7 @@ type Props = {|
 @observer
 export default class TransferSummaryPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { action, reaction } from 'mobx';
 import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { isValidMemoOptional } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -265,10 +265,7 @@ type State = {|
 
 @observer
 export default class WalletSendFormRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,

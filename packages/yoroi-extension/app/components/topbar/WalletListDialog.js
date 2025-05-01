@@ -7,7 +7,7 @@ import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { BigNumber } from 'bignumber.js';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ReactComponent as IconEyeOpen } from '../../assets/images/my-wallets/icon_eye_opened_revamp.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../assets/images/my-wallets/icon_eye_closed_revamp.inline.svg';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -76,9 +76,8 @@ type State = {|
 
 @observer
 export default class WalletListDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType = IntlContext;
+
   state: State = {
     selectedWalletId: null,
   };

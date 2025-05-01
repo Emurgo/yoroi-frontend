@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import DialogCloseButton from '../../../../components/widgets/DialogCloseButton';
 import Dialog from '../../../../components/widgets/Dialog';
@@ -25,10 +25,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class RegisterDialogContainer extends Component<AllProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { submit, cancel, onError, stepsList, stores } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;

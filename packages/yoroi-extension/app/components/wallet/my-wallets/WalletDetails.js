@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
@@ -31,10 +31,7 @@ export default class WalletDetails extends Component<Props> {
     infoText: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const {

@@ -10,7 +10,7 @@ import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import { ReactComponent as DeleteIcon } from '../../../assets/images/revamp/delete.inline.svg';
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Box, Typography, styled } from '@mui/material';
 import { constructPlate40 } from '../../topbar/WalletCard';
@@ -33,10 +33,7 @@ type State = {|
 |};
 
 export default class WalletRowRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     showDeleteIcon: false,
   };

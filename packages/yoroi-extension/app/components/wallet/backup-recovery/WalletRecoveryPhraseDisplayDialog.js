@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -35,10 +35,7 @@ type Props = {|
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const {

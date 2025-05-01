@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './OptForAnalyticsForm.scss';
 import tosStyles from './TermsOfUseText.scss';
@@ -85,10 +85,7 @@ type State = {|
 
 @observer
 export default class OptForAnalyticsForm extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = { isSubmitting: false, showPrivacyNotice: false };
 
   onOpt: boolean => void = isOptIn => {

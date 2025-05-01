@@ -1,5 +1,5 @@
 import { Typography, Box, Button } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
@@ -27,10 +27,7 @@ const messages = defineMessages({
 });
 
 export default class PagePreparation extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     return (
       <Box

@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { join } from 'lodash';
 import { action, observable } from 'mobx';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
@@ -34,10 +34,7 @@ type Props = {|
 @observer
 export default class YoroiPaperWalletFormPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
   @observable mnemonicForm: void | ReactToolboxMobxForm;
   @observable paperPasswordForm: void | ReactToolboxMobxForm;
 

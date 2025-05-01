@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
-import { intlShape, } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -50,10 +50,7 @@ type LocalProps = {|
 @observer
 export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };

@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -41,10 +41,7 @@ const messages = defineMessages({
 @observer
 export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   submit: {|
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|

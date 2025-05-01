@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import moment from 'moment';
 import styles from './WalletTransactionsListRevamp.scss';
@@ -57,10 +57,7 @@ type Props = {|
 
 @observer
 export default class WalletTransactionsListRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount(): void {
     this.localizedDateFormat = moment.localeData().longDateFormat('LL');

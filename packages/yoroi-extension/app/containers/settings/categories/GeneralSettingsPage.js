@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import GeneralSettings from '../../../components/settings/categories/general-setting/GeneralSettings';
 import ThemeSettingsBlock from '../../../components/settings/categories/general-setting/ThemeSettingsBlock';
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
@@ -64,10 +64,7 @@ const canUseSandbox = environment.isDev() || environment.isNightly();
 
 @observer
 export default class GeneralSettingsPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   componentDidMount() {
     const request = this.props.stores.wallets.getCashbackWalletRequest;
     request.reset();

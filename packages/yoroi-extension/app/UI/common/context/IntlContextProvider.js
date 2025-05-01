@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { intlShape, IntlProvider } from 'react-intl';
+import { IntlContext, IntlProvider } from 'react-intl';
 import { IntlProvider as IntlCustomProvider } from '../../context/IntlProvider';
 
 export class IntlContextProvider extends React.Component {
@@ -7,10 +7,7 @@ export class IntlContextProvider extends React.Component {
     children: undefined,
   };
 
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render() {
     const { children } = this.props;
     const { intl } = this.context;

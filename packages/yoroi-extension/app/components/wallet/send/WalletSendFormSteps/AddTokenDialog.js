@@ -9,7 +9,7 @@ import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/datab
 import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { Typography, Box, styled } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -123,10 +123,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddTokenDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     currentTokensList: [],
     fullTokensList: [],

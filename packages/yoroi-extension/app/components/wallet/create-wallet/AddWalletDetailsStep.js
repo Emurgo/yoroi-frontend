@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import StepController from './StepController';
@@ -67,10 +67,7 @@ type Props = {|
 
 @observer
 export default class AddWalletDetailsStep extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   componentDidMount(): void {
     if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
       this.props.openDialog(WalletNameAndPasswordTipsDialog);

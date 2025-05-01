@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -54,10 +54,7 @@ type Props = {|
 
 @observer
 export default class SupportSettings extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
     const { intl } = this.context;

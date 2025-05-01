@@ -3,7 +3,7 @@ import type { Node } from 'react';
 /* eslint-disable no-nested-ternary */
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -124,10 +124,7 @@ type Props = {|
 
 @observer
 export default class ConnectPage extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {

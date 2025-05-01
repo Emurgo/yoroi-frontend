@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -88,10 +88,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class CheckDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;

@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { messages } from '../../../components/wallet/settings/ResyncBlock';
 import globalMessages from '../../../i18n/global-messages';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
@@ -25,10 +25,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class ResyncWalletDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.clearHistory.reset();
   }

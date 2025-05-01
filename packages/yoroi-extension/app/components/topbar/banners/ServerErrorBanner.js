@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import styles from './ServerErrorBanner.scss';
 import { ReactComponent as WarningSvg }  from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
@@ -26,10 +26,7 @@ type Props = {| +errorType: ServerStatusErrorType, |};
 @observer
 export default class ServerErrorBanner extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const {
       errorType

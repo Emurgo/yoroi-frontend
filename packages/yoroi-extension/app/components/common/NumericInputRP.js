@@ -8,7 +8,7 @@ import { escapeRegExp } from 'lodash/string';
 import React, { Component } from 'react';
 import BigNumber, { BigNumber as BigNumberType } from 'bignumber.js';
 import type { ElementRef, Node, Ref } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
@@ -451,10 +451,7 @@ class AmountInput extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const { intl } = this.context;
@@ -503,10 +500,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const { intl } = this.context;

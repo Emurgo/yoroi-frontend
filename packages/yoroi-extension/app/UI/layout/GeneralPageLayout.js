@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import * as React from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
@@ -18,10 +18,7 @@ export default class GeneralPageLayout extends React.Component {
     children: undefined,
   };
 
-  static contextTypes = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render() {
     const { children, navbar, stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;

@@ -3,7 +3,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { action, observable } from 'mobx';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import environment from '../../../environment';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
@@ -121,10 +121,7 @@ export default class SeizaFetcher extends Component<Props> {
     window.removeEventListener('message', this.messageHandler);
   }
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { urlTemplate, locale, bias, totalAda } = this.props;
 

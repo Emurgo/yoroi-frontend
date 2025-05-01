@@ -1,7 +1,7 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
@@ -30,10 +30,7 @@ const StakingPageContent = lazy(StakingPageContentPromise);
 
 @observer
 class StakingPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;

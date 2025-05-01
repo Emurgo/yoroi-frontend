@@ -8,7 +8,7 @@ import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SidebarContainer from '../SidebarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { matchPath } from 'react-router';
 import type { StoresProps } from '../../stores';
@@ -26,9 +26,8 @@ const messages = defineMessages({
 });
 @observer
 export default class NFTsWrapper extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType = IntlContext;
+
   static defaultProps: {| children: void |} = {
     children: undefined,
   };

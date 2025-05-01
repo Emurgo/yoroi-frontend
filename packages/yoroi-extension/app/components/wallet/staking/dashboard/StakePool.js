@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { toSvg } from 'jdenticon';
 
 import { Button } from '@mui/material';
@@ -99,10 +99,7 @@ type Props = {|
 
 @observer
 export default class StakePool extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
 

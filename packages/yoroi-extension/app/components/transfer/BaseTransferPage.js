@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
@@ -26,10 +26,7 @@ export default class BaseTransferPage extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { onBack, step0 } = this.props;

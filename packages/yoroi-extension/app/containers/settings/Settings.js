@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import SettingsMenu from '../../components/settings/menu/SettingsMenu';
 import BannerContainer from '../banners/BannerContainer';
@@ -26,10 +26,7 @@ export default class Settings extends Component<AllProps> {
     children: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   isActivePage: string => boolean = route => {
     const { currentRoute } = this.props.stores.routing;
     if (route && currentRoute) {

@@ -3,7 +3,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography, Box, Button, styled } from '@mui/material';
@@ -44,10 +44,7 @@ type Props = {|
 
 @observer
 export default class AddWalletPageHeader extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { goToCurrentWallet, hasAnyWallets } = this.props;

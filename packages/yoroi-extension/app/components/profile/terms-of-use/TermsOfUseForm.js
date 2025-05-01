@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, FormattedMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';
 import globalMessages from '../../../i18n/global-messages';
@@ -44,10 +44,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     areTermsOfUseAccepted: false,
     showing: 'form',

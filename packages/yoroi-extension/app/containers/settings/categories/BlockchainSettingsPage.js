@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
 import registerProtocols from '../../../uri-protocols';
@@ -15,10 +15,7 @@ import type { StoresProps } from '../../../stores';
 
 @observer
 export default class BlockchainSettingsPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { selected } = stores.wallets;

@@ -9,7 +9,7 @@ import {
   splitAmount,
 } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
 import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet';
@@ -51,10 +51,7 @@ const messages = defineMessages({
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   constructor(props: Props) {
     super(props);
     // eslint-disable-next-line react/state-in-constructor

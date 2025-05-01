@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../common/TextField';
 import Autocomplete from '../common/Autocomplete';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -86,10 +86,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     introMessage: '',
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
   getInitRecoveryPhrase: void => Array<string> = () => {
     if (this.props.initValues) {
       const str: string = (this.props.initValues.recoveryPhrase || '').trim();

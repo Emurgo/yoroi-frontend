@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 
 import LocalizableError from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
@@ -16,10 +16,7 @@ type Props = {|
 
 @observer
 export default class ErrorBlock extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { error, parentId } = this.props;

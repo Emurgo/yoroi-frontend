@@ -4,7 +4,7 @@ import type { Notification } from '../../../types/notification.types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { Box, Typography, styled } from '@mui/material';
@@ -53,10 +53,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   submit: void => Promise<void> = async () => {
     await this.props.onGenerateAddress();
   };

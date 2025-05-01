@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
@@ -29,10 +29,7 @@ type Props = {|
 
 @observer
 export default class BaseWarningDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
 
   render(): Node {
     const { intl } = this.context;

@@ -10,7 +10,7 @@ import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriv
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { truncateAddress } from '../../../utils/formatters';
@@ -62,10 +62,7 @@ type Props = {|
 
 @observer
 export default class VerifyAddressDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
 

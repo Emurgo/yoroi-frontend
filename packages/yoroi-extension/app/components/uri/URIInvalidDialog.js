@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -48,10 +48,7 @@ type Props = {|
 @observer
 export default class URIInvalidDialog extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { onClose, onSubmit, address } = this.props;
 

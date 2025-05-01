@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
@@ -20,10 +20,7 @@ type Props = {|
 |};
 
 export default class MaxAssetsError extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
 

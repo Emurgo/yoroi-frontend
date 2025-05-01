@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import TextField from '../../common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -55,10 +55,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     isActive: false,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   validator: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {

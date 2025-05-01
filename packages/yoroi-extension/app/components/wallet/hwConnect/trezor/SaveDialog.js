@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import TextField from '../../../common/TextField';
 
@@ -54,10 +54,7 @@ type Props = {|
 
 @observer
 export default class SaveDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType = IntlContext;
   form: ReactToolboxMobxForm;
 
   // eslint-disable-next-line camelcase

@@ -9,7 +9,7 @@ import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -69,10 +69,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     isBannerVisible: false,
   };

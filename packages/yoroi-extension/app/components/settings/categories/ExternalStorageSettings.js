@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
@@ -37,10 +37,7 @@ type Props = {|
 
 @observer
 export default class ExternalStorageSettings extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { onConnect, onDisconnect, externalStorageProviders, selectedExternalStorage } = this.props;
     const { intl } = this.context;

@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import styles from './AssetsList.scss';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -104,10 +104,7 @@ export function compareNumbers(x: string, y: string, newSortDirection: string): 
 }
 @observer
 export default class AssetsList extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     assetsList: [...this.props.assetsList],
     sortingDirection: null,

@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import ErrorPage from '../../components/transfer/ErrorPage';
 import globalMessages from '../../i18n/global-messages';
@@ -20,10 +20,7 @@ export default class YoroiTransferErrorPage extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { error, onCancel } = this.props;

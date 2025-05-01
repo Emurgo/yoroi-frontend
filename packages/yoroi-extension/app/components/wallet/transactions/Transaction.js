@@ -13,7 +13,7 @@ import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiTo
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
@@ -251,10 +251,7 @@ type State = {|
 
 @observer
 export default class Transaction extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     isExpanded: false,
   };

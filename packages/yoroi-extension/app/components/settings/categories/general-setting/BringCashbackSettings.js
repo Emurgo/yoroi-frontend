@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { MenuItem, Typography, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -52,10 +52,7 @@ class BringCashbackSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       cashbackWalletId: {

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { ReactComponent as ArrowUpIcon } from '../../../../assets/images/arrow-up.inline.svg';
 import { ReactComponent as ArrowDownIcon } from '../../../../assets/images/arrow-down.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { Box, Typography, styled } from '@mui/material';
@@ -115,10 +115,7 @@ type State = {|
 |};
 
 export default class AssetsDropdown extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     isTokensOpen: false,
     isNftsOpen: false,

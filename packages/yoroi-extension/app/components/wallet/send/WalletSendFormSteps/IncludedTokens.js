@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon } from '../../../../assets/images/forms/close-small.inline.svg';
@@ -31,10 +31,7 @@ type Props = {|
   +nfts: FormattedNFTDisplay[],
 |};
 export default class IncludedTokens extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   renderItems(items: FormattedNFTDisplay[] | FormattedTokenDisplay[]): Node {
     return items.map(item => {
       const numberOfDecimals = item.info?.Metadata.numberOfDecimals || 0;

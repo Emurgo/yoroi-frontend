@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletType } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { Box, Button, Typography, styled } from '@mui/material';
 import { ReactComponent as AppStoreBadge } from '../../../assets/images/app-store-badge.inline.svg';
 import { ReactComponent as PlayStoreBadge } from '../../../assets/images/google-play-badge.inline.svg';
@@ -87,10 +87,7 @@ const WarningWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class Voting extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     showDisclamer: true,
   };

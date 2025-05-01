@@ -10,7 +10,7 @@ import {
   addressSubgroupName,
 } from '../../types/AddressFilterTypes';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type {
   AddressSubgroupMeta,
   IAddressTypeStore,
@@ -45,10 +45,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletReceivePage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
-
-  @observable notificationElementId: string = '';
-
+  static contextType = IntlContext;
   componentWillUnmount() {
     this.closeNotification();
     this.resetErrors();

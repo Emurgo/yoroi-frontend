@@ -5,7 +5,7 @@ import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import classnames from 'classnames';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -35,10 +35,7 @@ type Props = {|
 
 @observer
 export default class RegisterDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-  @observable spendingPasswordForm: void | ReactToolboxMobxForm;
+  static contextType = IntlContext;
 
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {

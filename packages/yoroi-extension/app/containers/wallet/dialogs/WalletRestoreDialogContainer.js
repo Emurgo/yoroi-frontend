@@ -12,7 +12,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';
 import { TransferStatus } from '../../../types/TransferTypes';
@@ -43,10 +43,7 @@ type LocalProps = {|
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {| introMessage: void |} = {
     introMessage: undefined,
   };

@@ -8,7 +8,7 @@ import type { TokenEntry, TokenLookupKey } from '../../api/common/lib/MultiToken
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import { ReactComponent as VerifyIcon } from '../../assets/images/revamp/verify-icon.inline.svg';
 import { ReactComponent as GenerateURIIcon } from '../../assets/images/revamp/generate-uri.inline.svg';
@@ -87,10 +87,7 @@ type Props = {|
 
 @observer
 export default class WalletReceiveRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-  locationId: string = 'wallet:receive:infoPanel:footer';
+  static contextType = IntlContext;
 
   getAmount: TokenEntry => ?Node = tokenEntry => {
     if (this.props.shouldHideBalance) {

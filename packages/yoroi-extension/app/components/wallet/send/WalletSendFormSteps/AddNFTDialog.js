@@ -7,7 +7,7 @@ import type { TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { ReactComponent as SearchIcon } from '../../../../assets/images/assets-page/search.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-nfts.inline.svg';
@@ -87,10 +87,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddNFTDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   componentDidMount(): void {
     const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
     const nftsList = getNFTs(spendableBalance, getTokenInfo);

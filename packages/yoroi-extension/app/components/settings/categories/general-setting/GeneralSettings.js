@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Box, Typography } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
@@ -42,10 +42,7 @@ export default class GeneralSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   selectLanguage: string => Promise<void> = async locale => {
     await this.props.onSelectLanguage({ locale });
   };

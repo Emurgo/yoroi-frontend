@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer } from 'recharts';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import styles from './GraphWrapper.scss';
 import CardShadow from './CardShadow';
@@ -230,10 +230,7 @@ type State = {|
 
 @observer
 export default class GraphWrapper extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     selectedTab: 0,
   }

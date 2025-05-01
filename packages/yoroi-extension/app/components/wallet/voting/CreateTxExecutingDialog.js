@@ -1,7 +1,7 @@
 // @flow
 
 import { Component } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import Dialog from '../../widgets/Dialog';
@@ -15,10 +15,7 @@ type Props = {|
 
 @observer
 export default class CreateTxExecutingDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     return (

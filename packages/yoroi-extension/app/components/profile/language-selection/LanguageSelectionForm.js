@@ -6,7 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, Typography } from '@mui/material';
 import Select from '../../common/Select';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { FormattedMessage, intlShape } from 'react-intl';
+import { FormattedMessage, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -40,10 +40,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   selectLanguage: string => void = locale => {
     this.props.onSelectLanguage({ locale });
   };

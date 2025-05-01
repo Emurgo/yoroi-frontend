@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, } from 'react-intl';
+import { IntlContext, defineMessages, } from 'react-intl';
 import styles from './IncorrectTimeBanner.scss';
 import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -30,10 +30,7 @@ type Props = {|
 @observer
 export default class IncorrectTimeBanner extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
 

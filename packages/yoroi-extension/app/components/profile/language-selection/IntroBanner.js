@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { ReactComponent as YoroiRevampLogo } from '../../../assets/images/yoroi-logo-revamp-blue.inline.svg';
 import {
   ReactComponent as YoroiRevampNightlyLogo
@@ -17,10 +17,7 @@ type Props = {|
 
 @observer
 export default class IntroBanner extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   getRevampLogo: void => string = () => {
     if (this.props.isNightly) return YoroiRevampNightlyLogo;
     return YoroiRevampLogo;

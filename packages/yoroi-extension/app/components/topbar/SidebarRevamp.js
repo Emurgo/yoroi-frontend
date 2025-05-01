@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { Box, Button, styled } from '@mui/material';
 import { ReactComponent as YoroiLogo } from '../../assets/images/sidebar/revamp/yoroi-logo.inline.svg';
 import SideBarCategoryRevamp from './SideBarCategoryRevamp';
@@ -21,10 +21,7 @@ type Props = {|
 
 @observer
 export default class SidebarRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {|
     categories: void,
     children: void,

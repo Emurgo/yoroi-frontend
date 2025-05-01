@@ -5,7 +5,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as CalendarIcon } from '../../../assets/images/calendar-24.inline.svg';
 import { styled, Box, TextField } from '@mui/material';
@@ -55,10 +55,7 @@ const OpenPickerIcon = () => (
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { date, setStartDate, setEndDate, initialId } = this.props;

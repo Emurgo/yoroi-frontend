@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
 import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
@@ -26,10 +26,7 @@ type Props = {|
 @observer
 export default class TestnetWarningBanner extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): null | Node {
     if (environment.isNightly()) {
       return (

@@ -9,7 +9,7 @@ import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/Mult
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type LocalizableError from '../../../../i18n/LocalizableError';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../../utils/unit-of-account';
 import { truncateToken } from '../../../../utils/formatters';
@@ -131,10 +131,7 @@ const messages = defineMessages({
 
 @observer
 export default class WalletSendPreviewStep extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     passwordError: null,
     txError: null,

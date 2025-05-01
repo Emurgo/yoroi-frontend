@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TopBar from '../../components/topbar/TopBar';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
@@ -22,10 +22,7 @@ const messages = defineMessages({
 
 @observer
 export default class ComplexityLevelPage extends Component<StoresProps> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;

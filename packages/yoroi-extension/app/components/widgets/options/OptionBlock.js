@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import classnames from 'classnames';
 
 import globalMessages from '../../../i18n/global-messages';
@@ -32,10 +32,7 @@ type State = {|
 
 @observer
 export default class OptionBlock extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {| learnMoreText: void |} = {
     learnMoreText: undefined,
   };

@@ -36,10 +36,7 @@ type Props = {|
 
 @observer
 export default class WalletInfo extends Component<Props> {
-  static contextTypes: {| infoText: void |} = {
-    infoText: undefined,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { shouldHideBalance, onUpdateHideBalance, walletAmount, conceptualWalletName } = this.props;
 

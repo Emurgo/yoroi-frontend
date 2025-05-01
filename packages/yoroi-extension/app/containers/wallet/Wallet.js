@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import BannerContainer from '../banners/BannerContainer';
@@ -38,10 +38,7 @@ type Props = {|
 
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {

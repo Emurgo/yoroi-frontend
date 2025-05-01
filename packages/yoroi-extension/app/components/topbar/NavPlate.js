@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import styles from './NavPlate.scss';
 import { ReactComponent as ConceptualIcon }  from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
 import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
@@ -25,10 +25,7 @@ type Props = {|
 @observer
 export default class NavPlate extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = (walletType) => {
     if (walletType === 'ledger') {
       return globalMessages.ledgerWallet;

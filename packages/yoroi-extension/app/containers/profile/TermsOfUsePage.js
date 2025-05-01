@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
@@ -15,10 +15,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class TermsOfUsePage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;

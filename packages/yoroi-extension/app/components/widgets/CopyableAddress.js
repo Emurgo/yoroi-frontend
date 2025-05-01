@@ -2,7 +2,7 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { Node } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg';
@@ -45,10 +45,7 @@ type Props = {|
 
 @observer
 export default class CopyableAddress extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   static defaultProps: {|
     darkVariant: boolean,
     elementId: void,

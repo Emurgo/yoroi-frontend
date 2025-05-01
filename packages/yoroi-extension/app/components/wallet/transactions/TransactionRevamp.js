@@ -14,7 +14,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
@@ -78,11 +78,7 @@ type State = {|
 
 @observer
 export default class TransactionRevamp extends Component<Props, State> {
-  static contextTypes: {|
-    intl: $npm$ReactIntl$IntlFormat,
-  |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType = IntlContext;
 
   state: State = {
     isExpanded: false,

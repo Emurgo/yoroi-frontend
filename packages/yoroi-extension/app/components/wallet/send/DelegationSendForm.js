@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Stack, Typography } from '@mui/material';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../../widgets/BorderedBox';
@@ -61,10 +61,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {

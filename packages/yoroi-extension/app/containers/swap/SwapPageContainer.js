@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import globalMessages from '../../i18n/global-messages';
 import SwapMenu from '../../components/swap/SwapMenu';
@@ -42,10 +42,7 @@ export default class SwapPageContainer extends Component<AllProps> {
     children: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   isActivePage: string => boolean = route => {
     const { currentRoute } = this.props.stores.routing;
     if (currentRoute) {

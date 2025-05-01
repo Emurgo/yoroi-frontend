@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
@@ -51,10 +51,7 @@ type Props = {|
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   getAmountLabel: () => string = (): string => {
     const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
       currency: truncateToken(getTokenName(this.props.tokenInfo)),

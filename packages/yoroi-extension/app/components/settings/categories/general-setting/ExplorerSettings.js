@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Box, Typography } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './ExplorerSettings.scss';
@@ -38,10 +38,7 @@ export default class ExplorerSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   selectExplorer: (string) => Promise<void> = async explorerId => {
     await this.props.onSelectExplorer({ explorerId });
   };

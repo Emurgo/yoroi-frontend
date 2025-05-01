@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, FormattedMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletRestoreVerifyDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
@@ -65,10 +65,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   generatePlate(title: string, plate: WalletChecksum): Node {
     return (
       <Box key={title}>

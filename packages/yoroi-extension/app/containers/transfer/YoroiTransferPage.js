@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
@@ -28,10 +28,7 @@ const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 @observer
 export default class YoroiTransferPage extends Component<StoresProps> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   goToCreateWallet: void => void = () => {
     this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
   }

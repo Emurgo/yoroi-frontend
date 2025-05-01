@@ -4,7 +4,7 @@ import moment from 'moment';
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -35,10 +35,7 @@ type State = {|
 
 @observer
 export default class StakingPageContent extends Component<StoresProps, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     govStatusFetched: false,
   };

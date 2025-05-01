@@ -17,7 +17,7 @@ import type {
 } from '../../types';
 import type LocalizableError from '../../../i18n/LocalizableError';
 import { Component } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -132,10 +132,7 @@ type DisplayAmount = {|
 
 @observer
 class SignTxPage extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   state: State = {
     isSubmitting: false,
   };

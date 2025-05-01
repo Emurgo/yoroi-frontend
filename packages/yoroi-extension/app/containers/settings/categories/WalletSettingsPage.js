@@ -16,17 +16,14 @@ import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { Typography } from '@mui/material';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 // $FlowIgnore: suppressing this error
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { stores } = this.props;

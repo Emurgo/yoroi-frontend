@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, } from 'react-intl';
+import { defineMessages, IntlContext, } from 'react-intl';
 import { ReactComponent as ExternalLinkSVG }  from '../../assets/images/link-external.inline.svg';
 import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
@@ -27,10 +27,7 @@ type Props = {|
 @observer
 export default class Maintenance extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
 

@@ -4,7 +4,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import { Box, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
@@ -38,10 +38,7 @@ type Props = {|
 
 @observer
 export default class GeneratePinDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const { intl } = this.context;
     const { stepsList, progressInfo, next, cancel, pin } = this.props;

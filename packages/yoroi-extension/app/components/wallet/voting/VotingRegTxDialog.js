@@ -9,7 +9,7 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import classnames from 'classnames';
 
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -65,10 +65,7 @@ type Props = {|
 export default class VotingRegTxDialog extends Component<Props> {
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
     this.spendingPasswordForm = form;

@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -61,10 +61,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     showEyeIcon: true,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType = IntlContext;
   render(): Node {
     const {
       shouldHideBalance,

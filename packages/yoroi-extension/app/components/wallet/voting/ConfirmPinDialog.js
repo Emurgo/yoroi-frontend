@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
@@ -41,10 +41,7 @@ type Props = {|
 
 @observer
 export default class ConfirmPinDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-  @observable pinForm: void | ReactToolboxMobxForm;
+  static contextType = IntlContext;
 
   @action
   setPinForm(form: ReactToolboxMobxForm) {

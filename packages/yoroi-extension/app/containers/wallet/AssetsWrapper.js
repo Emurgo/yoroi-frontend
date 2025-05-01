@@ -9,7 +9,7 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import globalMessages from '../../i18n/global-messages';
 import SidebarContainer from '../SidebarContainer';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { StoresProps } from '../../stores';
 
 type Props = {|
@@ -18,9 +18,8 @@ type Props = {|
 |};
 @observer
 export default class AssetsWrapper extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType = IntlContext;
+
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
