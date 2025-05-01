@@ -2,8 +2,7 @@ import React, {useRef, useState} from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Icons, IconWrapper } from '../icons/index';
 import { Tooltip } from '../Tooltip';
-import { useIntl } from '../../context/IntlProvider';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -26,7 +25,7 @@ interface Props {
 
 export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
-  const { intl } = useIntl();
+  const intl = useIntl();
   const strings = useRef({
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
     copied: intl.formatMessage(messages.copied),

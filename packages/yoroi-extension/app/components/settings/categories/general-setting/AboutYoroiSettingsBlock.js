@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useCallback, useEffect } from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import styles from './AboutYoroiSettingsBlock.scss';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
@@ -25,8 +25,6 @@ import { IconWrapper, Icons } from '../../../../UI/components';
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-// $FlowIgnore[cannot-resolve-module]
-import { useIntl } from '../../../../UI/context/IntlProvider';
 
 const messages = defineMessages({
   aboutYoroiLabel: {

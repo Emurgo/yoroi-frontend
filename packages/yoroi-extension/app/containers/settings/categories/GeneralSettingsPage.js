@@ -21,8 +21,6 @@ import type { StoresProps } from '../../../stores';
 // $FlowIgnore[cannot-resolve-module]
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
 // $FlowIgnore[cannot-resolve-module]
-import { IntlProvider } from '../../../UI/context/IntlProvider';
-// $FlowIgnore[cannot-resolve-module]
 import { ModalManager } from '../../../UI/components/modals/ModalManager';
 
 const currencyLabels = defineMessages({
@@ -116,60 +114,58 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
     const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
     return (
-      <IntlProvider intl={intl}>
-        <ModalProvider>
-          <ModalManager />
-          <Box sx={{ pb: '50px' }}>
-            <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
-              {intl.formatMessage(settingsMenuMessages.general)}
-            </Typography>
-            <GeneralSettings
-              onSelectLanguage={stores.profile.updateLocale}
-              isSubmitting={isSubmittingLocale}
-              languages={profileStore.LANGUAGE_OPTIONS}
-              currentLocale={profileStore.currentLocale}
-              error={profileStore.setProfileLocaleRequest.error}
+      <ModalProvider>
+        <ModalManager />
+        <Box sx={{ pb: '50px' }}>
+          <Typography component="div" variant="h5" fontWeight={500} mb="24px" color="ds.text_gray_medium">
+            {intl.formatMessage(settingsMenuMessages.general)}
+          </Typography>
+          <GeneralSettings
+            onSelectLanguage={stores.profile.updateLocale}
+            isSubmitting={isSubmittingLocale}
+            languages={profileStore.LANGUAGE_OPTIONS}
+            currentLocale={profileStore.currentLocale}
+            error={profileStore.setProfileLocaleRequest.error}
+          />
+          <BringCashbackSettings
+            onSelect={this.onSelectBringCashbackWallet}
+            isSubmitting={false}
+            // $FlowFixMe this is apparently correct, flow is out of its mind
+            cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
+            // $FlowFixMe this is apparently correct, flow is out of its mind
+            currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
+            isUseSandbox={profileStore.getBringSandboxRequest.result}
+            onSetUseSandbox={
+              canUseSandbox
+                ? async useSandbox => {
+                  await profileStore.setBringSandboxRequest.execute(useSandbox);
+                  await profileStore.getBringSandboxRequest.execute();
+                }
+                : null
+            }
+            error={null}
+          />
+          {selectedWallet && (
+            <UnitOfAccountSettings
+              onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
+              isSubmitting={isSubmittingUnitOfAccount}
+              currencies={currencies}
+              currentValue={unitOfAccountValue}
+              error={profileStore.setUnitOfAccountRequest.error}
+              lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
             />
-            <BringCashbackSettings
-              onSelect={this.onSelectBringCashbackWallet}
-              isSubmitting={false}
-              // $FlowFixMe this is apparently correct, flow is out of its mind
-              cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
-              // $FlowFixMe this is apparently correct, flow is out of its mind
-              currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
-              isUseSandbox={profileStore.getBringSandboxRequest.result}
-              onSetUseSandbox={
-                canUseSandbox
-                  ? async useSandbox => {
-                    await profileStore.setBringSandboxRequest.execute(useSandbox);
-                    await profileStore.getBringSandboxRequest.execute();
-                  }
-                  : null
-              }
-              error={null}
-            />
-            {selectedWallet && (
-              <UnitOfAccountSettings
-                onSelect={val => this.onSelectUnitOfAccount(selectedWallet.networkId, val)}
-                isSubmitting={isSubmittingUnitOfAccount}
-                currencies={currencies}
-                currentValue={unitOfAccountValue}
-                error={profileStore.setUnitOfAccountRequest.error}
-                lastUpdatedTimestamp={coinPriceStore.lastUpdateTimestamp}
-              />
-            )}
-            <ThemeSettingsBlock />
-            <AboutYoroiSettingsBlock
-              wallet={stores.wallets.selected}
-              onSwitchNetwork={() =>
-                stores.uiDialogs.open({
-                  dialog: SwitchNetworkDialogContainer,
-                })
-              }
-            />
-          </Box>
-        </ModalProvider>
-      </IntlProvider>
+          )}
+          <ThemeSettingsBlock />
+          <AboutYoroiSettingsBlock
+            wallet={stores.wallets.selected}
+            onSwitchNetwork={() =>
+              stores.uiDialogs.open({
+                dialog: SwitchNetworkDialogContainer,
+              })
+            }
+          />
+        </Box>
+      </ModalProvider>
     );
 }
 }

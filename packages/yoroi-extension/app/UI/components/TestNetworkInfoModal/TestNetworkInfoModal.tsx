@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Stack, Typography } from '@mui/material';
-import { defineMessages } from 'react-intl';
-import { useIntl } from '../../context/IntlProvider';
+import { defineMessages, useIntl } from 'react-intl';
 
 const messages = defineMessages({
   subtitile: {
@@ -40,7 +39,7 @@ const messages = defineMessages({
 });
 
 export const TestNetworkInfoModal = ({ onClose }) => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return (
     <Stack>
       <Typography variant="body1" mb="24px">

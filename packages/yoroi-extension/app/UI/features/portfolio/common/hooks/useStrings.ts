@@ -1,7 +1,6 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import globalMessages from '../../../../../i18n/global-messages';
-import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -317,7 +316,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return React.useRef({
     mainHeaderText: intl.formatMessage(messages.mainHeaderText),
     detailHeaderText: intl.formatMessage(messages.detailHeaderText),

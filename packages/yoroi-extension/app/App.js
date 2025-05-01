@@ -21,11 +21,10 @@ import Support from './components/widgets/Support';
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
-// $FlowIgnore: suppressing this error
-import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
+import { IntlProvider } from 'react-intl';
 
 type Props = {|
   +stores: StoresMap,
@@ -144,10 +143,10 @@ class App extends Component<Props, State> {
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProviderWrapper locale={locale} messages={mergedMessages}>
+          <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProviderWrapper>
-        </ColorModeProvider>
+          </IntlProvider>
+      </ColorModeProvider>
       </div>
     );
   }
@@ -162,19 +161,17 @@ class App extends Component<Props, State> {
     }
     return (
       <HashRouter>
-        <IntlContextProvider>
-          <NotificationsProvider
-            walletsStore={stores.wallets}
-            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
-          >
-            <NotificationsManager />
-            <div style={{ height: '100%' }}>
-              <Support />
-              {YoroiRoutes(stores)}
-              <RoutingHelper stores={stores}/>
-            </div>
-          </NotificationsProvider>
-        </IntlContextProvider>
+        <NotificationsProvider
+          walletsStore={stores.wallets}
+          appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+        >
+          <NotificationsManager />
+          <div style={{ height: '100%' }}>
+            <Support />
+            {YoroiRoutes(stores)}
+            <RoutingHelper stores={stores}/>
+          </div>
+        </NotificationsProvider>
       </HashRouter>
     );
   };
