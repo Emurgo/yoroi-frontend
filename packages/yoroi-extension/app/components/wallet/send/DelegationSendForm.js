@@ -67,7 +67,7 @@ export default class DelegationSendForm extends Component<Props> {
     {
       fields: {
         poolId: {
-          label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
+          label: this.context.formatMessage(globalMessages.stakePoolHash),
           placeholder: '',
           value: '',
           validators: [
@@ -75,13 +75,13 @@ export default class DelegationSendForm extends Component<Props> {
               const poolIdValue = field.value;
               if (poolIdValue === '') {
                 this.props.updatePool(undefined);
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
               if (this.props.poolQueryError != null) {
                 return [false]; // no error message since container already displays one
               }
-              return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
+              return [isValid, this.context.formatMessage(messages.invalidPoolId)];
             },
           ],
         },

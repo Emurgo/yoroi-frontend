@@ -72,7 +72,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: this.context.intl.formatMessage(messages.revampInputLabel),
+        label: this.context.formatMessage(messages.revampInputLabel),
       },
     },
   });

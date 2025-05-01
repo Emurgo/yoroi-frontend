@@ -142,13 +142,13 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
+          label: this.context.formatMessage(globalMessages.walletPasswordLabel),
           placeholder: '',
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -178,7 +178,7 @@ export default class WalletSendPreviewStep extends Component<Props, State> {
           try {
             await this.props.onSubmit(transactionData);
           } catch (error) {
-            const errorMessage = this.context.intl.formatMessage(error, error.values);
+            const errorMessage = this.context.formatMessage(error, error.values);
             if (error instanceof IncorrectWalletPasswordError) {
               this.setState({ passwordError: errorMessage });
             } else {

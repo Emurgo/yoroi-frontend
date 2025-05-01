@@ -66,7 +66,7 @@ export default class ResyncBlock extends Component<Props> {
           }}
           id="settings:wallet-resyncWallet-button"
         >
-          {this.context.intl.formatMessage(globalMessages.resyncButtonLabel)}
+          {this.context.formatMessage(globalMessages.resyncButtonLabel)}
         </Button>
       </Box>
     );

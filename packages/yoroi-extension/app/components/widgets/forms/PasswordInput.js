@@ -54,16 +54,16 @@ export default class PasswordInput extends Component<Props> {
         validators: [({ field }) => {
           return [
             this.props.passwordMatches(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
+            this.context.formatMessage(globalMessages.invalidRepeatPassword)
           ];
         },
         ({ field }) => ([
           this.props.allowEmptyInput || field.value.length >= 0,
-          this.context.intl.formatMessage(globalMessages.fieldIsRequired)
+          this.context.formatMessage(globalMessages.fieldIsRequired)
         ]),
         ({ field }) => ([
           this.props.validCheck(field.value),
-          this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
+          this.context.formatMessage(globalMessages.invalidWalletPassword)
         ]),
         ],
       },

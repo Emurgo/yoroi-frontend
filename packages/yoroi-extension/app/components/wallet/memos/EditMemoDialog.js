@@ -52,13 +52,13 @@ export default class EditMemoDialog extends Component<Props, State> {
     fields: {
       memoContent: {
         type: 'memo',
-        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        label: this.context.formatMessage(memoMessages.memoLabel),
         placeholder: '',
         value: this.props.existingMemo.Content,
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
+            this.context.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
           ]
         )],
       },
@@ -113,7 +113,7 @@ export default class EditMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(globalMessages.save),
+        label: this.context.formatMessage(globalMessages.save),
         primary: true,
         onClick: this.submit,
         isSubmitting,

@@ -69,7 +69,7 @@ export default class ExportWallet extends Component<Props> {
           }}
           id="settings:wallet-exportWallet-button"
         >
-          {`${this.context.intl.formatMessage(globalMessages.exportButtonLabel)}`}
+          {`${this.context.formatMessage(globalMessages.exportButtonLabel)}`}
         </Button>
       </Box>
     );

@@ -56,7 +56,7 @@ export default class Settings extends Component<AllProps> {
             stores={stores}
             title={
               <NavBarTitle
-                title={this.context.intl.formatMessage(globalMessages.sidebarSettings)}
+                title={this.context.formatMessage(globalMessages.sidebarSettings)}
               />
             }
             menu={menu}

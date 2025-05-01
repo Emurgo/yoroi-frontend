@@ -529,7 +529,7 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.formatMessage(globalMessages.assets)}
       </div>
     );
   };

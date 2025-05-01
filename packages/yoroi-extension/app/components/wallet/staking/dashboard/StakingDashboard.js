@@ -86,7 +86,7 @@ render(): Node {
 
   const pendingTxWarningComponent = this.props.hasAnyPending ? (
     <div className={styles.warningBox}>
-      <WarningBox>{this.context.intl.formatMessage(messages.pendingTxWarning)}</WarningBox>
+      <WarningBox>{this.context.formatMessage(messages.pendingTxWarning)}</WarningBox>
     </div>
   ) : null;
 
@@ -96,9 +96,9 @@ render(): Node {
       {/* <GraphWrapper
             themeVars={this.props.themeVars}
             tabs={[
-              this.context.intl.formatMessage(messages.positionsLabel),
-              this.context.intl.formatMessage(globalMessages.marginsLabel),
-              this.context.intl.formatMessage(messages.costsLabel),
+              this.context.formatMessage(messages.positionsLabel),
+              this.context.formatMessage(globalMessages.marginsLabel),
+              this.context.formatMessage(messages.costsLabel),
             ]}
             graphName="positions"
             data={graphData.positionsGraphData}

@@ -32,10 +32,10 @@ export default class PaperPasswordInput extends Component<Props> {
       passwordMatches={this.props.passwordMatches}
       fieldName="paperPassword"
       validCheck={password => !this.props.includeLengthCheck || isValidPaperPassword(password)}
-      placeholder={this.context.intl.formatMessage(globalMessages.paperPasswordLabel)}
+      placeholder={this.context.formatMessage(globalMessages.paperPasswordLabel)}
       allowEmptyInput={false}
       initValues={this.props.initValues}
-      disclaimer={this.context.intl.formatMessage(globalMessages.passwordDisclaimer)}
+      disclaimer={this.context.formatMessage(globalMessages.passwordDisclaimer)}
     />);
   }
 }

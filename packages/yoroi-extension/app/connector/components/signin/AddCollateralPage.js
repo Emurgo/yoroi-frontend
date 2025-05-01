@@ -80,13 +80,13 @@ class AddCollateralPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          label: this.context.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -122,7 +122,7 @@ class AddCollateralPage extends Component<Props, State> {
                 this.form
                   .$('walletPassword')
                   .invalidate(
-                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                    this.context.formatMessage(messages.incorrectWalletPasswordError)
                   );
               } else {
                 throw error;

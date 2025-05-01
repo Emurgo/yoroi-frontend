@@ -50,7 +50,7 @@ export default class GeneralSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
+        label: this.context.formatMessage(messages.languageSelectLabel),
         value: this.props.currentLocale,
       },
     },

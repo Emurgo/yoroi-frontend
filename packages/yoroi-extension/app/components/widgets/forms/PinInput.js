@@ -51,16 +51,16 @@ export default class PinInput extends Component<Props> {
         validators: [({ field }) => {
           return [
             this.props.pinMatches(field.value),
-            this.context.intl.formatMessage(globalMessages.pinDoesNotMatch)
+            this.context.formatMessage(globalMessages.pinDoesNotMatch)
           ];
         },
         ({ field }) => ([
           this.props.allowEmptyInput || field.value.length >= 0,
-          this.context.intl.formatMessage(globalMessages.fieldIsRequired)
+          this.context.formatMessage(globalMessages.fieldIsRequired)
         ]),
         ({ field }) => ([
           this.props.validCheck(field.value),
-          this.context.intl.formatMessage(globalMessages.invalidPin)
+          this.context.formatMessage(globalMessages.invalidPin)
         ]),
         ],
       },

@@ -25,25 +25,25 @@ export default class MnemonicInput extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
+        label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: '',
         value: [],
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
           if (this.props.mnemonicLength != null) {
             const wordsLeft = this.props.mnemonicLength - field.value.length;
             if (wordsLeft > 0) {
               return [
                 false,
-                this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+                this.context.formatMessage(globalMessages.shortRecoveryPhrase,
                   { number: wordsLeft })
               ];
             }
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
+            this.context.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },

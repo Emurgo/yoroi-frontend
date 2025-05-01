@@ -58,7 +58,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
+        label: this.context.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
       },
       tosAgreement: {
@@ -112,7 +112,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
       }}>
         <div className={styles.centeredBox}>
           <Typography component="div" variant="h5" fontWeight={500} mb="24px" textAlign="center">
-            {this.context.intl.formatMessage(globalMessages.languageSelectLabelShort)}
+            {this.context.formatMessage(globalMessages.languageSelectLabelShort)}
           </Typography>
           <Select
             formControlProps={{ sx: { marginBottom: '25px' } }}

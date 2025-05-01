@@ -69,9 +69,9 @@ export default class ExternalStorageSettings extends Component<Props> {
     return (
       <div className={styles.component}>
         <Typography variant="h4" color="ds.text_gray_medium" mb="8px">
-          {this.context.intl.formatMessage(messages.sectionTitle)}
+          {this.context.formatMessage(messages.sectionTitle)}
         </Typography>
-        <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>
+        <div>{this.context.formatMessage(messages.sectionIntro)}</div>
         {providersButtons}
       </div>
     );

@@ -53,13 +53,13 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
       fields: {
         currentPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.currentPasswordLabel),
+          label: this.context.formatMessage(messages.currentPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.currentPasswordValue,
         },
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+          label: this.context.formatMessage(globalMessages.newPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.newPasswordValue,
           validators: [
@@ -70,14 +70,14 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
               }
               return [
                 isValidWalletPassword(field.value),
-                this.context.intl.formatMessage(globalMessages.invalidWalletPassword),
+                this.context.formatMessage(globalMessages.invalidWalletPassword),
               ];
             },
           ],
         },
         repeatPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+          label: this.context.formatMessage(globalMessages.repeatPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.repeatedPasswordValue,
           validators: [
@@ -86,7 +86,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
               if (walletPassword.length === 0) return [true];
               return [
                 isValidRepeatPassword(walletPassword, field.value),
-                this.context.intl.formatMessage(globalMessages.invalidRepeatPassword),
+                this.context.formatMessage(globalMessages.invalidRepeatPassword),
               ];
             },
           ],

@@ -59,13 +59,13 @@ export default class DeleteMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(globalMessages.cancel),
+        label: this.context.formatMessage(globalMessages.cancel),
         onClick: onCancel,
         disabled: isSubmitting,
       },
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.deleteMemoActionsDelete),
+        label: this.context.formatMessage(messages.deleteMemoActionsDelete),
         primary: true,
         onClick: () => onDelete(selectedTransaction.txid),
         isSubmitting,

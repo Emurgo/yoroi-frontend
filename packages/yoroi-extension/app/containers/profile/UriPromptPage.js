@@ -71,7 +71,7 @@ export default class UriPromptPage extends Component<StoresProps> {
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(globalMessages.uriSchemeLabel)} />
+      <StaticTopbarTitle title={this.context.formatMessage(globalMessages.uriSchemeLabel)} />
     );
     const topbarElement = (
       <TopBar

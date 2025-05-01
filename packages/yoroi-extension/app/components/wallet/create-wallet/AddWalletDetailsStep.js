@@ -78,15 +78,15 @@ export default class AddWalletDetailsStep extends Component<Props> {
     {
       fields: {
         walletName: {
-          label: this.context.intl.formatMessage(messages.enterWalletName),
+          label: this.context.formatMessage(messages.enterWalletName),
           value: '',
           validators: [
-            ({ field }) => [isValidWalletName(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletName)],
+            ({ field }) => [isValidWalletName(field.value), this.context.formatMessage(globalMessages.invalidWalletName)],
           ],
         },
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.enterPassword),
+          label: this.context.formatMessage(messages.enterPassword),
           value: '',
           validators: [
             ({ field, form }) => {
@@ -94,20 +94,20 @@ export default class AddWalletDetailsStep extends Component<Props> {
               if (repeatPasswordField.value.length > 0) {
                 repeatPasswordField.validate({ showErrors: true });
               }
-              return [isValidWalletPassword(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletPassword)];
+              return [isValidWalletPassword(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)];
             },
           ],
         },
         repeatPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
+          label: this.context.formatMessage(messages.repeatPasswordLabel),
           value: '',
           validators: [
             ({ field, form }) => {
               const walletPassword = form.$('walletPassword').value;
               return [
                 isValidRepeatPassword(walletPassword, field.value),
-                this.context.intl.formatMessage(globalMessages.invalidRepeatPassword),
+                this.context.formatMessage(globalMessages.invalidRepeatPassword),
               ];
             },
           ],

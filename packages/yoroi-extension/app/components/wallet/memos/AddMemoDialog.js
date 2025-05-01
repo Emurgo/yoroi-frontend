@@ -55,13 +55,13 @@ export default class AddMemoDialog extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       memoContent: {
-        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        label: this.context.formatMessage(memoMessages.memoLabel),
         placeholder: '',
         value: '',
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
+            this.context.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
           ]
         )],
       },
@@ -112,7 +112,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.addMemoActionsSubmit),
+        label: this.context.formatMessage(messages.addMemoActionsSubmit),
         primary: true,
         onClick: this.submit,
         isSubmitting,

@@ -26,7 +26,7 @@ export default class NightlyPage extends Component<StoresProps> {
 
   render(): Node {
     const topBartitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+      <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />
     );
     const topBar = <TopBar title={topBartitle} />;
     return (

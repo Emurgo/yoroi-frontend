@@ -163,7 +163,7 @@ export default class WalletSendPage extends Component<StoresProps> {
       <ModalProvider>
         <ModalManager />
         <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-          <ReviewTxProvider stores={stores} intl={this.context.intl}>
+          <ReviewTxProvider stores={stores} intl={this.context}>
             <ReviewTxModal />
             <WalletSendFormRevamp
               stores={this.props.stores}

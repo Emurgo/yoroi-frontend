@@ -53,7 +53,7 @@ type Props = {|
 export default class URIGenerateDialog extends Component<Props> {
   static contextType:any = IntlContext;
   getAmountLabel: () => string = (): string => {
-    const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
+    const label = this.context.formatMessage(messages.uriGenerateDialogAmountLabel, {
       currency: truncateToken(getTokenName(this.props.tokenInfo)),
     });
 
@@ -65,7 +65,7 @@ export default class URIGenerateDialog extends Component<Props> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.uriGenerateDialogAddressLabel),
+          label: this.context.formatMessage(messages.uriGenerateDialogAddressLabel),
           value: this.props.walletAddress,
         },
         amount: {
@@ -76,7 +76,7 @@ export default class URIGenerateDialog extends Component<Props> {
             async ({ field }) => {
               const amountValue: string = field.value;
               if (amountValue === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               const formattedAmount = new BigNumber(
                 formattedAmountToNaturalUnits(amountValue, this.props.tokenInfo.Metadata.numberOfDecimals)
@@ -119,7 +119,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
     const actions = [
       {
-        label: this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel),
+        label: this.context.formatMessage(messages.uriGenerateDialogConfirmLabel),
         onClick: onGenerate.bind(this, receiverField.value, amountField.value),
         primary: true,
         disabled: !amountField.isValid,

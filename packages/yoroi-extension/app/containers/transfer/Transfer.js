@@ -35,7 +35,7 @@ export default class Transfer extends Component<AllProps> {
     const navbar = (
       <NavBarContainerRevamp
         stores={stores}
-        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />}
+        title={<NavBarTitle title={this.context.formatMessage(globalMessages.sidebarTransfer)} />}
       />
     );
 

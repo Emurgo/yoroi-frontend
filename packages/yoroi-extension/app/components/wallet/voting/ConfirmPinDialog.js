@@ -110,7 +110,7 @@ export default class ConfirmPinDialog extends Component<Props> {
             pinMatches={pinValidation}
             fieldName="pin"
             validCheck={_pin => true}
-            placeholder={this.context.intl.formatMessage(globalMessages.confirmPin)}
+            placeholder={this.context.formatMessage(globalMessages.confirmPin)}
             allowEmptyInput={false}
           />
         </div>

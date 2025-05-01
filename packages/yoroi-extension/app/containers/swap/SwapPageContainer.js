@@ -78,7 +78,7 @@ export default class SwapPageContainer extends Component<AllProps> {
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarSwap)} />}
+            title={<NavBarTitle title={this.context.formatMessage(globalMessages.sidebarSwap)} />}
             menu={menu}
             isErrorPage={isErrorPage}
           />
@@ -93,7 +93,7 @@ export default class SwapPageContainer extends Component<AllProps> {
             <ModalProvider>
               <ModalManager />
               <SwapFormProvider swapStore={this.props.stores.substores.ada.swapStore}>
-                <ReviewTxProvider stores={stores} intl={this.context.intl}>
+                <ReviewTxProvider stores={stores} intl={this.context}>
                   <ReviewTxModal />
                   {children}
                 </ReviewTxProvider>

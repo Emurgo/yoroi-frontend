@@ -56,7 +56,7 @@ class BringCashbackSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       cashbackWalletId: {
-        label: this.context.intl.formatMessage(messages.label),
+        label: this.context.formatMessage(messages.label),
       },
     },
   });

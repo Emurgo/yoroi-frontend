@@ -42,10 +42,10 @@ class StakingPage extends Component<StoresProps> {
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
+            title={<NavBarTitle title={this.context.formatMessage(globalMessages.stakingDashboard)} />}
             pageBanner={
               <PoolTransitionBanner
-                intl={this.context.intl}
+                intl={this.context}
                 showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
               />
             }
@@ -57,9 +57,9 @@ class StakingPage extends Component<StoresProps> {
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
             <ModalProvider>
               <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxProvider stores={stores} intl={this.context}>
                 <ReviewTxModal />
-                <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
+                <DrepPromotionBanner stores={stores} page="staking" intl={this.context} />
                 <StakingPageContent stores={this.props.stores} />
               </ReviewTxProvider>
             </ModalProvider>

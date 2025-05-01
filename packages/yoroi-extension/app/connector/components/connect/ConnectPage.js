@@ -130,13 +130,13 @@ export default class ConnectPage extends Component<Props> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder),
+          label: this.context.formatMessage(globalMessages.walletPasswordLabel),
+          placeholder: this.context.formatMessage(globalMessages.walletPasswordFieldPlaceholder),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -169,7 +169,7 @@ export default class ConnectPage extends Component<Props> {
         if (deriver && checksum) {
           this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
             if (error instanceof WrongPassphraseError) {
-              this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+              this.form.$('walletPassword').invalidate(this.context.formatMessage(messages.incorrectWalletPasswordError));
             } else {
               throw error;
             }

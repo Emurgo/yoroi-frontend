@@ -154,7 +154,7 @@ type Props = {|
 
 const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
   const { openModal, closeModal } = useModal();
-  const { intl } = useIntl();
+  const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
   const getNetworkValue = () => {

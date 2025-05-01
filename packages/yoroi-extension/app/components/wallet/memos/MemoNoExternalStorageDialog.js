@@ -38,7 +38,7 @@ export default class MemoNoExternalStorageDialog extends Component<Props> {
     const { onCancel, onAcknowledge } = this.props;
 
     const acknowledgeAction = {
-      label: this.context.intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel),
+      label: this.context.formatMessage(globalMessages.uriLandingDialogConfirmLabel),
       primary: true,
       onClick: onAcknowledge,
     };

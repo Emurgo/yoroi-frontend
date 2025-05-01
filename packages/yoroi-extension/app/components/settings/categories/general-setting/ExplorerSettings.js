@@ -46,7 +46,7 @@ export default class ExplorerSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       explorerId: {
-        label: this.context.intl.formatMessage(globalMessages.blockchainExplorer),
+        label: this.context.formatMessage(globalMessages.blockchainExplorer),
         value: this.props.selectedExplorer.selected.ExplorerId,
       },
     },

@@ -125,7 +125,7 @@ render(): Node {
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
             <ModalProvider>
               <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxProvider stores={stores} intl={this.context}>
                 <ReviewTxModal />
                 <DrepPromotionBanner stores={stores} intl={intl} />
                 {this.props.children}

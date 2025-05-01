@@ -387,7 +387,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_medium">
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.formatMessage(globalMessages.assets)}
       </Typography>
     );
   };

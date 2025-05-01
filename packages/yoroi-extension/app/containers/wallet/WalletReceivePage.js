@@ -284,7 +284,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
                 // we don't impose a minimum value for the creation of the QR codes
                 // since validation happens when the QR code is scanned anyway
                 new BigNumber(0),
-                this.context.intl
+                this.context
               )
             }
           />

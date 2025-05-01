@@ -273,7 +273,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context.intl} />
+          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context} />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />

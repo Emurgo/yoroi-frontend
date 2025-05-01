@@ -34,7 +34,7 @@ export default class ComplexityLevelPage extends Component<StoresProps> {
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
 
     const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+      <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />
     );
 
     const topbarElement = (

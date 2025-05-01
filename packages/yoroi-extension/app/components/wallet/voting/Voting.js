@@ -131,7 +131,7 @@ export default class Voting extends Component<Props, State> {
     const { showDisclamer } = this.state;
     const pendingTxWarningComponent = this.props.hasAnyPending ? (
       <div className={styles.warningBox}>
-        <WarningBox>{this.context.intl.formatMessage(globalMessages.sendingIsDisabled)}</WarningBox>
+        <WarningBox>{this.context.formatMessage(globalMessages.sendingIsDisabled)}</WarningBox>
       </div>
     ) : null;
     return (

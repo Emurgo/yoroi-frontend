@@ -69,7 +69,7 @@ export default class RemoveWallet extends Component<Props> {
           }}
           id="settings:wallet-removeWallet-button"
         >
-          {`${this.context.intl.formatMessage(globalMessages.remove)} ${this.props.walletName}`}
+          {`${this.context.formatMessage(globalMessages.remove)} ${this.props.walletName}`}
         </Button>
       </Box>
     );

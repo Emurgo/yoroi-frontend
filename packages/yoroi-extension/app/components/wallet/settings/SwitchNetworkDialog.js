@@ -47,7 +47,7 @@ export default class Switch extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       selectedNetwork: {
-        label: this.context.intl.formatMessage(messages.selectLabel),
+        label: this.context.formatMessage(messages.selectLabel),
         value: this.props.currentNetworkId,
       },
     },
