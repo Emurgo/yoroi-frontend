@@ -7,10 +7,12 @@ type Props = {
   actions: any;
 };
 
-export const SwapOrdersPage = (props: Props) => {
+const SwapOrdersPage = (props: Props) => {
   return (
     <SwapLayout {...props}>
       <SwapOrders />
     </SwapLayout>
   );
 };
+
+export default SwapOrdersPage;

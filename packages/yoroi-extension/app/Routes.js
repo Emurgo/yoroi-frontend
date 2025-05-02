@@ -58,6 +58,11 @@ import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
+import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
+// $FlowIgnore: suppressing this error
+import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+
+// $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 
@@ -138,12 +143,6 @@ const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
 const SwapPage = React.lazy(SwapPagePromise);
 const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
 const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
-
-//SWAP REVAMP
-const AssetSwapRevampPagePromise = () => import('./UI/pages/Swap-New/AssetSwapPage');
-const AssetSwapRevampPage = React.lazy(AssetSwapRevampPagePromise);
-
-import { SwapOrdersPage as SwapOrdersRevampPage } from './UI/pages/Swap-New/SwapOrdersPage';
 
 const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
