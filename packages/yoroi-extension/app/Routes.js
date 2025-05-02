@@ -36,6 +36,8 @@ import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
+import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextProvider';
+// $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
@@ -137,6 +139,12 @@ const SwapPage = React.lazy(SwapPagePromise);
 const SwapOrdersPagePromise = () => import('./containers/swap/orders/OrdersPage');
 const SwapOrdersPage = React.lazy(SwapOrdersPagePromise);
 
+//SWAP REVAMP
+const AssetSwapRevampPagePromise = () => import('./UI/pages/Swap-New/AssetSwapPage');
+const AssetSwapRevampPage = React.lazy(AssetSwapRevampPagePromise);
+
+import { SwapOrdersPage as SwapOrdersRevampPage } from './UI/pages/Swap-New/SwapOrdersPage';
+
 const ExchangeEndPagePromise = () => import('./containers/ExchangeEndPage');
 const ExchangeEndPage = React.lazy(ExchangeEndPagePromise);
 
@@ -231,6 +239,11 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.EXCHANGE_END} component={props => <ExchangeEndPage {...props} stores={stores} />} />
 
           {/* NEW UI Routes */}
+          <Route
+            path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
+            component={props => wrapSwapRevamp({ ...props, stores }, SwapRevampSubpages(stores))}
+          />
+
           <Route
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
@@ -338,6 +351,14 @@ const GovernanceSubpages = stores => (
       path={ROUTES.Governance.FAIL}
       component={props => <GovernanceTransactionFailedPage {...props} stores={stores} />}
     />
+  </Switch>
+);
+
+const SwapRevampSubpages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.SWAP_REVAMP.ASSET_SWAP} component={props => <AssetSwapRevampPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SWAP_REVAMP.ORDERS} component={props => <SwapOrdersRevampPage {...props} stores={stores} />} />
+    <Redirect to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
   </Switch>
 );
 
@@ -461,5 +482,15 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
+  );
+}
+
+export function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  return (
+    <SwapContextProvider currentWallet={currentWalletInfo}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </SwapContextProvider>
   );
 }
