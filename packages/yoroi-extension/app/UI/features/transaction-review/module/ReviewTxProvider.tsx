@@ -78,6 +78,7 @@ export const ReviewTxProvider = ({
       height: '440px',
       width: '612px',
       content: result === TransactionResult.SUCCESS ? <TxSuccess /> : <TxFail />,
+      modalId: result === TransactionResult.SUCCESS ? 'txSuccess' : 'txFail',
     });
   };
 

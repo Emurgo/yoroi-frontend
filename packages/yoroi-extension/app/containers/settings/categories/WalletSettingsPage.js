@@ -20,7 +20,6 @@ import { intlShape } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 // $FlowIgnore: suppressing this error
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
-import environment from '../../../environment';
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
@@ -34,7 +33,7 @@ export default class WalletSettingsPage extends Component <StoresProps> {
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;
 
-    const notifFeatFlagEnabled = environment.isDev();
+    const selectedWalletId: ?number = stores.wallets.selected?.publicDeriverId;
 
     const { selected: selectedWallet, selectedWalletName } = this.props.stores.wallets;
     if (selectedWallet == null) {
@@ -75,11 +74,11 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
-        {notifFeatFlagEnabled && (
-          <NotificationsSettings />
-        )}
+        {selectedWalletId != null ? (
+          <NotificationsSettings selectedWalletId={selectedWalletId} />
+        ) : null}
         {selectedWallet.type === 'mnemonic' && (
-          <SpendingPasswordSetting 
+          <SpendingPasswordSetting
             openDialog={() =>
               stores.uiDialogs.open({
                 dialog: ChangeWalletPasswordDialogContainer,

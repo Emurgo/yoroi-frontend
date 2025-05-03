@@ -39,10 +39,12 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           {
             component: (
               <OperationsDetails
+                intl={intl}
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${primaryTokenInfo.name
-                  }`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
+                  primaryTokenInfo.name
+                }`}
               />
             ),
             duplicated: false,
@@ -67,10 +69,12 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             params: { signRequest },
             wallet: selected,
             onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
+              return showTxResultModal(TransactionResult.FAIL);
+            },
+            onSuccess: () => {
+              return showTxResultModal(TransactionResult.SUCCESS);
             },
           });
-
         }
         if (walletType === 'ledger') {
           await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
@@ -79,8 +83,10 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
             onFail: () => {
               showTxResultModal(TransactionResult.FAIL);
             },
+            onSuccess: () => {
+              showTxResultModal(TransactionResult.SUCCESS);
+            },
           });
-
         }
       } else {
         await stores.substores.ada.mnemonicSend.sendMoney({
@@ -88,8 +94,8 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
           password: passswordInput,
           wallet: selected,
         });
+        showTxResultModal(TransactionResult.SUCCESS);
       }
-      showTxResultModal(TransactionResult.SUCCESS);
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });
@@ -117,11 +123,11 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   );
 };
 
-const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName }) => {
+const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl }) => {
   return (
     <Stack gap="8px">
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">TBD</Typography>
+        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.undelegatePool)}</Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{
@@ -137,7 +143,7 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName }) => {
         </Stack>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Unregister Staking key deposit</Typography>
+        <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.deregisteringStakingKey)}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
     </Stack>

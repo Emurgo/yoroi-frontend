@@ -27,6 +27,8 @@ const IconWrapper = styled(Box)(({ theme }: any) => ({
   },
 }));
 
+const commonIdPath = 'txReview:overview';
+
 export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   const strings = useStrings();
   const {
@@ -65,8 +67,15 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
         onClick={() => {
           changeModalView({ modalView: 'walletInfo', title: 'Wallet Details' });
         }}
+        id={commonIdPath + "-walletInfo-button"}
       >
-        <Typography variant="body1" color="ds.text_primary_medium" fontWeight={500}>{`${truncateLongName(
+        <Typography
+          variant="body1"
+          color="ds.text_primary_medium"
+          fontWeight={500}
+          id={commonIdPath + "-walletNameAndPlate-text"}
+        >
+          {`${truncateLongName(
           selectedWalletName,
           29
         )} | ${plate.TextPart}`}</Typography>
@@ -104,28 +113,35 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
 };
 
 const InfoInline = ({ label, value }) => {
+  const isText = typeof value === 'string' || typeof value === 'number';
+
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
       <Typography variant="body1" color="ds.text_gray_low">
         {label}
       </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {value}
-      </Typography>
+      {isText ? (
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + "-info" + label + "-text"}>
+          {value}
+        </Typography>
+      ) : (
+        value
+      )}
     </Stack>
   );
 };
 
 const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) => {
+  const strings = useStrings();
   return (
     <Box>
       <Collapsible
         expanded={true}
-        title="Your Wallet"
+        title={strings.yourWallet}
         content={
           <Stack gap="12px">
             <CopyableText value={stakingAddress}>
-              <Typography>{truncateAddress(stakingAddress)}</Typography>
+              <Typography id={commonIdPath + ":yourAddress-truncatedAddress-text"}>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
             <MyWalletTokens tx={tx} notOwnedOutputs={notOwnedOutputs} operationFee={operationFee} />
           </Stack>
@@ -140,18 +156,34 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
   const strings = useStrings();
 
   return (
-    <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
-      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-        {strings.addressToLabel}:
-      </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {receiverCustomTitle ?? <CopyableText value={output.address}>{truncateAddressShort(address, 40)}</CopyableText>}
-      </Typography>
-    </Stack>
+    <>
+      <Stack mt="16px" direction="row" alignItems="center" justifyContent="space-between">
+        <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+          {strings.addressToLabel}:
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":to-receiver-text"}>
+          {receiverCustomTitle?.to ?? (
+            <CopyableText value={address}>{truncateAddressShort(address, 40)}</CopyableText>
+          )}
+        </Typography>
+      </Stack>
+
+      {receiverCustomTitle?.associatedAddress && (
+        <Stack mt="8px" direction="row" alignItems="center" justifyContent="space-between">
+          <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+            {strings.associatedAddress}
+          </Typography>
+          <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":associatedAddress-truncatedAddress-text"}>
+            {<CopyableText value={address}>{truncateAddressShort(address, 25)}</CopyableText>}
+          </Typography>
+        </Stack>
+      )}
+    </>
   );
 };
 
 const OperationsSection = ({ operations }) => {
+  const strings = useStrings();
   const componentsNotDuplicated = operations?.components
     .filter(component => !component.duplicated)
     .map(({ component }) => component);
@@ -162,14 +194,12 @@ const OperationsSection = ({ operations }) => {
 
       <Collapsible
         expanded={true}
-        title="Operations"
+        title={strings.operations}
         content={
           <Box>
-            {[...componentsNotDuplicated].map((operation, index) => {
-              if (index === 0) return operation;
-
-              return <>{operation}</>;
-            })}
+            {componentsNotDuplicated.map((operation, index) => (
+              <React.Fragment key={operation.key || index}>{operation}</React.Fragment>
+            ))}
           </Box>
         }
       />
@@ -214,7 +244,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
           <Box
             sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px', flexWrap: 'nowrap', ml: '40px' }}
           >
-            <Typography color="ds.white_static">
+            <Typography color="ds.white_static" id={commonIdPath + "-txSendAmount-text"}>
               {formatedFee} {primaryTokenInfo.name}
             </Typography>
           </Box>
