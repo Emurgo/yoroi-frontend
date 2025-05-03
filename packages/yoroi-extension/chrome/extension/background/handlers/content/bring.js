@@ -9,6 +9,7 @@ import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
 import { getBoundsForTabWindow, popupProps, sendToInjector } from './utils';
 import { CoreAddressTypes } from '../../../../../app/api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
+import { networks } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
 declare var chrome;
 
@@ -84,7 +85,8 @@ const handlers = Object.freeze({
 async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
   const publicDerivers = (await loadWalletsFromStorage(db)).filter(publicDeriver =>
-    !isAnyTrezorWallet(publicDeriver.getParent())
+    !isAnyTrezorWallet(publicDeriver.getParent()) &&
+      publicDeriver.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   );
   if (!publicDerivers.length) {
     return null;
