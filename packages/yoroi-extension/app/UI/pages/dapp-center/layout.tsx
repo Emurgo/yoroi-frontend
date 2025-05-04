@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
+import { useIntl } from '../../context/IntlProvider';
+import { connectorMessages } from '../../../i18n/global-messages';
 
 type Props = {
   stores: any;
@@ -10,6 +12,7 @@ type Props = {
 };
 
 const DappCenterLayout = ({ stores, actions, children }: Props): JSX.Element => {
+  const { intl } = useIntl();
   return (
     <GeneralPageLayout
       stores={stores}
@@ -18,7 +21,7 @@ const DappCenterLayout = ({ stores, actions, children }: Props): JSX.Element => 
         <NavBarContainerRevamp
           actions={actions}
           stores={stores}
-          title={<NavBarTitle title={'dApp Center'} />}
+          title={<NavBarTitle title={intl.formatMessage(connectorMessages.dappConnector)} />}
         />
       }
     >

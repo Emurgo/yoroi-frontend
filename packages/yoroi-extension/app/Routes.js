@@ -52,6 +52,8 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
+import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
+// $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
@@ -220,6 +222,11 @@ export const Routes = (stores: StoresMap): Node => {
             exact
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
             component={props => <ConnectedWebsitesPage {...props} stores={stores} />}
+          />
+          <Route
+            exact
+            path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
+            component={props => WrapDappCenter({ ...props, stores }, <DappCenterPage {...props} stores={stores} />)}
           />
           <Route path={ROUTES.WALLETS.ROOT} component={props => wrapWallet({ ...props, stores }, WalletsSubpages(stores))} />
           <Route path={ROUTES.SETTINGS.ROOT} component={props => wrapSettings({ ...props, stores }, SettingsSubpages(stores))} />
@@ -450,15 +457,11 @@ export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node
   );
 }
 
-export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
-
-  const openDialogWrapper = (dialog): void => {
-    dappCenterProps.stores.uiDialogs.open({ dialog });
-  };
+export function WrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
+  console.log('dappCenterProps', dappCenterProps);
 
   return (
-    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
+    <DappCenterContextProvider stores={dappCenterProps.stores}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
   );

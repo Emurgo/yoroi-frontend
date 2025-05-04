@@ -13,12 +13,13 @@ import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import environment from '../../environment';
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-    selected: ?WalletState,
-      currentRoute: string,
-        isRewardWallet: isRewardWalletFunc,
+  selected: ?WalletState,
+  currentRoute: string,
+  isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
 type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
@@ -26,10 +27,10 @@ type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
-    +icon: string,
-      +label ?: MessageDescriptor,
-      +isVisible: isVisibleFunc,
-        +featureFlagName ?: string,
+  +icon: string,
+  +label?: MessageDescriptor,
+  +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
 const existsSelectedWallet = ({ selected }) => selected != null;
@@ -97,7 +98,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
     icon: dappConnectorIcon,
     label: connectorMessages.connector,
-    isVisible: () => true,
+    isVisible: () => !environment.isDev(),
+  },
+  {
+    className: 'dapp-center',
+    route: ROUTES.DAPP_CONNECTOR.DAPP_CENTER,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'governance',
