@@ -7,10 +7,10 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
 
 export const ChooseDrepId = () => {
-  const { drepId, isLoading, changeModalView, createUnsignedTx } = useTxReviewModal();
+  const { drepId, isLoading, changeModalView, createUnsignedTx, setDrepId } = useTxReviewModal();
   const strings = useStrings();
   const [error, setError] = React.useState(false);
-  const [drepIdInput, setDrepId] = React.useState('');
+  const [drepIdInput, setDrepValueId] = React.useState('');
 
   useEffect(() => {
     setError(false);
@@ -22,6 +22,7 @@ export const ChooseDrepId = () => {
     if (dRepCredentialHex == null) {
       setError(true);
     } else {
+      setDrepId({ drepID: drepIdInput });
       await createUnsignedTx(dRepCredentialHex);
       changeModalView({ modalView: 'operations', title: 'Operations' });
     }
@@ -35,13 +36,13 @@ export const ChooseDrepId = () => {
         </Typography>
         <Box>
           <TextInput
-            id="setDrepId"
+            id="setDrepValueId"
             label="Drep ID"
             variant="outlined"
             onChange={event => {
               //   dRepIdChanged(event.target.value);
               //   governanceVoteChanged({ kind: 'delegate', drepID: event.target.value });
-              setDrepId(event.target.value);
+              setDrepValueId(event.target.value);
             }}
             value={drepId}
             error={error}
