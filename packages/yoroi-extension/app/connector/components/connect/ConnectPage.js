@@ -358,7 +358,6 @@ export default class ConnectPage extends Component<Props> {
                       return (
                         <Box
                           component="li"
-                          className="ConnectPage_listItem"
                           key={wallet.publicDeriverId}
                           sx={{
                             border: '1px solid',
@@ -371,7 +370,7 @@ export default class ConnectPage extends Component<Props> {
                             }),
                           }}
                         >
-                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)}>
+                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)} id='connector:connect-walletItem-button'>
                             <ConnectedWallet
                               disabledForReason={isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null}
                               publicDeriver={wallet}

@@ -8,16 +8,16 @@ class DAppConnectWallet extends DAppBase {
     method: 'css',
   };
   walletItemButtonLocator = {
-    locator: '.ConnectPage_listItem',
-    method: 'css',
+    locator: 'connector:connect-walletItem-button',
+    method: 'id',
   };
   walletItemPlateLabelLocator = {
-    locator: '.ConnectedWallet_checksum',
-    method: 'css',
+    locator: 'connectedWalletPlate',
+    method: 'id',
   };
   walletItemNameLabelLocator = {
-    locator: '.ConnectedWallet_nameWrapper',
-    method: 'css',
+    locator: 'connectedWalletName',
+    method: 'id',
   };
   walletItemBalanceLabelLocator = {
     locator: 'dAppConnector:connect:walletList:walletCard_0-availableBalance-text',
@@ -45,6 +45,7 @@ class DAppConnectWallet extends DAppBase {
     } else if (resultWallets.length > 1) {
       throw new Error(`Too many wallet are found for the wallet plate ${walletPlate}`);
     }
+    this.logger.info(`DAppConnectWallet::_findWallet Wallet is found`);
     return resultWallets[0];
   }
   async getWallets() {
