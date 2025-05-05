@@ -16,9 +16,9 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-    selected: ?WalletState,
-      currentRoute: string,
-        isRewardWallet: isRewardWalletFunc,
+  selected: ?WalletState,
+  currentRoute: string,
+  isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
 type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
@@ -26,10 +26,10 @@ type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
-    +icon: string,
-      +label ?: MessageDescriptor,
-      +isVisible: isVisibleFunc,
-        +featureFlagName ?: string,
+  +icon: string,
+  +label?: MessageDescriptor,
+  +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
 const existsSelectedWallet = ({ selected }) => selected != null;
@@ -74,6 +74,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   {
     className: 'nfts',
     route: ROUTES.NFTS.ROOT,
+    icon: nftsIcon,
+    label: globalMessages.sidebarNfts,
+    isVisible: existsSelectedWallet,
+  },
+  {
+    className: 'nft-gallery',
+    route: ROUTES.NFT_GALLERY.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
     isVisible: existsSelectedWallet,
