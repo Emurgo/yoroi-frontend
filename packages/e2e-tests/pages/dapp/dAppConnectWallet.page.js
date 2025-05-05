@@ -8,16 +8,16 @@ class DAppConnectWallet extends DAppBase {
     method: 'css',
   };
   walletItemButtonLocator = {
-    locator: '.ConnectPage_listItem',
-    method: 'css',
+    locator: 'connector:connect-walletItem-button',
+    method: 'id',
   };
   walletItemPlateLabelLocator = {
-    locator: '.ConnectedWallet_checksum',
-    method: 'css',
+    locator: 'connectedWalletPlate',
+    method: 'id',
   };
   walletItemNameLabelLocator = {
-    locator: '.ConnectedWallet_nameWrapper',
-    method: 'css',
+    locator: 'connectedWalletName',
+    method: 'id',
   };
   walletItemBalanceLabelLocator = {
     locator: 'dAppConnector:connect:walletList:walletCard_0-availableBalance-text',
@@ -45,6 +45,7 @@ class DAppConnectWallet extends DAppBase {
     } else if (resultWallets.length > 1) {
       throw new Error(`Too many wallet are found for the wallet plate ${walletPlate}`);
     }
+    this.logger.info(`DAppConnectWallet::_findWallet Wallet is found`);
     return resultWallets[0];
   }
   async getWallets() {
@@ -55,16 +56,26 @@ class DAppConnectWallet extends DAppBase {
     this.logger.info(`DAppConnectWallet::getWalletInfo is called`);
     const wallets = await this.getWallets();
     const walletElem = await this._findWallet(wallets, walletChecksum);
+
     const walletNameFieldElem = await walletElem.findElement(
       getByLocator(this.walletItemNameLabelLocator)
     );
-    const fullText = await walletNameFieldElem.getText();
-    const [walletName, walletPlate] = fullText.split('\n');
+    const walletName = await walletNameFieldElem.getText();
+
+    const walletPlateElem = await walletElem.findElement(
+      getByLocator(this.walletItemPlateLabelLocator)
+    );
+    const walletPlate = await walletPlateElem.getText();
+
     const walletBalanceElem = await walletElem.findElement(
       getByLocator(this.walletItemBalanceLabelLocator)
     );
     const fullBalanceText = await walletBalanceElem.getText();
     const walletBalance = Number(fullBalanceText.split(' ')[0]);
+
+    this.logger.info(
+      `DAppConnectWallet::getWalletInfo Wallet info: walletName: "${walletName}", walletPlate: "${walletPlate}", walletBalance: ${walletBalance}`
+    );
 
     return {
       walletBalance,
