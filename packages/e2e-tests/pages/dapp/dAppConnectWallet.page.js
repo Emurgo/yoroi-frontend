@@ -67,6 +67,9 @@ class DAppConnectWallet extends DAppBase {
     );
     const walletPlate = await walletPlateElem.getText();
 
+    const walletBalanceElem = await walletElem.findElement(
+      getByLocator(this.walletItemBalanceLabelLocator)
+    );
     const fullBalanceText = await walletBalanceElem.getText();
     const walletBalance = Number(fullBalanceText.split(' ')[0]);
 
