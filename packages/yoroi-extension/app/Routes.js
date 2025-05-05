@@ -458,8 +458,6 @@ export function WrapPortfolio(portfolioProps: StoresProps, children: Node): Node
 }
 
 export function WrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  console.log('dappCenterProps', dappCenterProps);
-
   return (
     <DappCenterContextProvider stores={dappCenterProps.stores}>
       <Suspense fallback={null}>{children}</Suspense>

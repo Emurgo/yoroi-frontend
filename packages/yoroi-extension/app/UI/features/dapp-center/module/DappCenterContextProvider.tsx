@@ -32,7 +32,6 @@ export const DappCenterContextProvider = observer(({ children, stores }: DappCen
     }),
     [initialState]
   );
-  console.log('state', state);
 
   React.useEffect(() => {
     const prepareConnector = async () => {
