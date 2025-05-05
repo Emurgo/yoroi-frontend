@@ -56,16 +56,26 @@ class DAppConnectWallet extends DAppBase {
     this.logger.info(`DAppConnectWallet::getWalletInfo is called`);
     const wallets = await this.getWallets();
     const walletElem = await this._findWallet(wallets, walletChecksum);
+
     const walletNameFieldElem = await walletElem.findElement(
       getByLocator(this.walletItemNameLabelLocator)
     );
-    const fullText = await walletNameFieldElem.getText();
-    const [walletName, walletPlate] = fullText.split('\n');
+    const walletName = await walletNameFieldElem.getText();
+
+    const walletPlateElem = await walletElem.findElement(
+      getByLocator(this.walletItemPlateLabelLocator)
+    );
+    const walletPlate = await walletPlateElem.getText();
+
     const walletBalanceElem = await walletElem.findElement(
       getByLocator(this.walletItemBalanceLabelLocator)
     );
     const fullBalanceText = await walletBalanceElem.getText();
     const walletBalance = Number(fullBalanceText.split(' ')[0]);
+
+    this.logger.info(
+      `DAppConnectWallet::getWalletInfo Wallet info: walletName: "${walletName}", walletPlate: "${walletPlate}", walletBalance: ${walletBalance}`
+    );
 
     return {
       walletBalance,
