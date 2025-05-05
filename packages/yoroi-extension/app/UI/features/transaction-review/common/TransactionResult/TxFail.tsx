@@ -1,11 +1,9 @@
 import { Button, Stack, Typography } from '@mui/material';
 import React from 'react';
-import { useNavigateTo } from '../hooks/useNavigateTo';
 import { FailedIlustration } from './FailedIlustration';
 import { useModal } from '../../../../components/modals/ModalContext';
 
 export const TxFail = () => {
-  const navigate = useNavigateTo();
   const { closeModal } = useModal();
 
   return (
@@ -22,7 +20,6 @@ export const TxFail = () => {
         variant="primary"
         fullWidth
         onClick={() => {
-          navigate.walletTransactions();
           closeModal();
         }}
         id="txFail-close-button"
