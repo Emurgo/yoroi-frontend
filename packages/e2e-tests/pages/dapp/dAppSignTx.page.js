@@ -59,7 +59,7 @@ class DAppSignTx extends DAppSignBase {
   // error message
   errorMessageLocator = {
     locator: 'general-layoutContent-component',
-    methos: 'id',
+    method: 'id',
   };
   // functions
   async getFee() {
