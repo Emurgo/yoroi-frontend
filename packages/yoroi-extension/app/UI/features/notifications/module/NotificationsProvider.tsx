@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -19,7 +19,7 @@ export const NotificationTopics = {
 type TransactionType = 'self' | 'multi' | 'expend' | 'income';
 
 const TransactionTypeMap: Record<TransactionType, NotificationTypes> = {
-  self: NotificationTypes.Outcome,
+  self: NotificationTypes.Intrawallet,
   multi: NotificationTypes.Income,
   expend: NotificationTypes.Outcome,
   income: NotificationTypes.Income,
@@ -54,14 +54,24 @@ function getRandomNotification() {
 
 const Context = React.createContext(initialValue);
 
-export default function NotificationsProvider({ children, appLoadedSlots = {} }) {
+type Props = {
+  children: ReactNode,
+  appLoadedSlots: { [networkId: number]: number },
+  walletsStore: any,
+}
+
+export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore }: Props) {
   const lsApi = new LocalStorageApi();
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
   const history = useHistory();
 
+  const getSelectedWalletId =
+    () => walletsStore.selected?.publicDeriverId;
+
   const notificationTexts = {
+    [NotificationTypes.Intrawallet]: strings.intrawalletTxConfirmed,
     [NotificationTypes.Rewards]: strings.stakingRewardsReceived,
     [NotificationTypes.Income]: strings.assetsReceived,
     [NotificationTypes.Outcome]: strings.assetsSent,
@@ -96,9 +106,12 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
   };
 
   const isActiveSettingsForWallet = async () => {
-    const activeWallet = JSON.parse(await lsApi.getSelectedWalletId());
-    const notifSettings = JSON.parse((await lsApi.getNotificationsSetting()) || '{}');
-    return notifSettings[activeWallet] !== undefined ? notifSettings[activeWallet] : true;
+    const selectedWalletId = getSelectedWalletId();
+    if (selectedWalletId == undefined) {
+      return false;
+    }
+    const notifSettings = JSON.parse((await lsApi.getNotificationsSetting()) ?? '{}');
+    return notifSettings[selectedWalletId] ?? true;
   };
 
   const createNotification = async (type: NotificationTypes, id?: string) => {
@@ -109,6 +122,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
     if (!notifyWallet) return;
     // return if we're on the same route as the event redirection
     switch (type) {
+      case NotificationTypes.Intrawallet:
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:
@@ -134,6 +148,13 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
   };
 
   const handleSubscription = async (topic, data) => {
+
+    const selectedWalletId = getSelectedWalletId();
+    if (data.walletId != null && data.walletId !== selectedWalletId) {
+      // ignore notifications for non-selected wallets
+      return;
+    }
+
     const notifTypeByTopic = {
       [NotificationTopics.NEW_TX]: NotificationTypes.Income,
       [NotificationTopics.REWARDS]: NotificationTypes.Rewards,
@@ -159,12 +180,12 @@ export default function NotificationsProvider({ children, appLoadedSlots = {} })
       notifType = TransactionTypeMap[txType] || NotificationTypes.Cancelled;
     }
 
-    createNotification(notifType, data.txid);
+    await createNotification(notifType, data.txid);
   };
 
   const showRandomToast = async () => {
     const notif = getRandomNotification();
-    createNotification(notif.type, notif.id);
+    await createNotification(notif.type, notif.id);
   };
 
   const handleToastChanges = props => {
