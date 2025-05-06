@@ -362,7 +362,7 @@ export default class ConnectPage extends Component<Props> {
                           key={wallet.publicDeriverId}
                           sx={{
                             border: '1px solid',
-                            borderColor: 'ds.gray_700',
+                            borderColor: 'transparent',
                             borderRadius: '8px',
                             ...(!isTrezor && {
                               '&:hover': {
