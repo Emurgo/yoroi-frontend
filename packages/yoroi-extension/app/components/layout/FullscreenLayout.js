@@ -66,6 +66,7 @@ export default class FullscreenLayout extends Component<Props, State> {
       <div
         ref={this.contentRef}
         style={{ height: this.state.height || Number.MAX_SAFE_INTEGER }}
+        id='general-layoutContent-component'
       >
         {children}
       </div>
