@@ -9,6 +9,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
 import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import type LocalizableError from '../../../i18n/LocalizableError';
+import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 import { Component } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
@@ -25,7 +26,6 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
-import SignTxTabs from './SignTxTabs';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
@@ -33,8 +33,9 @@ import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 import { hexToUtf } from '../../../coreUtils';
+// $FlowIgnore: suppressing this error
+import SignTxTabs from '../../../UI/features/connector/useCases/SignTxTabs';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
