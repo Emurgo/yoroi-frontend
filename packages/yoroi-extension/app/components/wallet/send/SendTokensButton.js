@@ -5,7 +5,7 @@ import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
   const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
@@ -28,7 +28,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
   const submitTx = async (password, signRequest) => {
     try {
       startLoadingTxReview();
-      stores.transactionProcessingStore.adaSendAndRefresh({
+      await stores.transactionProcessingStore.adaSendAndRefresh({
         wallet: stores.wallets.selected,
         signRequest,
         password,
