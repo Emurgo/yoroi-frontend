@@ -29,11 +29,12 @@ import { Box } from '@mui/system';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
-import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
 import { hexToUtf } from '../../../coreUtils';
+// $FlowIgnore: suppressing this error
+import ConnectionInfo from '../../../UI/features/connector/useCases/ConnectionInfo';
 // $FlowIgnore: suppressing this error
 import SignTxTabs from '../../../UI/features/connector/useCases/SignTxTabs';
 

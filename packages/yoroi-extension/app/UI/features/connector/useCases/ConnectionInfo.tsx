@@ -1,27 +1,25 @@
-// @flow
-import type { Node, ComponentType } from 'react';
-import type { WhitelistEntry } from '../../../../../chrome/extension/connector/types';
-import type { ConnectorIntl } from '../../../types';
-import type { WalletState } from '../../../../../chrome/extension/background/types';
-import { defineMessages, injectIntl } from 'react-intl';
+import type { WhitelistEntryType, WalletStateType } from '../types';
+import React from 'react';
 import { Box, Typography } from '@mui/material';
-import ConnectedWallet from '../../connect/ConnectedWallet';
-import { ReactComponent as NoDappIcon } from '../../../../assets/images/dapp-connector/no-dapp.inline.svg';
+import { useIntl } from '../../../context/IntlProvider';
 import { connectorMessages } from '../../../../i18n/global-messages';
+import NoDapp from '../../../../UI/components/ilustrations/NoDapp';
+import ConnectedWallet from './ConnectedWallet';
 
-const messages: Object = defineMessages({
+interface Props {
+  connectedWebsite: WhitelistEntryType | null;
+  connectedWallet: WalletStateType;
+}
+
+const messages = {
   connectedTo: {
     id: 'connector.signin.connectedTo',
     defaultMessage: '!!!Connected To',
   },
-});
+};
 
-type Props = {|
-  connectedWebsite: ?WhitelistEntry,
-  connectedWallet: WalletState,
-|};
-
-function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & ConnectorIntl): Node {
+const ConnectionInfo: React.FC<Props> = ({ connectedWebsite, connectedWallet }) => {
+  const { intl } = useIntl();
   const url = connectedWebsite?.url ?? '';
   const faviconUrl = connectedWebsite?.image ?? '';
 
@@ -45,7 +43,7 @@ function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & Con
             img: { width: '30px' },
           }}
         >
-          {faviconUrl != null && faviconUrl !== '' ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDappIcon />}
+          {faviconUrl ? <img src={faviconUrl} alt={`${url} favicon`} /> : <NoDapp />}
         </Box>
         <Typography component="div" variant="body1" fontWeight="400" color="ds.gray_900" id="connectedToUrl">
           {url}
@@ -59,6 +57,6 @@ function ConnectionInfo({ intl, connectedWebsite, connectedWallet }: Props & Con
       </Box>
     </Box>
   );
-}
+};
 
-export default (injectIntl(ConnectionInfo): ComponentType<Props>);
+export default ConnectionInfo;
