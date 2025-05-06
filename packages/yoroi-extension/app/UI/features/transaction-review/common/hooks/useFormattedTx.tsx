@@ -2,30 +2,33 @@
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
 import { CredKind } from '@emurgo/cross-csl-core';
 import { isNonNullable } from '@yoroi/common';
-import BigNumber from 'bignumber.js';
-import { useQuery } from 'react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { FormattedTx, TransactionBody, TransactionInputs } from '../types';
+import { TransactionOutputsJSON } from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   const { walletUtxos, walletAddresses, primaryTokenInfo, allAssetList, networkId } = useTxReviewModal();
 
   const inputs = data?.inputs ?? [];
   const outputs = data?.outputs ?? [];
-  const collateral = data?.collateral ?? [];
+  // const collateral = data?.collateral ?? [];
   const referenceInputs = data?.reference_inputs ?? [];
-  const inputUtxos = useUtxos(inputs, walletUtxos, collateral);
+
+  const inputUtxos = getAllUtxos(inputs, walletUtxos);
+
+  // TODO: collateral utxos are not used in tx details for now, but maybe should be in the future
+  // const collateralUtxos = getAllUtxos(collateral, walletUtxos);
 
   const formattedFee = formatFee(primaryTokenInfo, data);
 
-  const referenceInputUtxos = useUtxos(referenceInputs, walletUtxos);
+  const referenceInputUtxos = getAllUtxos(referenceInputs, walletUtxos);
   const formattedCertificates = formatCertificates(data?.certs);
 
-  const formattedInputs = useFormattedInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses);
-  const formattedOutputs = useFormattedOutputs(outputs, networkId, primaryTokenInfo, walletAddresses, allAssetList);
+  const formattedInputs = formatInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses);
+  const formattedOutputs = formatOutputs(outputs, allAssetList, networkId, primaryTokenInfo, walletAddresses);
 
   return {
     inputs: formattedInputs,
@@ -36,126 +39,76 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
   };
 };
 
-export const useFormattedInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses) => {
-  const query = useQuery<any>(
-    ['useFormattedInputs', inputUtxos],
-    async () => formatInputs(inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses),
-    {
-      suspense: true,
-    }
-  );
+const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
+  return inputUtxos.map((utxo) => {
 
-  if (!query.data) throw new Error('invalid formatted inputs');
-  return query.data;
+    const address = utxo?.receiver;
+    const { resolvedAddress, paymentCredKind } = resolveAddress(address);
+
+    const rewardAddress = address !== null && paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
+
+    const assets = (utxo.assets??[]).map(asset => {
+      const tokenDetails = allAssetList.find(a => a.info.id === asset.Token?.Identifier);
+      const amount = asset.TokenList?.Amount;
+      if (tokenDetails == null || amount == null) {
+        return null
+      }
+      const tokenInfo = tokenDetails.info.id === '' ? primaryTokenInfo : tokenDetails;
+      return { tokenInfo, quantity: asQuantity(amount) }
+    }).filter(isNonNullable)
+
+    return {
+      assets,
+      address: resolvedAddress,
+      addressKind: paymentCredKind,
+      rewardAddress,
+      ownAddress: isOwnAddress,
+      txIndex: utxo.tx_index,
+      txHash: utxo.tx_hash,
+    };
+  });
 };
 
-export const useFormattedOutputs = (outputs, networkId, primaryTokenInfo, walletAddresses, allAssetList) => {
-  const query = useQuery<any>(
-    ['useFormattedOutputs', outputs],
-    () => formatOutputs(outputs, networkId, primaryTokenInfo, walletAddresses, allAssetList),
-    {
-      suspense: true,
-    }
-  );
-
-  if (!query.data) throw new Error('invalid formatted outputs');
-  return query.data;
-};
-
-const formatInputs = async (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): Promise<any> => {
-  return Promise.all(
-    inputUtxos.map(async (utxo, index) => {
-      const address = utxo?.receiver;
-      const coin = utxo?.amount != null ? asQuantity(utxo.amount) : null;
-
-      const addressKind = address != null ? await getAddressKind(address) : null;
-      const rewardAddress = address !== null && addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
-      const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
-      const primaryAssets =
-        coin != null
-          ? [
-              {
-                tokenInfo: primaryTokenInfo,
-                quantity: coin,
-              },
-            ]
-          : [];
-      const multiAssets = allAssetList.map(a => {
-        return {
-          tokenInfo: a,
-          quantity: a.quantity,
-        };
-      });
-
-      return {
-        assets: [...primaryAssets, ...(isOwnAddress !== null && index === 0 ? multiAssets : [])].filter(isNonNullable),
-        address,
-        addressKind: addressKind ?? null,
-        rewardAddress,
-        ownAddress: isOwnAddress,
-        txIndex: utxo.tx_index,
-        txHash: utxo.tx_hash,
-      };
-    })
-  );
-};
-
-type Output = {
-  address: string;
-  amount: {
-    coin: BigNumber;
-    multiasset: any;
-  };
-  plutus_data: any;
-  script_ref: any;
-};
-
-const formatOutputs = async (
-  outputs: Output[],
+const formatOutputs = (
+  outputs: TransactionOutputsJSON,
+  allAssetList: any,
   networkId: number,
   primaryTokenInfo: any,
   walletAddresses: any,
-  allAssetList: any
-): Promise<any> => {
-  return Promise.all(
-    outputs.map(async output => {
-      const address = output.address;
-      const coin: any = output.amount.coin;
+): any => {
+  return outputs.map(output => {
+    const address = output.address;
+    const coin: any = output.amount.coin;
 
-      const addressKind = await getAddressKind(address);
-      const rewardAddress = addressKind === CredKind.Key ? await deriveAddress(address, networkId) : null;
-      const primaryAssets = [
-        {
-          tokenInfo: primaryTokenInfo,
-          quantity: asQuantity(coin.toString()),
-        },
-      ];
+    const { resolvedAddress, paymentCredKind } = resolveAddress(address);
 
-      const multiAssets = output.amount.multiasset
-        ? Object.entries(output.amount.multiasset).flatMap(([policyId, assets]: any) => {
-            return Object.entries(assets).map(([assetId, amount]) => {
-              const tokenInfo: any = allAssetList.filter(asset => asset.info.id === `${policyId}.${assetId}`);
-              if (tokenInfo == null) return null;
-              const quantity: any = asQuantity(String(amount));
+    const rewardAddress = paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
+    const primaryAssets = [
+      {
+        tokenInfo: primaryTokenInfo,
+        quantity: asQuantity(coin.toString()),
+      },
+    ];
 
-              return {
-                tokenInfo: tokenInfo[0],
-                quantity,
-              };
-            });
-          })
-        : [];
-      const assets = [...primaryAssets, ...multiAssets];
+    const multiAssets = Object.entries(output.amount.multiasset ?? []).flatMap(([policyId, assets]: any) => {
+      return Object.entries(assets).map(([assetId, amount]) => {
+        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
+        if (tokenInfo == null) return null;
+        const quantity: any = asQuantity(String(amount));
+        return {tokenInfo, quantity};
+      });
+    });
+    const assets = [...primaryAssets, ...multiAssets];
 
-      return {
-        assets,
-        address,
-        addressKind,
-        rewardAddress,
-        ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
-      };
-    })
-  );
+    return {
+      assets,
+      address: resolvedAddress,
+      addressKind: paymentCredKind,
+      rewardAddress,
+      ownAddress: address != null ? isOwnedAddress(walletAddresses, address) : null,
+    };
+  });
 };
 
 export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => {
@@ -166,41 +119,42 @@ export const formatFee = (primaryTokenInfo: any, data: TransactionBody): any => 
   };
 };
 
-const deriveAddress = async (address: string, chainId: number) => {
+const deriveAddress = (address: string, networkId: number) => {
   try {
-    return await deriveRewardAddressFromAddress(address, chainId);
-  } catch {
+    return deriveRewardAddressFromAddress(address, networkId);
+  } catch (e) {
+    console.error('Failed to derive reward address from: ' + address, e);
     return null;
   }
 };
 
-const getAddressKind = async (addressBech32: string): Promise<any> => {
-  try {
-    const address = await RustModule.WalletV4.Address.from_bech32(addressBech32);
-    const addressKind = address.payment_cred().kind();
-
-    return addressKind ?? null;
-  } catch {
-    return null;
+const resolveAddress = (addressBech32: string | undefined): {
+  resolvedAddress: string | undefined,
+  paymentCredKind: number | null,
+} => {
+  if (addressBech32 == null) {
+    return { resolvedAddress: addressBech32, paymentCredKind: null };
   }
-};
-
-export const useUtxos = (inputs: TransactionInputs, walletUtxos: any, collateral?: any) => {
-  const query = useQuery(['useUtxos', inputs], async () => getAllUtxos(inputs, walletUtxos, collateral), {
-    suspense: true,
-  });
-  if (!query.data) throw new Error('invalid formatted inputs');
-  return query.data;
-};
-
-const getAllUtxos = async (inputs: TransactionInputs, walletUtxos: any, collateral) => {
-  if (collateral?.length > 0) {
-    return Promise.all(collateral.map(c => getUtxo(walletUtxos, c?.transaction_id, c.index))) ?? [];
+  const address = RustModule.WalletV4.Address.from_bech32(addressBech32);
+  if (address.kind() === RustModule.WalletV4.AddressKind.Byron) {
+    return {
+      resolvedAddress: RustModule.WalletV4.ByronAddress.from_address(address).to_base58(),
+      paymentCredKind: null,
+    };
   }
-  return Promise.all(inputs.map(input => getUtxo(walletUtxos, input?.transaction_id, input.index))) ?? [];
+  return {
+    resolvedAddress: addressBech32,
+    paymentCredKind: address.payment_cred().kind() ?? null,
+  };
+}
+
+export const getAllUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
+  // noinspection JSIncompatibleTypesComparison
+  return inputs.filter(i => i != null)
+    .map(input => getUtxo(walletUtxos, input.transaction_id, input.index)) ?? [];
 };
 
-const getUtxo = async (utxos: any, txHash: string, txIndex: number) => {
+const getUtxo = (utxos: any, txHash: string, txIndex: number) => {
   let internalUtxo = utxos.find(u => {
     return u.output.Transaction.Hash === txHash && u.output.UtxoTransactionOutput.OutputIndex === txIndex;
   });

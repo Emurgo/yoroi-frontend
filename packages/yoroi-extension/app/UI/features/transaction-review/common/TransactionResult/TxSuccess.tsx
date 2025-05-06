@@ -24,6 +24,7 @@ export const TxSuccess = () => {
           navigate.walletTransactions();
           closeModal();
         }}
+        id="txSuccess-close-button"
       >
         Close
       </Button>

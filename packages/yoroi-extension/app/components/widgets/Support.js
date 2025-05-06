@@ -52,7 +52,7 @@ export default class Support extends Component<Props, State> {
           position: 'absolute',
           bottom: '24px',
           right: '30px',
-          zIndex: '9999',
+          zIndex: '9998',
         }}
       >
         {open === false && (

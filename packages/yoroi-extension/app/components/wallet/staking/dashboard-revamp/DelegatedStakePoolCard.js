@@ -50,6 +50,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           intl={intl}
           delegateToSpecificPool={delegateToSpecificPool}
           stores={stores}
+          socialMediaInfo={{ socialLinks, websiteUrl }}
         />
       </Stack>
       <Box
@@ -74,7 +75,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
             {ticker != null ? `[${ticker}]` : ''} {name ?? truncateAddress(poolIdHexToBech32(id))}
           </Typography>
           <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
-          <br/>
+          <br />
         </Box>
       </Wrapper>
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>

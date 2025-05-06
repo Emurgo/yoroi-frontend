@@ -65,7 +65,7 @@ export const messages = Object.freeze(
       defaultMessage: '!!!fee',
     },
     interactWithOperations: {
-      id: 'wallet.transaction.fee',
+      id: 'transaction.review.interactWithOperations',
       defaultMessage: '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
     },
     learnMore: {
@@ -136,6 +136,18 @@ export const messages = Object.freeze(
       id: 'transaction.review.rewardsWithdraw',
       defaultMessage: '!!!Our rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
     },
+    associatedAddress: {
+      id: 'transaction.review.associatedAddress',
+      defaultMessage: '!!!Associated address',
+    },
+    yourWallet: {
+      id: 'global.label.yourWallet',
+      defaultMessage: '!!!Your Wallet',
+    },
+    receiveLabel: {
+      id: 'global.receive',
+      defaultMessage: '!!!receive',
+    },
   })
 );
 
@@ -175,5 +187,8 @@ export const useStrings = () => {
     operations: intl.formatMessage(messages.operations),
     attentionLabel: intl.formatMessage(messages.attentionLabel),
     rewardsWithdraw: intl.formatMessage(messages.rewardsWithdraw),
+    associatedAddress: intl.formatMessage(messages.associatedAddress),
+    yourWallet: intl.formatMessage(messages.yourWallet),
+    receiveLabel: intl.formatMessage(messages.receiveLabel),
   }).current;
 };

@@ -18,12 +18,14 @@ type ModalState = {
   isLoading: boolean;
   modalView: 'transactionReview' | 'walletInfo';
   unsignedTx: YoroiUnsignedTx | null;
+  drepID: string;
   cborTx: YoroiUnsignedTx | null;
 };
 type ModalActions = {
   openTxReviewModal: any;
   changeModalView: any;
   changePasswordInputValue: any;
+  setDrepId: any;
   setInputError: any;
   setUnsignedTx: any;
   setCborTx: any;
@@ -78,6 +80,7 @@ export const ReviewTxProvider = ({
       height: '440px',
       width: '612px',
       content: result === TransactionResult.SUCCESS ? <TxSuccess /> : <TxFail />,
+      modalId: result === TransactionResult.SUCCESS ? 'txSuccess' : 'txFail',
     });
   };
 
@@ -126,6 +129,12 @@ export const ReviewTxProvider = ({
         inputError: payload.inputError,
       });
     },
+    setDrepId: (payload: any) => {
+      dispatch({
+        type: 'setDrepId',
+        drepID: payload.drepID,
+      });
+    },
     setUnsignedTx: (payload: any) => {
       dispatch({
         type: 'setUnsignedTx',
@@ -162,6 +171,7 @@ export const ReviewTxProvider = ({
       isStakeRegistered: currentWalletInfo?.isStakeRegistered,
       stakeKeyDeposit,
       showTxResultModal: result => handleTxResult(result),
+      stakingRewards: currentWalletInfo?.stakingRewards,
       ...actions,
     }),
     [state, actions, stakeKeyDeposit]
@@ -206,6 +216,9 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
     case 'setInputError':
       return { ...state, inputError: action.inputError };
 
+    case 'setDrepId':
+      return { ...state, drepID: action.drepID };
+
     case 'setUnsignedTx':
       return { ...state, unsignedTx: action.unsignedTx };
 
@@ -239,4 +252,5 @@ const defaultState: ModalState = Object.freeze({
   passswordInput: '',
   inputError: null,
   extraDetails: null,
+  drepID: '',
 });
