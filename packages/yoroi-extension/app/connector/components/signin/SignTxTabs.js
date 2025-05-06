@@ -28,13 +28,7 @@ const messages = defineMessages({
   connection: { id: 'connector.signIn.tabs.connection', defaultMessage: '!!!Connection' },
 });
 
-function SignTxTabs({
-  connectionContent,
-  utxosContent,
-  detailsContent,
-  isDataSignin,
-  intl,
-}: Props & Intl): Node {
+function SignTxTabs({ connectionContent, utxosContent, detailsContent, isDataSignin, intl }: Props & Intl): Node {
   const [value, setValue] = useState(0);
   const match = useMediaQuery('(min-width:1441px)');
 
@@ -49,14 +43,14 @@ function SignTxTabs({
   const isTestEnv = environment.isNightly() || environment.isTest();
 
   return (
-    <Background>
-      <Typography component="div" color="#242838" variant="h4" align="center" my="32px">
+    <Box sx={{ bgcolor: 'ds.bg_color_high_contrast' }}>
+      <Typography component="div" color="ds.gray_700" variant="h4" align="center" my="32px">
         {intl.formatMessage(connectorMessages[isDataSignin ? 'signData' : 'signTransaction'])}
       </Typography>
       <TabContext value={value}>
         <Box
           sx={{
-            backgroundColor: 'var(--yoroi-palette-common-white)',
+            bgcolor: 'ds.bg_color_high_contrast',
             marginLeft: '32px',
             marginRight: '32px',
           }}
@@ -88,7 +82,7 @@ function SignTxTabs({
                 )
             )}
           </TabList>
-          <div style={{ backgroundColor: '#DCE0E9', height: '1px', width: '100%' }} />
+          <div style={{ bgcolor: 'ds.gray_100', height: '1px', width: '100%' }} />
         </Box>
         {tabs.map(
           ({ component, id }) =>
@@ -101,7 +95,7 @@ function SignTxTabs({
                   overflowY: 'scroll',
                   margin: 'auto',
                   boxShadow: 'none',
-                  backgroundColor: 'var(--yoroi-palette-common-white)',
+                  bgcolor: 'ds.bg_color_high_contrast',
                   p: '32px',
                   pr: '12px',
                   width: match ? '640px' : '480px',
@@ -114,13 +108,11 @@ function SignTxTabs({
             )
         )}
       </TabContext>
-    </Background>
+    </Box>
   );
 }
 
 export default (injectIntl(observer(SignTxTabs)): ComponentType<Props>);
-
-const Background = styled(Box)({ backgroundColor: 'var(--yoroi-palette-common-white)' });
 
 const StyledTab = styled(Tab)({
   '&.MuiTab-root': {
@@ -132,6 +124,6 @@ const StyledTab = styled(Tab)({
     minWidth: 0,
   },
   '&.MuiTab-root:hover': {
-    color: '#3154CB',
+    color: 'ds.primary_blue',
   },
 });
