@@ -22,6 +22,13 @@ export const AssetCarousel = ({ data }) => {
   return (
     <Box height="40px">
       <Carousel
+        containerProps={{
+          style: {
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '100%',
+          }
+        }}
         activeSlideIndex={activeSlideIndex}
         onRequestChange={setActiveSlideIndex}
         itemsToShow={4}
@@ -74,7 +81,6 @@ export const AssetCarousel = ({ data }) => {
                 width: 50,
                 height: 50,
                 backgroundColor: 'transparent',
-                marginRight: '8px',
                 padding: '0px',
                 position: 'relative',
               }}
@@ -83,13 +89,14 @@ export const AssetCarousel = ({ data }) => {
                 <img
                   width="48px"
                   height="48px"
+                  style={{borderRadius: '8px'}}
                   src={token.info.image}
                   onError={(e: any) => {
                     e.target.src = defaultImage;
                   }}
                 />
               </Box>
-              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%' }} />
+              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%'}} />
             </Box>
           ))}
       </Carousel>

@@ -92,7 +92,7 @@ const WalletStats = () => {
 const WalletAssets = () => {
   const { ftAssetsList, nftAssetList } = useTxReviewModal();
 
-  const formatedNftAssetList = nftAssetList.map(nft => ({
+  const formatedNftAssetList = [nftAssetList[0], nftAssetList[1]].map(nft => ({
     ...nft,
     info: { image: nft.image },
   }));
@@ -110,7 +110,7 @@ const WalletAssetsSection = ({ data, label }) => {
       direction="column"
       height="160px"
       width="233px"
-      sx={{ border: '1px solid gray', borderRadius: '8px', position: 'relative' }}
+      sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px', position: 'relative' }}
       p="16px"
       gap="16px"
     >
