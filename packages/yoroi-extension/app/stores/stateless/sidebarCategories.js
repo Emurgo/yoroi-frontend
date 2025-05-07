@@ -13,6 +13,7 @@ import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import environment from '../../environment';
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
@@ -83,7 +84,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.NFT_GALLERY.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: existsSelectedWallet,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'voting',

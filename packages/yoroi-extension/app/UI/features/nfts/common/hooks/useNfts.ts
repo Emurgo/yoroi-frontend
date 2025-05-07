@@ -7,7 +7,7 @@ import { Nft } from '../types';
 
 export const useNfts = () => {
   const { spendableBalance, getTokenInfo } = useNftGallery();
-
+  const [loading, setLoading] = useState(true);
   const [nftsList, setNftsList] = useState<Nft[]>([]);
 
   useEffect(() => {
@@ -35,7 +35,8 @@ export const useNfts = () => {
       });
 
     setNftsList(nfts);
+    setLoading(false);
   }, []);
 
-  return { nftsList };
+  return { nftsList, loading };
 };

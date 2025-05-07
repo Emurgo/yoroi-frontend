@@ -54,6 +54,8 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import NftsPage from './UI/pages/nfts/NftsPage';
 // $FlowIgnore: suppressing this error
+import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
@@ -62,7 +64,6 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
-
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
@@ -324,7 +325,7 @@ const NFTsSubPages = stores => (
 const NftGallerySubPages = stores => (
   <Switch>
     <Route exact path={ROUTES.NFT_GALLERY.ROOT} component={props => <NftsPage {...props} stores={stores} />} />
-    {/* <Route exact path={ROUTES.NFT_GALLERY.DETAILS} component={props => <NftGalleryDetailsPage {...props} stores={stores} />} /> */}
+    <Route exact path={ROUTES.NFT_GALLERY.DETAILS} component={props => <NftDetailsPage {...props} stores={stores} />} />
   </Switch>
 );
 
