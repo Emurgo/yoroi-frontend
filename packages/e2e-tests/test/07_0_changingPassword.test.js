@@ -39,7 +39,7 @@ describe('Changing wallet password. Positive', function () {
     const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToWalletSubMenu();
   });
-  it('Correct old password, correct new password', async function () {
+  it('Change password', async function () {
     const walletSubTabPage = new WalletSubTab(webdriver, logger);
     await walletSubTabPage.changeWalletPassword(oldPassword, newPassword, newPassword);
   });
@@ -61,11 +61,8 @@ describe('Changing wallet password. Positive', function () {
     const txReviewSubmit = new TxReviewSubmit(webdriver, logger);
     await txReviewSubmit.enterPassword(oldPassword);
     await txReviewSubmit.submit();
-    // the tx fail modal should appears
-    // The behaviour will be changed when the issue https://emurgo.atlassian.net/browse/YOEXT-1950 is done
-    const txFailModal = new TxFailModal(webdriver, logger);
-    const modalIsDisplayed = await txFailModal.isDisplayed();
-    expect(modalIsDisplayed, 'The error modal is not displayed').to.be.true;
+    const errorMessage = await txReviewSubmit.waitAndGetPasswordError();
+    expect(errorMessage, 'Password error message is different').to.equal('Wrong password');
   });
 
   afterEach(async function () {
