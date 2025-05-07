@@ -5,11 +5,12 @@ import NftImage from './NftImage';
 interface NftCardProps {
   ipfsUrl: string | null;
   name: string;
+  onClick: () => void;
 }
 
-export default function NftCard({ ipfsUrl, name }: NftCardProps) {
+export default function NftCard({ ipfsUrl, name, onClick }: NftCardProps) {
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={onClick}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
         <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
       </Box>

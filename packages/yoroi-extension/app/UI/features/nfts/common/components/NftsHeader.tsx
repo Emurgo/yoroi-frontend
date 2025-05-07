@@ -1,23 +1,10 @@
 import { InputAdornment } from '@mui/material';
 import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { defineMessages } from 'react-intl';
-import globalMessages from '../../../../../i18n/global-messages';
-import { useIntl } from '../../../../context/IntlProvider';
 import { SearchInput } from '../../../../components/Input/SearchInput';
 import { Icons, IconWrapper } from '../../../../components/icons';
 import { ListColumnView } from '../types';
-
-const messages = defineMessages({
-  searchNFTs: {
-    id: 'wallet.nftGallary.search',
-    defaultMessage: '!!!Search NFTs',
-  },
-  nftsCount: {
-    id: 'wallet.nftGallary.details.nftsCount',
-    defaultMessage: '!!!NFTs ({number})',
-  },
-});
+import { useStrings } from '../hooks/useStrings';
 
 interface ColumnProps {
   count: number;
@@ -37,14 +24,12 @@ interface NftsHeaderProps {
 }
 
 export default function NftsHeader({ numNfts, columns, search, listColumnViews }: NftsHeaderProps) {
-  const { intl } = useIntl();
+  const strings = useStrings();
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
       <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px">
-        {numNfts === 0
-          ? intl.formatMessage(globalMessages.sidebarNfts)
-          : intl.formatMessage(messages.nftsCount, { number: numNfts })}
+        {numNfts === 0 ? strings.nfts : strings.nftsCount(numNfts)}
       </Typography>
       <Box display="flex" alignItems="center">
         <Stack direction="row" spacing={1} marginRight="30px">
@@ -61,7 +46,7 @@ export default function NftsHeader({ numNfts, columns, search, listColumnViews }
         <SearchInput
           value={search.keyword}
           onChange={e => search.setKeyword(e.target.value)}
-          placeholder={intl.formatMessage(messages.searchNFTs)}
+          placeholder={strings.searchNfts}
           endAdornment={
             search.keyword !== '' && (
               <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
