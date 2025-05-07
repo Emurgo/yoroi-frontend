@@ -37,8 +37,8 @@ export default class InsufficientFundsPage extends Component<Props> {
         subtitle={intl.formatMessage(
           messages.subtitle,
           {
-            currentBalance: this.props.currentBalance,
-            requiredBalance: this.props.requiredBalance,
+            currentBalance: this.props.currentBalance.toString(),
+            requiredBalance: this.props.requiredBalance.toString(),
             tokenName: this.props.tokenName,
           }
         )}
