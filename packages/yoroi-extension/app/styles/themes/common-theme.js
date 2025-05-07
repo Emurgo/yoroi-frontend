@@ -19,6 +19,7 @@ export const commonTheme: Object = {
    * To create the "medium" vairant, you can overwrite the font-weight to be
    * "fontWeight: 500".
    */
+  spacing: 1,
   typography: {
     htmlFontSize: 14,
     fontSize: 14,

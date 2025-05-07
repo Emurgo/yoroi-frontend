@@ -1,6 +1,7 @@
 // @flow
 import { alpha } from '@mui/material/styles';
 import { light } from './themed-palettes/light';
+import { atoms } from './atoms/atoms';
 
 const grayscale = {
   main: '#8A92A3',
@@ -62,8 +63,9 @@ const magenta = {
 
 const system = { magenta, cyan, yellow, orange };
 
-export const lightThemeBase: any = {
+export const lightThemeBase = {
   name: 'light-theme',
+  atoms,
   palette: {
     mode: 'light',
     /* `main` is added since MUI required it but we don't use it at all */

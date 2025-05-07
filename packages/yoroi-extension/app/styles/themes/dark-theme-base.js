@@ -1,6 +1,7 @@
 // @flow
 import { alpha } from '@mui/material/styles';
 import { dark } from './themed-palettes/dark';
+import { atoms } from './atoms/atoms';
 
 const primary = {
   main: '#4B6DDE',
@@ -62,6 +63,7 @@ const system = { magenta, cyan, yellow, orange };
 
 export const darkThemeBase: any = {
   name: 'dark-theme',
+  atoms,
   palette: {
     mode: 'dark',
     /* `main` is added since MUI required it but we don't use it at all */

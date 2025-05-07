@@ -4,7 +4,7 @@ import { TopBarActions } from './TopBarActions';
 
 export const AssetSwap = () => {
   return (
-    <Content direction="column">
+    <Content direction="column" width="503px" margin="0 auto">
       <TopBarActions />
     </Content>
   );
