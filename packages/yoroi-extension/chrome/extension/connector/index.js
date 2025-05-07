@@ -29,7 +29,7 @@ const initializeDappConnector: void => Promise<void> = async () => {
   const router = new RouterStore();
   const hashHistory = createHashHistory();
   const history = syncHistoryWithStore(hashHistory, router);
-  const stores = createStores(api);
+  const stores = await createStores(api);
 
   window.yoroi = {
     api,
