@@ -64,12 +64,14 @@ const NftGallery = () => {
 
   return (
     <>
-      <NftsHeader
-        numNfts={filteredNftsList.length}
-        listColumnViews={listColumnViews}
-        search={{ keyword, setKeyword }}
-        columns={{ count: columns?.count || 4, setColumns: setColumnsAndTrack }}
-      />
+      {nftsList.length > 0 && (
+        <NftsHeader
+          numNfts={filteredNftsList.length}
+          listColumnViews={listColumnViews}
+          search={{ keyword, setKeyword }}
+          columns={{ count: columns?.count || 4, setColumns: setColumnsAndTrack }}
+        />
+      )}
       {filteredNftsList.length === 0 && <NftsEmptyState isSearch={keyword !== ''} />}
       {filteredNftsList.length > 0 && <NftsGrid columnsCount={columns?.count || 4} nftsList={filteredNftsList} />}
     </>
