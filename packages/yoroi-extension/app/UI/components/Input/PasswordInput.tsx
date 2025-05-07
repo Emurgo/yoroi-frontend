@@ -36,7 +36,7 @@ export const PasswordInput = ({ id, label, onChange, value, error, disabled, hel
       </InputLabel>
       <SOutlinedInput
         fullWidth
-        id={id}
+        id={id + '-input'}
         type={showPassword ? 'text' : 'password'}
         onChange={onChange}
         value={value}
@@ -57,7 +57,7 @@ export const PasswordInput = ({ id, label, onChange, value, error, disabled, hel
         error={error}
       />
       {error && (
-        <FormHelperText error id="labe-error">
+        <FormHelperText error id={id + 'Error-text'}>
           {helperText}
         </FormHelperText>
       )}

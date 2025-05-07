@@ -35,7 +35,7 @@ export const SubmitInput = () => {
       <Box>
         <PasswordInput
           label={strings.password}
-          id="txReview:submitTransaction-password-input"
+          id="txReview:submitTransaction-password"
           onChange={e => {
             changePasswordInputValue({ type: 'changeInputValue', passswordInput: e.target.value });
           }}

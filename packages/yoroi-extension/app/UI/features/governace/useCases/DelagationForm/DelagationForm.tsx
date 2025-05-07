@@ -52,7 +52,7 @@ export const DelagationForm = () => {
   const [password, setPassword] = React.useState('');
   const [formLoading, setFormLoading] = React.useState(false);
   const [txFee, setTxFee] = React.useState<string>('');
-  const [isIncorectPasswaord, setIsIncorectPassword] = React.useState(false);
+  const [isIncorectPassword, setIsIncorectPassword] = React.useState(false);
   const navigateTo = useNavigateTo();
   const {
     governanceVote,
@@ -197,11 +197,11 @@ export const DelagationForm = () => {
         ) : (
           <PasswordInput
             label={strings.password}
-            id="outlined-adornment-password"
+            id="txReview:submitTransaction-password"
             onChange={event => setPassword(event.target.value)}
             value={password}
-            error={!!isIncorectPasswaord}
-            helperText={isIncorectPasswaord ? strings.wrongPassword : ' '}
+            error={!!isIncorectPassword}
+            helperText={isIncorectPassword ? strings.wrongPassword : ' '}
             disabled={formLoading}
           />
         )}
