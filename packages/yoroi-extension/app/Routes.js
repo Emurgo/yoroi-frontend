@@ -38,6 +38,8 @@ import { GovernanceContextProvider } from './UI/features/governace/module/Govern
 // $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
+import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
+// $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
@@ -50,6 +52,10 @@ import GovernanceTransactionSubmittedPage from './UI/pages/Governance/Governance
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
+import NftsPage from './UI/pages/nfts/NftsPage';
+// $FlowIgnore: suppressing this error
+import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
@@ -58,7 +64,6 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
-
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
@@ -204,6 +209,10 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
+          <Route
+            path={ROUTES.NFT_GALLERY.ROOT}
+            component={props => wrapNftGallery({ ...props, stores }, NftGallerySubPages(stores))}
+          />
           <Route path={ROUTES.CASHBACK.ROOT} component={props => <CashbackPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.WALLETS.ADD} component={props => <AddWalletPage {...props} stores={stores} />} />
           <Route
@@ -310,6 +319,13 @@ const NFTsSubPages = stores => (
   <Switch>
     <Route exact path={ROUTES.NFTS.ROOT} component={props => <NFTsPageRevamp {...props} stores={stores} />} />
     <Route exact path={ROUTES.NFTS.DETAILS} component={props => <NFTDetailPageRevamp {...props} stores={stores} />} />
+  </Switch>
+);
+
+const NftGallerySubPages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.NFT_GALLERY.ROOT} component={props => <NftsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.NFT_GALLERY.DETAILS} component={props => <NftDetailsPage {...props} stores={stores} />} />
   </Switch>
 );
 
@@ -461,5 +477,13 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
+  );
+}
+
+export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
+  return (
+    <NftGalleryContextProvider stores={nftGalleryProps.stores}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </NftGalleryContextProvider>
   );
 }
