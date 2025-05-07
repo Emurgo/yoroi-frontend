@@ -17,6 +17,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
+import { strong } from '../../../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   description: {
@@ -104,7 +105,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
         maxWidth={length === 15 ? '636px' : '760px'}
       >
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedMessage {...messages.description} />
+          <FormattedMessage {...messages.description} values={{ strong }}/>
         </Typography>
 
         <RestoreRecoveryPhraseForm

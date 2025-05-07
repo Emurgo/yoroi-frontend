@@ -7,6 +7,7 @@ import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   maxNumberAllowed: {
@@ -33,7 +34,10 @@ export default class MaxAssetsError extends Component<Props> {
           </Typography>
         </Stack>
         <Typography component="div" variant="body1" color="grayscale.900">
-          <FormattedMessage {...messages.maxNumberAllowed} values={{ number: this.props.maxAssetsAllowed }} />
+          <FormattedMessage
+            {...messages.maxNumberAllowed}
+            values={{ number: String(this.props.maxAssetsAllowed), strong }}
+          />
         </Typography>
       </Box>
     );

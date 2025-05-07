@@ -7,6 +7,7 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import imgWarningIcon from '../../../assets/img/warning-icon.svg';
 import styles from './WebAuthnTopBlock.scss';
+import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   noteText: {
@@ -47,7 +48,7 @@ export default class WebAuthnTopBlock extends React.Component<Props> {
             alt="Warning Icon"
           />
           <div className={styles.text}>
-            {<FormattedMessage {...messages.noteText} />}
+            {<FormattedMessage {...messages.noteText} values={{ strong }}/>}
           </div>
         </div>
       </div>

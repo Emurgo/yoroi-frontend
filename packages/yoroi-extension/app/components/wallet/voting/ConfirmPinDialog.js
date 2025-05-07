@@ -19,6 +19,7 @@ import styles from './ConfirmPinDialog.scss';
 import type { StepsList } from './types';
 import { Typography } from '@mui/material';
 import Stepper from '../../common/stepper/Stepper';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   line1: {
@@ -99,7 +100,7 @@ export default class ConfirmPinDialog extends Component<Props> {
               variant="body1"
               color="grayscale.900"
             >
-              <FormattedMessage {...messages.line1} />
+              <FormattedMessage {...messages.line1} values={{ strong }}/>
             </Typography>
           </>
         )}

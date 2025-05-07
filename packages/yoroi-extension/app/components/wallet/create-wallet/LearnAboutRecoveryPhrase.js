@@ -12,6 +12,7 @@ import { isDialogShownBefore, TIPS_DIALOGS } from './steps';
 import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import { messages as infoDialogMessages } from '../../widgets/infoDialog';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages: * = defineMessages({
   description: {
@@ -48,7 +49,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1">
-          <FormattedMessage {...messages.description} />
+          <FormattedMessage {...messages.description} values={{ strong }}/>
           <Box
             component="span"
             sx={{

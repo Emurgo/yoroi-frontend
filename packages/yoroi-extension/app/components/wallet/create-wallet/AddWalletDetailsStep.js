@@ -18,6 +18,7 @@ import { observer } from 'mobx-react';
 import { Stack, Typography, Box, styled } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -149,7 +150,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography component="div" variant="body1" color="ds.text_gray_medium">
-              <FormattedMessage {...descriptionMessage} />
+              <FormattedMessage {...descriptionMessage} values={{ strong }}/>
             </Typography>
             <IconWrapper
               component="button"

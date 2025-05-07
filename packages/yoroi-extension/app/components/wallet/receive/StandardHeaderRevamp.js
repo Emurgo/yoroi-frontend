@@ -144,7 +144,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Box>
 
             <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
-              <FormattedMessage {...messages.walletReceiveInstructions} />
+              <FormattedMessage {...messages.walletReceiveInstructions} values={{ newLine: (<br/>) }}/>
             </Typography>
 
             {generateAddressForm}

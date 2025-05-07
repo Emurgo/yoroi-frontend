@@ -21,11 +21,6 @@ const messages: * = defineMessages({
     id: 'wallet.registrationOver.mainTitle',
     defaultMessage: '!!!Registration is not available',
   },
-  mainSubtitle: {
-    id: 'wallet.registrationOver.mainSubtitle',
-    defaultMessage:
-      '!!!The registration period for fund {roundNumber} has ended. For more information, check the <a href="https://projectcatalyst.io/get-involved/become-a-voter" target="_blank"> Catalyst app. </a>',
-  },
   unavailableTitle: {
     id: 'wallet.registrationOver.unavailableTitle',
     defaultMessage: '!!!Catalyst Round information is currently unavailable.',

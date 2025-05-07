@@ -19,6 +19,7 @@ import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
 import Card from '../../common/card/Card';
 import styles from './Voting.scss';
+import { makeLink } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   lineTitle: {
@@ -50,12 +51,12 @@ const messages = defineMessages({
   trezorTRequirement: {
     id: 'wallet.voting.trezorTRequirement',
     defaultMessage:
-      '!!!<a target="_blank" rel="noopener noreferrer" href="https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware">Update</a> your Trezor device firmware version to 2.4.1 or above.',
+      '!!!<updateLink>Update</updateLink> your Trezor device firmware version to 2.4.1 or above.',
   },
   ledgerNanoRequirement: {
     id: 'wallet.voting.ledgerNanoRequirement',
     defaultMessage:
-      '!!!<a target="_blank" rel="noopener noreferrer" href="https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/">Update</a> the Cardano app on your Ledger to version 6 or above with <a target="_blank" rel="noopener noreferrer" href="https://www.ledger.com/ledger-live"> Ledger Live</a>.',
+      '!!!<updateLink>Update</updateLink> the Cardano app on your Ledger to version 6 or above with <ledgerLiveLink>Ledger Live</ledgerLiveLink>.',
   },
 });
 
@@ -91,39 +92,6 @@ export default class Voting extends Component<Props, State> {
   state: State = {
     showDisclamer: true,
   };
-
-  renderStep3(): Node {
-    const { walletType } = this.props;
-
-    if (walletType === 'mnemonic') {
-      return null;
-    }
-    if (walletType === 'trezorT') {
-      return (
-        <div className={classnames([styles.card, styles.bgStep3TrezorT])}>
-          <div className={styles.number}>
-            <span>3</span>
-          </div>
-          <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedMessage {...messages.trezorTRequirement} />
-          </div>
-        </div>
-      );
-    }
-    if (walletType === 'ledgerNano') {
-      return (
-        <div className={classnames([styles.card, styles.bgStep3LedgerNano])}>
-          <div className={styles.number}>
-            <span>3</span>
-          </div>
-          <div className={classnames([styles.lineText, styles.step2Text])}>
-            <FormattedMessage {...messages.ledgerNanoRequirement} />
-          </div>
-        </div>
-      );
-    }
-    throw new Error(`${nameof(Voting)} impossible wallet type`);
-  }
 
   render(): Node {
     const intl = this.context;
@@ -202,9 +170,22 @@ export default class Voting extends Component<Props, State> {
                 label="Step 3"
                 imageSrc={walletType === 'ledgerNano' ? LedgerStepImage : TrezorStepImage}
                 description={
-                  <FormattedMessage
-                    {...(walletType === 'ledgerNano' ? messages.ledgerNanoRequirement : messages.trezorTRequirement)}
-                  />
+                  walletType === 'ledgerNano' ? (
+                    <FormattedMessage
+                      {...messages.ledgerNanoRequirement}
+                      values={{
+                        updateLink: makeLink('https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/'),
+                        ledgerLiveLink: makeLink('https://www.ledger.com/ledger-live'),
+                      }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      {...messages.trezorTRequirement}
+                      values={{
+                        updateLink:makeLink('https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware'),
+                      }}
+                    />
+                  )
                 }
               />
             )}

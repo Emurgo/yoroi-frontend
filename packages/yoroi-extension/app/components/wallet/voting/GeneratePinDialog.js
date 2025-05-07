@@ -14,6 +14,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
 import classnames from 'classnames';
 import styles from './GeneratePinDialog.scss';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   line1: {
@@ -107,7 +108,7 @@ export default class GeneratePinDialog extends Component<Props> {
               variant="body1"
               color="ds.text_gray_medium"
             >
-              <FormattedMessage {...messages.line1} />
+              <FormattedMessage {...messages.line1} values={{ strong }}/>
             </Typography>
           </>
         )}

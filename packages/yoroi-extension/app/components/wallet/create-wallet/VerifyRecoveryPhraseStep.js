@@ -12,6 +12,7 @@ import { makeSortedPhrase } from '../../../utils/recoveryPhrase';
 import globalMessages from '../../../i18n/global-messages';
 import Fade from '@mui/material/Fade';
 import { ampli } from '../../../../ampli/index';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   description: {
@@ -86,7 +87,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedMessage {...messages.description} />
+          <FormattedMessage {...messages.description} values={{ strong }}/>
         </Typography>
 
         <Box

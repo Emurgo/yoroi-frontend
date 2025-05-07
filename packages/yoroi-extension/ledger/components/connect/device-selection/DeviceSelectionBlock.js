@@ -18,6 +18,7 @@ import { getTutorialLink } from '../../../utils/cmn';
 import imgExternalLink from '../../../assets/img/external-link.svg';
 
 import styles from './DeviceSelectionBlock.scss';
+import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 
 const message = defineMessages({
   deviceNanos: {
@@ -134,13 +135,13 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
             <div className={styles.deviceKnown}>
               <div className={styles.knowInfoBlock}>
                 <div className={styles.knownInfoText}>
-                  <FormattedMessage {...message.knownInfo1} values={{ deviceName }} />
+                  <FormattedMessage {...message.knownInfo1} values={{ deviceName, strong }}/>
                 </div>
                 <div className={styles.knownInfoText}>
                   {intl.formatMessage(message.knownInfo2)}
                 </div>
                 <div className={styles.knownInfoText}>
-                  <FormattedMessage {...message.knownInfo3} />
+                  <FormattedMessage {...message.knownInfo3} values={{ strong }}/>
                 </div>
               </div>
               <div className={styles.continueButtonBlock}>

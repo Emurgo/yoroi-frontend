@@ -10,6 +10,7 @@ import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Box, Typography, styled } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   subtitle: {
@@ -153,6 +154,7 @@ export default class ComplexityLevel extends Component<Props> {
                 level: intl.formatMessage(
                   complexityLevel === ComplexityLevels.Advanced ? messages.titleAdvancedLevel : messages.titleSimpleLevel
                 ),
+                strong,
               }}
             />
           </Typography>

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { IntlContext, FormattedMessage } from 'react-intl';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './HintBlock.scss';
+import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 
 type Props = {|
   number: number,
@@ -42,7 +43,7 @@ export default class HintBlock extends React.Component<Props> {
           </div>
           <div className={styles.textBlock}>
             <div className={styles.primaryText}>
-              <FormattedMessage {...text} />
+              <FormattedMessage {...text}  values={{ strong }}/>
             </div>
             {secondaryText != null && (
               <div className={styles.secondaryText}>

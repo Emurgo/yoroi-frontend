@@ -8,15 +8,16 @@ import { ReactComponent as WarningSvg }  from '../../../assets/images/warning.in
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { makeLink } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   serverErrorLabel: {
     id: 'serverError.label.message',
-    defaultMessage: '!!!WARNING: Server experiencing difficulties.<br>Please check <a target="blank" href="https://twitter.com/YoroiWallet">our Twitter account</a>.<br>The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.',
+    defaultMessage: '!!!WARNING: Server experiencing difficulties.{newLine}Please check <yoroiXLink>our Twitter account</yoroiXLink>.{newLine}The displayed balance and transaction history may appear incorrect until our servers are back to normal, but your actual balance is not affected.',
   },
   networkErrorLabel: {
     id: 'networkError.label.message',
-    defaultMessage: '!!!Server connection failed <br/> Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
+    defaultMessage: '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLinkhere</zendeskLink>.',
   },
 });
 
@@ -48,8 +49,15 @@ export default class ServerErrorBanner extends Component<Props> {
         {displayMessage === null ? null : (
           <div className={styles.serverError}>
             <span key="0" className={styles.warningIcon}><WarningSvg /></span>
-            <FormattedMessage {...displayMessage} key="1" />
-
+            <FormattedMessage
+              {...displayMessage}
+              key="1"
+              values={{
+                newLine: (<br/>),
+                yoroiXLink: makeLink('https://twitter.com/YoroiWallet'),
+                zendeskLink: makeLink('https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'),
+              }}
+            />
           </div>)
         }
       </div>

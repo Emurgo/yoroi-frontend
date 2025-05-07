@@ -17,7 +17,7 @@ import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 import ReactMarkdown from 'react-markdown';
-
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   title: {
@@ -186,7 +186,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                     <Icon />
                   </Box>
                   <Typography component="div" color="ds.text_gray_medium">
-                    <FormattedMessage {...msg} />
+                    <FormattedMessage {...msg} values={{ strong }}/>
                   </Typography>
                 </Box>
               ))}

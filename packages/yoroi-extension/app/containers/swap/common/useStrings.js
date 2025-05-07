@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -430,8 +431,8 @@ export const useStrings = () => {
     marketPriceTooltip: intl.formatMessage(messages.marketPriceTooltip),
     priceImpact: intl.formatMessage(messages.priceImpact),
     priceImpactTooltip: intl.formatMessage(messages.priceImpactTooltip),
-    priceImpactSevere: <FormattedMessage {...messages.priceImpactSevere} />,
-    priceImpactNotSevere: <FormattedMessage {...messages.priceImpactNotSevere} />,
+    priceImpactSevere: <FormattedMessage {...messages.priceImpactSevere} values={{ strong }}/>,
+    priceImpactNotSevere: <FormattedMessage {...messages.priceImpactNotSevere} values={{ strong }}/>,
     numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num }),
     numAssetsAvailable: num => intl.formatMessage(messages.numAssetsAvailable, { num }),
     noAssetFoundWithTerm: term => intl.formatMessage(messages.noAssetFoundWithTerm, { searchTerm: term }),

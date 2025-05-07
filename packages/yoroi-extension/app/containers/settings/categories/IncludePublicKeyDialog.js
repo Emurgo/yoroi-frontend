@@ -6,9 +6,9 @@ import { observer } from 'mobx-react';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import type { StoresProps } from '../../../stores';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 type Props = {|
   +downloadIncludingKey: void => void,
@@ -68,8 +68,8 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
         }}
         id="includePublicKeyDialog"
       >
-        <div><FormattedMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
-        <div><FormattedMessage {...globalMessages.publicKeyExplanation} /></div>
+        <div><FormattedMessage {...dialogMessages.includeKeyExplanationLine1} values={{ strong }}/></div>
+        <div><FormattedMessage {...globalMessages.publicKeyExplanation} values={{ strong }}/></div>
       </DangerousActionDialog>
     );
   }

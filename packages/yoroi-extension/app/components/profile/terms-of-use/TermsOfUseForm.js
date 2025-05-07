@@ -107,7 +107,13 @@ export default class TermsOfUseForm extends Component<Props, State> {
                     },
                   }}
                 >
-                  <FormattedMessage {...globalMessages.tosAgreement} />
+                  <FormattedMessage
+                    {...globalMessages.tosAgreement}
+                    values={{
+                      tosLink: chunks => (<span id="tosLink">{chunks}</span>),
+                      privacyLink: chunks => (<span id="privacyLink">{chunks}</span>),
+                    }}
+                  />
                 </Box>
               }
               control={

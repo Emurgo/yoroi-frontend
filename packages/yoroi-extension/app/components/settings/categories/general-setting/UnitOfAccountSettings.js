@@ -17,6 +17,7 @@ import globalMessages from '../../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
+import { strong } from '../../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -197,7 +198,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                 mb="35px"
                 color="ds.text_gray_medium"
               >
-                <FormattedMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+                <FormattedMessage {...messages.lastUpdated} values={{ lastUpdated, strong }} />
               </Typography>
             </>
           )}

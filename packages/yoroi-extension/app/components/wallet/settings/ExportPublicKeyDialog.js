@@ -11,6 +11,7 @@ import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { Box, List, ListItem, Typography, styled } from '@mui/material';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 export const messages: * = defineMessages({
   publicKeyExplanationLine1: {
@@ -72,7 +73,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         >
           <Box marginBottom="20px">
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedMessage {...messages.publicKeyExplanationLine1} />
+              <FormattedMessage {...messages.publicKeyExplanationLine1} values={{ strong }}/>
             </Typography>
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
               <FormattedMessage {...globalMessages.publicKeyExplanation} />

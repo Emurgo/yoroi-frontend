@@ -8,6 +8,7 @@ import styles from './UriAccept.scss';
 import { ReactComponent as UriPrompt }  from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { strong, em } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   seePrompt: {
@@ -35,7 +36,7 @@ export default class UriAccept extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            <FormattedMessage {...messages.seePrompt} />
+            <FormattedMessage {...messages.seePrompt} values={{ strong, em }}/>
           </div>
 
           <div className={styles.buttonsWrapper}>
