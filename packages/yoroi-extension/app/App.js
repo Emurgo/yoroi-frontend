@@ -114,13 +114,7 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
-    const mergedMessages = this.mergedMessages;
-    if (mergedMessages === null) {
-      return null;
-    }
-
     const { stores } = this.props;
-    const locale = stores.profile.currentLocale;
 
     Logger.debug(`[yoroi] messages merged`);
 
@@ -142,10 +136,7 @@ class App extends Component<Props, State> {
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
-            {this.getContent()}
-          </IntlProvider>
+          {this.getContent()}
       </ColorModeProvider>
       </div>
     );
@@ -159,19 +150,27 @@ class App extends Component<Props, State> {
     if (stores.serverConnectionStore.isMaintenance) {
       return <MaintenancePage stores={stores} />;
     }
+    const locale = stores.profile.currentLocale;
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     return (
       <HashRouter>
-        <NotificationsProvider
-          walletsStore={stores.wallets}
-          appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
-        >
-          <NotificationsManager />
-          <div style={{ height: '100%' }}>
-            <Support />
-            {YoroiRoutes(stores)}
-            <RoutingHelper stores={stores}/>
-          </div>
-        </NotificationsProvider>
+        <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+          >
+            <NotificationsManager />
+            <div style={{ height: '100%' }}>
+              <Support />
+              {YoroiRoutes(stores)}
+              <RoutingHelper stores={stores}/>
+            </div>
+          </NotificationsProvider>
+        </IntlProvider>
       </HashRouter>
     );
   };
