@@ -92,7 +92,7 @@ const WalletStats = () => {
 const WalletAssets = () => {
   const { ftAssetsList, nftAssetList } = useTxReviewModal();
 
-  const formatedNftAssetList = [nftAssetList[0], nftAssetList[1]].map(nft => ({
+  const formatedNftAssetList = nftAssetList.map(nft => ({
     ...nft,
     info: { image: nft.image },
   }));
