@@ -8,6 +8,12 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
 
   setup(): void {
     super.setup();
+    this.stores.loading.registerBlockingLoadingRequest(
+      (async () => {
+        await this.getProfileLocaleRequest.execute();
+      })(),
+      'load locale'
+    );
   }
 
   teardown(): void {

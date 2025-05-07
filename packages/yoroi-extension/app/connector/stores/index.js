@@ -70,7 +70,7 @@ function initializeSubstore<T: {...}>(
 export default (action(
   (
     api: Api,
-  ): StoresMap => {
+  ): Promise<StoresMap> => {
     const storeNames = Object.keys(storeClasses);
     storeNames.forEach(name => {
       if (stores[name]) stores[name].teardown();
@@ -94,13 +94,14 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    loadedStores.loading.load()
+    return loadedStores.loading.load()
       .then(() => console.debug('connector / loading store loaded'))
-      .catch(e => console.error('connector / loading store load failed', e));
-
-    return loadedStores;
+      .catch(e => console.error('connector / loading store load failed', e))
+      .then(() => {
+        return loadedStores;
+      });
   }
-): (Api) => StoresMap);
+): (Api) => Promise<StoresMap>);
 
 export type ConnectorStoresProps = {|
   +stores: StoresMap,
