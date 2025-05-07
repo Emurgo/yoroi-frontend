@@ -16,7 +16,7 @@ export const TopBarActions = () => {
   ];
 
   return (
-    <Stack direction="row" justifyContent="space-between" width="100%" {...atoms.pr_sm} {...atoms.pt_sm}>
+    <Stack direction="row" justifyContent="space-between" width="100%" {...atoms.pr_sm}>
       <Tabs
         tabs={orderTypeTabs.map(({ type, label }) => ({
           label,
@@ -24,6 +24,7 @@ export const TopBarActions = () => {
           onClick: () => setOrderType(type),
         }))}
       />
+
       <Stack direction="row" alignItems="center" {...atoms.gap_sm}>
         <IconWrapper icon={Icons.Refresh} asButton />
         <IconWrapper icon={Icons.Settings} asButton />
