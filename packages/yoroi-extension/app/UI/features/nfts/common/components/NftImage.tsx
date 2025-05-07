@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Skeleton, styled } from '@mui/material';
 import { urlResolveForIpfsAndCorsproxy } from '../../../../../coreUtils';
-import { imageExists } from '../helpers/index';
+import { checkImageLoads } from '../helpers/index';
 import { DefaultNft } from '../../../../components/ilustrations';
 
 interface NftImageProps {
@@ -19,7 +19,7 @@ export default function NftImage({ imageUrl, name, width, height, contentHeight 
 
   useEffect(() => {
     if (url !== null)
-      imageExists(
+      checkImageLoads(
         String(url),
         () => {
           setLoading(false);
