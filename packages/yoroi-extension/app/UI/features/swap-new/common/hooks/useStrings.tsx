@@ -12,6 +12,14 @@ export const messages = Object.freeze(
       id: 'swap.menu.orders',
       defaultMessage: '!!!Orders',
     },
+    limitTabLabel: {
+      id: 'swap.actions.limitTabLabel',
+      defaultMessage: '!!!Limit',
+    },
+    marketTabLabel: {
+      id: 'swap.actions.marketTabLabel',
+      defaultMessage: '!!!Market',
+    },
   })
 );
 
@@ -20,5 +28,7 @@ export const useStrings = () => {
   return React.useRef({
     assetSwapLabel: intl.formatMessage(messages.assetSwapLabel),
     orderSwapLabel: intl.formatMessage(messages.orderSwapLabel),
+    limitTabLabel: intl.formatMessage(messages.limitTabLabel),
+    marketTabLabel: intl.formatMessage(messages.marketTabLabel),
   }).current;
 };

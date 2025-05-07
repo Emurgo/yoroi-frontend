@@ -86,6 +86,7 @@ import { VisibilityOn } from './VisibilityOn';
 import { Voting } from './Voting';
 import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
+import { Refresh } from './Refresh';
 
 export const Icon = {
   Assets,
@@ -141,6 +142,7 @@ export const Icon = {
   QuestionCircle,
   Receive,
   Reporting,
+  Refresh,
   Sandbox,
   Script,
   Search,
@@ -231,6 +233,7 @@ export enum Icons {
   QuestionCircle = 'QuestionCircle',
   Receive = 'Receive',
   Reporting = 'Reporting',
+  Refresh = 'Refresh',
   Sandbox = 'Sandbox',
   Script = 'Script',
   Search = 'Search',
