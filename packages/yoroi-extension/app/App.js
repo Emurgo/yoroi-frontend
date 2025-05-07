@@ -130,13 +130,23 @@ class App extends Component<Props, State> {
     const muiTheme = MuiThemes[currentTheme];
     Logger.debug(`[yoroi] themes changed`);
 
+    const locale = stores.profile.currentLocale;
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     return (
       <div style={{ height: '100%' }}>
         <ColorModeProvider>
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
-          {this.getContent()}
+          <HashRouter>
+            <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
+              {this.getContent()}
+            </IntlProvider>
+          </HashRouter>
       </ColorModeProvider>
       </div>
     );
@@ -150,15 +160,7 @@ class App extends Component<Props, State> {
     if (stores.serverConnectionStore.isMaintenance) {
       return <MaintenancePage stores={stores} />;
     }
-    const locale = stores.profile.currentLocale;
-    const mergedMessages = this.mergedMessages;
-    if (mergedMessages === null) {
-      return null;
-    }
-
     return (
-      <HashRouter>
-        <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
           <NotificationsProvider
             walletsStore={stores.wallets}
             appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
@@ -170,8 +172,6 @@ class App extends Component<Props, State> {
               <RoutingHelper stores={stores}/>
             </div>
           </NotificationsProvider>
-        </IntlProvider>
-      </HashRouter>
     );
   };
 }
