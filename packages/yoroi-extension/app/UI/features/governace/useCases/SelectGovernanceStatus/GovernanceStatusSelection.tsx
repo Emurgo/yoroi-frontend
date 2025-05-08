@@ -3,18 +3,16 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import { GovernanceProvider } from '@yoroi/staking';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
-import { useModal } from '../../../../components/modals/ModalContext';
-import { ChooseDRepModal } from '../../common/ChooseDRepModal';
+import { TransactionResult } from '../../../transaction-review/common/types';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
-import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
@@ -46,18 +44,28 @@ export const GovernanceStatusSelection = () => {
     triggerBuySellAdaDialog,
     submitedTransactions,
     governanceVote,
+    signDelegationTransaction,
+    selectedWallet,
     networkId,
   } = useGovernance();
+
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stopLoadingTxReview,
+    changePasswordInputValue,
+    drepCredentialHex,
+    setUnsignedTx,
+    showTxResultModal,
+  } = useTxReviewModal();
+
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { openModal, closeModal, startLoading } = useModal();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-
   const params: any = useLocation();
 
   React.useEffect(() => {
@@ -66,28 +74,28 @@ export const GovernanceStatusSelection = () => {
     }
   }, [params]);
 
-  const openDRepIdModal = (onSubmit: (drepID: string, drepCredential: string) => void) => {
+  const handleDelegate = async () => {
     if (!governanceManager) {
       return;
     }
-    openModal({
-      title: String(strings.chooseDrep).toUpperCase(),
-      content: (
-        <GovernanceProvider manager={governanceManager}>
-          <ChooseDRepModal onSubmit={onSubmit} />
-        </GovernanceProvider>
-      ),
-      width: '648px',
-      height: '304px',
-      isLoading: loadingUnsignTx,
-    });
-  };
 
-  const handleDelegate = async () => {
-    openDRepIdModal((drepID, drepCredential) => {
-      const vote: Vote = { kind: 'delegate', drepID };
-      governanceVoteChanged(vote);
-      createUnsignTx(drepCredential);
+    const vote: Vote = { kind: 'delegate', drepID: drepCredentialHex };
+    governanceVoteChanged(vote);
+    openTxReviewModal({
+      title: 'CHOOSE YOUR DREP',
+      modalView: 'chooseDrepId',
+      createUnsignedTx: async value => {
+        try {
+          startLoadingTxReview();
+          const txSignRequest: any = await createDrepDelegationTransaction(value);
+          setUnsignedTx({ type: 'setUnsignedTx', unsignedTx: txSignRequest.signTxRequest.unsignedTx });
+        } finally {
+          stopLoadingTxReview();
+        }
+      },
+      submitTx: password => {
+        signGovernanceTx(password);
+      },
     });
   };
   const handleYoroiDelegate = async () => {
@@ -114,9 +122,16 @@ export const GovernanceStatusSelection = () => {
   const createUnsignTx = async kind => {
     try {
       setLoadingUnsignTx(true);
-      startLoading();
-      await createDrepDelegationTransaction(kind);
-      navigateTo.delegationForm();
+      const txSignRequest: any = await createDrepDelegationTransaction(kind);
+
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        unsignedTx: txSignRequest.signTxRequest.unsignedTx,
+        submitTx: password => {
+          signGovernanceTx(password);
+        },
+      });
+
       setError(null);
     } catch (e) {
       if (e instanceof NotEnoughMoneyToSendError) {
@@ -124,13 +139,30 @@ export const GovernanceStatusSelection = () => {
       } else {
         setError('Error trying to Vote. Please try again later');
       }
-      closeModal();
     } finally {
       setLoadingUnsignTx(false);
     }
   };
 
   const isParticipatingInGovernance = governanceStatus.status != null && governanceStatus.status !== 'none';
+
+  const signGovernanceTx = async password => {
+    try {
+      startLoadingTxReview();
+      await signDelegationTransaction({
+        password,
+        wallet: selectedWallet,
+        dialog: null,
+      });
+      stopLoadingTxReview();
+      changePasswordInputValue({ type: 'changeInputValue', passswordInput: '' });
+      showTxResultModal(TransactionResult.SUCCESS);
+    } catch (error) {
+      console.warn('[createDrepDelegationTransaction,signDelegationTransaction]', error);
+      stopLoadingTxReview();
+      showTxResultModal(TransactionResult.FAIL);
+    }
+  };
 
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
@@ -191,7 +223,7 @@ export const GovernanceStatusSelection = () => {
 
   const skeletonsCards = new Array(optionsList.length).fill(null);
 
-  if (!isParticipatingInGovernance && (walletAdaBalance !== null && walletAdaBalance === 0)) {
+  if (!isParticipatingInGovernance && walletAdaBalance !== null && walletAdaBalance === 0) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
     return (
@@ -208,8 +240,9 @@ export const GovernanceStatusSelection = () => {
         >
           {strings.needAdaForParticipation}
         </Typography>
-        {/* @ts-ignore */}
-        <Button variant="primary"
+        <Button
+          // @ts-ignore
+          variant="primary"
           sx={{ marginTop: '16px' }}
           onClick={() => {
             if (isTestnet) {
@@ -220,7 +253,7 @@ export const GovernanceStatusSelection = () => {
             }
           }}
         >
-          {isTestnet ?  strings.goToFaucet : 'Buy Ada'}
+          {isTestnet ? strings.goToFaucet : 'Buy Ada'}
         </Button>
       </Stack>
     );

@@ -25,7 +25,6 @@ export const ROUTES = {
       ROOT: '/wallets/receive',
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
-    CARDANO_DELEGATION: '/wallets/cardano-delegation',
   },
   SETTINGS: {
     ROOT: '/settings',
@@ -53,11 +52,15 @@ export const ROUTES = {
   },
   // Bringweb3
   CASHBACK: {
-    ROOT: '/cashback'
+    ROOT: '/cashback',
   },
   NFTS: {
     ROOT: '/nfts',
     DETAILS: '/nfts/:nftId',
+  },
+  NFT_GALLERY: {
+    ROOT: '/nft-gallery',
+    DETAILS: '/nft-gallery/:nftId',
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
@@ -86,5 +89,9 @@ export const ROUTES = {
     ROOT: '/portfolio',
     DAPPS: '/portfolio/dapps',
     DETAILS: '/portfolio/details/:tokenId',
+  },
+  TX_REVIEW: {
+    FAIL: '/tx-review/failed',
+    SUCCESS: '/tx-review/success',
   },
 };

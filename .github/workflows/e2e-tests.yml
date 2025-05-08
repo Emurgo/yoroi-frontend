@@ -170,14 +170,19 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - name: Forcefully update Chrome browser
-        id: chrome-version
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get --only-upgrade install google-chrome-stable
-          echo "version=$(google-chrome --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
+      # - name: Forcefully update Chrome browser
+      #   id: chrome-version
+      #   run: |
+      #     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      #     sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+      #     sudo apt-get update
+      #     sudo apt-get --only-upgrade install google-chrome-stable
+      #     echo "version=$(google-chrome --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1.7.3
+        with:
+          chrome-version: 135
 
       - uses: actions/checkout@v4
 

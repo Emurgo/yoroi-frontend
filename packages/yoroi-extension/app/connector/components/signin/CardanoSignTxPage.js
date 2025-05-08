@@ -3,19 +3,13 @@
 import type { Node } from 'react';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
-import type {
-  DefaultTokenEntry,
-  TokenLookupKey,
-  TokenEntry,
-} from '../../../api/common/lib/MultiToken';
+import type { DefaultTokenEntry, TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
-import type {
-  CardanoConnectorSignRequest,
-  SignSubmissionErrorType,
-} from '../../types';
+import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../../types';
 import type LocalizableError from '../../../i18n/LocalizableError';
+import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 import { Component } from 'react';
 import { intlShape, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
@@ -25,27 +19,24 @@ import config from '../../../config';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../utils/formatters';
-import {
-  getTokenName,
-  getTokenIdentifierIfExists,
-  assetNameFromIdentifier,
-} from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
-import SignTxTabs from './SignTxTabs';
 import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
-import ConnectionInfo from './cardano/ConnectionInfo';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
 import TextField from '../../../components/common/TextField';
 import ErrorBlock from '../../../components/widgets/ErrorBlock';
-import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 import { hexToUtf } from '../../../coreUtils';
+// $FlowIgnore: suppressing this error
+import ConnectionInfo from '../../../UI/features/connector/useCases/ConnectionInfo';
+// $FlowIgnore: suppressing this error
+import SignTxTabs from '../../../UI/features/connector/useCases/SignTxTabs';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -62,11 +53,30 @@ const messages = defineMessages({
   },
 });
 
+export type AssetInfo = {|
+  amount: BigNumber,
+  tokenInfo: $ReadOnly<{
+    Identifier: string,
+    IsDefault: boolean,
+    IsNFT?: boolean,
+    Metadata: $ReadOnly<{
+      type: 'Cardano',
+      policyId: string,
+      assetName: string,
+      numberOfDecimals: number,
+      ticker: string | null,
+      longName: string | null,
+      ...
+    }>,
+    ...
+  }>,
+|};
+
 export type SummaryAssetsData = {|
   total: DisplayAmount | Object,
   isOnlyTxFee: boolean,
-  sent: Array<any>,
-  received: Array<any>,
+  sent: Array<AssetInfo>,
+  received: Array<AssetInfo>,
 |};
 
 type TokenEntryWithFee = {|
@@ -165,11 +175,7 @@ class SignTxPage extends Component<Props, State> {
             })
             .catch(error => {
               if (error instanceof WrongPassphraseError) {
-                this.form
-                  .$('walletPassword')
-                  .invalidate(
-                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
-                  );
+                this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
               } else {
                 throw error;
               }
@@ -193,12 +199,7 @@ class SignTxPage extends Component<Props, State> {
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined ? (
-      <ExplorableHashContainer
-        selectedExplorer={this.props.selectedExplorer}
-        hash={fingerprint}
-        light
-        linkType="token"
-      >
+      <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={fingerprint} light linkType="token">
         <span>{truncateToken(getTokenName(tokenInfo))}</span>
       </ExplorableHashContainer>
     ) : (
@@ -209,12 +210,7 @@ class SignTxPage extends Component<Props, State> {
   renderAddressExplorerUrl: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined ? (
-      <ExplorableHashContainer
-        selectedExplorer={this.props.selectedExplorer}
-        hash={fingerprint}
-        light
-        linkType="token"
-      >
+      <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={fingerprint} light linkType="token">
         <span>{truncateAddressShort(getTokenName(tokenInfo), 10)}</span> <ExternalLinkIcon />
       </ExplorableHashContainer>
     ) : (
@@ -239,13 +235,9 @@ class SignTxPage extends Component<Props, State> {
     const shiftedAmount = request.amount.shiftedBy(-numberOfDecimals);
     const shiftedFee = request.fee.shiftedBy(-numberOfDecimals);
     const onlyFeeOrSend = request.amount.toNumber() === 0 || request.amount.toNumber() < 0;
-    const shiftedTotal = request.amount
-      .plus(onlyFeeOrSend ? request.fee.negated() : request.fee)
-      .shiftedBy(-numberOfDecimals);
+    const shiftedTotal = request.amount.plus(onlyFeeOrSend ? request.fee.negated() : request.fee).shiftedBy(-numberOfDecimals);
 
-    const ticker = tokenInfo
-      ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.identifier);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo) : assetNameFromIdentifier(request.identifier);
 
     let fiatAmountDisplay = null;
     let fiatCurrency = null;
@@ -303,6 +295,7 @@ class SignTxPage extends Component<Props, State> {
           tokenInfo: this.props.getTokenInfo(asset) ?? {
             Identifier: asset.identifier,
             IsDefault: false,
+            IsNFT: false,
             Metadata: {
               type: 'Cardano',
               policyId: asset.identifier.split('.')[0],
@@ -379,12 +372,7 @@ class SignTxPage extends Component<Props, State> {
             walletType={walletType}
             hwWalletError={hwWalletError}
             passwordFormField={
-              <TextField
-                type="password"
-                {...walletPasswordField.bind()}
-                error={walletPasswordField.error}
-                id="walletPassword"
-              />
+              <TextField type="password" {...walletPasswordField.bind()} error={walletPasswordField.error} id="walletPassword" />
             }
             cip95Info={txData.cip95Info}
           />
@@ -394,10 +382,7 @@ class SignTxPage extends Component<Props, State> {
       utxosContent = (
         <Box>
           <Box mb="32px">
-            <CardanoSignTxSummary
-              txAssetsData={summaryAssetsData}
-              renderExplorerHashLink={this.renderAddressExplorerUrl}
-            />
+            <CardanoSignTxSummary txAssetsData={summaryAssetsData} renderExplorerHashLink={this.renderAddressExplorerUrl} />
           </Box>
           <CardanoUtxoDetails
             txData={txData}
@@ -415,13 +400,14 @@ class SignTxPage extends Component<Props, State> {
       // signing data
       content = (
         <Box>
-          <Typography component="div" color="#4A5065" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
+          <Typography component="div" color="ds.gray_700" variant="body1" fontWeight={500} mb="16px" id="signMessageTitle">
             {intl.formatMessage(messages.signMessage)}
           </Typography>
           <Box
             width="100%"
             p="16px"
-            border="1px solid var(--yoroi-palette-gray-100)"
+            border="1px solid"
+            borderColor="ds.gray_100"
             borderRadius="6px"
             id="signMessageBox-payload"
             sx={{ overflow: 'auto' }}
@@ -433,12 +419,7 @@ class SignTxPage extends Component<Props, State> {
 
           {walletType === 'mnemonic' && (
             <Box mt="16px">
-              <TextField
-                type="password"
-                {...walletPasswordField.bind()}
-                error={walletPasswordField.error}
-                id="walletPassword"
-              />
+              <TextField type="password" {...walletPasswordField.bind()} error={walletPasswordField.error} id="walletPassword" />
             </Box>
           )}
         </Box>
@@ -462,20 +443,16 @@ class SignTxPage extends Component<Props, State> {
         <SignTxTabs
           isDataSignin={!txData && Boolean(signData)}
           detailsContent={<Box overflowWrap="break-word">{content}</Box>}
-          connectionContent={
-            <ConnectionInfo
-              connectedWallet={this.props.selectedWallet}
-              connectedWebsite={connectedWebsite}
-            />
-          }
+          connectionContent={<ConnectionInfo connectedWallet={this.props.selectedWallet} connectedWebsite={connectedWebsite} />}
           utxosContent={utxosContent}
         />
         <Box
           sx={{
             padding: '32px',
-            borderTop: '1px solid #DCE0E9',
+            borderTop: '1px solid',
+            borderColor: 'ds.gray_200',
             maxWidth: '100%',
-            backgroundColor: '#fff',
+            backgroundColor: 'ds.bg_color_contrast_high',
           }}
         >
           <Box sx={{ display: 'flex', gap: '15px' }}>

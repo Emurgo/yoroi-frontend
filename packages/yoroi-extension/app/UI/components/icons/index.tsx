@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, IconButton } from '@mui/material';
+import { Back } from './Back';
 import { Assets } from './Assets';
 import { Assets1 } from './Assets1';
 import { AssetsFilled } from './AssetsFilled';
@@ -28,12 +29,17 @@ import { Device } from './Device';
 import { Drag } from './Drag';
 import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
+import { GridDefault } from './GridDefault';
+import { GridDense } from './GridDense';
+import { Indicator } from './Indicator';
+import { Info } from './Info';
+import { LeftArrow } from './LeftArrow';
+import { RightArrow } from './RightArrow';
 import { Explore } from './Explore';
 import { Export } from './Export';
 import { Eye } from './Eye';
 import { EyeOff } from './EyeOff';
 import { Image } from './Image';
-import { Info } from './Info';
 import { InfoCircle } from './InfoCircle';
 import { LastSeen } from './LastSeen';
 import { Ledger } from './Ledger';
@@ -116,8 +122,9 @@ export const Icon = {
   Export,
   Eye,
   EyeOff,
+  GridDefault,
+  GridDense,
   Image,
-  Info,
   InfoCircle,
   LastSeen,
   Ledger,
@@ -155,6 +162,11 @@ export const Icon = {
   StarOutlined,
   Support,
   Switch,
+  Indicator,
+  Info,
+  Back,
+  LeftArrow,
+  RightArrow,
   Table,
   TermsOfUse,
   ThumbUp,
@@ -201,6 +213,8 @@ export enum Icons {
   Export = 'Export',
   Eye = 'Eye',
   EyeOff = 'EyeOff',
+  GridDefault = 'GridDefault',
+  GridDense = 'GridDense',
   Image = 'Image',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
@@ -273,7 +287,7 @@ export function IconWrapper({
   }
   if (asButton) {
     return (
-      <IconButton {...buttonProps}>
+      <IconButton {...buttonProps} id={props.iconButtonId ?? 'icon-button'}>
         <Box component="span" display="inline-flex" color="ds.el_gray_medium" {...props}>
           <IconComponent {...iconProps} />
         </Box>
@@ -282,7 +296,7 @@ export function IconWrapper({
   }
 
   return (
-    <Box color="ds.el_gray_medium" {...props}>
+    <Box color="ds.el_gray_medium" display="inline-flex" {...props}>
       <IconComponent {...iconProps} />
     </Box>
   );

@@ -3,7 +3,6 @@
 import type { Node } from 'react';
 import React, { Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import type { ConfigType } from '../config/config-types';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import AddWalletPage from './containers/wallet/AddWalletPage';
@@ -39,6 +38,8 @@ import { GovernanceContextProvider } from './UI/features/governace/module/Govern
 // $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
+import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
+// $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
@@ -51,6 +52,10 @@ import GovernanceTransactionSubmittedPage from './UI/pages/Governance/Governance
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
+import NftsPage from './UI/pages/nfts/NftsPage';
+// $FlowIgnore: suppressing this error
+import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
@@ -60,9 +65,7 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
-import { ModalProvider } from './UI/components/modals/ModalContext';
-// $FlowIgnore: suppressing this error
-import { ModalManager } from './UI/components/modals/ModalManager'
+import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -105,9 +108,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
-
-const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
-const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
 const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -164,7 +164,6 @@ export const LazyLoadPromises: Array<() => any> = [
   URILandingPagePromise,
   WalletTransferPagePromise,
   ReceivePromise,
-  CardanoStakingPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
@@ -181,9 +180,6 @@ export const LazyLoadPromises: Array<() => any> = [
   AnalyticsSettingsPagePromise,
   ExchangeEndPagePromise,
 ];
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 export const Routes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
@@ -213,6 +209,10 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
+          <Route
+            path={ROUTES.NFT_GALLERY.ROOT}
+            component={props => wrapNftGallery({ ...props, stores }, NftGallerySubPages(stores))}
+          />
           <Route path={ROUTES.CASHBACK.ROOT} component={props => <CashbackPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.WALLETS.ADD} component={props => <AddWalletPage {...props} stores={stores} />} />
           <Route
@@ -245,6 +245,17 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
           <Route path={ROUTES.PORTFOLIO.ROOT} component={() => PortfolioSubpages(stores)} />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
+
           <Redirect to={ROUTES.WALLETS.ROOT} />
         </Switch>
       </Suspense>
@@ -260,11 +271,6 @@ const WalletsSubpages = stores => (
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
     />
-    <Route
-      exact
-      path={ROUTES.WALLETS.CARDANO_DELEGATION}
-      component={props => <CardanoStakingPage {...props} stores={stores} />}
-    />
   </Switch>
 );
 
@@ -278,32 +284,25 @@ const SwapSubpages = stores => (
 );
 
 const SettingsSubpages = stores => (
-  <ModalProvider>
-    <ModalManager />
-    <Switch>
-      <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
-      <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.TERMS_OF_USE}
-        component={props => <TermsOfUseSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-        component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-        component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
-      <Redirect to={ROUTES.SETTINGS.GENERAL} />
-    </Switch>
-  </ModalProvider>
+  <Switch>
+    <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.TERMS_OF_USE} component={props => <TermsOfUseSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+      component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
+    />
+    <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
+      component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
+    />
+    <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
+    <Redirect to={ROUTES.SETTINGS.GENERAL} />
+  </Switch>
 );
 
 const PortfolioSubpages = stores =>
@@ -320,6 +319,13 @@ const NFTsSubPages = stores => (
   <Switch>
     <Route exact path={ROUTES.NFTS.ROOT} component={props => <NFTsPageRevamp {...props} stores={stores} />} />
     <Route exact path={ROUTES.NFTS.DETAILS} component={props => <NFTDetailPageRevamp {...props} stores={stores} />} />
+  </Switch>
+);
+
+const NftGallerySubPages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.NFT_GALLERY.ROOT} component={props => <NftsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.NFT_GALLERY.DETAILS} component={props => <NftDetailsPage {...props} stores={stores} />} />
   </Switch>
 );
 
@@ -411,24 +417,28 @@ export function wrapReceive(receiveProps: StoresProps, children: Node): Node {
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
   const { stores } = governanceProps;
+  const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
+
   return (
-    <GovernanceContextProvider
-      currentWallet={currentWalletInfo}
-      createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
-      signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
-      txDelegationResult={delegationTxResult}
-      txDelegationError={delegationTxError}
-      tokenInfo={stores.tokenInfoStore.tokenInfo}
-      triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
-      getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
-      ampli={ampli}
-    >
-      <Suspense fallback={null}>{children}</Suspense>;
-    </GovernanceContextProvider>
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <GovernanceContextProvider
+        currentWallet={currentWalletInfo}
+        createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+        signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+        txDelegationResult={delegationTxResult}
+        txDelegationError={delegationTxError}
+        tokenInfo={stores.tokenInfoStore.tokenInfo}
+        triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+        getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
+        ampli={ampli}
+      >
+        <Suspense fallback={null}>{children}</Suspense>;
+      </GovernanceContextProvider>
+    </CurrencyProvider>
   );
 }
 
@@ -467,5 +477,13 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
+  );
+}
+
+export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
+  return (
+    <NftGalleryContextProvider stores={nftGalleryProps.stores}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </NftGalleryContextProvider>
   );
 }

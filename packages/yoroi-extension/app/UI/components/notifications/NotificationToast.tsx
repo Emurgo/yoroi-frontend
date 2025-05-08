@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { IconWrapper, Icons } from '../icons/index';
-import { NotificationTypes } from '../../types/notifications';
-import { Theme, toast } from 'react-toastify';
 import { noop } from 'lodash';
+import { IconWrapper, Icons } from '../icons/index';
+import { Theme, toast } from 'react-toastify';
+import { NotificationTypes } from '../../types/notifications';
 
 const NOTIFICATION_TIMEOUT = 4000; // 4s
 
@@ -24,7 +24,7 @@ export const NotificationCloseButton = ({ closeToast, ...props }) => {
   const handleClose = e => {
     e.stopPropagation();
     const { onClose } = props.data;
-    onClose && onClose(props);
+    onClose?.(props);
   };
 
   return (
@@ -75,6 +75,7 @@ const NotificationIcon = ({ type }: IconProps) => {
           <IconWrapper color="ds.static_green" icon={Icons.Receive} />
         </IconContainer>
       );
+    case NotificationTypes.Intrawallet:
     case NotificationTypes.Outcome:
       return (
         <IconContainer bgcolor="ds.primary_100">
@@ -97,7 +98,7 @@ const NotificationBody = ({ toastProps }: any) => {
   const { title, subtitle, onClick } = data;
 
   const handleClick = () => {
-    onClick && onClick(toastProps);
+    onClick?.(toastProps);
   };
 
   return (

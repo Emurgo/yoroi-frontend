@@ -26,9 +26,9 @@ export class IntlContextProvider extends React.Component {
 
 export class IntlProviderWrapper extends React.Component {
   render() {
-    const { children, locale, key, messages } = this.props;
+    const { children, locale, messages } = this.props;
     return (
-      <IntlProvider {...{ locale, key, messages }}>
+      <IntlProvider {...{ locale, key: locale, messages }}>
         {children}
       </IntlProvider>
     )

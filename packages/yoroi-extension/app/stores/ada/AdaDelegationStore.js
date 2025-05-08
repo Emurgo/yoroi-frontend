@@ -1,28 +1,25 @@
 // @flow
-
+import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
+import type { MangledAmountFunc } from '../stateless/mangledAddresses';
+import type { StoresMap } from '../index';
+import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
+import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
+import type { WalletState } from '../../../chrome/extension/background/types';
+import type { GetDelegatedBalanceFunc, RewardHistoryFunc } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { action, reaction, runInAction } from 'mobx';
+import PubSub from 'pubsub-js';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import { Logger, stringifyError } from '../../utils/logging';
 import CachedRequest from '../lib/LocalizedCachedRequest';
-import {
-  getDelegatedBalance,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+import { getDelegatedBalance } from '../../api/ada/lib/storage/bridge/delegationUtils';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import type { MangledAmountFunc } from '../stateless/mangledAddresses';
 import { getUnmangleAmounts } from '../stateless/mangledAddresses';
 import { MultiToken } from '../../api/common/lib/MultiToken';
-import type { StoresMap } from '../index';
 import { PoolInfoApi } from '@emurgo/yoroi-lib';
 import { entriesIntoMap, forceNonNull } from '../../coreUtils';
-import type { ExplorerPoolInfo as PoolInfo } from '@emurgo/yoroi-lib';
-import type { PoolInfoResponse, RemotePool } from '../../api/ada/lib/state-fetch/types';
-import type { WalletState } from '../../../chrome/extension/background/types';
-import type {
-  GetDelegatedBalanceFunc,
-  RewardHistoryFunc,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
+// $FlowIgnore: suppressing this error
+import { NotificationTopics } from '../../UI/features/notifications/module/NotificationsProvider';
 
 export default class AdaDelegationStore extends Store<StoresMap> {
   _recalculateDelegationInfoDisposer: Array<(void) => void> = [];
@@ -32,9 +29,7 @@ export default class AdaDelegationStore extends Store<StoresMap> {
     networkId: number,
     defaultTokenId: string,
     ...
-  }) => void = (
-    { publicDeriverId, networkId, defaultTokenId }
-  ) => {
+  }) => void = ({ publicDeriverId, networkId, defaultTokenId }) => {
     this.stores.delegation.delegationRequests.push({
       publicDeriverId,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
@@ -83,7 +78,7 @@ export default class AdaDelegationStore extends Store<StoresMap> {
     this._startWatch();
   }
 
-  refreshDelegation: (WalletState) => Promise<void> = async (wallet) => {
+  refreshDelegation: WalletState => Promise<void> = async wallet => {
     const delegationRequest = this.stores.delegation.getDelegationRequests(wallet.publicDeriverId);
     if (delegationRequest == null) return;
 
@@ -142,16 +137,19 @@ export default class AdaDelegationStore extends Store<StoresMap> {
         }
       })();
 
-      const rewardHistory = delegationRequest.rewardHistory.execute(
-        wallet.stakingAddress
-      ).promise;
+      const rewardHistory = delegationRequest.rewardHistory.execute(wallet.stakingAddress).promise;
 
-      await Promise.all([accountStateCalcs, rewardHistory]);
+      const [, rewardHistoryResult] = await Promise.all([accountStateCalcs, rewardHistory]);
+
+      if (rewardHistoryResult && rewardHistoryResult.length > 0) {
+        // publish last reward as notification on refresh
+        PubSub.publish(NotificationTopics.REWARDS, {
+          reward: rewardHistoryResult[rewardHistoryResult.length - 1],
+          networkId: wallet.networkId,
+        });
+      }
     } catch (e) {
-      Logger.error(
-        `${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` +
-          stringifyError(e)
-      );
+      Logger.error(`${nameof(AdaDelegationStore)}::${nameof(this.refreshDelegation)} error: ` + stringifyError(e));
     }
   };
 
@@ -161,9 +159,7 @@ export default class AdaDelegationStore extends Store<StoresMap> {
   |}) => Promise<void> = async request => {
     // update pool information
     const poolsCachedForNetwork = new Set<string>(
-      this.stores.delegation.poolInfo
-        .filter(next => next.networkId === request.network.NetworkId)
-        .map(next => next.poolId)
+      this.stores.delegation.poolInfo.filter(next => next.networkId === request.network.NetworkId).map(next => next.poolId)
     );
     const poolsToQuery = request.allPoolIds.filter(pool => !poolsCachedForNetwork.has(pool));
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
@@ -176,10 +172,10 @@ export default class AdaDelegationStore extends Store<StoresMap> {
     const remotePoolInfoPromises: Array<Promise<[string, PoolInfo | null]>> = poolsToQuery.map(id =>
       new PoolInfoApi(forceNonNull(BackendService) + '/api').getPool(id).then(res => [id, res])
     );
-    const [poolInfoResp, remotePoolInfoResps]: [
-      PoolInfoResponse,
-      Array<[string, PoolInfo | null]>
-    ] = await Promise.all([poolInfoPromise, Promise.all(remotePoolInfoPromises)]);
+    const [poolInfoResp, remotePoolInfoResps]: [PoolInfoResponse, Array<[string, PoolInfo | null]>] = await Promise.all([
+      poolInfoPromise,
+      Promise.all(remotePoolInfoPromises),
+    ]);
     const remoteInfoMap = entriesIntoMap<string, PoolInfo | null>(remotePoolInfoResps);
     runInAction(() => {
       for (const poolId of Object.keys(poolInfoResp)) {
@@ -216,9 +212,7 @@ export default class AdaDelegationStore extends Store<StoresMap> {
       if (selected == null) return;
       await this.refreshDelegation(selected);
     };
-    this._recalculateDelegationInfoDisposer.push(
-      reaction(() => [this.stores.wallets.selected], triggerRefresh)
-    );
+    this._recalculateDelegationInfoDisposer.push(reaction(() => [this.stores.wallets.selected], triggerRefresh));
     this._recalculateDelegationInfoDisposer.push(
       reaction(
         () => [

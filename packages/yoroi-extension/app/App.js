@@ -97,7 +97,7 @@ class App extends Component<Props, State> {
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+          <IntlProviderWrapper locale={locale} messages={mergedMessages}>
             {this.getContent()}
           </IntlProviderWrapper>
         </ColorModeProvider>
@@ -116,7 +116,10 @@ class App extends Component<Props, State> {
     return (
       <Router history={history}>
         <IntlContextProvider>
-          <NotificationsProvider>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+          >
             <NotificationsManager />
             <div style={{ height: '100%' }}>
               <Support />

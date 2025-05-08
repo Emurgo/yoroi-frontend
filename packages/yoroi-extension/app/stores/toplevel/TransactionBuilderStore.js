@@ -465,12 +465,13 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
   }
 
   @action
-  updateTentativeTx: void => void = () => {
+  updateTentativeTx: void => any = () => {
     if (!this.plannedTx) {
       this.tentativeTx = null;
       return;
     }
     this.tentativeTx = this._cloneTx(this.plannedTx);
+    return this.tentativeTx;
   }
 
   @action
@@ -487,7 +488,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
     this.metadata = undefined;
     this.createUnsignedTx.cancel();
     this.createUnsignedTx.reset();
-    this.maxSendableAmount.cancel()
+    this.maxSendableAmount.cancel();
     this.maxSendableAmount.reset();
     this.plannedTx = null;
     this.tentativeTx = null;
