@@ -4,7 +4,7 @@ import * as CSL from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const TrezorModels = Object.freeze({
   ModelT: 'T2T1',
-  Safe3: 'T2B1',
+  Safe3: 'T3B1',
   Safe5: 'T3T1',
 });
 
