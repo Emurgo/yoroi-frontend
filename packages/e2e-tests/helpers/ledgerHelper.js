@@ -17,13 +17,9 @@ export const convertVerifiedAddressesInfo = ledgerScreensContent => {
     'Ledger screens contents amount is different from expected'
   ).to.equal(3);
 
-  const addrDerPathSplit = ledgerScreensContent[0].split(' ');
-  const addressDerivationPath = addrDerPathSplit[addrDerPathSplit.length - 1];
-
-  const stakeKeyPathSplit = ledgerScreensContent[1].split(' ');
-  const stakeKeyPath = stakeKeyPathSplit[stakeKeyPathSplit.length - 1];
-
-  const addressFull = ledgerScreensContent[2].trim().replace(/ /g, '');
+  const addressDerivationPath = ledgerScreensContent[0];
+  const stakeKeyPath = ledgerScreensContent[1];
+  const addressFull = ledgerScreensContent[2];
   return {
     addressDerivationPath,
     addressFull,
