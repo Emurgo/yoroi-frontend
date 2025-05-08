@@ -112,7 +112,7 @@ export class TrezorEmulatorController {
     const requestJson = {
       type: 'emulator-start',
       version: '2-main',
-      model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T2B1 - Trezor Safe 3
+      model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
