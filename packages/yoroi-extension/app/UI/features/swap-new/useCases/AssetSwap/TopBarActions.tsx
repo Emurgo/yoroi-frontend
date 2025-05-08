@@ -8,7 +8,6 @@ export const TopBarActions = () => {
   const [orderType, setOrderType] = React.useState('market');
   const { marketTabLabel, limitTabLabel } = useStrings();
   const { atoms }: any = useTheme();
-  console.log('atoms', atoms);
 
   const orderTypeTabs = [
     { type: 'market', label: marketTabLabel },

@@ -1,10 +1,10 @@
 import { useTheme } from '@mui/material';
 import { default as MuiTooltip, TooltipProps } from '@mui/material/Tooltip';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 interface Props extends TooltipProps {
   children: JSX.Element;
-  title: JSX.Element | string;
+  title: ReactNode | string;
 }
 
 export const Tooltip = ({ children, title, ...props }: Props): JSX.Element => {

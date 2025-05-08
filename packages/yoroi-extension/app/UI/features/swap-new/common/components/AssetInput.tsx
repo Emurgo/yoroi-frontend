@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Icon, Stack, Typography, styled, useTheme } from '@mui/material';
+import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 
 type AssetInputProps = {
@@ -7,19 +7,27 @@ type AssetInputProps = {
   assetName: string;
   selected?: boolean;
   error?: string | null;
+  onAssetSelect: () => void;
 };
 
-export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, selected = false, error = null }) => {
-  const { atoms, space }: any = useTheme();
+export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error = null, onAssetSelect }) => {
+  const [focusState, setFocusState] = React.useState(false);
+  const { atoms }: any = useTheme();
   const label = type === 'from' ? 'From' : 'To';
 
   return (
-    <Wrapper selected={selected} hasError={!!error} atoms={atoms} type={type}>
-      <Stack spacing={1} {...atoms.gap_lg}>
+    <Wrapper selected={focusState} hasError={!!error} atoms={atoms} type={type}>
+      <Stack spacing={1} {...atoms.gap_sm}>
         <Label variant="body2">{label}</Label>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Stack direction="row" justifyContent="flex-start" alignItems="center">
+          <Stack
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="center"
+            onClick={onAssetSelect}
+            sx={{ cursor: 'pointer' }}
+          >
             <IconWrapper icon={Icons.Assets} />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm}>
               {assetName}
@@ -43,15 +51,15 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, selecte
             textAlign="right"
             // onChange={handleChange}
             // value={disabled ? '' : value}
-            // onFocus={() => focusState.update(true)}
-            // onBlur={() => focusState.update(false)}
+            onFocus={() => setFocusState(true)}
+            onBlur={() => setFocusState(false)}
           />
         </Stack>
 
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
-            <IconWrapper icon={Icons.Wallet} />
-            <Typography variant="body2" color="ds.text_gray_low">
+            <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
+            <Typography variant="body2" color="ds.text_gray_low" mb={2}>
               2 345 119,005231 ADA
             </Typography>
           </Stack>
@@ -75,10 +83,16 @@ const Wrapper = styled(Box, {
   ...atoms.py_md,
   ...atoms.px_lg,
   borderRadius: 12,
-  border: `1px solid ${
-    hasError ? theme.palette.ds.text_error : selected ? theme.palette.ds_gray_max : theme.palette.ds.gray_200
+  border: `2px solid ${
+    hasError ? theme.palette.ds.text_error : selected ? theme.palette.ds.el_gray_max : theme.palette.ds.gray_200
   }`,
   backgroundColor: type === 'from' ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
+  height: '132px',
+
+  '&:hover': {
+    borderColor: !hasError && theme.palette.ds.el_gray_max,
+    borderWidth: 2,
+  },
 }));
 
 const Label = styled(Typography)(({ theme }: any) => ({
