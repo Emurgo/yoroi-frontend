@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
-import { LedgerEmulatorController, LedgerStates } from '../../helpers/ledgerEmulatorController.js';
+import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
 import {
   WindowManager,
   extensionTabName,
@@ -46,7 +46,7 @@ for (const model in LedgerModels) {
       logger = getTestLogger(this.test.parent.title);
 
       const ledgerLogger = getTestLogger('ledger', this.test.parent.title);
-      ledgerController = new LedgerEmulatorController(ledgerLogger);
+      ledgerController = new LedgerEmulatorController(ledgerLogger, LedgerModels[model]);
 
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
@@ -54,8 +54,8 @@ for (const model in LedgerModels) {
     });
 
     it('Ledger is ready', async function () {
-      const ledgerState = await ledgerController.readScreen();
-      expect(ledgerState, 'Cardano app is not ready').to.equal(LedgerStates.cardanoIsReady);
+      const ledgerState = await ledgerController.cardanoIsReady(threeSeconds, quarterSecond);
+      expect(ledgerState, 'Cardano app is not ready').to.true;
     });
 
     it('Selecting Connect HW wallet', async function () {
@@ -69,18 +69,14 @@ for (const model in LedgerModels) {
     it('Approve connection', async function () {
       await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
       const ledgerConnectPage = new LedgerConnect(webdriver, logger);
-      if (LedgerModels[model] === LedgerModels.NanoX) {
+      if (ledgerController.isLedgerX()) {
         await ledgerConnectPage.selectNanoX();
       } else {
         await ledgerConnectPage.selectNanoS();
       }
-      const ledgerIsReady = await ledgerController.isReadyForAction(threeSeconds, quarterSecond);
-      expect(ledgerIsReady, `Ledger isn't ready after ${threeSeconds / 1000} seconds`).to.be.true;
-      if (LedgerModels[model] === LedgerModels.NanoS){
-        await ledgerController.clickRight();
-      } else {
-        await ledgerController.clickBoth();
-      }
+      await ledgerController.confirmExportPubKeys();
+      const ledgerState = await ledgerController.cardanoIsReady(threeSeconds, quarterSecond);
+      expect(ledgerState, 'Cardano app is not ready').to.true;
       await windowManager.waitForClosingAndSwitchTo(ledgerConnectTabName, extensionTabName);
     });
 
