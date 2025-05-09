@@ -20,7 +20,8 @@ import {
 import {
   buildConnectorSignedTransaction as trezorBuildConnectorSignedTransaction
 } from '../../api/ada/transactions/shelley/trezorTx';
-import { convertToLocalizableError } from '../../domain/TrezorLocalizedError';
+import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
+import { convertToLocalizableError as ledgerConvertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import type { Addressing, Address, Value } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import {
   generateCip15RegistrationMetadata,
@@ -240,7 +241,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       return { txId };
     } catch (error) {
       Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignAndBroadcast)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
+      throw new trezorConvertToLocalizableError(error);
     }
   }
 
@@ -349,7 +350,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       return { signedTxHex: txHex, txId, metadata };
     } catch (error) {
       Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
+      throw new trezorConvertToLocalizableError(error);
     }
   }
 
@@ -391,7 +392,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       return { txId };
     } catch (error) {
       Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
+      throw new ledgerConvertToLocalizableError(error);
     }
   };
 
@@ -547,7 +548,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       return { signedTxHex: txHex, txId, metadata };
     } catch (error) {
       Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} error: ` + stringifyError(error));
-      throw new convertToLocalizableError(error);
+      throw new ledgerConvertToLocalizableError(error);
     }
   }
 }
