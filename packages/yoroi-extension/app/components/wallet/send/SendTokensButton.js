@@ -29,7 +29,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
     try {
       startLoadingTxReview();
 
-      stores.transactionProcessingStore.adaSendAndRefresh({
+      await stores.transactionProcessingStore.adaSendAndRefresh({
         wallet: stores.wallets.selected,
         signRequest,
         password,
