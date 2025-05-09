@@ -118,7 +118,9 @@ const WalletAssetsSection = ({ data, label }) => {
         {label}
       </Typography>
       <Stack direction="column" justifyContent="space-between" gap="8px">
-        <Typography variant="h3">{data.length > 0 ? data.length : '-'}</Typography>
+        <Typography variant="h3" fontSize="28px" fontWeight={500}>
+          {data.length > 0 ? data.length : '-'}
+        </Typography>
         <AssetCarousel data={data} />
       </Stack>
     </Stack>

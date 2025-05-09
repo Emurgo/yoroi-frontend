@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl } from '../../../types';
 import type { SummaryAssetsData } from '../CardanoSignTxPage';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { defineMessages, injectIntl } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
 
@@ -20,11 +20,7 @@ type Props = {|
 
 type AssetsSummaryDisplayProps = {| ...Props, ...ConnectorIntl |};
 
-const getAssetsSummaryDisplay = ({
-  txAssetsData,
-  renderExplorerHashLink,
-  intl,
-}: AssetsSummaryDisplayProps): Node => {
+const getAssetsSummaryDisplay = ({ txAssetsData, renderExplorerHashLink, intl }: AssetsSummaryDisplayProps): Node => {
   const { sent, received } = txAssetsData;
   const [sentAsset = null] = sent;
   const [receivedAsset = null] = received;
@@ -33,16 +29,14 @@ const getAssetsSummaryDisplay = ({
   return (
     <>
       {/* SENT ASSETS */}
-      {sent.length > 1 && (
-        <Box lineHeight="24px">{intl.formatMessage(assetsSent, { quantity: sent.length })}</Box>
-      )}
+      {sent.length > 1 && <Box lineHeight="24px">{intl.formatMessage(assetsSent, { quantity: sent.length })}</Box>}
       {sent.length === 1 && (
         <Box
           lineHeight="24px"
           sx={{
-            '& .ExplorableHash_url': { color: '#fff' },
+            '& .ExplorableHash_url': { color: 'ds.uitext.gray.max' },
             '& .ExplorableHash_url svg': { marginRight: '3px' },
-            '& .ExplorableHash_url svg path': { fill: '#fff' },
+            '& .ExplorableHash_url svg path': { fill: 'ds.uitext.gray.max' },
           }}
         >
           {renderExplorerHashLink(sentAsset?.tokenInfo)}
@@ -51,42 +45,29 @@ const getAssetsSummaryDisplay = ({
       )}
 
       {/* RECEIVED ASSETS */}
-      {received.length > 1 && (
-        <Box lineHeight="24px">
-          {intl.formatMessage(assetsReceived, { quantity: received.length })}
-        </Box>
-      )}
+      {received.length > 1 && <Box lineHeight="24px">{intl.formatMessage(assetsReceived, { quantity: received.length })}</Box>}
       {received.length === 1 && (
         <Box
           lineHeight="24px"
           sx={{
-            '& .ExplorableHash_url': { color: '#fff' },
+            '& .ExplorableHash_url': { color: 'ds.uitext.gray.max' },
             '& .ExplorableHash_url svg': { marginRight: '3px' },
-            '& .ExplorableHash_url svg path': { fill: '#fff' },
+            '& .ExplorableHash_url svg path': { fill: 'ds.uitext.gray.max' },
           }}
         >
-          {renderExplorerHashLink(receivedAsset?.tokenInfo)}{' '}
-          {intl.formatMessage(assetReceived, { assetName: '' })}
+          {renderExplorerHashLink(receivedAsset?.tokenInfo)} {intl.formatMessage(assetReceived, { assetName: '' })}
         </Box>
       )}
     </>
   );
 };
 
-function CardanoSignTxSummary({
-  txAssetsData,
-  renderExplorerHashLink,
-  intl,
-}: Props & ConnectorIntl): Node {
+function CardanoSignTxSummary({ txAssetsData, renderExplorerHashLink, intl }: Props & ConnectorIntl): Node {
   const { total, isOnlyTxFee, sent, received } = txAssetsData;
   const showOnlyTxFee = isOnlyTxFee && sent.length === 0 && received.length === 0;
+  const theme = useTheme();
   return (
-    <Box
-      p="16px"
-      borderRadius="8px"
-      color="var(--yoroi-palette-common-white)"
-      sx={{ background: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 176.73%)' }}
-    >
+    <Box p="16px" borderRadius="8px" color="ds.white_static" sx={{ backgroundImage: theme.palette.ds.bg_gradient_3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" id="signTxMessagesSummaryBox">
         <Typography component="div" variant="b1" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
@@ -98,9 +79,7 @@ function CardanoSignTxSummary({
       {(sent.length > 0 || received.length > 0) && (
         <>
           <Separator />
-          <Box textAlign="right">
-            {getAssetsSummaryDisplay({ txAssetsData, renderExplorerHashLink, intl })}
-          </Box>
+          <Box textAlign="right">{getAssetsSummaryDisplay({ txAssetsData, renderExplorerHashLink, intl })}</Box>
         </>
       )}
     </Box>

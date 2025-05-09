@@ -1,9 +1,12 @@
 import { Button, styled } from '@mui/material';
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
+import CopyableText from '../../../UI/components/CopyableText';
 
-export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
+export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
+  const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -14,6 +17,10 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
       operations: {
         kind: 'send',
       },
+      receiverCustomTitle: resolvedNameServer && {
+        to: <CopyableText value={receiverHandler}>{receiverHandler}</CopyableText>,
+        associatedAddress: resolvedAddress,
+      },
       unsignedTx: signTxRequest.unsignedTx,
     });
   };
@@ -21,6 +28,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, stores }) => {
   const submitTx = async (password, signRequest) => {
     try {
       startLoadingTxReview();
+
       stores.transactionProcessingStore.adaSendAndRefresh({
         wallet: stores.wallets.selected,
         signRequest,

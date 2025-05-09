@@ -11,11 +11,7 @@ import type { Notification } from '../../../../types/notification.types';
 import { splitAmount, truncateAddressShort, truncateToken } from '../../../../utils/formatters';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import {
-  getTokenName,
-  getTokenIdentifierIfExists,
-  assetNameFromIdentifier,
-} from '../../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
 import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHashContainer';
@@ -47,12 +43,7 @@ class CardanoUtxoDetails extends Component<Props> {
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined ? (
-      <ExplorableHashContainer
-        selectedExplorer={this.props.selectedExplorer}
-        hash={fingerprint}
-        light
-        linkType="token"
-      >
+      <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={fingerprint} light linkType="token">
         <span>{truncateToken(getTokenName(tokenInfo))}</span> <ExternalLinkIcon />
       </ExplorableHashContainer>
     ) : (
@@ -82,15 +73,10 @@ class CardanoUtxoDetails extends Component<Props> {
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
     const ticker = tokenInfo ? this.getTicker(tokenInfo) : nameFromIdentifier;
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      numberOfDecimals
-    );
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, numberOfDecimals);
 
     // we may need to explicitly add + for positive values
-    const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards
-      : '+' + beforeDecimalRewards;
+    const adjustedBefore = beforeDecimalRewards.startsWith('-') ? beforeDecimalRewards : '+' + beforeDecimalRewards;
 
     return (
       <div>
@@ -113,8 +99,7 @@ class CardanoUtxoDetails extends Component<Props> {
     if (addressValue == null) return null;
 
     const notificationElementId = `${request.kind}-address-${request.addressIndex}-copyNotification`;
-    const divKey = identifier =>
-      `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
+    const divKey = identifier => `${request.kind}-${request.address.address}-${request.addressIndex}-${identifier}`;
     const renderAmount = entry => {
       return (
         <div id="addressRow-amount">
@@ -128,9 +113,7 @@ class CardanoUtxoDetails extends Component<Props> {
       );
     };
 
-    const addressHash = request.address.address
-      ? this.props.addressToDisplayString(request.address.address)
-      : '';
+    const addressHash = request.address.address ? this.props.addressToDisplayString(request.address.address) : '';
 
     return (
       // eslint-disable-next-line react/no-array-index-key
@@ -147,30 +130,23 @@ class CardanoUtxoDetails extends Component<Props> {
           id={'utxoDetails_' + request.addressIndex}
           hash={addressHash}
           elementId={notificationElementId}
-          onCopyAddress={() =>
-            this.props.onCopyAddressTooltip(request.address.address, notificationElementId)
-          }
+          onCopyAddress={() => this.props.onCopyAddressTooltip(request.address.address, notificationElementId)}
           notification={this.props.notification}
         >
-          <ExplorableHashContainer
-            selectedExplorer={this.props.selectedExplorer}
-            hash={addressHash}
-            light
-            linkType="address"
-          >
-            <Typography as="span" color="#242838">
+          <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={addressHash} light linkType="address">
+            <Typography as="span" color="ds.gray_900">
               {truncateAddressShort(addressHash, 10)}
             </Typography>
           </ExplorableHashContainer>
         </CopyableAddress>
         <Box
           textAlign="right"
-          color="var(--yoroi-palette-gray-600)"
+          color="ds.gray_600"
           sx={{
             '& > *': {
               paddingTop: '6px',
               ':first-child': {
-                color: 'var(--yoroi-palette-gray-900)',
+                color: 'ds.gray_900',
               },
             },
           }}
@@ -197,13 +173,13 @@ class CardanoUtxoDetails extends Component<Props> {
       <Box>
         <Box>
           <Box pb="10px">
-            <Typography component="div" variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_max">
               {intl.formatMessage(connectorMessages.fromAddresses, { qty: txData.inputs.length })}
             </Typography>
           </Box>
           <Panel>
             <Box>
-              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_700">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="fromAddressesBox-yourInputs">
@@ -222,7 +198,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box>
-                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_700">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box id="fromAddressesBox-foreignInputs">
@@ -242,13 +218,13 @@ class CardanoUtxoDetails extends Component<Props> {
         </Box>
         <Box>
           <Box pb="10px">
-            <Typography component="div" variant="body1" fontWeight="500" color="#000">
+            <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_max">
               {intl.formatMessage(connectorMessages.toAddresses, { qty: txData.outputs.length })}
             </Typography>
           </Box>
           <Panel withMargin={false}>
             <Box>
-              <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
+              <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_700">
                 {intl.formatMessage(connectorMessages.yourAddresses)}
               </Typography>
               <Box id="toAddressesBox-yourOutputs">
@@ -268,7 +244,7 @@ class CardanoUtxoDetails extends Component<Props> {
               <>
                 <Separator />
                 <Box id="toAddressesBox-foreignOutputs">
-                  <Typography component="div" variant="body1" fontWeight="500" color="#4A5065">
+                  <Typography component="div" variant="body1" fontWeight="500" color="ds.gray_700">
                     {intl.formatMessage(connectorMessages.foreignAddresses)}
                   </Typography>
                   <Box>
@@ -294,7 +270,8 @@ class CardanoUtxoDetails extends Component<Props> {
 const Panel = ({ children, withMargin = true }) => (
   <Box
     sx={{
-      border: '1px solid #DCE0E9',
+      border: '1px solid',
+      borderColor: 'ds.gray_200',
       borderRadius: '8px',
       padding: '16px',
       marginBottom: withMargin ? '40px' : 0,
@@ -304,8 +281,6 @@ const Panel = ({ children, withMargin = true }) => (
   </Box>
 );
 
-const Separator = () => (
-  <Box sx={{ height: '1px', width: '100%', backgroundColor: '#DCE0E9', mt: '16px', mb: '16px' }} />
-);
+const Separator = () => <Box sx={{ height: '1px', width: '100%', bgcolor: 'ds.gray_200', mt: '16px', mb: '16px' }} />;
 
 export default CardanoUtxoDetails;

@@ -18,6 +18,7 @@ const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
     width: '530px',
     background: theme.palette.ds.bg_color_contrast_high,
   },
+  zIndex: '9999',
 }));
 
 export const ReviewTxManager = () => {
@@ -58,7 +59,7 @@ export const ReviewTxManager = () => {
   };
 
   return (
-    <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'}>
+    <StyledDrawer open={isOpen} onClose={toggleDrawer('right', false)} anchor={'right'} id="transactionReview-panel-component">
       <TopActions onBack={handleOnBack} />
       {modalView === 'transactionReview' && <ReviewTxSection />}
       {modalView === 'walletInfo' && <WalletInfoSection />}

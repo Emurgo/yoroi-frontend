@@ -45,14 +45,14 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
   return (
     <StyledStack direction="row" justifyContent="center">
       {showOnBackIcon && (
-        <StyledButton onClick={onBack} sx={{ left: '24px' }}>
+        <StyledButton onClick={onBack} sx={{ left: '24px' }} id='txReview-back-button'>
           <Icon.Back />
         </StyledButton>
       )}
-      <Typography variant="h4" my="24px" fontWeight="500" textAlign="center">
+      <Typography variant="h4" my="24px" fontWeight="500" textAlign="center" id='txReview-title-text'>
         {getModalTitle()}
       </Typography>
-      <StyledButton onClick={() => closeTxReviewModal({ type: 'close' })} sx={{ right: '24px' }}>
+      <StyledButton onClick={() => closeTxReviewModal({ type: 'close' })} sx={{ right: '24px' }} id='txReview-close-button'>
         <Icon.CloseIcon />
       </StyledButton>
     </StyledStack>
