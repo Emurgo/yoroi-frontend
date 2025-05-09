@@ -65,10 +65,21 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!Maximum allowed difference between expected and final price. Higher slippage improves success but may result in worse rates.',
     },
-
     numYourAssets: {
       id: 'swap.numYourAssets',
       defaultMessage: '!!!Your assets {num}',
+    },
+    slippageTolerance: {
+      id: 'swap.actions.slippageTolerance',
+      defaultMessage: '!!!Slippage tolerance',
+    },
+    manualLabel: {
+      id: 'swap.manual',
+      defaultMessage: '!!!Slippage tolerance',
+    },
+    routingPreferance: {
+      id: 'swap.routingPreferance',
+      defaultMessage: '!!!Slippage tolerance',
     },
   })
 );
@@ -91,6 +102,9 @@ export const useStrings = () => {
     guaranteedMin: intl.formatMessage(messages.guaranteedMin),
     slippageLabel: intl.formatMessage(messages.slippage),
     slippageInfo: intl.formatMessage(messages.slippageInfo),
+    slippageTolerance: intl.formatMessage(messages.slippageTolerance),
+    manualLabel: intl.formatMessage(messages.manualLabel),
+    routingPreferance: intl.formatMessage(messages.routingPreferance),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

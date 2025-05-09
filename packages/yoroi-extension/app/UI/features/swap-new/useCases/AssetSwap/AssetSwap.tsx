@@ -6,6 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { DexTradeInfo } from './DexTradeInfo';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { SelectAssetModalContent } from '../../common/components/SelectAssetModalContent';
+import { SwitchAssets } from '../../common/components/SwitchAssets';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -22,11 +23,12 @@ export const AssetSwap = () => {
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
-      <Stack>
+      <Stack position="relative">
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
         <AssetInput type="from" assetName="ADA" onAssetSelect={() => openSelectAssetModal('from')} />
-        <Stack {...atoms.pt_lg} />
+        <Stack {...atoms.pt_sm} />
+        <SwitchAssets />
         <AssetInput type="to" assetName="ADA" onAssetSelect={() => openSelectAssetModal('to')} />
         <Stack {...atoms.pt_lg} />
         <DexTradeInfo />

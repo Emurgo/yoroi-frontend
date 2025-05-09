@@ -87,6 +87,7 @@ import { Voting } from './Voting';
 import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
 import { Refresh } from './Refresh';
+import { Swap } from './Swap';
 
 export const Icon = {
   Assets,
@@ -176,6 +177,7 @@ export const Icon = {
   Voting,
   Wallet,
   Wallets,
+  Swap,
 };
 
 export enum Icons {
@@ -262,6 +264,7 @@ export enum Icons {
   Voting = 'Voting',
   Wallet = 'Wallet',
   Wallets = 'Wallets',
+  Swap = 'Swap',
 }
 
 interface IconWrapperProps {

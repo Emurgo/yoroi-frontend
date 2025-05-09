@@ -512,6 +512,7 @@
   "swap.txSubmitted": "Transaction submitted",
   "swap.txFailed": "Transaction failed",
   "swap.txId": "Transaction ID",
+  "swap.routingPreferance": "Routing preference",
   "swap.checkTx": "Check this transaction in the list of wallet transactions",
   "swap.txNotProcessed": "Your transaction has not been processed properly due to technical issues",
   "swap.goToTxs": "Go to transactions",
