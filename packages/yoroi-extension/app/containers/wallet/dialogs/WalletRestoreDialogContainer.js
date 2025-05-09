@@ -10,7 +10,7 @@ import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreV
 import globalMessages from '../../../i18n/global-messages';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
