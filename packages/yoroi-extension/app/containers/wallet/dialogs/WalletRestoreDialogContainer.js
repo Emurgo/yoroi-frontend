@@ -7,18 +7,11 @@ import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
-import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
 import globalMessages from '../../../i18n/global-messages';
-import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, intlShape } from 'react-intl';
-import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
-import SuccessPage from '../../../components/transfer/SuccessPage';
-import { TransferStatus } from '../../../types/TransferTypes';
-import ErrorPage from '../../../components/transfer/ErrorPage';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
 import NavPlate from '../../../components/topbar/NavPlate';
@@ -26,13 +19,6 @@ import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
 import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../../stores';
-
-const messages = defineMessages({
-  walletUpgradeNoop: {
-    id: 'wallet.restore.dialog.upgrade.noop',
-    defaultMessage: '!!!Your wallet did not need to be upgraded',
-  },
-});
 
 type LocalProps = {|
   +onClose: void => void,

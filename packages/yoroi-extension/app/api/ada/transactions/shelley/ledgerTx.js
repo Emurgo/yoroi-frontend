@@ -34,7 +34,7 @@ import {
 import type { Addressing, Address, Value } from '../../lib/storage/models/PublicDeriver/interfaces';
 import type { LedgerNanoCatalystRegistrationTxSignData } from './HaskellShelleyTxSignRequest';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import { HARD_DERIVATION_START } from '../../../../config/numbersConfig';
+import { WalletTypePurpose, HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
 import {
   bytesToHex,
@@ -46,7 +46,6 @@ import {
   maybe
 } from '../../../../coreUtils';
 import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
-import { WalletTypePurpose } from '../../../../config/numbersConfig';
 
 // ==================== LEDGER ==================== //
 function toLedgerTokenBundle(
