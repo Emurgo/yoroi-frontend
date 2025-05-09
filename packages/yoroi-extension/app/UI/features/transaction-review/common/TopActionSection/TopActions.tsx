@@ -42,6 +42,9 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
     }
     return strings.transactionReview;
   };
+
+  const title = (getModalTitle()).toLocaleUpperCase()
+
   return (
     <StyledStack direction="row" justifyContent="center">
       {showOnBackIcon && (
@@ -50,7 +53,7 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
         </StyledButton>
       )}
       <Typography variant="h4" my="24px" fontWeight="500" textAlign="center" id='txReview-title-text'>
-        {getModalTitle()}
+        {title}
       </Typography>
       <StyledButton onClick={() => closeTxReviewModal({ type: 'close' })} sx={{ right: '24px' }} id='txReview-close-button'>
         <Icon.CloseIcon />
