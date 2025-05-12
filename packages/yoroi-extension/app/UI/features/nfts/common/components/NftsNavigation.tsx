@@ -5,6 +5,7 @@ import { ROUTES } from '../../../../../routes-config';
 import { IconWrapper, Icons } from '../../../../components/icons';
 import { ampli } from '../../../../../../ampli';
 import { TabItem } from '../../../../components/tabs/Tabs';
+
 type NftsNavigationProps = {
   prevNftId: string;
   nextNftId: string;

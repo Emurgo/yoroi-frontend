@@ -18,10 +18,10 @@ interface NftImageProps {
 export default function NftImage({
   imageUrl,
   name,
+  contentHeight,
   width = 'auto',
   height = 'auto',
   imageSx = {},
-  contentHeight,
 }: NftImageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -77,7 +77,7 @@ const SvgWrapper = styled(Box)`
   background-color: ${({ theme }) => {
     // @ts-ignore
     return theme.palette.ds.gray_100;
-  }};<
+  }};
   height: 100%;
   & svg {
     & path {
