@@ -13,6 +13,8 @@ import { CheckmarkFilled } from './CheckmarkFilled';
 import { CheckmarkOutlined } from './CheckmarkOutlined';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
+import { ChevronLeft } from './ChevronLeft';
+import { ChevronRight } from './ChevronRight';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
 import { CloseCircleIcon } from './CloseCircleIcon';
@@ -102,6 +104,8 @@ export const Icon = {
   CheckmarkOutlined,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   ChipArrowDown,
   ChipArrowUp,
   CloseCircleIcon,
@@ -193,6 +197,8 @@ export enum Icons {
   CheckmarkOutlined = 'CheckmarkOutlined',
   ChevronDown = 'ChevronDown',
   ChevronUp = 'ChevronUp',
+  ChevronLeft = 'ChevronLeft',
+  ChevronRight = 'ChevronRight',
   ChipArrowDown = 'ChipArrowDown',
   ChipArrowUp = 'ChipArrowUp',
   CloseCircleIcon = 'CloseCircleIcon',

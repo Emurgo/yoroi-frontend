@@ -38,9 +38,10 @@ const SignTxTabs = observer(({ connectionContent, utxosContent, detailsContent, 
 
   return (
     <Tabs
+      headerSx={{ mx: '32px' }}
       title={intl.formatMessage(connectorMessages[isDataSignin ? 'signData' : 'signTransaction'])}
       tabs={tabs}
-      containerHeight={containerHeight}
+      contentSx={{ height: containerHeight, p: '32px', pr: '12px' }}
     />
   );
 });
