@@ -101,7 +101,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <IconWrapper
           onClick={dismissBanner}
           icon={Icons.CloseCircleIcon}
-          iconProps={{fill: theme.palette.ds.el_gray_medium}}
+          iconProps={{fill: theme.palette.ds.el_gray_max}}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
           asButton
