@@ -31,8 +31,8 @@ export const AssetCarousel = ({ data }) => {
         }}
         activeSlideIndex={activeSlideIndex}
         onRequestChange={setActiveSlideIndex}
-        itemsToShow={4}
-        itemsToScroll={4}
+        itemsToShow={5}
+        itemsToScroll={3}
         forwardBtnProps={{
           style: {
             alignSelf: 'center',
@@ -78,9 +78,8 @@ export const AssetCarousel = ({ data }) => {
           data.map(token => (
             <Box
               sx={{
-                mr: '8px !important',
-                width: 50,
-                height: 50,
+                width: 48,
+                height: 40,
                 backgroundColor: 'transparent',
                 padding: '0px',
                 position: 'relative',
@@ -88,8 +87,8 @@ export const AssetCarousel = ({ data }) => {
             >
               <Box zIndex={1}>
                 <img
-                  width="48px"
-                  height="48px"
+                  width="40px"
+                  height="40px"
                   style={{borderRadius: '8px'}}
                   src={token.info.image}
                   onError={(e: any) => {
