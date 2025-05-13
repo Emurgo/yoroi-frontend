@@ -392,7 +392,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
         return 'nonsense';
       })
       .catch(console.error);
-  }, []);
+  }, [stores.wallets.selected?.publicDeriverId]);
 
   const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
 
@@ -461,6 +461,8 @@ const CashbackPageContainer = observer((props: AllProps) => {
             }}
             onSwitchToCashbackWallet={() => {
               stores.wallets.setActiveWallet({ publicDeriverId: shownCashbackWallet.publicDeriverId });
+              setShownCashbackWallet(null);
+              setPopup(false);
             }}
           />
         )}
