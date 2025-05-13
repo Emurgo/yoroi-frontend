@@ -8,6 +8,7 @@ import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
 import globalMessages from '../../../i18n/global-messages';
+import { CheckAddressesInUseApiError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape } from 'react-intl';
