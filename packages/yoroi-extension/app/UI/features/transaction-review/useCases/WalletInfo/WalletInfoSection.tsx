@@ -108,7 +108,7 @@ const WalletAssetsSection = ({ data, label }) => {
   return (
     <Stack
       direction="column"
-      height="160px"
+      height="152px"
       width="233px"
       sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px', position: 'relative' }}
       p="16px"
