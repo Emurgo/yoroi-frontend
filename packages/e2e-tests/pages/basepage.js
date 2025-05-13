@@ -97,6 +97,10 @@ class BasePage {
     const element = await this.findElement(locator);
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
+  async clickElementByScript(webElement) {
+    this.logger.info(`BasePage::clickElementByScript is called.`);
+    await this.driver.executeScript(`arguments[0].click()`, webElement);
+  }
   async focus(locator) {
     this.logger.info(`BasePage::focus is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
