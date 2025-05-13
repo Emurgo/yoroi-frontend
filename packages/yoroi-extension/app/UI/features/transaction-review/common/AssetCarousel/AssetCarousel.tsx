@@ -77,7 +77,8 @@ export const AssetCarousel = ({ data }) => {
         {data &&
           data.map(token => (
             <Box
-              style={{
+              sx={{
+                mr: '8px !important',
                 width: 50,
                 height: 50,
                 backgroundColor: 'transparent',
