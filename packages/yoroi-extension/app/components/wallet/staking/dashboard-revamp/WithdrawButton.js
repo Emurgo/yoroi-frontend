@@ -9,7 +9,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
   const {
     openTxReviewModal,
     walletType,
-    isHardwareWallet,
     stopLoadingTxReview,
     startLoadingTxReview,
     showTxResultModal,
@@ -47,42 +46,23 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         ],
         kind: 'withdraw',
       },
-      unsignedTx: unsignedTx.unsignedTx,
+      unsignedTx: stores.substores.ada.delegationTransaction.createWithdrawalTx.result.unsignedTx,
     });
   };
 
-  const submitTx = async passswordInput => {
-    const selected = stores.wallets.selected;
+  const submitTx = async password => {
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
     try {
       startLoadingTxReview();
-      if (isHardwareWallet) {
-        if (walletType === 'trezor') {
-          await stores.substores.ada.trezorSend.sendUsingTrezor({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-          });
-        }
-        if (walletType === 'ledger') {
-          await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-          });
-        }
-      } else {
-        await stores.substores.ada.mnemonicSend.sendMoney({
-          signRequest,
-          password: passswordInput,
-          wallet: selected,
-        });
-      }
+
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: stores.wallets.selected,
+        signRequest,
+        password,
+        callback: async () => {},
+      });
+
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.SUCCESS);
 
