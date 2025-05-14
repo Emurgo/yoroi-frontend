@@ -90,7 +90,7 @@ class DriversManager {
     const driverObject = poolOfDrivers.shift();
     this.logger.info(`DriversManager::getDriverFromPool Returning driver ${driverObject.driverId}`);
     const newDriverObject = this.addNewDriverToPool();
-    await this.prepareExtension(newDriverObject);
+    this.prepareExtension(newDriverObject);
 
     return driverObject.driver;
   }
