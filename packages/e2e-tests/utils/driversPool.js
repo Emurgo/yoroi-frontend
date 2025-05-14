@@ -1,9 +1,7 @@
-import { getBuilder, getDriver } from './driverBootstrap.js';
-import { getTargetBrowser, getTestLogger } from './utils.js';
-import { TargetBrowser } from '../helpers/constants.js';
+import { getDriver } from './driverBootstrap.js';
+import { getTestLogger } from './utils.js';
 import BasePage from '../pages/basepage.js';
 import InitialStepsPage from '../pages/initialSteps.page.js';
-import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 import { WebDriver } from 'selenium-webdriver';
 
 let instance = null;
