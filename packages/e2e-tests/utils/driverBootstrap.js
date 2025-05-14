@@ -176,4 +176,5 @@ export const getDriver = (maxAttempts = 3, retryDelay = 2000) => {
       }
     }
   }
+  throw new Error('Not able to get a driver. All attempts exhausted');
 };
