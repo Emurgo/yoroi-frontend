@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { noop } from 'lodash';
 import { IconWrapper, Icons } from '../icons/index';
 import { Theme, toast } from 'react-toastify';
@@ -62,30 +62,32 @@ const IconContainer = ({ children, ...props }) => (
 );
 
 const NotificationIcon = ({ type }: IconProps) => {
+  const theme: any = useTheme();
+
   switch (type) {
     case NotificationTypes.Rewards:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <IconWrapper color="ds.static_green" icon={Icons.Staking} />
+          <IconWrapper iconProps={{fill: theme.palette.ds.static_green}} icon={Icons.Staking} />
         </IconContainer>
       );
     case NotificationTypes.Income:
       return (
         <IconContainer bgcolor="ds.secondary_100">
-          <IconWrapper color="ds.static_green" icon={Icons.Receive} />
+          <IconWrapper iconProps={{fill: theme.palette.ds.static_green}} icon={Icons.Receive} />
         </IconContainer>
       );
     case NotificationTypes.Intrawallet:
     case NotificationTypes.Outcome:
       return (
         <IconContainer bgcolor="ds.primary_100">
-          <IconWrapper color="ds.primary_600" icon={Icons.Send} />
+          <IconWrapper iconProps={{fill: theme.palette.ds.primary_600}} icon={Icons.Send} />
         </IconContainer>
       );
     case NotificationTypes.Cancelled:
       return (
         <IconContainer bgcolor="ds.sys_magenta_100">
-          <IconWrapper color="ds.sys_magenta_500" icon={Icons.Cancel} />
+          <IconWrapper iconProps={{fill: theme.palette.ds.sys_magenta_500}} icon={Icons.Cancel} />
         </IconContainer>
       );
     default:
