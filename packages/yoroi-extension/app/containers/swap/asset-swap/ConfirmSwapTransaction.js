@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';
 import { ampli } from '../../../../ampli/index';
+import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
+import type { PriceImpact } from '../../../components/swap/types';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { SwapTxInfo } from './SwapTxInfo';
