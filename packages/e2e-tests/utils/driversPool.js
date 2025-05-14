@@ -1,4 +1,4 @@
-import { getBuilder } from './driverBootstrap.js';
+import { getBuilder, getDriver } from './driverBootstrap.js';
 import { getTargetBrowser, getTestLogger } from './utils.js';
 import { TargetBrowser } from '../helpers/constants.js';
 import BasePage from '../pages/basepage.js';
@@ -21,22 +21,12 @@ class DriversManager {
     this.logger = getTestLogger(`DriversManager_${Date.now()}`, 'DriversManager');
   }
 
-  buildDriver() {
-    this.logger.info(`DriversManager::buildDriver Building a new driver`);
-    const driver = getBuilder().build();
-    driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
-    if (getTargetBrowser() === TargetBrowser.FF) {
-      driver.manage().window().maximize();
-    }
-    return driver;
-  }
-
   /**
    * Adding a new driver to the pool of drivers
    * @returns {{driver: ThenableWebDriver, driverId: number}}
    */
   addNewDriverToPool() {
-    const newDriver = this.buildDriver();
+    const newDriver = getDriver();
     driverGlobalCounter++;
     const driverObject = {
       driver: newDriver,
@@ -97,7 +87,7 @@ class DriversManager {
 
   async getPreparedDriver() {
     this.logger.info(`DriversManager::getPreparedDriver is called`);
-    const driver = this.buildDriver();
+    const driver = getDriver();
     await this._prepareExtensionCommon(driver);
 
     return driver;
