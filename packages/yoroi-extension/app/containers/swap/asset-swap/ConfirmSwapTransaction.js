@@ -1,5 +1,5 @@
 //@flow
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
@@ -8,10 +8,6 @@ import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { SwapTxInfo } from './SwapTxInfo';
-
-const GradientBox = styled(Box)(({ theme }: any) => ({
-  backgroundImage: theme.palette.ds.bg_gradient_3,
-}));
 
 type Props = {|
   slippageValue: string,
@@ -31,7 +27,6 @@ export default function ConfirmSwapTransaction({
   onRemoteOrderDataResolved,
   defaultTokenInfo,
   getTokenInfo,
-  getFormattedPairingValue,
   onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
@@ -39,7 +34,7 @@ export default function ConfirmSwapTransaction({
     selectedPoolCalculation: { pool },
   } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
-  const { ptAmount, formattedPtAmount, formattedNonPtAmount, formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
+  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
 
