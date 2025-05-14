@@ -24,6 +24,9 @@ export class WindowManager {
     this.logger = logger;
   }
 
+  /**
+   * Initializing the Window manager
+   */
   async init() {
     this.logger.info(`WindowManager::init Initializing the Window manager`);
     const mainWindowHandle = await this._getCurrentWindowHandle();
