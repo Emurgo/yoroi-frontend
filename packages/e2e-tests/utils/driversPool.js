@@ -59,19 +59,22 @@ class DriversManager {
     }
   }
 
+  async _prepareExtensionCommon(driver) {
+    const logger = getTestLogger(`DriversManager_Page_${Date.now()}`, 'DriversManager');
+    const basePage = new BasePage(driver, logger);
+    await basePage.goToExtension();
+    const initialStepsPage = new InitialStepsPage(driver, logger);
+    await initialStepsPage.skipInitialSteps();
+  }
+
   /**
    * Preparing an extension for tests
-   * @param {{driver: ThenableWebDriver, driverId: number}} driverObject 
-   * @returns 
+   * @param {{driver: ThenableWebDriver, driverId: number}} driverObject
+   * @returns
    */
   async prepareExtension(driverObject) {
     this.logger.info(`DriversManager::prepareExtension driver ID ${driverObject.driverId}`);
-    const logger = getTestLogger(`DriversManager_Page_${Date.now()}`, 'DriversManager');
-    const basePage = new BasePage(driverObject.driver, logger);
-    await basePage.goToExtension();
-    const initialStepsPage = new InitialStepsPage(driverObject.driver, logger);
-    await initialStepsPage.skipInitialSteps();
-    return true; 
+    await this._prepareExtensionCommon(driverObject.driver);
   }
 
   async prepareExtensions() {
@@ -90,6 +93,14 @@ class DriversManager {
     await this.prepareExtension(newDriverObject);
 
     return driverObject.driver;
+  }
+
+  async getPreparedDriver() {
+    this.logger.info(`DriversManager::getPreparedDriver is called`);
+    const driver = this.buildDriver();
+    await this._prepareExtensionCommon(driver);
+
+    return driver;
   }
 
   async closeAllUnused() {
