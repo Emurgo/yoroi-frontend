@@ -7,8 +7,6 @@ import type {
 } from './types';
 
 import type { IFetcher } from './IFetcher.types';
-
-import axios from 'axios';
 import {
   Logger,
   stringifyError
@@ -23,6 +21,39 @@ import { networks } from '../../../ada/lib/storage/database/prepackaged/networks
 import type { ConfigType } from '../../../../../config/config-types';
 
 import { environment } from '../../../../environment';
+
+function makeTimeoutAbortSignal(timeout: number) {
+  // $FlowIgnore[prop-missing] newer API than outdated flow
+  return AbortSignal.timeout(timeout);
+}
+
+type ServerErrorResponse = {|
+  status: number,
+  data: string,
+|};
+
+class ServerError extends Error {
+  response: ServerErrorResponse;
+
+  constructor(response: ServerErrorResponse) {
+    super(`server returns ${response.status}`);
+    // Maintains proper stack trace for where our error was thrown (non-standard)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ServerError);
+    }
+    this.response = response;
+  }
+}
+const fetchAndEnsureSuccess: typeof fetch = function(...args) {
+  return fetch(...args).then(resp => {
+    if (resp.ok) {
+      return resp;
+    }
+    return resp.text().then(data => {
+      throw new ServerError({ status: resp.status, data });
+    })
+  });
+}
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -69,17 +100,17 @@ export class RemoteFetcher implements IFetcher {
   }
 
   checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = (param) => (
-    axios(
+    fetchAndEnsureSuccess(
       `${param.backend || getEndpoint()}/api/status`,
       {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'GET',
+        signal: makeTimeoutAbortSignal(CONFIG.app.walletRefreshInterval),
         headers: {
           'yoroi-version': `${this.getPlatform()} / ${this.getLastLaunchVersion()}`,
           'yoroi-locale': this.getCurrentLocale(),
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkServerStatus)} error: ` + stringifyError(error));
         throw new ServerStatusError();
@@ -87,15 +118,15 @@ export class RemoteFetcher implements IFetcher {
   )
 
   getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = (body) => (
-    axios(`${priceBackendUrl}/api/price/${body.from}/current`,
+    fetchAndEnsureSuccess(`${priceBackendUrl}/api/price/${body.from}/current`,
       {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'GET',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
-      }).then(response => response.data)
+      }).then(response => response.json())
       .catch(error => {
         Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
         throw new CurrentCoinPriceError();
@@ -105,15 +136,15 @@ export class RemoteFetcher implements IFetcher {
   getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = (
     body
   ) => (
-    axios(`${priceBackendUrl}/api/price/${body.from}/${body.timestamps.join(',')}`,
+    fetchAndEnsureSuccess(`${priceBackendUrl}/api/price/${body.from}/${body.timestamps.join(',')}`,
       {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'GET',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
-      }).then(response => response.data)
+      }).then(response => response.json())
       .catch(error => {
         Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));
         throw new HistoricalCoinPriceError();
