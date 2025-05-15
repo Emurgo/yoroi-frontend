@@ -1,6 +1,6 @@
-// @flow
 import { alpha } from '@mui/material/styles';
 import { dark } from './themed-palettes/dark';
+// $FlowIgnore: suppressing this error
 import { atoms } from './atoms/atoms';
 
 const primary = {

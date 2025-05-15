@@ -1,6 +1,6 @@
-// @flow
 import { alpha } from '@mui/material/styles';
 import { light } from './themed-palettes/light';
+// $FlowIgnore: suppressing this error
 import { atoms } from './atoms/atoms';
 
 const grayscale = {
