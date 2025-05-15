@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography, styled } from '@mui/material';
+import { Box, Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import React, { useState, useRef } from 'react';
 import { useStrings } from '../hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
@@ -158,16 +158,16 @@ const RoutingPreferance = () => {
 
 const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
   const strings = useStrings();
-
+  const { atoms }: any = useTheme();
   return (
     <Box my="16px">
       <Box
         component="fieldset"
         sx={{
+          ...atoms.p_lg,
           border: '1px solid',
           borderColor: 'ds.el_gray_max',
           borderRadius: '8px',
-          p: '16px',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           justifyContent: 'start',

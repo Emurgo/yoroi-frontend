@@ -39,7 +39,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
               appearance: 'none',
               border: '0',
               outline: 'none',
-              '::placeholder': { color: 'grayscale.600' },
+              '::placeholder': { color: 'ds.gray_600' },
               bgcolor: type === 'from' ? 'ds.bg_color_max' : 'ds.bg_color_contrast_min',
             }}
             component="input"
