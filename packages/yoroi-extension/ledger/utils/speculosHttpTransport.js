@@ -2,7 +2,6 @@
 
 import Transport from "@ledgerhq/hw-transport";
 import { TransportError } from "@ledgerhq/errors";
-import axios from "axios";
 
 const SPECULOS_ENDPOINT = 'http://localhost:5001/apdu';
 /**
@@ -17,9 +16,8 @@ export default class HttpTransport extends Transport {
     unsubscribe: () => {},
   });
   static check = async (url: string, timeout = 5000) => {
-    const response = await axios({
-      url,
-      timeout,
+    const response = await fetch(url, {
+      signal: makeTimeoutAbortSignal(timeout),
     });
 
     if (response.status !== 200) {
@@ -49,14 +47,13 @@ export default class HttpTransport extends Transport {
 
   async exchange(apdu: Buffer): Promise<Buffer> {
     const apduHex = apdu.toString("hex");
-    const response = await axios({
+    const response = await fetch(this.url, {
       method: "POST",
-      url: this.url,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      data: JSON.stringify({
+      body: JSON.stringify({
         data: apduHex,
       }),
     });
@@ -68,9 +65,8 @@ export default class HttpTransport extends Transport {
       );
     }
 
-    const body: any = await response.data;
-    if (body.error) throw body.error;
-    return Buffer.from(body.data, "hex");
+    const data = await response.text();
+    return Buffer.from(data, "hex");
   }
 
   setScrambleKey() {}
