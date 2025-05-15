@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, useTheme } from '@mui/material';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -39,10 +39,24 @@ type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-const IconWrapper = styled(Box)(({ theme }) => ({
+const StakingIconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& rect': {
       fill: theme.palette.ds.primary_100,
+    },
+    '& path': {
+      fill: theme.palette.ds.primary_600,
+    },
+  },
+}));
+
+const TotalDelegatedIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& rect': {
+      fill: theme.palette.ds.secondary_100,
+    },
+    '& path': {
+      fill: theme.palette.ds.secondary_600,
     },
   },
 }));
@@ -132,9 +146,9 @@ function SummaryCard({
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <IconWrapper>
-            <StakingIcon />
-          </IconWrapper>
+          <StakingIconWrapper>
+             <StakingIcon />
+          </StakingIconWrapper>
           <InfoDetails>
             <Typography component="div" variant="caption1" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
@@ -153,9 +167,9 @@ function SummaryCard({
             </OverviewButton> */}
         </InfoRow>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <IconWrapper>
+          <TotalDelegatedIconWrapper>
             <TotalDelegatedIcon />
-          </IconWrapper>
+          </TotalDelegatedIconWrapper>
           <InfoDetails>
             <Typography
               component="div"
