@@ -12,7 +12,6 @@ export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
   const openSelectAssetModal = (type: 'from' | 'to') => {
-    console.log('openSelectAssetModal type', type);
     openModal({
       title: `SWAP ${type === 'from' ? 'FROM' : 'TO'}`,
       content: <SelectAssetModalContent />,

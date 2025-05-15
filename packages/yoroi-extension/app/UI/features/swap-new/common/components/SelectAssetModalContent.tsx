@@ -1,8 +1,40 @@
-import { Box, Stack, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react';
+import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { useStrings } from '../hooks/useStrings';
 import { AssetInfoInRow } from './AssetInfoInRow';
+
+const SearchWrapper = styled(Box)({
+  position: 'relative',
+  height: '40px',
+  marginBottom: '8px',
+});
+
+const SearchIconWrapper = styled(Box)({
+  position: 'absolute',
+  left: '7px',
+  top: '10px',
+  display: 'inline-flex',
+});
+
+const SearchInput = styled(Box)({
+  border: '2px solid',
+  borderRadius: '8px',
+  padding: '8px',
+  paddingLeft: '34px',
+  outline: 'none',
+  width: '100%',
+  fontSize: '14px',
+  fontFamily: 'Rubik',
+  height: '40px',
+  '&:focus': {
+    borderWidth: '2px',
+  },
+}) as typeof Box;
+
+const AssetCountText = styled(Typography)({
+  marginBottom: '16px',
+});
 
 export const SelectAssetModalContent = ({ assets = [] }: any) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -19,36 +51,19 @@ export const SelectAssetModalContent = ({ assets = [] }: any) => {
   return (
     <Stack>
       <Stack {...atoms.pb_xl}>
-        <Box mb="8px" position="relative" height="40px">
-          <Box
-            sx={{
-              position: 'absolute',
-              left: '7px',
-              top: '10px',
-              display: 'inline-flex',
-            }}
-          >
+        <SearchWrapper>
+          <SearchIconWrapper>
             <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
-          </Box>
-          <Box
+          </SearchIconWrapper>
+          <SearchInput
             component="input"
             type="text"
             placeholder="Search"
             sx={{
-              border: '2px solid',
               borderColor: 'ds.el_gray_min',
-              borderRadius: '8px',
-              padding: '8px',
-              paddingLeft: '34px',
-              outline: 'none',
-              width: '100%',
-              fontSize: '14px',
-              fontFamily: 'Rubik',
-              height: '40px',
               backgroundColor: 'ds.bg_color_max',
               color: 'ds.el_gray_low',
               '&:focus': {
-                borderWidth: '2px',
                 borderColor: 'ds.el_gray_max',
               },
             }}
@@ -56,15 +71,14 @@ export const SelectAssetModalContent = ({ assets = [] }: any) => {
               setSearchTerm(e.target.value?.trim() ?? '');
             }}
           />
-        </Box>
-        <Box sx={{ marginBottom: '16px' }}>
-          <Typography component="div" variant="body2" color="ds.text_gray_low">
-            {strings.numYourAssets(filteredAssets.length)}
-          </Typography>
-        </Box>
+        </SearchWrapper>
+        <AssetCountText variant="body2" color="ds.text_gray_low">
+          {strings.numYourAssets(filteredAssets.length)}
+        </AssetCountText>
       </Stack>
 
       <AssetInfoInRow />
     </Stack>
   );
 };
+

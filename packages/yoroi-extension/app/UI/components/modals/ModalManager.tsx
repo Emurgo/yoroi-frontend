@@ -20,6 +20,7 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
   '& .MuiPaper-root': {
     maxWidth: width,
     height: height,
+    maxHeight: height,
     margin: 0,
   },
   '& .MuiDialogActions-root': {

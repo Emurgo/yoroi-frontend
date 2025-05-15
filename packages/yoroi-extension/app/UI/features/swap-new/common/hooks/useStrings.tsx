@@ -81,6 +81,18 @@ export const messages = Object.freeze(
       id: 'swap.routingPreferance',
       defaultMessage: '!!!Slippage tolerance',
     },
+    autoLabel: {
+      id: 'swap.auto',
+      defaultMessage: '!!!Auto',
+    },
+    slippageInputInfo: {
+      id: 'swap.slippageInputInfo',
+      defaultMessage: '!!!Enter a value from 0% to 75%. You can also enter up to 1 decimal',
+    },
+    slippageToleranceHigh: {
+      id: 'swap.actions.slippageToleranceHigh',
+      defaultMessage: '!!!When the slippage tolerance is set really high, it allows the transaction to still complete despite large price swings. This can open the door to front-running and sandwich attacks.',
+    },
   })
 );
 
@@ -103,8 +115,11 @@ export const useStrings = () => {
     slippageLabel: intl.formatMessage(messages.slippage),
     slippageInfo: intl.formatMessage(messages.slippageInfo),
     slippageTolerance: intl.formatMessage(messages.slippageTolerance),
+    slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
     routingPreferance: intl.formatMessage(messages.routingPreferance),
+    autoLabel: intl.formatMessage(messages.autoLabel),
+    slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

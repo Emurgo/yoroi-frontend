@@ -21,8 +21,8 @@ export const TopBarActions = () => {
     openModal({
       title: 'Settings',
       content: <SettingsModalContent />,
-      height: '612px',
-      width: '540px',
+      height: '540px',
+      width: '612px',
     });
   };
 
