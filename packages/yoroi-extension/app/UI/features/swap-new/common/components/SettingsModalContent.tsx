@@ -1,9 +1,7 @@
 import { Box, Button, Stack, Typography, styled } from '@mui/material';
 import React, { useState, useRef } from 'react';
 import { useStrings } from '../hooks/useStrings';
-import Tabs from '../../../../components/tabs/Tabs';
 import { Switch } from '../../../../components/Switch/Switch';
-import { fontWeight } from '../../../../../styles/themes/tokens/tokens';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -25,7 +23,7 @@ export const SettingsModalContent = () => {
   return (
     <Box display="flex" flexDirection="column" height="100%" position="relative">
       {/* Scrollable content */}
-      <Box flex={1} overflow="auto" paddingBottom="80px">
+      <Box flex={1} overflow="auto">
         <Typography variant="body1" color="ds.text_gray_medium" mb={16}>
           {strings.slippageTolerance}
         </Typography>
@@ -44,8 +42,7 @@ export const SettingsModalContent = () => {
         </Typography>
         <RoutingPreferance />
       </Box>
-
-      {/* Fixed button */}
+      {/* @ts-ignore */}
       <SButton fullWidth variant="primary">
         Apply
       </SButton>
@@ -53,7 +50,7 @@ export const SettingsModalContent = () => {
   );
 };
 
-const SButton = styled(Button)(({ theme }) => ({
+const SButton = styled(Button)(({ theme }:any) => ({
   ...theme.atoms.my_lg,
   position: 'sticky',
   bottom: 0,
@@ -61,31 +58,39 @@ const SButton = styled(Button)(({ theme }) => ({
   zIndex: 1,
 }));
 
-const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlippage, selectedSlippage, onManualSelect }) => {
+const SlipageOptions = ({
+  setIsManualSlippage,
+  setSelectedSlippage,
+  isManualSlippage,
+  selectedSlippage,
+  onManualSelect,
+}) => {
   const strings = useStrings();
 
+  const slippages = defaultSlippages.map((val) => ({
+    value: val,
+    label: `${val}%`,
+    isActive: !isManualSlippage && val === selectedSlippage,
+    onClick: () => {
+      setIsManualSlippage(false);
+      setSelectedSlippage(val);
+    },
+  }));
+
   return (
-    <Box display="flex" justifyContent="flex-start" mb="32">
-      <Tabs
-        tabs={defaultSlippages
-          .map(val => ({
-            label: `${val}%`,
-            isActive: !isManualSlippage && val === selectedSlippage,
-            onClick: () => {
-              setIsManualSlippage(false);
-              setSelectedSlippage(val);
-            },
-          }))
-          .concat({
-            label: strings.manualLabel,
-            isActive: isManualSlippage,
-            onClick: onManualSelect,
-          })}
+    <Box display="flex" gap="8px" flexWrap="wrap">
+      {slippages.map(({ value, label, isActive, onClick }) => (
+        <SlippageTab key={value} label={label} isActive={isActive} onClick={onClick} />
+      ))}
+
+      <SlippageTab
+        label={strings.manualLabel}
+        isActive={isManualSlippage}
+        onClick={onManualSelect}
       />
     </Box>
   );
 };
-
 const RoutingPreferance = () => {
   const [autoSelected, setAutoSelected] = useState(true);
   const [dexHunter, setDexHunter] = useState(true);
@@ -202,7 +207,8 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
           }}
         />
       </Box>
-      <Typography variant="caption1" color="ds.text_gray_low" pt={4}>
+      {/* ts-ignore */}
+      <Typography variant="caption" color="ds.text_gray_low" pt={4}>
         {strings.slippageInputInfo}
       </Typography>
 
@@ -211,6 +217,38 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
           {strings.slippageToleranceHigh}
         </Typography>
       </Box>
+    </Box>
+  );
+};
+
+
+const SlippageTab = ({
+  label,
+  isActive,
+  onClick,
+}: {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <Box
+      onClick={onClick}
+      p={8}
+      borderRadius="8px"
+      bgcolor={isActive ? 'ds.gray_200' : 'transparent'}
+      sx={{
+        cursor: 'pointer',
+        border: `1px solid ${isActive ? 'ds.gray_300' : 'ds.gray_200'}`,
+        transition: 'background-color 0.2s',
+        '&:hover': {
+          backgroundColor: !isActive ? 'ds.gray_100' : undefined,
+        },
+      }}
+    >
+      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+        {label}
+      </Typography>
     </Box>
   );
 };
