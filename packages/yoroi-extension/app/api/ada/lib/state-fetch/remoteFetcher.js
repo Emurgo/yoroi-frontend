@@ -91,6 +91,7 @@ export const sendTx: ({|
       signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
       body: JSON.stringify(({ signedTx: signedTx64}: SignedRequestInternal)),
       headers: {
+        'content-type': 'application/json',
         'yoroi-version': lastLaunchVersion,
         'yoroi-locale': currentLocale,
       }
@@ -139,6 +140,7 @@ export class RemoteFetcher implements IFetcher {
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -171,6 +173,7 @@ export class RemoteFetcher implements IFetcher {
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         body: JSON.stringify(rest),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -240,6 +243,7 @@ export class RemoteFetcher implements IFetcher {
           signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
           body: JSON.stringify({ addresses, before }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
@@ -260,6 +264,7 @@ export class RemoteFetcher implements IFetcher {
           signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
           body: JSON.stringify({ txHashes }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
@@ -319,6 +324,7 @@ export class RemoteFetcher implements IFetcher {
           signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
           body: JSON.stringify({ txHashes }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
@@ -338,6 +344,7 @@ export class RemoteFetcher implements IFetcher {
         body: JSON.stringify(rest),
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -387,6 +394,7 @@ export class RemoteFetcher implements IFetcher {
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -408,6 +416,7 @@ export class RemoteFetcher implements IFetcher {
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -429,6 +438,7 @@ export class RemoteFetcher implements IFetcher {
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         body: JSON.stringify({ poolIds: body.poolIds }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
@@ -513,7 +523,10 @@ export class RemoteFetcher implements IFetcher {
           method: 'POST',
           body: JSON.stringify({
             assets: body.assets
-          })
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
         }
       ).then(response => response.json())
       .catch((error) => {
@@ -532,7 +545,10 @@ export class RemoteFetcher implements IFetcher {
           method: 'POST',
           body: JSON.stringify({
             assets: body.assets
-          })
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
         }
       ).then(response => response.json()).then(data => data.supplies)
       .catch((error) => {
@@ -576,6 +592,7 @@ export class RemoteFetcher implements IFetcher {
         body: JSON.stringify({ slots: body.slots }),
         signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
