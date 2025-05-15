@@ -58,8 +58,8 @@ class DAppSignTx extends DAppSignBase {
   };
   // error message
   errorMessageLocator = {
-    locator: '.Layout_content',
-    methos: 'css',
+    locator: 'general-layoutContent-component',
+    method: 'id',
   };
   // functions
   async getFee() {

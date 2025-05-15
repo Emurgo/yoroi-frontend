@@ -1,4 +1,4 @@
-import { Builder, logging } from 'selenium-webdriver';
+import { Builder, logging, WebDriver } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome.js';
 import firefox from 'selenium-webdriver/firefox.js';
 import path from 'path';
@@ -147,7 +147,11 @@ export const getBuilder = () => {
     }
   }
 };
-// getting a driver
+
+/**
+ * Getting a driver with not prepared extension
+ * @returns {WebDriver}
+ */
 export const getDriver = () => {
   const driver = getBuilder().build();
   driver.manage().setTimeouts({ implicit: defaultWaitTimeout });

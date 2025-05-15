@@ -19,10 +19,10 @@ export interface SubMenuOption {
   route: string;
 }
 
-const IconWrapper = styled(Box)(({ theme }: any) => ({
+const IconWrapper = styled(Box)<{ receive: boolean }>(({ theme, receive }: any) => ({
   '& svg': {
     '& path': {
-      fill: theme.palette.ds.el_primary_medium,
+      fill: receive ? theme.palette.ds.secondary_400 : theme.palette.ds.el_primary_medium,
     },
   },
 }));
@@ -40,11 +40,19 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
     isStakeRegistered,
     stakeKeyDeposit,
     primaryTokenInfo,
+    drepID,
   } = useTxReviewModal();
   const { selected, selectedWalletName } = currentWalletDetails;
   const notOwnedOutputs = React.useMemo(() => tx.outputs.filter(output => !output.ownAddress), [tx.outputs]);
 
-  const operationsCerts = useOperations(tx.certificates, isStakeRegistered, stakeKeyDeposit, primaryTokenInfo, operations);
+  const operationsCerts = useOperations(
+    tx.certificates,
+    isStakeRegistered,
+    stakeKeyDeposit,
+    primaryTokenInfo,
+    operations,
+    drepID
+  );
   const warningComp = useWarningSection({ warning: operations, title: strings.attentionLabel, content: strings.rewardsWithdraw });
 
   const { plate } = selected;
@@ -67,18 +75,16 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
         onClick={() => {
           changeModalView({ modalView: 'walletInfo', title: 'Wallet Details' });
         }}
-        id={commonIdPath + "-walletInfo-button"}
+        id={commonIdPath + '-walletInfo-button'}
       >
         <Typography
           variant="body1"
           color="ds.text_primary_medium"
           fontWeight={500}
-          id={commonIdPath + "-walletNameAndPlate-text"}
+          id={commonIdPath + '-walletNameAndPlate-text'}
         >
-          {`${truncateLongName(
-          selectedWalletName,
-          29
-        )} | ${plate.TextPart}`}</Typography>
+          {`${truncateLongName(selectedWalletName, 29)} | ${plate.TextPart}`}
+        </Typography>
       </Box>
     </Stack>
   );
@@ -121,7 +127,7 @@ const InfoInline = ({ label, value }) => {
         {label}
       </Typography>
       {isText ? (
-        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + "-info" + label + "-text"}>
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + '-info' + label + '-text'}>
           {value}
         </Typography>
       ) : (
@@ -141,7 +147,7 @@ const MyWalletSection = ({ tx, stakingAddress, notOwnedOutputs, operationFee }) 
         content={
           <Stack gap="12px">
             <CopyableText value={stakingAddress}>
-              <Typography id={commonIdPath + ":yourAddress-truncatedAddress-text"}>{truncateAddress(stakingAddress)}</Typography>
+              <Typography id={commonIdPath + ':yourAddress-truncatedAddress-text'}>{truncateAddress(stakingAddress)}</Typography>
             </CopyableText>
             <MyWalletTokens tx={tx} notOwnedOutputs={notOwnedOutputs} operationFee={operationFee} />
           </Stack>
@@ -161,10 +167,8 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {strings.addressToLabel}:
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":to-receiver-text"}>
-          {receiverCustomTitle?.to ?? (
-            <CopyableText value={address}>{truncateAddressShort(address, 40)}</CopyableText>
-          )}
+        <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ':to-receiver-text'}>
+          {receiverCustomTitle?.to ?? <CopyableText value={address}>{truncateAddressShort(address, 40)}</CopyableText>}
         </Typography>
       </Stack>
 
@@ -173,7 +177,7 @@ const ExternalPartySection = ({ receiverCustomTitle, output }) => {
           <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
             {strings.associatedAddress}
           </Typography>
-          <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ":associatedAddress-truncatedAddress-text"}>
+          <Typography variant="body1" color="ds.text_gray_medium" id={commonIdPath + ':associatedAddress-truncatedAddress-text'}>
             {<CopyableText value={address}>{truncateAddressShort(address, 25)}</CopyableText>}
           </Typography>
         </Stack>
@@ -209,7 +213,10 @@ const OperationsSection = ({ operations }) => {
 
 const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
   const strings = useStrings();
-  const { primaryTokenInfo } = useTxReviewModal();
+  const { primaryTokenInfo, operations, stakeKeyDeposit, stakingRewards } = useTxReviewModal();
+  const isReceiving = operations?.kind === 'undelegate';
+  const undelegateOperation = operations?.kind === 'undelegate';
+
   const totalPrimaryTokenSent = React.useMemo(
     () =>
       notOwnedOutputs
@@ -228,24 +235,31 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
       notOwnedOutputs.flatMap(output => output.assets.filter(asset => asset.tokenInfo.nature !== Portfolio.Token.Nature.Primary)),
     [notOwnedOutputs]
   );
-
   const formatedFee = new BigNumber(totalPrimaryTokenSpent).shiftedBy(-primaryTokenInfo.decimals).toString();
+  const undelegateFee = Quantities.diff(stakeKeyDeposit, totalPrimaryTokenSpent);
+  const undelegateFormatedFee = new BigNumber(Quantities.diff(undelegateFee, stakingRewards))
+    .shiftedBy(-primaryTokenInfo.decimals)
+    .toString();
 
   return (
     <Stack direction="row" sx={{ display: 'flex', flexWrap: 'wrap' }} gap="8px">
       <Stack direction="row" justifyContent="space-between" width="100%" alignItems="flex-start">
         <Stack direction="row" gap="4px" alignItems="flex-start">
-          <IconWrapper>
-            <Icon.Send />
-          </IconWrapper>
-          <Typography fontWeight="500">{strings.sendLabel}</Typography>
+          <IconWrapper receive={isReceiving}>{isReceiving ? <Icon.Receive /> : <Icon.Send />}</IconWrapper>
+          <Typography fontWeight="500">{isReceiving ? strings.receiveLabel : strings.sendLabel}</Typography>
         </Stack>
         <Stack direction="row" gap="8px" justifyContent="flex-end" flexWrap="wrap">
           <Box
-            sx={{ padding: '4px 12px', backgroundColor: 'ds.primary_500', borderRadius: '8px', flexWrap: 'nowrap', ml: '40px' }}
+            sx={{
+              padding: '4px 12px',
+              backgroundColor: isReceiving ? 'ds.secondary_300' : 'ds.primary_500',
+              borderRadius: '8px',
+              flexWrap: 'nowrap',
+              ml: '40px',
+            }}
           >
-            <Typography color="ds.white_static" id={commonIdPath + "-txSendAmount-text"}>
-              {formatedFee} {primaryTokenInfo.name}
+            <Typography color={isReceiving ? 'ds.text_gray_max' : 'ds.white_static'} id={commonIdPath + '-txSendAmount-text'}>
+              {undelegateOperation ? undelegateFormatedFee : formatedFee} {primaryTokenInfo.name}
             </Typography>
           </Box>
           {notPrimaryTokenSent.length > 0 &&
