@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 
-import { Button, Typography, useTheme } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
