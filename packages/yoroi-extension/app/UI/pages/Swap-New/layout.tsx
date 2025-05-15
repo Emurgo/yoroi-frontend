@@ -14,9 +14,9 @@ type Props = {
 
 const SwapLayout = ({ stores, actions, children }: Props): JSX.Element => {
   const { isTestnet } = stores.wallets.selectedOrFail;
+  const location = useLocation();
 
   const isActivePage = (route: string): boolean => {
-    const location = useLocation();
     if (route && location.pathname === route) {
       return true;
     }
