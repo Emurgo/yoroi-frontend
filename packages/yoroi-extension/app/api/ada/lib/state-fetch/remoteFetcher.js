@@ -62,42 +62,10 @@ import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
 import { addressBech32ToHex } from '../cardanoCrypto/utils';
 import { bytesToBase64, bytesToHex, forceNonNull, last } from '../../../../coreUtils';
+import { makeTimeoutAbortSignal, fetchAndEnsureSuccess, type ServerError } from '../../../utils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-
-function makeTimeoutAbortSignal(timeout: number) {
-  // $FlowIgnore[prop-missing] newer API than outdated flow
-  return AbortSignal.timeout(timeout);
-}
-
-type ServerErrorResponse = {|
-  status: number,
-  data: string,
-|};
-
-class ServerError extends Error {
-  response: ServerErrorResponse;
-
-  constructor(response: ServerErrorResponse) {
-    super(`server returns ${response.status}`);
-    // Maintains proper stack trace for where our error was thrown (non-standard)
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, ServerError);
-    }
-    this.response = response;
-  }
-}
-const fetchAndEnsureSuccess: typeof fetch = function(...args) {
-  return fetch(...args).then(resp => {
-    if (resp.ok) {
-      return resp;
-    }
-    return resp.text().then(data => {
-      throw new ServerError({ status: resp.status, data });
-    })
-  });
-}
 
 export const sendTx: ({|
   body: SignedRequest | SignedBatchRequest,
