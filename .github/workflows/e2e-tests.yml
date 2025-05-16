@@ -86,8 +86,6 @@ jobs:
         with:
           chrome-version: "stable"
 
-      - uses: nanasess/setup-chromedriver@v2
-
       - uses: actions/checkout@v4
 
       - name: Read .nvmrc
