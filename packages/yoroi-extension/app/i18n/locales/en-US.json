@@ -118,7 +118,7 @@
   "connector.connect.createWallet": "create wallet",
   "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "Connecting to hardware wallet with authentication is not supported",
   "connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
-  "connector.connect.noWalletsFound": "Ooops, no {network} wallets found.",
+  "connector.connect.noWalletsFound": "Ooops, no wallets found.",
   "connector.connect.noWebsitesConnected": "You don't have any websites connected yet",
   "connector.connect.testnetWarningText": "This DApp may not support Cardano {networkName} (test blockchain network). Ensure it supports {networkName} before connecting.",
   "connector.connect.testnetWarningTitle": "Testnet support",
