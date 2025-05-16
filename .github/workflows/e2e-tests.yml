@@ -85,7 +85,8 @@ jobs:
         id: setup-chrome
         with:
           chrome-version: "stable"
-          install-chromedriver: true
+
+      - uses: nanasess/setup-chromedriver@v2
 
       - uses: actions/checkout@v4
 
