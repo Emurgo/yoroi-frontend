@@ -210,6 +210,7 @@ export enum Icons {
   Eye = 'Eye',
   EyeOff = 'EyeOff',
   Image = 'Image',
+  Indicator = 'Indicator',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
   LastSeen = 'LastSeen',
