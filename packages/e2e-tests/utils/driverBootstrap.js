@@ -67,7 +67,11 @@ const getBraveBuilder = () => {
 
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
-  const chromeOpts = new chrome.Options()
+  const chromeOpts = new chrome.Options({
+      'goog:chromeOptions': {
+        'enableExtensionTargets': true,
+      }
+    })
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
