@@ -81,14 +81,11 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - name: Forcefully update Chrome browser
-        id: chrome-version
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get --only-upgrade install google-chrome-stable
-          echo "version=$(google-chrome --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
+      - uses: browser-actions/setup-chrome@v1.7.3
+        id: setup-chrome
+        with:
+          chrome-version: "stable"
+          install-chromedriver: true
 
       - uses: actions/checkout@v4
 
@@ -109,7 +106,7 @@ jobs:
           path: |
             packages/e2e-tests/node_modules
             ~/.npm
-          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ needs.Setup-Browser.outputs.chrome-version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ steps.setup-chrome.outputs.chrome-version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-
             ${{ runner.os }}-e2e-tests-node-
@@ -124,9 +121,6 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
-
-      - name: Install ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
 
       - name: Run Xvfb
         run: |
@@ -169,7 +163,9 @@ jobs:
 
     steps:
       - uses: browser-actions/setup-chrome@v1.7.3
-      - run: chrome --version
+        id: setup-chrome
+        with:
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -190,7 +186,7 @@ jobs:
           path: |
             packages/e2e-tests/node_modules
             ~/.npm
-          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ needs.Setup-Browser.outputs.chrome-version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ steps.setup-chrome.outputs.chrome-version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-
             ${{ runner.os }}-e2e-tests-node-
