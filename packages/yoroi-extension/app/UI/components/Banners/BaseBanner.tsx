@@ -14,10 +14,10 @@ interface BaseBannerProps {
   onClose: () => void;
   title: string | React.ReactNode;
   description: string | React.ReactNode;
-  buttonText: string | React.ReactNode;
-  buttonProps: ButtonProps;
-  illustration: React.ReactNode;
-  illustrationProps: StackProps;
+  buttonText?: string | React.ReactNode;
+  buttonProps?: ButtonProps;
+  illustration?: React.ReactNode;
+  illustrationProps?: StackProps;
   displayIllustration?: boolean;
 }
 
@@ -50,10 +50,10 @@ export const BaseBanner = ({
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
           {title}
         </Typography>
-        <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
+        <Typography variant="body1" mt="8px" mb={buttonText ? '24px' : '0px'} color="ds.gray_max">
           {description}
         </Typography>
-        <Button {...buttonProps}>{buttonText}</Button>
+        {buttonText && <Button {...buttonProps}>{buttonText}</Button>}
       </Stack>
       {displayIllustration && (
         <Stack height={125} {...illustrationProps}>

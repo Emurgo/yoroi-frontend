@@ -40,6 +40,8 @@ import { PortfolioContextProvider } from './UI/features/portfolio/module/Portfol
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
+import { CatalystRegistrationContextProvider } from './UI/features/catalyst-registration/module/CatalystRegistrationContextProvider';
+// $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
@@ -53,6 +55,8 @@ import GovernanceTransactionSubmittedPage from './UI/pages/Governance/Governance
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import NftsPage from './UI/pages/nfts/NftsPage';
+// $FlowIgnore: suppressing this error
+import CatalystRegistration from './UI/pages/catalyst-registration/CatalystRegistration';
 // $FlowIgnore: suppressing this error
 import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
 // $FlowIgnore: suppressing this error
@@ -237,6 +241,13 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.SEND_FROM_URI.ROOT} component={props => <URILandingPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.SWITCH} component={props => <WalletSwitch {...props} stores={stores} />} />
           <Route exact path={ROUTES.REVAMP.CATALYST_VOTING} component={props => <VotingPage {...props} stores={stores} />} />
+          <Route
+            exact
+            path={ROUTES.CATALYST_REGISTRATION.ROOT}
+            component={props =>
+              wrapCatalystRegistration({ ...props, stores }, <CatalystRegistration {...props} stores={stores} />)
+            }
+          />
           <Route exact path={ROUTES.EXCHANGE_END} component={props => <ExchangeEndPage {...props} stores={stores} />} />
 
           {/* NEW UI Routes */}
@@ -485,5 +496,13 @@ export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): No
     <NftGalleryContextProvider stores={nftGalleryProps.stores}>
       <Suspense fallback={null}>{children}</Suspense>
     </NftGalleryContextProvider>
+  );
+}
+
+export function wrapCatalystRegistration(catalystRegistrationProps: StoresProps, children: Node): Node {
+  return (
+    <CatalystRegistrationContextProvider stores={catalystRegistrationProps.stores}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </CatalystRegistrationContextProvider>
   );
 }

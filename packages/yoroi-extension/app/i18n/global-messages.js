@@ -763,6 +763,10 @@ const globalMessages: * = defineMessages({
     id: 'sidebar.voting',
     defaultMessage: '!!!Voting',
   },
+  sidebarCatalystRegistration: {
+    id: 'sidebar.catalystRegistration',
+    defaultMessage: '!!!Catalyst Registration',
+  },
   sidebarSwap: {
     id: 'sidebar.swap',
     defaultMessage: '!!!Swap',
