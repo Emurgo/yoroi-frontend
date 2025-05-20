@@ -6,7 +6,7 @@ import { asQuantity, Quantities } from '../../../utils/quantities';
 import { CertificateType, FormattedTx } from './types';
 import { useStrings } from './hooks/useStrings';
 import { drepNames } from '../../governace/common/constants';
-import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils'
+import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 
 type OperationsCount = Record<CertificateType, number>;
 export type Operations = {
