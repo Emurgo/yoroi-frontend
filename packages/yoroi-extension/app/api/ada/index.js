@@ -348,7 +348,7 @@ export type CreateUnsignedTxForUtxosFunc = (
 // createDelegationTx
 
 export type CreateDelegationTxRequest = {|
- wallet: WalletState,
+  wallet: WalletState,
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
   poolRequest?: string,

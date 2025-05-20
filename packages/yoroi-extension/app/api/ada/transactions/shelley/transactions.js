@@ -1216,13 +1216,14 @@ export function signTransaction(
     bootstrapWits,
   );
 
+  let signedWithOwnStakingKeyAlready = false;
+  const ownStakingKeyHash = stakingKey?.to_public().hash().to_hex();
+
   const withdrawals = txBody.withdrawals?.();
   if (withdrawals != null) {
     if (stakingKey == null) {
       console.warn('Transaction in signing contains withdrawals but no staking key is provided. Cannot fully sign.')
     } else {
-      let signedWithOwnStakingKeyAlready = false;
-      const ownStakingKeyHash = stakingKey.to_public().hash().to_hex();
       for (const rewardAddress of iterateLenGet(withdrawals.keys())) {
         const stakingKeyHash = rewardAddress.payment_cred().to_keyhash()?.to_hex();
         if (stakingKeyHash != null) {
@@ -1237,6 +1238,31 @@ export function signTransaction(
             console.warn(`Transaction in signing contains a withdrawal for key '${stakingKeyHash}' which does not match own staking key '${ownStakingKeyHash}'. Cannot fully sign.`)
           }
         }
+      }
+    }
+  }
+
+  const certificates = txBody.certs?.();
+  if (certificates != null) {
+    for (const cert of iterateLenGet(certificates)) {
+      switch (cert.kind()) {
+        case RustModule.WalletV4.CertificateKind.StakeRegistration:
+        case RustModule.WalletV4.CertificateKind.StakeDeregistration:
+        case RustModule.WalletV4.CertificateKind.StakeDelegation:
+        case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation:
+        case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
+        case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
+        case RustModule.WalletV4.CertificateKind.VoteDelegation:
+        case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation: {
+          if (!signedWithOwnStakingKeyAlready) {
+            vkeyWits.add(
+              RustModule.WalletV4.make_vkey_witness(txHash, stakingKey),
+            );
+            signedWithOwnStakingKeyAlready = true;
+          }
+          break;
+        }
+        default:
       }
     }
   }
