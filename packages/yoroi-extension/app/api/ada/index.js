@@ -208,7 +208,7 @@ export type AdaGetTransactionsRequest = {|
 // signAndBroadcast
 
 export type SignAndBroadcastRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  publicDeriver: PublicDeriver<>,
   signRequest: {
     senderUtxos: Array<CardanoAddressedUtxo>,
     +unsignedTx: RustModule.WalletV4.Transaction |
