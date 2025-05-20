@@ -9,11 +9,9 @@ import {
   asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asGetSigningKey,
   asHasLevels,
   asHasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 
 import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '../../../app/api/common/errors';

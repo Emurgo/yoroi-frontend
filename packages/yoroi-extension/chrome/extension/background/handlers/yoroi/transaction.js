@@ -9,11 +9,7 @@ import {
   transactionHexToHash,
   transactionHexAddSignaturesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
-import {
-  asGetSigningKey,
-  asGetAllAccounting,
-} from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-import AdaApi, { genOwnStakingKey } from '../../../../../app/api/ada';
+import AdaApi from '../../../../../app/api/ada';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import LocalStorageApi from '../../../../../app/api/localStorage/index';
