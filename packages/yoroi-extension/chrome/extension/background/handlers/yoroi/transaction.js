@@ -75,42 +75,9 @@ export const SignAndBroadcastTransaction: HandlerType<
   handle: async (request) => {
     return RustModule.WasmScope(async (Scope) => {
       const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-      const { senderUtxos, unsignedTx, metadata, wits, neededHashes, txHash } = request;
+      const { senderUtxos, unsignedTx, metadata, wits } = request;
 
       try {
-        const withSigning = asGetSigningKey(publicDeriver);
-        if (withSigning == null) {
-          throw new Error('unexpected missing asGetSigningKey result');
-        }
-
-        if (neededHashes.length - wits.length >= 2) {
-          throw new Error('Too many missing witnesses');
-        }
-        if (neededHashes.length !== wits.length) {
-          const withStakingKey = asGetAllAccounting(withSigning);
-          if (withStakingKey == null) {
-            throw new Error('unexpected missing asGetAllAcccounting result');
-          }
-          const stakingKey = await genOwnStakingKey({
-            publicDeriver: withStakingKey,
-            password: request.password,
-          });
-          if (neededHashes.includes(
-              Scope.WalletV4.Credential.from_keyhash(
-                stakingKey.to_public().hash()
-              ).to_hex()
-          )) {
-            wits.push(
-              Scope.WalletV4.make_vkey_witness(
-                Scope.WalletV4.TransactionHash.from_hex(txHash),
-                stakingKey
-              ).to_hex()
-            );
-          } else {
-            throw new Error('missing witness but it was not ours');
-          }
-        }
-
         const unsignedTxWasm = RustModule.WalletV4.Transaction.from_hex(unsignedTx);
 
         const signRequest = {
@@ -124,7 +91,7 @@ export const SignAndBroadcastTransaction: HandlerType<
         const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
         const adaApi = new AdaApi();
         const { txId, signedTxHex, } = await adaApi.signAndBroadcast({
-          publicDeriver: withSigning,
+          publicDeriver,
           password: request.password,
           signRequest,
           sendTx: stateFetcher.sendTx,

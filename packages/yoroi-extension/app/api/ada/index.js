@@ -77,7 +77,7 @@ import {
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
   sendAllUnsignedTx as shelleySendAllUnsignedTx,
-  signTransaction as shelleySignTransaction,
+  signTransactionFromWallet as shelleySignTransactionFromWallet,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
 import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
@@ -701,22 +701,14 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
     const { password } = request;
     try {
-      const signingKey = await request.publicDeriver.getSigningKey();
-      const normalizedKey = await request.publicDeriver.normalizeKey({
-        ...signingKey,
-        password,
-      });
-
-      const { txHash, encodedTx } = RustModule.WasmScope(Scope => {
-        const signedTx = shelleySignTransaction(
+      const { txHash, encodedTx } = await RustModule.WasmScope(async (Scope) => {
+        const signedTx = await shelleySignTransactionFromWallet(
           request.signRequest.senderUtxos,
           request.signRequest.unsignedTx,
-          request.publicDeriver.getParent().getPublicDeriverLevel(),
-          Scope.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
-          request.signRequest.neededStakingKeyHashes.wits,
+          request.publicDeriver,
+          password,
           request.signRequest.metadata,
         );
-
         return {
           txHash: Scope.WalletV4.FixedTransaction.from_hex(signedTx.to_hex()).transaction_hash().to_hex(),
           encodedTx: signedTx.to_bytes(),
@@ -737,7 +729,7 @@ export default class AdaApi {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-
+      console.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)}`, error);
       Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -1579,20 +1571,6 @@ export default class AdaApi {
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
       );
 
-      {
-        const tx = unsignedTxResponse.txBuilder.build_tx();
-        for (const withdrawal of request.withdrawals) {
-          if (withdrawal.privateKey != null) {
-            const { privateKey } = withdrawal;
-            neededKeys.wits.add(
-              RustModule.WalletV4.make_vkey_witness(
-                RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash(),
-                privateKey
-              ).to_hex()
-            );
-          }
-        }
-      }
       const result = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTxResponse.senderUtxos,
         unsignedTx: unsignedTxResponse.txBuilder,
