@@ -929,12 +929,12 @@ export default class Transaction extends Component<Props, State> {
 
         try {
           jsonData = parseMetadata(data.metadata);
-        } catch (error) {
+        } catch (_error) {
           // try to parse schema using detailed conversion if advanced user
           if (this.props.complexityLevel === ComplexityLevels.Advanced) {
             try {
               jsonData = parseMetadataDetailed(data.metadata);
-            } catch (errDetailed) {
+            } catch (_errDetailed) {
               // discard error
               // can not parse metadata as json
               // show the metadata hex as is

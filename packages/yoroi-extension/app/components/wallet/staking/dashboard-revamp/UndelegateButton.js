@@ -104,7 +104,7 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });
-    } catch (error) {
+    } catch (_error) {
       showTxResultModal(TransactionResult.FAIL);
     }
   };

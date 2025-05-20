@@ -89,7 +89,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
       // });
-    } catch (error) {
+    } catch (_error) {
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.FAIL);
     }

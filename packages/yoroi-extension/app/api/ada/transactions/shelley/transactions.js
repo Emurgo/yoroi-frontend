@@ -173,7 +173,7 @@ function addUtxoInput(
       .checked_add(txBuilder.get_implicit_input());
     try {
       currentInputSum.checked_add(wasmAmount);
-    } catch (e) {
+    } catch (_e) {
       return AddInputResult.OVERFLOW;
     }
     return AddInputResult.VALID;

@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
-import type { ConfigType } from '../../../config/config-types';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
 import TransferSendPage from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
@@ -11,9 +10,6 @@ import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { intlShape, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 type Props = {|
   +onClose: void => void,

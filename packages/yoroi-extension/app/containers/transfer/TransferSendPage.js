@@ -14,7 +14,6 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
-import type { ConfigType } from '../../../config/config-types';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
@@ -25,9 +24,6 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 type LocalProps = {|
   +onClose: {|
