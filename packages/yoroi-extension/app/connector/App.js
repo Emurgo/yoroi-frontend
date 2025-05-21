@@ -17,8 +17,6 @@ import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
 import { autorun, observable, runInAction } from 'mobx';
 import { Routes } from './Routes';
@@ -46,8 +44,6 @@ addLocaleData([
   ...id,
   ...es,
   ...it,
-  ...tr,
-  ...cs,
   ...sk,
 ]);
 

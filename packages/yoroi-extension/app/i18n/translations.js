@@ -11,8 +11,6 @@ import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
 import sk from 'react-intl/locale-data/sk';
 import vi from 'react-intl/locale-data/vi';
 import globalMessages from './global-messages';
@@ -29,8 +27,6 @@ import { ReactComponent as BrazilFlag }  from '../assets/images/flags/brazil.inl
 import { ReactComponent as SpanishFlag }  from '../assets/images/flags/spanish.inline.svg';
 import { ReactComponent as ItalianFlag }  from '../assets/images/flags/italian.inline.svg';
 import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indonesian.inline.svg';
-import { ReactComponent as TurkishFlag }  from '../assets/images/flags/turkish.inline.svg';
-import { ReactComponent as CzechFlag }  from '../assets/images/flags/czech.inline.svg';
 import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
 import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
 
@@ -47,8 +43,6 @@ export const locales: any = Object.freeze([
   ...id,
   ...es,
   ...it,
-  ...tr,
-  ...cs,
   ...sk,
   ...vi,
 ]);
@@ -93,11 +87,6 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: Chinese
   },
   {
-    value: 'zh-Hant',
-    label: globalMessages.languageChineseTraditional,
-    svg: Chinese
-  },
-  {
     value: 'ru-RU',
     label: globalMessages.languageRussian,
     svg: RussianFlag
@@ -136,16 +125,6 @@ export const LANGUAGES: Array<LanguageType> = [
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
     svg: IndonesianFlag
-  },
-  {
-    value: 'tr-TR',
-    label: globalMessages.languageTurkish,
-    svg: TurkishFlag
-  },
-  {
-    value: 'cs-CZ',
-    label: globalMessages.languageCzech,
-    svg: CzechFlag
   },
   {
     value: 'sk-SK',
