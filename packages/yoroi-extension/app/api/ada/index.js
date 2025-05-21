@@ -215,10 +215,6 @@ export type SignAndBroadcastRequest = {|
       Buffer |
       Uint8Array,
     metadata: void | RustModule.WalletV4.AuxiliaryData,
-    +neededStakingKeyHashes: {
-      wits: Set<string>, // Vkeywitness
-      ...
-    },
     ...
   },
   password: string,
@@ -955,10 +951,6 @@ export default class AdaApi {
           PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
           NetworkId: request.network.NetworkId,
         },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
-        },
         receiver: signRequestReceiver,
       });
     } catch (error) {
@@ -1319,10 +1311,6 @@ export default class AdaApi {
         PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
         NetworkId: network.NetworkId,
       },
-      neededStakingKeyHashes: {
-        neededHashes: new Set(),
-        wits: new Set(),
-      },
     });
   }
 
@@ -1416,9 +1404,6 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
-      const stakeCredentialHex = RustModule.WasmScope(Scope =>
-        Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex());
-
       const signTxRequest = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,
@@ -1429,10 +1414,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: networkInfo.NetworkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set([stakeCredentialHex]),
-          wits: new Set(),
         },
       });
       return {
@@ -1469,12 +1450,7 @@ export default class AdaApi {
       const addressedUtxo = asAddressedUtxo(utxos);
 
       const changeAddr = request.wallet.receiveAddress;
-
       const certificates = [];
-      const neededKeys = {
-        neededHashes: new Set(),
-        wits: new Set(),
-      };
 
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
@@ -1492,7 +1468,6 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
-          neededKeys.neededHashes.add(paymentCred.to_hex());
         }
       }
       const accountStates = await request.getAccountState({
@@ -1522,10 +1497,6 @@ export default class AdaApi {
           );
           if (rewardAddress == null) {
             throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
-          }
-          {
-            const stakeCredential = rewardAddress.payment_cred();
-            neededKeys.neededHashes.add(stakeCredential.to_hex());
           }
           list.push({
             address: rewardAddress,
@@ -1576,7 +1547,6 @@ export default class AdaApi {
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
-        neededStakingKeyHashes: neededKeys,
       });
       return result;
     } catch (error) {
@@ -1636,10 +1606,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.publicDeriver.networkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
         },
       });
     } catch (error) {
@@ -1720,10 +1686,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
         },
         trezorTCatalystRegistrationTxSignData:
           request.trezorTWallet ? request.trezorTWallet : undefined,

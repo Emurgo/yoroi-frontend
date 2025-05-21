@@ -57,10 +57,7 @@ export type SignAndBroadcastTransactionRequestType = {|
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: string,
   metadata: ?string,
-  neededHashes: Array<string>,
-  wits: Array<string>,
   password: string,
-  txHash: string,
 |};
 export const SignAndBroadcastTransaction: HandlerType<
   SignAndBroadcastTransactionRequestType,
@@ -71,7 +68,7 @@ export const SignAndBroadcastTransaction: HandlerType<
   handle: async (request) => {
     return RustModule.WasmScope(async (Scope) => {
       const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-      const { senderUtxos, unsignedTx, metadata, wits } = request;
+      const { senderUtxos, unsignedTx, metadata, password, } = request;
 
       try {
         const unsignedTxWasm = RustModule.WalletV4.Transaction.from_hex(unsignedTx);
@@ -80,15 +77,12 @@ export const SignAndBroadcastTransaction: HandlerType<
           senderUtxos,
           unsignedTx: unsignedTxWasm,
           metadata: metadata ? Scope.WalletV4.AuxiliaryData.from_hex(metadata) : undefined,
-          neededStakingKeyHashes: {
-            wits: new Set(wits),
-          },
         };
         const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
         const adaApi = new AdaApi();
         const { txId, signedTxHex, } = await adaApi.signAndBroadcast({
           publicDeriver,
-          password: request.password,
+          password,
           signRequest,
           sendTx: stateFetcher.sendTx,
         });
