@@ -422,10 +422,6 @@ export type CreateWithdrawalTxRequest = {|
 |};
 export type CreateWithdrawalTxResponse = HaskellShelleyTxSignRequest;
 
-export type CreateWithdrawalTxFunc = (
-  request: CreateWithdrawalTxRequest
-) => Promise<CreateWithdrawalTxResponse>;
-
 // saveLastReceiveAddressIndex
 
 export type SaveLastReceiveAddressIndexRequest = {|
