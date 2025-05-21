@@ -9,7 +9,7 @@ export default function NftsGrid({ columnsCount, nftsList }: { columnsCount: num
   const navigateTo = useNavigateTo();
   return (
     <Grid container columns={columnsCount} spacing="24px">
-      {nftsList.map(nft => (
+      {nftsList.map((nft, index) => (
         <Grid key={nft.id} item xs={1} sx={{ aspectRatio: '1/1' }}>
           <NftCard
             onClick={() => {
@@ -18,6 +18,7 @@ export default function NftsGrid({ columnsCount, nftsList }: { columnsCount: num
             }}
             ipfsUrl={nft.image}
             name={nft.name}
+            nftPathId={`nftsList:nft_${index}`}
           />
         </Grid>
       ))}
