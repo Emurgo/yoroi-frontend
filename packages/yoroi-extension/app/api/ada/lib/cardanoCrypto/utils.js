@@ -258,7 +258,7 @@ function getWithdrawalKeyHashesFromTransactionBody(
 
 function resolveCredential(
   cred: RustModule.WalletV4.Credential,
-): { keyHash: ?string, scriptHash: ?string } {
+): {| keyHash: ?string, scriptHash: ?string |} {
   return {
     keyHash: cred.to_keyhash()?.to_hex(),
     scriptHash: cred.to_scripthash()?.to_hex(),
@@ -267,24 +267,24 @@ function resolveCredential(
 
 function getCertificateStakeCredential(
   cert: RustModule.WalletV4.Certificate,
-): ?{ keyHash: ?string, scriptHash: ?string } {
+): ?{| keyHash: ?string, scriptHash: ?string |} {
   switch (cert.kind()) {
     case RustModule.WalletV4.CertificateKind.StakeRegistration:
-      return resolveCredential(cert.as_stake_registration().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_registration()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeDeregistration:
-      return resolveCredential(cert.as_stake_deregistration().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_deregistration()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeDelegation:
-      return resolveCredential(cert.as_stake_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_delegation()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation:
-      return resolveCredential(cert.as_stake_and_vote_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_and_vote_delegation()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
-      return resolveCredential(cert.as_stake_registration_and_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_registration_and_delegation()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
-      return resolveCredential(cert.as_stake_vote_registration_and_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_stake_vote_registration_and_delegation()).stake_credential());
     case RustModule.WalletV4.CertificateKind.VoteDelegation:
-      return resolveCredential(cert.as_vote_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_vote_delegation()).stake_credential());
     case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
-      return resolveCredential(cert.as_vote_registration_and_delegation().stake_credential());
+      return resolveCredential(forceNonNull(cert.as_vote_registration_and_delegation()).stake_credential());
     default:
       return null;
   }

@@ -1217,15 +1217,20 @@ export function signTransaction(
     bootstrapWits,
   );
 
-  const ownStakingKeyHash = stakingKey?.to_public().hash().to_hex();
   const stakingKeyHashesInTx = getStakingKeyHashesInTransactionBody(txBody.to_hex());
-
-  if (stakingKeyHashesInTx.has(ownStakingKeyHash)) {
-    vkeyWits.add(RustModule.WalletV4.make_vkey_witness(txHash, stakingKey));
-  }
-  if (stakingKeyHashesInTx.size > 1) {
-    const foreignStakingKeyHashes = [...stakingKeyHashesInTx].filter(x => x !== ownStakingKeyHash);
-    console.warn(`Transaction in signing contains foreign staking key hashes '${JSON.stringify(foreignStakingKeyHashes)}' which does not match own staking key '${String(ownStakingKeyHash)}'. Cannot fully sign.`)
+  if (stakingKeyHashesInTx.size > 0) {
+    if (stakingKey == null) {
+      console.warn('Transaction in signing contains staking credentials but no staking key is provided. Cannot fully sign.')
+    } else {
+      const ownStakingKeyHash = stakingKey.to_public().hash().to_hex();
+      if (stakingKeyHashesInTx.has(ownStakingKeyHash)) {
+        vkeyWits.add(RustModule.WalletV4.make_vkey_witness(txHash, stakingKey));
+      }
+      if (stakingKeyHashesInTx.size > 1) {
+        const foreignStakingKeyHashes = [...stakingKeyHashesInTx].filter(x => x !== ownStakingKeyHash);
+        console.warn(`Transaction in signing contains foreign staking credentials hashes '${JSON.stringify(foreignStakingKeyHashes)}' which do not match own staking key '${String(ownStakingKeyHash)}'. Cannot fully sign.`)
+      }
+    }
   }
 
   if (bootstrapWits.len() > 0) witnessSet.set_bootstraps(bootstrapWits);
