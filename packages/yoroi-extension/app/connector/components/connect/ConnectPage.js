@@ -62,7 +62,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'connector.connect.noWalletsFound',
-    defaultMessage: '!!!Ooops, no {network} wallets found',
+    defaultMessage: '!!!Ooops, no wallets found',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -231,7 +231,7 @@ export default class ConnectPage extends Component<Props> {
             <NoWalletImage />
           </div>
           <div>
-            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound, { networkId })}</div>
+            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound)}</div>
             <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>
