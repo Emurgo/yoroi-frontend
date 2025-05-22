@@ -156,9 +156,9 @@ export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: stri
     </Stack>
   );
 };
-export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash?: string; fee: string | null }) => {
+export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash: string | undefined; fee: string | null }) => {
   const strings = useStrings();
-  const normalizedDrep = dRepNormalize(hash);
+  const normalizedDrep = hash == null || hash === '' ? null : dRepNormalize(hash);
   const drepTitle = normalizedDrep ? drepNames[normalizedDrep] ?? normalizedDrep : '-';
 
   return (
