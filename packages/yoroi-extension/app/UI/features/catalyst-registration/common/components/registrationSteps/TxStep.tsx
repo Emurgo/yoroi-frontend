@@ -11,11 +11,47 @@ import { useIntl } from '../../../../../context/IntlProvider';
 export const TxStep = () => {
   const strings = useStrings();
   const [passwd, setPasswd] = useState('');
-  const { votingNextStep, registrationState, votingRegTx } = useVoting();
+  const { votingNextStep, registrationState, votingRegTx, walletType } = useVoting();
   const { error } = registrationState;
   const { intl } = useIntl();
 
   const handleSetPasswd = e => setPasswd(e.target.value);
+
+  const renderInfoBlock = () => {
+    if (walletType === 'mnemonic') {
+      return (
+        <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="ds.text_gray_medium">
+          {strings.txStep}
+        </Typography>
+      );
+    }
+
+    return (
+      <Box
+        sx={{
+          pt: '24px',
+          pb: '40px',
+          backgroundColor: 'ds.gray_50',
+          padding: '10px',
+          marginBottom: '30px',
+          lineHeight: 1.38,
+          fontSize: '14px',
+          opacity: 0.7,
+          letterSpacing: '0.5px',
+          borderRadius: '10px',
+        }}
+      >
+        <Typography component="div" textAlign="center" variant="body1" color="ds.text_gray_medium">
+          <ul style={{ listStyle: 'disc', padding: 0, margin: 0, textAlign: 'left' }}>
+            <li style={{ marginLeft: '18px', marginBottom: '8px' }}>
+              {walletType === 'trezor' ? strings.txStepTrezor : strings.txStepLedger}
+            </li>
+            <li style={{ marginLeft: '18px' }}>{walletType === 'trezor' ? strings.txStepTrezor2 : strings.txStepLedger2}</li>
+          </ul>
+        </Typography>
+      </Box>
+    );
+  };
 
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
@@ -27,15 +63,7 @@ export const TxStep = () => {
           flexGrow: 1,
         }}
       >
-        <Typography
-          component="div"
-          textAlign="center"
-          pt="24px"
-          pb="40px"
-          variant="body1"
-          color="ds.text_gray_medium"
-          dangerouslySetInnerHTML={{ __html: strings.txStep }}
-        />
+        {renderInfoBlock()}
 
         <AmountInput
           className="amount"
@@ -51,15 +79,17 @@ export const TxStep = () => {
           allowSigns={false}
         />
 
-        <PasswordInput
-          label={strings.passwordLabel}
-          value={passwd}
-          onChange={handleSetPasswd}
-          id="confirm-passwd"
-          error={!!error}
-          helperText={!!error ? intl.formatMessage(error) : ''}
-          variant="outlined"
-        />
+        {walletType === 'mnemonic' && (
+          <PasswordInput
+            label={strings.passwordLabel}
+            value={passwd}
+            onChange={handleSetPasswd}
+            id="confirm-passwd"
+            error={!!error}
+            helperText={!!error ? intl.formatMessage(error) : ''}
+            variant="outlined"
+          />
+        )}
       </Box>
       <Box>
         <Button

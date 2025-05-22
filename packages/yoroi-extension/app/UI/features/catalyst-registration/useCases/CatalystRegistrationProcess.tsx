@@ -8,13 +8,14 @@ import { useStrings } from '../common/hooks/useStrings';
 import { PasswordStep } from '../common/components/registrationSteps/PasswordStep';
 import { TxStep } from '../common/components/registrationSteps/TxStep';
 import { QrCodeStep } from '../common/components/registrationSteps/QrCodeStep';
+import { TxExecutingStep } from '../common/components/registrationSteps/TxExecutingStep';
 import { useVoting, ProgressStep } from '../common/hooks/useVoting';
 
 const modalId = 'catalyst-registration';
 
 export const CatalystRegistrationProcess = () => {
   const { openModal, closeModal } = useModal();
-  const { currentVotingStep, resetRegistration, startRegistration, votingPrevStep } = useVoting();
+  const { currentVotingStep, resetRegistration, startRegistration, votingPrevStep, votingRegTx } = useVoting();
   const strings = useStrings();
 
   const title = strings.votingRegistrationTitle;
@@ -30,6 +31,15 @@ export const CatalystRegistrationProcess = () => {
   useEffect(() => {
     if (currentVotingStep === -1) {
       closeModal();
+      return;
+    }
+
+    if (votingRegTx.isExecuting) {
+      openModal({
+        modalId,
+        title,
+        content: <TxExecutingStep />,
+      });
       return;
     }
 
@@ -63,7 +73,7 @@ export const CatalystRegistrationProcess = () => {
       content,
       handleBack: hasBack ? votingPrevStep : undefined,
     });
-  }, [currentVotingStep]);
+  }, [currentVotingStep, votingRegTx]);
 
   return (
     <Button

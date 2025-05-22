@@ -92,7 +92,7 @@ export default class VotingRegTxDialog extends Component<Props> {
     const { walletType } = this.props;
     const { intl } = this.context;
 
-    if (walletType === 'mnemonic') {
+    if (walletType !== 'mnemonic') {
       return (
         <Typography className={classnames([styles.lineText, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line1)}
@@ -102,7 +102,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     let infoLine1;
     let infoLine2;
-    if (walletType === 'trezorT') {
+    if (walletType === 'mnemonic') {
       infoLine1 = messages.txConfirmationTrezorTLine1;
       infoLine2 = globalMessages.txConfirmationTrezorTLine2;
     } else if (walletType === 'ledgerNano') {
@@ -132,7 +132,7 @@ export default class VotingRegTxDialog extends Component<Props> {
     const { intl } = this.context;
 
     const spendingPasswordForm =
-      this.props.walletType === 'mnemonic' ? (
+      this.props.walletType !== 'mnemonic' ? (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
           isSubmitting={this.props.isSubmitting}

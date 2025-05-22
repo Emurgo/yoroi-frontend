@@ -97,7 +97,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     className: 'catalyst-registration',
     route: ROUTES.CATALYST_REGISTRATION.ROOT,
     icon: votingIcon,
-    label: globalMessages.sidebarCatalystRegistration,
+    label: globalMessages.sidebarVoting,
     isVisible: existsSelectedWallet,
   },
   {

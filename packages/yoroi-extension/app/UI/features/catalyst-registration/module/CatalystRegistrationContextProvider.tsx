@@ -114,6 +114,7 @@ export const CatalystRegistrationContextProvider = observer(({ children, stores 
 
   // voting tx info
   const createVotingRegTx = voting.createVotingRegTx.result;
+  const isExecuting = voting.createVotingRegTx.isExecuting;
 
   let votingRegTx = {};
   if (createVotingRegTx) {
@@ -127,6 +128,7 @@ export const CatalystRegistrationContextProvider = observer(({ children, stores 
       decimalPlaces,
       currency,
       fees,
+      isExecuting,
     };
   }
 

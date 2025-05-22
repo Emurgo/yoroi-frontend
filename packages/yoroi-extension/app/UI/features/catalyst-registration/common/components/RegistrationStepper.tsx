@@ -6,7 +6,7 @@ import { ProgressStep, useVoting } from '../hooks/useVoting';
 
 export const RegistrationStepper = () => {
   const strings = useStrings();
-  const { currentVotingStep: currentStep, votingPrevStep } = useVoting();
+  const { currentVotingStep: currentStep, votingPrevStep, walletType } = useVoting();
   return (
     <Box>
       <Stepper
@@ -33,17 +33,21 @@ export const RegistrationStepper = () => {
                 ? StepStates.CURRENT
                 : StepStates.NEXT,
           },
-          {
-            label: strings.step3Label,
-            disabled: currentStep < ProgressStep.TRANSACTION,
-            onClick: votingPrevStep,
-            state:
-              currentStep > ProgressStep.REGISTER
-                ? StepStates.COMPLETED_CURRENT
-                : currentStep === ProgressStep.REGISTER
-                ? StepStates.CURRENT
-                : StepStates.NEXT,
-          },
+          ...(walletType === 'mnemonic'
+            ? [
+                {
+                  label: strings.step3Label,
+                  disabled: currentStep < ProgressStep.TRANSACTION,
+                  onClick: votingPrevStep,
+                  state:
+                    currentStep > ProgressStep.REGISTER
+                      ? StepStates.COMPLETED_CURRENT
+                      : currentStep === ProgressStep.REGISTER
+                      ? StepStates.CURRENT
+                      : StepStates.NEXT,
+                },
+              ]
+            : []),
           {
             label: strings.step4Label,
             disabled: currentStep < ProgressStep.QR_CODE,

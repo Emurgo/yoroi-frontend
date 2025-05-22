@@ -119,13 +119,21 @@ export const messages = Object.freeze(
       id: 'wallet.voting.dialog.step.trx.line1',
       defaultMessage: '!!!Confirm your password to register in the blockchain the certificate previously generated for voting.',
     },
-    txStepTrezo: {
+    txStepTrezor: {
       id: 'wallet.voting.dialog.step.trx.trezor.info.line.1',
       defaultMessage: '!!!After connecting your Trezor device to your computer, press the Register button.',
     },
     txStepLedger: {
       id: 'wallet.voting.dialog.step.trx.ledger.info.line.1',
-      defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
+      defaultMessage: "!!!After connecting your Ledger device to your computer's USB port, press the Register button.",
+    },
+    txStepLedger2: {
+      id: 'wallet.send.ledger.confirmationDialog.info.line.2',
+      defaultMessage: '!!!Make sure Cardano ADA app must remain open on the Ledger device throughout the process.',
+    },
+    txStepTrezor2: {
+      id: 'wallet.send.trezor.confirmationDialog.info.line.2',
+      defaultMessage: '!!!A new tab will appear. Please follow the instructions in the new tab.',
     },
     useCatalystAppToScan: {
       id: 'wallet.voting.dialog.step.qr.lineTitle',
@@ -139,7 +147,7 @@ export const messages = Object.freeze(
     takeAScreenshot: {
       id: 'wallet.voting.dialog.step.qr.line3',
       defaultMessage:
-        '!!!Also we suggest to take a screenshot of it as a backup — you won’t be able to access this QR code after clicking Complete.',
+        "!!!Also we suggest to take a screenshot of it as a backup — you won't be able to access this QR code after clicking Complete.",
     },
     qrStepConfirm: {
       id: 'wallet.voting.dialog.step.qr.actionButton',
@@ -172,6 +180,14 @@ export const messages = Object.freeze(
     step5Label: {
       id: 'wallet.voting.dialog.stepQrCode',
       defaultMessage: '!!!QR Code',
+    },
+    processingLabel: {
+      id: 'global.labels.processing',
+      defaultMessage: '!!!Processing...',
+    },
+    txGeneration: {
+      id: 'wallet.delegation.transaction.generation',
+      defaultMessage: '!!!Generating transaction',
     },
   })
 );
@@ -209,8 +225,10 @@ export const useStrings = () => {
     passwordStepButton: intl.formatMessage(messages.passwordStepButton),
     passwordLabel: intl.formatMessage(messages.passwordLabel),
     txStep: intl.formatMessage(messages.txStep),
-    txStepTrezo: intl.formatMessage(messages.txStepTrezo),
+    txStepTrezor: intl.formatMessage(messages.txStepTrezor),
+    txStepTrezor2: intl.formatMessage(messages.txStepTrezor2),
     txStepLedger: intl.formatMessage(messages.txStepLedger),
+    txStepLedger2: intl.formatMessage(messages.txStepLedger2),
     useCatalystAppToScan: intl.formatMessage(messages.useCatalystAppToScan),
     qrCodeIsTheGeneratedCertificate: intl.formatMessage(messages.qrCodeIsTheGeneratedCertificate),
     takeAScreenshot: intl.formatMessage(messages.takeAScreenshot),
@@ -223,5 +241,7 @@ export const useStrings = () => {
     step3Label: intl.formatMessage(messages.register),
     step4Label: intl.formatMessage(messages.step4Label),
     step5Label: intl.formatMessage(messages.step5Label),
+    processingLabel: intl.formatMessage(messages.processingLabel),
+    txGeneration: intl.formatMessage(messages.txGeneration),
   }).current;
 };
