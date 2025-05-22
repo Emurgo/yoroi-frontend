@@ -5,6 +5,8 @@ import React from 'react';
 import { asQuantity, Quantities } from '../../../utils/quantities';
 import { CertificateType, FormattedTx } from './types';
 import { useStrings } from './hooks/useStrings';
+import { drepNames } from '../../governace/common/constants';
+import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 
 type OperationsCount = Record<CertificateType, number>;
 export type Operations = {
@@ -156,6 +158,8 @@ export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: stri
 };
 export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash?: string; fee: string | null }) => {
   const strings = useStrings();
+  const normalizedDrep = dRepNormalize(hash);
+  const drepTitle = normalizedDrep ? drepNames[normalizedDrep] ?? normalizedDrep : '-';
 
   return (
     <Stack direction="column" spacing={2}>
@@ -171,7 +175,7 @@ export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; h
           {label}
         </Typography>
         <Typography color="ds.text_gray_medium" minWidth="230px" sx={{ wordWrap: 'break-word' }} textAlign="right">
-          {hash}
+          {drepTitle}
         </Typography>
       </Stack>
     </Stack>
