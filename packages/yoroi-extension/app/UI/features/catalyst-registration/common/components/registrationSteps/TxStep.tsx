@@ -6,11 +6,14 @@ import { useStrings } from '../../hooks/useStrings';
 import { PasswordInput } from '../../../../../components';
 import { AmountInput } from '../../../../../../components/common/NumericInputRP';
 import { useVoting } from '../../hooks/useVoting';
+import { useIntl } from '../../../../../context/IntlProvider';
 
 export const TxStep = () => {
   const strings = useStrings();
   const [passwd, setPasswd] = useState('');
-  const { votingNextStep } = useVoting();
+  const { votingNextStep, registrationState, votingRegTx } = useVoting();
+  const { error } = registrationState;
+  const { intl } = useIntl();
 
   const handleSetPasswd = e => setPasswd(e.target.value);
 
@@ -37,10 +40,10 @@ export const TxStep = () => {
         <AmountInput
           className="amount"
           label={'amount'}
-          decimalPlaces={8}
+          decimalPlaces={votingRegTx?.decimalPlaces}
           disabled
-          currency={'TADA'}
-          fees={120301032}
+          currency={votingRegTx?.currency}
+          fees={votingRegTx?.fees}
           // note: we purposely don't put "total" since it doesn't really make sense here
           // since the fee is unrelated to the amount you're about to register
           total=""
@@ -53,6 +56,8 @@ export const TxStep = () => {
           value={passwd}
           onChange={handleSetPasswd}
           id="confirm-passwd"
+          error={!!error}
+          helperText={!!error ? intl.formatMessage(error) : ''}
           variant="outlined"
         />
       </Box>
@@ -61,7 +66,7 @@ export const TxStep = () => {
           // @ts-ignore
           variant="primary"
           fullWidth
-          onClick={votingNextStep}
+          onClick={() => votingNextStep(passwd)}
         >
           {strings.register}
         </Button>

@@ -1,10 +1,12 @@
 import type { StoresMap } from '../../../../stores';
 import * as React from 'react';
 import { observer } from 'mobx-react';
-import { CatalystRegistrationContextType, StepAction, StepStateType } from '../common/types';
+import { CatalystRegistrationContextType, StepAction, StepStateType, CatalystState } from '../common/types';
 import { ProgressStep } from '../../../../stores/ada/VotingStore';
-// import { getPrivateStakingKey } from '../../../../api/thunk';
+import { getTokenName, genFormatTokenAmount, genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
+import { truncateToken } from '../../../../utils/formatters';
 import { StepState } from '../../../../components/widgets/ProgressSteps';
+import { ROUTES } from '../../../../routes-config';
 
 const initialStepState: StepState = {
   currentStep: -1,
@@ -66,14 +68,20 @@ const defaultCatalystRegistrationValues = {
   isDelegating: false,
   stepState: initialStepState,
   registrationState: null,
+  votingRegTx: {},
   // @ts-ignore
   dispatch: (action: StepAction) => {},
 };
 
 const defaultCatalystRegistrationActions = {
   generatePin: async () => {},
+  resetRegistration: () => {},
   // @ts-ignore
-  createTransaction: async (password: string) => {},
+  createTransaction: async (password: string | null) => {},
+  // @ts-ignore
+  signTransaction: async (password: string | null) => {},
+  // @ts-ignore
+  setError: (error: string | null) => {},
 };
 
 const defaultCatalystRegistrationState = {
@@ -88,15 +96,7 @@ type CatalystRegistrationProviderProps = {
   stores: StoresMap;
 };
 
-type CatalystRegistrationState = {
-  pin: number[];
-  encryptedKey: string;
-  catalystPrivateKey: string;
-  isStale: boolean;
-  error: string | null;
-};
-
-const defaultCatalystState: CatalystRegistrationState = {
+const defaultCatalystState: CatalystState = {
   pin: [],
   encryptedKey: '',
   catalystPrivateKey: '',
@@ -105,13 +105,32 @@ const defaultCatalystState: CatalystRegistrationState = {
 };
 
 export const CatalystRegistrationContextProvider = observer(({ children, stores }: CatalystRegistrationProviderProps) => {
-  const { wallets, delegation, substores } = stores;
+  const { wallets, delegation, substores, tokenInfoStore, app } = stores;
   const { votingStore: voting } = substores.ada;
 
+  const getTokenInfo = genLookupOrFail(tokenInfoStore.tokenInfo);
   const selectedWallet = wallets.selected;
   const isDelegating = delegation.isCurrentlyDelegating(selectedWallet?.publicDeriverId);
 
-  const [catalystState, setCatalystState] = React.useState<CatalystRegistrationState>(defaultCatalystState);
+  // voting tx info
+  const createVotingRegTx = voting.createVotingRegTx.result;
+
+  let votingRegTx = {};
+  if (createVotingRegTx) {
+    const tokenInfo = getTokenInfo(createVotingRegTx?.fee().getDefaultEntry());
+    const decimalPlaces = tokenInfo.Metadata.numberOfDecimals;
+    const currency = truncateToken(getTokenName(tokenInfo));
+    const formatValue = genFormatTokenAmount(getTokenInfo);
+    const fees = formatValue(createVotingRegTx?.fee().getDefaultEntry());
+
+    votingRegTx = {
+      decimalPlaces,
+      currency,
+      fees,
+    };
+  }
+
+  const [catalystState, setCatalystState] = React.useState<CatalystState>(defaultCatalystState);
 
   const [stepState, dispatch] = React.useReducer(stepReducer, initialStepState);
 
@@ -122,6 +141,7 @@ export const CatalystRegistrationContextProvider = observer(({ children, stores 
     stepState,
     dispatch,
     registrationState: catalystState,
+    votingRegTx,
   };
 
   const state = React.useMemo(
@@ -139,20 +159,23 @@ export const CatalystRegistrationContextProvider = observer(({ children, stores 
         await voting.generateCatalystKey();
         setCatalystState({ ...catalystState, pin: voting.pin });
       },
-      createTransaction: async (password: string) => {
+      // @ts-ignore
+      createTransaction: async (password: string | null) => {
         if (!voting) throw new Error('Voting store not initialized');
         await voting.createTransaction(password);
       },
-      checkUserPassword: async (password: string): Promise<void | any> => {
-        try {
-          console.log('checkUserPassword', password);
-          // await getPrivateStakingKey({ publicDeriverId: selectedWallet?.publicDeriverId, password });
-        } catch (error) {
-          return error;
-        }
+      signTransaction: async (password: string | null) => {
+        await voting.signTransaction({ password, wallet: selectedWallet });
+      },
+      setError: (error: string | null) => {
+        setCatalystState({ ...catalystState, error });
+      },
+      resetRegistration: () => {
+        app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+        voting?.reset({ justTransaction: false });
       },
     }),
-    [voting]
+    [voting, catalystState]
   );
 
   const context = React.useMemo(

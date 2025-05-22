@@ -1,18 +1,18 @@
-import type { WalletTypes, CatalystRegistrationContextType } from '../types';
+import type { WalletTypes, CatalystRegistrationContextType, CatalystState } from '../types';
 import { useCatalystRegistration } from '../../module/CatalystRegistrationContextProvider';
 import { ProgressStep } from '../../../../../stores/ada/VotingStore';
-
-export { ProgressStep };
 
 export type VotingHookType = {
   startRegistration: () => void;
   resetRegistration: () => void;
-  votingNextStep: () => void;
+  votingNextStep: (value?: string) => void;
   votingPrevStep: () => void;
   isDelegating: boolean;
   currentVotingStep: number;
   walletType: WalletTypes;
-  registrationPin: string;
+  registrationState: CatalystState;
+  votingRegTx: any | null;
+  votingKey: string | null;
 };
 
 export const useVoting = (): VotingHookType => {
@@ -24,26 +24,42 @@ export const useVoting = (): VotingHookType => {
     registrationState,
     generatePin,
     createTransaction,
+    signTransaction,
     dispatch,
+    setError,
+    votingRegTx,
+    voting,
+    resetRegistration: resetReg,
   } = context as CatalystRegistrationContextType;
 
-  const votingNextStep = async (value?: string) => {
-    if (!registrationState) throw new Error('Registration state not initialized');
-    console.log('votingNextStep', value);
-
+  const votingNextStep = async (value: string | null = null) => {
     switch (stepState.currentStep) {
       case -1:
       case ProgressStep.QR_CODE:
         dispatch({ type: 'RESET' });
+        resetReg();
         break;
       case ProgressStep.GENERATE:
       case ProgressStep.CONFIRM:
-      case ProgressStep.TRANSACTION:
         dispatch({ type: 'NEXT_STEP' });
         break;
       case ProgressStep.REGISTER:
-        await createTransaction(value || '');
-        dispatch({ type: 'NEXT_STEP' });
+        try {
+          await createTransaction(value);
+          setError(null);
+          dispatch({ type: 'NEXT_STEP' });
+        } catch (error: any) {
+          setError(error);
+        }
+        break;
+      case ProgressStep.TRANSACTION:
+        try {
+          await signTransaction(value);
+          setError(null);
+          dispatch({ type: 'NEXT_STEP' });
+        } catch (error: any) {
+          setError(error);
+        }
         break;
     }
   };
@@ -77,8 +93,12 @@ export const useVoting = (): VotingHookType => {
     votingNextStep,
     votingPrevStep,
     isDelegating,
+    registrationState,
+    votingRegTx,
     currentVotingStep: stepState.currentStep,
     walletType: (selectedWallet?.type as WalletTypes) ?? 'mnemonic',
-    registrationPin: registrationState?.pin.join('') ?? '',
+    votingKey: voting?.encryptedKey,
   };
 };
+
+export { ProgressStep };

@@ -4,6 +4,7 @@ import { Button, Box, Stack, Typography } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';
 import { downloadQrCode } from '../../../../../components/qrCode/helpers';
 import QrCode from '../../../../../components/qrCode/QrCode';
+import { useVoting } from '../../hooks/useVoting';
 
 type Props = {
   closeModal: () => void;
@@ -12,9 +13,15 @@ type Props = {
 const QR_ID = 'qr-vote';
 
 export const QrCodeStep = ({ closeModal }: Props) => {
+  const { votingKey, votingNextStep } = useVoting();
   const strings = useStrings();
 
   const handleDownloadQrCode = () => downloadQrCode(QR_ID, 'Voting key');
+
+  const handleCloseModal = () => {
+    votingNextStep();
+    closeModal();
+  };
 
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
@@ -32,16 +39,18 @@ export const QrCodeStep = ({ closeModal }: Props) => {
 
         <Typography color="ds.sys_magenta_500">{strings.takeAScreenshot}</Typography>
 
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-          <QrCode value={QR_ID} size={200} id={QR_ID} />
-        </Box>
+        {votingKey && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+            <QrCode value={votingKey} size={200} id={QR_ID} />
+          </Box>
+        )}
       </Box>
       <Box sx={{ display: 'flex', gap: '16px' }}>
         <Button
           // @ts-ignore
           variant="secondary"
           fullWidth
-          onClick={closeModal}
+          onClick={handleCloseModal}
         >
           {strings.close}
         </Button>

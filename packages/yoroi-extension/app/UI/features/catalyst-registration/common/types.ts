@@ -22,12 +22,24 @@ type CatalystRegistrationState = {
   isDelegating: boolean;
   stepState: StepStateType;
   registrationState: any;
+  votingRegTx: any;
   dispatch: (action: StepAction) => void;
 };
 
 type CatalystRegistrationActions = {
   generatePin: () => Promise<void>;
-  createTransaction: (password: string) => Promise<void>;
+  createTransaction: (password: string | null) => Promise<void>;
+  signTransaction: (password: string | null) => Promise<void>;
+  setError: (error: string | null) => void;
+  resetRegistration: () => void;
+};
+
+export type CatalystState = {
+  pin: number[];
+  encryptedKey: string;
+  catalystPrivateKey: string;
+  isStale: boolean;
+  error: string | null;
 };
 
 export type CatalystRegistrationContextType = CatalystRegistrationState & CatalystRegistrationActions;

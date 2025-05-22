@@ -8,13 +8,14 @@ import { useVoting } from '../../hooks/useVoting';
 export const ConfirmPinStep = () => {
   const [pin, setPin] = useState('');
   const strings = useStrings();
-  const { registrationPin, votingNextStep } = useVoting();
+  const { registrationState, votingNextStep } = useVoting();
+  const { pin: registrationPin } = registrationState;
 
   const handleSetPin = e => {
     setPin(e.target.value.slice(0, 4));
   };
 
-  const errorPin = pin.length === 4 && pin !== registrationPin;
+  const errorPin = pin.length === 4 && pin !== registrationPin.join('');
 
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
@@ -54,7 +55,7 @@ export const ConfirmPinStep = () => {
           variant="primary"
           fullWidth
           onClick={votingNextStep}
-          disabled={pin !== registrationPin}
+          disabled={pin !== registrationPin.join('')}
         >
           {strings.confirmPinStepButton}
         </Button>

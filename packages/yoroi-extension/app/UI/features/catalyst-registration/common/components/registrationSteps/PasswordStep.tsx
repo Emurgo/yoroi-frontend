@@ -8,7 +8,8 @@ import { useVoting } from '../../hooks/useVoting';
 export const PasswordStep = () => {
   const [passwd, setPasswd] = useState('');
   const strings = useStrings();
-  const { votingNextStep } = useVoting();
+  const { votingNextStep, registrationState } = useVoting();
+  const { error } = registrationState;
 
   const handleSetPasswd = e => setPasswd(e.target.value);
 
@@ -37,6 +38,9 @@ export const PasswordStep = () => {
           label={strings.passwordLabel}
           value={passwd}
           onChange={handleSetPasswd}
+          error={!!error}
+          // TODO: add translation
+          helperText={!!error ? 'Invalid password' : ''}
           id="confirm-passwd"
           variant="outlined"
         />
@@ -46,7 +50,7 @@ export const PasswordStep = () => {
           // @ts-ignore
           variant="primary"
           fullWidth
-          onClick={votingNextStep}
+          onClick={() => votingNextStep(passwd)}
         >
           {strings.passwordStepButton}
         </Button>

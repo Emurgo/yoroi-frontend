@@ -7,7 +7,8 @@ import { useVoting } from '../../hooks/useVoting';
 
 export const PinStep = () => {
   const strings = useStrings();
-  const { registrationPin, startRegistration, votingNextStep } = useVoting();
+  const { registrationState, startRegistration, votingNextStep } = useVoting();
+  const { pin } = registrationState;
 
   useEffect(() => {
     startRegistration();
@@ -33,7 +34,7 @@ export const PinStep = () => {
           color="ds.text_gray_medium"
           dangerouslySetInnerHTML={{ __html: strings.pinStep }}
         />
-        <PinInput value={registrationPin} length={4} />
+        <PinInput value={pin.join('')} length={4} />
       </Box>
       <Box>
         <Button
