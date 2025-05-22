@@ -6,12 +6,9 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
 import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import sk from 'react-intl/locale-data/sk';
 import vi from 'react-intl/locale-data/vi';
 import globalMessages from './global-messages';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
@@ -22,12 +19,9 @@ import { ReactComponent as Chinese }  from '../assets/images/flags/chinese.inlin
 import { ReactComponent as RussianFlag }  from '../assets/images/flags/russian.inline.svg';
 import { ReactComponent as GermanFlag }  from '../assets/images/flags/german.inline.svg';
 import { ReactComponent as FrenchFlag }  from '../assets/images/flags/french.inline.svg';
-import { ReactComponent as DutchFlag }  from '../assets/images/flags/dutch.inline.svg';
 import { ReactComponent as BrazilFlag }  from '../assets/images/flags/brazil.inline.svg';
 import { ReactComponent as SpanishFlag }  from '../assets/images/flags/spanish.inline.svg';
-import { ReactComponent as ItalianFlag }  from '../assets/images/flags/italian.inline.svg';
 import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indonesian.inline.svg';
-import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
 import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
 
 export const locales: any = Object.freeze([
@@ -38,12 +32,9 @@ export const locales: any = Object.freeze([
   ...ru,
   ...de,
   ...fr,
-  ...nl,
   ...pt,
   ...id,
   ...es,
-  ...it,
-  ...sk,
   ...vi,
 ]);
 
@@ -102,11 +93,6 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: FrenchFlag
   },
   {
-    value: 'nl-NL',
-    label: globalMessages.languageDutch,
-    svg: DutchFlag
-  },
-  {
     value: 'pt-BR',
     label: globalMessages.languagePortuguese,
     svg: BrazilFlag
@@ -117,19 +103,9 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: SpanishFlag
   },
   {
-    value: 'it-IT',
-    label: globalMessages.languageItalian,
-    svg: ItalianFlag
-  },
-  {
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
     svg: IndonesianFlag
-  },
-  {
-    value: 'sk-SK',
-    label: globalMessages.languageSlovak,
-    svg: SlovakFlag
   },
   {
     value: 'vi-VN',
