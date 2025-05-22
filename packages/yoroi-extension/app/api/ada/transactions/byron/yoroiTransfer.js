@@ -93,7 +93,7 @@ export async function buildYoroiTransferTx(payload: {|
       unsignedTxResponse.txBuilder,
       payload.keyLevel,
       payload.signingKey,
-      new Set(),
+      null,
       undefined,
     );
 
