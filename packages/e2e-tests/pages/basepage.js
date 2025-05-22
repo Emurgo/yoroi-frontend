@@ -20,6 +20,7 @@ import {
   quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
+import { ElementLocator } from './locator.js';
 
 const writeFile = promisify(fs.writeFile);
 
@@ -140,13 +141,18 @@ class BasePage {
   }
   /**
    * 
-   * @param {{locator: string, method: string}} locator 
+   * @param {{ElementLocator}} locator 
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
     this.logger.info(`BasePage::findElements is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElements(getByLocator(locator));
   }
+  /**
+   * Getting a text by element locator
+   * @param {ElementLocator} locator 
+   * @returns {Promise<string>}
+   */
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
     return await this.waitPresentedAndAct(locator, async () => {
@@ -442,7 +448,7 @@ class BasePage {
   }
   /**
    * The function wait until the passed element is found and call the passed function
-   * @param {{locator: string, method: id}} locator Element locator
+   * @param {ElementLocator} locator Element locator
    * @param {object} funcToCall A function that should be called when the element is found
    * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
    * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds

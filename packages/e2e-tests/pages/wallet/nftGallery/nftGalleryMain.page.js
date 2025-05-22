@@ -1,41 +1,61 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
+import { pageTitle } from '../../../helpers/pageTitles.js';
+import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
+import { ElementLocator } from '../../locator.js';
 
 class NftGalleryTab extends WalletCommonBase {
   // locators
+  /** @type {ElementLocator} */
   nftsCountTextLocator = {
     locator: 'nftsList-nftsCount-text',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   searchInputLocator = {
     locator: 'nftsList-search-input',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   clearSearchBtnLocator = {
     locator: 'nftsList:search-clear-button',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   fourColumnViewBtnLocator = {
     locator: 'nftsList-4_columnView-button',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   sixColumnViewBtnLocator = {
     locator: 'nftsList-6_columnView-button',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   noNftsTextLocator = {
     locator: 'nftsList-noNfts-text',
     method: 'id',
   };
+  /** @type {ElementLocator} */
   noNftsFoundImageLocator = {
     locator: '#nftsList-emptyState-component > svg',
     method: 'css',
   };
+  /**
+   * getting locator of a NFT by a NFT index
+   * @param {number} nftIndex 
+   * @returns {ElementLocator}
+   */
   getNftButtonLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-component-button`,
       method: 'id',
     };
   };
+  /**
+   * getting locator of a NFT by its name
+   * @param {number} nftIndex 
+   * @returns {ElementLocator}
+   */
   getNftNameLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-name-text`,
