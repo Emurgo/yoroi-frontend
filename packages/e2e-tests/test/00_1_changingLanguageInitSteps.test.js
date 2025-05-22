@@ -24,6 +24,10 @@ describe('Changing language on the initial screen', function () {
       btnTransalation: '次へ',
     },
     {
+      lang: 'ko-KR',
+      btnTransalation: '계속'
+    },
+    {
       lang: 'zh-Hans',
       btnTransalation: '继续',
     },
@@ -36,8 +40,24 @@ describe('Changing language on the initial screen', function () {
       btnTransalation: 'Weiter',
     },
     {
+      lang: 'es-ES',
+      btnTransalation: 'Continuar',
+    },
+    {
+      lang: 'fr-FR',
+      btnTransalation: 'Continuer'
+    },
+    {
       lang: 'pt-BR',
       btnTransalation: 'Continuar',
+    },
+    {
+      lang: 'id-ID',
+      btnTransalation: 'Lanjutkan',
+    },
+    {
+      lang: 'vi-VN',
+      btnTransalation: 'Tiếp tục',
     },
     {
       lang: 'en-US',
@@ -47,12 +67,12 @@ describe('Changing language on the initial screen', function () {
 
   for (const testDatum of testData) {
     describe(`Changing language to ${testDatum.lang}`, function () {
-      it('Selecting language', async function () {
+      it(`Selecting language ${testDatum.lang}`, async function () {
         const initialStepsPage = new InitialStepsPage(webdriver, logger);
         await initialStepsPage.selectLanguage(testDatum.lang);
       });
 
-      it('Checking translation on the button', async function () {
+      it(`Checking translation on the button ${testDatum.lang}`, async function () {
         const initialStepsPage = new InitialStepsPage(webdriver, logger);
         const btnText = await initialStepsPage.getContinueButtonText();
         expect(btnText).to.equal(testDatum.btnTransalation.toLocaleUpperCase());
