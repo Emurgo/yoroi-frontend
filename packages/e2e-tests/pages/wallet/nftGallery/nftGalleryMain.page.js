@@ -2,6 +2,7 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import { ElementLocator } from '../../locator.js';
+import { NO_NFTS_ADDED, NO_NFTS_FOUND } from '../../../helpers/messages.js';
 
 class NftGalleryTab extends WalletCommonBase {
   // locators
@@ -42,7 +43,7 @@ class NftGalleryTab extends WalletCommonBase {
   };
   /**
    * getting locator of a NFT by a NFT index
-   * @param {number} nftIndex 
+   * @param {number} nftIndex
    * @returns {ElementLocator}
    */
   getNftButtonLocator = nftIndex => {
@@ -53,7 +54,7 @@ class NftGalleryTab extends WalletCommonBase {
   };
   /**
    * getting locator of a NFT by its name
-   * @param {number} nftIndex 
+   * @param {number} nftIndex
    * @returns {ElementLocator}
    */
   getNftNameLocator = nftIndex => {
@@ -62,6 +63,11 @@ class NftGalleryTab extends WalletCommonBase {
       method: 'id',
     };
   };
+  /**
+   * getting locator of a NFT image by a NFT index
+   * @param {number} nftIndex
+   * @returns {ElementLocator}
+   */
   getNftImageLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-image-component`,
@@ -75,6 +81,24 @@ class NftGalleryTab extends WalletCommonBase {
    */
   async isDisplayed() {
     this.logger.info(`NftGalleryTab::isDisplayed is called`);
+    const titleIsCorrectPromise = this.titleIsCorrect(pageTitle.nfts);
+    const counterTitleIsDisplayedPromise = this.customWaitIsPresented(
+      this.nftsCountTextLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    const searchIsDisplayedPromise = this.customWaitIsPresented(
+      this.nftsCountTextLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+    const [titleState, counterState, searchState] = await Promise.all([
+      titleIsCorrectPromise,
+      counterTitleIsDisplayedPromise,
+      searchIsDisplayedPromise,
+    ]);
+
+    return titleState && counterState && searchState;
   }
   /**
    * Checking no NFTs screen is displayed
@@ -82,6 +106,31 @@ class NftGalleryTab extends WalletCommonBase {
    */
   async noNftsIsDisplayed() {
     this.logger.info(`NftGalleryTab::noNftsIsDisplayed is called`);
+    const counterText = await this.getText(this.nftsCountTextLocator);
+    const counterArray = counterText.split(' ');
+    const noNftsText = await this.getText(this.noNftsTextLocator);
+    const noNftsImageIsDisplayed = await this.customWaitIsPresented(
+      this.noNftsFoundImageLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return counterArray.length === 1 && noNftsText === NO_NFTS_ADDED && noNftsImageIsDisplayed;
+  }
+  /**
+   * Checking No NFTs found screen is displayed
+   * @returns {Promise<boolean>}
+   */
+  async noNftsAreFoundIsDisplayed() {
+    this.logger.info(`NftGalleryTab::noNftsAreFoundIsDisplayed is called`);
+    const noNftsText = await this.getText(this.noNftsTextLocator);
+    const noNftsImageIsDisplayed = await this.customWaitIsPresented(
+      this.noNftsFoundImageLocator,
+      fiveSeconds,
+      quarterSecond
+    );
+
+    return noNftsText === NO_NFTS_FOUND && noNftsImageIsDisplayed;
   }
   /**
    * Getting a number of NFTs from the page title
@@ -89,6 +138,13 @@ class NftGalleryTab extends WalletCommonBase {
    */
   async getNftsAmountFromTitle() {
     this.logger.info(`NftGalleryTab::getNftsAmountFromTitle is called`);
+    const counterText = await this.getText(this.nftsCountTextLocator);
+    const counterArray = counterText.split(' ');
+    if (counterArray.length === 1) {
+      return 0;
+    }
+    const counterNumberinStr = counterArray[1].match(/\((\d+)\)/)[1];
+    return parseInt(counterNumberinStr);
   }
   /**
    * Selecting appearance NFTs in 4 rows
