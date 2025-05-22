@@ -5,61 +5,130 @@ class NftGalleryTab extends WalletCommonBase {
   nftsCountTextLocator = {
     locator: 'nftsList-nftsCount-text',
     method: 'id',
-  }
+  };
   searchInputLocator = {
     locator: 'nftsList-search-input',
     method: 'id',
-  }
+  };
   clearSearchBtnLocator = {
     locator: 'nftsList:search-clear-button',
     method: 'id',
-  }
+  };
   fourColumnViewBtnLocator = {
     locator: 'nftsList-4_columnView-button',
     method: 'id',
-  }
+  };
   sixColumnViewBtnLocator = {
     locator: 'nftsList-6_columnView-button',
     method: 'id',
-  }
+  };
   noNftsTextLocator = {
     locator: 'nftsList-noNfts-text',
     method: 'id',
-  }
+  };
   noNftsFoundImageLocator = {
     locator: '#nftsList-emptyState-component > svg',
     method: 'css',
-  }
-  getNftButtonLocator = (nftIndex) => {
+  };
+  getNftButtonLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-component-button`,
       method: 'id',
-    }
-  }
-  getNftNameLocator = (nftIndex) => {
+    };
+  };
+  getNftNameLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-name-text`,
       method: 'id',
-    }
-  }
-  getNftImageLocator = (nftIndex) => {
+    };
+  };
+  getNftImageLocator = nftIndex => {
     return {
       locator: `nftsList:nft_${nftIndex}-image-component`,
-      method: 'id'
-    }
-  }
+      method: 'id',
+    };
+  };
   // methods
-  // * isDisplayed
-  // * noNftsIsDisplayed
-  // * get nfts amount from title
-  // * switch to 4 columns view
-  // * switch to 6 columns view
-  // * search
-  // * clear search
-  // * count nfts
-  // * get NFT name by index
-  // * select NFT by index
-  // * select NFT by name
+  /**
+   * Checking the NFTs gallery page is displayed
+   * @returns {Promise<boolean>}
+   */
+  async isDisplayed() {
+    this.logger.info(`NftGalleryTab::isDisplayed is called`);
+  }
+  /**
+   * Checking no NFTs screen is displayed
+   * @returns {Promise<boolean>}
+   */
+  async noNftsIsDisplayed() {
+    this.logger.info(`NftGalleryTab::noNftsIsDisplayed is called`);
+  }
+  /**
+   * Getting a number of NFTs from the page title
+   * @returns {Promise<number>}
+   */
+  async getNftsAmountFromTitle() {
+    this.logger.info(`NftGalleryTab::getNftsAmountFromTitle is called`);
+  }
+  /**
+   * Selecting appearance NFTs in 4 rows
+   * @returns {Promise<void>}
+   */
+  async setFourColumnsView() {
+    this.logger.info(`NftGalleryTab::setFourColumnsView is called`);
+  }
+  /**
+   * Selecting appearance NFTs in 6 rows
+   * @returns {Promise<void>}
+   */
+  async setSixColumnsView() {
+    this.logger.info(`NftGalleryTab::setSixColumnsView is called`);
+  }
+  /**
+   * Searching for a NFT
+   * @param {string} searchValue
+   * @returns {Promise<void>}
+   */
+  async search(searchValue) {
+    this.logger.info(`NftGalleryTab::search is called. Search value: "${searchValue}"`);
+  }
+  /**
+   * Clearing the search input by pressing on the cross button
+   * @returns {Promise<void>}
+   */
+  async clearSearch() {
+    this.logger.info(`NftGalleryTab::clearSearch is called.`);
+  }
+  /**
+   * Counting displayed NFTs
+   * @returns {Promise<number>}
+   */
+  async countShownNfts() {
+    this.logger.info(`NftGalleryTab::countShownNfts is called.`);
+  }
+  /**
+   * Getting a NFT name by a NFT's index
+   * @param {number} nftIndex
+   * @returns {Promise<string>}
+   */
+  async getNftName(nftIndex) {
+    this.logger.info(`NftGalleryTab::getNftName is called. NFT's index: ${nftIndex}`);
+  }
+  /**
+   * Selecting a NFT by its index
+   * @param {number} nftIndex
+   * @returns {Promise<void>}
+   */
+  async selectNftByIndex(nftIndex) {
+    this.logger.info(`NftGalleryTab::selectNftByIndex is called. NFT's index: ${nftIndex}`);
+  }
+  /**
+   * Selecting a NFT by its name
+   * @param {string} nftName
+   */
+  async selectNftByName(nftName) {
+    this.logger.info(`NftGalleryTab::selectNftByName is called. NFT's name: ${nftName}`);
+  }
 }
 
 export default NftGalleryTab;
