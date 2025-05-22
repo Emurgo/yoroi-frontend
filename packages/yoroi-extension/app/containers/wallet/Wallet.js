@@ -19,8 +19,6 @@ import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDi
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 // $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
@@ -169,7 +167,6 @@ render(): Node {
               <ModalManager />
               <ReviewTxProvider stores={stores} intl={this.context.intl}>
                 <ReviewTxModal />
-                <DrepPromotionBanner stores={stores} intl={intl} />
                 {this.props.children}
                 {this.getDialogs(intl, currentPool)}{' '}
               </ReviewTxProvider>
