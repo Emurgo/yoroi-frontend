@@ -4,10 +4,10 @@ export const DownloadApp = () => {
   return (
     <svg width="224" height="168" viewBox="0 0 224 168" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g opacity="0.2">
-        <path d="M75.8723 165.63L222.45 82.3646" stroke="#1D45B9" stroke-width="0.5" />
-        <path d="M20.1738 124.146L156.904 46.4735" stroke="#1D45B9" stroke-width="0.5" />
-        <path d="M82.3307 45.0068L213.41 119.371" stroke="#1D45B9" stroke-width="0.5" />
-        <path d="M0.449951 93.5731L129.886 167.007" stroke="#1D45B9" stroke-width="0.5" />
+        <path d="M75.8723 165.63L222.45 82.3646" stroke="#1D45B9" strokeWidth="0.5" />
+        <path d="M20.1738 124.146L156.904 46.4735" stroke="#1D45B9" strokeWidth="0.5" />
+        <path d="M82.3307 45.0068L213.41 119.371" stroke="#1D45B9" strokeWidth="0.5" />
+        <path d="M0.449951 93.5731L129.886 167.007" stroke="#1D45B9" strokeWidth="0.5" />
       </g>
       <path
         d="M139.168 5.98519C135.262 4.11051 127.546 5.38433 126.664 5.95515L86.5841 27.9946C83.0561 30.0255 81.9881 32.8015 82.0001 37.4882L82.1321 121.44C82.1321 124.991 84.0881 126.277 86.8961 127.659L135.496 95.8135C139.03 93.7766 140.896 90.2315 140.896 85.5569L139.168 5.98519Z"

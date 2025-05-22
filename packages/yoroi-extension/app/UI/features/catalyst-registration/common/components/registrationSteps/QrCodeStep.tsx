@@ -1,25 +1,24 @@
 import React from 'react';
-import { RegistrationStepper } from './RegistrationStepper';
+import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Stack, Typography } from '@mui/material';
-import { useStrings } from '../hooks/useStrings';
-import QrCode from '../../../../components/qrCode/QrCode';
-import { downloadQrCode } from '../../../../components/qrCode/helpers';
+import { useStrings } from '../../hooks/useStrings';
+import { downloadQrCode } from '../../../../../components/qrCode/helpers';
+import QrCode from '../../../../../components/qrCode/QrCode';
 
 type Props = {
   closeModal: () => void;
-  handlePreviousStep: (step: number) => void;
 };
 
 const QR_ID = 'qr-vote';
 
-export const QrCodeStep = ({ closeModal, handlePreviousStep }: Props) => {
+export const QrCodeStep = ({ closeModal }: Props) => {
   const strings = useStrings();
 
   const handleDownloadQrCode = () => downloadQrCode(QR_ID, 'Voting key');
 
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
-      <RegistrationStepper currentStep={5} onStepClick={handlePreviousStep} />
+      <RegistrationStepper />
       <Box
         sx={{
           display: 'flex',

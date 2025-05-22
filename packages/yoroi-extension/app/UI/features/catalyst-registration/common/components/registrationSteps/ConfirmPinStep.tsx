@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import { RegistrationStepper } from './RegistrationStepper';
+import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Typography, Stack } from '@mui/material';
-import { useStrings } from '../hooks/useStrings';
-import { TextInput } from '../../../../components';
+import { useStrings } from '../../hooks/useStrings';
+import { TextInput } from '../../../../../components';
+import { useVoting } from '../../hooks/useVoting';
 
-type Props = {
-  handleNextStep: () => void;
-  handlePreviousStep: (step: number) => void;
-};
-
-export const ConfirmPinStep = ({ handleNextStep, handlePreviousStep }: Props) => {
+export const ConfirmPinStep = () => {
   const [pin, setPin] = useState('');
   const strings = useStrings();
+  const { registrationPin, votingNextStep } = useVoting();
 
   const handleSetPin = e => {
-    setPin(e.target.value);
+    setPin(e.target.value.slice(0, 4));
   };
+
+  const errorPin = pin.length === 4 && pin !== registrationPin;
 
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
-      <RegistrationStepper currentStep={2} onStepClick={handlePreviousStep} />
+      <RegistrationStepper />
       <Box
         sx={{
           display: 'flex',
@@ -38,14 +37,24 @@ export const ConfirmPinStep = ({ handleNextStep, handlePreviousStep }: Props) =>
           dangerouslySetInnerHTML={{ __html: strings.confirmPinStep }}
         />
 
-        <TextInput label={strings.confirmPinInputLabel} value={pin} onChange={handleSetPin} id="confirm-pin" variant="outlined" />
+        <TextInput
+          error={errorPin}
+          helperText={errorPin ? 'Incorrect pin' : ''}
+          label={strings.confirmPinInputLabel}
+          value={pin}
+          onChange={handleSetPin}
+          id="confirm-pin"
+          variant="outlined"
+        />
       </Box>
+
       <Box>
         <Button
           // @ts-ignore
           variant="primary"
           fullWidth
-          onClick={handleNextStep}
+          onClick={votingNextStep}
+          disabled={pin !== registrationPin}
         >
           {strings.confirmPinStepButton}
         </Button>

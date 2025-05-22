@@ -271,6 +271,7 @@ interface IconWrapperProps {
   icon: Icons;
   iconProps?: React.SVGProps<SVGSVGElement>;
   asButton?: boolean;
+  iconButtonId?: string;
   [key: string]: any;
 }
 
@@ -279,6 +280,7 @@ export function IconWrapper({
   iconProps = {},
   asButton = false,
   buttonProps = {},
+  iconButtonId = '',
   ...props
 }: Readonly<IconWrapperProps>): React.ReactNode {
   const IconComponent = typeof icon === 'string' ? Icon[icon] : icon;

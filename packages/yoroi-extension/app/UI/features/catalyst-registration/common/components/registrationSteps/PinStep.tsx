@@ -1,19 +1,21 @@
-import React from 'react';
-import { RegistrationStepper } from './RegistrationStepper';
+import React, { useEffect } from 'react';
+import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Typography, Stack } from '@mui/material';
-import { useStrings } from '../hooks/useStrings';
-import { PinInput } from '../../../../components/Input/PinInput';
+import { useStrings } from '../../hooks/useStrings';
+import { PinInput } from '../../../../../components/Input/PinInput';
+import { useVoting } from '../../hooks/useVoting';
 
-type Props = {
-  handleNextStep: () => void;
-  handlePreviousStep: (step: number) => void;
-};
-
-export const PinStep = ({ handleNextStep, handlePreviousStep }: Props) => {
+export const PinStep = () => {
   const strings = useStrings();
+  const { registrationPin, startRegistration, votingNextStep } = useVoting();
+
+  useEffect(() => {
+    startRegistration();
+  }, []);
+
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
-      <RegistrationStepper currentStep={1} onStepClick={handlePreviousStep} />
+      <RegistrationStepper />
       <Box
         sx={{
           display: 'flex',
@@ -31,15 +33,14 @@ export const PinStep = ({ handleNextStep, handlePreviousStep }: Props) => {
           color="ds.text_gray_medium"
           dangerouslySetInnerHTML={{ __html: strings.pinStep }}
         />
-
-        <PinInput value="1234" length={4} />
+        <PinInput value={registrationPin} length={4} />
       </Box>
       <Box>
         <Button
           // @ts-ignore
           variant="primary"
           fullWidth
-          onClick={handleNextStep}
+          onClick={votingNextStep}
         >
           {strings.pinStepButton}
         </Button>

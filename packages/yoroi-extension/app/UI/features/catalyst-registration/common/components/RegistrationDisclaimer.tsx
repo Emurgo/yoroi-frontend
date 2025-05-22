@@ -13,9 +13,9 @@ export default function RegistrationDisclaimer({ onClose }: { onClose: () => voi
     <BaseBanner
       onClose={onClose}
       title={
-        <Stack direction="row" alignItems="center" gap="8px">
+        <Stack component="span" direction="row" alignItems="center" gap="8px">
           <IconWrapper icon={Icons.ExclamationCircle} />
-          <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
+          <Typography component="div" variant="body1" fontWeight={500} color="ds.gray_900">
             Disclaimer
           </Typography>
         </Stack>

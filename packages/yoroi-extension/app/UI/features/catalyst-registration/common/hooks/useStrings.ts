@@ -180,14 +180,16 @@ export const useStrings = () => {
   const { intl } = useIntl();
   return React.useRef({
     notAvailableTitle: intl.formatMessage(messages.notAvailableTitle),
-    notAvailableSubtitle: intl.formatMessage(messages.notAvailableSubtitle),
+    notAvailableSubtitle: (roundNumber: string) => intl.formatMessage(messages.notAvailableSubtitle, { roundNumber }),
     unavailableTitle: intl.formatMessage(messages.unavailableTitle),
     unavailableSubtitle: intl.formatMessage(messages.unavailableSubtitle),
     earlyForRegistrationTitle: intl.formatMessage(messages.earlyForRegistrationTitle),
-    earlyForRegistrationSubTitle: intl.formatMessage(messages.earlyForRegistrationSubTitle),
-    beforeVotingSubtitle: intl.formatMessage(messages.beforeVotingSubtitle),
-    betweenVotingSubtitle: intl.formatMessage(messages.betweenVotingSubtitle),
-    nextFundRegistration: intl.formatMessage(messages.nextFundRegistration),
+    earlyForRegistrationSubTitle: (roundNumber: string, registrationStart: string) =>
+      intl.formatMessage(messages.earlyForRegistrationSubTitle, { roundNumber, registrationStart }),
+    beforeVotingSubtitle: (votingStart: string) => intl.formatMessage(messages.beforeVotingSubtitle, { votingStart }),
+    betweenVotingSubtitle: (votingEnd: string) => intl.formatMessage(messages.betweenVotingSubtitle, { votingEnd }),
+    nextFundRegistration: (roundNumber: string, registrationStart: string) =>
+      intl.formatMessage(messages.nextFundRegistration, { roundNumber, registrationStart }),
     title: (fundName: string) => intl.formatMessage(messages.title, { fundName }),
     subtitle: intl.formatMessage(messages.subtitle),
     downloadApp: intl.formatMessage(messages.downloadApp),

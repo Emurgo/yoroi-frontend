@@ -1,23 +1,22 @@
 import BigNumber from 'bignumber.js';
 import React, { useState } from 'react';
-import { RegistrationStepper } from './RegistrationStepper';
+import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Typography, Stack } from '@mui/material';
-import { useStrings } from '../hooks/useStrings';
-import { PasswordInput } from '../../../../components';
-import { AmountInput } from '../../../../../components/common/NumericInputRP';
+import { useStrings } from '../../hooks/useStrings';
+import { PasswordInput } from '../../../../../components';
+import { AmountInput } from '../../../../../../components/common/NumericInputRP';
+import { useVoting } from '../../hooks/useVoting';
 
-type Props = {
-  handleNextStep: () => void;
-  handlePreviousStep: (step: number) => void;
-};
-
-export const TxStep = ({ handleNextStep, handlePreviousStep }: Props) => {
+export const TxStep = () => {
   const strings = useStrings();
   const [passwd, setPasswd] = useState('');
+  const { votingNextStep } = useVoting();
+
   const handleSetPasswd = e => setPasswd(e.target.value);
+
   return (
     <Stack direction="column" gap="24px" height="100%" pb="24px">
-      <RegistrationStepper currentStep={4} onStepClick={handlePreviousStep} />
+      <RegistrationStepper />
       <Box
         sx={{
           display: 'flex',
@@ -62,7 +61,7 @@ export const TxStep = ({ handleNextStep, handlePreviousStep }: Props) => {
           // @ts-ignore
           variant="primary"
           fullWidth
-          onClick={handleNextStep}
+          onClick={votingNextStep}
         >
           {strings.register}
         </Button>
