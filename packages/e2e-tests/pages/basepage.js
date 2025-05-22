@@ -140,8 +140,8 @@ class BasePage {
     return await this.driver.findElement(getByLocator(locator));
   }
   /**
-   * 
-   * @param {{ElementLocator}} locator 
+   * Finding all suitable WebElements by the locator
+   * @param {ElementLocator} locator 
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
