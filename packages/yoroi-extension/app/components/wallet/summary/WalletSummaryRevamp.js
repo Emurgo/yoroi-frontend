@@ -27,6 +27,7 @@ import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import environment from '../../../environment';
+// $FlowIgnore: suppressing this error
 import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
 
