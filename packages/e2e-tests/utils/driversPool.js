@@ -1,9 +1,7 @@
-import { getBuilder } from './driverBootstrap.js';
-import { getTargetBrowser, getTestLogger } from './utils.js';
-import { TargetBrowser } from '../helpers/constants.js';
+import { getDriver } from './driverBootstrap.js';
+import { getTestLogger } from './utils.js';
 import BasePage from '../pages/basepage.js';
 import InitialStepsPage from '../pages/initialSteps.page.js';
-import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 import { WebDriver } from 'selenium-webdriver';
 
 let instance = null;
@@ -21,22 +19,12 @@ class DriversManager {
     this.logger = getTestLogger(`DriversManager_${Date.now()}`, 'DriversManager');
   }
 
-  buildDriver() {
-    this.logger.info(`DriversManager::buildDriver Building a new driver`);
-    const driver = getBuilder().build();
-    driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
-    if (getTargetBrowser() === TargetBrowser.FF) {
-      driver.manage().window().maximize();
-    }
-    return driver;
-  }
-
   /**
    * Adding a new driver to the pool of drivers
    * @returns {{driver: ThenableWebDriver, driverId: number}}
    */
   addNewDriverToPool() {
-    const newDriver = this.buildDriver();
+    const newDriver = getDriver();
     driverGlobalCounter++;
     const driverObject = {
       driver: newDriver,
@@ -90,14 +78,14 @@ class DriversManager {
     const driverObject = poolOfDrivers.shift();
     this.logger.info(`DriversManager::getDriverFromPool Returning driver ${driverObject.driverId}`);
     const newDriverObject = this.addNewDriverToPool();
-    await this.prepareExtension(newDriverObject);
+    this.prepareExtension(newDriverObject);
 
     return driverObject.driver;
   }
 
   async getPreparedDriver() {
     this.logger.info(`DriversManager::getPreparedDriver is called`);
-    const driver = this.buildDriver();
+    const driver = getDriver();
     await this._prepareExtensionCommon(driver);
 
     return driver;

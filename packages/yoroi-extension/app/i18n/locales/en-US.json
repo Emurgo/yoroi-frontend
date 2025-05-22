@@ -501,7 +501,7 @@
   "swap.minimumAssetsTooltip": "The minimum amount you are guaranteed to receive in case of price slippage",
   "swap.lpFee": "Liquidity provider fee",
   "swap.lpFeeTooltip": "A fixed 0.3% operational fee paid to liquidity providers as a reward for supplying tokens, enabling traders to buy and sell assets on the decentralized Cardano network",
-  "swap.confirmSwapTx": "Confirm swap transaction",
+  "swap.confirmSwapTx": "Swap review",
   "swap.txSubmitted": "Transaction submitted",
   "swap.txFailed": "Transaction failed",
   "swap.txId": "Transaction ID",
