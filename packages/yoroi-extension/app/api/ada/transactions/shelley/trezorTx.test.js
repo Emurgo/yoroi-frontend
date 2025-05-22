@@ -226,10 +226,6 @@ test('Create Trezor transaction', async () => {
         KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
         NetworkId: network.NetworkId,
       },
-      neededStakingKeyHashes: {
-        neededHashes: new Set([stakeCredential.to_hex()]),
-        wits: new Set() // not needed for this test, but something should be here
-      },
     }),
     ByronNetworkId,
     Number.parseInt(ChainNetworkId, 10),
