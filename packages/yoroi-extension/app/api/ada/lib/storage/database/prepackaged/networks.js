@@ -61,7 +61,7 @@ export const networks = Object.freeze({
       BackendService: 'https://preprod-backend.yoroiwallet.com',
       TokenInfoService:
         'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-preprod.emurgornd.com',
+      BackendServiceZero: 'https://yoroi-backend-zero-preprod-prod.emurgornd.com',
     },
     BaseConfig: ([
       Object.freeze({

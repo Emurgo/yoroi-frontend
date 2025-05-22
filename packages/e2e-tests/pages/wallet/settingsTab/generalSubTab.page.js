@@ -1,3 +1,4 @@
+import { halfSecond } from '../../../helpers/timeConstants.js';
 import SettingsTab from './settingsTab.page.js';
 
 class GeneralSubTab extends SettingsTab {
@@ -77,6 +78,7 @@ class GeneralSubTab extends SettingsTab {
     this.logger.info(`GeneralSubTab::openLanguageSelection is called`);
     await this.waitForElement(this.languagesDropDownLocator);
     await this.click(this.languagesDropDownLocator);
+    await this.sleep(halfSecond);
   }
   async pickLanguage(countryCode) {
     this.logger.info(`GeneralSubTab::pickLanguage is called. Country code: "${countryCode}"`);
