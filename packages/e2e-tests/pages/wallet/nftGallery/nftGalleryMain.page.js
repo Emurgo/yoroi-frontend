@@ -30,6 +30,24 @@ class NftGalleryTab extends WalletCommonBase {
     locator: '#nftsList-emptyState-component > svg',
     method: 'css',
   }
+  getNftButtonLocator = (nftIndex) => {
+    return {
+      locator: `nftsList:nft_${nftIndex}-component-button`,
+      method: 'id',
+    }
+  }
+  getNftNameLocator = (nftIndex) => {
+    return {
+      locator: `nftsList:nft_${nftIndex}-name-text`,
+      method: 'id',
+    }
+  }
+  getNftImageLocator = (nftIndex) => {
+    return {
+      locator: `nftsList:nft_${nftIndex}-image-component`,
+      method: 'id'
+    }
+  }
   // methods
   // * isDisplayed
   // * noNftsIsDisplayed
