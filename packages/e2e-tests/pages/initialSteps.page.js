@@ -2,6 +2,7 @@ import BasePage from './basepage.js';
 import { isChrome } from '../utils/utils.js';
 import {
   defaultWaitTimeout,
+  halfSecond,
   oneSecond,
   quarterSecond,
   twoSeconds,
@@ -64,6 +65,7 @@ class InitialStepsPage extends BasePage {
     this.logger.info(`InitialStepsPage::openLanguageSelection is called`);
     await this.waitForElement(this.languagesDropDownLocator);
     await this.click(this.languagesDropDownLocator);
+    await this.sleep(halfSecond);
   }
   async pickLanguage(countryCode) {
     this.logger.info(`InitialStepsPage::pickLanguage is called. Country code: "${countryCode}"`);
