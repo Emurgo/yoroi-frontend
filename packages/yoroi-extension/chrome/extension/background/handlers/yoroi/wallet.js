@@ -2,7 +2,7 @@
 import type { HandlerType } from './type';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getNetworkById } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import AdaApi, { genOwnStakingKey } from '../../../../../app/api/ada';
+import AdaApi from '../../../../../app/api/ada';
 import { getDb, syncWallet } from '../../state';
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import type { WalletState } from '../../types';
@@ -32,6 +32,7 @@ import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
 import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
 import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver';
+import { genOwnStakingKey } from '../../../../../app/api/ada/staking';
 
 type CreateWalletRequest = {|
   networkId: number,

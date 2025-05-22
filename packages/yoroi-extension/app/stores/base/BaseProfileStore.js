@@ -5,7 +5,7 @@ import moment from 'moment/moment';
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
-import { LANGUAGES } from '../../i18n/translations';
+import { LANGUAGES, translations } from '../../i18n/translations';
 import type { LanguageType } from '../../i18n/translations';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -259,7 +259,13 @@ export default class BaseProfileStore
     if (result == null) {
       result = this.getProfileLocaleRequest.execute().result;
     }
-    if (this.isCurrentLocaleSet && result != null && result !== '') return result;
+    if (this.isCurrentLocaleSet && result != null && result !== '') {
+      if (translations[result] == null) {
+        noop(this.updateLocale({ locale: BaseProfileStore.getDefaultLocale() }));
+        return BaseProfileStore.getDefaultLocale();
+      }
+      return result;
+    }
 
     return BaseProfileStore.getDefaultLocale();
   }
@@ -269,10 +275,7 @@ export default class BaseProfileStore
   }
 
   @computed get isCurrentLocaleSet(): boolean {
-    return (
-      this.getProfileLocaleRequest.result !== null &&
-      this.getProfileLocaleRequest.result !== undefined
-    );
+    return this.getProfileLocaleRequest.result != null;
   }
 
   @computed get lastAnnouncedFeatureVersion(): string | null {

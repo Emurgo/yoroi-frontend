@@ -154,11 +154,8 @@ export default class WithdrawRewardsDialog extends Component<{| ...StoresProps, 
 
     const network = getNetworkById(publicDeriver.networkId);
     const meta = this.props.stores.delegation.getLocalPoolInfo(publicDeriver.networkId, String(currentPool));
-    if (meta == null) {
-      // server hasn't returned information about the stake pool yet
-      return null;
-    }
-    const name = meta.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
+
+    const name = meta?.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel);
     const avatarSource = toSvg(currentPool, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 

@@ -19,8 +19,6 @@ import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDi
 import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 type Props = {|
   +children: Node,
@@ -153,7 +151,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
           <WalletLoadingAnimation />
         ) : (
           <>
-            <DrepPromotionBanner stores={stores} intl={intl} />
             {this.props.children}
             {this.getDialogs(intl, currentPool)}
           </>
