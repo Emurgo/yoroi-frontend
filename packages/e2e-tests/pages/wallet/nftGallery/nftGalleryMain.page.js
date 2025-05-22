@@ -56,6 +56,10 @@ class NftGalleryTab extends WalletCommonBase {
   // * switch to 6 columns view
   // * search
   // * clear search
+  // * count nfts
+  // * get NFT name by index
+  // * select NFT by index
+  // * select NFT by name
 }
 
 export default NftGalleryTab;
