@@ -35,11 +35,6 @@ class WalletTab extends WalletCommonBase {
       await this.sleep(500);
     }
   }
-  async titleIsCorrect() {
-    this.logger.info(`WalletTab::titleIsCorrect is called`);
-    const displayedTitle = await this.getPageTitle();
-    return displayedTitle === pageTitle.wallet;
-  }
 }
 
 export default WalletTab;
