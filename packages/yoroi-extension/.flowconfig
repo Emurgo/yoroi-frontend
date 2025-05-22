@@ -6,6 +6,8 @@
 .*/.git/.*
 .*/.vscode/.*
 .*/.circleci/.*
+.*/.*\.ts
+.*/.*\.tsx
 <PROJECT_ROOT>/dev/.*
 <PROJECT_ROOT>/build/.*
 <PROJECT_ROOT>/node_modules/@emurgo/cross-csl-browser/node_modules/resolve/test/resolver/malformed_package_json/package.json
