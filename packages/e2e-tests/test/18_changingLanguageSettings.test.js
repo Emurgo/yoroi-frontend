@@ -25,6 +25,10 @@ describe('Changing language through the Settings', function () {
       lang: 'ja-JP',
       btnTransalation: '一般',
     },
+        {
+      lang: 'ko-KR',
+      btnTransalation: '일반'
+    },
     {
       lang: 'zh-Hans',
       btnTransalation: '一般',
@@ -38,8 +42,24 @@ describe('Changing language through the Settings', function () {
       btnTransalation: 'Allgemein',
     },
     {
+      lang: 'es-ES',
+      btnTransalation: 'General',
+    },
+    {
+      lang: 'fr-FR',
+      btnTransalation: 'Général'
+    },
+    {
       lang: 'pt-BR',
       btnTransalation: 'Geral',
+    },
+    {
+      lang: 'id-ID',
+      btnTransalation: 'Umum',
+    },
+    {
+      lang: 'vi-VN',
+      btnTransalation: 'Chung',
     },
     {
       lang: 'en-US',
@@ -56,12 +76,12 @@ describe('Changing language through the Settings', function () {
 
   for (const testDatum of testData) {
     describe(`Changing language to ${testDatum.lang}`, function () {
-      it('Selecting language', async function () {
+      it(`Selecting language ${testDatum.lang}`, async function () {
         const generalSubTab = new GeneralSubTab(webdriver, logger);
         await generalSubTab.selectLanguage(testDatum.lang);
       });
 
-      it('Checking translation on the button', async function () {
+      it(`Checking translation on the button ${testDatum.lang}`, async function () {
         const settingsPage = new SettingsTab(webdriver, logger);
         const btnText = await settingsPage.getGeneralSubTabText();
         expect(btnText).to.equal(testDatum.btnTransalation);
