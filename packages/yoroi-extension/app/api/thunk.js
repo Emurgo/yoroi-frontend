@@ -2,7 +2,6 @@
 
 import type { WalletState, ServerStatus } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import WalletTransaction from '../domain/WalletTransaction';
 import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
 import CardanoShelleyTransaction, {
@@ -218,21 +217,16 @@ export async function signAndBroadcastTransaction(
 ): Promise<{| txId: string |}> {
   const tx = request.signRequest.unsignedTx.build_tx();
   const txBody = tx.body();
-  const txHash = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash();
 
   const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,
     unsignedTx: tx.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
-    neededHashes: [...request.signRequest.neededStakingKeyHashes.neededHashes],
-    wits: [...request.signRequest.neededStakingKeyHashes.wits],
     password: request.password,
     publicDeriverId: request.publicDeriverId,
-    txHash: txHash.to_hex(),
   };
-  tx.free();
   txBody.free();
-  txHash.free();
+  tx.free();
   const result = await callBackground({
     type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
