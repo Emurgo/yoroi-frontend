@@ -352,6 +352,7 @@ export async function getReceiveAddress(
     const nextInternal = await withChains.nextInternal();
     return nextInternal.addressInfo;
   }
+  // <TODO:PENDING_REMOVAL> we don't have wallets without chain support
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos) {
 

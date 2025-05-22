@@ -22,10 +22,17 @@ export const AssetCarousel = ({ data }) => {
   return (
     <Box height="40px">
       <Carousel
+        containerProps={{
+          style: {
+            display: 'flex',
+            justifyContent: 'flex-start',
+            width: '100%',
+          }
+        }}
         activeSlideIndex={activeSlideIndex}
         onRequestChange={setActiveSlideIndex}
-        itemsToShow={4}
-        itemsToScroll={4}
+        itemsToShow={5}
+        itemsToScroll={3}
         forwardBtnProps={{
           style: {
             alignSelf: 'center',
@@ -70,26 +77,26 @@ export const AssetCarousel = ({ data }) => {
         {data &&
           data.map(token => (
             <Box
-              style={{
-                width: 50,
-                height: 50,
+              sx={{
+                width: 48,
+                height: 40,
                 backgroundColor: 'transparent',
-                marginRight: '8px',
                 padding: '0px',
                 position: 'relative',
               }}
             >
               <Box zIndex={1}>
                 <img
-                  width="48px"
-                  height="48px"
+                  width="40px"
+                  height="40px"
+                  style={{borderRadius: '8px'}}
                   src={token.info.image}
                   onError={(e: any) => {
                     e.target.src = defaultImage;
                   }}
                 />
               </Box>
-              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%' }} />
+              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%'}} />
             </Box>
           ))}
       </Carousel>

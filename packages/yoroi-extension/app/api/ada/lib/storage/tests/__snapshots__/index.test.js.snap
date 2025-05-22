@@ -1254,7 +1254,7 @@ Object {
     Object {
       "Backend": Object {
         "BackendService": "https://preprod-backend.yoroiwallet.com",
-        "BackendServiceZero": "https://yoroi-backend-zero-preprod.emurgornd.com",
+        "BackendServiceZero": "https://yoroi-backend-zero-preprod-prod.emurgornd.com",
         "TokenInfoService": "https://stage-cdn.yoroiwallet.com",
       },
       "BaseConfig": Array [
