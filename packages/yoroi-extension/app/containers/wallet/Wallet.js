@@ -110,47 +110,11 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     }
     const currentPool = stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
-<<<<<<< Updated upstream
     const visibilityContext = {
       selected: selectedWallet.publicDeriverId,
       networkId: selectedWallet.networkId,
       walletHasAssets,
     };
-=======
-  return (
-    <TopBarLayout
-      banner={<BannerContainer stores={stores} />}
-      sidebar={sidebarContainer}
-      navbar={
-        <NavBarContainerRevamp
-          stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
-          menu={isInitialSyncing ? null : menu}
-        />
-      }
-      showInContainer
-    >
-      {warning}
-      {isInitialSyncing ? (
-        <WalletLoadingAnimation />
-      ) : (
-        <>
-          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <ModalProvider>
-              <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
-                <ReviewTxModal />
-                {this.props.children}
-                {this.getDialogs(intl, currentPool)}{' '}
-              </ReviewTxProvider>
-            </ModalProvider>
-          </CurrencyProvider>
-        </>
-      )}
-    </TopBarLayout>
-  );
-}
->>>>>>> Stashed changes
 
     const menu = (
       <SubMenu
@@ -187,7 +151,6 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
           <WalletLoadingAnimation />
         ) : (
           <>
-            <DrepPromotionBanner stores={stores} intl={intl} />
             {this.props.children}
             {this.getDialogs(intl, currentPool)}
           </>
