@@ -343,6 +343,7 @@ test('Create Ledger transaction', async () => {
       fee: '2000',
       ttl: '500',
       scriptDataHashHex: null,
+      votingProcedures: null,
       network: {
         networkId: 1,
         protocolMagic: 764824073,
