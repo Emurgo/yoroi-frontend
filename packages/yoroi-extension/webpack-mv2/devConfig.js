@@ -149,7 +149,7 @@ const contentScriptConfig = (
       Boolean(isLight),
       Boolean(isE2E),
     )),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/[\S]+.dev$/ }),
   ],
   module: {
     rules: [
