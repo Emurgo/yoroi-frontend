@@ -348,7 +348,7 @@ jobs:
     needs: [Build-Extension]
     steps:
       - name: Pull Speculos Docker image
-        run: docker pull ghcr.io/ledgerhq/speculos:421a6d6053d4a6c758964f614b9165a83ffd75ee
+        run: docker pull ghcr.io/ledgerhq/speculos:4d320a7be879fba8d5f29a0c9516e47cb556fed8
 
       - uses: browser-actions/setup-chrome@v1.7.3
         id: setup-chrome
