@@ -66,6 +66,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: isOnMainnet,
   },
   {
+    className: 'swap',
+    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
+    icon: swapIcon,
+    label: globalMessages.sidebarSwap,
+    isVisible: () => environment.isDev(),
+  },
+  {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
@@ -78,6 +85,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
     isVisible: existsSelectedWallet,
+  },
+  {
+    className: 'nft-gallery',
+    route: ROUTES.NFT_GALLERY.ROOT,
+    icon: nftsIcon,
+    label: globalMessages.sidebarNfts,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'voting',

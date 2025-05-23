@@ -58,7 +58,15 @@ class TxReviewOverviewTab extends TxReviewCommon {
   }
   async getReceiver() {
     this.logger.info(`TxReviewOverviewTab::getReceiver is called`);
-    return await this.getText(this.receiverLocator);
+    const fieldIsNotEmpty = await this.customWaiter(async () => {
+      const fieldElem = await this.findElement(this.receiverLocator);
+      const fieldText = await fieldElem.getText();
+      return fieldText !== '' && fieldText !== null && fieldText !== undefined;
+    });
+    if (fieldIsNotEmpty) {
+      return await this.getText(this.receiverLocator);
+    }
+    throw new Error('The receiver field is empty!');
   }
   async getAsocciatedAddress() {
     this.logger.info(`TxReviewOverviewTab::getAsocciatedAddress is called`);

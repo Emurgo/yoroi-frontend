@@ -9,11 +9,9 @@ import {
   asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asGetSigningKey,
   asHasLevels,
   asHasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-import { ConceptualWallet } from '../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import BigNumber from 'bignumber.js';
 
 import { CannotSendBelowMinimumValueError, NotEnoughMoneyToSendError, } from '../../../app/api/common/errors';
@@ -39,7 +37,7 @@ import type {
   RemoteUnspentOutput,
 } from '../../../app/api/ada/lib/state-fetch/types';
 import {
-  signTransaction as shelleySignTransaction,
+  signTransactionFromWallet as shelleySignTransactionFromWallet,
   toLibUTxO,
 } from '../../../app/api/ada/transactions/shelley/transactions';
 import {
@@ -755,21 +753,6 @@ async function __connectorSignCardanoTx(
     submittedTxs
   );
 
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  if (!withLevels) {
-    throw new Error(`can't get level`);
-  }
-
-  const withSigningKey = asGetSigningKey(publicDeriver);
-  if (!withSigningKey) {
-    throw new Error('expect to be able to get signing key');
-  }
-  const signingKey = await withSigningKey.getSigningKey();
-  const normalizedKey = await withSigningKey.normalizeKey({
-    ...signingKey,
-    password,
-  });
-
   const utxoIdSet: Set<string> =
     iterateLenGet(txBody.inputs())
       .join(iterateLenGet(txBody.collateral()))
@@ -779,12 +762,11 @@ async function __connectorSignCardanoTx(
   const usedUtxos = addressedUtxos
     .filter(utxo => utxoIdSet.has(utxo.utxo_id));
 
-  const signedTx = shelleySignTransaction(
+  const signedTx = await shelleySignTransactionFromWallet(
     usedUtxos,
     rawTxBody,
-    withLevels.getParent().getPublicDeriverLevel(),
-    RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
-    new Set(), // stakingKeyWits
+    publicDeriver,
+    password,
     auxiliaryData, // metadata
     otherRequiredSigners,
   );
@@ -833,32 +815,14 @@ export async function connectorCreateCardanoTx(
     },
     foreignUtxoFetcher,
   );
-
   if (password == null) {
     return signRequest.unsignedTx.build_tx().to_hex();
   }
-
-  const withSigningKey = asGetSigningKey(publicDeriver);
-  if (!withSigningKey) {
-    throw new Error('expect to be able to get signing key');
-  }
-  const signingKey = await withSigningKey.getSigningKey();
-  const normalizedKey = await withSigningKey.normalizeKey({
-    ...signingKey,
-    password,
-  });
-
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  if (!withLevels) {
-    throw new Error(`can't get level`);
-  }
-
-  const signedTx = shelleySignTransaction(
+  const signedTx = await shelleySignTransactionFromWallet(
     signRequest.senderUtxos,
     signRequest.unsignedTx,
-    withLevels.getParent().getPublicDeriverLevel(),
-    RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
-    signRequest.neededStakingKeyHashes.wits,
+    publicDeriver,
+    password,
     signRequest.metadata,
   );
   return signedTx.to_hex();

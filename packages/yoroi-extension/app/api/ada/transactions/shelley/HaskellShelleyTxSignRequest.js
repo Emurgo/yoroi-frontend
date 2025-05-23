@@ -52,11 +52,6 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
   changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>;
   metadata: void | RustModule.WalletV4.AuxiliaryData;
   networkSettingSnapshot: NetworkSettingSnapshot;
-  // TODO: this should be provided by WASM in some SignedTxBuilder interface of some kind
-  neededStakingKeyHashes: {|
-    neededHashes: Set<string>, // StakeCredential
-    wits: Set<string>, // Vkeywitness
-  |};
   trezorTCatalystRegistrationTxSignData:
     void | TrezorTCatalystRegistrationTxSignData;
   ledgerNanoCatalystRegistrationTxSignData:
@@ -68,10 +63,6 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     changeAddr: Array<{| ...Address, ...Value, ...Addressing |}>,
     metadata: void | RustModule.WalletV4.AuxiliaryData,
     networkSettingSnapshot: NetworkSettingSnapshot,
-    neededStakingKeyHashes: {|
-      neededHashes: Set<string>, // StakeCredential
-      wits: Set<string>, // Vkeywitness
-    |},
     trezorTCatalystRegistrationTxSignData?:
       void | TrezorTCatalystRegistrationTxSignData;
     ledgerNanoCatalystRegistrationTxSignData?:
@@ -83,7 +74,6 @@ implements ISignRequest<RustModule.WalletV4.TransactionBuilder> {
     this.changeAddr = data.changeAddr;
     this.metadata = data.metadata;
     this.networkSettingSnapshot = data.networkSettingSnapshot;
-    this.neededStakingKeyHashes = data.neededStakingKeyHashes;
     this.trezorTCatalystRegistrationTxSignData =
       data.trezorTCatalystRegistrationTxSignData;
     this.ledgerNanoCatalystRegistrationTxSignData =

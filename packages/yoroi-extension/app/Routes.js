@@ -36,7 +36,11 @@ import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
+import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextProvider';
+// $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
+// $FlowIgnore: suppressing this error
+import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
@@ -50,6 +54,10 @@ import GovernanceTransactionSubmittedPage from './UI/pages/Governance/Governance
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
+import NftsPage from './UI/pages/nfts/NftsPage';
+// $FlowIgnore: suppressing this error
+import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
@@ -58,9 +66,13 @@ import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
+import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
+// $FlowIgnore: suppressing this error
+import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+
+// $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
-
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
@@ -206,6 +218,10 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.STAKING} component={props => <StakingPage {...props} stores={stores} />} />
           <Route path={ROUTES.ASSETS.ROOT} component={props => wrapAssets({ ...props, stores }, AssetsSubpages(stores))} />
           <Route path={ROUTES.NFTS.ROOT} component={props => wrapNFTs({ ...props, stores }, NFTsSubPages(stores))} />
+          <Route
+            path={ROUTES.NFT_GALLERY.ROOT}
+            component={props => wrapNftGallery({ ...props, stores }, NftGallerySubPages(stores))}
+          />
           <Route path={ROUTES.CASHBACK.ROOT} component={props => <CashbackPage {...props} stores={stores} />} />
           <Route exact path={ROUTES.WALLETS.ADD} component={props => <AddWalletPage {...props} stores={stores} />} />
           <Route
@@ -238,6 +254,11 @@ export const Routes = (stores: StoresMap): Node => {
           <Route exact path={ROUTES.EXCHANGE_END} component={props => <ExchangeEndPage {...props} stores={stores} />} />
 
           {/* NEW UI Routes */}
+          <Route
+            path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
+            component={props => wrapSwapRevamp({ ...props, stores }, SwapRevampSubpages(stores))}
+          />
+
           <Route
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
@@ -320,6 +341,13 @@ const NFTsSubPages = stores => (
   </Switch>
 );
 
+const NftGallerySubPages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.NFT_GALLERY.ROOT} component={props => <NftsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.NFT_GALLERY.DETAILS} component={props => <NftDetailsPage {...props} stores={stores} />} />
+  </Switch>
+);
+
 const AssetsSubpages = stores => (
   <Switch>
     <Route exact path={ROUTES.ASSETS.ROOT} component={props => <TokensPageRevamp {...props} stores={stores} />} />
@@ -345,6 +373,14 @@ const GovernanceSubpages = stores => (
       path={ROUTES.Governance.FAIL}
       component={props => <GovernanceTransactionFailedPage {...props} stores={stores} />}
     />
+  </Switch>
+);
+
+const SwapRevampSubpages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.SWAP_REVAMP.ASSET_SWAP} component={props => <AssetSwapRevampPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SWAP_REVAMP.ORDERS} component={props => <SwapOrdersRevampPage {...props} stores={stores} />} />
+    <Redirect to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
   </Switch>
 );
 
@@ -462,5 +498,23 @@ export function WrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider stores={dappCenterProps.stores}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
+  );
+}
+
+export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
+  return (
+    <NftGalleryContextProvider stores={nftGalleryProps.stores}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </NftGalleryContextProvider>
+  );
+}
+
+export function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  return (
+    <SwapContextProvider currentWallet={currentWalletInfo}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </SwapContextProvider>
   );
 }

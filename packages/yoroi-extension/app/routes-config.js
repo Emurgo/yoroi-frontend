@@ -52,11 +52,15 @@ export const ROUTES = {
   },
   // Bringweb3
   CASHBACK: {
-    ROOT: '/cashback'
+    ROOT: '/cashback',
   },
   NFTS: {
     ROOT: '/nfts',
     DETAILS: '/nfts/:nftId',
+  },
+  NFT_GALLERY: {
+    ROOT: '/nft-gallery',
+    DETAILS: '/nft-gallery/:nftId',
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
@@ -76,6 +80,12 @@ export const ROUTES = {
   EXCHANGE_END: '/exchange-end',
 
   // NEW UI ROUTES
+  SWAP_REVAMP: {
+    ASSET_SWAP: '/swap-revamp',
+    ORDERS: '/swap-revamp/orders',
+    // $FlowIgnore
+    ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
+  },
   Governance: {
     ROOT: '/governance',
     DELEGATE: '/governance/delagation',
