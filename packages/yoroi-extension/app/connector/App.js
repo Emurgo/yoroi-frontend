@@ -4,7 +4,7 @@ import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter as Router } from 'react-router';
-import { addLocaleData, IntlProvider } from 'react-intl';
+import { addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
 import ja from 'react-intl/locale-data/ja';
