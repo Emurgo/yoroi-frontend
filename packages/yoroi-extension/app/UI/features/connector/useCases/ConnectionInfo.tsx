@@ -19,7 +19,7 @@ const messages = {
 };
 
 const ConnectionInfo: React.FC<Props> = ({ connectedWebsite, connectedWallet }) => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   const url = connectedWebsite?.url ?? '';
   const faviconUrl = connectedWebsite?.image ?? '';
 

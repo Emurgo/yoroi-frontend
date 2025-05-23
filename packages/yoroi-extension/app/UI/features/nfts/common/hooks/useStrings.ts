@@ -19,7 +19,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return React.useRef({
     searchNfts: intl.formatMessage(messages.searchNfts),
     nftsCount: (numNfts: number) => intl.formatMessage(messages.nftsCount, { number: numNfts }),

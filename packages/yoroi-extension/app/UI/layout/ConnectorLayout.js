@@ -21,7 +21,7 @@ export const messages = defineMessages({
 });
 
 const ConnectorLayout = observer(({ networkId, children }) => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   const location = useLocation();
   const theme = useTheme();
 

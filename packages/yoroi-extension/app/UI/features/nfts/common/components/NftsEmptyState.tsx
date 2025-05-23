@@ -19,7 +19,7 @@ type NftsEmptyStateProps = {
 };
 
 export default function NftsEmptyState({ isSearch }: NftsEmptyStateProps) {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return (
     <Stack
       sx={{

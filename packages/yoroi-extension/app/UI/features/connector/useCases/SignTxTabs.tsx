@@ -16,7 +16,7 @@ const SignTxTabs = observer(({ connectionContent, utxosContent, detailsContent, 
   const isTestEnv = environment.isNightly() || environment.isTest();
   const containerHeight = isTestEnv ? 'calc(100vh - 306px - 46px)' : 'calc(100vh - 306px)';
 
-  const { intl } = useIntl();
+  const intl = useIntl();
 
   const tabs: TabItem[] = [
     {
