@@ -13,7 +13,6 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { truncateAddress, truncateToken } from '../../utils/formatters';
 import type { TransferTx } from '../../types/TransferTypes';

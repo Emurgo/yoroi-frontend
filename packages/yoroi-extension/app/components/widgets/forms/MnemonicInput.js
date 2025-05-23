@@ -9,7 +9,6 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import Autocomplete from '../../common/Autocomplete';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,

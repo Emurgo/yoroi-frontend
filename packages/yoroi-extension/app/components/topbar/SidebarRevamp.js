@@ -1,7 +1,6 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { SidebarCategoryRevamp } from '../../stores/stateless/sidebarCategories';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';

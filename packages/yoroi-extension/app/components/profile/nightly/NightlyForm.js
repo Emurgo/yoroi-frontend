@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as NightlyIconRevamp } from '../../../assets/images/yoroi-nightly-icon-dark.inline.svg';

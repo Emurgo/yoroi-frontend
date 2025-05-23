@@ -26,7 +26,6 @@ import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography } from '@mui/material';
 
 const messages = defineMessages({

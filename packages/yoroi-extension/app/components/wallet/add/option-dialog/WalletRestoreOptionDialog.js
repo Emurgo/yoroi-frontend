@@ -7,7 +7,6 @@ import { defineMessages, IntlContext } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import OptionBlock from '../../../widgets/options/OptionBlock';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../../../widgets/options/OptionListWrapperStyle.scss';
 
 const messages = defineMessages({

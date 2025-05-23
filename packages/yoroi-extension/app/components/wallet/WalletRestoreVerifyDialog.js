@@ -18,7 +18,6 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notification.types';
 import CenteredLayout from '../layout/CenteredLayout';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 import { Box, Typography } from '@mui/material';

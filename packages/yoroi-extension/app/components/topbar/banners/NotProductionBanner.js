@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { IntlContext, defineMessages, } from 'react-intl';
 import styles from './NotProductionBanner.scss';
 import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   notProdLabel: {

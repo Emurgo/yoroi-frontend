@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, Typography } from '@mui/material';
 import Select from '../../common/Select';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { FormattedMessage, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';

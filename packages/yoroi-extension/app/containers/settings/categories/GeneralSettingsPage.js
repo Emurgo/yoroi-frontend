@@ -10,7 +10,6 @@ import UnitOfAccountSettings from '../../../components/settings/categories/gener
 import BringCashbackSettings from '../../../components/settings/categories/general-setting/BringCashbackSettings';
 import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
 import LocalStorageApi from '../../../api/localStorage/index';

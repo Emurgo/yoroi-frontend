@@ -13,7 +13,6 @@ import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from 
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitle: {

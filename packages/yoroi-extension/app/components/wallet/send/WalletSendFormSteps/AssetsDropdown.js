@@ -5,7 +5,6 @@ import { ReactComponent as ArrowUpIcon } from '../../../../assets/images/arrow-u
 import { ReactComponent as ArrowDownIcon } from '../../../../assets/images/arrow-down.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
 import { IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { Box, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';

@@ -21,7 +21,6 @@ import { ReactComponent as AboutPrerequisiteIconSVG } from '../../../../assets/i
 import { ReactComponent as AboutTrezorSvg } from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../common/CheckDialog.scss';
 import { Link, Box, styled, Stack, Typography } from '@mui/material';
 

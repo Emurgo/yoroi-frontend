@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { defineMessages, IntlContext } from 'react-intl';
 import FullscreenMessage from '../../../components/wallet/layouts/FullscreenMessage';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BigNumber from 'bignumber.js';
 import { ReactComponent as InsufficientFundsSvg } from '../../../assets/images/uri/invalid-uri.inline.svg';
 

@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';

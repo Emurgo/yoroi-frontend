@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';

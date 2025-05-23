@@ -12,7 +12,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   deleteMemoContent: {

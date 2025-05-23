@@ -5,7 +5,6 @@ import type { Node } from 'react';
 import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography, Box, Button, styled } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';

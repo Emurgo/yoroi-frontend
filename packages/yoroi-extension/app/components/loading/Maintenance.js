@@ -6,7 +6,6 @@ import { defineMessages, IntlContext, } from 'react-intl';
 import { ReactComponent as ExternalLinkSVG }  from '../../assets/images/link-external.inline.svg';
 import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import UnavailableDialog from '../widgets/UnavailableDialog';
 
 const messages = defineMessages({

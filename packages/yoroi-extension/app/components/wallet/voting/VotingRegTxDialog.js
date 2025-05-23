@@ -17,7 +17,6 @@ import DialogBackButton from '../../widgets/DialogBackButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VotingRegTxDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import { AmountInput } from '../../common/NumericInputRP';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';

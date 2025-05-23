@@ -7,7 +7,6 @@ import styles from './ServerErrorBanner.scss';
 import { ReactComponent as WarningSvg }  from '../../../assets/images/warning.inline.svg';
 import type { ServerStatusErrorType } from '../../../types/serverStatusErrorType';
 import { ServerStatusErrors } from '../../../types/serverStatusErrorType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { makeLink } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({

@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import Dialog from '../../components/widgets/Dialog';

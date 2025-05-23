@@ -8,7 +8,6 @@ import TermsOfUseForm from '../../components/profile/terms-of-use/TermsOfUseForm
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import environment from '../../environment';
 import type { StoresProps } from '../../stores';

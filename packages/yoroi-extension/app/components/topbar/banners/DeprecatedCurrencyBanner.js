@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import styles from './DeprecatedCurrencyBanner.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { Button } from '@mui/material';
 

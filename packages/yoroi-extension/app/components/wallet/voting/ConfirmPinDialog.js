@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 

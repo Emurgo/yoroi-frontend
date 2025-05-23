@@ -6,7 +6,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as CalendarIcon } from '../../../assets/images/calendar-24.inline.svg';
 import { styled, Box, TextField } from '@mui/material';
 

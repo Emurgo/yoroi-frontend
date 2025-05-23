@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';

@@ -8,7 +8,6 @@ import { splitAmount, truncateToken } from '../../../utils/formatters';
 import styles from './WalletDetails.scss';
 import { ReactComponent as IconEyeOpen } from '../../../assets/images/my-wallets/icon_eye_open.inline.svg';
 import { ReactComponent as IconEyeClosed } from '../../../assets/images/my-wallets/icon_eye_closed.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { hiddenAmount } from '../../../utils/strings';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';

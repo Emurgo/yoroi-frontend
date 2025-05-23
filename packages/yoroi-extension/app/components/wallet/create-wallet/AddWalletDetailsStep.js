@@ -1,7 +1,6 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';

@@ -20,7 +20,6 @@ import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/lin
 import { ReactComponent as AboutPrerequisiteIconSVG } from '../../../../assets/images/hardware-wallet/check-prerequisite-header-icon.inline.svg';
 import { ReactComponent as AboutPrerequisiteTrezorSVG } from '../../../../assets/images/hardware-wallet/ledger/check.inline.svg';
 import { ReactComponent as AboutLedgerSVG } from '../../../../assets/images/hardware-wallet/ledger/check-modern.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
 
 import styles from './CheckDialog.scss';

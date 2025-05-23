@@ -36,7 +36,6 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/SaveDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const SaveStartSVG = SaveLoadSVG;
 

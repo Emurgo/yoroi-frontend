@@ -3,7 +3,6 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext, defineMessages } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import yoroiIcon from '../../../../assets/img/yoroi.svg';
 import hardwareWalletsIllustration from '../../../../assets/img/illustration-hardware-extension.svg';
 import styles from './SignMessageBlock.scss';

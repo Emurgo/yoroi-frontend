@@ -3,7 +3,6 @@
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';

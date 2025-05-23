@@ -3,7 +3,6 @@
 import type { Node } from 'react';
 import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { Component } from 'react';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';

@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';

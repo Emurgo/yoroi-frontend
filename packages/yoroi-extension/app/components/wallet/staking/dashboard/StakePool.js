@@ -15,7 +15,6 @@ import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHa
 import styles from './StakePool.scss';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateStakePool } from '../../../../utils/formatters';
 
 const messages = defineMessages({

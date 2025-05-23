@@ -3,7 +3,6 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 import type { OperationNameType } from '../../../types/enum';
 import { OPERATION_NAME } from '../../../types/enum';

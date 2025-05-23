@@ -9,7 +9,6 @@ import bannerPng from '../../../assets/images/banner-yoroi-announcement-modal.pn
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import semver from 'semver/preload';
 
 const messages = defineMessages({

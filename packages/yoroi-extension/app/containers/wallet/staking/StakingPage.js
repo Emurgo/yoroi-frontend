@@ -2,7 +2,6 @@
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
 import { IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import BannerContainer from '../../banners/BannerContainer';
@@ -45,7 +44,6 @@ class StakingPage extends Component<StoresProps> {
             title={<NavBarTitle title={this.context.formatMessage(globalMessages.stakingDashboard)} />}
             pageBanner={
               <PoolTransitionBanner
-                intl={this.context}
                 showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
               />
             }

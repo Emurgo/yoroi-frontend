@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
@@ -273,7 +272,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context} />
+          <GovernanceParticipateDialog stores={stores} onClose={this.onClose}/>
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />

@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import PasswordInput from './PasswordInput';
 
 type Props = {|

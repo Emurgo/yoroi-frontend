@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext } from 'react-intl';
 import environment from '../../environment';
 import TopBarLayout from '../../components/layout/TopBarLayout';

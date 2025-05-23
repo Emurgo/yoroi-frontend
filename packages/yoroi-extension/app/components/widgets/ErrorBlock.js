@@ -6,7 +6,6 @@ import { IntlContext } from 'react-intl';
 
 import LocalizableError from '../../i18n/LocalizableError';
 import { Logger, stringifyError } from '../../utils/logging';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 
 type Props = {|

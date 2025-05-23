@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import styles from './WarningHeader.scss';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography, styled } from '@mui/material';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 

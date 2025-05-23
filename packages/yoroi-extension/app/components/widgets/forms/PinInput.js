@@ -8,7 +8,6 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import TextField from '../../common/TextField';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box } from '@mui/material';
 
 type Props = {|

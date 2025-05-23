@@ -7,7 +7,6 @@ import BannerContainer from '../banners/BannerContainer';
 import NavBarContainerRevamp from '../NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import SidebarContainer from '../SidebarContainer';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext, defineMessages } from 'react-intl';
 import { buildRoute } from '../../utils/routing';
 import { matchPath } from 'react-router';

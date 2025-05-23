@@ -8,7 +8,6 @@ import Dialog from '../../widgets/Dialog';
 import CodeBlock from '../../widgets/CodeBlock';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { Box, List, ListItem, Typography, styled } from '@mui/material';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';

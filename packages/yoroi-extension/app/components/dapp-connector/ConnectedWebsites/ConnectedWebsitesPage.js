@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, IntlContext } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';

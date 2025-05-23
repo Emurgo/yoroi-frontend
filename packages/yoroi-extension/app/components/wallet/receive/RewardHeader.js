@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import WarningHeader from './WarningHeader';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 
 const messages = defineMessages({

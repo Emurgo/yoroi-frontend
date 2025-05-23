@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Tab, { tabClasses } from '@mui/material/Tab';
 import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import { Box, Typography, styled } from '@mui/material';
@@ -332,7 +331,7 @@ export default class BuySellDialog extends Component<Props, State> {
     const intl = this.context;
     const { onCancel } = this.props;
     return (
-      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} intl={intl} />
+      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel}/>
     )
   }
 

@@ -7,7 +7,6 @@ import type { ConfigType } from '../../../config/config-types';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
 import TransferSendPage from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';

@@ -12,7 +12,6 @@ import Dialog from '../../widgets/Dialog';
 import MnemonicWord from './MnemonicWord';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseEntryDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   verificationInstructions: {

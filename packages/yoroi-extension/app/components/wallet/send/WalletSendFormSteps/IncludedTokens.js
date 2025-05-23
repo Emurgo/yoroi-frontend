@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';

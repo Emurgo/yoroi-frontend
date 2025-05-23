@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { Box, Button, Link, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   faqTitle: {

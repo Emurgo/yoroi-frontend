@@ -7,7 +7,6 @@ import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import NightlyForm from '../../components/profile/nightly/NightlyForm';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresProps } from '../../stores';
 
 const messages = defineMessages({

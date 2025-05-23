@@ -9,7 +9,6 @@ import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarning
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
 import type { StoresProps } from '../../stores';
 

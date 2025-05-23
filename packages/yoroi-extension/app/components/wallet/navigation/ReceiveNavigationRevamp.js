@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButtonRevamp from './ReceiveNavButtonRevamp';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   addressGroupName,
   addressSubgroupName,

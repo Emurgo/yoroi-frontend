@@ -1,6 +1,5 @@
 import { Typography, Box, Button } from '@mui/material';
 import { defineMessages, IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
 import { ROUTES } from '../../routes-config';

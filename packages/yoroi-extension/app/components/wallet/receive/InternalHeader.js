@@ -6,7 +6,6 @@ import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Link, Typography } from '@mui/material';
 
 const messages = defineMessages({

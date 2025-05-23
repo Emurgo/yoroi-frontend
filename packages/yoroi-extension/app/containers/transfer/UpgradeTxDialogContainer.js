@@ -5,7 +5,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import type {
   TransferTx,

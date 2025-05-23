@@ -9,7 +9,6 @@ import { defineMessages, IntlContext } from 'react-intl';
 import styles from './GraphWrapper.scss';
 import CardShadow from './CardShadow';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { readCssVar } from '../../../../styles/utils';
 import { Skeleton } from '@mui/material';
 

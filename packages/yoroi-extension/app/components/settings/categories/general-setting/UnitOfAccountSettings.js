@@ -14,7 +14,6 @@ import Dialog from '../../../widgets/Dialog';
 import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 import { strong } from '../../../../i18n/htmlEmbeddedMessageHelper';

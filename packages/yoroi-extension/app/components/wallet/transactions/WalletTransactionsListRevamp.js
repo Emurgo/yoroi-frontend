@@ -14,7 +14,6 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';

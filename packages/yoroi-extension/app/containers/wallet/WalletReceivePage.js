@@ -9,7 +9,6 @@ import {
   AddressSubgroup,
   addressSubgroupName,
 } from '../../types/AddressFilterTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext } from 'react-intl';
 import type {
   AddressSubgroupMeta,

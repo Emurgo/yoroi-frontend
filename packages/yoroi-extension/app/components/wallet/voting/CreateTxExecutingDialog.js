@@ -8,7 +8,6 @@ import Dialog from '../../widgets/Dialog';
 import AnnotatedLoader from '../../transfer/AnnotatedLoader';
 
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
 |};

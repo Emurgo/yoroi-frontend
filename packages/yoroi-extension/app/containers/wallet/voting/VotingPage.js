@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';

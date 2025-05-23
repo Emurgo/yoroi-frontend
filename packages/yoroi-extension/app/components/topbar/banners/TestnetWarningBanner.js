@@ -6,7 +6,6 @@ import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
 import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   testnetLabel: {

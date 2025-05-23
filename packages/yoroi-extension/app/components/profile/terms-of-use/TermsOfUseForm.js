@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';

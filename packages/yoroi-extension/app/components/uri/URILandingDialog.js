@@ -12,7 +12,6 @@ import { ReactComponent as PerformTxImg }  from '../../assets/images/uri/perform
 
 import styles from './URILandingDialog.scss';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   uriLandingDialogTitle: {

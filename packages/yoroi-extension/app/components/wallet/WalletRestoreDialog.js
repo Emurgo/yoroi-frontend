@@ -22,7 +22,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {

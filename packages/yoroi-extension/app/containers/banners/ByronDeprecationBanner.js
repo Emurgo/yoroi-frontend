@@ -3,7 +3,6 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext, defineMessages, } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DeprecatedCurrencyBanner from '../../components/topbar/banners/DeprecatedCurrencyBanner';
 
 const messages = defineMessages({

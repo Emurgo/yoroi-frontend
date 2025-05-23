@@ -6,7 +6,6 @@ import { defineMessages, IntlContext } from 'react-intl';
 
 import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Link } from '@mui/material';
 
 const messages = defineMessages({

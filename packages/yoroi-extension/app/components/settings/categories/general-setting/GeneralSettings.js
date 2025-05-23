@@ -13,7 +13,6 @@ import type { LanguageType } from '../../../../i18n/translations';
 import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 

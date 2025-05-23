@@ -6,7 +6,6 @@ import { Box, Button, Typography } from '@mui/material';
 import { IntlContext } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { observable, runInAction } from 'mobx';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +registerUriScheme: void => void,

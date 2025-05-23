@@ -7,7 +7,6 @@ import WarningHeader from './WarningHeader';
 import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   warning1: {

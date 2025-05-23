@@ -7,7 +7,6 @@ import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HelperTooltip } from './StakePool/StakePool';

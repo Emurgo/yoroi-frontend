@@ -14,7 +14,6 @@ import Dialog from '../../../widgets/Dialog';
 import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { RevampSwitch } from '../../../widgets/Switch';

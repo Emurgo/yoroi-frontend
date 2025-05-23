@@ -5,7 +5,6 @@ import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import type { StoresProps } from '../../../stores';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';

@@ -7,7 +7,6 @@ import { IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import { Box, Typography } from '@mui/material';
 

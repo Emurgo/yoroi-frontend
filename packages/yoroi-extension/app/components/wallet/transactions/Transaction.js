@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
@@ -260,7 +259,8 @@ export default class Transaction extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
+  getTxTypeMsg(currency: string, data: WalletTransaction): string {
+    const intl = this.context;
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return intl.formatMessage(messages.sent, { currency });
@@ -309,7 +309,8 @@ export default class Transaction extends Component<Props, State> {
     return '???';
   }
 
-  getStatusString(intl: $npm$ReactIntl$IntlFormat, state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+  getStatusString(state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+    const intl = this.context;
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
     }
@@ -634,7 +635,7 @@ export default class Transaction extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
+    const status = this.getStatusString(state, assuranceLevel, isValidTransaction);
 
     return (
       <div className={componentStyles}>
@@ -643,7 +644,7 @@ export default class Transaction extends Component<Props, State> {
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={styles.time}>{moment(data.date).format('hh:mm:ss A')}</div>
-              <div className={styles.type}>{this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}</div>
+              <div className={styles.type}>{this.getTxTypeMsg(this.getTicker(data.amount.getDefaultEntry()), data)}</div>
               {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (

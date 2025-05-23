@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { defineMessages, IntlContext, FormattedMessage, } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BaseWarningDialog from './BaseWarningDialog';
 
 const messages = defineMessages({

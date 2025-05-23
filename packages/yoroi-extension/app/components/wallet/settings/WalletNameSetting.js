@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import InlineEditingInput from '../../widgets/forms/InlineEditingInput';

@@ -2,7 +2,6 @@
 import type { Node } from 'react';
 import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
 import type { Notification } from '../../types/notification.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenEntry, TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';

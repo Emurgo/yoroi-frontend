@@ -4,7 +4,6 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IntlContext, defineMessages } from 'react-intl';
 import environment from '../../environment';
 

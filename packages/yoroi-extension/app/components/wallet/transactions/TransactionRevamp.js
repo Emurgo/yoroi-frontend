@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -88,14 +87,8 @@ export default class TransactionRevamp extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxType(
-    intl: $npm$ReactIntl$IntlFormat,
-    currency: string,
-    data: WalletTransaction
-  ): {|
-    icon: string,
-    msg: string,
-  |} {
+  getTxType(currency: string, data: WalletTransaction): {| icon: string, msg: string |} {
+    const intl = this.context;
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return { icon: 'send', msg: intl.formatMessage(messages.sent, { currency }) };
@@ -147,7 +140,8 @@ export default class TransactionRevamp extends Component<Props, State> {
     return { icon: '', msg: '???' };
   }
 
-  getStatusString(intl: $npm$ReactIntl$IntlFormat, state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+  getStatusString(state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+    const intl = this.context;
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
     }
@@ -495,8 +489,8 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
-    const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
+    const status = this.getStatusString(state, assuranceLevel, isValidTransaction);
+    const txType = this.getTxType(this.getTicker(data.amount.getDefaultEntry()), data);
 
     const txIdBasePart = `${this.props.id}:transaction_${this.props.txIndex}`;
     const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`;

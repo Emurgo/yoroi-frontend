@@ -14,7 +14,6 @@ import config from '../../config';
 import { TransferStatus, } from '../../types/TransferTypes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';

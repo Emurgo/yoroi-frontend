@@ -10,7 +10,6 @@ import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './ExplorerSettings.scss';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ExplorerRow } from '../../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';

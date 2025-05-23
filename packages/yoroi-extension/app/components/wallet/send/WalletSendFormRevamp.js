@@ -24,7 +24,6 @@ import {
 } from '../../../utils/formatters';
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   getTokenName,

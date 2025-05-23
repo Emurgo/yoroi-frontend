@@ -6,7 +6,6 @@ import { IntlContext } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import ErrorPage from '../../components/transfer/ErrorPage';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GenerateTransferTxError } from '../../api/common/errors';
 
 type Props = {|

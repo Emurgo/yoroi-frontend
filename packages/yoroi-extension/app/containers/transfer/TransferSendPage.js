@@ -15,7 +15,6 @@ import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswo
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type {

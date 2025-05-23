@@ -19,7 +19,6 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   addMemoActionsSubmit: {

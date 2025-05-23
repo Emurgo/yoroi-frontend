@@ -15,7 +15,6 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type {
   TokenLookupKey,

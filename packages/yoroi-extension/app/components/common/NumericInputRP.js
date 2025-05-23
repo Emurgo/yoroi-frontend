@@ -9,7 +9,6 @@ import React, { Component } from 'react';
 import BigNumber, { BigNumber as BigNumberType } from 'bignumber.js';
 import type { ElementRef, Node, Ref } from 'react';
 import { defineMessages, IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TextField from './TextField';
 import { Box } from '@mui/system';
 import { Typography } from '@mui/material';

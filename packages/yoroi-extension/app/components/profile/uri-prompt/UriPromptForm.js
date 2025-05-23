@@ -7,7 +7,6 @@ import { defineMessages, IntlContext } from 'react-intl';
 import styles from './UriPromptForm.scss';
 import { ReactComponent as AboutUri }  from '../../../assets/images/uri/about-url.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   uriHeading: {

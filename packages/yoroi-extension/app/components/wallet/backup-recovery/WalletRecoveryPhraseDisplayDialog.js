@@ -11,7 +11,6 @@ import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseDisplayDialog.scss';
 import { ReactComponent as RecoveryPhraseSvg }  from '../../../assets/images/recovery-phrase.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   backupInstructions: {

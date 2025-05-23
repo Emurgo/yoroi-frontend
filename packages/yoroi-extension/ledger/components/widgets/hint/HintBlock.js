@@ -3,7 +3,6 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext, FormattedMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from './HintBlock.scss';
 import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 

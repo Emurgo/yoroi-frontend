@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';

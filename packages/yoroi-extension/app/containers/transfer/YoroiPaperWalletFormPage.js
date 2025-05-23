@@ -9,7 +9,6 @@ import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
 import PaperPasswordInput from '../../components/widgets/forms/PaperPasswordInput';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   step0: {

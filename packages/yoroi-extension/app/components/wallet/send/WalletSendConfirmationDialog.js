@@ -21,7 +21,6 @@ import RawHash from '../../widgets/hashWrappers/RawHash';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   truncateAddress, truncateToken,
 } from '../../../utils/formatters';

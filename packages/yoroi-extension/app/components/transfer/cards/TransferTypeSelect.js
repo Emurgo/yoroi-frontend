@@ -3,7 +3,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import TransferCards from './TransferCards';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { Box, Link, Typography } from '@mui/material';

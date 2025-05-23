@@ -8,7 +8,6 @@ import globalMessages from '../../i18n/global-messages';
 import styles from './WalletAlreadyExistDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
 import Dialog from '../widgets/Dialog';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   walletAlreadyExist: {

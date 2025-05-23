@@ -16,7 +16,6 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { noop } from '../../coreUtils';
 import type { StoresProps } from '../../stores';
 

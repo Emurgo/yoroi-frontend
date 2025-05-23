@@ -11,7 +11,6 @@ import TransferSummaryPage from '../../../components/transfer/TransferSummaryPag
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { defineMessages, IntlContext } from 'react-intl';
 import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
 import SuccessPage from '../../../components/transfer/SuccessPage';

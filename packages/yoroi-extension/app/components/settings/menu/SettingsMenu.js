@@ -6,7 +6,6 @@ import { defineMessages, IntlContext } from 'react-intl';
 import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
 import type { SubMenuOption } from '../../topbar/SubMenu';
 

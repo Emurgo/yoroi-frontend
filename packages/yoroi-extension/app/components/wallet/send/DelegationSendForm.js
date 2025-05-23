@@ -11,7 +11,6 @@ import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';

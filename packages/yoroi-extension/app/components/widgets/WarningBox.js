@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 
 import styles from './WarningBox.scss';

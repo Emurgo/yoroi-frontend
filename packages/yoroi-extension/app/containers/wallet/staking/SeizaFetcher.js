@@ -4,7 +4,6 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { action, observable } from 'mobx';
 import { IntlContext } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import environment from '../../../environment';
 import VerticallyCenteredLayout from '../../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../../components/widgets/LoadingSpinner';

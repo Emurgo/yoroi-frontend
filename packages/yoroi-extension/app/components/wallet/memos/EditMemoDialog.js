@@ -19,7 +19,6 @@ import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { IconButton, InputAdornment } from '@mui/material';
 import { ReactComponent as CloseIcon }  from '../../../assets/images/forms/close.inline.svg'
 

@@ -7,7 +7,6 @@ import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import styles from './UriAccept.scss';
 import { ReactComponent as UriPrompt }  from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { strong, em } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({

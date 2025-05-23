@@ -4,7 +4,6 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import CustomTooltip from '../../widgets/CustomTooltip';
 
 import { Box, Typography, styled } from '@mui/material';
