@@ -36,6 +36,8 @@ import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
+import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextProvider';
+// $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
@@ -61,6 +63,11 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
+import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
+// $FlowIgnore: suppressing this error
+import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
@@ -241,6 +248,11 @@ export const Routes = (stores: StoresMap): Node => {
 
           {/* NEW UI Routes */}
           <Route
+            path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
+            component={props => wrapSwapRevamp({ ...props, stores }, SwapRevampSubpages(stores))}
+          />
+
+          <Route
             path={ROUTES.Governance.ROOT}
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
@@ -354,6 +366,14 @@ const GovernanceSubpages = stores => (
       path={ROUTES.Governance.FAIL}
       component={props => <GovernanceTransactionFailedPage {...props} stores={stores} />}
     />
+  </Switch>
+);
+
+const SwapRevampSubpages = stores => (
+  <Switch>
+    <Route exact path={ROUTES.SWAP_REVAMP.ASSET_SWAP} component={props => <AssetSwapRevampPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SWAP_REVAMP.ORDERS} component={props => <SwapOrdersRevampPage {...props} stores={stores} />} />
+    <Redirect to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
   </Switch>
 );
 
@@ -485,5 +505,15 @@ export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): No
     <NftGalleryContextProvider stores={nftGalleryProps.stores}>
       <Suspense fallback={null}>{children}</Suspense>
     </NftGalleryContextProvider>
+  );
+}
+
+export function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  return (
+    <SwapContextProvider currentWallet={currentWalletInfo}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </SwapContextProvider>
   );
 }
