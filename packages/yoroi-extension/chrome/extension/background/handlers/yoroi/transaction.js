@@ -9,11 +9,7 @@ import {
   transactionHexToHash,
   transactionHexAddSignaturesFromWitnessSetHex,
 } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
-import {
-  asGetSigningKey,
-  asGetAllAccounting,
-} from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
-import AdaApi, { genOwnStakingKey } from '../../../../../app/api/ada';
+import AdaApi from '../../../../../app/api/ada';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import LocalStorageApi from '../../../../../app/api/localStorage/index';
@@ -61,10 +57,7 @@ export type SignAndBroadcastTransactionRequestType = {|
   senderUtxos: Array<CardanoAddressedUtxo>,
   unsignedTx: string,
   metadata: ?string,
-  neededHashes: Array<string>,
-  wits: Array<string>,
   password: string,
-  txHash: string,
 |};
 export const SignAndBroadcastTransaction: HandlerType<
   SignAndBroadcastTransactionRequestType,
@@ -75,57 +68,21 @@ export const SignAndBroadcastTransaction: HandlerType<
   handle: async (request) => {
     return RustModule.WasmScope(async (Scope) => {
       const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-      const { senderUtxos, unsignedTx, metadata, wits, neededHashes, txHash } = request;
+      const { senderUtxos, unsignedTx, metadata, password, } = request;
 
       try {
-        const withSigning = asGetSigningKey(publicDeriver);
-        if (withSigning == null) {
-          throw new Error('unexpected missing asGetSigningKey result');
-        }
-
-        if (neededHashes.length - wits.length >= 2) {
-          throw new Error('Too many missing witnesses');
-        }
-        if (neededHashes.length !== wits.length) {
-          const withStakingKey = asGetAllAccounting(withSigning);
-          if (withStakingKey == null) {
-            throw new Error('unexpected missing asGetAllAcccounting result');
-          }
-          const stakingKey = await genOwnStakingKey({
-            publicDeriver: withStakingKey,
-            password: request.password,
-          });
-          if (neededHashes.includes(
-              Scope.WalletV4.Credential.from_keyhash(
-                stakingKey.to_public().hash()
-              ).to_hex()
-          )) {
-            wits.push(
-              Scope.WalletV4.make_vkey_witness(
-                Scope.WalletV4.TransactionHash.from_hex(txHash),
-                stakingKey
-              ).to_hex()
-            );
-          } else {
-            throw new Error('missing witness but it was not ours');
-          }
-        }
-
         const unsignedTxWasm = RustModule.WalletV4.Transaction.from_hex(unsignedTx);
 
         const signRequest = {
           senderUtxos,
           unsignedTx: unsignedTxWasm,
           metadata: metadata ? Scope.WalletV4.AuxiliaryData.from_hex(metadata) : undefined,
-          neededStakingKeyHashes: {
-            wits: new Set(wits),
-          },
         };
         const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
         const adaApi = new AdaApi();
         const { txId, signedTxHex, } = await adaApi.signAndBroadcast({
-          publicDeriver: withSigning,
-          password: request.password,
+          publicDeriver,
+          password,
           signRequest,
           sendTx: stateFetcher.sendTx,
         });

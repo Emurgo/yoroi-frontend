@@ -25,7 +25,7 @@ describe('dApp, CIP-95, signData', function () {
   before(async function () {
     try {
       mockServer = await getMockServer({});
-      webdriver = await driversPoolsManager.getDriverFromPool();
+      webdriver = await driversPoolsManager.getPreparedDriver();
       logger = getTestLogger(this.test.parent.title);
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       const dappLogger = getTestLogger('dApp', this.test.parent.title);

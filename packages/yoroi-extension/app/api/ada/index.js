@@ -42,12 +42,12 @@ import {
   asGetAllUtxos,
   asGetPublicKey,
   asGetSigningKey,
+  asGetStakingKey,
   asHasLevels,
   asHasUtxoChains,
-  asGetStakingKey,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
-import { WalletTypeOption, type IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
+import { type IHasLevels, WalletTypeOption } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
   Address,
   Addressing,
@@ -56,8 +56,6 @@ import type {
   IDisplayCutoff,
   IGetAllUtxoAddressesResponse,
   IGetAllUtxosResponse,
-  IGetSigningKey,
-  IGetStakingKey,
   IHasUtxoChains,
   IHasUtxoChainsRequest,
   IPublicDeriver,
@@ -78,7 +76,7 @@ import {
   newAdaUnsignedTx as shelleyNewAdaUnsignedTx,
   newAdaUnsignedTxForConnector as shelleyNewAdaUnsignedTxForConnector,
   sendAllUnsignedTx as shelleySendAllUnsignedTx,
-  signTransaction as shelleySignTransaction,
+  signTransactionFromWallet as shelleySignTransactionFromWallet,
 } from './transactions/shelley/transactions';
 import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto/cryptoWallet';
 import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
@@ -209,7 +207,7 @@ export type AdaGetTransactionsRequest = {|
 // signAndBroadcast
 
 export type SignAndBroadcastRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey,
+  publicDeriver: PublicDeriver<>,
   signRequest: {
     senderUtxos: Array<CardanoAddressedUtxo>,
     +unsignedTx: RustModule.WalletV4.Transaction |
@@ -218,10 +216,6 @@ export type SignAndBroadcastRequest = {|
       Buffer |
       Uint8Array,
     metadata: void | RustModule.WalletV4.AuxiliaryData,
-    +neededStakingKeyHashes: {
-      wits: Set<string>, // Vkeywitness
-      ...
-    },
     ...
   },
   password: string,
@@ -354,7 +348,7 @@ export type CreateUnsignedTxForUtxosFunc = (
 // createDelegationTx
 
 export type CreateDelegationTxRequest = {|
- wallet: WalletState,
+  wallet: WalletState,
   absSlotNumber: BigNumber,
   registrationStatus: boolean,
   poolRequest?: string,
@@ -427,10 +421,6 @@ export type CreateWithdrawalTxRequest = {|
   protocolParameters: ProtocolParameters,
 |};
 export type CreateWithdrawalTxResponse = HaskellShelleyTxSignRequest;
-
-export type CreateWithdrawalTxFunc = (
-  request: CreateWithdrawalTxRequest
-) => Promise<CreateWithdrawalTxResponse>;
 
 // saveLastReceiveAddressIndex
 
@@ -706,22 +696,14 @@ export default class AdaApi {
     Logger.debug(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} called`);
     const { password } = request;
     try {
-      const signingKey = await request.publicDeriver.getSigningKey();
-      const normalizedKey = await request.publicDeriver.normalizeKey({
-        ...signingKey,
-        password,
-      });
-
-      const { txHash, encodedTx } = RustModule.WasmScope(Scope => {
-        const signedTx = shelleySignTransaction(
+      const { txHash, encodedTx } = await RustModule.WasmScope(async (Scope) => {
+        const signedTx = await shelleySignTransactionFromWallet(
           request.signRequest.senderUtxos,
           request.signRequest.unsignedTx,
-          request.publicDeriver.getParent().getPublicDeriverLevel(),
-          Scope.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
-          request.signRequest.neededStakingKeyHashes.wits,
+          request.publicDeriver,
+          password,
           request.signRequest.metadata,
         );
-
         return {
           txHash: Scope.WalletV4.FixedTransaction.from_hex(signedTx.to_hex()).transaction_hash().to_hex(),
           encodedTx: signedTx.to_bytes(),
@@ -742,7 +724,7 @@ export default class AdaApi {
       if (error instanceof WrongPassphraseError) {
         throw new IncorrectWalletPasswordError();
       }
-
+      console.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)}`, error);
       Logger.error(`${nameof(AdaApi)}::${nameof(this.signAndBroadcast)} error: ${fullErrStr(error)}` );
       if (error instanceof InvalidWitnessError) {
         throw new InvalidWitnessError();
@@ -921,10 +903,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
           NetworkId: request.network.NetworkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
         },
         receiver: signRequestReceiver,
       });
@@ -1286,10 +1264,6 @@ export default class AdaApi {
         PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
         NetworkId: network.NetworkId,
       },
-      neededStakingKeyHashes: {
-        neededHashes: new Set(),
-        wits: new Set(),
-      },
     });
   }
 
@@ -1383,9 +1357,6 @@ export default class AdaApi {
         .joinAddCopy(differenceAfterTx) // subtract any part of the fee that comes from UTXO
         .joinAddCopy(request.valueInAccount); // recall: rewards are compounding
 
-      const stakeCredentialHex = RustModule.WasmScope(Scope =>
-        Scope.WalletV4.Credential.from_keyhash(stakingKey.hash()).to_hex());
-
       const signTxRequest = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,
@@ -1396,10 +1367,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: networkInfo.NetworkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set([stakeCredentialHex]),
-          wits: new Set(),
         },
       });
       return {
@@ -1436,12 +1403,7 @@ export default class AdaApi {
       const addressedUtxo = asAddressedUtxo(utxos);
 
       const changeAddr = request.wallet.receiveAddress;
-
       const certificates = [];
-      const neededKeys = {
-        neededHashes: new Set(),
-        wits: new Set(),
-      };
 
       const requiredWits: Array<RustModule.WalletV4.Ed25519KeyHash> = [];
       for (const withdrawal of request.withdrawals) {
@@ -1459,7 +1421,6 @@ export default class AdaApi {
           certificates.push(RustModule.WalletV4.Certificate.new_stake_deregistration(
             RustModule.WalletV4.StakeDeregistration.new(paymentCred)
           ));
-          neededKeys.neededHashes.add(paymentCred.to_hex());
         }
       }
       const accountStates = await request.getAccountState({
@@ -1489,10 +1450,6 @@ export default class AdaApi {
           );
           if (rewardAddress == null) {
             throw new Error(`${nameof(AdaApi)}::${nameof(this.createUnsignedTx)} withdrawal not a reward address`);
-          }
-          {
-            const stakeCredential = rewardAddress.payment_cred();
-            neededKeys.neededHashes.add(stakeCredential.to_hex());
           }
           list.push({
             address: rewardAddress,
@@ -1532,20 +1489,6 @@ export default class AdaApi {
         `${nameof(AdaApi)}::${nameof(this.createWithdrawalTx)} success: ` + stringifyData(unsignedTxResponse)
       );
 
-      {
-        const tx = unsignedTxResponse.txBuilder.build_tx();
-        for (const withdrawal of request.withdrawals) {
-          if (withdrawal.privateKey != null) {
-            const { privateKey } = withdrawal;
-            neededKeys.wits.add(
-              RustModule.WalletV4.make_vkey_witness(
-                RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash(),
-                privateKey
-              ).to_hex()
-            );
-          }
-        }
-      }
       const result = new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTxResponse.senderUtxos,
         unsignedTx: unsignedTxResponse.txBuilder,
@@ -1557,7 +1500,6 @@ export default class AdaApi {
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
         },
-        neededStakingKeyHashes: neededKeys,
       });
       return result;
     } catch (error) {
@@ -1617,10 +1559,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.publicDeriver.networkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
         },
       });
     } catch (error) {
@@ -1701,10 +1639,6 @@ export default class AdaApi {
           KeyDeposit: new BigNumber(request.protocolParameters.keyDeposit),
           PoolDeposit: new BigNumber(request.protocolParameters.poolDeposit),
           NetworkId: request.wallet.networkId,
-        },
-        neededStakingKeyHashes: {
-          neededHashes: new Set(),
-          wits: new Set(),
         },
         trezorTCatalystRegistrationTxSignData:
           request.trezorTWallet ? request.trezorTWallet : undefined,
@@ -2560,37 +2494,6 @@ function getDifferenceAfterTx(
   }
 
   return sumOutForKey.joinSubtractCopy(sumInForKey);
-}
-
-export async function genOwnStakingKey(request: {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
-  password: string,
-|}): Promise<RustModule.WalletV4.PrivateKey> {
-  try {
-    const signingKeyFromStorage = await request.publicDeriver.getSigningKey();
-    const stakingAddr = await request.publicDeriver.getStakingKey();
-    const normalizedKey = await request.publicDeriver.normalizeKey({
-      ...signingKeyFromStorage,
-      password: request.password,
-    });
-    const normalizedSigningKey = RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex);
-    const normalizedStakingKey = derivePrivateByAddressing({
-      addressing: stakingAddr.addressing,
-      startingFrom: {
-        key: normalizedSigningKey,
-        level: request.publicDeriver.getParent().getPublicDeriverLevel(),
-      },
-    }).to_raw_key();
-
-    return normalizedStakingKey;
-  } catch (error) {
-    Logger.error(`${nameof(genOwnStakingKey)} error: ` + stringifyError(error));
-    if (error instanceof WrongPassphraseError) {
-      throw new IncorrectWalletPasswordError();
-    }
-    if (error instanceof LocalizableError) throw error;
-    throw new GenericApiError();
-  }
 }
 
 export { cip8Sign } from './lib/cardanoCrypto/utils';
