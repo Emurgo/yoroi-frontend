@@ -39,7 +39,7 @@ interface OutputProps {
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
   return (
-    <Stack direction="column" sx={{ padding: '24px', direction: 'collumn' }}>
+    <Stack direction="column" sx={{ padding: '24px', direction: 'collumn', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
       <FeeDisplay fee={tx.fee.quantity} primaryTokenInfo={primaryTokenInfo} />
       <Outputs outputs={tx.outputs} />
@@ -164,7 +164,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
   return (
     <Stack direction="column" gap="8px" mt="16px">
       <Stack direction="row" alignItems="center" gap="8px">
-        <Icon.Indicator />
+        <Icon.Indicator fill="#93F5E1"/>
         <Typography fontWeight="500" variant="h5">
           {isOwnAdddress ? 'Your Address' : 'Foreign address'}
         </Typography>
