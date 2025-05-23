@@ -1,5 +1,7 @@
 // @flow
 import type { Node } from 'react';
+import type { RouterHistory } from 'react-router-dom';
+import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter as Router } from 'react-router';
@@ -11,25 +13,22 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
 import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
+import vi from 'react-intl/locale-data/vi';
 import { autorun, observable, runInAction } from 'mobx';
 import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
-import type { StoresMap } from './stores';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
 import { Logger } from '../utils/logging';
-import { ThemeProvider } from '@mui/material/styles';
 import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
+import { ColorModeProvider } from '../styles/context/mode';
+// $FlowIgnore: suppressing this error
+import { IntlProviderWrapper, IntlContextProvider } from '../UI/common/context/IntlContextProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData([
@@ -40,14 +39,10 @@ addLocaleData([
   ...ru,
   ...de,
   ...fr,
-  ...nl,
   ...pt,
   ...id,
   ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
+  ...vi,
 ]);
 
 type Props = {|
@@ -100,19 +95,20 @@ class App extends Component<Props, State> {
     const locale = stores.profile.currentLocale;
 
     const currentTheme = stores.profile.currentTheme;
-    const muiTheme = MuiThemes[currentTheme];
     changeToplevelTheme(currentTheme);
+    const muiTheme = MuiThemes[currentTheme];
+    Logger.debug(`[yoroi] themes changed`);
 
     return (
       <div style={{ height: '100%', backgroundColor: 'var(--yoroi-palette-gray-50)' }}>
-        <ThemeProvider theme={muiTheme}>
+        <ColorModeProvider>
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager />
-          <IntlProvider {...{ locale, key: locale, messages: mergedMessages }}>
+          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProvider>
-        </ThemeProvider>
+          </IntlProviderWrapper>
+        </ColorModeProvider>
       </div>
     );
   }
@@ -124,7 +120,9 @@ class App extends Component<Props, State> {
     }
     return (
       <Router>
-        <YoroiRoutes stores={stores} />
+        <IntlContextProvider>
+          <YoroiRoutes stores={stores} />
+        </IntlContextProvider>
       </Router>
     );
   };

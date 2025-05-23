@@ -24,7 +24,7 @@ BigNumber.DEBUG = true;
 // Entry point into our application
 const initializeDappConnector: void => Promise<void> = async () => {
   const api = await setupApi();
-  const stores = createStores(api);
+  const stores = await createStores(api);
 
   window.yoroi = {
     api,

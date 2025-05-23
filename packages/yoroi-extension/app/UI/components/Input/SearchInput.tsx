@@ -30,7 +30,6 @@ export const SearchInput = (props: InputProps) => {
   return (
     <StyledInput
       inputRef={ref}
-      disableUnderline
       startAdornment={
         <InputAdornment
           position="start"
