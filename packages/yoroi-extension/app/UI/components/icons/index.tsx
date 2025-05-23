@@ -90,10 +90,12 @@ import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
 import { Refresh } from './Refresh';
 import { Swap } from './Swap';
+import { AdaToken } from './AdaToken';
 
 export const Icon = {
   Assets,
   Assets1,
+  AdaToken,
   AssetsFilled,
   Bio,
   Bug,
@@ -187,6 +189,7 @@ export const Icon = {
 export enum Icons {
   Assets = 'Assets',
   Assets1 = 'Assets1',
+  AdaToken = 'AdaToken',
   AssetsFilled = 'AssetsFilled',
   Bio = 'Bio',
   Bug = 'Bug',

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
+import { TokenIcon } from './TokenIcon/TokenIcon';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 type AssetInputProps = {
   type: 'from' | 'to';
@@ -13,7 +15,13 @@ type AssetInputProps = {
 export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error = null, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
+  const { assetToSell, primaryTokenInfo } = useSwapRevamp();
   const label = type === 'from' ? 'From' : 'To';
+
+  const iconImage = type === 'from' ? assetToSell?.info.image : null;
+  const tokenQuantity = assetToSell?.formatedAmount;
+
+  console.log('assetToSell', assetToSell);
 
   return (
     <Wrapper selected={focusState} hasError={!!error} atoms={atoms} type={type}>
@@ -28,7 +36,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
             onClick={onAssetSelect}
             sx={{ cursor: 'pointer' }}
           >
-            <IconWrapper icon={Icons.Assets} />
+            <TokenIcon image={iconImage} />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm}>
               {assetName}
             </Typography>
@@ -60,7 +68,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
           <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
             <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
             <Typography variant="body2" color="ds.text_gray_low" mb={2}>
-              2 345 119,005231 ADA
+              {tokenQuantity} {primaryTokenInfo.name}
             </Typography>
           </Stack>
           <Typography variant="body2" color="ds.text_gray_low">

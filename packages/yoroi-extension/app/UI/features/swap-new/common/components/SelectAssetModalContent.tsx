@@ -3,6 +3,10 @@ import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { useStrings } from '../hooks/useStrings';
 import { AssetInfoInRow } from './AssetInfoInRow';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
+import { useCurrencyPairing } from '../../../../context/CurrencyContext';
+import { usePortfolioTokenActivity } from '../../../portfolio/module/PortfolioTokenActivityProvider';
+import { useModal } from '../../../../components/modals/ModalContext';
 
 const SearchWrapper = styled(Box)({
   position: 'relative',
@@ -36,20 +40,33 @@ const AssetCountText = styled(Typography)({
   marginBottom: '16px',
 });
 
-export const SelectAssetModalContent = ({ assets = [] }: any) => {
+export const SelectAssetModalContent = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
+  const { ftAssetList, primaryTokenInfo, selectAssetToSell } = useSwapRevamp();
+  const { currency } = useCurrencyPairing();
+  const { closeModal } = useModal();
+  // console.log('useCurrencyPairing', currency);
+  console.log('ftAssetList', ftAssetList);
+
+  const {
+    tokenActivity: { data24h },
+  } = usePortfolioTokenActivity();
+
+  const {
+    ptActivity: { close: ptPrice },
+  } = useCurrencyPairing();
 
   const filteredAssets =
-    assets.filter(a => {
+    ftAssetList.filter(a => {
       if (a == null) return false;
       if (!searchTerm) return true;
-      return `${a.name};[${a.ticker}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
+      return `${a.info.name};[${a.info.id}];${a.id};${a.info.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
 
   return (
-    <Stack>
+    <Stack {...atoms.mb_2xl}>
       <Stack {...atoms.pb_xl}>
         <SearchWrapper>
           <SearchIconWrapper>
@@ -76,8 +93,23 @@ export const SelectAssetModalContent = ({ assets = [] }: any) => {
           {strings.numYourAssets(filteredAssets.length)}
         </AssetCountText>
       </Stack>
-
-      <AssetInfoInRow />
+      <Stack>
+        {filteredAssets.map(asset => {
+          return (
+            <AssetInfoInRow
+              asset={asset}
+              currency={currency}
+              primaryTokenActivity={ptPrice}
+              secondaryToken24Activity={data24h && data24h[asset.info.id]}
+              primaryTokenInfo={primaryTokenInfo}
+              onAssetClick={() => {
+                selectAssetToSell(asset);
+                closeModal();
+              }}
+            />
+          );
+        })}
+      </Stack>
     </Stack>
   );
 };

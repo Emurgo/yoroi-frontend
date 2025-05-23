@@ -500,14 +500,17 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
   );
 }
 
-export function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+export function wrapSwapRevamp(swapProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(swapProps.stores);
+  const { unitOfAccount } = swapProps.stores.profile;
 
   return (
-    <SwapContextProvider currentWallet={currentWalletInfo}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </SwapContextProvider>
-  )
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <SwapContextProvider currentWallet={currentWalletInfo}>
+        <Suspense fallback={null}>{children}</Suspense>
+      </SwapContextProvider>
+    </CurrencyProvider>
+  );
 }
 
 export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
