@@ -3,11 +3,10 @@ import { useLocation } from 'react-router';
 import { ROUTES } from '../../routes-config';
 import { Stack, Typography, Box, useTheme } from '@mui/material';
 import { NETWORK_BADGES } from '../../containers/NavBarContainerRevamp';
-import { defineMessages } from 'react-intl';
+import { useIntl, defineMessages } from 'react-intl';
 import YoroiConnectorLogo from '../components/ilustrations/YoroiConnectorLogo';
 import { IconWrapper, Icons } from '../components/icons';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
-import { useIntl } from '../context/IntlProvider';
 import environment from '../../environment';
 
 export const messages = defineMessages({

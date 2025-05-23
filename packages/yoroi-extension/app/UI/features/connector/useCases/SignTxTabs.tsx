@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import { Tabs, TabItem } from '../../../components/tabs/Tabs';
-import { useIntl } from '../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 import environment from '../../../../environment';
 
 interface Props {

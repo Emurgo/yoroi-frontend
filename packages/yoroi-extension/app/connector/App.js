@@ -15,8 +15,6 @@ import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 import { ColorModeProvider } from '../styles/context/mode';
-// $FlowIgnore: suppressing this error
-import { IntlProviderWrapper, IntlContextProvider } from '../UI/common/context/IntlContextProvider';
 
 type Props = {|
   +stores: StoresMap,
@@ -78,9 +76,9 @@ class App extends Component<Props, State> {
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager />
-          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+          <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProviderWrapper>
+          </IntlProvider>
         </ColorModeProvider>
       </div>
     );
@@ -93,9 +91,7 @@ class App extends Component<Props, State> {
     }
     return (
       <Router>
-        <IntlContextProvider>
-          <YoroiRoutes stores={stores} />
-        </IntlContextProvider>
+        <YoroiRoutes stores={stores} />
       </Router>
     );
   };
