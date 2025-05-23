@@ -27,6 +27,7 @@ export class SpeculosDockerController {
         PortBindings: {
           '5001/tcp': [
             {
+              HostIp: '127.0.0.1',
               HostPort: '5001',
             },
           ],
@@ -106,6 +107,7 @@ export class SpeculosDockerController {
     try {
       const containerLogs = await this.getContainerLogs();
       this.logger.info(`killContainer: Container logs:\n${containerLogs}`);
+      this.logger.info(containerLogs);
       this.logger.info(`killContainer: Killing container with Id: ${this.containerId}`);
       const container = this.docker.getContainer(this.containerId);
       await container.kill();
