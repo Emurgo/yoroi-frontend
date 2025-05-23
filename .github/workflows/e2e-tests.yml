@@ -132,12 +132,6 @@ jobs:
           export DISPLAY=:99
           sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
 
-      - name: Warm up Chrome
-        run: |
-          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
-          sleep 5
-          pkill chrome
-
       - name: Run tests
         working-directory: ./packages/e2e-tests
         env:
@@ -356,6 +350,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build-Extension]
     steps:
+      - name: Pull Speculos Docker image
+        run: docker pull ghcr.io/ledgerhq/speculos:421a6d6053d4a6c758964f614b9165a83ffd75ee
+
       - uses: browser-actions/setup-chrome@v1.7.3
         id: setup-chrome
         with:
