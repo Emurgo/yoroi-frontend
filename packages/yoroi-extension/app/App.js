@@ -147,7 +147,7 @@ class App extends Component<Props, State> {
               {this.getContent()}
             </IntlProvider>
           </HashRouter>
-      </ColorModeProvider>
+        </ColorModeProvider>
       </div>
     );
   }

@@ -4,7 +4,7 @@
 
 import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../../../types/unitOfAccountType';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import type { TokenLookupKey, TokenEntry } from '../../../../api/common/lib/MultiToken';
 import type { TokenRow, NetworkRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
 import type LocalizableError from '../../../../i18n/LocalizableError';

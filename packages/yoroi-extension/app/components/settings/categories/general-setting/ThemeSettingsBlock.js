@@ -11,7 +11,6 @@ type Props = {|
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
   render(): Node {
-    const intl = this.context;
     return (
       <Box
         sx={{

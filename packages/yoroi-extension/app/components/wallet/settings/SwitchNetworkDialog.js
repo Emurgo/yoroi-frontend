@@ -7,7 +7,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { Typography } from '@mui/material';
 import Select from '../../common/Select';
 import { MenuItemStyled } from '../../common/commonStyles/MenuItemStyled';

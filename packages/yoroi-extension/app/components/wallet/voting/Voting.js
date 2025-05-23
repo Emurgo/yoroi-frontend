@@ -13,7 +13,6 @@ import Step1Image from '../../../assets/images/revamp/catalyst-step1.inline.svg'
 import Step2Image from '../../../assets/images/revamp/catalyst-step2.inline.svg';
 import TrezorStepImage from '../../../assets/images/pic-catalyst-step3-trezor.inline.svg';
 import LedgerStepImage from '../../../assets/images/pic-catalyst-step3-ledger.inline.svg';
-import classnames from 'classnames';
 import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
 import Card from '../../common/card/Card';

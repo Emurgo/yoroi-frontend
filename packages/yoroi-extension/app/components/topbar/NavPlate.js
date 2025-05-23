@@ -10,7 +10,7 @@ import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/le
 import { Typography, Tooltip } from '@mui/material';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import type { WalletType } from '../../../chrome/extension/background/types';
 import { constructPlate40 } from './WalletCard';
