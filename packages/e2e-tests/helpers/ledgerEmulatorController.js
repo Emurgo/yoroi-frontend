@@ -1,5 +1,5 @@
 import { sleep } from '../utils/utils.js';
-import { networkInterfaces } from 'os';
+import { hostname } from 'os';
 import { LedgerModels } from './ledgerHelper.js';
 import { quarterSecond, threeSeconds } from './timeConstants.js';
 
@@ -15,7 +15,7 @@ export class LedgerEmulatorController {
   constructor(logger, model) {
     this.logger = logger;
     this.model = model;
-    this.speculosEndpoint = `http://${networkInterfaces().eth0[0].address}:5001`;
+    this.speculosEndpoint = `http://${hostname()}:5001`;
     this.logger.info(`LedgerEmulator::constructor speculos endpoint: ${this.speculosEndpoint}`);
   }
 
