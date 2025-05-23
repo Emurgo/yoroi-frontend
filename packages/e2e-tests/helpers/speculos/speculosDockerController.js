@@ -150,7 +150,6 @@ export class SpeculosDockerController {
     try {
       const container = this.docker.getContainer(this.containerId);
       const data = await container.inspect();
-      data.State.Status
       return data.State.Running;
     } catch (error) {
       return false;
