@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
