@@ -8,7 +8,6 @@ import { ampli } from '../../../../../ampli/index';
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
   const {
     openTxReviewModal,
-    walletType,
     stopLoadingTxReview,
     startLoadingTxReview,
     showTxResultModal,
@@ -46,7 +45,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         ],
         kind: 'withdraw',
       },
-      unsignedTx: stores.substores.ada.delegationTransaction.createWithdrawalTx.result.unsignedTx,
+      unsignedTx,
     });
   };
 
