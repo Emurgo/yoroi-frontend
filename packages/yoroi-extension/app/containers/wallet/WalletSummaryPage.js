@@ -166,6 +166,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
     return (
       <Box>
         <WalletSummaryRevamp
+          stores={stores}
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
           isLoadingTransactions={

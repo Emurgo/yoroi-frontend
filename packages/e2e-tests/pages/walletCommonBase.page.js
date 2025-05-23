@@ -134,6 +134,10 @@ class WalletCommonBase extends BasePage {
   };
   //
   // functions
+  /**
+   * Getting the selected wallet info from the top-right corner of the app
+   * @returns {Promise<{name: string, plate: string, balance: number, fiatBalance: number, fiatCurrency: string}>}
+   */
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 

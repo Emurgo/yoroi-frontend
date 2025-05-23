@@ -274,7 +274,7 @@ export const messages = Object.freeze(
     },
     confirmSwapTx: {
       id: 'swap.confirmSwapTx',
-      defaultMessage: '!!!Confirm swap transaction',
+      defaultMessage: '!!!Swap review',
     },
     txSubmitted: {
       id: 'swap.txSubmitted',

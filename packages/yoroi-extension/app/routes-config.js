@@ -51,11 +51,15 @@ export const ROUTES = {
   },
   // Bringweb3
   CASHBACK: {
-    ROOT: '/cashback'
+    ROOT: '/cashback',
   },
   NFTS: {
     ROOT: '/nfts',
     DETAILS: '/nfts/:nftId',
+  },
+  NFT_GALLERY: {
+    ROOT: '/nft-gallery',
+    DETAILS: '/nft-gallery/:nftId',
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',

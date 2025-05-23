@@ -144,6 +144,10 @@ export const messages = Object.freeze(
       id: 'global.label.yourWallet',
       defaultMessage: '!!!Your Wallet',
     },
+    receiveLabel: {
+      id: 'global.receive',
+      defaultMessage: '!!!receive',
+    },
   })
 );
 
@@ -185,5 +189,6 @@ export const useStrings = () => {
     rewardsWithdraw: intl.formatMessage(messages.rewardsWithdraw),
     associatedAddress: intl.formatMessage(messages.associatedAddress),
     yourWallet: intl.formatMessage(messages.yourWallet),
+    receiveLabel: intl.formatMessage(messages.receiveLabel),
   }).current;
 };

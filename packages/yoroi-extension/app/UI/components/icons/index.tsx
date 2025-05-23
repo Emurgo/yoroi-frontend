@@ -29,6 +29,8 @@ import { Device } from './Device';
 import { Drag } from './Drag';
 import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
+import { GridDefault } from './GridDefault';
+import { GridDense } from './GridDense';
 import { Indicator } from './Indicator';
 import { Info } from './Info';
 import { LeftArrow } from './LeftArrow';
@@ -120,6 +122,8 @@ export const Icon = {
   Export,
   Eye,
   EyeOff,
+  GridDefault,
+  GridDense,
   Image,
   InfoCircle,
   LastSeen,
@@ -209,6 +213,8 @@ export enum Icons {
   Export = 'Export',
   Eye = 'Eye',
   EyeOff = 'EyeOff',
+  GridDefault = 'GridDefault',
+  GridDense = 'GridDense',
   Image = 'Image',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
@@ -290,7 +296,7 @@ export function IconWrapper({
   }
 
   return (
-    <Box color="ds.el_gray_medium" {...props}>
+    <Box color="ds.el_gray_medium" display="inline-flex" {...props}>
       <IconComponent {...iconProps} />
     </Box>
   );

@@ -30,7 +30,7 @@ describe('dApp, mainnet, connection in extension,', function () {
     try {
       mockServer = await getMockServer({});
       logger = getTestLogger(this.test.parent.title);
-      webdriver = await driversPoolsManager.getDriverFromPool();
+      webdriver = await driversPoolsManager.getPreparedDriver();
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
