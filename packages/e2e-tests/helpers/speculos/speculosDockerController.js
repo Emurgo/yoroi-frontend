@@ -1,6 +1,6 @@
 import Docker from 'dockerode';
 import { LedgerModels } from '../ledgerHelper.js';
-import { fiveSeconds, halfSecond } from '../timeConstants.js';
+import { fiveSeconds, halfSecond, threeSeconds } from '../timeConstants.js';
 import { sleep } from '../../utils/utils.js';
 
 class SpeculosDockerControllerError extends Error {}
@@ -74,6 +74,8 @@ export class SpeculosDockerController {
         }
         await sleep(halfSecond);
       }
+      // we need to give some time for container to properly start
+      await sleep(threeSeconds);
     } catch (error) {
       this.logger.error('Error while running the container:');
       this.logger.error(JSON.stringify(error, null, 2));
@@ -148,6 +150,7 @@ export class SpeculosDockerController {
     try {
       const container = this.docker.getContainer(this.containerId);
       const data = await container.inspect();
+      data.State.Status
       return data.State.Running;
     } catch (error) {
       return false;
