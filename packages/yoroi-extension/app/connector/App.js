@@ -13,14 +13,10 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
 import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
+import vi from 'react-intl/locale-data/vi';
 import { autorun, observable, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
@@ -35,7 +31,19 @@ import { ColorModeProvider } from '../styles/context/mode';
 import { IntlProviderWrapper, IntlContextProvider } from '../UI/common/context/IntlContextProvider';
 
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it, ...tr, ...cs, ...sk]);
+addLocaleData([
+  ...en,
+  ...ko,
+  ...ja,
+  ...zh,
+  ...ru,
+  ...de,
+  ...fr,
+  ...pt,
+  ...id,
+  ...es,
+  ...vi,
+]);
 
 type Props = {|
   +stores: StoresMap,

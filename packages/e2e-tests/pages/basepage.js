@@ -1,4 +1,4 @@
-import { until, Key, logging, WebElement } from 'selenium-webdriver';
+import { until, Key, logging, WebElement, WebDriver } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
@@ -21,12 +21,20 @@ import {
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
 import { ElementLocator } from './locator.js';
+import { Logger } from 'simple-node-logger';
 
 const writeFile = promisify(fs.writeFile);
 
 class BasePage {
+  /**
+   *
+   * @param {WebDriver} webDriver
+   * @param {Logger} logger
+   */
   constructor(webDriver, logger) {
+    /**@type {WebDriver} */
     this.driver = webDriver;
+    /**@type {Logger} */
     this.logger = logger;
   }
 
@@ -90,7 +98,7 @@ class BasePage {
       }
     }
     if (!success) {
-      throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`)
+      throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`);
     }
   }
   async clickByScript(locator) {
@@ -105,10 +113,12 @@ class BasePage {
   async focus(locator) {
     this.logger.info(`BasePage::focus is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
-    await this.driver.executeScript("arguments[0].focus();", element);
+    await this.driver.executeScript('arguments[0].focus();', element);
   }
   async dispatchMouseDownEvent(locator) {
-    this.logger.info(`BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`);
+    this.logger.info(
+      `BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`
+    );
     const element = await this.findElement(locator);
     await this.driver.executeScript(
       `arguments[0].dispatchEvent(new MouseEvent('mousedown', {view: window, bubbles : true, cancelable: true}))`,
@@ -740,7 +750,10 @@ class BasePage {
     }
     // set info into the chrome local storage
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
-    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(
+      browserStorageFileName,
+      useGeneralStorageInfo
+    );
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
@@ -753,12 +766,15 @@ class BasePage {
   }
   /**
    * Setting info into the browser local storage
-   * @param {string} templateName 
-   * @param {boolean} useGeneralStorageInfo 
+   * @param {string} templateName
+   * @param {boolean} useGeneralStorageInfo
    */
   async prepareBrowserLocalStorage(templateName, useGeneralStorageInfo) {
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
-    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(
+      browserStorageFileName,
+      useGeneralStorageInfo
+    );
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
