@@ -42,8 +42,6 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       ],
     ],
     plugins: [
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-      '@babel/plugin-proposal-optional-chaining',
       'babel-plugin-ts-nameof',
       [
         '@babel/plugin-proposal-decorators',
@@ -67,10 +65,8 @@ module.exports = function (api /*: ApiType */) /*: * */ {
           extractSourceLocation: true
         }
       ],
-      '@babel/plugin-syntax-dynamic-import',
       'add-module-exports',
-      '@babel/plugin-proposal-class-properties',
-      '@babel/plugin-proposal-private-methods',
+      '@babel/plugin-transform-private-methods',
       '@babel/plugin-proposal-export-default-from',
       '@babel/plugin-proposal-export-namespace-from',
     ],
