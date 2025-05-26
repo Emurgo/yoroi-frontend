@@ -241,7 +241,7 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
+      <SvgWrapper height={contentHeight ? contentHeight : '100%'} id={`${nftPathId}-image-box`}>
         <DefaultNFT />
       </SvgWrapper>
     );

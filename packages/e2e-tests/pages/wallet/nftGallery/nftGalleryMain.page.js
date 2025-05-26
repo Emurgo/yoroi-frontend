@@ -3,6 +3,7 @@ import { pageTitle } from '../../../helpers/pageTitles.js';
 import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import { ElementLocator } from '../../locator.js';
 import { NO_NFTS_ADDED, NO_NFTS_FOUND } from '../../../helpers/messages.js';
+import NftDetails from './nftDetails.page.js';
 
 class NftGalleryTab extends WalletCommonBase {
   // locators
@@ -80,6 +81,17 @@ class NftGalleryTab extends WalletCommonBase {
     return {
       locator: `nftsList:nft_${nftIndex}-image-component`,
       method: 'id',
+    };
+  };
+  /**
+   * Getting locator of a NFT template image by a NFT index
+   * @param {number} nftIndex
+   * @returns {ElementLocator}
+   */
+  getNftTemplateImageLocator = nftIndex => {
+    return {
+      locator: `#nftsList:nft_${nftIndex}-image-component > svg`,
+      method: 'css',
     };
   };
   // methods
@@ -215,15 +227,17 @@ class NftGalleryTab extends WalletCommonBase {
   /**
    * Selecting a NFT by its index
    * @param {number} nftIndex
-   * @returns {Promise<void>}
+   * @returns {Promise<NftDetails>}
    */
   async selectNftByIndex(nftIndex) {
     this.logger.info(`NftGalleryTab::selectNftByIndex is called. NFT's index: ${nftIndex}`);
     await this.click(this.getNftButtonLocator(nftIndex));
+    return new NftDetails(this.driver, this.logger);
   }
   /**
    * Selecting a NFT by its name
    * @param {string} nftName
+   * @returns {NftDetails}
    */
   async selectNftByName(nftName) {
     this.logger.info(`NftGalleryTab::selectNftByName is called. NFT's name: ${nftName}`);
@@ -232,7 +246,7 @@ class NftGalleryTab extends WalletCommonBase {
       const receivedNftName = await this.getText(this.getNftNameLocator(index));
       if (receivedNftName === nftName) {
         await allNftComponents[index].click();
-        return;
+        return new NftDetails(this.driver, this.logger);
       }
     }
     throw new Error(`Suitable NFT with name "${nftName}" is not found`);
