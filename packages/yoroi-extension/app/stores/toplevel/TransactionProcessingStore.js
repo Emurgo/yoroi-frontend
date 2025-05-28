@@ -118,7 +118,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       };
     } else if (wallet.type === 'mnemonic') {
       if (!password) {
-        throw new Error('missing password for hardware wallet');
+        throw new Error('missing password for mnemonic wallet');
       }
       broadcastRequest = async () => {
         return await this.mnemonicWalletSignAndBroadcast({

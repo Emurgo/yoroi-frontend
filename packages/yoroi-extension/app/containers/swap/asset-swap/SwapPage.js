@@ -216,8 +216,8 @@ function SwapPage(props: StoresProps & Intl): Node {
           receiverCustomTitle: {
             to: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
           },
-          submitTx: pasword => {
-            handleSubmitTransaction(pasword);
+          submitTx: password => {
+            handleSubmitTransaction(password);
           },
           extraOverviewDetails: {
             title: 'Swap Details',
@@ -280,12 +280,11 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
-  const handleSubmitTransaction = async passswordInput => {
+  const handleSubmitTransaction = async (password) => {
     if (signRequest == null) return;
-    validateSignRequestAndUserPassword(passswordInput);
+    validateSignRequestAndUserPassword(password);
 
     setOpenedDialog('loadingOverlay');
-    const password = userPasswordState?.value;
 
     try {
       await stores.transactionProcessingStore.adaSendAndRefresh({
