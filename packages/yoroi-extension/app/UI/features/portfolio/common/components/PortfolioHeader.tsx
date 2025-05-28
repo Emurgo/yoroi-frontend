@@ -225,7 +225,6 @@ export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChange
         {changePercent}
       </Typography>
     </PnlTag>
-
   );
 };
 
