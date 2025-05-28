@@ -128,7 +128,7 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome
+        run: npm run test:chrome
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
