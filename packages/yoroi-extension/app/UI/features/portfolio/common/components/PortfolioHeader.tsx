@@ -241,7 +241,6 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>
     </PnlTag>
-
   );
 };
 
