@@ -164,6 +164,8 @@ export const getDriver = (maxAttempts = 3, retryDelay = 2000) => {
       driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       if (isFirefox()) {
         driver.manage().window().maximize();
+      } else {
+        driver.manage().window().setRect({ width: 1440, height: 900 });
       }
       return driver;
     } catch (error) {

@@ -35,6 +35,15 @@ class DriversManager {
     this.logger.info(
       `DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${driverGlobalCounter}`
     );
+    newDriver
+      .manage()
+      .window()
+      .getRect()
+      .then(size => {
+        this.logger.info(
+          `DriversManager::addNewDriverToPool Window size ${size.width}x${size.height}`
+        );
+      });
     return driverObject;
   }
 
