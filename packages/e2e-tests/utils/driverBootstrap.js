@@ -79,12 +79,10 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .addArguments('--remote-debugging-pipe')
-    .setUserPreferences({ 'download.default_directory': downloadsDir });
+    .setUserPreferences({ 'download.default_directory': downloadsDir })
+    .setChromeBinaryPath(chromeBin);
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
-  }
-  if (isDapp()) {
-    chromeOpts.setChromeBinaryPath(chromeBin);
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
