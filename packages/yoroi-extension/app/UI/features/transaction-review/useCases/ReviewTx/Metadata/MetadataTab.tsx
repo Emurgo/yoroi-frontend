@@ -28,12 +28,21 @@ export const MetadataTab = ({ hash, metadata }) => {
           sx={{
             overflow: 'auto',
             whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
+            wordBreak: 'break-all',
             padding: '8px',
             borderRadius: '4px',
+            maxWidth: '100%',
           }}
         >
-          <Typography variant="body1" component="pre">
+          <Typography
+            variant="body1"
+            component="pre"
+            sx={{
+              margin: 0,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-all',
+            }}
+          >
             {metadata ? JSON.stringify(metadata, null, 2) : strings.missingMetadata}
           </Typography>
         </Box>

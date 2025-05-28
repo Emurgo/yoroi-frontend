@@ -57,6 +57,7 @@ export const GovernanceStatusSelection = () => {
     drepCredentialHex,
     setUnsignedTx,
     showTxResultModal,
+    setDrepId,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
@@ -104,7 +105,8 @@ export const GovernanceStatusSelection = () => {
     const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
 
     governanceVoteChanged(vote);
-    createUnsignTx(dRepCredentialHex);
+    setDrepId({ drepID });
+    await createUnsignTx(dRepCredentialHex);
   };
 
   const handleAbstain = async () => {

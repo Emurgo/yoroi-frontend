@@ -12,14 +12,10 @@ import zh from 'react-intl/locale-data/zh';
 import ru from 'react-intl/locale-data/ru';
 import de from 'react-intl/locale-data/de';
 import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
 import pt from 'react-intl/locale-data/pt';
 import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
+import vi from 'react-intl/locale-data/vi';
 import { autorun, observable, runInAction } from 'mobx';
 import { Routes } from './Routes';
 import { translations } from '../i18n/translations';
@@ -41,14 +37,10 @@ addLocaleData([
   ...ru,
   ...de,
   ...fr,
-  ...nl,
   ...pt,
   ...id,
   ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
+  ...vi,
 ]);
 
 type Props = {|
