@@ -501,7 +501,7 @@
   "swap.minimumAssetsTooltip": "価格変動が発生した場合に保証される最低受取額",
   "swap.lpFee": "流動性プロバイダー手数料",
   "swap.lpFeeTooltip": "トークン供給の報酬として流動性プロバイダーに支払われる固定 0.3% の運用手数料により、トレーダーは分散型Cardanoネットワーク上で資産の売買が可能になります",
-  "swap.confirmSwapTx": "Swap review",
+  "swap.confirmSwapTx": "スワップのレビュー",
   "swap.txSubmitted": "取引は送信されました",
   "swap.txFailed": "取引が失敗しました",
   "swap.txId": "トランザクションID",
