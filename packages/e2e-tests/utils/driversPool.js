@@ -24,7 +24,26 @@ class DriversManager {
    * @returns {{driver: ThenableWebDriver, driverId: number}}
    */
   addNewDriverToPool() {
-    const newDriver = getDriver();
+    let attempts = 0;
+    const maxAttempts = 3;
+    let newDriver;
+
+    while (attempts < maxAttempts) {
+      try {
+        newDriver = getDriver();
+        break;
+      } catch (error) {
+        if (error.message.includes('Timeout') && attempts < maxAttempts - 1) {
+          console.error(`Creating driver error (attempt ${attempts + 1}):`, error.message);
+          const sleepPromise = new Promise(resolve => setTimeout(resolve, retryDelay));
+          sleepPromise.then(() => console.log('Waited for 2 seconds'));
+          attempts++;
+        } else {
+          console.error('No success to create a new driver after all attempts:', error);
+          throw error;
+        }
+      }
+    }
     driverGlobalCounter++;
     const driverObject = {
       driver: newDriver,
