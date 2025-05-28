@@ -371,9 +371,15 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     try {
       Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} called: ` + stringifyData(request));
 
+      // only when handling Byron wallet transfer this value is different from `request.wallet.networkId`
+      const mainnetNetworkIdForByronTransfer = request.signRequest.networkSettingSnapshot.NetworkId;
+
       const { signedTxHex, txId, metadata } = await this.ledgerWalletSignRawTx({
         rawTxHex: request.signRequest.self().build_tx().to_hex(),
-        wallet: request.wallet,
+        wallet: {
+          ...request.wallet,
+          networkId: mainnetNetworkIdForByronTransfer,
+        },
         catalystData: request.signRequest.ledgerNanoCatalystRegistrationTxSignData,
         changeAddrs: request.signRequest.changeAddr,
         additionalSenderUtxos: request.signRequest.senderUtxos,
@@ -386,7 +392,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       await broadcastTransaction({
         publicDeriverId: request.wallet.publicDeriverId,
         signedTxHex,
-        networkId: request.wallet.networkId,
+        networkId: mainnetNetworkIdForByronTransfer,
       });
 
       return { txId };
