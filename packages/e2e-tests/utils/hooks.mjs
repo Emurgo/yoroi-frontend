@@ -6,12 +6,14 @@ export const mochaHooks = {
   async beforeAll() {
     let attempts = 0;
     const maxAttempts = 3;
+    let waitTimeout = oneMinute;
 
     while (attempts < maxAttempts) {
       try {
-        this.timeout(oneMinute);
+        this.timeout(waitTimeout);
         driversPoolsManager.createPoolOfDrivers(DRIVERS_AMOUNT);
         await driversPoolsManager.prepareExtensions();
+        this.timeout(oneMinute);
         break;
       } catch (error) {
         if (error.message.includes('Timeout') && attempts < maxAttempts - 1) {
@@ -19,8 +21,9 @@ export const mochaHooks = {
           const sleepPromise = new Promise(resolve => setTimeout(resolve, retryDelay));
           sleepPromise.then(() => console.log('[beforeAll] Waited for 2 seconds'));
           attempts++;
+          waitTimeout = waitTimeout + oneMinute;
         } else {
-          console.error('[beforeAll] No success to create a new driver after all attempts:', error);
+          console.error('[beforeAll] No success to create a new driver:', error);
           throw error;
         }
       }
@@ -38,8 +41,7 @@ export const mochaHooks = {
     }
     done();
   },
-  afterAll(done) {
-    driversPoolsManager.closeAllUnused();
-    done();
+  async afterAll() {
+    await driversPoolsManager.closeAllUnused();
   },
 };
