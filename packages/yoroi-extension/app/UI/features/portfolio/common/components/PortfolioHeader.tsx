@@ -159,14 +159,13 @@ const PortfolioHeader = observer(
             {isLoading || loading ? (
               <Skeletons theme={theme} />
             ) : (
-              <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} placement="right">
-                <PriceChangeDisplay
-                  variantPnl={variantPnl}
-                  changePercent={changePercent}
-                  changeValue={changeValue}
-                  config={config}
-                />
-              </Tooltip>
+              <PriceChangeDisplay
+                variantPnl={variantPnl}
+                changePercent={changePercent}
+                changeValue={changeValue}
+                config={config}
+                tooltipTitle={tooltipTitle}
+              />
             )}
           </Stack>
         </Stack>
@@ -209,11 +208,13 @@ const Skeletons = ({ theme }) => (
   </Stack>
 );
 
-const PriceChangeDisplay = ({ variantPnl, changePercent, changeValue, config }) => (
-  <Stack direction="row" alignItems="center" spacing={1}>
-    <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
-    <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
-  </Stack>
+const PriceChangeDisplay = ({ variantPnl, changePercent, changeValue, config, tooltipTitle }) => (
+  <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} place='right' positionStrategy="fixed">
+    <Stack direction="row" alignItems="center" spacing={1}>
+      <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
+      <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />
+    </Stack>
+  </Tooltip>
 );
 
 type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; changePercent: string };
@@ -224,6 +225,7 @@ export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChange
         {changePercent}
       </Typography>
     </PnlTag>
+
   );
 };
 
@@ -240,6 +242,7 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>
     </PnlTag>
+
   );
 };
 
