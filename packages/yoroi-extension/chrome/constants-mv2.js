@@ -66,6 +66,8 @@ export function genCSP(request: {|
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
+  connectSrc.push('https://aggregator-v2.muesliswap.com/');
+  connectSrc.push('https://daehx1qv45z7c.cloudfront.net/');
 
   // Bringweb3
   frameSrc.push('http://localhost:5173/')

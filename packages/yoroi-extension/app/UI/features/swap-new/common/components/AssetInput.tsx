@@ -5,26 +5,27 @@ import { TokenIcon } from './TokenIcon/TokenIcon';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 type AssetInputProps = {
-  type: 'from' | 'to';
-  assetName: string;
+  direction: 'in' | 'out';
+  defaultAsset?: any;
   selected?: boolean;
   error?: string | null;
   onAssetSelect: () => void;
 };
 
-export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error = null, onAssetSelect }) => {
+export const AssetInput: React.FC<AssetInputProps> = ({ direction, defaultAsset, error = null, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
-  const { assetToSell, primaryTokenInfo } = useSwapRevamp();
-  const label = type === 'from' ? 'From' : 'To';
+  const { primaryTokenInfo, swapForm } = useSwapRevamp();
+  const label = direction === 'in' ? 'From' : 'To';
 
-  const iconImage = type === 'from' ? assetToSell?.info.image : null;
-  const tokenQuantity = assetToSell?.formatedAmount;
+  console.log('swapForm AssetInput', swapForm);
 
-  console.log('assetToSell', assetToSell);
+  const iconImage = direction === 'in' ? swapForm.tokenInInput?.info?.image : '';
+  const assetName = direction === 'in' ? swapForm.tokenInInput?.info?.name : 'Select token';
+  const tokenQuantity = swapForm.tokenInInput?.formatedAmount;
 
   return (
-    <Wrapper selected={focusState} hasError={!!error} atoms={atoms} type={type}>
+    <Wrapper selected={focusState} hasError={!!error} atoms={atoms} direction={direction}>
       <Stack spacing={1} {...atoms.gap_sm}>
         <Label variant="body2">{label}</Label>
 
@@ -38,7 +39,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
           >
             <TokenIcon image={iconImage} />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm}>
-              {assetName}
+              {assetName ?? primaryTokenInfo.name ?? ''}
             </Typography>
             <IconWrapper icon={Icons.ChevronDown} asButton />
           </Stack>
@@ -48,7 +49,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
               border: '0',
               outline: 'none',
               '::placeholder': { color: 'ds.gray_600' },
-              bgcolor: type === 'from' ? 'ds.bg_color_max' : 'ds.bg_color_contrast_min',
+              bgcolor: direction === 'in' ? 'ds.bg_color_max' : 'ds.bg_color_contrast_min',
             }}
             component="input"
             type="text"
@@ -67,8 +68,8 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
             <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
-            <Typography variant="body2" color="ds.text_gray_low" mb={2}>
-              {tokenQuantity} {primaryTokenInfo.name}
+            <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
+              {tokenQuantity} {swapForm.tokenInInput?.info?.name}
             </Typography>
           </Stack>
           <Typography variant="body2" color="ds.text_gray_low">
@@ -81,20 +82,20 @@ export const AssetInput: React.FC<AssetInputProps> = ({ type, assetName, error =
 };
 
 const Wrapper = styled(Box, {
-  shouldForwardProp: prop => prop !== 'selected' && prop !== 'hasError' && prop !== 'atoms' && prop !== 'type',
+  shouldForwardProp: prop => prop !== 'selected' && prop !== 'hasError' && prop !== 'atoms' && prop !== 'direction',
 })<{
   selected: boolean;
   hasError: boolean;
   atoms: any;
-  type: 'from' | 'to';
-}>(({ selected, hasError, atoms, type, theme }: any) => ({
+  direction: 'in' | 'out';
+}>(({ selected, hasError, atoms, direction, theme }: any) => ({
   ...atoms.py_md,
   ...atoms.px_lg,
   borderRadius: 12,
   border: `2px solid ${
     hasError ? theme.palette.ds.text_error : selected ? theme.palette.ds.el_gray_max : theme.palette.ds.gray_200
   }`,
-  backgroundColor: type === 'from' ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
+  backgroundColor: direction === 'in' ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
   height: '132px',
 
   '&:hover': {

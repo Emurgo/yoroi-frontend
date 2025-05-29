@@ -5,16 +5,20 @@ import { AssetInput } from '../../common/components/AssetInput';
 import { LoadingButton } from '@mui/lab';
 import { DexTradeInfo } from './DexTradeInfo';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { SelectAssetModalContent } from '../../common/components/SelectAssetModalContent';
+import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom';
 import { SwitchAssets } from '../../common/components/SwitchAssets';
+import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
-  const openSelectAssetModal = (type: 'from' | 'to') => {
+  const { primaryTokenInfo } = useSwapRevamp();
+
+  const openSelectAssetModal = (direction: 'in' | 'out') => {
     openModal({
-      title: `SWAP ${type === 'from' ? 'FROM' : 'TO'}`,
-      content: <SelectAssetModalContent />,
+      title: `SWAP ${direction === 'in' ? 'FROM' : 'TO'}`,
+      content: direction === 'in' ? <SelectAssetFrom /> : <SelectAssetTo />,
       height: '624px',
       width: '612px',
     });
@@ -25,10 +29,10 @@ export const AssetSwap = () => {
       <Stack position="relative">
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
-        <AssetInput type="from" assetName="ADA" onAssetSelect={() => openSelectAssetModal('from')} />
+        <AssetInput direction="in" defaultAsset={primaryTokenInfo} onAssetSelect={() => openSelectAssetModal('in')} />
         <Stack {...atoms.pt_sm} />
         <SwitchAssets />
-        <AssetInput type="to" assetName="ADA" onAssetSelect={() => openSelectAssetModal('to')} />
+        <AssetInput direction="out" onAssetSelect={() => openSelectAssetModal('out')} />
         <Stack {...atoms.pt_lg} />
         <DexTradeInfo />
       </Stack>

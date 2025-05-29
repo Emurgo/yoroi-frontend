@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
-import { Icons, IconWrapper } from '../../../../components';
-import { useStrings } from '../hooks/useStrings';
-import { AssetInfoInRow } from './AssetInfoInRow';
-import { useSwapRevamp } from '../../module/SwapContextProvider';
-import { useCurrencyPairing } from '../../../../context/CurrencyContext';
-import { usePortfolioTokenActivity } from '../../../portfolio/module/PortfolioTokenActivityProvider';
-import { useModal } from '../../../../components/modals/ModalContext';
+import { Icons, IconWrapper } from '../../../../../components';
+import { useStrings } from '../../hooks/useStrings';
+import { useSwapRevamp } from '../../../module/SwapContextProvider';
+// import { AssetInfoInRow } from '../AssetInfoInRow';
+// import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+// import { usePortfolioTokenActivity } from '../../../../portfolio/module/PortfolioTokenActivityProvider';
+// import { useModal } from '../../../../../components/modals/ModalContext';
 
 const SearchWrapper = styled(Box)({
   position: 'relative',
@@ -40,30 +40,14 @@ const AssetCountText = styled(Typography)({
   marginBottom: '16px',
 });
 
-export const SelectAssetModalContent = () => {
+export const SelectAssetTo = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { ftAssetList, primaryTokenInfo, selectAssetToSell } = useSwapRevamp();
-  const { currency } = useCurrencyPairing();
-  const { closeModal } = useModal();
-  // console.log('useCurrencyPairing', currency);
-  console.log('ftAssetList', ftAssetList);
+  const { assetToSell ,tokensToBuy} = useSwapRevamp();
 
-  const {
-    tokenActivity: { data24h },
-  } = usePortfolioTokenActivity();
 
-  const {
-    ptActivity: { close: ptPrice },
-  } = useCurrencyPairing();
-
-  const filteredAssets =
-    ftAssetList.filter(a => {
-      if (a == null) return false;
-      if (!searchTerm) return true;
-      return `${a.info.name};[${a.info.id}];${a.id};${a.info.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
-    }) || [];
+  console.log("tokensToBuy",tokensToBuy)
 
   return (
     <Stack {...atoms.mb_2xl}>
@@ -90,11 +74,12 @@ export const SelectAssetModalContent = () => {
           />
         </SearchWrapper>
         <AssetCountText variant="body2" color="ds.text_gray_low">
-          {strings.numYourAssets(filteredAssets.length)}
+          {/* {strings.numYourAssets(filteredAssets.length)} */}
         </AssetCountText>
       </Stack>
       <Stack>
-        {filteredAssets.map(asset => {
+        <p>Assets to Buy</p>
+        {/* {filteredAssets.map(asset => {
           return (
             <AssetInfoInRow
               asset={asset}
@@ -108,9 +93,8 @@ export const SelectAssetModalContent = () => {
               }}
             />
           );
-        })}
+        })} */}
       </Stack>
     </Stack>
   );
 };
-

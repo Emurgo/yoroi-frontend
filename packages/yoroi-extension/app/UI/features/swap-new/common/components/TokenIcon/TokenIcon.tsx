@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import React, { useState } from 'react';
+import React from 'react';
 import defaultTokenImage from './token-default.inline.svg';
 import defaultTokenDarkImage from './asset-default-dark.inline.svg';
 import adaTokenImage from './ada.inline.svg';
