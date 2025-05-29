@@ -27,6 +27,7 @@ import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 // $FlowIgnore[cannot-resolve-module]
 import { useIntl } from '../../../../UI/context/IntlProvider';
+import type { PushSubscription } from '../../../../stores/toplevel/PushNotificationStore';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -151,10 +152,11 @@ const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
   wallet: null | { isTestnet: boolean, networkId: number, ... },
+  pushSubscription: PushSubscription | null,
   onSwitchNetwork: () => void,
 |};
 
-const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
+const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: Props): Node => {
   const { openModal, closeModal } = useModal();
   const { intl } = useIntl();
   const localStorageApi = new LocalStorageApi();
@@ -246,6 +248,23 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
             url={baseGithubUrl + 'tree/' + environment.branch}
             componentId={basePageComponentPath + '-branchInfo-text'}
           />
+        )}
+
+        {pushSubscription && (
+          <>
+            <LabelWithValue
+              label="Push endpoint:"
+              value={pushSubscription.endpoint}
+            />
+            <LabelWithValue
+              label="Push key:"
+              value={pushSubscription.keys.p256dh}
+            />
+            <LabelWithValue
+              label="Push auth:"
+              value={pushSubscription.keys.auth}
+            />
+          </>
         )}
       </Box>
 

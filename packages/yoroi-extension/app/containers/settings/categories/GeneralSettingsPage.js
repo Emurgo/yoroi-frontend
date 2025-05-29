@@ -164,6 +164,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             <ThemeSettingsBlock />
             <AboutYoroiSettingsBlock
               wallet={stores.wallets.selected}
+              pushSubscription={stores.pushNotificationStore.subscription}
               onSwitchNetwork={() =>
                 stores.uiDialogs.open({
                   dialog: SwitchNetworkDialogContainer,
