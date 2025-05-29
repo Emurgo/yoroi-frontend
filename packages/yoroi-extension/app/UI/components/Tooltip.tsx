@@ -30,8 +30,12 @@ export const Tooltip = ({
   const id = uuid();
 
   return (
-    <>
-      {React.cloneElement(children, { 'data-tooltip-id': id })}
+    <span
+      {...props}
+      data-tooltip-id={id}
+      style={{ display: 'inline-flex' }}
+    >
+      {children}
 
       <ReactTooltip
         id={id}
@@ -47,6 +51,6 @@ export const Tooltip = ({
       >
         {title}
       </ReactTooltip>
-    </>
+    </span>
   );
 };
