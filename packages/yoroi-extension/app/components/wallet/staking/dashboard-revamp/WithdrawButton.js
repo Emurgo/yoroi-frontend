@@ -31,7 +31,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
   const createWithdrawalTx = async () => {
     const walletSelect = stores.wallets.selectedOrFail;
     stores.substores.ada.delegationTransaction.setShouldDeregister(false);
-    const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
+    const { unsignedTx } = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
 
     openTxReviewModal({
       modalView: 'transactionReview',
