@@ -2423,6 +2423,7 @@ export default class AdaApi {
     };
   };
 
+  // <TODO:PENDING_REMOVAL> All tx-building eventually should use collateral return so no pure picking for collaterals would be required
   pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
     const allUtxos = wallet.utxos;
     if (allUtxos.length === 0) {
