@@ -92,7 +92,7 @@ export default class LedgerConnectStore
     this.error = undefined;
     this.hwDeviceInfo = undefined;
     this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
   };
 
   @action _openTransferDialog: void => void = () => {
