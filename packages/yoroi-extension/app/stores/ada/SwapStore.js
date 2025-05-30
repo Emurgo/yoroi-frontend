@@ -82,8 +82,7 @@ export default class SwapStore extends Store<StoresMap> {
   getCollateralUtxoHexForCancel: ({| wallet: WalletState |}) => Promise<?string> = async ({
     wallet,
   }) => {
-    const utxo: ?QueriedUtxo = await this.stores.substores.ada.wallets
-      .pickCollateralUtxo({ wallet });
+    const utxo: ?QueriedUtxo = await this.api.ada.pickCollateralUtxo({ wallet });
     return maybe(utxo, u => {
       const [addressedUtxo] = asAddressedUtxo([u]);
       return cardanoUtxoHexFromRemoteFormat(cast(addressedUtxo));
