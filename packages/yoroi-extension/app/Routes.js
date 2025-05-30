@@ -217,7 +217,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
             <Route exact path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage tores={stores} />} />
+            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
@@ -332,7 +332,7 @@ const SwapRevampSubpages = stores => (
   <Routes>
     <Route exact path={ROUTES.SWAP_REVAMP.ASSET_SWAP} component={props => <AssetSwapRevampPage {...props} stores={stores} />} />
     <Route exact path={ROUTES.SWAP_REVAMP.ORDERS} component={props => <SwapOrdersRevampPage {...props} stores={stores} />} />
-    <Redirect to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
+    <Navigate to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
   </Routes>
 );
 
@@ -425,29 +425,7 @@ const GovernanceSubpages = ({ stores }) => {
   );
 };
 
-export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
-
-  const openDialogWrapper = (dialog): void => {
-    dappCenterProps.stores.uiDialogs.open({ dialog });
-  };
-
-  return (
-    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </DappCenterContextProvider>
-  );
-}
-
-export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
-  return (
-    <NftGalleryContextProvider stores={nftGalleryProps.stores}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </NftGalleryContextProvider>
-  );
-}
-
-export function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
+function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
 
   return (

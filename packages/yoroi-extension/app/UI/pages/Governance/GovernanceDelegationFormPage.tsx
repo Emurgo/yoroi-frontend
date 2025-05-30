@@ -1,11 +1,10 @@
 import React from 'react';
 import { DelagationForm } from '../../features/governace/useCases/DelagationForm/DelagationForm';
 import GovernanceLayout from './layout';
-import {useGovernance} from "../../features/governace/module/GovernanceContextProvider";
+import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 
 type Props = {
   stores: any;
-  actions: any;
   children?: any;
 };
 
