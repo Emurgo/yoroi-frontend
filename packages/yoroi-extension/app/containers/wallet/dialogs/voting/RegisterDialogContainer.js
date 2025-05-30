@@ -30,7 +30,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
   };
 
   render(): Node {
-    const { submit, cancel, onError, stepsList, stores } = this.props;
+    const { submit, cancel, onError, stepsList, stores, goBack } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
 
     if (votingStore.createVotingRegTx.error != null) {
@@ -53,6 +53,7 @@ export default class RegisterDialogContainer extends Component<AllProps> {
         }}
         isProcessing={votingStore.isActionProcessing}
         cancel={cancel}
+        goBack={goBack}
       />
     );
   }

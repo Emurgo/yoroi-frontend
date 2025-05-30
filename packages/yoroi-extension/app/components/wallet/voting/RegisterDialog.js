@@ -16,6 +16,7 @@ import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import styles from './RegisterDialog.scss';
 import { Typography } from '@mui/material';
 import Stepper from '../../common/stepper/Stepper';
+import DialogBackButton from '../../widgets/DialogBackButton';
 
 const messages = defineMessages({
   line1: {
@@ -31,6 +32,7 @@ type Props = {|
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
   +isProcessing: boolean,
+  +goBack: void => void,
 |};
 
 @observer
@@ -46,7 +48,7 @@ export default class RegisterDialog extends Component<Props> {
   }
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, cancel, isProcessing } = this.props;
+    const { stepsList, progressInfo, cancel, isProcessing, goBack } = this.props;
 
     const dailogActions = [
       {
@@ -65,6 +67,7 @@ export default class RegisterDialog extends Component<Props> {
         dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
+        backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
         {(
