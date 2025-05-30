@@ -17,8 +17,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ROUTES } from '../../routes-config';
-import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
@@ -29,6 +28,8 @@ import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/derive
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
 import { bytesToHex, noop } from '../../coreUtils';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { IncorrectWalletPasswordError } from '../../api/common/errors'
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -163,6 +164,8 @@ export default class VotingStore extends Store<StoresMap> {
   };
 
   @action goBackToGenerate: void => void = () => {
+    this.createVotingRegTx.reset();
+    this.error = null;
     this.progressInfo.currentStep = ProgressStep.GENERATE;
     this.progressInfo.stepState = StepState.LOAD;
   };
@@ -388,4 +391,14 @@ export default class VotingStore extends Store<StoresMap> {
     this.catalystPrivateKey = undefined;
     this.pin = [];
   }
+}
+
+function convertToLocalizableError(error: Error): LocalizableError {
+  if (error instanceof LocalizableError) {
+    return error;
+  }
+  if (error instanceof WrongPassphraseError) {
+    return new IncorrectWalletPasswordError();
+  }
+  return new UnexpectedError();
 }
