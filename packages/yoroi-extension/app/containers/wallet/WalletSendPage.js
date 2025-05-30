@@ -4,25 +4,14 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable, runInAction } from 'mobx';
 import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { intlShape } from 'react-intl';
 import { ROUTES } from '../../routes-config';
-
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
-
-// Web Wallet Confirmation
-import WalletSendConfirmationDialogContainer from './dialogs/WalletSendConfirmationDialogContainer';
-import WalletSendConfirmationDialog from '../../components/wallet/send/WalletSendConfirmationDialog';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
-
-// Hardware Wallet Confirmation
-import HWSendConfirmationDialog from '../../components/wallet/send/HWSendConfirmationDialog';
-import globalMessages from '../../i18n/global-messages';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
 import { ampli } from '../../../ampli/index';
@@ -41,25 +30,6 @@ import { ModalProvider } from '../../UI/components/modals/ModalContext';
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
-
-const messages = defineMessages({
-  txConfirmationLedgerNanoLine1: {
-    id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
-  },
-  sendUsingLedgerNano: {
-    id: 'wallet.send.ledger.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Ledger',
-  },
-  txConfirmationTrezorTLine1: {
-    id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
-  },
-  sendUsingTrezorT: {
-    id: 'wallet.send.trezor.confirmationDialog.submit',
-    defaultMessage: '!!!Send using Trezor',
-  },
-});
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {
@@ -151,7 +121,7 @@ export default class WalletSendPage extends Component<StoresProps> {
     const { hasAnyPending } = stores.transactions;
 
     // disallow sending when pending tx exists
-    if ((uiDialogs.isOpen(HWSendConfirmationDialog) || uiDialogs.isOpen(WalletSendConfirmationDialog)) && hasAnyPending) {
+    if (hasAnyPending) {
       stores.uiDialogs.closeActiveDialog();
     }
 
@@ -222,12 +192,6 @@ export default class WalletSendPage extends Component<StoresProps> {
               maxSendableAmount={transactionBuilderStore.maxSendableAmount}
               signRequest={transactionBuilderStore.tentativeTx}
               staleTx={transactionBuilderStore.txMismatch}
-              sendMoneyRequest={stores.wallets.sendMoneyRequest}
-              sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
-              ledgerSendError={stores.substores.ada.ledgerSend.error || null}
-              trezorSendError={stores.substores.ada.trezorSend.error || null}
-              ledgerSend={stores.substores.ada.ledgerSend}
-              trezorSend={stores.substores.ada.trezorSend}
             />
             {this.renderDialog()}
           </ReviewTxProvider>
@@ -239,12 +203,6 @@ export default class WalletSendPage extends Component<StoresProps> {
   renderDialog: () => Node = () => {
     const { uiDialogs } = this.props.stores;
 
-    if (uiDialogs.isOpen(WalletSendConfirmationDialog)) {
-      return this.webWalletDoConfirmation();
-    }
-    if (uiDialogs.isOpen(HWSendConfirmationDialog)) {
-      return this.hardwareWalletDoConfirmation();
-    }
     if (uiDialogs.isOpen(MemoNoExternalStorageDialog)) {
       return this.noCloudWarningDialog();
     }
@@ -262,130 +220,6 @@ export default class WalletSendPage extends Component<StoresProps> {
     }
 
     return '';
-  };
-
-  /** Web Wallet Send Confirmation dialog
-   * Callback that creates a container to avoid the component knowing about actions/stores */
-  webWalletDoConfirmation: () => Node = () => {
-    const { stores } = this.props;
-    const { selected } = this.props.stores.wallets;
-    if (!selected) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-
-    const { transactionBuilderStore } = this.props.stores;
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.webWalletDoConfirmation)}::should never happen`);
-    }
-    const signRequest = transactionBuilderStore.tentativeTx;
-
-    return (
-      <WalletSendConfirmationDialogContainer
-        stores={stores}
-        signRequest={signRequest}
-        staleTx={transactionBuilderStore.txMismatch}
-        unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-        openTransactionSuccessDialog={this.openTransactionSuccessDialog}
-      />
-    );
-  };
-
-  /** Hardware Wallet (Trezor or Ledger) Confirmation dialog
-   * Callback that creates a component to avoid the component knowing about actions/stores
-   * separate container is not needed, this container acts as container for Confirmation dialog */
-  hardwareWalletDoConfirmation: () => Node = () => {
-    const { selected } = this.props.stores.wallets;
-    if (!selected) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
-    const { transactionBuilderStore } = this.props.stores;
-
-    if (!transactionBuilderStore.tentativeTx) {
-      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)}::should never happen`);
-    }
-    const signRequest = transactionBuilderStore.tentativeTx;
-
-    const totalInput = signRequest.totalInput();
-    const fee = signRequest.fee();
-    const receivers = signRequest.receivers(false);
-
-    let hwSendConfirmationDialog: Node = null;
-
-    if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
-      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} hw wallets only supported for Byron`);
-    }
-    const selectedExplorerForNetwork =
-      this.props.stores.explorers.selectedExplorer.get(selected.networkId) ??
-      (() => {
-        throw new Error('No explorer for wallet network');
-      })();
-
-    if (selected.type === 'ledger') {
-      const messagesLedgerNano = {
-        infoLine1: messages.txConfirmationLedgerNanoLine1,
-        infoLine2: globalMessages.txConfirmationLedgerNanoLine2,
-        sendUsingHWButtonLabel: messages.sendUsingLedgerNano,
-      };
-      const ledgerSendStore = this.props.stores.substores.ada.ledgerSend;
-      ledgerSendStore.init();
-      hwSendConfirmationDialog = (
-        <HWSendConfirmationDialog
-          staleTx={transactionBuilderStore.txMismatch}
-          selectedExplorer={selectedExplorerForNetwork}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-          amount={totalInput.joinSubtractCopy(fee)}
-          receivers={receivers}
-          totalAmount={totalInput}
-          transactionFee={fee}
-          messages={messagesLedgerNano}
-          isSubmitting={ledgerSendStore.isActionProcessing}
-          error={ledgerSendStore.error}
-          onSubmit={() =>
-            ledgerSendStore.sendUsingLedgerWallet({
-              params: { signRequest },
-              onSuccess: this.openTransactionSuccessDialog,
-              wallet: selected,
-            })
-          }
-          onCancel={ledgerSendStore.cancel}
-          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
-        />
-      );
-    } else if (selected.type === 'trezor') {
-      const messagesTrezor = {
-        infoLine1: messages.txConfirmationTrezorTLine1,
-        infoLine2: globalMessages.txConfirmationTrezorTLine2,
-        sendUsingHWButtonLabel: messages.sendUsingTrezorT,
-      };
-      const trezorSendStore = this.props.stores.substores.ada.trezorSend;
-      hwSendConfirmationDialog = (
-        <HWSendConfirmationDialog
-          staleTx={transactionBuilderStore.txMismatch}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          selectedExplorer={selectedExplorerForNetwork}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-          amount={totalInput.joinSubtractCopy(fee)}
-          receivers={receivers}
-          totalAmount={totalInput}
-          transactionFee={fee}
-          messages={messagesTrezor}
-          isSubmitting={trezorSendStore.isActionProcessing}
-          error={trezorSendStore.error}
-          onSubmit={() =>
-            trezorSendStore.sendUsingTrezor({
-              params: { signRequest },
-              onSuccess: this.openTransactionSuccessDialog,
-              wallet: selected,
-            })
-          }
-          onCancel={trezorSendStore.cancel}
-          unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
-        />
-      );
-    } else {
-      throw new Error('Unsupported hardware wallet found at hardwareWalletDoConfirmation.');
-    }
-
-    return hwSendConfirmationDialog;
   };
 
   showMemoDialog: ({|

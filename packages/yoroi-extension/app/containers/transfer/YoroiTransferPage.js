@@ -156,7 +156,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
               label: intl.formatMessage(globalMessages.nextButtonLabel),
               trigger: this.transferFunds,
             }}
-            isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
+            isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
             onCancel={{
               label: intl.formatMessage(globalMessages.cancel),
               trigger: this.cancelTransferFunds

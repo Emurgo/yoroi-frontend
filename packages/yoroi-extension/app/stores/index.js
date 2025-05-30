@@ -24,6 +24,7 @@ import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 import ConnectorStore from './toplevel/DappConnectorStore'
 import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
+import TransactionProcessingStore from './toplevel/TransactionProcessingStore';
 import RoutingStore from './toplevel/RoutingStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
@@ -49,6 +50,7 @@ const storeClasses = Object.freeze({
   explorers: ExplorerStore,
   connector: ConnectorStore,
   protocolParameters: ProtocolParametersStore,
+  transactionProcessingStore: TransactionProcessingStore,
   routing: RoutingStore,
   // note: purposely exclude substores
 });
@@ -78,6 +80,7 @@ export type StoresMap = {|
     ada: AdaStoresMap,
   |},
   protocolParameters: ProtocolParametersStore<StoresMap>,
+  transactionProcessingStore: TransactionProcessingStore,
   routing: RoutingStore,
 |};
 
@@ -110,6 +113,7 @@ const stores: StoresMap = (observable({
   substores: null,
   connector: null,
   protocolParameters: null,
+  transactionProcessingStore: null,
   routingStore: null,
 }): any);
 

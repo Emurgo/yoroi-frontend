@@ -83,14 +83,10 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - name: Forcefully update Chrome browser
+      - uses: browser-actions/setup-chrome@v1.7.3
         id: setup-chrome
-        run: |
-          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-          sudo apt-get update
-          sudo apt-get --only-upgrade install google-chrome-stable
-          echo "version=$(google-chrome --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
+        with:
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -111,7 +107,7 @@ jobs:
           path: |
             packages/e2e-tests/node_modules
             ~/.npm
-          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ steps.setup-chrome.outputs.version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
+          key: ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-${{ steps.setup-chrome.outputs.chrome-version }}-${{ hashFiles('packages/e2e-tests/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-e2e-tests-node-${{ steps.nvm.outputs.NVMRC }}-
             ${{ runner.os }}-e2e-tests-node-
@@ -126,17 +122,6 @@ jobs:
         with:
           name: builtApp
           path: ./packages/yoroi-extension
-
-      - name: Run Xvfb
-        run: |
-          export DISPLAY=:99
-          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
-
-      - name: Warm up Chrome
-        run: |
-          xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" google-chrome &
-          sleep 5
-          pkill chrome
 
       - name: Run tests
         working-directory: ./packages/e2e-tests
@@ -167,19 +152,10 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      # - name: Forcefully update Chrome browser
-      #   id: chrome-version
-      #   run: |
-      #     wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-      #     sudo sh -c 'echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-      #     sudo apt-get update
-      #     sudo apt-get --only-upgrade install google-chrome-stable
-      #     echo "version=$(google-chrome --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
-
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1.7.3
         with:
-          chrome-version: 135
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -356,6 +332,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [Build-Extension]
     steps:
+      - name: Pull Speculos Docker image
+        run: docker pull ghcr.io/ledgerhq/speculos:4d320a7be879fba8d5f29a0c9516e47cb556fed8
+
       - uses: browser-actions/setup-chrome@v1.7.3
         id: setup-chrome
         with:
