@@ -425,6 +425,20 @@ const GovernanceSubpages = ({ stores }) => {
   );
 };
 
+export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
+  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
+
+  const openDialogWrapper = (dialog): void => {
+    dappCenterProps.stores.uiDialogs.open({ dialog });
+  };
+
+  return (
+    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
+      <Suspense fallback={null}>{children}</Suspense>
+    </DappCenterContextProvider>
+  );
+}
+
 function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
   const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
 
