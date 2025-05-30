@@ -11,8 +11,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   const {
     openTxReviewModal,
     startLoadingTxReview,
-    walletType,
-    isHardwareWallet,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
@@ -62,7 +60,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   };
 
   const submitTx = async password => {
-    const selected = stores.wallets.selected;
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
