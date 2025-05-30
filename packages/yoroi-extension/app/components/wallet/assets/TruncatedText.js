@@ -15,7 +15,7 @@ export const TruncatedText: any = styled(Typography)({
   textOverflow: 'ellipsis',
 });
 
-export function CopyAddress({ text, children, pathId }: {| text: string, children: Node, pathId: string | undefined |}): Node {
+export function CopyAddress({ text, children, pathId }: {| text: string, children: Node, pathId: string |}): Node {
   const [isCopied, setCopy] = useState(false);
   const localPathId = pathId ?? 'somewhere';
 
