@@ -2,15 +2,15 @@ import * as React from 'react';
 
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
-import { isPrimaryToken } from '@yoroi/portfolio';
+import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
 import { isLeft, isRight } from '@yoroi/common';
 import { useSwapConfig } from '../common/hooks/useSwapConfig';
 import { useQuery } from 'react-query';
 import { Api, Chain, Portfolio, Swap } from '@yoroi/types';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
-import { primaryTokenInfoMainnet } from '../../../utils/network-config';
 import { undefinedToken } from '../common/constants';
+import { usePortfolioTokenInfos } from '../../portfolio/common/hooks/usePortfolioTokenInfo';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
@@ -31,12 +31,11 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const { ftAssetList, primaryTokenInfo, walletAddresses } = currentWallet;
   const [stakingKey, setStakingKey] = React.useState(null);
+  const [loadingSwapPage, setLoadingSwapPage] = React.useState(true);
   const { partners, excludedTokens } = useSwapConfig();
-  const addressHex = useAddressHex(walletAddresses[0]);
+  // const addressHex = useAddressHex(walletAddresses[0]);
 
   const [state, action] = React.useReducer(swapReducer, defaultState);
-
-  console.log('CONTEXT INFO', { state, partners, excludedTokens });
 
   React.useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -49,93 +48,67 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const swapManager = React.useMemo(() => {
     const storage = swapStorageMaker();
-    console.log('swapStorageMaker Data', {
-      storage,
-      network: Chain.Network.Mainnet,
-      stakingKey: String(stakingKey),
-      address: walletAddresses[0],
-      addressHex: addressHex,
-      primaryTokenInfo: primaryTokenInfo,
-      isPrimaryToken: isPrimaryToken,
-      partners,
-    });
+
     return swapManagerMaker({
       storage,
       network: Chain.Network.Mainnet,
       stakingKey: String(stakingKey),
       address: walletAddresses[0],
-      addressHex: addressHex,
+      addressHex: String(stakingKey),
       primaryTokenInfo: primaryTokenInfo,
       isPrimaryToken: isPrimaryToken,
       partners,
     });
-  }, [stakingKey, primaryTokenInfo, addressHex, partners, walletAddresses[0]]);
+  }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
-  const { data: tokens = [], refetch: refetchTokens } = useQuery({
-    queryKey: ['useSwapTokens', swapManager.settings.routingPreference],
+  const { data: tokenIds = [], refetch: refetchTokens } = useQuery({
+    queryKey: ['useSwapTokenIds', swapManager.settings.routingPreference],
     queryFn: async () => {
       const res = await swapManager.api.tokens();
-      console.log('RESPONSE swapManager.api.tokens', res);
-
+      console.log('res', res);
       if (isRight(res)) {
-        const filteredTokens = res.value.data
-          .filter(token => !excludedTokens.includes(token.id)) // remove excluded tokens
-          .map(token => ({
-            status: token.status,
-            id: token.id,
-            ticker: token.ticker,
-            name: token.name,
-            type: token.type,
-            nature: token.nature,
-
-            fingerprint: token.fingerprint,
-            decimals: token.decimals,
-            description: token.description,
-            originalImage: token.originalImage,
-            symbol: token.symbol,
-            tag: token.tag,
-            website: token.website,
-          }));
-
-        const availableIds = filteredTokens.map(token => token.id);
-        const currentTokenId = state.tokenOutInput?.info?.id ?? undefinedToken;
-
-        if (!availableIds.includes(currentTokenId)) {
-          action({ type: 'ResetForm' });
-        }
-
-        return filteredTokens;
+        const tokenIds = res.value.data.map(({ id }) => id).filter(id => excludedTokens.indexOf(id) === -1);
+        if (!tokenIds.includes(state.tokenOutInput.id ?? undefinedToken)) action({ type: 'ResetForm' });
+        return tokenIds;
       }
-
       return [];
     },
   });
+
+  const getTokenInfoBatch = ids => stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(Chain.Network.Mainnet, ids);
+  const getTokenInfo = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
+
+  // React.useEffect(() => {
+  //   refetchTokens();
+  // }, [addressHex]);
+
+  const { tokenInfos = new Map<Portfolio.Token.Id, Portfolio.Token.Info>(), isLoading, isFetching } = usePortfolioTokenInfos(
+    {
+      wallet: { networkId: Chain.Network.Mainnet, portfolioPrimaryTokenInfo: primaryTokenInfo },
+      tokenIds,
+      sourceId: 'SwapProvider',
+    },
+    {
+      enabled: tokenIds.length > 0, // ✅ Only run query when we have token IDs
+    }
+  );
+
+  console.log('usePortfolioTokenInfos isLoading', { isLoading, isFetching });
+
   React.useEffect(() => {
-    refetchTokens();
-  }, [addressHex]);
-
-  console.log('tokenIds', tokens);
-
-  // const actions = React.useRef({
-  //   selectAssetToSell: (asset: any) => {
-  //     dispatch({
-  //       type: SwapActionType.SelectAssetToSell,
-  //       asset: asset,
-  //     });
-  //   },
-  //   selectAssetToBuy: (asset: any) => {
-  //     dispatch({
-  //       type: SwapActionType.SelectAssetToSell,
-  //       asset: asset,
-  //     });
-  //   },
-  // }).current;
+    setLoadingSwapPage(prev => {
+      const next = isLoading || isFetching;
+      return prev !== next ? next : prev;
+    });
+  }, [isLoading, isFetching]);
 
   const context: any = {
-    swapForm: { action, ...state },
+    swapForm: { action, ...state, tokenInfos },
     ftAssetList: ftAssetList || [],
     primaryTokenInfo,
     assetsStore: stores.substores.ada.swapStore.assets,
+    loadingSwapPage: loadingSwapPage,
+    getTokenInfo,
   };
 
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
@@ -167,17 +140,15 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapAction.TokenInIdChanged:
-        draft.tokenInInput = action.value;
+        draft.tokenInInput.tokenId = action.value;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
-
         break;
 
       case SwapAction.TokenOutIdChanged:
-        draft.tokenOutInput = action.value;
+        draft.tokenOutInput.tokenId = action.value;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
-
         break;
 
       case SwapAction.TokenInAmountChanged:
@@ -222,12 +193,12 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
 
       case SwapAction.SwitchTouched:
         draft.tokenOutInput.isTouched = state.tokenInInput.isTouched;
-        draft.tokenOutInput.tokenInfo = state.tokenInInput.tokenInfo;
+        draft.tokenOutInput.tokenId = state.tokenInInput.tokenId;
         draft.tokenOutInput.value = '';
         draft.tokenOutInput.error = null;
 
         draft.tokenInInput.isTouched = state.tokenOutInput.isTouched;
-        draft.tokenInInput.tokenInfo = state.tokenOutInput.tokenInfo;
+        draft.tokenInInput.tokenId = state.tokenOutInput.tokenId;
         draft.tokenInInput.value = state.tokenOutInput.value;
         draft.tokenInInput.error = null;
 
@@ -360,14 +331,14 @@ const defaultState: SwapState = Object.freeze({
   lastInputTouched: 'in',
   tokenInInput: {
     isTouched: true,
-    tokenInfo: primaryTokenInfoMainnet,
+    tokenId: primaryTokenId,
     disabled: false,
     error: null,
     value: '',
   },
   tokenOutInput: {
     isTouched: false,
-    tokenInfo: undefined,
+    tokenId: primaryTokenId,
     disabled: false,
     error: null,
     value: '',
@@ -393,14 +364,14 @@ type SwapState = {
   lastInputTouched: 'in' | 'out';
   tokenInInput: {
     isTouched: boolean;
-    tokenInfo?: any | null;
+    tokenId?: Portfolio.Token.Id;
     disabled: boolean;
     error: string | null;
     value: string;
   };
   tokenOutInput: {
     isTouched: boolean;
-    tokenInfo?: any | null;
+    tokenId?: Portfolio.Token.Id;
     disabled: boolean;
     error: string | null;
     value: string;

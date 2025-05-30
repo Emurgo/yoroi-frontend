@@ -13,7 +13,7 @@ import { useSwapRevamp } from '../../module/SwapContextProvider';
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
-  const { primaryTokenInfo } = useSwapRevamp();
+  const { primaryTokenInfo, loadingSwapPage } = useSwapRevamp();
 
   const openSelectAssetModal = (direction: 'in' | 'out') => {
     openModal({
@@ -23,6 +23,16 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
+
+  console.log('AssetSwap loadingSwapPage', loadingSwapPage);
+
+  // if (loadingSwapPage) {
+  //   return (
+  //     <Stack height="100%" width="100%" justifyContent="center" alignItems="center">
+  //       Loading...
+  //     </Stack>
+  //   );
+  // }
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
@@ -44,7 +54,7 @@ export const AssetSwap = () => {
       </LoadingButton>
     </Content>
   );
-};
+};;;;;;;;;
 
 const Content = styled(Stack)(({ theme }: any) => ({
   ...theme.atoms.pt_xl,

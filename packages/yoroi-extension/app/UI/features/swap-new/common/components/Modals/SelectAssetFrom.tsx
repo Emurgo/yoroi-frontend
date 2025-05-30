@@ -102,7 +102,7 @@ export const SelectAssetFrom = () => {
               secondaryToken24Activity={data24h && data24h[asset.info.id]}
               primaryTokenInfo={primaryTokenInfo}
               onAssetClick={() => {
-                swapForm.action({ type: 'TokenInIdChanged', value: asset });
+                swapForm.action({ type: 'TokenInIdChanged', value: asset.info.id });
                 closeModal();
               }}
             />
