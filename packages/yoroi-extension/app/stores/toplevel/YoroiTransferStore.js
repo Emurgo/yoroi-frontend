@@ -194,7 +194,7 @@ export default class YoroiTransferStore extends Store<StoresMap> {
       const { next } = payload;
 
       try {
-        await this.stores.wallets.sendAndRefresh({
+        await this.stores.transactionProcessingStore.sendAndRefresh({
           publicDeriverId: undefined,
           plateTextPart: undefined,
           broadcastRequest: async () => {
@@ -256,7 +256,7 @@ export default class YoroiTransferStore extends Store<StoresMap> {
     this.status = TransferStatus.UNINITIALIZED;
     this.error = null;
     this.transferTx = null;
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.recoveryPhrase = '';
 
     if (this.stores.profile.selectedNetwork != null) {

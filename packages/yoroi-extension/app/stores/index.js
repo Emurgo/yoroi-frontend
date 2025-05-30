@@ -26,6 +26,7 @@ import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 import ConnectorStore from './toplevel/DappConnectorStore'
 import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
+import TransactionProcessingStore from './toplevel/TransactionProcessingStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -51,6 +52,7 @@ const storeClasses = Object.freeze({
   explorers: ExplorerStore,
   connector: ConnectorStore,
   protocolParameters: ProtocolParametersStore,
+  transactionProcessingStore: TransactionProcessingStore,
   // note: purposely exclude substores and router
 });
 
@@ -82,6 +84,7 @@ export type StoresMap = {|
   // $FlowFixMe[value-as-type]
   router: RouterStore,
   protocolParameters: ProtocolParametersStore<StoresMap>,
+  transactionProcessingStore: TransactionProcessingStore,
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -115,6 +118,7 @@ const stores: StoresMap = (observable({
   router: null,
   connector: null,
   protocolParameters: null,
+  transactionProcessingStore: null,
 }): any);
 
 function initializeSubstore<T: {...}>(

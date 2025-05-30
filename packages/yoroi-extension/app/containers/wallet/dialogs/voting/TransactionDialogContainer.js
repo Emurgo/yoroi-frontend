@@ -43,7 +43,7 @@ export default class TransactionDialogContainer extends Component<AllProps> {
           progressInfo={votingStore.progressInfo}
           staleTx={votingStore.isStale}
           transactionFee={votingRegTx.fee()}
-          isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           onCancel={cancel}
           goBack={goBack}

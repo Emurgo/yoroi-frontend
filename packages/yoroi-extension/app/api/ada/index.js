@@ -61,6 +61,7 @@ import type {
   IPublicDeriver,
   UsedStatus,
   Value,
+  QueriedUtxo,
 } from './lib/storage/models/PublicDeriver/interfaces';
 import type {
   BaseGetTransactionsRequest,
@@ -81,8 +82,8 @@ import { generateAdaMnemonic, generateWalletRootKey, } from './lib/cardanoCrypto
 import { buildCoseSign1FromSignature, cip8Sign, makeCip8Key, v4PublicToV2 } from './lib/cardanoCrypto/utils';
 import { isValidBip39Mnemonic, } from './lib/cardanoCrypto/wallet';
 import type { CardanoSignTransaction } from 'trezor-connect-flow';
-import { createTrezorSignTxPayload, toTrezorSignRequest, } from './transactions/shelley/trezorTx';
-import { createLedgerSignTxPayload, toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
+import { toTrezorSignRequest, } from './transactions/shelley/trezorTx';
+import { toLedgerSignRequest, } from './transactions/shelley/ledgerTx';
 import {
   GenericApiError,
   IncorrectWalletPasswordError,
@@ -155,7 +156,7 @@ import type { DefaultTokenEntry } from '../common/lib/MultiToken';
 import { MultiToken } from '../common/lib/MultiToken';
 import { getReceiveAddress } from '../../stores/stateless/addressStores';
 import { generateRegistrationMetadata } from './lib/cardanoCrypto/catalyst';
-import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet } from '../../coreUtils';
+import { bytesToHex, fail, hexToBytes, hexToUtf, iterateLenGet, first, sorted } from '../../coreUtils';
 import type { PersistedSubmittedTransaction } from '../localStorage';
 import type WalletTransaction from '../../domain/WalletTransaction';
 import { derivePrivateByAddressing, derivePublicByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
@@ -250,8 +251,11 @@ export type CreateHWSignTxDataRequestFromRawTx = {|
   txBodyHex: string,
   network: $ReadOnly<NetworkRow>,
   addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
+  changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners?: Array<string>,
+  ledgerSupportsCip36?: boolean,
+  catalystData?: LedgerNanoCatalystRegistrationTxSignData,
 |};
 
 // createUnsignedTx
@@ -509,7 +513,8 @@ export type GetTransactionRowsToExportFunc = (
 export type ForeignUtxoFetcher = (Array<string>) => Promise<Array<?RemoteUnspentOutput>>;
 
 export const FETCH_TXS_BATCH_SIZE = 20;
-const MIN_REORG_OUTPUT_AMOUNT  = '1000000';
+const MIN_REORG_OUTPUT_AMOUNT = '1000000';
+const MAX_PICKED_COLLATERAL_UTXO_ADA = 10_000_000; // 10 ADA
 
 export default class AdaApi {
 
@@ -729,63 +734,6 @@ export default class AdaApi {
     }
   }
 
-  createTrezorSignTxData(request: {|
-    signRequest: HaskellShelleyTxSignRequest,
-    network: $ReadOnly<NetworkRow>,
-  |}): CreateTrezorSignTxDataResponse {
-    try {
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} called`);
-
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
-      const trezorSignTxPayload = createTrezorSignTxPayload(
-        request.signRequest,
-        config.ByronNetworkId,
-        Number.parseInt(config.ChainNetworkId, 10),
-      );
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} success: ` + stringifyData(trezorSignTxPayload));
-      return {
-        trezorSignTxPayload,
-      };
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.createTrezorSignTxData)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
-  createLedgerSignTxData(
-    request: CreateLedgerSignTxDataRequest
-  ): CreateLedgerSignTxDataResponse {
-    try {
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} called`);
-
-      const config = getCardanoHaskellBaseConfig(
-        request.network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
-
-      const ledgerSignTxPayload = createLedgerSignTxPayload({
-        signRequest: request.signRequest,
-        byronNetworkMagic: config.ByronNetworkId,
-        networkId: Number.parseInt(config.ChainNetworkId, 10),
-        addressingMap: request.addressingMap,
-        cip36: request.cip36,
-      });
-
-      Logger.debug(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} success: ` + stringifyData(ledgerSignTxPayload));
-      return {
-        ledgerSignTxPayload
-      };
-    } catch (error) {
-      Logger.error(`${nameof(AdaApi)}::${nameof(this.createLedgerSignTxData)} error: ` + stringifyError(error));
-
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
-  }
-
   createHwSignTxDataFromRawTx(
     hw: 'ledger' | 'trezor',
     request: CreateHWSignTxDataRequestFromRawTx
@@ -808,8 +756,11 @@ export default class AdaApi {
           Number(config.ChainNetworkId),
           protocolMagic,
           addressMap,
+          request.changeAddrs ?? [],
           request.senderUtxos,
           request.additionalRequiredSigners ?? [],
+          request.ledgerSupportsCip36,
+          request.catalystData,
         );
 
         Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(ledgerSignTxPayload));
@@ -822,7 +773,9 @@ export default class AdaApi {
           Number(config.ChainNetworkId),
           protocolMagic,
           addressMap,
+          request.changeAddrs ?? [],
           request.senderUtxos,
+          request.catalystData,
         );
         Logger.debug(`${nameof(AdaApi)}::${nameof(this.createHwSignTxDataFromRawTx)} success: ` + stringifyData(trezorSignTxPayload));
         return { hw, result: { trezorSignTxPayload } };
@@ -1807,7 +1760,7 @@ export default class AdaApi {
         network,
       });
     }
-
+  
     const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
       db,
       wallet.cip1852WrapperRow,
@@ -2469,6 +2422,21 @@ export default class AdaApi {
       });
     };
   };
+
+  // <TODO:PENDING_REMOVAL> All tx-building eventually should use collateral return so no pure picking for collaterals would be required
+  pickCollateralUtxo: ({| wallet: WalletState |}) => Promise<?QueriedUtxo> = async ({ wallet }) => {
+    const allUtxos = wallet.utxos;
+    if (allUtxos.length === 0) {
+      fail('Cannot pick a collateral utxo! No utxo available at all in the wallet!');
+    }
+    const utxoDefaultCoinAmount = (u: QueriedUtxo): BigNumber =>
+      new BigNumber(u.output.tokens.find(x => x.Token.Identifier === '')?.TokenList.Amount ?? 0);
+    const compareDefaultCoins = (a: QueriedUtxo, b: QueriedUtxo): number =>
+      utxoDefaultCoinAmount(a).comparedTo(utxoDefaultCoinAmount(b));
+    const smallPureUtxos = allUtxos
+      .filter(u => u.output.tokens.length === 1 && utxoDefaultCoinAmount(u).lte(MAX_PICKED_COLLATERAL_UTXO_ADA));
+    return first(sorted(smallPureUtxos, compareDefaultCoins));
+  }
 }
 // ========== End of class AdaApi =========
 
