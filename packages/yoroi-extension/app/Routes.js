@@ -276,10 +276,16 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
-          <Route
-            path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
-            component={props => wrapSwapRevamp({ ...props, stores }, SwapRevampSubpages(stores))}
-          />
+          <Route element={<SwapRevampSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
+              element={<AssetSwapRevampPage stores={stores} />}
+            />
+            <Route
+              path={ROUTES.SWAP_REVAMP.ORDERS}
+              element={<SwapOrdersRevampPage stores={stores} />}
+            />
+          </Route>
 
           <Route element={<GovernanceSubpages stores={stores}/>}>
             <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
@@ -328,12 +334,10 @@ const NftGallerySubPages = ({ stores }) => (
   </NftGalleryContextProvider>
 );
 
-const SwapRevampSubpages = stores => (
-  <Routes>
-    <Route exact path={ROUTES.SWAP_REVAMP.ASSET_SWAP} component={props => <AssetSwapRevampPage {...props} stores={stores} />} />
-    <Route exact path={ROUTES.SWAP_REVAMP.ORDERS} component={props => <SwapOrdersRevampPage {...props} stores={stores} />} />
-    <Navigate to={ROUTES.SWAP_REVAMP.ASSET_SWAP} />
-  </Routes>
+const SwapRevampSubpages = ({ stores }) => (
+  <SwapContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </SwapContextProvider>
 );
 
 const SwapSubpages = ({ stores }) => {
@@ -436,15 +440,5 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
-  );
-}
-
-function wrapSwapRevamp(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
-
-  return (
-    <SwapContextProvider currentWallet={currentWalletInfo}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </SwapContextProvider>
   );
 }
