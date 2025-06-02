@@ -30,9 +30,10 @@ export default function NftsEmptyState({ isSearch }: NftsEmptyStateProps) {
         justifyContent: 'center',
       }}
       spacing={2}
+      id="nftsList-emptyState-component"
     >
       <NftsNotFound />
-      <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium">
+      <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium" id="nftsList-noNfts-text">
         {intl.formatMessage(isSearch ? messages.noResultsFound : messages.noNFTsAdded)}
       </Typography>
     </Stack>
