@@ -1368,6 +1368,7 @@
   "transaction.review.outputsLabel": "Outputs",
   "transaction.review.yourAddressLabel": "Your Address",
   "transaction.review.registerStakingKey": "Register Staking key deposit",
+  "transaction.review.stakeWalletBalance": "Stake entire wallet balance to",
   "transaction.review.trezorConfirm": "Confirm using Trezor",
   "transaction.review.ledgerConfirm": "Confirm using Ledger",
   "transaction.review.transactionReview": "Transaction Review",

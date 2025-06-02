@@ -3,6 +3,8 @@ import { toSvg } from 'jdenticon';
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import SeizaFetcher from './SeizaFetcher';
+import { useStrings } from '../../../UI/features/transaction-review/common/hooks/useStrings';
+import BigNumber from 'bignumber.js';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
@@ -67,19 +69,19 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
 
 const OperationsDetails = ({ avatarGenerated, poolName }) => {
   const { isStakeRegistered, stakeKeyDeposit, primaryTokenInfo } = useTxReviewModal();
-  console.log('isStakeRegistered', isStakeRegistered);
+  const strings =  useStrings();
   return (
     <Stack direction="column" spacing={2}>
       {!isStakeRegistered && (
         <Stack direction="row" justifyContent="space-between">
-          <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+          <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
           <Typography color="ds.text_gray_medium">
-            {stakeKeyDeposit} {primaryTokenInfo.name}
+            {`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`}
           </Typography>
         </Stack>
       )}
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Stake entire wallet balance to</Typography>
+        <Typography color="ds.text_gray_low">{strings.stakeWalletBalance}</Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{
