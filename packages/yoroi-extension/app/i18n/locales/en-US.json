@@ -928,6 +928,8 @@
   "wallet.revampAnnouncement.updates.5new": "Yoroi Drep vote delegation",
   "wallet.revampAnnouncement.updates.6new": "Network Switch feature (can use wallets on Cardano Preprod testing network with test TADA)",
   "wallet.revampAnnouncement.updates.7new": "Side menu scroll",
+  "wallet.revampAnnouncement.updates.8new": "In app notifications (receive notifications when a transactions is confirmed)",
+  "wallet.revampAnnouncement.updates.9new": "Redesigned transaction preview interface (Review transactions at a glance before signing)",
   "wallet.revampAnnouncement.updatesSectionTitleNew": "Yoroi wallet just got more powerful new features. Start exploring the updates and take your crypto experience to the next level!",
   "wallet.send.confirmationDialog.addressToLabel": "To",
   "wallet.send.confirmationDialog.amountLabel": "Amount",
