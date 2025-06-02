@@ -2,7 +2,7 @@ import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import { ElementLocator } from '../../locator.js';
 import WalletCommonBase from '../../walletCommonBase.page.js';
 
-class NftDetails extends WalletCommonBase {
+export default class NftDetails extends WalletCommonBase {
   // locators
   /** @type {ElementLocator} */
   backNFTsGalleryBtnLocator = {
@@ -245,5 +245,3 @@ class NftDetails extends WalletCommonBase {
     return await this.getText(this.metadataInfoTextLocator);
   }
 }
-
-export default NftDetails;

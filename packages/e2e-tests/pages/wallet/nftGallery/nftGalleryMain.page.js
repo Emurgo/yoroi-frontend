@@ -5,7 +5,7 @@ import { ElementLocator } from '../../locator.js';
 import { NO_NFTS_ADDED, NO_NFTS_FOUND } from '../../../helpers/messages.js';
 import NftDetails from './nftDetails.page.js';
 
-class NftGalleryTab extends WalletCommonBase {
+export default class NftGalleryTab extends WalletCommonBase {
   // locators
   /** @type {ElementLocator} */
   nftsCountTextLocator = {
@@ -237,7 +237,7 @@ class NftGalleryTab extends WalletCommonBase {
   /**
    * Selecting a NFT by its name
    * @param {string} nftName
-   * @returns {NftDetails}
+   * @returns {Promise<NftDetails>}
    */
   async selectNftByName(nftName) {
     this.logger.info(`NftGalleryTab::selectNftByName is called. NFT's name: ${nftName}`);
@@ -252,5 +252,3 @@ class NftGalleryTab extends WalletCommonBase {
     throw new Error(`Suitable NFT with name "${nftName}" is not found`);
   }
 }
-
-export default NftGalleryTab;
