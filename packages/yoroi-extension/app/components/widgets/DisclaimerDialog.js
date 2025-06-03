@@ -1,5 +1,6 @@
 // @flow
-import { useState, Element } from 'react';
+import { useState } from 'react';
+import type { Element } from 'react';
 import { injectIntl, defineMessages, type $npm$ReactIntl$IntlShape } from 'react-intl';
 import Dialog from './Dialog';
 import globalMessages from '../../i18n/global-messages';
