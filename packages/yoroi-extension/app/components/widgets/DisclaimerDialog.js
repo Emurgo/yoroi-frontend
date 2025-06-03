@@ -1,5 +1,5 @@
 // @flow
-import { useState, Node } from 'react';
+import { useState, Element } from 'react';
 import { injectIntl, defineMessages, type $npm$ReactIntl$IntlShape } from 'react-intl';
 import Dialog from './Dialog';
 import globalMessages from '../../i18n/global-messages';
@@ -44,7 +44,7 @@ const messages = defineMessages({
 
 type Props = {|
   onProceed: () => void,
-  closeButton: Node,
+  closeButton: Element<any>,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
