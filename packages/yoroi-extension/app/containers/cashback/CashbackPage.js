@@ -553,24 +553,6 @@ const CashbackPageContainer = observer((props: AllProps) => {
   );
 });
 
-const CircleButton = ({ label = 'OK', onClick }) => {
-  const buttonStyle = {
-    width: '60px',
-    height: '60px',
-    borderRadius: '50%',
-    backgroundColor: '#4CAF50',
-    color: 'white',
-    border: 'none',
-    fontSize: '16px',
-    cursor: 'pointer',
-  };
-
-  return (
-    <button style={buttonStyle} onClick={onClick}>
-      {label}
-    </button>
-  );
-};
 
 const CloseButton = ({onClick}) => {
   return (
