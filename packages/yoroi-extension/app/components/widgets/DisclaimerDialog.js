@@ -44,6 +44,7 @@ const messages = defineMessages({
 
 type Props = {|
   onProceed: () => void,
+  closeButton: Element<any>,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -67,6 +68,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
   return (
     <Dialog
       title={intl.formatMessage(globalMessages.disclaimer)}
+      closeButton={props.closeButton}
       dialogActions={[
         {
           label: intl.formatMessage(globalMessages.proceed),
