@@ -94,7 +94,7 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
             stores={stores}
             stepsList={stepsList}
             submit={votingStore.submitRegister}
-            goBack={votingStore.goBackToRegister}
+            goBack={votingStore.goBackToGenerate}
             cancel={this.cancel}
             onError={votingStore.submitRegisterError}
           />
@@ -107,7 +107,7 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
             stepsList={stepsList}
             cancel={this.cancel}
             submit={votingStore.submitTransaction}
-            goBack={votingStore.goBackToRegister}
+            goBack={votingStore.goBackToGenerate}
             onError={votingStore.submitTransactionError}
             walletType={walletType}
           />
