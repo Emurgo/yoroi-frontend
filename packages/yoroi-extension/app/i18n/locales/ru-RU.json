@@ -928,6 +928,8 @@
   "wallet.revampAnnouncement.updates.5new": "Yoroi Drep vote delegation",
   "wallet.revampAnnouncement.updates.6new": "Network Switch feature (can use wallets on Cardano Preprod testing network with test TADA)",
   "wallet.revampAnnouncement.updates.7new": "Side menu scroll",
+  "wallet.revampAnnouncement.updates.8new": "In app notifications (receive notifications when a transactions is confirmed)",
+  "wallet.revampAnnouncement.updates.9new": "Redesigned transaction preview interface (Review transactions at a glance before signing)",
   "wallet.revampAnnouncement.updatesSectionTitleNew": "Yoroi wallet just got more powerful new features. Start exploring the updates and take your crypto experience to the next level!",
   "wallet.send.confirmationDialog.addressToLabel": "Кому",
   "wallet.send.confirmationDialog.amountLabel": "Сумма",
@@ -1368,6 +1370,7 @@
   "transaction.review.outputsLabel": "Outputs",
   "transaction.review.yourAddressLabel": "Your Address",
   "transaction.review.registerStakingKey": "Register Staking key deposit",
+  "transaction.review.stakeWalletBalance": "Stake entire wallet balance to",
   "transaction.review.trezorConfirm": "Confirm using Trezor",
   "transaction.review.ledgerConfirm": "Confirm using Ledger",
   "transaction.review.transactionReview": "Transaction Review",
@@ -1380,5 +1383,5 @@
   "transaction.review.collateralInfo": "Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.",
   "transaction.review.interactWithOperations": "You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.",
   "transaction.review.takeHardwareWallet": "Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.",
-  "transaction.review.rewardsWithdraw": "Our rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation."
+  "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation."
 }
