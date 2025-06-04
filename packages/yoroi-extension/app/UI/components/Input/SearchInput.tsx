@@ -1,6 +1,6 @@
 import { InputAdornment, InputProps, OutlinedInput, styled, useTheme } from '@mui/material';
-import React, { useRef } from 'react';
-import { Icon } from './../icons/index';
+import { useRef } from 'react';
+import { Icon } from '../icons/index';
 
 const StyledInput = styled(OutlinedInput)(({ theme }: any) => ({
   width: '320px',

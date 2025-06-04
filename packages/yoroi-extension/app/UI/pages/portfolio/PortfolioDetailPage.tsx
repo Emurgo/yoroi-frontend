@@ -10,7 +10,7 @@ type Props = {
 };
 
 const PortfolioDetailPage = observer(({ stores, ...props }: Props) => {
-  const { tokenId } = useParams();
+  const { tokenId } = useParams<{ tokenId: string }>();
 
   const { ftAssetList } = usePortfolio();
 

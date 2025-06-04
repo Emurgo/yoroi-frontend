@@ -1,4 +1,3 @@
-import * as React from 'react';
 import styled from '@emotion/styled';
 import { Switch as MuiSwitch } from '@mui/material';
 

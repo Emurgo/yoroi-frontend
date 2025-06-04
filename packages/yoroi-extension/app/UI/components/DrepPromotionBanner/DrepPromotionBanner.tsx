@@ -1,7 +1,7 @@
 import { Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { dRepNormalize } from '../../../api/ada/lib/cardanoCrypto/utils';
 import LocalStorageApi from '../../../api/localStorage/index';
 import globalMessages from '../../../i18n/global-messages';

@@ -5,16 +5,14 @@ import GeneralPageLayout from '../../layout/GeneralPageLayout';
 
 type Props = {
   stores: any;
-  actions: any;
   children: ReactNode;
 };
 
-const NftsLayout = ({ stores, actions, children }: Props): JSX.Element => {
+const NftsLayout = ({ stores, children }: Props): JSX.Element => {
   return (
     <GeneralPageLayout
       stores={stores}
-      actions={actions}
-      navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'NFT Gallery'} />} />}
+      navbar={<NavBarContainerRevamp stores={stores} title={<NavBarTitle title={'NFT Gallery'} />} />}
     >
       {children}
     </GeneralPageLayout>

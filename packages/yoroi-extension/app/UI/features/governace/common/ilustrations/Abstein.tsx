@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const Abstein = () => {
   return (
     <svg width="157" height="180" viewBox="0 0 280 280" fill="none">
