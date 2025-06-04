@@ -928,6 +928,8 @@
   "wallet.revampAnnouncement.updates.5new": "Yoroi Drep 投票委托",
   "wallet.revampAnnouncement.updates.6new": "网络切换功能（可使用测试版 TADA 在 Cardano Preprod 测试网络上的钱包）",
   "wallet.revampAnnouncement.updates.7new": "侧边菜单滚动",
+  "wallet.revampAnnouncement.updates.8new": "In app notifications (receive notifications when a transactions is confirmed)",
+  "wallet.revampAnnouncement.updates.9new": "Redesigned transaction preview interface (Review transactions at a glance before signing)",
   "wallet.revampAnnouncement.updatesSectionTitleNew": "Yoroi 钱包新增了更强大的新功能。立即探索更新内容，将您的加密货币体验提升到新高度！",
   "wallet.send.confirmationDialog.addressToLabel": "到",
   "wallet.send.confirmationDialog.amountLabel": "金额",
@@ -1368,6 +1370,7 @@
   "transaction.review.outputsLabel": "输出",
   "transaction.review.yourAddressLabel": "您的地址",
   "transaction.review.registerStakingKey": "注册质押密钥抵押",
+  "transaction.review.stakeWalletBalance": "Stake entire wallet balance to",
   "transaction.review.trezorConfirm": "使用 Trezor 确认",
   "transaction.review.ledgerConfirm": "使用 Ledger 确认",
   "transaction.review.transactionReview": "交易审查",
@@ -1380,5 +1383,5 @@
   "transaction.review.collateralInfo": "在 Cardano 上与某些智能合约进行交互时，必须提供抵押。只有当交易验证失败时，才会从您的抵押中扣除 ADA。",
   "transaction.review.interactWithOperations": "您即将与运营模块进行交互，这些模块是治理及各类区块链活动中的核心组件。其中包括根据 CIP-0095 规范设计的 Cardano 治理证书，该证书用于支持治理交易的执行。",
   "transaction.review.takeHardwareWallet": "取出您的硬件钱包设备，并按照设备上的指示操作。请确保您进行的是可信操作。",
-  "transaction.review.rewardsWithdraw": "一旦您从质押池中撤销质押，您的奖励将自动被提取。您还将收回您的质押押金 2 ADA。如果您希望选择另一个质押池，您可以更改您的偏好设置而无需撤销质押。"
+  "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation."
 }
