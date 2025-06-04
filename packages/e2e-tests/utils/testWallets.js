@@ -52,7 +52,7 @@ export const testWalletNFTs = Object.freeze({
   name: 'TestWalletNFTs',
   plate: 'DCDT-7109',
   mnemonic: 'eternal logic shrimp direct weasel heart relief tonight else expose lift lava barrel frame multiply',
-  balance: 0,
+  balance: 3.24112,
 })
 
 export const getSpendableWallet = () => {
