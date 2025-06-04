@@ -16,6 +16,9 @@ import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import styles from './RegisterDialog.scss';
 import { Typography } from '@mui/material';
 import Stepper from '../../common/stepper/Stepper';
+import DialogBackButton from '../../widgets/DialogBackButton';
+import type LocalizableError from '../../../i18n/LocalizableError';
+import ErrorBlock from '../../widgets/ErrorBlock';
 
 const messages = defineMessages({
   line1: {
@@ -31,6 +34,8 @@ type Props = {|
   +submit: string => PossiblyAsync<void>,
   +cancel: void => void,
   +isProcessing: boolean,
+  +goBack: void => void,
+  +error: ?LocalizableError,
 |};
 
 @observer
@@ -46,7 +51,7 @@ export default class RegisterDialog extends Component<Props> {
   }
   render(): Node {
     const { intl } = this.context;
-    const { stepsList, progressInfo, cancel, isProcessing } = this.props;
+    const { stepsList, progressInfo, cancel, isProcessing, goBack, error } = this.props;
 
     const dailogActions = [
       {
@@ -65,6 +70,7 @@ export default class RegisterDialog extends Component<Props> {
         dialogActions={dailogActions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
+        backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
         {(
@@ -95,6 +101,7 @@ export default class RegisterDialog extends Component<Props> {
             setForm={form => this.setSpendingPasswordForm(form)}
             isSubmitting={isProcessing}
           />
+          <ErrorBlock error={error} />
         </div>
       </Dialog>
     );

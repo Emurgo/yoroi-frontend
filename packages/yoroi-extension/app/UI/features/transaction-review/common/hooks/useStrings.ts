@@ -92,6 +92,10 @@ export const messages = Object.freeze(
       id: 'transaction.review.registerStakingKey',
       defaultMessage: '!!!Register Staking key deposit',
     },
+    stakeWalletBalance: {
+      id: 'transaction.review.stakeWalletBalance',
+      defaultMessage: '!!!Stake entire wallet balance to',
+    },
     trezorConfirm: {
       id: 'transaction.review.trezorConfirm',
       defaultMessage: '!!!Confirm using Trezor',
@@ -134,7 +138,7 @@ export const messages = Object.freeze(
     },
     rewardsWithdraw: {
       id: 'transaction.review.rewardsWithdraw',
-      defaultMessage: '!!!Our rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
+      defaultMessage: '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
     },
     associatedAddress: {
       id: 'transaction.review.associatedAddress',
@@ -176,6 +180,7 @@ export const useStrings = () => {
     identifyDrep: intl.formatMessage(messages.identifyDrep),
     confirmLabel: intl.formatMessage(messages.confirmLabel),
     registerStakingKey: intl.formatMessage(messages.registerStakingKey),
+    stakeWalletBalance: intl.formatMessage(messages.stakeWalletBalance),
     trezorConfirm: intl.formatMessage(messages.trezorConfirm),
     ledgerConfirm: intl.formatMessage(messages.ledgerConfirm),
     submitLabel: intl.formatMessage(messages.submitLabel),

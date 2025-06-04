@@ -54,6 +54,14 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.7new',
     defaultMessage: '!!!Side menu scroll',
   },
+  update8: {
+    id: 'wallet.revampAnnouncement.updates.8new',
+    defaultMessage: '!!!In app notifications (receive notifications when a transactions is confirmed)',
+  },
+  update9: {
+    id: 'wallet.revampAnnouncement.updates.9new',
+    defaultMessage: '!!!Redesigned transaction preview interface (Review transactions at a glance before signing)',
+  },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
     defaultMessage: '!!!Go to the wallet',
@@ -73,6 +81,8 @@ const ANNOUNCEMENT_MESSAGES: Array<[string, Object]> = [
   ['5.6.0', messages.update5],
   ['5.7.0', messages.update6],
   ['5.7.0', messages.update7],
+  ['5.8.0', messages.update8],
+  ['5.8.0', messages.update9],
 ];
 
 export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =

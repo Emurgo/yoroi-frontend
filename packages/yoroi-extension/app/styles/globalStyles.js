@@ -290,12 +290,12 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
           '--toastify-color-warning': '#f1c40f',
           '--toastify-color-error': 'hsl(6, 78%, 57%)',
           '--toastify-color-transparent': 'rgba(255, 255, 255, 0.7)',
-      
+
           '--toastify-icon-color-info': 'var(--toastify-color-info)',
           '--toastify-icon-color-success': 'var(--toastify-color-success)',
           '--toastify-icon-color-warning': 'var(--toastify-color-warning)',
           '--toastify-icon-color-error': 'var(--toastify-color-error)',
-      
+
           '--toastify-container-width': 'fit-content',
           '--toastify-toast-width': '446px',
           '--toastify-toast-offset': '16px',
@@ -313,13 +313,13 @@ export function getMainYoroiPalette(theme: ColorPaletteForStyles): { [string]: s
           '--toastify-z-index': '9999',
           '--toastify-text-color-light': '#757575',
           '--toastify-text-color-dark': '#fff',
-      
+
           /* Used only for colored theme */
           '--toastify-text-color-info': '#fff',
           '--toastify-text-color-success': '#fff',
           '--toastify-text-color-warning': '#fff',
           '--toastify-text-color-error': '#fff',
-      
+
           '--toastify-spinner-color': '#616161',
           '--toastify-spinner-color-empty-area': '#e0e0e0',
           '--toastify-color-progress-light': 'linear-gradient(to right, #4cd964, #5ac8fa, #007aff, #34aadc, #5856d6, #ff2d55)',
@@ -387,6 +387,7 @@ const globalStyles = (theme: Object): Node => {
           boxSizing: 'border-box',
           '&::-webkit-scrollbar': {
             width: '20px',
+            height: '20px',
           },
           '&::-webkit-scrollbar-track': {
             backgroundColor: 'transparent',

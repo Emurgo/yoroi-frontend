@@ -1,4 +1,4 @@
-import { Button, Stack, Typography, styled } from '@mui/material';
+import { Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -55,6 +55,7 @@ const useDrepBannerVisibility = (balance: BigNumber, selectedWalletId: number) =
 
 export const DrepPromotionBanner = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
+  const theme: any = useTheme();
 
   if (selectedWallet.isTestnet) {
     return null;
@@ -100,6 +101,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <IconWrapper
           onClick={dismissBanner}
           icon={Icons.CloseCircleIcon}
+          iconProps={{fill: theme.palette.ds.el_gray_max}}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
           asButton

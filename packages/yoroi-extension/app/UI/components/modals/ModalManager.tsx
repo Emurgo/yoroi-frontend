@@ -41,7 +41,7 @@ export const ModalManager = () => {
       id={`${modalId}-dialogWindow-presentation`}
     >
       <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${modalId}-modalTitle-text`}>
-        <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900">
+        <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900" sx={{ textTransform: 'uppercase' }}>
           {title}
         </Typography>
       </DialogTitle>

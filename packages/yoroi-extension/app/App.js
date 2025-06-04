@@ -28,6 +28,8 @@ import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
 
+import 'react-tooltip/dist/react-tooltip.css';
+
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
 
