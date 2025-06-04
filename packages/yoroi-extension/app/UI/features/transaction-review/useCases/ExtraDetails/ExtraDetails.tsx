@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 
 export const ExtraDetails = () => {

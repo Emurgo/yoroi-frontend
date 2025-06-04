@@ -1,9 +1,5 @@
-
-
 import { Stack, TableCell, TableRow } from '@mui/material';
-import React from 'react';
 import { Skeleton } from '../../../../components';
-
 
 export const TableRowSkeleton = ({ theme, ...props }) => (
     <TableRow

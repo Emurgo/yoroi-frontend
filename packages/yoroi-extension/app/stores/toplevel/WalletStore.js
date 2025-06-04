@@ -8,7 +8,6 @@ import config from '../../config';
 import globalMessages from '../../i18n/global-messages';
 import type { Notification } from '../../types/notification.types';
 import type { IGetLastSyncInfoResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import { Logger, stringifyError } from '../../utils/logging';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { createDebugWalletDialog } from '../../containers/wallet/dialogs/DebugWalletDialogContainer';
 import { createProblematicWalletDialog } from '../../containers/wallet/dialogs/ProblematicWalletDialogContainer';
@@ -29,8 +28,6 @@ import { asAddressedUtxo } from '../../api/ada/transactions/utils';
 declare var chrome;
 */
 
-export type SendMoneyRequest = Request<DeferredCall<{| txId: string |}>>;
-
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -47,10 +44,6 @@ export default class WalletStore extends Store<StoresMap> {
   @observable selectedWalletName: null | string = null;
 
   @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
-
-  @observable sendMoneyRequest: SendMoneyRequest = new Request<
-    DeferredCall<{| txId: string |}>
-  >(request => request());
 
   @observable createWalletRequest: Request<
     (() => Promise<WalletState>) => Promise<WalletState>
@@ -379,50 +372,6 @@ export default class WalletStore extends Store<StoresMap> {
         )
       );
     }
-  };
-
-  sendAndRefresh: ({|
-    publicDeriverId: void | number,
-    plateTextPart: void | string,
-    broadcastRequest: void => Promise<{| txId: string |}>,
-    refreshWallet: () => Promise<void>,
-  |}) => Promise<{| txId: string |}> = async request => {
-    this.sendMoneyRequest.reset();
-    const resp = await this.sendMoneyRequest.execute(async () => {
-      const result = await request.broadcastRequest();
-
-      if (request.publicDeriverId != null) {
-        const memo = this.stores.transactionBuilderStore.memo;
-        if (memo !== '' && memo !== undefined && request.plateTextPart) {
-          try {
-            await this.stores.memos.saveTxMemo({
-              publicDeriverId: request.publicDeriverId,
-              plateTextPart: request.plateTextPart,
-              memo: {
-                Content: memo,
-                TransactionHash: result.txId,
-                LastUpdated: new Date(),
-              },
-            });
-          } catch (error) {
-            Logger.error(
-              `${nameof(WalletStore)}::${nameof(this.sendAndRefresh)} error: ` +
-                stringifyError(error)
-            );
-            throw new Error('An error has ocurred when saving the transaction memo.');
-          }
-        }
-      }
-      try {
-        await request.refreshWallet();
-      } catch (_e) {
-        // even if refreshing the wallet fails, we don't want to fail the tx
-        // otherwise user may try and re-send the tx
-      }
-      return result;
-    }).promise;
-    if (resp == null) throw new Error(`Should never happen`);
-    return resp;
   };
 
   @action onRenameSelectedWallet: (string) => void = (newName) => {

@@ -24,7 +24,9 @@ import NotificationsManager from './UI/features/notifications/common/Notificatio
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
+import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
+
 
 type Props = {|
   +stores: StoresMap,

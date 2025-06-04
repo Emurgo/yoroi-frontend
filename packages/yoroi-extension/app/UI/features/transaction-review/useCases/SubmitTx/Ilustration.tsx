@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const Ilustration = () => {
   return (
     <svg width="161" height="247" viewBox="0 0 161 247" fill="none" xmlns="http://www.w3.org/2000/svg">

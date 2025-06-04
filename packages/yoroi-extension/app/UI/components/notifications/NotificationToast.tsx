@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Typography } from '@mui/material';
 import { noop } from 'lodash';
 import { IconWrapper, Icons } from '../icons/index';

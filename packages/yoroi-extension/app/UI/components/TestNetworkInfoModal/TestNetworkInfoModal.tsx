@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button, Stack, Typography } from '@mui/material';
 import { defineMessages, useIntl } from 'react-intl';
 

@@ -17,8 +17,7 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import type { StepStateEnum } from '../../components/widgets/ProgressSteps';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { ROUTES } from '../../routes-config';
-import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
-import LocalizableError from '../../i18n/LocalizableError';
+import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
@@ -29,6 +28,8 @@ import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/derive
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
 import { bytesToHex, noop } from '../../coreUtils';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { IncorrectWalletPasswordError } from '../../api/common/errors'
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -163,6 +164,8 @@ export default class VotingStore extends Store<StoresMap> {
   };
 
   @action goBackToGenerate: void => void = () => {
+    this.createVotingRegTx.reset();
+    this.error = null;
     this.progressInfo.currentStep = ProgressStep.GENERATE;
     this.progressInfo.stepState = StepState.LOAD;
   };
@@ -304,48 +307,15 @@ export default class VotingStore extends Store<StoresMap> {
     password?: string,
     wallet: WalletState,
   |}) => Promise<void> = async request => {
-    const result = this.createVotingRegTx.result;
-    if (result == null) {
+    const signRequest = this.createVotingRegTx.result;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    if (request.wallet.type === 'ledger') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          ledger: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-    if (request.wallet.type === 'trezor') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          trezor: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-    }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          wallet: request.wallet,
-          password: request.password,
-          signRequest: result,
-        },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+    await this.stores.transactionProcessingStore.adaSendAndRefresh({
+      wallet: request.wallet,
+      signRequest,
+      password: request.password,
+      callback: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
   };
 
@@ -379,7 +349,7 @@ export default class VotingStore extends Store<StoresMap> {
       stepState: StepState.LOAD,
     };
     this.error = null;
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createVotingRegTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;
@@ -388,4 +358,14 @@ export default class VotingStore extends Store<StoresMap> {
     this.catalystPrivateKey = undefined;
     this.pin = [];
   }
+}
+
+function convertToLocalizableError(error: Error): LocalizableError {
+  if (error instanceof LocalizableError) {
+    return error;
+  }
+  if (error instanceof WrongPassphraseError) {
+    return new IncorrectWalletPasswordError();
+  }
+  return new UnexpectedError();
 }

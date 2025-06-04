@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { SuccessIlustration } from './SuccessIlustration';
 // @ts-ignore

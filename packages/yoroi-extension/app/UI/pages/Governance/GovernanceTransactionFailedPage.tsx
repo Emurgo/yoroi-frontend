@@ -1,11 +1,9 @@
-import React from 'react';
-import { TransactionFailed } from '../../components/TransactionFailed/TransactionFailed';
+import { TransactionFailed } from '../../components';
 import { useNavigateTo } from '../../features/governace/common/useNavigateTo';
 import GovernanceLayout from './layout';
 
 type Props = {
   stores: any;
-  actions: any;
   children?: any;
 };
 

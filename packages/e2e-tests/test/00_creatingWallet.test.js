@@ -84,7 +84,7 @@ describe('Creating wallet', function () {
     await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
-    const titleIsCorrect = await transactionsPage.titleIsCorrect();
+    const titleIsCorrect = await transactionsPage.titleIsCorrect(pageTitle.wallet);
     expect(titleIsCorrect, `Title is different from "${pageTitle.wallet}"`).to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
     expect(walletInfo.balance, 'The wallet balance should be 0 (zero)').to.equal(0);
@@ -118,7 +118,7 @@ describe('Creating wallet', function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToStakingTab();
     const stakingPage = new StakingTab(webdriver, logger);
-    const titleIsCorrect = await stakingPage.titleIsCorrect();
+    const titleIsCorrect = await stakingPage.titleIsCorrect(pageTitle.staking);
     expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
     const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
     expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;

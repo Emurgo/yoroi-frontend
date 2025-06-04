@@ -74,6 +74,7 @@ export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network =
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
+  const componentPathId = 'assets:tokenDetails';
 
   return (
     <Box>
@@ -159,7 +160,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
                 },
               }}
             >
-              <CopyAddress text={tokenInfo.id}>{tokenInfo.id}</CopyAddress>
+              <CopyAddress text={tokenInfo.id} pathId={`${componentPathId}:fingerprint`}>{tokenInfo.id}</CopyAddress>
             </Box>
           }
         />
@@ -178,7 +179,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
                 },
               }}
             >
-              <CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>
+              <CopyAddress text={tokenInfo.policyId} pathId={`${componentPathId}:policyId`}>{tokenInfo.policyId}</CopyAddress>
             </Box>
           }
         />

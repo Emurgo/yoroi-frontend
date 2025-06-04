@@ -36,6 +36,8 @@ import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
+import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextProvider';
+// $FlowIgnore: suppressing this error
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
@@ -61,6 +63,11 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
+// $FlowIgnore: suppressing this error
+import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
+// $FlowIgnore: suppressing this error
+import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
@@ -210,7 +217,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
             <Route exact path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage tores={stores} />} />
+            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
@@ -269,6 +276,17 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
+          <Route element={<SwapRevampSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
+              element={<AssetSwapRevampPage stores={stores} />}
+            />
+            <Route
+              path={ROUTES.SWAP_REVAMP.ORDERS}
+              element={<SwapOrdersRevampPage stores={stores} />}
+            />
+          </Route>
+
           <Route element={<GovernanceSubpages stores={stores}/>}>
             <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
             <Route
@@ -314,6 +332,12 @@ const NftGallerySubPages = ({ stores }) => (
   <NftGalleryContextProvider stores={stores}>
     <Outlet />
   </NftGalleryContextProvider>
+);
+
+const SwapRevampSubpages = ({ stores }) => (
+  <SwapContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </SwapContextProvider>
 );
 
 const SwapSubpages = ({ stores }) => {
@@ -416,13 +440,5 @@ export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): No
     <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
       <Suspense fallback={null}>{children}</Suspense>
     </DappCenterContextProvider>
-  );
-}
-
-export function wrapNftGallery(nftGalleryProps: StoresProps, children: Node): Node {
-  return (
-    <NftGalleryContextProvider stores={nftGalleryProps.stores}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </NftGalleryContextProvider>
   );
 }

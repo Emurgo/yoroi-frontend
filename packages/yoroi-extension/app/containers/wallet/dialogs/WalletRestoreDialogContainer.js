@@ -7,17 +7,11 @@ import config from '../../../config';
 import validWords from 'bip39/src/wordlists/english.json';
 import WalletRestoreDialog from '../../../components/wallet/WalletRestoreDialog';
 import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreVerifyDialog';
-import TransferSummaryPage from '../../../components/transfer/TransferSummaryPage';
 import globalMessages from '../../../i18n/global-messages';
-import { CheckAddressesInUseApiError, NoInputsError } from '../../../api/common/errors';
+import { CheckAddressesInUseApiError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
-import { defineMessages, IntlContext } from 'react-intl';
-import YoroiTransferWaitingPage from '../../transfer/YoroiTransferWaitingPage';
-import SuccessPage from '../../../components/transfer/SuccessPage';
-import { TransferStatus } from '../../../types/TransferTypes';
-import ErrorPage from '../../../components/transfer/ErrorPage';
+import { IntlContext } from 'react-intl';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { addressToDisplayString } from '../../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
 import NavPlate from '../../../components/topbar/NavPlate';
@@ -25,13 +19,6 @@ import WalletDetails from '../../../components/wallet/my-wallets/WalletDetails';
 import { ROUTES } from '../../../routes-config';
 import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../../stores';
-
-const messages = defineMessages({
-  walletUpgradeNoop: {
-    id: 'wallet.restore.dialog.upgrade.noop',
-    defaultMessage: '!!!Your wallet did not need to be upgraded',
-  },
-});
 
 type LocalProps = {|
   +onClose: void => void,
@@ -200,99 +187,8 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
           />
         );
       }
-      case RestoreSteps.TRANSFER_TX_GEN: {
-        return this._transferDialogContent();
-      }
       default:
         return null;
-    }
-  }
-
-  _transferDialogContent(): null | Node {
-    const { yoroiTransfer } = this.props.stores;
-
-    const walletRestore = this.props.stores.substores.ada.walletRestore;
-    const intl = this.context;
-
-    switch (yoroiTransfer.status) {
-      // we have to verify briefly go through this step
-      // and we don't want to throw an error for it
-      case TransferStatus.DISPLAY_CHECKSUM:
-        return null;
-      case TransferStatus.RESTORING_ADDRESSES:
-      case TransferStatus.CHECKING_ADDRESSES:
-      case TransferStatus.GENERATING_TX:
-        return <YoroiTransferWaitingPage status={yoroiTransfer.status} />;
-      case TransferStatus.READY_TO_TRANSFER: {
-        if (yoroiTransfer.transferTx == null) {
-          return null; // TODO: throw error? Shouldn't happen
-        }
-        return (
-          <TransferSummaryPage
-            form={null}
-            transferTx={yoroiTransfer.transferTx}
-            selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(
-                this.getSelectedNetwork().NetworkId
-              ) ??
-              (() => {
-                throw new Error('No explorer for wallet network');
-              })()
-            }
-            getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-            onSubmit={{
-              label: intl.formatMessage(globalMessages.nextButtonLabel),
-              trigger: walletRestore.transferFromLegacy,
-            }}
-            isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
-            onCancel={{
-              label: intl.formatMessage(globalMessages.cancel),
-              trigger: this.onCancel,
-            }}
-            error={yoroiTransfer.error}
-            addressLookup={
-              /** no wallet is created yet so we can't know this information */
-              () => undefined
-            }
-            dialogTitle={intl.formatMessage(globalMessages.walletUpgrade)}
-            getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
-            unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-            addressToDisplayString={addr => addressToDisplayString(addr, this.getSelectedNetwork())}
-          />
-        );
-      }
-      case TransferStatus.ERROR: {
-        if (!(yoroiTransfer.error instanceof NoInputsError)) {
-          return (
-            <ErrorPage
-              error={yoroiTransfer.error}
-              onCancel={this.onCancel}
-              title=""
-              backButtonLabel={intl.formatMessage(globalMessages.cancel)}
-            />
-          );
-        }
-        return (
-          <SuccessPage
-            title={intl.formatMessage(globalMessages.success)}
-            text={intl.formatMessage(messages.walletUpgradeNoop)}
-            closeInfo={{
-              closeLabel: intl.formatMessage(globalMessages.continue),
-              onClose: walletRestore.startWalletRestore,
-            }}
-          />
-        );
-      }
-      case TransferStatus.SUCCESS: {
-        return null;
-      }
-      case TransferStatus.UNINITIALIZED: {
-        return null;
-      }
-      default:
-        throw new Error(
-          `${nameof(WalletRestoreDialogContainer)} tx status ${yoroiTransfer.status}`
-        );
     }
   }
 }
