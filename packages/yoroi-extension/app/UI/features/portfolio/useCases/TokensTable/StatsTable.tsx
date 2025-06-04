@@ -1,6 +1,6 @@
 import { TableCell, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import Table from '../../common/components/Table';
 import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { CopyButton } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';

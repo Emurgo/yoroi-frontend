@@ -1,6 +1,5 @@
-import React from "react";
-import { css, Global } from "@emotion/react";
-import { cssTransition } from "react-toastify";
+import { css, Global } from '@emotion/react';
+import { cssTransition } from 'react-toastify';
 
 export const FadeInOut = cssTransition({
   enter: 'Toastify__toast--fade-in-top',

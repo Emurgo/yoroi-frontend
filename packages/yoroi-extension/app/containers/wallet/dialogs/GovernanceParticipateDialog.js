@@ -52,7 +52,7 @@ export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps)
         width="100%"
         onClick={() => {
           onClose();
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: ROUTES.Governance.ROOT,
           });
         }}

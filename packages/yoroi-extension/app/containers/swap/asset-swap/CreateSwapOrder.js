@@ -17,7 +17,7 @@ import { TopActions } from './actions/TopActions';
 import { MiddleActions } from './actions/MiddleActions';
 import { EditSlippage } from './actions/EditSlippage';
 import { useSwapForm } from '../context/swap-form';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { comparatorByGetter } from '../../../coreUtils';
 
 type Props = {|

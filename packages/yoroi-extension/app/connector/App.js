@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
 import ko from 'react-intl/locale-data/ko';
@@ -18,7 +17,7 @@ import id from 'react-intl/locale-data/id';
 import es from 'react-intl/locale-data/es';
 import vi from 'react-intl/locale-data/vi';
 import { autorun, observable, runInAction } from 'mobx';
-import { Routes } from './Routes';
+import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
@@ -47,7 +46,6 @@ addLocaleData([
 
 type Props = {|
   +stores: StoresMap,
-  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,
@@ -115,14 +113,14 @@ class App extends Component<Props, State> {
   }
 
   getContent: void => ?Node = () => {
-    const { stores, history } = this.props;
+    const { stores } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
     return (
-      <Router history={history}>
+      <Router>
         <IntlContextProvider>
-          <Routes stores={stores} />
+          <YoroiRoutes stores={stores} />
         </IntlContextProvider>
       </Router>
     );

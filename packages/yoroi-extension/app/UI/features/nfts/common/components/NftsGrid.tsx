@@ -1,4 +1,3 @@
-import React from 'react';
 import { Grid } from '@mui/material';
 import { Nft } from '../types';
 import { ampli } from '../../../../../../ampli';

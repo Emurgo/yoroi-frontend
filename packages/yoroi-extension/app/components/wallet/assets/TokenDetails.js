@@ -8,7 +8,7 @@ import { ReactComponent as ArrowLeft } from '../../../assets/images/assets-page/
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';

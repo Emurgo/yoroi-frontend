@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled } from '@mui/material';
-import React from 'react';
 import { WelcomeWallet } from '../../../../components/ilustrations/WelcomeWallet';
 import { useDappCenter } from '../../module/DappCenterContextProvider';
 import { useStrings } from '../hooks/useStrings';

@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { SubMenuOption } from '../../../common/types/index';
