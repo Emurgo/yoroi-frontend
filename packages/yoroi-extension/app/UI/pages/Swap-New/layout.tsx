@@ -18,7 +18,7 @@ const SwapLayout = ({ stores, children }: Props): JSX.Element => {
   const menu = isTestnet ? null : (
     <SwapTabs
       onItemClick={route => {
-        stores.app.goToRoute({ route });
+        stores.routing.goToRoute({ route });
       }}
       isActiveItem={route => typeof route === 'string' && location.pathname === route}
     />
