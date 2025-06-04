@@ -16,7 +16,7 @@ const messages = defineMessages({
   },
   networkErrorLabel: {
     id: 'networkError.label.message',
-    defaultMessage: '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLinkhere</zendeskLink>.',
+    defaultMessage: '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLink></zendeskLink>here</zendeskLink>.',
   },
 });
 

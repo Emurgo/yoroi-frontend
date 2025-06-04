@@ -275,7 +275,7 @@
   "maintenance.screen.title": "Temporary Maintenance",
   "myWallets.wallets.lastSyncText": "Last sync",
   "myWallets.wallets.neverSync": "Never synced",
-  "networkError.label.message": "Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLinkhere</zendeskLink>.",
+  "networkError.label.message": "Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLink>here</zendeskLink>.",
   "networkName.mainnet": "Mainnet",
   "networkName.preprod": "Preprod",
   "networkName.preview": "Preview",
