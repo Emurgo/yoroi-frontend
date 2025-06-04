@@ -1,3 +1,5 @@
+import BigNumber from "bignumber.js";
+
 type UnitOfAccount = {
   enabled: boolean;
   currency: string;
@@ -42,5 +44,12 @@ export type CurrentWalletType = {
   primaryTokenInfo: PrimaryTokenInfo;
   walletBalance: WalletBalance;
   ftAssetList: any[];
-  explorer: { tokenInfo: { name: string; baseUrl: string } };
+  allAssetList: any[];
+  nftAssetList: any[];
+  explorer: { tokenInfo: { name: string; baseUrl: string } }; // TODO to be removed
+  selectedExplorer: any;
+  stakingRewards: BigNumber;
+  walletAddresses: string;
+  isStakeRegistered: boolean;
+  walletType: 'ledger' | 'trezor';
 };

@@ -31,12 +31,21 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import FullscreenLayout from '../../components/layout/FullscreenLayout';
 import type { StoresProps } from '../../stores';
+// $FlowIgnore: suppressing this error
+import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
+// $FlowIgnore: suppressing this error
+import { ReviewTxModal } from '../../UI/features/transaction-review/useCases/ReviewTx';
+// $FlowIgnore: suppressing this error
+import { ModalProvider } from '../../UI/components/modals/ModalContext';
+// $FlowIgnore: suppressing this error
+import { ModalManager } from '../../UI/components/modals/ModalManager';
+// $FlowIgnore: suppressing this error
+import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 
 const messages = defineMessages({
   txConfirmationLedgerNanoLine1: {
     id: 'wallet.send.ledger.confirmationDialog.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
+    defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Send using Ledger button.',
   },
   sendUsingLedgerNano: {
     id: 'wallet.send.ledger.confirmationDialog.submit',
@@ -44,8 +53,7 @@ const messages = defineMessages({
   },
   txConfirmationTrezorTLine1: {
     id: 'wallet.send.trezor.confirmationDialog.info.line.1',
-    defaultMessage:
-      '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
+    defaultMessage: '!!!After connecting your Trezor device to your computer, press the Send using Trezor button.',
   },
   sendUsingTrezorT: {
     id: 'wallet.send.trezor.confirmationDialog.submit',
@@ -82,8 +90,7 @@ export default class WalletSendPage extends Component<StoresProps> {
   componentDidMount(): void {
     runInAction(() => {
       this.showMemo = false;
-      this.showSupportedAddressDomainBanner =
-        this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
+      this.showSupportedAddressDomainBanner = this.props.stores.substores.ada.addresses.getSupportedAddressDomainBannerState();
     });
     const { loadProtocolParametersRequest } = this.props.stores.protocolParameters;
     if (!loadProtocolParametersRequest.wasExecuted && !loadProtocolParametersRequest.isExecuting) {
@@ -115,9 +122,7 @@ export default class WalletSendPage extends Component<StoresProps> {
   _getNumDecimals(): number {
     const { selected } = this.props.stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
-    const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(
-      selected.networkId
-    );
+    const defaultToken = this.props.stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId);
     const getTokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo);
     const info = getTokenInfo({
       identifier: defaultToken.Identifier,
@@ -131,11 +136,7 @@ export default class WalletSendPage extends Component<StoresProps> {
     const { selected } = stores.wallets;
     if (!selected) throw new Error(`Active wallet required for ${nameof(WalletSendPage)}.`);
 
-    const {
-      uiDialogs,
-      transactionBuilderStore,
-      protocolParameters,
-    } = stores;
+    const { uiDialogs, transactionBuilderStore, protocolParameters } = stores;
 
     if (!protocolParameters.loadProtocolParametersRequest.wasExecuted) {
       return (
@@ -150,85 +151,88 @@ export default class WalletSendPage extends Component<StoresProps> {
     const { hasAnyPending } = stores.transactions;
 
     // disallow sending when pending tx exists
-    if (
-      (uiDialogs.isOpen(HWSendConfirmationDialog) ||
-        uiDialogs.isOpen(WalletSendConfirmationDialog)) &&
-      hasAnyPending
-    ) {
+    if ((uiDialogs.isOpen(HWSendConfirmationDialog) || uiDialogs.isOpen(WalletSendConfirmationDialog)) && hasAnyPending) {
       stores.uiDialogs.closeActiveDialog();
     }
 
-    const defaultToken = stores.tokenInfoStore.getDefaultTokenInfo(
-      selected.networkId
-    );
-    const network  = getNetworkById(selected.networkId);
+    const defaultToken = stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId);
+    const network = getNetworkById(selected.networkId);
 
     const addressStore = stores.substores.ada.addresses;
     const resolveDomainAddressFunc = addressStore.domainResolverSupported()
       ? addressStore.resolveDomainAddress.bind(addressStore)
       : null;
     return (
-      <>
-        <WalletSendFormRevamp
-          resolveDomainAddress={resolveDomainAddressFunc}
-          supportedAddressDomainBannerState={{
-            isDisplayed: this.showSupportedAddressDomainBanner,
-            onClose: this.onSupportedAddressDomainBannerClose,
-          }}
-          selectedNetwork={network}
-          selectedWallet={selected}
-          selectedExplorer={stores.explorers.selectedExplorer}
-          selectedToken={transactionBuilderStore.selectedToken}
-          defaultToken={defaultToken}
-          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          onSubmit={transactionBuilderStore.updateTentativeTx}
-          totalInput={transactionBuilderStore.totalInput}
-          hasAnyPending={hasAnyPending}
-          shouldSendAll={transactionBuilderStore.shouldSendAll}
-          updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
-            transactionBuilderStore.updateReceiver({ address, handle })}
-          updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
-          updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
-          fee={transactionBuilderStore.fee}
-          isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
-          reset={transactionBuilderStore.reset}
-          error={transactionBuilderStore.createUnsignedTx.error}
-          // Min ADA for all tokens that is already included in the tx
-          minAda={transactionBuilderStore.minAda}
-          uriParams={stores.loading.uriParams}
-          resetUriParams={stores.loading.resetUriParams}
-          memo={transactionBuilderStore.memo}
-          showMemo={this.showMemo}
-          updateMemo={(content: void | string) => transactionBuilderStore.updateMemo(content)}
-          onAddMemo={() =>
-            this.showMemoDialog({
-              dialog: MemoNoExternalStorageDialog,
-              continuation: this.toggleShowMemo,
-            })}
-          spendableBalance={stores.transactions.balance}
-          onAddToken={transactionBuilderStore.addToken}
-          onRemoveTokens={transactionBuilderStore.removeTokens}
-          plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
-          isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
-          openDialog={this.openDialog}
-          closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
-          isOpen={uiDialogs.isOpen}
-          openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
-          unitOfAccountSetting={stores.profile.unitOfAccount}
-          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-          calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
-          maxSendableAmount={transactionBuilderStore.maxSendableAmount}
-          signRequest={transactionBuilderStore.tentativeTx}
-          staleTx={transactionBuilderStore.txMismatch}
-          sendMoneyRequest={stores.wallets.sendMoneyRequest}
-          sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
-          ledgerSendError={stores.substores.ada.ledgerSend.error || null}
-          trezorSendError={stores.substores.ada.trezorSend.error || null}
-          ledgerSend={stores.substores.ada.ledgerSend}
-          trezorSend={stores.substores.ada.trezorSend}
-        />
-        {this.renderDialog()}
-      </>
+      <ModalProvider>
+        <ModalManager />
+        <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+          <ReviewTxProvider stores={stores} intl={this.context.intl}>
+            <ReviewTxModal />
+            <WalletSendFormRevamp
+              stores={this.props.stores}
+              resolveDomainAddress={resolveDomainAddressFunc}
+              supportedAddressDomainBannerState={{
+                isDisplayed: this.showSupportedAddressDomainBanner,
+                onClose: this.onSupportedAddressDomainBannerClose,
+              }}
+              selectedNetwork={network}
+              selectedWallet={selected}
+              selectedExplorer={stores.explorers.selectedExplorer}
+              selectedToken={transactionBuilderStore.selectedToken}
+              defaultToken={defaultToken}
+              getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+              onSubmit={transactionBuilderStore.updateTentativeTx}
+              totalInput={transactionBuilderStore.totalInput}
+              hasAnyPending={hasAnyPending}
+              shouldSendAll={transactionBuilderStore.shouldSendAll}
+              updateReceiver={(address: void | string, handle: void | {| handle: string, nameServer: string |}) =>
+                transactionBuilderStore.updateReceiver({ address, handle })
+              }
+              updateAmount={(value: ?BigNumber) => transactionBuilderStore.updateAmount(value)}
+              updateSendAllStatus={transactionBuilderStore.updateSendAllStatus}
+              fee={transactionBuilderStore.fee}
+              isCalculatingFee={transactionBuilderStore.createUnsignedTx.isExecuting}
+              reset={transactionBuilderStore.reset}
+              error={transactionBuilderStore.createUnsignedTx.error}
+              // Min ADA for all tokens that is already included in the tx
+              minAda={transactionBuilderStore.minAda}
+              uriParams={stores.loading.uriParams}
+              resetUriParams={stores.loading.resetUriParams}
+              memo={transactionBuilderStore.memo}
+              showMemo={this.showMemo}
+              updateMemo={(content: void | string) => transactionBuilderStore.updateMemo(content)}
+              onAddMemo={() =>
+                this.showMemoDialog({
+                  dialog: MemoNoExternalStorageDialog,
+                  continuation: this.toggleShowMemo,
+                })
+              }
+              spendableBalance={stores.transactions.balance}
+              onAddToken={transactionBuilderStore.addToken}
+              onRemoveTokens={transactionBuilderStore.removeTokens}
+              plannedTxInfoMap={transactionBuilderStore.plannedTxInfoMap}
+              isDefaultIncluded={transactionBuilderStore.isDefaultIncluded}
+              openDialog={this.openDialog}
+              closeDialog={this.props.stores.uiDialogs.closeActiveDialog}
+              isOpen={uiDialogs.isOpen}
+              openTransactionSuccessDialog={this.openTransactionSuccessDialog.bind(this)}
+              unitOfAccountSetting={stores.profile.unitOfAccount}
+              getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
+              calculateMaxAmount={transactionBuilderStore.calculateMaxAmount}
+              maxSendableAmount={transactionBuilderStore.maxSendableAmount}
+              signRequest={transactionBuilderStore.tentativeTx}
+              staleTx={transactionBuilderStore.txMismatch}
+              sendMoneyRequest={stores.wallets.sendMoneyRequest}
+              sendMoney={stores.substores.ada.mnemonicSend.sendMoney}
+              ledgerSendError={stores.substores.ada.ledgerSend.error || null}
+              trezorSendError={stores.substores.ada.trezorSend.error || null}
+              ledgerSend={stores.substores.ada.ledgerSend}
+              trezorSend={stores.substores.ada.trezorSend}
+            />
+            {this.renderDialog()}
+          </ReviewTxProvider>
+        </CurrencyProvider>
+      </ModalProvider>
     );
   }
 
@@ -245,14 +249,8 @@ export default class WalletSendPage extends Component<StoresProps> {
       return this.noCloudWarningDialog();
     }
     if (uiDialogs.isOpen(TransactionSuccessDialog)) {
-      const process = this.props.stores.loading.sellAdaParams?.redirect ?
-        'for-sell' : 'normal';
-      return (
-        <TransactionSuccessDialog
-          process={process}
-          onClose={this.closeTransactionSuccessDialog}
-        />
-      );
+      const process = this.props.stores.loading.sellAdaParams?.redirect ? 'for-sell' : 'normal';
+      return <TransactionSuccessDialog process={process} onClose={this.closeTransactionSuccessDialog} />;
     }
 
     if (uiDialogs.isOpen(AddNFTDialog)) {
@@ -271,8 +269,7 @@ export default class WalletSendPage extends Component<StoresProps> {
   webWalletDoConfirmation: () => Node = () => {
     const { stores } = this.props;
     const { selected } = this.props.stores.wallets;
-    if (!selected)
-      throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+    if (!selected) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
 
     const { transactionBuilderStore } = this.props.stores;
     if (!transactionBuilderStore.tentativeTx) {
@@ -296,8 +293,7 @@ export default class WalletSendPage extends Component<StoresProps> {
    * separate container is not needed, this container acts as container for Confirmation dialog */
   hardwareWalletDoConfirmation: () => Node = () => {
     const { selected } = this.props.stores.wallets;
-    if (!selected)
-      throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
+    if (!selected) throw new Error(`Active wallet required for ${nameof(this.webWalletDoConfirmation)}.`);
     const { transactionBuilderStore } = this.props.stores;
 
     if (!transactionBuilderStore.tentativeTx) {
@@ -312,14 +308,10 @@ export default class WalletSendPage extends Component<StoresProps> {
     let hwSendConfirmationDialog: Node = null;
 
     if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
-      throw new Error(
-        `${nameof(this.hardwareWalletDoConfirmation)} hw wallets only supported for Byron`
-      );
+      throw new Error(`${nameof(this.hardwareWalletDoConfirmation)} hw wallets only supported for Byron`);
     }
     const selectedExplorerForNetwork =
-      this.props.stores.explorers.selectedExplorer.get(
-        selected.networkId
-      ) ??
+      this.props.stores.explorers.selectedExplorer.get(selected.networkId) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();
@@ -345,8 +337,8 @@ export default class WalletSendPage extends Component<StoresProps> {
           messages={messagesLedgerNano}
           isSubmitting={ledgerSendStore.isActionProcessing}
           error={ledgerSendStore.error}
-          onSubmit={
-            () => ledgerSendStore.sendUsingLedgerWallet({
+          onSubmit={() =>
+            ledgerSendStore.sendUsingLedgerWallet({
               params: { signRequest },
               onSuccess: this.openTransactionSuccessDialog,
               wallet: selected,
@@ -354,9 +346,7 @@ export default class WalletSendPage extends Component<StoresProps> {
           }
           onCancel={ledgerSendStore.cancel}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          addressToDisplayString={addr =>
-            addressToDisplayString(addr, getNetworkById(selected.networkId))
-          }
+          addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
         />
       );
     } else if (selected.type === 'trezor') {
@@ -379,8 +369,8 @@ export default class WalletSendPage extends Component<StoresProps> {
           messages={messagesTrezor}
           isSubmitting={trezorSendStore.isActionProcessing}
           error={trezorSendStore.error}
-          onSubmit={
-            () => trezorSendStore.sendUsingTrezor({
+          onSubmit={() =>
+            trezorSendStore.sendUsingTrezor({
               params: { signRequest },
               onSuccess: this.openTransactionSuccessDialog,
               wallet: selected,
@@ -388,9 +378,7 @@ export default class WalletSendPage extends Component<StoresProps> {
           }
           onCancel={trezorSendStore.cancel}
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
-          addressToDisplayString={addr =>
-            addressToDisplayString(addr, getNetworkById(selected.networkId))
-          }
+          addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
         />
       );
     } else {
@@ -472,9 +460,7 @@ export default class WalletSendPage extends Component<StoresProps> {
     return [...tokens.values()];
   };
 
-  shouldAddMoreTokens: (
-    Array<{| token: $ReadOnly<TokenRow>, included: boolean |}>
-  ) => boolean = tokens => {
+  shouldAddMoreTokens: (Array<{| token: $ReadOnly<TokenRow>, included: boolean |}>) => boolean = tokens => {
     const { maxAssetsAllowed } = this.props.stores.transactionBuilderStore;
 
     const allTokens = this._mergeTokens(tokens);

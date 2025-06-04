@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js';
 import moment from 'moment';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { maybe } from '../../coreUtils';
 import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters.js';
+import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
 import { cardanoAdaBase64Logo } from '../features/portfolio/common/helpers/constants';
 import { CurrentWalletType } from '../types/currrentWallet';
 import { networkConfigs } from './network-config';
@@ -64,7 +66,7 @@ const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*:
   return defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };
 
-const getAssetWalletAssetList = (stores: any) => {
+const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
   const spendableBalance = stores.transactions.balance;
   const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
   if (spendableBalance == null) return [];
@@ -73,7 +75,13 @@ const getAssetWalletAssetList = (stores: any) => {
       entry,
       info: getTokenInfo(entry),
     }))
-    .filter((item: any) => item.info.IsNFT === false)
+    .filter((item: any) => {
+      if (noFilter) {
+        return item;
+      }
+      return item.info.IsNFT === false;
+    })
+
     .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
@@ -107,6 +115,35 @@ const getAssetWalletAssetList = (stores: any) => {
     });
 };
 
+const getNFTAssetWalletAssetList = (stores: any) => {
+  const spendableBalance = stores.transactions.balance;
+  const getTokenInfo = genLookupOrFail(stores.tokenInfoStore.tokenInfo);
+
+  const nftsList = (() => {
+    if (spendableBalance == null) return [];
+    return [...spendableBalance.nonDefaultEntries()]
+      .map(entry => ({
+        entry,
+        info: getTokenInfo(entry),
+      }))
+      .filter(item => item.info.IsNFT)
+      .map(token => {
+        const split = token.entry.identifier.split('.');
+        const policyId = split[0];
+        const hexName = split[1] ?? '';
+        const fullName = getTokenStrictName(token.info).name;
+        const name = truncateToken(fullName ?? '-');
+        return {
+          name,
+          id: getTokenIdentifierIfExists(token.info) ?? '-',
+          image: getImageFromTokenMetadata(policyId, hexName, token.info.Metadata),
+        };
+      });
+  })();
+
+  return nftsList;
+};
+
 const dateFormat = 'YYYY-MM-DD';
 
 const groupTransactionsByDay = transactions => {
@@ -138,6 +175,13 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       throw new Error(`no selected Wallet. Should never happen`);
     }
 
+    const allWalletAddresses = selectedWallet?.allAddresses?.utxoAddresses?.map(a => {
+      if (a.address?.Hash) {
+        return RustModule.WalletV4.Address.from_hex(a.address?.Hash).to_bech32();
+      }
+    });
+
+    const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
     const currentWalletId = selectedWallet.publicDeriverId;
     const networkId = selectedWallet.networkId;
 
@@ -159,13 +203,23 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const isHardware: boolean = selectedWallet.isHardware;
 
     // FT Asset List
-    const ftAssetList = getAssetWalletAssetList(stores);
+    const ftAssetList = getFTAssetWalletAssetList(stores, false);
+    // All Assets LIst
+    const allAssetList = getFTAssetWalletAssetList(stores, true);
+    // NFT Asset List
+    const nftAssetList = getNFTAssetWalletAssetList(stores);
 
     const groupedTx = groupTransactionsByDay(stores.transactions.recent);
 
     const selectedExplorer = explorers.selectedExplorer.get(networkId);
     const explorerTransactionInfo = selectedExplorer.getOrDefault('token');
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
+    const delegatedRewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
+
+    const getRewardAmountArray= token => {
+      return maybe(token, t => formatTokenEntry(t.getDefaultEntry(),getTokenInfo));
+    }; 
+    const stakingRewardsArray = getRewardAmountArray(delegatedRewards)
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -183,10 +237,17 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       primaryTokenInfo: { ...primaryTokenInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
-        ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
+      ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
       ftAssetList: ftAssetList,
+      nftAssetList: nftAssetList,
+      allAssetList,
+      walletAddresses: allWalletAddresses,
       explorer: { tokenInfo: explorerTransactionInfo },
+      selectedExplorer: selectedExplorer,
+      walletType: selectedWallet.type,
+      isStakeRegistered,
+      stakingRewards:combineStringsToDecimal(stakingRewardsArray),
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
@@ -230,4 +291,26 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   }
 
   return null;
+};
+
+
+const formatTokenEntry = (tokenEntry,getTokenInfo) => {
+      const tokenInfo = getTokenInfo(tokenEntry);
+      let splitAmountValue = tokenEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+        .toFormat(tokenInfo.Metadata.numberOfDecimals)
+        .split('.');
+      return splitAmountValue
+}
+
+
+export const combineStringsToDecimal = (array: [number, number]): BigNumber => {
+  const [integerPart, decimalPart] = array;
+
+  const intStr = integerPart.toString();
+  const decStr = decimalPart.toString();
+
+  const combined = `${intStr}.${decStr}`;
+
+  return new BigNumber(combined);
 };

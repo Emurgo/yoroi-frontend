@@ -7,6 +7,7 @@ import { getTestLogger, isLocalRun } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
+import TxReviewOverviewTab from '../pages/transactionReviewPages/txReviewOverviewTab.page.js';
 import { getTestString } from '../helpers/constants.js';
 import { RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
 
@@ -18,7 +19,7 @@ describe('Handle handles', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await prepareWallet(webdriver, logger, 'testWallet1', this);
+    await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
   const testDataPositive = [
@@ -97,11 +98,8 @@ describe('Handle handles', function () {
       });
 
       it(`${testDatum.provider}. Check info on confirmation page`, async function () {
-        const sendStep3Page = new SendSubTab(webdriver, logger);
-        const receiverHadlerInfo = await sendStep3Page.getHandlerInfoConfirmTxPage();
-        const [provider, userHandleRaw] = receiverHadlerInfo.split(':');
-        const userHandle = userHandleRaw.trim();
-        expect(provider, 'Handler provider is different').to.equal(testDatum.provider);
+        const txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
+        const userHandle = await txReviewOverview.getReceiver();
         expect(userHandle, 'User handler is different').to.equal(testDatum.userHandle);
       });
     });

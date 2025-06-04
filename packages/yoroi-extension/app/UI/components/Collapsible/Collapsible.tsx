@@ -1,11 +1,10 @@
+import * as React from 'react';
 import MuiAccordion from '@mui/material/Accordion';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import MuiAccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import * as React from 'react';
-import { Icon } from '../icons/index';
-import { IconButtonWrapper } from '../wrappers/IconButtonWrapper';
+import { IconWrapper, Icons } from '../icons/index';
 
 const Accordion: any = styled(MuiAccordion)(({ theme }: any) => ({
   '&:not(:last-child)': {
@@ -36,9 +35,9 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }: any) => ({
 }));
 
 type Props = {
-  title: string;
+  title: string | React.ReactNode;
   content: React.ReactNode;
-  expanded?: boolean,
+  expanded?: boolean;
 };
 
 export const Collapsible = ({ title, content, expanded: startExpanded }: Props) => {
@@ -53,11 +52,7 @@ export const Collapsible = ({ title, content, expanded: startExpanded }: Props) 
       <AccordionSummary
         aria-controls="panel1d-content"
         id="panel1d-header"
-        expandIcon={
-          <IconButtonWrapper>
-            <Icon.ChevronDown />
-          </IconButtonWrapper>
-        }
+        expandIcon={<IconWrapper icon={Icons.ChevronDown} asButton />}
       >
         <Typography variant="body1" fontWeight="500">
           {title}

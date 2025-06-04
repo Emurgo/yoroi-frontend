@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Stack, Typography } from '@mui/material';
 import { defineMessages } from 'react-intl';
+import { useIntl } from '../../context/IntlProvider';
 
 const messages = defineMessages({
   subtitile: {
@@ -38,7 +39,8 @@ const messages = defineMessages({
   },
 });
 
-export const TestNetworkInfoModal = ({ intl, onClose }) => {
+export const TestNetworkInfoModal = ({ onClose }) => {
+  const { intl } = useIntl();
   return (
     <Stack>
       <Typography variant="body1" mb="24px">
@@ -57,7 +59,7 @@ export const TestNetworkInfoModal = ({ intl, onClose }) => {
       </Stack>
       {/* <Link mt="8px">{intl.formatMessage(messages.learnMore)}</Link> */}
       {/* @ts-ignore */}
-      <Button variant="primary" onClick={onClose} sx={{ mt: '28px' }}>
+      <Button variant="primary" onClick={onClose} sx={{ mt: '28px' }} id="testNetworkInfoModal-understand-button">
         {intl.formatMessage(messages.understand)}
       </Button>
     </Stack>

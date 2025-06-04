@@ -1,41 +1,20 @@
 //@flow
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
 import { useEffect } from 'react';
-import { IncorrectWalletPasswordError } from '../../../api/common/errors';
-import TextField from '../../../components/common/TextField';
-import {
-  FormattedActualPrice,
-  FormattedLimitPrice,
-  FormattedMarketPrice,
-  PriceImpactBanner,
-  PriceImpactColored,
-  PriceImpactIcon,
-  PriceImpactPercent,
-} from '../../../components/swap/PriceImpact';
-import { AssetAndAmountRow } from '../../../components/swap/SelectAssetDialog';
-import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
-import { InfoTooltip } from '../../../components/widgets/InfoTooltip';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';
-import SwapPoolFullInfo from './edit-pool/PoolFullInfo';
+import { ampli } from '../../../../ampli/index';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
-import type { State } from '../context/swap-form/types';
-import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
-
-const GradientBox = styled(Box)(({ theme }: any) => ({
-  backgroundImage: theme.palette.ds.bg_gradient_3,
-}));
+import { SwapTxInfo } from './SwapTxInfo';
 
 type Props = {|
   slippageValue: string,
   walletAddress: ?string,
   priceImpactState: ?PriceImpact,
-  userPasswordState: ?State<string>,
-  txSubmitErrorState: State<?Error>,
   onRemoteOrderDataResolved: any => Promise<void>,
   defaultTokenInfo: RemoteTokenInfo,
   getTokenInfo: string => Promise<RemoteTokenInfo>,
@@ -47,38 +26,21 @@ export default function ConfirmSwapTransaction({
   slippageValue,
   walletAddress,
   priceImpactState,
-  userPasswordState,
-  txSubmitErrorState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
   getTokenInfo,
-  getFormattedPairingValue,
   onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
   const {
     selectedPoolCalculation: { pool },
-    bestPoolCalculation: { pool: bestPool },
   } = orderData;
   const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
-  const { ptAmount, formattedPtAmount, formattedNonPtAmount, formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
+  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
-  const isAutoPool = pool?.poolId === bestPool?.poolId;
-
-  const isIncorrectPassword = txSubmitErrorState.value instanceof IncorrectWalletPasswordError;
 
   const strings = useStrings();
-  const priceStrings = {
-    market: {
-      label: strings.marketPrice,
-      info: strings.marketPriceTooltip,
-    },
-    limit: {
-      label: strings.limitPrice,
-      info: strings.limitPriceTooltip,
-    },
-  };
 
   const { createOrderData } = useSwapCreateOrder({
     onSuccess: data => {
@@ -127,128 +89,12 @@ export default function ConfirmSwapTransaction({
           {strings.confirmSwapTx}
         </Typography>
       </Box>
-      <Box display="flex" gap="16px" flexDirection="column">
-        <Box>
-          <Box>
-            <Typography component="div" variant="body1" color="ds.text_gray_low">
-              {strings.swapFromLabel}
-            </Typography>
-          </Box>
-          <Box>
-            <AssetAndAmountRow
-              asset={sellTokenInfo}
-              displayAmount={sellQuantity.displayValue}
-              type="from"
-              defaultTokenInfo={defaultTokenInfo}
-              getTokenInfo={getTokenInfo}
-            />
-          </Box>
-        </Box>
-        <Box>
-          <Box>
-            <Typography component="div" variant="body1" color="ds.text_gray_low">
-              {strings.swapToLabel}
-            </Typography>
-          </Box>
-          <Box>
-            <Box>
-              <AssetAndAmountRow
-                asset={buyTokenInfo}
-                displayAmount={buyQuantity.displayValue}
-                type="from"
-                defaultTokenInfo={defaultTokenInfo}
-                getTokenInfo={getTokenInfo}
-                priceImpactState={priceImpactState}
-              />
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-
-      <PriceImpactBanner priceImpactState={priceImpactState} />
-
-      <Box display="flex" flexDirection="column" gap="8px">
-        <SummaryRow col1={strings.dexLabel}>
-          <SwapPoolLabel provider={pool?.provider} isAutoPool={isAutoPool} />
-        </SummaryRow>
-        <SummaryRow col1={strings.slippageTolerance}>{slippageValue}%</SummaryRow>
-        <SwapPoolFullInfo defaultTokenInfo={defaultTokenInfo} showMinAda />
-        <SummaryRow col1={priceStrings[orderData.type].label} withInfo infoText={priceStrings[orderData.type].info}>
-          {orderData.type === 'market' ? <FormattedMarketPrice /> : <FormattedLimitPrice />}
-        </SummaryRow>
-        <SummaryRow col1={strings.priceImpact} withInfo infoText={strings.priceImpactTooltip}>
-          <PriceImpactColored priceImpactState={priceImpactState} sx={{ display: 'flex' }}>
-            {priceImpactState && <PriceImpactIcon isSevere={priceImpactState.isSevere} />}
-            <PriceImpactPercent />
-          </PriceImpactColored>
-        </SummaryRow>
-        {priceImpactState && (
-          <SummaryRow col1="">
-            <PriceImpactColored priceImpactState={priceImpactState}>
-              (<FormattedActualPrice />)
-            </PriceImpactColored>
-          </SummaryRow>
-        )}
-      </Box>
-      <GradientBox p="16px" borderRadius="8px" color="common.white">
-        <Box display="flex" justifyContent="space-between">
-          <Typography color="ds.white_static">{strings.total}</Typography>
-          <Box>
-            <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
-              {formattedNonPtAmount ?? formattedPtAmount}
-            </Typography>
-          </Box>
-        </Box>
-        {formattedNonPtAmount && (
-          <Box display="flex" justifyContent="right">
-            <Box>
-              <Typography component="div" fontSize="20px" fontWeight="500" color="ds.white_static">
-                {formattedPtAmount}
-              </Typography>
-            </Box>
-          </Box>
-        )}
-        <Box display="flex" justifyContent="right">
-          <Typography component="div" variant="body1" color="ds.white_static" sx={{ opacity: '0.5' }}>
-            {getFormattedPairingValue(ptAmount)}
-          </Typography>
-        </Box>
-      </GradientBox>
-      {userPasswordState != null && (
-        <Box>
-          <TextField
-            className="walletPassword"
-            value={userPasswordState.value}
-            label={strings.password}
-            type="password"
-            onChange={e => {
-              txSubmitErrorState.update(null);
-              userPasswordState.update(e.target.value);
-            }}
-            error={isIncorrectPassword && strings.passwordIncorrect}
-          />
-        </Box>
-      )}
+      <SwapTxInfo
+        defaultTokenInfo={defaultTokenInfo}
+        getTokenInfo={getTokenInfo}
+        priceImpactState={priceImpactState}
+        slippageValue={slippageValue}
+      />
     </Box>
   );
 }
-
-const SummaryRow = ({ col1, children, withInfo = false, infoText = '' }) => (
-  <Box display="flex" alignItems="center" justifyContent="space-between">
-    <Box display="flex" alignItems="center">
-      <Typography variant="body1" color="ds.text_gray_low">
-        {col1}
-      </Typography>
-      {withInfo ? (
-        <Box ml="8px" sx={{ height: '24px' }}>
-          <InfoTooltip width={500} content={<Typography color="inherit">{infoText}</Typography>} />
-        </Box>
-      ) : null}
-    </Box>
-    <Box>
-      <Typography component="div" variant="body1" color="ds.text_gray_medium">
-        {children}
-      </Typography>
-    </Box>
-  </Box>
-);

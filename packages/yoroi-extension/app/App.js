@@ -26,6 +26,8 @@ import NotificationsManager from './UI/features/notifications/common/Notificatio
 // $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
+import 'react-tooltip/dist/react-tooltip.css';
+
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
 
@@ -97,7 +99,7 @@ class App extends Component<Props, State> {
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
           {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+          <IntlProviderWrapper locale={locale} messages={mergedMessages}>
             {this.getContent()}
           </IntlProviderWrapper>
         </ColorModeProvider>
@@ -116,7 +118,10 @@ class App extends Component<Props, State> {
     return (
       <Router history={history}>
         <IntlContextProvider>
-          <NotificationsProvider>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+          >
             <NotificationsManager />
             <div style={{ height: '100%' }}>
               <Support />

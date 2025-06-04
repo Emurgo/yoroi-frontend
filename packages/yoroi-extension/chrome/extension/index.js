@@ -1,5 +1,4 @@
 // @flow
-
 import { render } from 'react-dom';
 import { action, configure } from 'mobx';
 import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
@@ -16,6 +15,8 @@ import environment from '../../app/environment';
 import { ampli } from '../../ampli/index';
 import { ROUTES } from '../../app/routes-config';
 import { pathToRegexp } from 'path-to-regexp';
+import { getCardanoHaskellBaseConfig, networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
+import TimeUtils from '../../app/api/ada/lib/storage/bridge/timeUtils';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -24,9 +25,12 @@ configure({ enforceActions: 'always' });
 // Since Yoroi handles money, it's better to error our than proceed if an error occurs
 BigNumber.DEBUG = true;
 
+type SlotsProps = {|
+  [networkId: number]: number,
+|};
+
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
-
   const api = await setupApi();
   const router = new RouterStore();
   const hashHistory = createHashHistory();
@@ -35,13 +39,22 @@ const initializeYoroi: void => Promise<void> = async () => {
 
   Logger.debug(`[yoroi] stores created`);
 
+  // calculate the last slot for each network for notifications
+  const appLoadedSlotPerNetwork: SlotsProps = Object.values(networks).reduce((acc: SlotsProps, network: any) => {
+    const fullConfig = getCardanoHaskellBaseConfig(network);
+    const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
+    acc[network.NetworkId] = absSlotNumber.toNumber();
+    return acc;
+  }, {});
+
   window.yoroi = {
+    appLoadedSlotPerNetwork,
     api,
     translations,
     stores,
     reset: action(async () => {
       await createStores(api, router);
-    })
+    }),
   };
 
   const root = document.querySelector('#root');
@@ -56,14 +69,11 @@ const initializeYoroi: void => Promise<void> = async () => {
   // lazy loading breaks e2e tests, so eagerly load the pages
   if (environment.isTest()) {
     for (const promise of LazyLoadPromises) {
-      promise()
+      promise();
     }
   }
 
-  render(
-    <App stores={stores} history={history} />,
-    root
-  );
+  render(<App stores={stores} history={history} />, root);
 
   history.listen(({ pathname }) => {
     if (pathname === ROUTES.ASSETS.ROOT) {

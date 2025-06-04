@@ -34,7 +34,7 @@ describe('Verify addresses', function () {
     bech32StakeAddress = (await receivePage.getAddressInfo(0)).addressFull;
     expect(bech32StakeAddress)
       .to.be.a('string')
-      .and.satisfy(msg => msg.startsWith('stake1'));
+      .and.satisfy(msg => msg.startsWith('stake_test1'));
     stakingKeyHexExp = getRewarKeyHashFromBech32(bech32StakeAddress);
   });
 

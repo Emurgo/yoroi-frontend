@@ -54,7 +54,7 @@ describe('dApp, connection, no wallets', function () {
     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
   });
 
-  it('No wallet are displayed', async function () {
+  it('No wallets are displayed', async function () {
     const dappConnectPage = new DAppConnectWallet(webdriver, logger);
     const warningIsDisplayed = await dappConnectPage.noWalletsWarningIsDisplayed();
     expect(warningIsDisplayed).to.be.true;

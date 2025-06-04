@@ -11,20 +11,26 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
 describe('dApp, connection in extension', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
 
   before(async function () {
     try {
       mockServer = await getMockServer({});
       logger = getTestLogger(this.test.parent.title);
-      webdriver = await driversPoolsManager.getDriverFromPool();
+      webdriver = await driversPoolsManager.getPreparedDriver();
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
@@ -67,8 +73,8 @@ describe('dApp, connection in extension', function () {
 
   it('Check connection state in the dApp', async function () {
     await windowManager.switchTo(mockDAppName);
-    const connectionSate = await mockedDApp.getConnectionState();
-    expect(connectionSate).to.be.false;
+    const connectionSate = await mockedDApp.isEnabled();
+    expect(connectionSate.retValue, 'Wallet is still connected').to.be.false;
   });
 
   afterEach(function (done) {

@@ -3,7 +3,6 @@
 import type { Node } from 'react';
 import React, { Suspense } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import type { ConfigType } from '../config/config-types';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
 import AddWalletPage from './containers/wallet/AddWalletPage';
@@ -59,10 +58,9 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
+
 // $FlowIgnore: suppressing this error
-import { ModalProvider } from './UI/components/modals/ModalContext';
-// $FlowIgnore: suppressing this error
-import { ModalManager } from './UI/components/modals/ModalManager'
+import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -105,9 +103,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
-
-const CardanoStakingPagePromise = () => import('./containers/wallet/staking/CardanoStakingPage');
-const CardanoStakingPage = React.lazy(CardanoStakingPagePromise);
 
 const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
 const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
@@ -164,7 +159,6 @@ export const LazyLoadPromises: Array<() => any> = [
   URILandingPagePromise,
   WalletTransferPagePromise,
   ReceivePromise,
-  CardanoStakingPagePromise,
   VotingPageContentPromise,
   ComplexityLevelSettingsPagePromise,
   ComplexityLevelPagePromise,
@@ -181,9 +175,6 @@ export const LazyLoadPromises: Array<() => any> = [
   AnalyticsSettingsPagePromise,
   ExchangeEndPagePromise,
 ];
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 export const Routes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
@@ -245,6 +236,17 @@ export const Routes = (stores: StoresMap): Node => {
             component={props => wrapGovernance({ ...props, stores }, GovernanceSubpages(stores))}
           />
           <Route path={ROUTES.PORTFOLIO.ROOT} component={() => PortfolioSubpages(stores)} />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
+          <Route
+            exact
+            path={ROUTES.TX_REVIEW.FAIL}
+            component={props => <TransactionReviewFailedPage {...props} stores={stores} />}
+          />
+
           <Redirect to={ROUTES.WALLETS.ROOT} />
         </Switch>
       </Suspense>
@@ -260,11 +262,6 @@ const WalletsSubpages = stores => (
       path={ROUTES.WALLETS.RECEIVE.ROOT}
       component={props => wrapReceive({ ...props, stores }, <WalletReceivePage {...props} stores={stores} />)}
     />
-    <Route
-      exact
-      path={ROUTES.WALLETS.CARDANO_DELEGATION}
-      component={props => <CardanoStakingPage {...props} stores={stores} />}
-    />
   </Switch>
 );
 
@@ -278,32 +275,25 @@ const SwapSubpages = stores => (
 );
 
 const SettingsSubpages = stores => (
-  <ModalProvider>
-    <ModalManager />
-    <Switch>
-      <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
-      <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.TERMS_OF_USE}
-        component={props => <TermsOfUseSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-        component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
-      <Route
-        exact
-        path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-        component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
-      />
-      <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
-      <Redirect to={ROUTES.SETTINGS.GENERAL} />
-    </Switch>
-  </ModalProvider>
+  <Switch>
+    <Route exact path={ROUTES.SETTINGS.GENERAL} component={props => <GeneralSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.BLOCKCHAIN} component={props => <BlockchainSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.TERMS_OF_USE} component={props => <TermsOfUseSettingsPage {...props} stores={stores} />} />
+    <Route exact path={ROUTES.SETTINGS.WALLET} component={props => <WalletSettingsPage {...props} stores={stores} />} />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
+      component={props => <ExternalStorageSettingsPage {...props} stores={stores} />}
+    />
+    <Route exact path={ROUTES.SETTINGS.SUPPORT} component={props => <SupportSettingsPage {...props} stores={stores} />} />
+    <Route
+      exact
+      path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
+      component={props => <ComplexityLevelSettingsPage {...props} stores={stores} />}
+    />
+    <Route exact path={ROUTES.SETTINGS.ANALYTICS} component={props => <AnalyticsSettingsPage {...props} stores={stores} />} />
+    <Redirect to={ROUTES.SETTINGS.GENERAL} />
+  </Switch>
 );
 
 const PortfolioSubpages = stores =>
@@ -411,24 +401,28 @@ export function wrapReceive(receiveProps: StoresProps, children: Node): Node {
 // NEW UI - TODO: to be refactred
 export function wrapGovernance(governanceProps: StoresProps, children: Node): Node {
   const { stores } = governanceProps;
+  const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
+
   return (
-    <GovernanceContextProvider
-      currentWallet={currentWalletInfo}
-      createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
-      signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
-      txDelegationResult={delegationTxResult}
-      txDelegationError={delegationTxError}
-      tokenInfo={stores.tokenInfoStore.tokenInfo}
-      triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
-      getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
-      ampli={ampli}
-    >
-      <Suspense fallback={null}>{children}</Suspense>;
-    </GovernanceContextProvider>
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <GovernanceContextProvider
+        currentWallet={currentWalletInfo}
+        createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+        signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+        txDelegationResult={delegationTxResult}
+        txDelegationError={delegationTxError}
+        tokenInfo={stores.tokenInfoStore.tokenInfo}
+        triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+        getCurrentPrice={governanceProps.stores.coinPriceStore.getCurrentPrice}
+        ampli={ampli}
+      >
+        <Suspense fallback={null}>{children}</Suspense>;
+      </GovernanceContextProvider>
+    </CurrencyProvider>
   );
 }
 

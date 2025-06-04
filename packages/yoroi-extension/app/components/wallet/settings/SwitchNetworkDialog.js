@@ -59,6 +59,7 @@ export default class Switch extends Component<Props> {
   render(): Node {
     const { intl } = this.context;
     const { onCancel, onApply, networks } = this.props;
+    const baseComponentPath = 'switchNetworkDialog';
 
     return (
       <Dialog
@@ -66,7 +67,7 @@ export default class Switch extends Component<Props> {
         closeOnOverlayClick={false}
         onClose={onCancel}
         closeButton={<DialogCloseButton onClose={onCancel} />}
-        id="switchNetworkDialog"
+        id={baseComponentPath}
         styleOverride={{ maxWidth: '648px' }}
         dialogActions={[
           {
@@ -86,11 +87,12 @@ export default class Switch extends Component<Props> {
         </Typography>
         <Select
           formControlProps={{ sx: { marginTop: '25px' } }}
-          labelId="network-select"
+          labelId={baseComponentPath}
           {...this.form.$('selectedNetwork').bind()}
+          id={baseComponentPath + '-selectNetwork-dropdown'}
         >
           {networks.map(({ id, name }) => (
-            <MenuItemStyled value={id} key={id} id={'selectNetwork-network_' + id + '-menuItem'} isGray>
+            <MenuItemStyled value={id} key={id} id={baseComponentPath + '-selectNetwork_' + id + '-menuItem'} isGray>
               {intl.formatMessage(name)}
             </MenuItemStyled>
           ))}

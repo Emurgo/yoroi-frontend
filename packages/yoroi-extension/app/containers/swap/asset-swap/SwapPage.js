@@ -35,6 +35,12 @@ import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
+// $FlowIgnore: suppressing this error
+import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
+import { SwapPoolLabel } from '../../../components/swap/SwapPoolComponents';
+import { SwapTxInfo } from './SwapTxInfo';
+// $FlowIgnore: suppressing this error
+import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 
 export const PRICE_IMPACT_MODERATE_RISK = 1;
 export const PRICE_IMPACT_HIGH_RISK = 10;
@@ -52,6 +58,8 @@ function SwapPage(props: StoresProps & Intl): Node {
   const { back, sendUsingLedgerNano, sendUsingTrezorT, swap } = useStrings();
   const { orderStep, setOrderStepValue } = stores.substores.ada.swapStore;
 
+  const { openTxReviewModal, changeModalView, showTxResultModal } = useTxReviewModal();
+
   const {
     slippage,
     slippageChanged,
@@ -62,6 +70,7 @@ function SwapPage(props: StoresProps & Intl): Node {
       amounts: { sell, buy },
       limitPrice: orderLimitPrice,
     },
+
     frontendFeeTiersChanged,
   } = useSwap();
   const { sellTokenInfo, buyTokenInfo, resetSwapForm, sellQuantity, buyQuantity } = useSwapForm();
@@ -70,13 +79,10 @@ function SwapPage(props: StoresProps & Intl): Node {
   const walletType: string = wallet.type;
   const isHardwareWallet = wallet.isHardware;
   const network = getNetworkById(wallet.networkId);
-  const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(
-    network.NetworkId
-  );
-  const getTokenInfoBatch: Array<string> => { [string]: Promise<RemoteTokenInfo> } = ids =>
+  const defaultTokenInfo = stores.tokenInfoStore.getDefaultTokenInfoSummary(network.NetworkId);
+  const getTokenInfoBatch: (Array<string>) => { [string]: Promise<RemoteTokenInfo> } = ids =>
     stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo: string => Promise<RemoteTokenInfo> = id =>
-    getTokenInfoBatch([id])[id].then(res => res ?? {});
+  const getTokenInfo: string => Promise<RemoteTokenInfo> = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
 
   const isMarketOrder = orderType === 'market';
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
@@ -92,6 +98,12 @@ function SwapPage(props: StoresProps & Intl): Node {
   const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
+  // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
+  const [parsedSignRequest, setParsedSignRequest] = useState(null);
+
+  // useEffect(() => {
+  //   userPasswordState?.update(passwordInputValue);
+  // }, [passwordInputValue, userPasswordState?.value]);
 
   useEffect(
     () => () => {
@@ -109,8 +121,7 @@ function SwapPage(props: StoresProps & Intl): Node {
     buyQuantity.error == null &&
     isValidTickers;
 
-  const confirmationCanContinue = (isHardwareWallet || userPasswordState?.value !== '') && signRequest != null;
-
+  const confirmationCanContinue = true;
   const isButtonLoader = orderStep === 1 && signRequest == null;
 
   const isSwapEnabled = (orderStep === 0 && swapFormCanContinue) || (orderStep === 1 && confirmationCanContinue);
@@ -193,18 +204,40 @@ function SwapPage(props: StoresProps & Intl): Node {
     return `${val} ${currency}`;
   };
 
-  async function processSwapOrder() {
+  const processSwapOrder = async () => {
     try {
       if (orderStep === 0) {
         handleInitialStep();
       } else if (orderStep === 1) {
-        await handleSubmitTransaction();
+        const isAutoPool = selectedPoolCalculation.pool?.poolId === selectedPoolCalculation.pool.bestPool?.poolId;
+        openTxReviewModal({
+          title: 'Transaction confirmation',
+          modalView: 'transactionReview',
+          receiverCustomTitle: {
+            to: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
+          },
+          submitTx: pasword => {
+            handleSubmitTransaction(pasword);
+          },
+          extraOverviewDetails: {
+            title: 'Swap Details',
+            onClick: () => changeModalView({ modalView: 'extraDetails' }),
+            component: (
+              <SwapTxInfo
+                defaultTokenInfo={defaultTokenInfo}
+                getTokenInfo={getTokenInfo}
+                priceImpactState={priceImpactState}
+                slippageValue={slippageValue}
+              />
+            ),
+          },
+          unsignedTx: parsedSignRequest, // Ensure it stays in sync with the store
+        });
       }
     } catch (error) {
       console.error('Error handling next step', error);
-      // Handle error appropriately
     }
-  }
+  };
 
   function processBackToStart() {
     runInAction(() => {
@@ -247,23 +280,23 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
+  const handleSubmitTransaction = async passswordInput => {
+    if (signRequest == null) return;
+    validateSignRequestAndUserPassword(passswordInput);
 
-  async function handleSubmitTransaction() {
-    if (openedDialog !== '' || signRequest == null) return;
-
-    validateSignRequestAndUserPassword();
     setOpenedDialog('loadingOverlay');
-    const password = userPasswordState?.value;
 
     const baseBroadcastRequest = { wallet, signRequest };
     const broadcastRequest = isHardwareWallet
       ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password } };
+      : { normal: { ...baseBroadcastRequest, password: passswordInput } };
     try {
       const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
       // $FlowIgnore[incompatible-call]
       await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
       setOrderStepValue(2);
+      showTxResultModal(TransactionResult.SUCCESS);
+
       try {
         ampli.swapOrderSubmitted({
           ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
@@ -283,24 +316,25 @@ function SwapPage(props: StoresProps & Intl): Node {
     } finally {
       setOpenedDialog('');
     }
-  }
+  };
 
-  function validateSignRequestAndUserPassword() {
+  const validateSignRequestAndUserPassword = password => {
     if (signRequest == null) {
       throw new Error('Incorrect state! Order transaction is not prepared properly');
     }
     if (!isHardwareWallet) {
-      if (userPasswordState?.value === '') {
+      if (password === '') {
         throw new Error('Incorrect state! User password is required');
       }
     }
-  }
+  };
 
   function handleTransactionError(e) {
     const isPasswordError = e instanceof IncorrectWalletPasswordError;
     runInAction(() => {
       txSubmitErrorState.update(e);
       setOrderStepValue(isPasswordError ? 1 : 2);
+      showTxResultModal(TransactionResult.FAIL);
     });
     if (!isPasswordError) {
       console.error('Failed to submit swap tx', e);
@@ -332,8 +366,12 @@ function SwapPage(props: StoresProps & Intl): Node {
       ptFees,
       poolProvider,
     };
-    const txSignRequest: HaskellShelleyTxSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const txSignRequest = await stores.substores.ada.swapStore.createUnsignedSwapTx(swapTxReq);
+    const unsigned = txSignRequest;
+    const txBodyjson = unsigned.unsignedTx;
+
     runInAction(() => {
+      setParsedSignRequest(txBodyjson);
       setSignRequest(txSignRequest);
     });
   };
@@ -365,8 +403,6 @@ function SwapPage(props: StoresProps & Intl): Node {
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
               onRemoteOrderDataResolved={onRemoteOrderDataResolved}
-              userPasswordState={userPasswordState}
-              txSubmitErrorState={txSubmitErrorState}
               defaultTokenInfo={defaultTokenInfo}
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}

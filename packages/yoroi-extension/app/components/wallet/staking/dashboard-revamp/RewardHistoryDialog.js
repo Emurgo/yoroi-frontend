@@ -1,6 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
-import type { GraphData } from './StakingDashboard';
+import type { GraphData } from '../dashboard/StakingDashboard';
 import { useMemo } from 'react';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../../i18n/global-messages';

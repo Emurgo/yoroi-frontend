@@ -25,6 +25,10 @@ class GeneralSubTab extends SettingsTab {
       method: 'id',
     };
   };
+  switchNetworkBtnLocator = {
+    locator: 'settings:general-switchNetwork-button',
+    method: 'id'
+  };
   // * network text
   networkInfoTextLocator = {
     locator: 'settings:general-networkInfo-text',
@@ -104,6 +108,11 @@ class GeneralSubTab extends SettingsTab {
     await this.openFiatSelection();
     await this.pickFiat(fiatCode);
     await this.sleep(200);
+  }
+  async openSwitchNetworkModal() {
+    this.logger.info(`GeneralSubTab::openSwitchNetworkModal is called.`);
+    await this.scrollIntoView(this.switchNetworkBtnLocator);
+    await this.click(this.switchNetworkBtnLocator);
   }
   async getNetworkText() {
     this.logger.info(`GeneralSubTab::getNetworkText is called`);

@@ -8,20 +8,22 @@ import { ReactComponent as StakingIllustration } from '../../assets/images/dashb
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard-revamp/StakingDashboard';
+import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
 import { SocialMediaStakePool, HelperTooltip } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
+import { DelegateButton } from '../../components/wallet/staking/dashboard-revamp/DelegateButton';
+
 type Props = {|
   +isOpen: boolean,
   +isWalletWithNoFunds: boolean,
   +isTestnet: boolean,
   +poolInfo: PoolData | void,
-  +onDelegateClick: string => Promise<void>,
   +ticker: string,
+  +stores: any,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -71,15 +73,7 @@ const messages = defineMessages({
   },
 });
 
-function WalletDelegationBanner({
-  isOpen,
-  isWalletWithNoFunds,
-  isTestnet,
-  onDelegateClick,
-  intl,
-  ticker,
-  poolInfo,
-}: Props & Intl): Node {
+function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, ticker, poolInfo, stores }: Props & Intl): Node {
   if (poolInfo == null) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" py="40px">
@@ -169,24 +163,14 @@ function WalletDelegationBanner({
           >
             {intl.formatMessage(globalMessages.learnMore)}
           </Link>
-          <Button
-            variant="primary"
-            sx={{
-              '&.MuiButton-sizeMedium': {
-                padding: '9px 20px',
-              },
-            }}
-            onClick={() =>
-              onDelegateClick(
-                // Testnet pool:
-                // https://preprod.cardanoscan.io/pool/7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349
-                isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : id
-              )
-            }
+          <DelegateButton
+            poolID={id}
+            poolName={name}
+            stores={stores}
+            label={intl.formatMessage(globalMessages.delegateLabel)}
             disabled={isWalletWithNoFunds}
-          >
-            {intl.formatMessage(globalMessages.delegateLabel)}
-          </Button>
+            isTestnet={isTestnet}
+          />
         </Box>
       </Box>
     </WrapperBanner>

@@ -248,7 +248,8 @@ const definePlugin = (
   networkName /*: string */,
   isProd /*: boolean */,
   isNightly /*: boolean */,
-  isLight /*: boolean */ = false
+  isLight /*: boolean */ = false,
+  isE2E /*: boolean */,
 ) /*: * */ => {
   return {
     'process.env': {
@@ -264,6 +265,7 @@ const definePlugin = (
       NIGHTLY: isNightly,
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
       IS_LIGHT: isLight,
+      IS_E2E: isE2E,
     },
   };
 };

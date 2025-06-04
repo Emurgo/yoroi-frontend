@@ -10,16 +10,17 @@ import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as StakingIcon } from '../../../../assets/images/dashboard/staking-active.inline.svg';
 import { ReactComponent as TotalDelegatedIcon } from '../../../../assets/images/dashboard/total-delegated.inline.svg';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import styles from './UserSummary.scss';
+import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import type { TokenEntry, TokenLookupKey } from '../../../../api/common/lib/MultiToken';
 import { hiddenAmount } from '../../../../utils/strings';
 import { truncateToken } from '../../../../utils/formatters';
 import { getTokenName } from '../../../../stores/stateless/tokenHelpers';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { GraphData } from './StakingDashboard';
+import type { GraphData } from '../dashboard/StakingDashboard';
 import RewardHistoryGraph from './RewardHistoryGraph';
 import { maybe } from '../../../../coreUtils';
+import { WithdrawButton } from './WithdrawButton';
 
 type Props = {|
   +onOverviewClick: Function,
@@ -30,17 +31,32 @@ type Props = {|
   +unitOfAccount: TokenEntry => void | {| currency: string, amount: string |},
   +shouldHideBalance: boolean,
   +graphData: GraphData,
-  +withdrawRewards: void | (void => Promise<void>),
+  +govStatusFetched: boolean,
+  +stores: any,
 |};
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
 
-const IconWrapper = styled(Box)(({ theme }) => ({
+const StakingIconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
     '& rect': {
       fill: theme.palette.ds.primary_100,
+    },
+    '& path': {
+      fill: theme.palette.ds.primary_600,
+    },
+  },
+}));
+
+const TotalDelegatedIconWrapper = styled(Box)(({ theme }) => ({
+  '& svg': {
+    '& rect': {
+      fill: theme.palette.ds.secondary_100,
+    },
+    '& path': {
+      fill: theme.palette.ds.secondary_600,
     },
   },
 }));
@@ -62,12 +78,13 @@ function SummaryCard({
   totalDelegated,
   getTokenInfo,
   onOverviewClick: _onOverviewClick, // todo: remove?
-  withdrawRewards,
   shouldHideBalance,
   onOpenRewardList,
   unitOfAccount,
   graphData,
   intl,
+  govStatusFetched,
+  stores,
 }: Props & Intl): Node {
   const formatTokenEntry: TokenEntry => Node = tokenEntry => {
     const tokenInfo = getTokenInfo(tokenEntry);
@@ -101,6 +118,8 @@ function SummaryCard({
     return maybe(unitOfAccountCalculated, u => `${shouldHideBalance ? hiddenAmount : u.amount} ${u.currency}`);
   };
 
+  const hasNoRewards = token => maybe(token, t => t.getDefaultEntry()?.amount?.isZero?.()) ?? false;
+
   return (
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_max' }}>
       <Box
@@ -116,25 +135,20 @@ function SummaryCard({
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(messages.summary)}
         </Typography>
-        <Button
-          variant="primary"
-          sx={{
-            '&.MuiButton-sizeMedium': {
-              height: 'unset',
-              p: '9px 20px',
-            },
-          }}
-          onClick={withdrawRewards}
-          disabled={!withdrawRewards}
-        >
-          {intl.formatMessage(globalMessages.withdrawLabel)}
-        </Button>
+
+        <WithdrawButton
+          label={intl.formatMessage(globalMessages.withdrawLabel)}
+          govStatusFetched={govStatusFetched}
+          stores={stores}
+          intl={intl}
+          isDisabled={hasNoRewards(totalRewards)}
+        />
       </Box>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <IconWrapper>
-            <StakingIcon />
-          </IconWrapper>
+          <StakingIconWrapper>
+             <StakingIcon />
+          </StakingIconWrapper>
           <InfoDetails>
             <Typography component="div" variant="caption1" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>
               {intl.formatMessage(globalMessages.totalRewardsLabel)}
@@ -153,9 +167,9 @@ function SummaryCard({
             </OverviewButton> */}
         </InfoRow>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
-          <IconWrapper>
+          <TotalDelegatedIconWrapper>
             <TotalDelegatedIcon />
-          </IconWrapper>
+          </TotalDelegatedIconWrapper>
           <InfoDetails>
             <Typography
               component="div"
@@ -173,7 +187,7 @@ function SummaryCard({
                 {renderAmount(totalDelegated)}
               </Typography>
             ) : (
-              <div className={styles.loadingSpinner}>
+              <div className={loadingSpinnerStyles.loadingSpinner}>
                 <LoadingSpinner small />
               </div>
             )}
