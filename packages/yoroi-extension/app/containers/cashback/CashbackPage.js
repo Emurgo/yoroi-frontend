@@ -439,7 +439,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
       <Suspense fallback={null}>
         {shouldShowDisclaimer && (
           <DisclaimerDialog
-            closeButton={<CloseButton onClick={() => stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT })} />}
+            closeButton={<CloseButton onClick={() => stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT })} />}
             onProceed={() => {
               setShouldShowDisclaimer(false);
               const localStorageApi = new LocalStorageApi();
