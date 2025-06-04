@@ -26,6 +26,8 @@ import NotificationsManager from './UI/features/notifications/common/Notificatio
 // $FlowIgnore: suppressing this error
 import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 
+import 'react-tooltip/dist/react-tooltip.css';
+
 // https://github.com/yahoo/react-intl/wiki#loading-locale-data
 addLocaleData(locales);
 
