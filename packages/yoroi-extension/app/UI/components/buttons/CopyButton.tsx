@@ -41,7 +41,7 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
 
   return (
     <CopyToClipboard text={textToCopy} onCopy={handleCopy} {...props}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow placement="bottom-start">
+      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} place="bottom-start">
         <IconWrapper disabled={disabled} buttonProps={{ sx: { padding: 0 } }} icon={copied ? Icons.Copied : Icons.Copy} asButton />
       </Tooltip>
     </CopyToClipboard>
