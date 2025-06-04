@@ -928,6 +928,8 @@
   "wallet.revampAnnouncement.updates.5new": "ヨロイDrep投票委任",
   "wallet.revampAnnouncement.updates.6new": "ネットワークスイッチ機能（Cardano Preprod テストネットワークでテストTADAを使用してウォレットを使用できます）",
   "wallet.revampAnnouncement.updates.7new": "サイドメニューのスクロール",
+  "wallet.revampAnnouncement.updates.8new": "In app notifications (receive notifications when a transactions is confirmed)",
+  "wallet.revampAnnouncement.updates.9new": "Redesigned transaction preview interface (Review transactions at a glance before signing)",
   "wallet.revampAnnouncement.updatesSectionTitleNew": "ヨロイにさらに強力な新機能が追加されました。ぜひアップデートし、暗号通貨の新たな体験をぜひお楽しみください！",
   "wallet.send.confirmationDialog.addressToLabel": "受信者",
   "wallet.send.confirmationDialog.amountLabel": "金額",
@@ -1368,6 +1370,7 @@
   "transaction.review.outputsLabel": "出力",
   "transaction.review.yourAddressLabel": "あなたのアドレス",
   "transaction.review.registerStakingKey": "ステーキングキーの保証金を登録",
+  "transaction.review.stakeWalletBalance": "Stake entire wallet balance to",
   "transaction.review.trezorConfirm": "Trezorで確認",
   "transaction.review.ledgerConfirm": "Ledgerで確認",
   "transaction.review.transactionReview": "取引のレビュー",
@@ -1380,5 +1383,5 @@
   "transaction.review.collateralInfo": "Cardano上の特定のスマートコントラクトとやり取りする際には担保が必須です。取引の検証に失敗した場合に限り、ADAが担保から差し引かれます。",
   "transaction.review.interactWithOperations": "あなたは、ガバナンスや様々なブロックチェーン活動で使用される重要なコンポーネントであるオペレーションとやり取りしようとしています。これには、CIP-0095に概説されているように、ガバナンス取引を促進するCardanoガバナンス証明書が含まれます。",
   "transaction.review.takeHardwareWallet": "ハードウェアウォレットデバイスを取り出し、そこに表示される指示に従ってください。信頼できる操作であることを確認してください。",
-  "transaction.review.rewardsWithdraw": "ステークプールから委任を解除すると、報酬は自動的に引き出されます。また、2 ADA のステークデポジットも返却されます。別のステークプールを選択したい場合は、委任を解除せずに設定を変更することができます。"
+  "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation."
 }
