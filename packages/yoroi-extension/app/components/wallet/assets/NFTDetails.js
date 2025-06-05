@@ -22,6 +22,7 @@ import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 import type { CardanoAssetMintMetadata, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+// $FlowIgnore
 import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 type Props = {|

@@ -17,6 +17,7 @@ import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+// $FlowIgnore
 import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
