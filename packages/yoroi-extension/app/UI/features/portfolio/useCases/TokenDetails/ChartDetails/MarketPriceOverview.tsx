@@ -1,7 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { isEmpty } from 'lodash';
-import React from 'react';
 import { Chip, ChipTypes, Icon, Skeleton } from '../../../../../components';
 import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 import { DEFAULT_FIAT_PAIR } from '../../../common/helpers/constants';

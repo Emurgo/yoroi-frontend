@@ -11,8 +11,7 @@ import { IntlProvider } from '../context/IntlProvider';
 import NotificationsManager from '../features/notifications/common/NotificationsManager';
 import { ReviewTxManager } from '../features/transaction-review/module/ReviewTxManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
-import { createCurrrentWalletInfo } from '../utils/createCurrentWalletInfo';
-import { SwapContextProvider } from '../features/swap-new/module/SwapContextProvider';
+
 
 @observer
 export default class GeneralPageLayout extends React.Component {
@@ -27,23 +26,20 @@ export default class GeneralPageLayout extends React.Component {
   render() {
     const { children, navbar, stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
-    const currentWalletInfo = createCurrrentWalletInfo(stores);
 
     const { intl } = this.context;
 
     return (
       <IntlProvider intl={intl}>
         <ModalProvider>
-          <SwapContextProvider currentWallet={currentWalletInfo} stores={stores}>
-            <ReviewTxProvider stores={stores} intl={intl}>
-              <ModalManager />
-              <NotificationsManager />
-              <ReviewTxManager />
-              <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
-                {children}
-              </TopBarLayout>
-            </ReviewTxProvider>
-          </SwapContextProvider>
+          <ReviewTxProvider stores={stores} intl={intl}>
+            <ModalManager />
+            <NotificationsManager />
+            <ReviewTxManager />
+            <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={sidebarContainer} navbar={navbar}>
+              {children}
+            </TopBarLayout>
+          </ReviewTxProvider>
         </ModalProvider>
       </IntlProvider>
     );

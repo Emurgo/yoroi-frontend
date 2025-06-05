@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -14,7 +15,6 @@ import { produce } from 'immer';
 import { undefinedToken } from '../common/constants';
 import { usePortfolioTokenInfos } from '../../portfolio/common/hooks/usePortfolioTokenInfo';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
-import { useModal } from '../../../components/modals/ModalContext';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
@@ -32,12 +32,13 @@ export const useAddressHex = address => {
 };
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
-  if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
-  const { ftAssetList, primaryTokenInfo, walletAddresses } = currentWallet;
+  const { ftAssetList, primaryTokenInfo, walletAddresses ,selectedWallet} = currentWallet;
+    if (selectedWallet === undefined) {
+    return <></>;
+  }
   const [stakingKey, setStakingKey] = React.useState(null);
   const [loadingSwapPage, setLoadingSwapPage] = React.useState(true);
   const { partners, excludedTokens } = useSwapConfig();
-  const { title } = useModal();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
 
@@ -73,7 +74,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
   const { data: tokenIds = [], refetch: refetchTokens } = useQuery({
-    queryKey: ['useSwapTokenIds', title, swapManager.settings.routingPreference],
+    queryKey: ['useSwapTokenIds', swapManager.settings.routingPreference],
     queryFn: async () => {
       const res = await swapManager.api.tokens();
       if (isRight(res)) {
@@ -91,7 +92,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   React.useEffect(() => {
     refetchTokens();
-  }, [tokenIds, title]);
+  }, [tokenIds]);
 
   const { tokenInfos = new Map<Portfolio.Token.Id, Portfolio.Token.Info>(), isLoading, isFetching } = usePortfolioTokenInfos({
     tokenManager,

@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled } from '@mui/material';
-import React from 'react';
 import { Icon } from '../icons';
 
 const IconWrapper = styled(Box)(({ theme }: any) => ({

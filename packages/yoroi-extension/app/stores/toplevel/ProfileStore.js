@@ -23,10 +23,10 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     isDone: () => this.isAnalyticsOpted,
     action: async () => {
       const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
-      if (this.stores.app.currentRoute === route) {
+      if (this.stores.routing.currentRoute === route) {
         return;
       }
-      this.stores.app.goToRoute({ route });
+      this.stores.routing.goToRoute({ route });
     },
   };
 
@@ -41,10 +41,10 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
         const route = ROUTES.PROFILE.LANGUAGE_SELECTION;
-        if (this.stores.app.currentRoute === route) {
+        if (this.stores.routing.currentRoute === route) {
           return;
         }
-        this.stores.app.goToRoute({ route });
+        this.stores.routing.goToRoute({ route });
         ampli.createWalletLanguagePageViewed();
       },
     },
@@ -52,10 +52,10 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       isDone: () => this.areTermsOfUseAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.TERMS_OF_USE;
-        if (this.stores.app.currentRoute === route) {
+        if (this.stores.routing.currentRoute === route) {
           return;
         }
-        this.stores.app.goToRoute({ route });
+        this.stores.routing.goToRoute({ route });
         ampli.createWalletTermsPageViewed();
       },
     },
@@ -64,7 +64,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       isDone: () => this.isComplexityLevelSelected,
       action: async () => {
         const route = ROUTES.PROFILE.COMPLEXITY_LEVEL;
-        if (this.stores.app.currentRoute === route) {
+        if (this.stores.routing.currentRoute === route) {
           return;
         }
         noop(this.stores.profile.selectComplexityLevel(ComplexityLevels.Simple));
@@ -74,20 +74,20 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       isDone: () => !environment.isNightly() || this.acceptedNightly,
       action: async () => {
         const route = ROUTES.NIGHTLY_INFO;
-        if (this.stores.app.currentRoute === route) {
+        if (this.stores.routing.currentRoute === route) {
           return;
         }
-        this.stores.app.goToRoute({ route });
+        this.stores.routing.goToRoute({ route });
       },
     },
     {
       isDone: () => !environment.canRegisterProtocol() || this.isUriSchemeAccepted,
       action: async () => {
         const route = ROUTES.PROFILE.URI_PROMPT;
-        if (this.stores.app.currentRoute === route) {
+        if (this.stores.routing.currentRoute === route) {
           return;
         }
-        this.stores.app.goToRoute({ route });
+        this.stores.routing.goToRoute({ route });
       },
     },
     {
@@ -107,7 +107,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
 
         const firstWallet = wallets.wallets.length !== 0 ? wallets.wallets[0] : null;
         if (firstWallet == null) {
-          stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+          stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
           return;
         }
         let wallet;
@@ -123,9 +123,9 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
 
         if (stores.loading.landingRoute) {
-          stores.app.goToRoute({ route: stores.loading.landingRoute });
+          stores.routing.goToRoute({ route: stores.loading.landingRoute });
         } else {
-          stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+          stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
         }
         runInAction(() => {
           this.hasRedirected = true;

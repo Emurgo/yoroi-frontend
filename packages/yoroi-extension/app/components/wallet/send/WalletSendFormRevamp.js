@@ -48,18 +48,14 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
-import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
-import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
-import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 import { SendTokensButton } from './SendTokensButton';
 
 const messages = defineMessages({
@@ -212,21 +208,6 @@ type Props = {|
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: SendMoneyRequest,
-  +sendMoney: (params: {|
-    password: string,
-    +wallet: {
-      publicDeriverId: number,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-    signRequest: ISignRequest<any>,
-    onSuccess?: void => void,
-  |}) => Promise<void>,
-  +ledgerSendError: null | LocalizableError,
-  +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendStore,
-  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
@@ -955,29 +936,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             />
           </Box>
         );
-      case SEND_FORM_STEP.PREVIEW:
-        return (
-          <WalletSendPreviewStepContainer
-            signRequest={this.props.signRequest}
-            staleTx={this.props.staleTx}
-            isDefaultIncluded={this.props.isDefaultIncluded}
-            unitOfAccountSetting={this.props.unitOfAccountSetting}
-            openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
-            minAda={this.props.minAda}
-            plannedTxInfoMap={this.props.plannedTxInfoMap}
-            onUpdateStep={this.onUpdateStep.bind(this)}
-            sendMoneyRequest={this.props.sendMoneyRequest}
-            sendMoney={this.props.sendMoney}
-            getTokenInfo={this.props.getTokenInfo}
-            getCurrentPrice={this.props.getCurrentPrice}
-            ledgerSendError={this.props.ledgerSendError}
-            trezorSendError={this.props.trezorSendError}
-            ledgerSend={this.props.ledgerSend}
-            trezorSend={this.props.trezorSend}
-            selectedExplorer={this.props.selectedExplorer}
-            selectedWallet={this.props.selectedWallet}
-          />
-        );
       default:
         throw Error(`${step} is not a valid step`);
     }
@@ -1051,21 +1009,19 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             >
               {this.renderCurrentStep(currentStep)}
             </Box>
-            {currentStep !== SEND_FORM_STEP.PREVIEW && (
-              <Box
-                borderTop={bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'}
-                borderColor="grayscale.200"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                gap="24px"
-                p="24px"
-                mx="-24px"
-                mt="30px"
-              >
-                {this.renderCurrentFooter(currentStep)}
-              </Box>
-            )}
+            <Box
+              borderTop={bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'}
+              borderColor="grayscale.200"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap="24px"
+              p="24px"
+              mx="-24px"
+              mt="30px"
+            >
+              {this.renderCurrentFooter(currentStep)}
+            </Box>
           </Box>
         </Box>
       </>
@@ -1079,17 +1035,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       this.maxStep = step;
       if (step === SEND_FORM_STEP.AMOUNT) {
         ampli.sendSelectAssetPageViewed();
-      } else if (step === SEND_FORM_STEP.PREVIEW) {
-        const { totalInput } = this.props;
-        if (totalInput == null) {
-          throw new Error('expect totalInput');
-        }
-        ampli.sendSelectAssetSelected({
-          asset_count: totalInput.nonDefaultEntries().length,
-        });
-        ampli.sendSummaryPageViewed({
-          asset_count: totalInput.nonDefaultEntries().length,
-        });
       }
     }
   }

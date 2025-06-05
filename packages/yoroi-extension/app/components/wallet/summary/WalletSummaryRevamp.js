@@ -27,6 +27,9 @@ import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import environment from '../../../environment';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
+import type { StoresMap } from '../../../stores';
 
 const messages = defineMessages({
   transactionType: {
@@ -57,8 +60,9 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
-  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
+  +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
+  +stores: StoresMap,
 |};
 
 type State = {|
@@ -242,6 +246,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
       emptyBannerComponent,
+      stores,
     } = this.props;
     const { intl } = this.context;
 
@@ -297,6 +302,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
+        <DrepPromotionBanner stores={stores} intl={intl} />
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}

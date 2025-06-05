@@ -33,7 +33,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
   };
 
   goToCreateWallet: void => void = () => {
-    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+    this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
   }
 
   setupTransferFundsWithPaperMnemonic: ((payload: {|
@@ -76,7 +76,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
         await new Promise(resolve => {
           setTimeout(() => {
             if (walletsStore.selected != null) {
-              stores.app.goToRoute({
+              stores.routing.goToRoute({
                 route: ROUTES.WALLETS.TRANSACTIONS
               });
             }
@@ -156,7 +156,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
               label: intl.formatMessage(globalMessages.nextButtonLabel),
               trigger: this.transferFunds,
             }}
-            isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
+            isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
             onCancel={{
               label: intl.formatMessage(globalMessages.cancel),
               trigger: this.cancelTransferFunds

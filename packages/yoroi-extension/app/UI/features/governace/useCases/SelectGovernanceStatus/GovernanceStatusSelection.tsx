@@ -4,7 +4,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { TransactionResult } from '../../../transaction-review/common/types';
@@ -57,6 +57,7 @@ export const GovernanceStatusSelection = () => {
     drepCredentialHex,
     setUnsignedTx,
     showTxResultModal,
+    setDrepId,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
@@ -66,13 +67,13 @@ export const GovernanceStatusSelection = () => {
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-  const params: any = useLocation();
+  const location = useLocation();
 
   React.useEffect(() => {
-    if (params?.delegateToYoroiDrep) {
+    if (location.search.includes('delegateToYoroiDrep=true')) {
       handleYoroiDelegate();
     }
-  }, [params]);
+  }, [useLocation]);
 
   const handleDelegate = async () => {
     if (!governanceManager) {
@@ -104,7 +105,8 @@ export const GovernanceStatusSelection = () => {
     const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
 
     governanceVoteChanged(vote);
-    createUnsignTx(dRepCredentialHex);
+    setDrepId({ drepID });
+    await createUnsignTx(dRepCredentialHex);
   };
 
   const handleAbstain = async () => {

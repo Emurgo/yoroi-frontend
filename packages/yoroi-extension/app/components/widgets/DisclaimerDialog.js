@@ -1,5 +1,6 @@
 // @flow
 import { useState } from 'react';
+import type { Element } from 'react';
 import { injectIntl, defineMessages, type $npm$ReactIntl$IntlShape } from 'react-intl';
 import Dialog from './Dialog';
 import globalMessages from '../../i18n/global-messages';
@@ -44,6 +45,7 @@ const messages = defineMessages({
 
 type Props = {|
   onProceed: () => void,
+  closeButton: Element<any>,
 |};
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -67,6 +69,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
   return (
     <Dialog
       title={intl.formatMessage(globalMessages.disclaimer)}
+      closeButton={props.closeButton}
       dialogActions={[
         {
           label: intl.formatMessage(globalMessages.proceed),

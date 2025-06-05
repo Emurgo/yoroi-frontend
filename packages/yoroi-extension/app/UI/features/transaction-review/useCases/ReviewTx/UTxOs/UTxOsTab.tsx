@@ -2,7 +2,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { Portfolio } from '@yoroi/types';
 import BigNumber from 'bignumber.js';
 import React from 'react';
-import { Collapsible, CopyButton, Icon } from '../../../../../components';
+import { Collapsible, CopyButton, Icons, IconWrapper } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { TokenItem } from '../../../common/TokenItem'; // Adjust this path as necessary
 import { useTxReviewModal } from '../../../module/ReviewTxProvider';
@@ -111,7 +111,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
   return (
     <Stack direction="column" gap="8px" mt="16px">
       <Stack direction="row" alignItems="center" gap="8px">
-        <Icon.Indicator />
+        <IconWrapper color="ds.primary_500" icon={Icons.Indicator} />
         <Typography fontWeight="500" variant="h5" color="ds.text_gray_medium">
           {strings.yourAddressLabel}
         </Typography>
@@ -164,7 +164,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
   return (
     <Stack direction="column" gap="8px" mt="16px">
       <Stack direction="row" alignItems="center" gap="8px">
-        <Icon.Indicator />
+        <IconWrapper color="ds.static_green" icon={Icons.Indicator} />
         <Typography fontWeight="500" variant="h5">
           {isOwnAdddress ? 'Your Address' : 'Foreign address'}
         </Typography>

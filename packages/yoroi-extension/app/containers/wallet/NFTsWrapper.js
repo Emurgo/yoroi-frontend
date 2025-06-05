@@ -33,9 +33,9 @@ export default class NFTsWrapper extends Component<Props> {
     children: undefined,
   };
   isActivePage: string => boolean = route => {
-    const { location } = this.props.stores.router;
-    if (location) {
-      return !!matchPath(location.pathname, {
+    const { currentRoute } = this.props.stores.routing;
+    if (currentRoute) {
+      return !!matchPath(currentRoute, {
         path: buildRoute(route),
         exact: false,
       });

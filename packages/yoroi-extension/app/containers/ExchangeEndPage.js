@@ -27,7 +27,7 @@ export default class ExchangeEndPage extends Component<StoresProps> {
         showInContainer
       >
         <ExchangeEndPageContent
-          onConfirm={() => stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
+          onConfirm={() => stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
         />
       </TopBarLayout>
     );

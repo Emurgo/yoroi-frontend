@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';

@@ -16,11 +16,8 @@ import SubMenu from '../../components/topbar/SubMenu';
 import WalletLoadingAnimation from '../../components/wallet/WalletLoadingAnimation';
 import { TOP_RECENT_ANNOUNCEMENT_VERSION, RevampAnnouncementDialog } from './dialogs/RevampAnnouncementDialog';
 import { PoolTransitionDialog } from './dialogs/pool-transition/PoolTransitionDialog';
-import { Redirect } from 'react-router';
 import type { StoresProps } from '../../stores';
 import semver from 'semver/preload';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 // $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from '../../UI/features/transaction-review/module/ReviewTxProvider';
@@ -66,50 +63,12 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     });
 }
 
-checkRoute(): void | string {
-  const categories = allSubcategoriesRevamp;
-  if (this.props.stores.app.currentRoute.startsWith(ROUTES.TRANSFER.ROOT)) {
-    return ROUTES.WALLETS.TRANSACTIONS;
-  }
-
-  // void -> this route is fine for this wallet type
-  // string -> what you should be redirected to
-  const wallet = this.props.stores.wallets.selected;
-  if (wallet == null) return;
-
-  const spendableBalance = this.props.stores.transactions.balance;
-  const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
-
-  const activeCategory = categories.find(category => this.props.stores.app.currentRoute.startsWith(category.route));
-
-  // if we're on a page that isn't applicable for the currently selected wallet
-  // ex: a cardano-only page for an Ergo wallet
-  // or no category is selected yet (wallet selected for the first time)
-  const visibilityContext = {
-    selected: wallet.publicDeriverId,
-    networkId: wallet.networkId,
-    walletHasAssets,
-  };
-  if (!activeCategory?.isVisible(visibilityContext) && activeCategory?.isHiddenButAllowed !== true) {
-    const firstValidCategory = categories.find(c => c.isVisible(visibilityContext));
-    if (firstValidCategory == null) {
-      throw new Error(`Selected wallet has no valid category`);
-    }
-    return firstValidCategory.route;
-  }
-}
-
 navigateToMyWallets: string => void = destination => {
-  this.props.stores.app.goToRoute({ route: destination });
+  this.props.stores.routing.goToRoute({ route: destination });
 };
 
 render(): Node {
   const { stores } = this.props;
-  // abort rendering if the page isn't valid for this wallet
-  const newRoute = this.checkRoute();
-  if (newRoute != null) {
-    return <Redirect to={newRoute} />;
-  }
   const { intl } = this.context;
   const selectedWallet = stores.wallets.selectedOrFail;
   const warning = this.getWarning(selectedWallet.publicDeriverId);
@@ -138,8 +97,8 @@ render(): Node {
           label: intl.formatMessage(category.label),
           route: category.route,
         }))}
-      onItemClick={route => stores.app.goToRoute({ route })}
-      isActiveItem={route => stores.app.currentRoute.startsWith(route)}
+      onItemClick={route => stores.routing.goToRoute({ route })}
+      isActiveItem={route => stores.routing.currentRoute.startsWith(route)}
       locationId="wallet"
     />
   );
@@ -169,7 +128,6 @@ render(): Node {
               <ModalManager />
               <ReviewTxProvider stores={stores} intl={this.context.intl}>
                 <ReviewTxModal />
-                <DrepPromotionBanner stores={stores} intl={intl} />
                 {this.props.children}
                 {this.getDialogs(intl, currentPool)}{' '}
               </ReviewTxProvider>
@@ -214,7 +172,7 @@ getDialogs: (any, any) => Node = (intl, currentPool) => {
             show: 'idle',
             shouldUpdatePool: true,
           });
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: ROUTES.STAKING,
           });
         }}

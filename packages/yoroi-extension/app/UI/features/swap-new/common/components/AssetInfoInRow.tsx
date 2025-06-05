@@ -1,30 +1,52 @@
-import { Stack, Typography, useTheme, styled, Icon } from '@mui/material';
 import React from 'react';
+import { Stack, Typography, useTheme, styled } from '@mui/material';
+import BigNumber from 'bignumber.js';
 import { TokenIcon } from './TokenIcon/TokenIcon';
 import { atomicBreakdown } from '@yoroi/common';
-import BigNumber from 'bignumber.js';
 import { Icons, IconWrapper } from '../../../../components';
 
-export const AssetInfoInRow = React.memo(
-  ({ token, currency, secondaryToken24Activity, primaryTokenActivity, primaryTokenInfo, onAssetClick, direction }: any) => {
-    const { atoms }: any = useTheme();
-    const isPrimary: boolean = token.id === '-';
+interface AssetInfoInRowProps {
+  token: any;
+  currency: string;
+  secondaryToken24Activity?: [any, { price?: { close?: number } }];
+  primaryTokenActivity?: number | string;
+  primaryTokenInfo: { decimals: number };
+  onAssetClick: () => void;
+  direction: 'in' | 'out';
+}
 
-    const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
-    const tokenQuantityAsBigInt = direction === 'in' && bigNumberToBigInt(token.quantity);
+export const AssetInfoInRow = React.memo(
+  ({
+    token,
+    currency,
+    secondaryToken24Activity,
+    primaryTokenActivity,
+    primaryTokenInfo,
+    onAssetClick,
+    direction,
+  }: AssetInfoInRowProps) => {
+    const { atoms }: any = useTheme();
+    const isPrimary = token.id === '-';
+    const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
     const decimals = isPrimary ? primaryTokenInfo.decimals : token.decimals;
 
-    const totalPrice =
-      direction === 'in' && primaryTokenActivity && typeof tokenQuantityAsBigInt === 'bigint'
-        ? atomicBreakdown(tokenQuantityAsBigInt, decimals)
-            .bn.times(tokenPrice ?? 1)
-            .times(new BigNumber(primaryTokenActivity))
-            .toFormat(decimals)
-        : undefined;
+    let totalPrice: string | undefined;
+
+    if (direction === 'in' && primaryTokenActivity != null) {
+      try {
+        const quantityBigInt = bigNumberToBigInt(token.quantity);
+        const activityBN = new BigNumber(primaryTokenActivity.toString());
+
+        totalPrice = atomicBreakdown(quantityBigInt, decimals).bn.times(tokenPrice).times(activityBN).toFormat(decimals);
+      } catch (err) {
+        console.error('Failed to calculate totalPrice:', err);
+      }
+    }
 
     return (
       <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
         <Stack direction="row" alignItems="center" {...atoms.gap_lg}>
+          {/* Uncomment if TokenIcon should be shown */}
           {/* <TokenIcon large tokenId={token.id} /> */}
           <Stack direction="column" justifyContent="space-between">
             <Typography variant="body1" color="ds.text_gray_medium">
@@ -35,6 +57,7 @@ export const AssetInfoInRow = React.memo(
             </Typography>
           </Stack>
         </Stack>
+
         {direction === 'in' ? (
           <Stack direction="column" alignItems="flex-end">
             <Typography variant="body1" color="ds.text_gray_medium">
@@ -52,11 +75,8 @@ export const AssetInfoInRow = React.memo(
   }
 );
 
-export function bigNumberToBigInt(bn: BigNumber): bigint {
-  const wholeNumberString = bn.toFixed(0); // 0 means no decimals
-  const bigIntValue = BigInt(wholeNumberString);
-
-  return bigIntValue;
+function bigNumberToBigInt(bn: BigNumber): bigint {
+  return BigInt(bn.toFixed(0));
 }
 
 const RowWrapper = styled(Stack)(({ theme }: any) => ({

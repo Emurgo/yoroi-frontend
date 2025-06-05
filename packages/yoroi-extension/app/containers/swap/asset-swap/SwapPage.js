@@ -216,8 +216,8 @@ function SwapPage(props: StoresProps & Intl): Node {
           receiverCustomTitle: {
             to: <SwapPoolLabel provider={selectedPoolCalculation.pool?.provider} isAutoPool={isAutoPool} />,
           },
-          submitTx: pasword => {
-            handleSubmitTransaction(pasword);
+          submitTx: password => {
+            handleSubmitTransaction(password);
           },
           extraOverviewDetails: {
             title: 'Swap Details',
@@ -280,20 +280,20 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
-  const handleSubmitTransaction = async passswordInput => {
+  const handleSubmitTransaction = async (password) => {
     if (signRequest == null) return;
-    validateSignRequestAndUserPassword(passswordInput);
+    validateSignRequestAndUserPassword(password);
 
     setOpenedDialog('loadingOverlay');
 
-    const baseBroadcastRequest = { wallet, signRequest };
-    const broadcastRequest = isHardwareWallet
-      ? { [walletType]: baseBroadcastRequest }
-      : { normal: { ...baseBroadcastRequest, password: passswordInput } };
     try {
-      const refreshWallet = () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId);
-      // $FlowIgnore[incompatible-call]
-      await stores.substores.ada.wallets.adaSendAndRefresh({ broadcastRequest, refreshWallet });
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
+
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);
 
@@ -407,7 +407,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               getTokenInfo={getTokenInfo}
               getFormattedPairingValue={getFormattedPairingValue}
               onError={() => {
-                stores.app.goToRoute({ route: ROUTES.SWAP.ERROR });
+                stores.routing.goToRoute({ route: ROUTES.SWAP.ERROR });
               }}
             />
           )}
@@ -416,7 +416,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               txSubmitErrorState={txSubmitErrorState}
               onTryAgain={processBackToStart}
               onSuccess={() => {
-                stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+                stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
               }}
               onDownloadLogs={downloadLogs}
             />
@@ -475,7 +475,7 @@ function SwapPage(props: StoresProps & Intl): Node {
         <SwapDisclaimerDialog
           onDialogConfirm={onAcceptDisclaimer}
           onDialogRefuse={() => {
-            stores.app.redirect({ route: ROUTES.WALLETS.ROOT });
+            stores.routing.replaceRoute({ route: ROUTES.WALLETS.ROOT });
           }}
         />
       )}

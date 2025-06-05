@@ -1,4 +1,3 @@
-import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import TabMenu, { SubMenuOption } from '../../../../components/Menus/TabMenu';
 import { ROUTES } from '../../../../../routes-config';
