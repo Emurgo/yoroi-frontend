@@ -17,6 +17,7 @@ import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -184,13 +185,6 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 }
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
-
-function imageExists(imageSrc: string, onload: void => void, onerror: void => void) {
-  const img = new Image();
-  img.onload = onload;
-  img.onerror = onerror;
-  img.src = imageSrc;
-}
 
 const SvgWrapper = styled(Box)(({ theme, height }) => ({
   display: 'flex',
