@@ -779,6 +779,19 @@ class BasePage {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
   }
+  /**
+   * Getting an element size
+   * @param {ElementLocator} locator 
+   * @returns {{height: number, width: number}}
+   */
+  async getSize(locator) {
+    const element = await this.findElement(locator);
+    const rect = await element.getRect();
+    return {
+      height: rect.height,
+      width: rect.width,
+    }
+  }
 }
 
 export default BasePage;
