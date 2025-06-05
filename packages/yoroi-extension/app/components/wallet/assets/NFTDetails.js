@@ -4,7 +4,7 @@ import { Button, Grid, IconButton, Link as LinkMui, Modal, Stack, Tab, Typograph
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
@@ -22,7 +22,6 @@ import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 import type { CardanoAssetMintMetadata, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { useEffect } from 'react';
 import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 type Props = {|
@@ -177,22 +176,23 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
     return addr;
   }
-  // Todo: Should be handling by displaying an error page
-  if (nftInfo == null) return null;
-
 
   useEffect(() => {
-    if (nftImageUrl !== null)
-      imageExists(
-        String(nftImageUrl),
-        () => {
-          setIsImageValid(true)
-        }, // on-success
-        () => {
-          setIsImageValid(false)
-        } // on-error
-      );
+      if (nftImageUrl !== null) {
+        imageExists(
+          String(nftImageUrl),
+          () => {
+            setIsImageValid(true)
+          }, // on-success
+          () => {
+            setIsImageValid(false)
+          } // on-error
+        );
+      }
   }, [nftImageUrl]);
+
+  // Todo: Should be handling by displaying an error page
+  if (nftInfo == null) return null;
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
