@@ -174,6 +174,7 @@ export default class NftGalleryTab extends WalletCommonBase {
     this.logger.info(`NftGalleryTab::setFourColumnsView is called`);
     await this.click(this.fourColumnViewBtnLocator);
   }
+  async fourColumnsViewIsSelected() {}
   /**
    * Selecting appearance NFTs in 6 rows
    * @returns {Promise<void>}
@@ -182,6 +183,7 @@ export default class NftGalleryTab extends WalletCommonBase {
     this.logger.info(`NftGalleryTab::setSixColumnsView is called`);
     await this.click(this.sixColumnViewBtnLocator);
   }
+  async sixColumnsViewIsSelected() {}
   /**
    * Searching for a NFT
    * @param {string} searchValue
@@ -250,5 +252,10 @@ export default class NftGalleryTab extends WalletCommonBase {
       }
     }
     throw new Error(`Suitable NFT with name "${nftName}" is not found`);
+  }
+  async getNftCardSize(nftIndex) {
+    this.logger.info(`NftGalleryTab::getNftCardSize is called. NFT's index: ${nftIndex}`);
+    const buttonLocator = this.getNftButtonLocator(nftIndex);
+    return this.getSize(buttonLocator);
   }
 }
