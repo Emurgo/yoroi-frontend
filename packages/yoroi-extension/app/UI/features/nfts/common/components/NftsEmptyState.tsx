@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography, Stack } from '@mui/material';
 import { NftsNotFound } from '../../../../components/ilustrations';
 import { useIntl } from '../../../../context/IntlProvider';
@@ -30,9 +29,10 @@ export default function NftsEmptyState({ isSearch }: NftsEmptyStateProps) {
         justifyContent: 'center',
       }}
       spacing={2}
+      id="nftsList-emptyState-component"
     >
       <NftsNotFound />
-      <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium">
+      <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium" id="nftsList-noNfts-text">
         {intl.formatMessage(isSearch ? messages.noResultsFound : messages.noNFTsAdded)}
       </Typography>
     </Stack>

@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
 
     /* Type Checking */
     "moduleResolution": "node",
@@ -26,5 +26,9 @@
     "noImplicitAny": false,
     "types": ["chrome"]
   },
-  "include": ["app/UI/**/*", ".d.ts"]
+  "include": ["app/UI/**/*", ".d.ts"],
+  "exclude": [
+    "**/*.js",
+    "**/*.flow.js"
+  ]
 }

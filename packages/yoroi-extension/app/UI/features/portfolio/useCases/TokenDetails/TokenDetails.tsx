@@ -1,7 +1,6 @@
 import { Box, Divider, Stack } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { BackButton, Card } from '../../../../components';
 import NavigationButton from '../../common/components/NavigationButton';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';

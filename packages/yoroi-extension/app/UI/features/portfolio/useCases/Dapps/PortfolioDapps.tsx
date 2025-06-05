@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { useStrings } from '../../common/hooks/useStrings';
 import { ITabButtonProps, LiquidityItemType, OrderItemType } from '../../common/types/index';

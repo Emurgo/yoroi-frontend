@@ -1,6 +1,5 @@
 import { Skeleton, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { HiddenAmount } from './HiddenAmount';
 

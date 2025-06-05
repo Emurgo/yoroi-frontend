@@ -4,6 +4,7 @@ import { toSvg } from 'jdenticon';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { observer } from 'mobx-react';
+import { useStrings } from '../../../../UI/features/transaction-review/common/hooks/useStrings';
 
 export const DelegateButton = observer(({ stores, label, disabled, poolName, poolID }) => {
   const {
@@ -32,9 +33,7 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
-                  primaryTokenInfo.name
-                }`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`}
               />
             ),
             duplicated: false,
@@ -83,14 +82,15 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
 });
 
 const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
+  const strings =  useStrings();
   return (
     <Stack direction="column" spacing={2}>
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Register Staking key deposit</Typography>
+        <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
-        <Typography color="ds.text_gray_low">Stake entire wallet balance to</Typography>
+        <Typography color="ds.text_gray_low">{strings.stakeWalletBalance}</Typography>
         <Stack direction="row" spacing={1} alignItems="center">
           <Box
             sx={{

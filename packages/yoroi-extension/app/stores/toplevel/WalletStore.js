@@ -184,7 +184,7 @@ export default class WalletStore extends Store<StoresMap> {
           publicDeriverId: newWallet.publicDeriverId,
         });
         this.stores.uiDialogs.closeActiveDialog();
-        this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+        this.stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
       });
     }
   };

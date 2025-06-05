@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const WelcomeWallet = () => {
   return (
     <svg width="541" height="188" viewBox="0 0 541 188" fill="none" xmlns="http://www.w3.org/2000/svg">
