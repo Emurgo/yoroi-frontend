@@ -1,20 +1,15 @@
 import * as React from 'react';
-import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
 
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
-import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
-import { isLeft, isRight } from '@yoroi/common';
 import { useSwapConfig } from '../common/hooks/useSwapConfig';
 import { useQuery } from 'react-query';
 import { Api, Chain, Portfolio, Swap } from '@yoroi/types';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
-import { undefinedToken } from '../common/constants';
-import { usePortfolioTokenInfos } from '../../portfolio/common/hooks/usePortfolioTokenInfo';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
+import { useTokenInfo } from '../common/hooks/useTokensInfo';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
@@ -32,8 +27,8 @@ export const useAddressHex = address => {
 };
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
-  const { ftAssetList, primaryTokenInfo, walletAddresses ,selectedWallet} = currentWallet;
-    if (selectedWallet === undefined) {
+  const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet } = currentWallet;
+  if (selectedWallet === undefined) {
     return <></>;
   }
   const [stakingKey, setStakingKey] = React.useState(null);
@@ -73,52 +68,32 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     });
   }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
-  const { data: tokenIds = [], refetch: refetchTokens } = useQuery({
-    queryKey: ['useSwapTokenIds', swapManager.settings.routingPreference],
-    queryFn: async () => {
-      const res = await swapManager.api.tokens();
-      if (isRight(res)) {
-        const tokenIds = res.value.data.map(({ id }) => id).filter(id => excludedTokens.indexOf(id) === -1);
-        if (!tokenIds.includes(state.tokenOutInput.id ?? undefinedToken)) action({ type: 'ResetForm' });
-        return tokenIds;
-      }
-      return [];
-    },
-  });
-  const network = getNetworkById(stores.wallets.selected.networkId);
-
-  const getTokenInfoBatch = ids => stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
-  const getTokenInfo = id => getTokenInfoBatch([id])[id].then(res => res ?? {}); // not using this way to get token image anymore
-
-  React.useEffect(() => {
-    refetchTokens();
-  }, [tokenIds]);
-
-  const { tokenInfos = new Map<Portfolio.Token.Id, Portfolio.Token.Info>(), isLoading, isFetching } = usePortfolioTokenInfos({
+  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {} } = useTokenInfo({
+    swapManager,
     tokenManager,
     wallet: { networkId: Chain.Network.Mainnet, portfolioPrimaryTokenInfo: primaryTokenInfo },
-    tokenIds,
-    sourceId: 'SwapProvider',
+    excludedTokens,
   });
 
-  React.useEffect(() => {
-    setLoadingSwapPage(prev => {
-      const next = isLoading || isFetching;
-      return prev !== next ? next : prev;
-    });
-  }, [isLoading, isFetching]);
+
+  // React.useEffect(() => {
+  //   setLoadingSwapPage(prev => {
+  //     const next = isLoading || isFetching;
+  //     return prev !== next ? next : prev;
+  //   });
+  // }, [isLoading, isFetching]);
 
   const context = React.useMemo(
     () => ({
       swapForm: { action, ...state },
       tokenInfos,
+      tokenInfoList,
       tokenInInputRef,
       tokenOutInputRef,
       ftAssetList: ftAssetList || [],
       primaryTokenInfo,
       assetsStore: stores.substores.ada.swapStore.assets,
       loadingSwapPage: loadingSwapPage,
-      getTokenInfo,
       tokenManager,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]

@@ -34,7 +34,6 @@ const cardanoIconSizeMap = {
 
 export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconProps) => {
   const theme: any = useTheme();
-console.log("TokenInfoIcon", { info, size, imageStyle });
   const dimension = sizeMap[size];
 
   if (info.id === undefined) {
@@ -55,9 +54,9 @@ console.log("TokenInfoIcon", { info, size, imageStyle });
     );
   }
 
-  const [policy, name] = !info ? '.' : info.id.split('.')
-  const { uri, onError, onLoad, isError,crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
-  console.log('TokenInfoIcon URI', { policy, name, uri, isError });
+  const [policy, name] = !info ? '.' : info.id.split('.');
+  const { uri, onError, onLoad, isError, crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
+
   return (
     <Box
       component="img"
@@ -65,8 +64,7 @@ console.log("TokenInfoIcon", { info, size, imageStyle });
       onLoad={onLoad}
       onError={onError}
       alt={name}
-        crossOrigin={crossOrigin}
-
+      crossOrigin={crossOrigin}
       sx={{
         width: dimension,
         height: dimension,

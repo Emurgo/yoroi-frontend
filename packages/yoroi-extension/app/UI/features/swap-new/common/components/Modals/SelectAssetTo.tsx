@@ -51,7 +51,7 @@ export const SelectAssetTo = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { tokenInfos, swapForm, primaryTokenInfo } = useSwapRevamp();
+  const { tokenInfos, swapForm, primaryTokenInfo, tokenInfoList } = useSwapRevamp();
   const { swapConfig } = useSwapConfig();
   const { closeModal } = useModal();
   const { currency } = useCurrencyPairing();
@@ -81,7 +81,7 @@ export const SelectAssetTo = () => {
       if (!searchTerm) return true;
       return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
-  console.log('filteredAssets', filteredAssets);
+
   const handleAssetClick = (assetId: string) => {
     swapForm.action({ type: 'TokenOutIdChanged', tokenId: assetId });
     swapForm.action({ type: 'TokenOutInputTouched', value: assetId });
@@ -113,11 +113,11 @@ export const SelectAssetTo = () => {
           />
         </SearchWrapper>
         <AssetCountText variant="body2" color="ds.text_gray_low">
-          {strings.numYourAssets(filteredAssets.length)}
+          {strings.numYourAssets(tokenInfoList.length)}
         </AssetCountText>
       </Stack>
       <Stack>
-        {filteredAssets.map(asset => {
+        {tokenInfoList.map(asset => {
           return (
             <AssetInfoInRow
               key={asset.id}

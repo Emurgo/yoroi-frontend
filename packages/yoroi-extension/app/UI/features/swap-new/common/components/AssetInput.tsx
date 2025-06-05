@@ -29,7 +29,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const assetInputName = React.useMemo(() => {
     if (direction === 'in') {
-      return tokenInputInfo?.ticker ?? tokenInputInfo?.name;
+      return tokenInputInfo?.ticker ? tokenInputInfo?.name : primaryTokenInfo.name;
     }
     if (direction === 'out') {
       if (!touched) {
