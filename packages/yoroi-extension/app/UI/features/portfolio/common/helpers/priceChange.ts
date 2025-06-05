@@ -1,9 +1,15 @@
 import BigNumber from 'bignumber.js';
 
-export const priceChange = (open: number | string | undefined, close: number | string | undefined) => {
+export type PriceChangeResult = {
+  changeValue: number;
+  changePercent: number;
+  variantPnl: 'neutral' | 'success' | 'danger';
+};
+
+export const priceChange = (open: number | string | undefined, close: number | string | undefined): PriceChangeResult => {
   if (open === undefined || close === undefined) {
     return {
-      change: 0,
+      changeValue: 0,
       changePercent: NaN,
       variantPnl: 'neutral',
     };
@@ -15,7 +21,11 @@ export const priceChange = (open: number | string | undefined, close: number | s
   const change = closeBN.minus(openBN);
   const changePercent = openBN.isZero() ? NaN : change.dividedBy(openBN).multipliedBy(100).toNumber();
 
-  const variantPnl = change.isZero() ? 'neutral' : change.isGreaterThan(0) ? 'success' : 'danger';
+  const variantPnl: PriceChangeResult['variantPnl'] = change.isZero()
+    ? 'neutral'
+    : change.isGreaterThan(0)
+    ? 'success'
+    : 'danger';
 
   return {
     changeValue: change.toNumber(),
