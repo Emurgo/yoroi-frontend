@@ -3,10 +3,17 @@ import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../../components';
 import { useStrings } from '../../hooks/useStrings';
 import { useSwapRevamp } from '../../../module/SwapContextProvider';
+import { useSwapConfig } from '../../hooks/useSwapConfig';
+import { isNonNullable } from '@yoroi/common';
+import { AssetInfoInRow } from '../AssetInfoInRow';
+import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
+import { usePortfolioTokenActivity } from '../../../../portfolio/module/PortfolioTokenActivityProvider';
+import { useModal } from '../../../../../components/modals/ModalContext';
 // import { AssetInfoInRow } from '../AssetInfoInRow';
 // import { useCurrencyPairing } from '../../../../../context/CurrencyContext';
 // import { usePortfolioTokenActivity } from '../../../../portfolio/module/PortfolioTokenActivityProvider';
 // import { useModal } from '../../../../../components/modals/ModalContext';
+import { id } from 'react-intl/locale-data/id';
 
 const SearchWrapper = styled(Box)({
   position: 'relative',
@@ -44,10 +51,42 @@ export const SelectAssetTo = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { assetToSell ,tokensToBuy} = useSwapRevamp();
+  const { tokenInfos, swapForm, primaryTokenInfo } = useSwapRevamp();
+  const { swapConfig } = useSwapConfig();
+  const { closeModal } = useModal();
+  const { currency } = useCurrencyPairing();
 
+  const {
+    tokenActivity: { data24h },
+  } = usePortfolioTokenActivity();
 
-  console.log("tokensToBuy",tokensToBuy)
+  const {
+    ptActivity: { close: ptPrice },
+  } = useCurrencyPairing();
+  console.log('tokenInfos', tokenInfos.values());
+  const verifiedTokens = React.useMemo(() => swapConfig?.verifiedTokens?.filter(ti => tokenInfos.has(ti)) ?? [], [
+    swapConfig?.verifiedTokens,
+    tokenInfos,
+  ]);
+  const secondaryTokenInfos = React.useMemo(() => {
+    return Array.from(tokenInfos.values()).filter(({ id }) => !verifiedTokens.includes(id));
+  }, [tokenInfos, verifiedTokens]);
+
+  const verifiedList = verifiedTokens.map(ti => tokenInfos.get(ti)).filter(isNonNullable);
+  // .filter(({ id }) => !ownedTokens.includes(id));  // TODO add owned tokens
+
+  const filteredAssets =
+    secondaryTokenInfos.filter(a => {
+      if (a == null) return false;
+      if (!searchTerm) return true;
+      return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
+    }) || [];
+  console.log('filteredAssets', filteredAssets);
+  const handleAssetClick = (assetId: string) => {
+    swapForm.action({ type: 'TokenOutIdChanged', tokenId: assetId });
+    swapForm.action({ type: 'TokenOutInputTouched', value: assetId });
+    closeModal();
+  };
 
   return (
     <Stack {...atoms.mb_2xl}>
@@ -74,26 +113,29 @@ export const SelectAssetTo = () => {
           />
         </SearchWrapper>
         <AssetCountText variant="body2" color="ds.text_gray_low">
-          {/* {strings.numYourAssets(filteredAssets.length)} */}
+          {strings.numYourAssets(filteredAssets.length)}
         </AssetCountText>
       </Stack>
       <Stack>
-        <p>Assets to Buy</p>
-        {/* {filteredAssets.map(asset => {
+        {filteredAssets.map(asset => {
           return (
             <AssetInfoInRow
-              asset={asset}
+              key={asset.id}
+              direction="out"
               currency={currency}
-              primaryTokenActivity={ptPrice}
-              secondaryToken24Activity={data24h && data24h[asset.info.id]}
-              primaryTokenInfo={primaryTokenInfo}
-              onAssetClick={() => {
-                selectAssetToSell(asset);
-                closeModal();
+              token={{
+                decimals: asset.decimals,
+                name: asset.ticker ?? asset.name,
+                fingerprint: asset.fingerprint,
+                id: asset.id,
               }}
+              primaryTokenActivity={ptPrice}
+              secondaryToken24Activity={data24h && data24h[asset.id]}
+              primaryTokenInfo={primaryTokenInfo}
+              onAssetClick={() => handleAssetClick(asset.id)}
             />
           );
-        })} */}
+        })}
       </Stack>
     </Stack>
   );

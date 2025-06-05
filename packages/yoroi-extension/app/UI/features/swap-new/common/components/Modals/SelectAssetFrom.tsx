@@ -64,6 +64,13 @@ export const SelectAssetFrom = () => {
       return `${a.info.name};[${a.info.id}];${a.id};${a.info.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
 
+  const handleAssetClick = (assetId: string) => {
+    swapForm.action({ type: 'TokenInIdChanged', tokenId: assetId });
+    swapForm.action({ type: 'TokenInInputTouched', value: assetId });
+
+    closeModal();
+  };
+
   return (
     <Stack {...atoms.mb_2xl}>
       <Stack {...atoms.pb_xl}>
@@ -96,19 +103,23 @@ export const SelectAssetFrom = () => {
         {filteredAssets.map(asset => {
           return (
             <AssetInfoInRow
-              asset={asset}
+              direction="in"
               currency={currency}
               primaryTokenActivity={ptPrice}
               secondaryToken24Activity={data24h && data24h[asset.info.id]}
               primaryTokenInfo={primaryTokenInfo}
-              onAssetClick={() => {
-                swapForm.action({ type: 'TokenInIdChanged', value: asset.info.id });
-                closeModal();
+              token={{
+                decimals: asset.info.numberOfDecimals,
+                name: asset.info.ticker ?? asset.info.name,
+                id: asset.info.id,
+                formatedAmount: asset.formatedAmount,
+                quantity: asset.quantity,
               }}
+              onAssetClick={() => handleAssetClick(asset.info.id)}
             />
           );
         })}
       </Stack>
     </Stack>
   );
-};
+};;

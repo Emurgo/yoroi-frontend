@@ -26,7 +26,7 @@ export function genCSP(request: {|
 
   frameSrc.push('https://connect.trezor.io/');
   frameSrc.push('https://emurgo.github.io/');
-  frameSrc.push('https://www.youtube.com/')
+  frameSrc.push('https://www.youtube.com/');
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
@@ -48,11 +48,12 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator-v2.muesliswap.com/');
   connectSrc.push('https://daehx1qv45z7c.cloudfront.net/');
   connectSrc.push('https://api-us.dexhunterv3.app/swap/tokens');
-  connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/*');
+  connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
+  connectSrc.push('https://*.yoroiwallet.com');
 
   // Bringweb3
-  frameSrc.push('https://*.bringweb3.io/')
-  connectSrc.push('https://*.bringweb3.io')
+  frameSrc.push('https://*.bringweb3.io/');
+  connectSrc.push('https://*.bringweb3.io');
   // cashback domain whitelist
   connectSrc.push('https://raw.githubusercontent.com');
 
@@ -69,9 +70,6 @@ export function genCSP(request: {|
   ].join(' ');
 }
 
-export const injectedScripts = [
-  'cardanoApiInject.js',
-  'initialInject.js',
-];
+export const injectedScripts = ['cardanoApiInject.js', 'initialInject.js'];
 
 export const speculosEndpoint = 'http://localhost:5001';

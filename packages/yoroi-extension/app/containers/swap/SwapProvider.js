@@ -1,13 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  supportedProviders,
-  swapApiMaker,
-  swapManagerMaker,
-  SwapProvider as Provider,
-  swapStorageMaker,
-} from '@yoroi/swap';
+import { supportedProviders, swapApiMaker, swapManagerMaker, SwapProvider as Provider, swapStorageMaker } from 'legacySwap';
 import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { asyncLocalStorageWrapper } from '../../api/localStorage';

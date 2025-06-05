@@ -4,45 +4,65 @@ import { Icons, IconWrapper } from '../../../../components';
 import { TokenIcon } from './TokenIcon/TokenIcon';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { undefinedToken } from '../constants';
-// import { TokenInfoIcon } from './TokenIcon/TokenInfoIcon';
+import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
 
 type AssetInputProps = {
   direction: 'in' | 'out';
-  defaultAsset?: any;
   selected?: boolean;
-  error?: string | null;
   onAssetSelect: () => void;
 };
 
-export const AssetInput: React.FC<AssetInputProps> = ({ direction, defaultAsset, error = null, onAssetSelect }) => {
+export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
-  const [remoteTokenLogo, setRemoteTokenLogo] = useState(null);
   const { atoms }: any = useTheme();
-  const { primaryTokenInfo, swapForm, getTokenInfo } = useSwapRevamp();
+  const { primaryTokenInfo, swapForm, tokenInfos } = useSwapRevamp();
+
+  const tokenInput = swapForm[direction === 'in' ? 'tokenInInput' : 'tokenOutInput'];
+  const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
+  const error = direction === 'in' ? tokenInput.error : null;
+
   const label = direction === 'in' ? 'From' : 'To';
-  const tokenInInfo = swapForm.tokenInfos.get(swapForm.tokenInInput.tokenId);
+  const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
+  const touched = tokenInput.isTouched;
 
-  useEffect(() => {
-    if (tokenInInfo?.id !== '.') {
-      console.log('tokenInInfo?.id', tokenInInfo?.id);
-      getTokenInfo(tokenInInfo?.id)
-        .then(remoteTokenInfo => {
-          if (remoteTokenInfo.logo != null) {
-            setRemoteTokenLogo(`data:image/png;base64,${remoteTokenInfo.logo}`);
-          }
-          return null;
-        })
-        .catch(e => {
-          console.warn('Failed to resolve remote info for token: ' + tokenInInfo?.id, e);
-        });
-    }
-  }, [tokenInInfo?.id]);
-  console.log('remoteTokenLogo', { remoteTokenLogo, tokenInInfo });
-  // const imgSrc = tokenInInfo?.tokenId  ? remoteTokenLogo ?? "";
-
-  const iconImage = direction === 'in' ? swapForm.tokenInInput?.info?.image : '';
-  const assetName = direction === 'in' ? tokenInInfo?.ticker ?? tokenInInfo?.name : 'Select token';
   const tokenQuantity = swapForm.tokenInInput?.formatedAmount;
+
+  const assetInputName = React.useMemo(() => {
+    if (direction === 'in') {
+      return tokenInputInfo?.ticker ?? tokenInputInfo?.name;
+    }
+    if (direction === 'out') {
+      if (!touched) {
+        return 'Select token';
+      }
+      return tokenInputInfo?.ticker ?? tokenInputInfo?.name;
+    }
+    return undefined;
+  }, [direction, tokenInputInfo]);
+
+  console.log('AssetInput Info', {
+    tokenInput,
+    tokenInputInfo,
+    direction,
+    // inputRef,
+    // isTouched: tokenInput.isTouched,
+    // swapForm,
+    // tokenInInfo,
+    // tokenOutInfo,
+    // tokenIconId,
+    // assetInputName,
+  });
+
+  const focusInput = () => {
+    if (inputRef?.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+  };
+
   return (
     <Wrapper selected={focusState} hasError={!!error} atoms={atoms} direction={direction}>
       <Stack spacing={1} {...atoms.gap_sm}>
@@ -53,35 +73,24 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, defaultAsset,
             direction="row"
             justifyContent="flex-start"
             alignItems="center"
-            onClick={onAssetSelect}
+            onClick={() => {
+              onAssetSelect();
+            }}
             sx={{ cursor: 'pointer' }}
           >
-            {/* <Box
-                          width="24px"
-                          height="24px"
-                          sx={{
-                            overflowY: 'hidden',
-                            '& > svg': { width: '100%', height: '100%' },
-                            borderRadius: '4px',
-                          }}
-                        >
-                          <img
-                            width="100%"
-                            src={imgSrc}
-                            alt=""
-                            onError={e => {
-                              e.target.src = defaultTokenImage
-                            }}
-                          />
-                        </Box> */}
-            {/* <TokenInfoIcon info={{ policy: tokenInInfo?.id, name: tokenInInfo?.name, id: tokenInInfo?.id }} size="md" /> */}
-            <Typography variant="h5" fontWeight={500} {...atoms.pl_sm}>
-              {assetName ?? primaryTokenInfo.name ?? ''}
+            {/* <TokenIcon tokenId={tokenIconId} /> */}
+            <TokenInfoIcon
+              info={{ id: tokenInputInfo?.id, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
+              size="md"
+            />
+            <Typography variant="h5" fontWeight={500} {...atoms.pl_sm} inline>
+              {assetInputName}
             </Typography>
             <IconWrapper icon={Icons.ChevronDown} asButton />
           </Stack>
           <Typography
             sx={{
+              width: '50%',
               appearance: 'none',
               border: '0',
               outline: 'none',
@@ -95,10 +104,13 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, defaultAsset,
             placeholder="0"
             padding="0"
             textAlign="right"
-            // onChange={handleChange}
+            onChange={handleInputChange}
             // value={disabled ? '' : value}
             onFocus={() => setFocusState(true)}
             onBlur={() => setFocusState(false)}
+            // onPress={() => {
+            //   focusInput();
+            // }}
           />
         </Stack>
 
@@ -106,7 +118,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, defaultAsset,
           <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
             <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
             <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
-              {tokenQuantity} {assetName}
+              {tokenQuantity} {tokenInputInfo?.name}
             </Typography>
           </Stack>
           <Typography variant="body2" color="ds.text_gray_low">

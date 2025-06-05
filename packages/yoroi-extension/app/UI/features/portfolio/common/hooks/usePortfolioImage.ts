@@ -125,7 +125,9 @@ export const usePortfolioImage = ({
     headers,
     isError: isError || query.isError,
     isLoading: isLoading || query.isLoading,
+    crossOrigin: 'anonymous' as const,
+
     onError,
     onLoad,
-  }
+  };
 }

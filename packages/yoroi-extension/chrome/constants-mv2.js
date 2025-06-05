@@ -10,12 +10,12 @@ export function genCSP(request: {|
   isDev: boolean,
   additional: {|
     'default-src'?: Array<string>,
-      'frame-src' ?: Array < string >,
-      'script-src' ?: Array < string >,
-      'object-src' ?: Array < string >,
-      'connect-src' ?: Array < string >,
-      'style-src' ?: Array < string >,
-      'img-src' ?: Array < string >,
+    'frame-src'?: Array<string>,
+    'script-src'?: Array<string>,
+    'object-src'?: Array<string>,
+    'connect-src'?: Array<string>,
+    'style-src'?: Array<string>,
+    'img-src'?: Array<string>,
   |},
 |}): string {
   const defaultSrc = request.additional['default-src'] ?? [];
@@ -69,13 +69,13 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator-v2.muesliswap.com/');
   connectSrc.push('https://daehx1qv45z7c.cloudfront.net/');
   connectSrc.push('https://api-us.dexhunterv3.app/swap/tokens');
-  connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/*');
-
+  connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
+  connectSrc.push('https://*.yoroiwallet.com');
 
   // Bringweb3
-  frameSrc.push('http://localhost:5173/')
-  frameSrc.push('https://*.bringweb3.io/')
-  connectSrc.push('https://*.bringweb3.io')
+  frameSrc.push('http://localhost:5173/');
+  frameSrc.push('https://*.bringweb3.io/');
+  connectSrc.push('https://*.bringweb3.io');
   // cashback domain whitelist
   connectSrc.push('https://raw.githubusercontent.com');
 

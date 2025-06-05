@@ -1,6 +1,6 @@
 //@flow
 import { Box, Typography, styled } from '@mui/material';
-import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from '@yoroi/swap';
+import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from 'legacySwap';
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';

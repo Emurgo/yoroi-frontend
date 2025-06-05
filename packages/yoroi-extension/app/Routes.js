@@ -506,9 +506,9 @@ export function wrapSwapRevamp(swapProps: StoresProps, children: Node): Node {
 
   return (
     <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
-      <SwapContextProvider currentWallet={currentWalletInfo} stores={swapProps.stores}>
-        <Suspense fallback={null}>{children}</Suspense>
-      </SwapContextProvider>
+      {/* <SwapContextProvider currentWallet={currentWalletInfo} stores={swapProps.stores}> */}
+      <Suspense fallback={null}>{children}</Suspense>
+      {/* </SwapContextProvider> */}
     </CurrencyProvider>
   );
 }

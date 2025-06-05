@@ -4,7 +4,7 @@ import type { PriceImpact } from './types';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Quantities } from '../../utils/quantities';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { PRICE_PRECISION } from './common';
 import { useSwapForm } from '../../containers/swap/context/swap-form';
 import { observer } from 'mobx-react';

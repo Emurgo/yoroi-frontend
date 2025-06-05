@@ -24,8 +24,6 @@ export const AssetSwap = () => {
     });
   };
 
-  console.log('AssetSwap loadingSwapPage', loadingSwapPage);
-
   // if (loadingSwapPage) {
   //   return (
   //     <Stack height="100%" width="100%" justifyContent="center" alignItems="center">
@@ -39,7 +37,7 @@ export const AssetSwap = () => {
       <Stack position="relative">
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
-        <AssetInput direction="in" defaultAsset={primaryTokenInfo} onAssetSelect={() => openSelectAssetModal('in')} />
+        <AssetInput direction="in" onAssetSelect={() => openSelectAssetModal('in')} />
         <Stack {...atoms.pt_sm} />
         <SwitchAssets />
         <AssetInput direction="out" onAssetSelect={() => openSelectAssetModal('out')} />
@@ -54,7 +52,7 @@ export const AssetSwap = () => {
       </LoadingButton>
     </Content>
   );
-};;;;;;;;;
+}
 
 const Content = styled(Stack)(({ theme }: any) => ({
   ...theme.atoms.pt_xl,

@@ -1,6 +1,8 @@
 import * as React from 'react';
 
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
+import { getNetworkById } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
 import { isLeft, isRight } from '@yoroi/common';
@@ -11,6 +13,8 @@ import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
 import { undefinedToken } from '../common/constants';
 import { usePortfolioTokenInfos } from '../../portfolio/common/hooks/usePortfolioTokenInfo';
+import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
+import { useModal } from '../../../components/modals/ModalContext';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
@@ -33,7 +37,14 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [stakingKey, setStakingKey] = React.useState(null);
   const [loadingSwapPage, setLoadingSwapPage] = React.useState(true);
   const { partners, excludedTokens } = useSwapConfig();
+  const { title } = useModal();
+
+  const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
+
   // const addressHex = useAddressHex(walletAddresses[0]);
+
+  const tokenOutInputRef = React.useRef<any | null>(null);
+  const tokenInInputRef = React.useRef<any | null>(null);
 
   const [state, action] = React.useReducer(swapReducer, defaultState);
 
@@ -62,10 +73,9 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
   const { data: tokenIds = [], refetch: refetchTokens } = useQuery({
-    queryKey: ['useSwapTokenIds', swapManager.settings.routingPreference],
+    queryKey: ['useSwapTokenIds', title, swapManager.settings.routingPreference],
     queryFn: async () => {
       const res = await swapManager.api.tokens();
-      console.log('res', res);
       if (isRight(res)) {
         const tokenIds = res.value.data.map(({ id }) => id).filter(id => excludedTokens.indexOf(id) === -1);
         if (!tokenIds.includes(state.tokenOutInput.id ?? undefinedToken)) action({ type: 'ResetForm' });
@@ -74,26 +84,21 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       return [];
     },
   });
+  const network = getNetworkById(stores.wallets.selected.networkId);
 
-  const getTokenInfoBatch = ids => stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(Chain.Network.Mainnet, ids);
-  const getTokenInfo = id => getTokenInfoBatch([id])[id].then(res => res ?? {});
+  const getTokenInfoBatch = ids => stores.tokenInfoStore.fetchMissingAndGetLocalOrRemoteMetadata(network, ids);
+  const getTokenInfo = id => getTokenInfoBatch([id])[id].then(res => res ?? {}); // not using this way to get token image anymore
 
-  // React.useEffect(() => {
-  //   refetchTokens();
-  // }, [addressHex]);
+  React.useEffect(() => {
+    refetchTokens();
+  }, [tokenIds, title]);
 
-  const { tokenInfos = new Map<Portfolio.Token.Id, Portfolio.Token.Info>(), isLoading, isFetching } = usePortfolioTokenInfos(
-    {
-      wallet: { networkId: Chain.Network.Mainnet, portfolioPrimaryTokenInfo: primaryTokenInfo },
-      tokenIds,
-      sourceId: 'SwapProvider',
-    },
-    {
-      enabled: tokenIds.length > 0, // ✅ Only run query when we have token IDs
-    }
-  );
-
-  console.log('usePortfolioTokenInfos isLoading', { isLoading, isFetching });
+  const { tokenInfos = new Map<Portfolio.Token.Id, Portfolio.Token.Info>(), isLoading, isFetching } = usePortfolioTokenInfos({
+    tokenManager,
+    wallet: { networkId: Chain.Network.Mainnet, portfolioPrimaryTokenInfo: primaryTokenInfo },
+    tokenIds,
+    sourceId: 'SwapProvider',
+  });
 
   React.useEffect(() => {
     setLoadingSwapPage(prev => {
@@ -102,17 +107,24 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     });
   }, [isLoading, isFetching]);
 
-  const context: any = {
-    swapForm: { action, ...state, tokenInfos },
-    ftAssetList: ftAssetList || [],
-    primaryTokenInfo,
-    assetsStore: stores.substores.ada.swapStore.assets,
-    loadingSwapPage: loadingSwapPage,
-    getTokenInfo,
-  };
+  const context = React.useMemo(
+    () => ({
+      swapForm: { action, ...state },
+      tokenInfos,
+      tokenInInputRef,
+      tokenOutInputRef,
+      ftAssetList: ftAssetList || [],
+      primaryTokenInfo,
+      assetsStore: stores.substores.ada.swapStore.assets,
+      loadingSwapPage: loadingSwapPage,
+      getTokenInfo,
+      tokenManager,
+    }),
+    [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
+  );
 
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
-};
+};;
 
 export const useSwapRevamp = () =>
   React.useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
@@ -140,13 +152,15 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapAction.TokenInIdChanged:
-        draft.tokenInInput.tokenId = action.value;
+        console.log('TokenInIdChanged ACTION', action);
+        draft.tokenInInput.tokenId = action.tokenId;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
         break;
 
       case SwapAction.TokenOutIdChanged:
-        draft.tokenOutInput.tokenId = action.value;
+        console.log('TokenInIdChanged ACTION', action);
+        draft.tokenOutInput.tokenId = action.tokenId;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
         break;
@@ -338,7 +352,7 @@ const defaultState: SwapState = Object.freeze({
   },
   tokenOutInput: {
     isTouched: false,
-    tokenId: primaryTokenId,
+    tokenId: undefined,
     disabled: false,
     error: null,
     value: '',
