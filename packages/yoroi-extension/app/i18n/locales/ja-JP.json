@@ -1362,7 +1362,7 @@
   "portfolio.orderTable.header.assetAmount": "資産額",
   "portfolio.orderTable.header.transactionId": "トランザクションID",
   "portfolio.welcomeBanner.title": "暗号の旅を始めよう",
-  "portfolio.welcomeBanner.description": "Cardanoのネイティブ通貨ADAを始めましょう。あなたの可能性の世界を開く鍵です。",
+  "portfolio.welcomeBanner.description": "Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities.",
   "transaction.review.tolatValue": "合計ウォレット総額",
   "transaction.review.confirmHardware": "ハードウェアウォレットで確認してください",
   "transaction.review.enterPassword": "このトランザクションに署名するためのパスワードを入力してください",
