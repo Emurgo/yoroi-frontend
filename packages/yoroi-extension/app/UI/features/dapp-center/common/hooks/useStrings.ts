@@ -311,7 +311,7 @@ export const messages = Object.freeze(
     },
     welcomeBannerDesc: {
       id: 'portfolio.welcomeBanner.description',
-      defaultMessage: '!!!Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities',
+      defaultMessage: '!!!Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities',
     },
   })
 );

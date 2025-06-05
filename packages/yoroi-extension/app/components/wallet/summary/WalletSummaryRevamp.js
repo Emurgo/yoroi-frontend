@@ -206,6 +206,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const { goToRoute, selectedWallet } = this.props;
     const { isBannerVisible } = this.state;
 
+    const onClose = () => {
+      this.setState({ isBannerVisible: false });
+      localStorage.setBringBannerClosed('true');
+    }
+
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
 
@@ -213,11 +218,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
 
     return (
       <BringBanner
-        onClose={() => {
-          this.setState({ isBannerVisible: false });
-          localStorage.setBringBannerClosed('true');
+        onClose={onClose}
+        onClick={() => {
+          goToRoute({ route: ROUTES.CASHBACK.ROOT });
+          onClose();
         }}
-        onClick={() => goToRoute({ route: ROUTES.CASHBACK.ROOT })}
         displayIllustration={false}
       />
     );
