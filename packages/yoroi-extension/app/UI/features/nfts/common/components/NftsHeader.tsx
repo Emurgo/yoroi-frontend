@@ -1,8 +1,5 @@
-import { InputAdornment } from '@mui/material';
-import React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
-import { SearchInput } from '../../../../components/Input/SearchInput';
-import { Icons, IconWrapper } from '../../../../components/icons';
+import { InputAdornment, Box, Stack, Typography } from '@mui/material';
+import { SearchInput, Icons, IconWrapper } from '../../../../components';
 import { ListColumnView } from '../types';
 import { useStrings } from '../hooks/useStrings';
 

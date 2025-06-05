@@ -31,9 +31,9 @@ export default class Settings extends Component<AllProps> {
   };
 
   isActivePage: string => boolean = route => {
-    const { location } = this.props.stores.router;
-    if (route && location) {
-      return location.pathname === buildRoute(route);
+    const { currentRoute } = this.props.stores.routing;
+    if (route && currentRoute) {
+      return currentRoute === buildRoute(route);
     }
     return false;
   };
@@ -45,7 +45,7 @@ export default class Settings extends Component<AllProps> {
 
     const menu = (
       <SettingsMenu
-        onItemClick={route => stores.app.goToRoute({ route })}
+        onItemClick={route => stores.routing.goToRoute({ route })}
         isActiveItem={this.isActivePage}
       />
     );

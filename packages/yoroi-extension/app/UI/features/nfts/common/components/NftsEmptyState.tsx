@@ -1,4 +1,3 @@
-import React from 'react';
 import { Typography, Stack } from '@mui/material';
 import { NftsNotFound } from '../../../../components/ilustrations';
 import { useIntl } from '../../../../context/IntlProvider';

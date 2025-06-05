@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import { HiddenAmount } from '../../common/components/HiddenAmount';

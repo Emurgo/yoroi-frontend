@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Skeleton, styled } from '@mui/material';
 import { urlResolveForIpfsAndCorsproxy } from '../../../../../coreUtils';
 import { checkImageLoads } from '../helpers/index';

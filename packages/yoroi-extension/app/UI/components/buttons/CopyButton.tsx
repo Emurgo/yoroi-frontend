@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import { useRef, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Icons, IconWrapper } from '../icons/index';
 import { Tooltip } from '../Tooltip';

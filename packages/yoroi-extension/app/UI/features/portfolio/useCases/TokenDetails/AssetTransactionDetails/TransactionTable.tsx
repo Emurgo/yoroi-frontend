@@ -2,7 +2,7 @@ import { Box, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRo
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Card } from '../../../../../components';
 import { Icon, Icons, IconWrapper } from '../../../../../components/icons';
 import { formatNumber } from '../../../common/helpers/formatHelper';

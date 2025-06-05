@@ -1,5 +1,4 @@
-import React from 'react';
-import { TransactionSubmitted } from '../../components/TransactionSubmitted/TransactionSubmitted';
+import { TransactionSubmitted } from '../../components';
 import { useNavigateTo } from '../../features/transaction-review/common/hooks/useNavigateTo';
 import GovernanceLayout from './layout';
 

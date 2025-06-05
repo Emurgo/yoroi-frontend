@@ -1,5 +1,4 @@
 import { IconButton, Stack, styled, Typography } from '@mui/material';
-import React from 'react';
 import { Icon } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../hooks/useStrings';

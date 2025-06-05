@@ -1,10 +1,8 @@
-import React from 'react';
 import { GovernanceStatusSelection } from '../../features/governace/useCases/SelectGovernanceStatus/GovernanceStatusSelection';
 import GovernanceLayout from './layout';
 
 type Props = {
   stores: any;
-  actions: any;
   children?: any;
 };
 

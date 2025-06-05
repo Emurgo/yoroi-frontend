@@ -1,5 +1,5 @@
 import { Box, styled, useTheme } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Carousel from 'react-simply-carousel';
 import defaultTokenDarkImage from '../../../../../assets/images/revamp/asset-default-dark.inline.svg';
 import defaultTokenImage from '../../../../../assets/images/revamp/asset-default.inline.svg';

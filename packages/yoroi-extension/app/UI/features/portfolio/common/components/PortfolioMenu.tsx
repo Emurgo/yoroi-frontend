@@ -1,4 +1,3 @@
-import React from 'react';
 import { ROUTES } from '../../../../../routes-config';
 import { useStrings } from '../hooks/useStrings';
 import mockData from '../mockData';
