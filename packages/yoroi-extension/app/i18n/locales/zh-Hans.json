@@ -1362,7 +1362,7 @@
   "portfolio.orderTable.header.assetAmount": "资产数量",
   "portfolio.orderTable.header.transactionId": "交易 ID",
   "portfolio.welcomeBanner.title": "开启您的加密货币之旅",
-  "portfolio.welcomeBanner.description": "立即开始使用 Cardano 的原生货币 ADA。它是您探索全新可能性世界的钥匙。",
+  "portfolio.welcomeBanner.description": "Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities.",
   "transaction.review.tolatValue": "钱包总价值",
   "transaction.review.confirmHardware": "在您的硬件钱包上确认",
   "transaction.review.enterPassword": "输入密码以完成此次交易",
