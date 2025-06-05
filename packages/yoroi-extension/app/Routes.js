@@ -9,7 +9,7 @@ import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
-import type { StoresMap, StoresProps } from './stores/index';
+import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -235,11 +235,12 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
             element={<ConnectedWebsitesPage stores={stores} />}
           />
-          <Route
-            exact
-            path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
-            component={props => WrapDappCenter({ ...props, stores }, <DappCenterPage {...props} stores={stores} />)}
-          />
+          <Route element={<DappCenterSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
+              element={<DappCenterPage stores={stores} />}
+            />
+          </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -409,6 +410,12 @@ const AssetsSubpages = ({ stores }) => (
   </AssetsWrapper>
 );
 
+const DappCenterSubpages = ({ stores }) => (
+  <DappCenterContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </DappCenterContextProvider>
+);
+
 // NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
@@ -435,11 +442,3 @@ const GovernanceSubpages = ({ stores }) => {
     </CurrencyProvider>
   );
 };
-
-export function WrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  return (
-    <DappCenterContextProvider stores={dappCenterProps.stores}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </DappCenterContextProvider>
-  );
-}
