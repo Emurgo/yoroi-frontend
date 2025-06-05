@@ -1362,7 +1362,7 @@
   "portfolio.orderTable.header.assetAmount": "Montant de l'actif",
   "portfolio.orderTable.header.transactionId": "Identifiant de la transaction ",
   "portfolio.welcomeBanner.title": "Start your crypto journey",
-  "portfolio.welcomeBanner.description": "Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities.",
+  "portfolio.welcomeBanner.description": "Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities.",
   "transaction.review.tolatValue": "Total wallet value",
   "transaction.review.confirmHardware": "Confirm on your hardware wallet",
   "transaction.review.enterPassword": "Enter password to sign this transaction",
