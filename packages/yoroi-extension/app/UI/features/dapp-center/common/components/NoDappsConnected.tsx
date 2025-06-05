@@ -1,7 +1,5 @@
-import React from 'react';
-import { Typography } from '@mui/material';
+import { Typography , Box } from '@mui/material';
 import { useIntl } from '../../../../context/IntlProvider';
-import { Box } from '@mui/material';
 import { connectorMessages } from '../../../../../i18n/global-messages';
 import { defineMessages } from 'react-intl';
 import { NoDappsConnected as NoDappsConnectedIllustration } from '../../../../components/ilustrations';

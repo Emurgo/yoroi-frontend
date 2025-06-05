@@ -1,5 +1,5 @@
 import type { WalletState } from '../../../../../../chrome/extension/background/types';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { constructPlate40 } from '../../../../../components/topbar/WalletCard';
