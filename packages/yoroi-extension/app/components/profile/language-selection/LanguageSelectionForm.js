@@ -150,7 +150,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
             label={
               <Box
                 sx={{
-                  '& span > span': {
+                  '& a': {
                     color: 'primary.600',
                   },
                 }}
@@ -158,8 +158,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                 <FormattedMessage
                   {...globalMessages.tosAgreement}
                   values={{
-                    tosLink: chunks => (<a href="." id="tosLink">{chunks}</a>),
-                    privacyLink: chunks => (<a href="." id="privacyLink">{chunks}</a>),
+                    tosLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="tosLink">{chunks}</a>),
+                    privacyLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="privacyLink">{chunks}</a>),
                   }}
                 />
               </Box>
