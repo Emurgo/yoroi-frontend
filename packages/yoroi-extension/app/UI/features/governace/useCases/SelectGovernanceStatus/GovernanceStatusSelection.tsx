@@ -193,7 +193,7 @@ export const GovernanceStatusSelection = () => {
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegatingToYoroi,
       isVisible: Number(networkId) === 0,
-      bottom:
+      bottom: (
         <Stack direction="column" pt="16px" width="100%">
           <Divider />
           <Box>
@@ -201,7 +201,8 @@ export const GovernanceStatusSelection = () => {
               {strings.yoroiVotingRecordLink}
             </Link>
           </Box>
-        </Stack>,
+        </Stack>
+      ),
     },
     {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
