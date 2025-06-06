@@ -10,7 +10,7 @@ export const MetadataTab = ({ hash, metadata }) => {
         <Typography variant="body1" color="ds.gray_600">
           {strings.wallet}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" sx={{ wordWrap: 'break-word' }} maxWidth="450px">
+        <Typography variant="body1" color="ds.text_gray_medium" sx={{ wordWrap: 'break-word' }} maxWidth="426px">
           {hash}
         </Typography>
       </Stack>
