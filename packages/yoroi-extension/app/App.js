@@ -92,12 +92,18 @@ class App extends Component<Props, State> {
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
-      const _mergedMessages = {
-        ...(await translations['en-US']),
-        ...(await translations[locale]),
-      };
+
+      const englishMessages = await translations['en-US'];
+      const localeMessages = await translations[locale];
+
+      // clean wrong format strings from locale messages
+      // to be removed after all locale messages get updated
+      const fixedLocaleMessages = Object.entries(localeMessages)
+        .filter(([,v]) => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='))
+        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+
       runInAction(() => {
-        this.mergedMessages = _mergedMessages;
+        this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
       });
     });
   };
