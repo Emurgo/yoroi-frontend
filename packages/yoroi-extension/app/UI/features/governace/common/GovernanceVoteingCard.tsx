@@ -20,6 +20,7 @@ type Props = {
   smallCard?: boolean;
   isVisible?: boolean;
   extraInfo?: string | null;
+  bottom?: React.ReactNode;
 };
 
 const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({
@@ -28,9 +29,7 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selec
   flexDirection: 'column',
   alignItems: 'center',
   width: smallCard ? '298px' : '612px',
-  paddingTop: '16px',
-  paddingBottom: '16px',
-  maxHeight: '300px',
+  padding: '16px',
   minHeight: '126px',
   borderRadius: '8px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
@@ -87,7 +86,10 @@ export const GovernanceVoteingCard = ({
   smallCard,
   isVisible,
   extraInfo,
+  bottom,
 }: Props) => {
+
+  console.log('bottom', bottom)
   const [hover, onHover] = React.useState(false);
   const { governanceStatus } = useGovernance();
   if (isVisible === false) return <></>;
@@ -110,7 +112,7 @@ export const GovernanceVoteingCard = ({
           <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color="ds.gray_800" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
+          <Description variant="body2" color="ds.gray_800"  whiteSpace="pre-line" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </Stack>
@@ -119,6 +121,7 @@ export const GovernanceVoteingCard = ({
             {extraInfo}
           </Typography>
         )}
+        {bottom}
       </StyledCard>
     </div>
   );

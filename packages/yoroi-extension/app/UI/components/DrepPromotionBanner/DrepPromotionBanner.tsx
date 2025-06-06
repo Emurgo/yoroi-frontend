@@ -90,7 +90,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
   if (
     !isVisible ||
     stores.delegation.governanceStatus === undefined ||
-    (governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance)
+    governanceInfo.isParticipatingToGovernance
   ) {
     return null;
   }
@@ -110,12 +110,10 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
 
       <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
-          {!governanceInfo.isParticipatingToGovernance
-            ? intl.formatMessage(globalMessages.delegateToYoroiDRep)
-            : intl.formatMessage(globalMessages.considerDelegating)}
+          {intl.formatMessage(globalMessages.bannerTitle)}
         </Typography>
         <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
-          {intl.formatMessage(globalMessages.delegateToYoroi)}
+          {intl.formatMessage(globalMessages.bannerText)}
         </Typography>
         <Button
           //  @ts-ignore

@@ -11,7 +11,7 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID } from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -26,6 +26,13 @@ const Container = styled(Box)(() => ({
   alignItems: 'center',
   textAlign: 'center',
   paddingTop: '24px',
+}));
+
+const Divider = styled(Box)(({ theme }: any) => ({
+  backgroundColor:  theme.palette.ds.gray_200,
+  height: 2,
+  width: '100%',
+  marginBottom: '16px'
 }));
 
 export const mapStatus = {
@@ -175,10 +182,10 @@ export const GovernanceStatusSelection = () => {
       titleHover: strings.delegateToYoroiDRep,
       description: statusDelegatingToYoroi
         ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.designatingSomeoneElse,
+        : strings.delegateToYoroi,
       descriptionHover: statusDelegatingToYoroi
         ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.designatingSomeoneElse,
+        : strings.delegateToYoroi,
       extraInfo: statusDelegatingToYoroi ? governanceStatus.drep : null,
       icon: <DRepIlustration />,
       selected: statusDelegatingToYoroi,
@@ -186,6 +193,15 @@ export const GovernanceStatusSelection = () => {
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegatingToYoroi,
       isVisible: Number(networkId) === 0,
+      bottom:
+        <Stack direction="column" pt="16px" width="100%">
+          <Divider />
+          <Box>
+            <Link onClick={(event) => event.stopPropagation()} href={YOROI_VOTING_RECORD_LINK} target="_blank" rel="noopener" lineHeight="22px">
+              {strings.yoroiVotingRecordLink}
+            </Link>
+          </Box>
+        </Stack>,
     },
     {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
@@ -266,7 +282,7 @@ export const GovernanceStatusSelection = () => {
       <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low">
+      <Typography variant="body1" mb="24px" /* maxWidth="" */ gutterBottom color="ds.text_gray_low" whiteSpace="pre-line">
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
@@ -286,6 +302,7 @@ export const GovernanceStatusSelection = () => {
                   loading={option.loading}
                   isVisible={option.isVisible}
                   extraInfo={option.extraInfo}
+                  bottom={option.bottom}
                 />
               );
             })
