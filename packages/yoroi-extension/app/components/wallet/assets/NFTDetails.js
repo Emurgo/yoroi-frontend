@@ -4,7 +4,7 @@ import { Button, Grid, IconButton, Link as LinkMui, Modal, Stack, Tab, Typograph
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
@@ -22,6 +22,8 @@ import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 import type { CardanoAssetMintMetadata, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+// $FlowIgnore
+import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 type Props = {|
   nftInfo: void | {
@@ -130,6 +132,8 @@ const STypography = styled(Typography)(({ theme }) => ({
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
+  const nftImageUrl = nftImage ? urlResolveForIpfsAndCorsproxy(nftImage) : null;
+
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {
@@ -140,6 +144,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   };
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
+  const [isImageValid, setIsImageValid] = useState(false);
   const below1400 = useMediaQuery('(max-width:1400px)');
   const below1250 = useMediaQuery('(max-width:1250px)');
   const nftPathId = 'nftDetails';
@@ -172,6 +177,21 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
     return addr;
   }
+
+  useEffect(() => {
+      if (nftImageUrl !== null) {
+        imageExists(
+          String(nftImageUrl),
+          () => {
+            setIsImageValid(true)
+          }, // on-success
+          () => {
+            setIsImageValid(false)
+          } // on-error
+        );
+      }
+  }, [nftImageUrl]);
+
   // Todo: Should be handling by displaying an error page
   if (nftInfo == null) return null;
 
@@ -195,7 +215,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         <Grid item xs={4}>
           <ImageItem
             sx={{
-              cursor: nftImage !== null ? 'zoom-in' : 'auto',
+              cursor: isImageValid ? 'zoom-in' : 'auto',
               paddingY: '24px',
               display: 'block',
               img: {
@@ -203,7 +223,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               },
               backgroundColor: 'ds.bg_color_max',
             }}
-            onClick={() => nftImage !== null && setOpenAndTrack()}
+            onClick={() => isImageValid && setOpenAndTrack()}
             id={`${nftPathId}-image-box`}
           >
             <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" nftPathId={nftPathId} />
