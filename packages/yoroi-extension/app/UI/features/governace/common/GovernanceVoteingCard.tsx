@@ -89,7 +89,6 @@ export const GovernanceVoteingCard = ({
   bottom,
 }: Props) => {
 
-  console.log('bottom', bottom)
   const [hover, onHover] = React.useState(false);
   const { governanceStatus } = useGovernance();
   if (isVisible === false) return <></>;
