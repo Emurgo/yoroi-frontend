@@ -65,7 +65,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
       this.setState({ showing: 'privacy' });
     }
 
-    return false;
+    return undefined;
   };
 
   onClickBack: () => void = () => {

@@ -86,7 +86,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
       }
     }
 
-    return false;
+    return undefined;
   };
 
   onClickBack: () => void = () => {
