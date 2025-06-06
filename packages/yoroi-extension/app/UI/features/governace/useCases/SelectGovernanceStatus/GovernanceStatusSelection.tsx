@@ -283,7 +283,7 @@ export const GovernanceStatusSelection = () => {
       <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="24px" /* maxWidth="" */ gutterBottom color="ds.text_gray_low" whiteSpace="pre-line">
+      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low" whiteSpace="pre-line">
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
