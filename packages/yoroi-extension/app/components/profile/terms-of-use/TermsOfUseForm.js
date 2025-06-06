@@ -64,6 +64,8 @@ export default class TermsOfUseForm extends Component<Props, State> {
     } else if (target.id === 'privacyLink') {
       this.setState({ showing: 'privacy' });
     }
+
+    return false;
   };
 
   onClickBack: () => void = () => {
@@ -109,8 +111,8 @@ export default class TermsOfUseForm extends Component<Props, State> {
                   <FormattedMessage
                     {...globalMessages.tosAgreement}
                     values={{
-                      tosLink: chunks => (<span id="tosLink">{chunks}</span>),
-                      privacyLink: chunks => (<span id="privacyLink">{chunks}</span>),
+                      tosLink: chunks => (<a href="." id="tosLink">{chunks}</a>),
+                      privacyLink: chunks => (<a href="." id="privacyLink">{chunks}</a>),
                     }}
                   />
                 </Box>

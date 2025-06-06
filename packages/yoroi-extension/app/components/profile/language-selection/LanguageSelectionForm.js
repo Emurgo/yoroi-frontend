@@ -85,6 +85,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
         this.setState({ showing: 'privacy' });
       }
     }
+
+    return false;
   };
 
   onClickBack: () => void = () => {
@@ -156,8 +158,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                 <FormattedMessage
                   {...globalMessages.tosAgreement}
                   values={{
-                    tosLink: chunks => (<span id="tosLink">{chunks}</span>),
-                    privacyLink: chunks => (<span id="privacyLink">{chunks}</span>),
+                    tosLink: chunks => (<a href="." id="tosLink">{chunks}</a>),
+                    privacyLink: chunks => (<a href="." id="privacyLink">{chunks}</a>),
                   }}
                 />
               </Box>
