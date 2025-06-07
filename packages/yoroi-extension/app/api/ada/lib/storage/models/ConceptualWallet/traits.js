@@ -9,7 +9,6 @@ import type {
   IConceptualWallet,
   IConceptualWalletConstructor,
   IHasPrivateDeriver,
-  IHasSign,
   IDerivePublicFromPrivateRequest,
   IDerivePublicFromPrivateResponse,
   IDerivePublicFromPrivate,
@@ -432,7 +431,7 @@ export async function refreshConceptualWalletFunctionality(
 }
 
 export async function refreshCip1852WalletFunctionality<
-  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver & IHasSign
+  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
@@ -469,7 +468,7 @@ export async function refreshCip1852WalletFunctionality<
 
 // <TODO:PENDING_REMOVAL> bip44
 export async function refreshBip44WalletFunctionality<
-  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver & IHasSign
+  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver
 >(
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,

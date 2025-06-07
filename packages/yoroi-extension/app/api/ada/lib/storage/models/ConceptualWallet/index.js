@@ -40,6 +40,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   #conceptualWalletId: number;
   #protocolMagic: string;
   #publicDeriverLevel: number;
+  #signingLevel: number | null;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
   networkInfo: $ReadOnly<NetworkRow>;
@@ -48,10 +49,12 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   constructor(
     data: IConceptualWalletConstructor,
     publicDeriverLevel: number,
+    signingLevel: number | null,
   ): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.#publicDeriverLevel = publicDeriverLevel;
+    this.#signingLevel = signingLevel;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
     this.networkInfo = data.networkInfo;
@@ -70,6 +73,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   getDerivationTables: void => Map<number, string> = () => {
     // recall: cip1852 is an extension of bip44 so the tables are the same
     return Bip44TableMap;
+  }
+
+  getSigningLevel(): number | null {
+    return this.#signingLevel;
   }
 
   getNetworkInfo(): $ReadOnly<NetworkRow> {

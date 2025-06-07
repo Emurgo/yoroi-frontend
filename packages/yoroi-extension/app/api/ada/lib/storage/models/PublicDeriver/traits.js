@@ -41,7 +41,7 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
 import type {
-  IHasPrivateDeriver, IHasSign, IConceptualWallet,
+  IHasPrivateDeriver, IConceptualWallet,
 } from '../ConceptualWallet/interfaces';
 
 import {
@@ -175,7 +175,7 @@ export function asHasLevels<Wrapper: ConceptualWallet, Rest=Empty>(
   return undefined;
 }
 
-type HasSignDependencies = IPublicDeriver<ConceptualWallet & IHasSign>;
+type HasSignDependencies = IPublicDeriver<ConceptualWallet>;
 const HasSignMixin = (
   superclass: Class<HasSignDependencies>,
 ) => (class HasSign extends superclass {
@@ -186,7 +186,7 @@ export const HasSign: * = Mixin<
 >(HasSignMixin);
 export function asHasSign<Wrapper: ConceptualWallet, Rest=Empty>(
   obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasSign> & Rest) {
+): void | (IPublicDeriver<Wrapper> & Rest) {
   if (obj instanceof HasSign) {
     return obj;
   }
@@ -1477,7 +1477,7 @@ export function asGetPublicKey<T: IPublicDeriver<any>>(
 //   GetSigningKey
 // ==================
 
-type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet & IHasSign>;
+type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet>;
 const GetSigningKeyMixin = (
   superclass: Class<GetSigningKeyDependencies>,
 ) => (class GetSigningKey extends superclass implements IGetSigningKey {
@@ -2283,7 +2283,7 @@ type AddBip44TraitsRequest = {|
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IConceptualWallet & IHasSign,
+  conceptualWallet: IConceptualWallet,
   startClass: Class<Bip44PublicDeriver>,
 |};
 type AddBip44TraitsResponse = {|
@@ -2432,7 +2432,7 @@ export async function addTraitsForCip1852Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IConceptualWallet & IHasSign,
+  conceptualWallet: IConceptualWallet,
   startClass: Class<Cip1852PublicDeriver>,
 ): Promise<{|
   finalClass: Class<Cip1852PublicDeriver>,

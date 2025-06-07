@@ -48,7 +48,11 @@ export type IConceptualWalletConstructor = {|
 |};
 
 export interface IConceptualWallet {
-  constructor(data: IConceptualWalletConstructor, publicDeriverLevel: number): IConceptualWallet;
+  constructor(
+    data: IConceptualWalletConstructor,
+    publicDeriverLevel: number,
+    signingLevel: number | null,
+  ): IConceptualWallet;
   getWalletType(): WalletType;
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
   getDb(): lf$Database;
@@ -57,15 +61,12 @@ export interface IConceptualWallet {
   rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>;
   getPublicDeriverLevel(): number;
   getDerivationTables(): Map<number, string>;
+  getSigningLevel(): number | null;
 }
 
 export interface IHasPrivateDeriver {
   getPrivateDeriverLevel(): number | null;
   getPrivateDeriverKeyDerivationId(): number | null;
-}
-
-export interface IHasSign {
-  getSigningLevel(): number | null;
 }
 
 export type IDerivePublicFromPrivateRequest = {|

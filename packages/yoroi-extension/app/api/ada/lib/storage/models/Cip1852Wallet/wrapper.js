@@ -6,7 +6,7 @@ import type {
 
 import type {
   IConceptualWalletConstructor,
-  IHasPrivateDeriver, IHasSign,
+  IHasPrivateDeriver,
 } from '../ConceptualWallet/interfaces';
 import {
   ConceptualWallet, rawRemoveConceptualWallet,
@@ -19,12 +19,11 @@ import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/wri
 /** Snapshot of a Cip1852Wallet in the database */
 export class Cip1852Wallet
   extends ConceptualWallet
-  implements ICip1852Wallet, IHasPrivateDeriver, IHasSign {
+  implements ICip1852Wallet, IHasPrivateDeriver {
   /**
    * Should only cache information we know will never change
    */
 
-  #signingLevel: number | null;
   #privateDeriverLevel: number | null;
   #privateDeriverKeyDerivationId: number | null;
 
@@ -38,15 +37,10 @@ export class Cip1852Wallet
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): Cip1852Wallet {
-    super(conceptualWalletCtorData, row.PublicDeriverLevel);
-    this.#signingLevel = row.SignerLevel;
+    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel);
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     return this;
-  }
-
-  getSigningLevel(): number | null {
-    return this.#signingLevel;
   }
 
   getPrivateDeriverLevel(): number | null {

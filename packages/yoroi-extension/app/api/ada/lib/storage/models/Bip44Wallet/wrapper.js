@@ -10,7 +10,6 @@ import {
 import type {
   IConceptualWalletConstructor,
   IHasPrivateDeriver,
-  IHasSign,
 } from '../ConceptualWallet/interfaces';
 import { refreshBip44WalletFunctionality } from '../ConceptualWallet/traits';
 
@@ -27,12 +26,11 @@ import { ModifyBip44Wrapper } from '../../database/walletTypes/bip44/api/write';
 /** Snapshot of a Bip44Wallet in the database */
 export class Bip44Wallet
   extends ConceptualWallet
-  implements IBip44Wallet, IHasPrivateDeriver, IHasSign {
+  implements IBip44Wallet, IHasPrivateDeriver {
   /**
    * Should only cache information we know will never change
    */
 
-  #signingLevel: number | null;
   #privateDeriverLevel: number | null;
   #privateDeriverKeyDerivationId: number | null;
   #protocolMagic: number;
@@ -47,15 +45,10 @@ export class Bip44Wallet
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): Bip44Wallet {
-    super(conceptualWalletCtorData, row.PublicDeriverLevel);
-    this.#signingLevel = row.SignerLevel;
+    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel);
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     return this;
-  }
-
-  getSigningLevel(): number | null {
-    return this.#signingLevel;
   }
 
   getPrivateDeriverLevel(): number | null {
