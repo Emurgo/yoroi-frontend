@@ -26,6 +26,7 @@ import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
+import { filterByValues } from './coreUtils';
 
 
 type Props = {|
@@ -98,9 +99,8 @@ class App extends Component<Props, State> {
 
       // clean wrong format strings from locale messages
       // to be removed after all locale messages get updated
-      const fixedLocaleMessages = Object.entries(localeMessages)
-        .filter(([,v]) => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='))
-        .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+      const fixedLocaleMessages = filterByValues(localeMessages,
+          v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='));
 
       runInAction(() => {
         this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
