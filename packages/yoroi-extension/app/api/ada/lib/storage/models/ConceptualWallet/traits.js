@@ -46,7 +46,6 @@ import {
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
-import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 
 // ===========================
 //   DerivePublicFromPrivate
@@ -425,13 +424,10 @@ export async function refreshConceptualWalletFunctionality(
   };
 }
 
-export async function refreshCip1852WalletFunctionality<
-  T: ConceptualWallet & Cip1852Wallet
->(
+export async function createAndRefreshCip1852Wallet(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
-  base: Class<T>,
-): Promise<T> {
+): Promise<ConceptualWallet> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
     db,
     row.ConceptualWalletId,
@@ -440,7 +436,7 @@ export async function refreshCip1852WalletFunctionality<
   let privateDeriverLevel = null;
   let privateDeriverKeyDerivationId = null;
 
-  let currClass = base;
+  let currClass = ConceptualWallet;
 
   if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
     currClass = PublicFromPrivate(currClass);
@@ -452,9 +448,9 @@ export async function refreshCip1852WalletFunctionality<
   }
 
   const instance = new currClass(
-    db,
     conceptualWalletCtorData,
-    row,
+    row.PublicDeriverLevel,
+    row.SignerLevel,
     privateDeriverLevel,
     privateDeriverKeyDerivationId,
   );

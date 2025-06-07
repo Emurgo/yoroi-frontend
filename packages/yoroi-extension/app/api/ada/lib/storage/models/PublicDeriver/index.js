@@ -4,7 +4,6 @@ import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
 
-import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
 import type {
@@ -206,25 +205,21 @@ export async function refreshPublicDeriverFunctionality(
     pubDeriver.KeyDerivationId,
   );
 
-  if (parent instanceof Cip1852Wallet) {
-    const result = await addTraitsForCip1852Child(
-      db,
-      pubDeriver,
-      keyDerivation,
-      parent,
-      PublicDeriver,
-    );
-    const finalClass = result.finalClass;
-    const instance = new finalClass({
-      publicDeriverId: pubDeriver.PublicDeriverId,
-      parent,
-      pathToPublic: result.pathToPublic,
-      derivationId: keyDerivation.KeyDerivationId,
-    });
-    return instance;
-  }
-
-  throw new Error(`${nameof(refreshPublicDeriverFunctionality)} unknown wallet type`);
+  const result = await addTraitsForCip1852Child(
+    db,
+    pubDeriver,
+    keyDerivation,
+    parent,
+    PublicDeriver,
+  );
+  const finalClass = result.finalClass;
+  const instance = new finalClass({
+    publicDeriverId: pubDeriver.PublicDeriverId,
+    parent,
+    pathToPublic: result.pathToPublic,
+    derivationId: keyDerivation.KeyDerivationId,
+  });
+  return instance;
 }
 
 async function getKeyDerivation(
@@ -254,4 +249,4 @@ async function getKeyDerivation(
   );
 }
 
-export type Cip1852PublicDeriver = PublicDeriver<Cip1852Wallet>;
+export type Cip1852PublicDeriver = PublicDeriver<ConceptualWallet>;

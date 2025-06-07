@@ -29,6 +29,7 @@ import type {
 import type { DefaultTokenEntry } from '../../../../../common/lib/MultiToken';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
 import { Bip44TableMap } from '../../database/walletTypes/bip44/api/utils';
+import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/write';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -172,6 +173,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   }
 
   rawRemove: (lf$Database, lf$Transaction) => Promise<void> = async (db, tx) => {
+    await ModifyCip1852Wrapper.remove(
+      db, tx,
+      this.getConceptualWalletId()
+    );
     await rawRemoveConceptualWallet(
       db, tx,
       this.getConceptualWalletId()
