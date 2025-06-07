@@ -41,7 +41,7 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
 import type {
-  IHasPrivateDeriver, IConceptualWallet,
+  IConceptualWallet,
 } from '../ConceptualWallet/interfaces';
 
 import {
@@ -139,7 +139,7 @@ import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddress
 import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
 interface Empty {}
-type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
+type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet>;
 const HasPrivateDeriverMixin = (
   superclass: Class<HasPrivateDeriverDependencies>,
 ) => (class HasPrivateDeriver extends superclass {
@@ -150,7 +150,7 @@ export const HasPrivateDeriver: * = Mixin<
 >(HasPrivateDeriverMixin);
 export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
   obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasPrivateDeriver> & Rest) {
+): void | (IPublicDeriver<Wrapper> & Rest) {
   if (obj instanceof HasPrivateDeriver) {
     return obj;
   }

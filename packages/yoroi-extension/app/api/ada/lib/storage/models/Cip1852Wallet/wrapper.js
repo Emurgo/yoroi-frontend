@@ -6,7 +6,6 @@ import type {
 
 import type {
   IConceptualWalletConstructor,
-  IHasPrivateDeriver,
 } from '../ConceptualWallet/interfaces';
 import {
   ConceptualWallet, rawRemoveConceptualWallet,
@@ -19,13 +18,7 @@ import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/wri
 /** Snapshot of a Cip1852Wallet in the database */
 export class Cip1852Wallet
   extends ConceptualWallet
-  implements ICip1852Wallet, IHasPrivateDeriver {
-  /**
-   * Should only cache information we know will never change
-   */
-
-  #privateDeriverLevel: number | null;
-  #privateDeriverKeyDerivationId: number | null;
+  implements ICip1852Wallet {
 
   /**
    * This constructor it will NOT populate functionality from db
@@ -37,18 +30,8 @@ export class Cip1852Wallet
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): Cip1852Wallet {
-    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel);
-    this.#privateDeriverLevel = privateDeriverLevel;
-    this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
+    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel, privateDeriverLevel, privateDeriverKeyDerivationId);
     return this;
-  }
-
-  getPrivateDeriverLevel(): number | null {
-    return this.#privateDeriverLevel;
-  }
-
-  getPrivateDeriverKeyDerivationId(): number | null {
-    return this.#privateDeriverKeyDerivationId;
   }
 
   static async createCip1852Wallet(

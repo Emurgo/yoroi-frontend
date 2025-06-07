@@ -8,7 +8,6 @@ import type {
 import type {
   IConceptualWallet,
   IConceptualWalletConstructor,
-  IHasPrivateDeriver,
   IDerivePublicFromPrivateRequest,
   IDerivePublicFromPrivateResponse,
   IDerivePublicFromPrivate,
@@ -115,7 +114,7 @@ export async function derivePublicDeriver<Row>(
   );
 }
 
-type PublicFromPrivateDependencies = IHasPrivateDeriver & IConceptualWallet;
+type PublicFromPrivateDependencies = IConceptualWallet;
 const PublicFromPrivateMixin = (
   superclass: Class<PublicFromPrivateDependencies>
 ) => (class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
@@ -180,7 +179,7 @@ export const PublicFromPrivate: * = Mixin<
 const PublicFromPrivateInstance = (
   (PublicFromPrivate: any): ReturnType<typeof PublicFromPrivateMixin>
 );
-export function asPublicFromPrivate<T: IHasPrivateDeriver>(
+export function asPublicFromPrivate<T: IConceptualWallet>(
   obj: T
 ): void | (IDerivePublicFromPrivate & PublicFromPrivateDependencies & T) {
   if (obj instanceof PublicFromPrivateInstance) {
@@ -193,7 +192,7 @@ export function asPublicFromPrivate<T: IHasPrivateDeriver>(
 //   GetPrivateDeriverKey
 // ========================
 
-type GetPrivateDeriverKeyDependencies = IHasPrivateDeriver & IConceptualWallet;
+type GetPrivateDeriverKeyDependencies = IConceptualWallet;
 const GetPrivateDeriverKeyMixin = (
   superclass: Class<GetPrivateDeriverKeyDependencies>
 ) => (class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
@@ -287,7 +286,7 @@ export const GetPrivateDeriverKey: * = Mixin<
 const GetPrivateDeriverKeyInstance = (
   (GetPrivateDeriverKey: any): ReturnType<typeof GetPrivateDeriverKeyMixin>
 );
-export function asGetPrivateDeriverKey<T: IHasPrivateDeriver>(
+export function asGetPrivateDeriverKey<T: IConceptualWallet>(
   obj: T
 ): void | (IGetPrivateDeriverKey & GetPrivateDeriverKeyDependencies & T) {
   if (obj instanceof GetPrivateDeriverKeyInstance) {
@@ -431,7 +430,7 @@ export async function refreshConceptualWalletFunctionality(
 }
 
 export async function refreshCip1852WalletFunctionality<
-  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver
+  T: ConceptualWallet & ICip1852Wallet
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
@@ -468,7 +467,7 @@ export async function refreshCip1852WalletFunctionality<
 
 // <TODO:PENDING_REMOVAL> bip44
 export async function refreshBip44WalletFunctionality<
-  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver
+  T: ConceptualWallet & IBip44Wallet
 >(
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,

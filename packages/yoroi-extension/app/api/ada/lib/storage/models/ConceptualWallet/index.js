@@ -38,8 +38,9 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   db: lf$Database;
   #conceptualWalletId: number;
-  #protocolMagic: string;
   #publicDeriverLevel: number;
+  #privateDeriverLevel: number | null;
+  #privateDeriverKeyDerivationId: number | null;
   #signingLevel: number | null;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
@@ -50,10 +51,14 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     data: IConceptualWalletConstructor,
     publicDeriverLevel: number,
     signingLevel: number | null,
+    privateDeriverLevel: number | null,
+    privateDeriverKeyDerivationId: number | null,
   ): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
     this.#publicDeriverLevel = publicDeriverLevel;
+    this.#privateDeriverLevel = privateDeriverLevel;
+    this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     this.#signingLevel = signingLevel;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
@@ -68,6 +73,14 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   getPublicDeriverLevel(): number {
     return this.#publicDeriverLevel;
+  }
+
+  getPrivateDeriverLevel(): number | null {
+    return this.#privateDeriverLevel;
+  }
+
+  getPrivateDeriverKeyDerivationId(): number | null {
+    return this.#privateDeriverKeyDerivationId;
   }
 
   getDerivationTables: void => Map<number, string> = () => {

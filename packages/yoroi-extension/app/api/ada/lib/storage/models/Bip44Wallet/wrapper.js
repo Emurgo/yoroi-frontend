@@ -9,7 +9,6 @@ import {
 } from '../ConceptualWallet/index';
 import type {
   IConceptualWalletConstructor,
-  IHasPrivateDeriver,
 } from '../ConceptualWallet/interfaces';
 import { refreshBip44WalletFunctionality } from '../ConceptualWallet/traits';
 
@@ -26,14 +25,7 @@ import { ModifyBip44Wrapper } from '../../database/walletTypes/bip44/api/write';
 /** Snapshot of a Bip44Wallet in the database */
 export class Bip44Wallet
   extends ConceptualWallet
-  implements IBip44Wallet, IHasPrivateDeriver {
-  /**
-   * Should only cache information we know will never change
-   */
-
-  #privateDeriverLevel: number | null;
-  #privateDeriverKeyDerivationId: number | null;
-  #protocolMagic: number;
+  implements IBip44Wallet {
 
   /**
    * This constructor it will NOT populate functionality from db
@@ -45,18 +37,8 @@ export class Bip44Wallet
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): Bip44Wallet {
-    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel);
-    this.#privateDeriverLevel = privateDeriverLevel;
-    this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
+    super(conceptualWalletCtorData, row.PublicDeriverLevel, row.SignerLevel, privateDeriverLevel, privateDeriverKeyDerivationId);
     return this;
-  }
-
-  getPrivateDeriverLevel(): number | null {
-    return this.#privateDeriverLevel;
-  }
-
-  getPrivateDeriverKeyDerivationId(): number | null {
-    return this.#privateDeriverKeyDerivationId;
   }
 
   // <TODO:PENDING_REMOVAL> bip44

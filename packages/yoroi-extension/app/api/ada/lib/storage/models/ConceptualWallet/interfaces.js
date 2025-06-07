@@ -52,6 +52,8 @@ export interface IConceptualWallet {
     data: IConceptualWalletConstructor,
     publicDeriverLevel: number,
     signingLevel: number | null,
+    privateDeriverLevel: number | null,
+    privateDeriverKeyDerivationId: number | null,
   ): IConceptualWallet;
   getWalletType(): WalletType;
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
@@ -62,9 +64,6 @@ export interface IConceptualWallet {
   getPublicDeriverLevel(): number;
   getDerivationTables(): Map<number, string>;
   getSigningLevel(): number | null;
-}
-
-export interface IHasPrivateDeriver {
   getPrivateDeriverLevel(): number | null;
   getPrivateDeriverKeyDerivationId(): number | null;
 }
