@@ -16,7 +16,7 @@ const messages = defineMessages({
   header: {
     id: 'profile.nightly.header',
     defaultMessage:
-      '!!!Yoroi Nightly automatically updates nightly with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
+      '!!!<strong>Yoroi Nightly is periodically updated with the latest in-progress features.</strong> Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
   },
   warningHeader: {
     id: 'profile.nightly.warningHeader',
@@ -100,7 +100,12 @@ export default class NightlyForm extends Component<Props, State> {
             }}
           >
             <Typography component="div" variant="body1" lineHeight="24px">
-              <FormattedMessage {...messages.header} />
+              <FormattedMessage
+                {...messages.header}
+                values={{
+                  strong: chunks => <strong>{chunks}</strong>
+                }}
+              />
             </Typography>
 
             <Box>

@@ -314,7 +314,7 @@
   "profile.languageSelect.tosAgreement": "I agree with <tosLink>Terms of Service Agreement</tosLink> and <privacyLink>Privacy Notice</privacyLink>",
   "profile.nighly.slogan": "Testnet wallet for Cardano assets",
   "profile.nightly.acknowledgedRisks": "I Understand the risk",
-  "profile.nightly.header": "Yoroi Nightly automatically updates nightly with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.",
+  "profile.nightly.header": "<strong>Yoroi Nightly is periodically updated with the latest in-progress features.</strong> Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.",
   "profile.nightly.recommendation1": "You only use wallets with a small balance to minimize risk.",
   "profile.nightly.recommendation2": "You report any issues to EMURGO through the Yoroi Nightly channel.",
   "profile.nightly.recommendationHeader": "We recommend that:",
