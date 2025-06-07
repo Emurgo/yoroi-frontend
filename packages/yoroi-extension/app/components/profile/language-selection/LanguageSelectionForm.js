@@ -85,6 +85,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
         this.setState({ showing: 'privacy' });
       }
     }
+
+    return undefined;
   };
 
   onClickBack: () => void = () => {
@@ -148,7 +150,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
             label={
               <Box
                 sx={{
-                  '& span > span': {
+                  '& a': {
                     color: 'primary.600',
                   },
                 }}
@@ -156,8 +158,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                 <FormattedMessage
                   {...globalMessages.tosAgreement}
                   values={{
-                    tosLink: chunks => (<span id="tosLink">{chunks}</span>),
-                    privacyLink: chunks => (<span id="privacyLink">{chunks}</span>),
+                    tosLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="tosLink">{chunks}</a>),
+                    privacyLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="privacyLink">{chunks}</a>),
                   }}
                 />
               </Box>
