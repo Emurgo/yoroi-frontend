@@ -1778,16 +1778,6 @@
         "Bip44ChainId": 2
       }
     ],
-    "Bip44Wrapper": [
-      {
-        "ConceptualWalletId": 1,
-        "SignerLevel": 0,
-        "PublicDeriverLevel": 3,
-        "PrivateDeriverKeyDerivationId": 1,
-        "PrivateDeriverLevel": 0,
-        "RootKeyDerivationId": 1
-      }
-    ],
     "Cip1852Wrapper": [],
     "UtxoTransactionInput": [
       {
