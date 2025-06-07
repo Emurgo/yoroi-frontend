@@ -138,26 +138,6 @@ import type {
 import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
 import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
-interface Empty {}
-
-type HasLevelsDependencies = IPublicDeriver<ConceptualWallet>;
-const HasLevelsMixin = (
-  superclass: Class<HasLevelsDependencies>,
-) => (class HasLevels extends superclass {
-});
-export const HasLevels: * = Mixin<
-  HasLevelsDependencies,
-  Empty,
->(HasLevelsMixin);
-export function asHasLevels<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper> & Rest) {
-  if (obj instanceof HasLevels) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ===============
 //   GetAllUtxos
 // ===============
@@ -1048,10 +1028,7 @@ const CardanoBip44PickReceiveMixin = (
   pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
     body,
   ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -1130,10 +1107,7 @@ const Cip1852PickReceiveMixin = (
   pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
     body,
   ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -2280,7 +2254,6 @@ export async function addTraitsForCardanoBip44(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasLevels(currClass);
   currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
 
   let publicKey;
@@ -2408,7 +2381,6 @@ export async function addTraitsForCip1852Child(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasLevels(currClass);
   currClass = GetAllUtxos(currClass);
   currClass = GetStakingKey(GetAllAccounting(currClass));
 

@@ -86,7 +86,7 @@ import {
   PRIMARY_ASSET_CONSTANTS,
 } from '../database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels, asGetAllUtxos,
+  asScanAddresses, asGetAllUtxos,
 } from '../models/PublicDeriver/traits';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 import type {
@@ -903,10 +903,7 @@ export async function updateUtxos(
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
 ): Promise<void> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map<number, string>()
-    : withLevels.getParent().getDerivationTables();
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
 
   // sync our address set with remote to make sure txs are identified as ours
   const scanAddrTables = Object.freeze({
@@ -1033,10 +1030,7 @@ export async function updateTransactions(
   after?: ?ReferenceTx,
   before?: ?ReferenceTx,
 ): Promise<TxData> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map<number, string>()
-    : withLevels.getParent().getDerivationTables();
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
 
   try {
