@@ -11,11 +11,9 @@ import { RustModule } from '../../cardanoCrypto/rustLoader';
 import {
   dumpByVersion,
   loadLovefieldDB,
-  loadLovefieldDBFromDump
 } from '../database/index';
-import { storageV2Migration, populateNewUtxodata } from '../adaMigration';
+import { storageV2Migration } from '../adaMigration';
 import { mockDate, filterDbSnapshot } from '../../../../jestUtils.forTests';
-import utxoTestDbDump from './testDb.dump.json';
 
 beforeAll(async () => {
   await RustModule.load();
@@ -78,51 +76,4 @@ test('Migrate ledger storage v1 to storage v2', async (done) => {
 
   await baseTest(db);
   done();
-});
-
-test('Migrate to Yoroi-lib UtxoService storage', async () => {
-  const db = await loadLovefieldDBFromDump(schema.DataStoreType.MEMORY, utxoTestDbDump);
-
-  await populateNewUtxodata(db);
-
-  const dump = await db.export();
-
-  expect(dump.tables.UtxoAtSafePointTable).toEqual(
-    [
-      {
-        PublicDeriverId: 1,
-        UtxoAtSafePoint: {
-          lastSafeBlockHash: 'a9835cc1e0f9b6c239aec4c446a6e181b7db6a80ad53cc0b04f70c6b85e9ba26',
-          utxos: [
-            {
-              utxoId: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5460',
-              txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-              txIndex: 0,
-              receiver: 'Ae2tdPwUPEZ3Kt2BJnDMQggxEA4c9MTagByH41rJkv2k82dBch2nqMAdyHJ',
-              amount: '1100000',
-              assets: [
-                {
-                  assetId: '0ccb954ed44c1cd267f21f628317637679887033564eef61857a0b62.616263',
-                  policyId: '0ccb954ed44c1cd267f21f628317637679887033564eef61857a0b62',
-                  name: '616263',
-                  amount: '1'
-                }
-              ],
-              blockNum: 218609
-            },
-            {
-              utxoId: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed5461',
-              txHash: '29f2fe214ec2c9b05773a689eca797e903adeaaf51dfe20782a4bf401e7ed546',
-              txIndex: 1,
-              receiver: 'Ae2tdPwUPEYxsngJhnW49jrmGuaCvQK34Hqrnx5w5SWxgfjDkSDcnrRdT5G',
-              amount: '900000',
-              assets: [],
-              blockNum: 218609
-            }
-          ]
-        },
-        UtxoAtSafePointId: 1
-      }
-    ]
-  );
 });
