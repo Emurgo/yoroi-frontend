@@ -1,41 +1,25 @@
 // @flow
 
-import type {
-  lf$Database, lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction, } from 'lovefield';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
 import type {
+  IGetLastSyncInfo,
+  IGetLastSyncInfoRequest,
+  IGetLastSyncInfoResponse,
   IPublicDeriver,
   IPublicDeriverConstructor,
-  IGetLastSyncInfo, IGetLastSyncInfoRequest, IGetLastSyncInfoResponse,
 } from './interfaces';
-import type {
-  IRename, IRenameRequest, IRenameResponse,
-} from '../common/interfaces';
 
-import {
-  getAllSchemaTables,
-  raii,
-  StaleStateError,
-} from '../../database/utils';
+import { getAllSchemaTables, raii, StaleStateError, } from '../../database/utils';
 
-import type {
-  PublicDeriverRow,
-} from '../../database/walletTypes/core/tables';
-import {
-  GetPublicDeriver,
-  GetLastSyncForPublicDeriver,
-} from '../../database/walletTypes/core/api/read';
+import type { PublicDeriverRow, } from '../../database/walletTypes/core/tables';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, } from '../../database/walletTypes/core/api/read';
 import { ModifyPublicDeriver, } from '../../database/walletTypes/core/api/write';
 
-import type {
-  KeyDerivationRow,
-} from '../../database/primitives/tables';
-import {
-  GetKeyDerivation,
-} from '../../database/primitives/api/read';
+import type { KeyDerivationRow, } from '../../database/primitives/tables';
+import { GetKeyDerivation, } from '../../database/primitives/api/read';
 import { addTraitsForCip1852Child } from './traits';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
@@ -44,7 +28,7 @@ import { networks } from '../../database/prepackaged/networks';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
-implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
+implements IPublicDeriver<Parent>, IGetLastSyncInfo {
   /**
    * Should only cache information we know will never change
    */
@@ -141,8 +125,8 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
   rawRename: (
     tx: lf$Transaction,
     deps: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
-    body: IRenameRequest,
-  ) => Promise<IRenameResponse> = async (tx, deps, body) => {
+    body: {| newName: string, |},
+  ) => Promise<void> = async (tx, deps, body) => {
     return await deps.ModifyPublicDeriver.rename(
       this.getDb(), tx,
       {
@@ -151,7 +135,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       }
     );
   }
-  rename: IRenameRequest => Promise<IRenameResponse> = async (body) => {
+  rename: {| newName: string, |} => Promise<void> = async (body) => {
     const deps = Object.freeze({
       ModifyPublicDeriver,
     });
@@ -159,7 +143,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii<IRenameResponse>(
+    return await raii<void>(
       this.getDb(),
       depTables,
       async tx => this.rawRename(tx, deps, body)

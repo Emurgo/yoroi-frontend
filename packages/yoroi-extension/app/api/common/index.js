@@ -2,49 +2,33 @@
 
 import type { lf$Database } from 'lovefield';
 import BigNumber from 'bignumber.js';
-import {
-  Logger,
-  stringifyError,
-  stringifyData
-} from '../../utils/logging';
-import {
-  loadWalletsFromStorage,
-} from '../ada/lib/storage/models/load';
-import {
-  PublicDeriver,
-} from '../ada/lib/storage/models/PublicDeriver/index';
-import {
-  GenericApiError, IncorrectWalletPasswordError,
-} from './errors';
+import { Logger, stringifyData, stringifyError } from '../../utils/logging';
+import { loadWalletsFromStorage, } from '../ada/lib/storage/models/load';
+import { PublicDeriver, } from '../ada/lib/storage/models/PublicDeriver/index';
+import { GenericApiError, IncorrectWalletPasswordError, } from './errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
-  IPublicDeriver,
-  IGetLastSyncInfo,
-  IGetLastSyncInfoResponse,
   IDisplayCutoffPopFunc,
   IDisplayCutoffPopResponse,
+  IGetLastSyncInfo,
+  IGetLastSyncInfoResponse,
+  IPublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import WalletTransaction from '../../domain/WalletTransaction';
+import type { TransactionExportDataFormat, TransactionExportFileType, TransactionExportRow } from '../export';
+import type { GetBalanceRequest, GetBalanceResponse, SendTokenList, } from './types';
 import type {
-  TransactionExportRow,
-  TransactionExportDataFormat,
-  TransactionExportFileType
-} from '../export';
-import type {
-  GetBalanceRequest, GetBalanceResponse,
-  SendTokenList,
-} from './types';
-import type {
-  IRenameFunc, IRenameRequest, IRenameResponse,
-  IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
+  IChangePasswordRequest,
+  IChangePasswordRequestFunc,
+  IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
 import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
 import { getAllTokenInfo } from './lib/tokens/utils';
-import { MultiToken } from './lib/MultiToken';
 import type { DefaultTokenEntry } from './lib/MultiToken';
+import { MultiToken } from './lib/MultiToken';
 import type { UnconfirmedAmount } from '../../types/unconfirmedAmount.types';
 
 // getTokenInfo
@@ -187,17 +171,6 @@ export type CreateAddressFunc = (
   request: CreateAddressRequest
 ) => Promise<CreateAddressResponse>;
 
-// renameModel
-
-export type RenameModelRequest = {|
-  func: IRenameFunc,
-  request: IRenameRequest,
-|};
-export type RenameModelResponse = IRenameResponse;
-export type RenameModelFunc = (
-  request: RenameModelRequest
-) => Promise<RenameModelResponse>;
-
 // changeModelPassword
 
 export type ChangeModelPasswordRequest = {|
@@ -285,21 +258,6 @@ export default class CommonApi {
   ): Promise<string> {
     const data = await db.export();
     return JSON.stringify(data);
-  }
-
-  async renameModel(
-    request: RenameModelRequest
-  ): Promise<RenameModelResponse> {
-    Logger.debug(`${nameof(CommonApi)}::${nameof(this.renameModel)} called: ` + stringifyData(request));
-    try {
-      const result = await request.func(request.request);
-      Logger.debug(`${nameof(CommonApi)}::${nameof(this.renameModel)} success: ` + stringifyData(result));
-      return result;
-    } catch (error) {
-      Logger.error(`${nameof(CommonApi)}::${nameof(this.renameModel)} error: ` + stringifyError(error));
-      if (error instanceof LocalizableError) throw error;
-      throw new GenericApiError();
-    }
   }
 
   async changeModelPassword(
