@@ -16,7 +16,6 @@ import type {
   IAdhocPublicDeriver,
 } from './interfaces';
 import { WalletTypeOption, } from './interfaces';
-import type { ICip1852Wallet } from '../Cip1852Wallet/interfaces';
 import { ConceptualWallet } from './index';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
 import {
@@ -47,6 +46,7 @@ import {
 import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
+import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 
 // ===========================
 //   DerivePublicFromPrivate
@@ -426,7 +426,7 @@ export async function refreshConceptualWalletFunctionality(
 }
 
 export async function refreshCip1852WalletFunctionality<
-  T: ConceptualWallet & ICip1852Wallet
+  T: ConceptualWallet & Cip1852Wallet
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,

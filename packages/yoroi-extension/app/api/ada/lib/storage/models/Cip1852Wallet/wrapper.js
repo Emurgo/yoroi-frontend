@@ -11,14 +11,11 @@ import {
   ConceptualWallet, rawRemoveConceptualWallet,
 } from '../ConceptualWallet/index';
 import { refreshCip1852WalletFunctionality } from '../ConceptualWallet/traits';
-import type { ICip1852Wallet } from './interfaces';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
 import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/write';
 
 /** Snapshot of a Cip1852Wallet in the database */
-export class Cip1852Wallet
-  extends ConceptualWallet
-  implements ICip1852Wallet {
+export class Cip1852Wallet extends ConceptualWallet {
 
   /**
    * This constructor it will NOT populate functionality from db
