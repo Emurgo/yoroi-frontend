@@ -139,23 +139,6 @@ import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddress
 import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
 interface Empty {}
-type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet>;
-const HasPrivateDeriverMixin = (
-  superclass: Class<HasPrivateDeriverDependencies>,
-) => (class HasPrivateDeriver extends superclass {
-});
-export const HasPrivateDeriver: * = Mixin<
-  HasPrivateDeriverDependencies,
-  Empty,
->(HasPrivateDeriverMixin);
-export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper> & Rest) {
-  if (obj instanceof HasPrivateDeriver) {
-    return obj;
-  }
-  return undefined;
-}
 
 type HasLevelsDependencies = IPublicDeriver<ConceptualWallet>;
 const HasLevelsMixin = (
@@ -170,24 +153,6 @@ export function asHasLevels<Wrapper: ConceptualWallet, Rest=Empty>(
   obj: IPublicDeriver<Wrapper> & Rest
 ): void | (IPublicDeriver<Wrapper> & Rest) {
   if (obj instanceof HasLevels) {
-    return obj;
-  }
-  return undefined;
-}
-
-type HasSignDependencies = IPublicDeriver<ConceptualWallet>;
-const HasSignMixin = (
-  superclass: Class<HasSignDependencies>,
-) => (class HasSign extends superclass {
-});
-export const HasSign: * = Mixin<
-  HasSignDependencies,
-  Empty,
->(HasSignMixin);
-export function asHasSign<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper> & Rest) {
-  if (obj instanceof HasSign) {
     return obj;
   }
   return undefined;
@@ -2315,9 +2280,7 @@ export async function addTraitsForCardanoBip44(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasPrivateDeriver(currClass);
   currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
   currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
 
   let publicKey;
@@ -2445,9 +2408,7 @@ export async function addTraitsForCip1852Child(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasPrivateDeriver(currClass);
   currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
   currClass = GetAllUtxos(currClass);
   currClass = GetStakingKey(GetAllAccounting(currClass));
 
