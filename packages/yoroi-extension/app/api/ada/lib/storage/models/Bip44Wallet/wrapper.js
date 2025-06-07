@@ -10,7 +10,6 @@ import {
 import type {
   IConceptualWalletConstructor,
   IHasPrivateDeriver,
-  IHasLevels,
   IHasSign,
 } from '../ConceptualWallet/interfaces';
 import { refreshBip44WalletFunctionality } from '../ConceptualWallet/traits';
@@ -23,20 +22,16 @@ import type {
   Bip44WrapperRow,
 } from '../../database/walletTypes/bip44/tables';
 import { ModifyBip44Wrapper } from '../../database/walletTypes/bip44/api/write';
-import {
-  Bip44TableMap,
-} from '../../database/walletTypes/bip44/api/utils';
 
 // <TODO:PENDING_REMOVAL> bip44
 /** Snapshot of a Bip44Wallet in the database */
 export class Bip44Wallet
   extends ConceptualWallet
-  implements IBip44Wallet, IHasPrivateDeriver, IHasLevels, IHasSign {
+  implements IBip44Wallet, IHasPrivateDeriver, IHasSign {
   /**
    * Should only cache information we know will never change
    */
 
-  #publicDeriverLevel: number;
   #signingLevel: number | null;
   #privateDeriverLevel: number | null;
   #privateDeriverKeyDerivationId: number | null;
@@ -52,20 +47,11 @@ export class Bip44Wallet
     privateDeriverLevel: number | null,
     privateDeriverKeyDerivationId: number | null,
   ): Bip44Wallet {
-    super(conceptualWalletCtorData);
-    this.#publicDeriverLevel = row.PublicDeriverLevel;
+    super(conceptualWalletCtorData, row.PublicDeriverLevel);
     this.#signingLevel = row.SignerLevel;
     this.#privateDeriverLevel = privateDeriverLevel;
     this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
     return this;
-  }
-
-  getDerivationTables: void => Map<number, string> = () => {
-    return Bip44TableMap;
-  }
-
-  getPublicDeriverLevel(): number {
-    return this.#publicDeriverLevel;
   }
 
   getSigningLevel(): number | null {

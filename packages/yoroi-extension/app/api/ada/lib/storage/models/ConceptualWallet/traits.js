@@ -9,7 +9,6 @@ import type {
   IConceptualWallet,
   IConceptualWalletConstructor,
   IHasPrivateDeriver,
-  IHasLevels,
   IHasSign,
   IDerivePublicFromPrivateRequest,
   IDerivePublicFromPrivateResponse,
@@ -117,7 +116,7 @@ export async function derivePublicDeriver<Row>(
   );
 }
 
-type PublicFromPrivateDependencies = IHasPrivateDeriver & IHasLevels & IConceptualWallet;
+type PublicFromPrivateDependencies = IHasPrivateDeriver & IConceptualWallet;
 const PublicFromPrivateMixin = (
   superclass: Class<PublicFromPrivateDependencies>
 ) => (class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
@@ -302,7 +301,7 @@ export function asGetPrivateDeriverKey<T: IHasPrivateDeriver>(
 //   AdhocPublicDeriver
 // ======================
 
-type AdhocPublicDeriverDepenencies = IHasLevels & IConceptualWallet;
+type AdhocPublicDeriverDepenencies = IConceptualWallet;
 const AdhocPublicDeriverMixin = (
   superclass: Class<AdhocPublicDeriverDepenencies>
 ) => (class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
@@ -433,7 +432,7 @@ export async function refreshConceptualWalletFunctionality(
 }
 
 export async function refreshCip1852WalletFunctionality<
-  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver & IHasLevels & IHasSign
+  T: ConceptualWallet & ICip1852Wallet & IHasPrivateDeriver & IHasSign
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
@@ -470,7 +469,7 @@ export async function refreshCip1852WalletFunctionality<
 
 // <TODO:PENDING_REMOVAL> bip44
 export async function refreshBip44WalletFunctionality<
-  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver & IHasLevels & IHasSign
+  T: ConceptualWallet & IBip44Wallet & IHasPrivateDeriver & IHasSign
 >(
   db: lf$Database,
   row: $ReadOnly<Bip44WrapperRow>,

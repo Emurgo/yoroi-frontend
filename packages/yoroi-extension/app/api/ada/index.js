@@ -47,7 +47,7 @@ import {
   asHasUtxoChains,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
-import { type IHasLevels, WalletTypeOption } from './lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
   Address,
   Addressing,
@@ -184,7 +184,7 @@ export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
 // getChainAddressesForDisplay
 
 export type GetChainAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IHasUtxoChains & IDisplayCutoff,
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 |};
@@ -502,7 +502,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
   getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;

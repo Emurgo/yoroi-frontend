@@ -48,23 +48,20 @@ export type IConceptualWalletConstructor = {|
 |};
 
 export interface IConceptualWallet {
-  constructor(data: IConceptualWalletConstructor): IConceptualWallet;
+  constructor(data: IConceptualWalletConstructor, publicDeriverLevel: number): IConceptualWallet;
   getWalletType(): WalletType;
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
   getDb(): lf$Database;
   getConceptualWalletId(): number;
   getNetworkInfo(): $ReadOnly<NetworkRow>;
-  rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>
+  rawRemove(db: lf$Database, tx: lf$Transaction): Promise<void>;
+  getPublicDeriverLevel(): number;
+  getDerivationTables(): Map<number, string>;
 }
 
 export interface IHasPrivateDeriver {
   getPrivateDeriverLevel(): number | null;
   getPrivateDeriverKeyDerivationId(): number | null;
-}
-
-export interface IHasLevels {
-  getPublicDeriverLevel(): number;
-  getDerivationTables(): Map<number, string>;
 }
 
 export interface IHasSign {
