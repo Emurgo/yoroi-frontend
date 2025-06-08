@@ -202,7 +202,7 @@ export async function copyDbToMemory(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 18;
+  const schemaVersion = 19;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
@@ -487,5 +487,8 @@ async function onUpgrade(
       'IsUsed',
       false
     );
+  }
+  if (version < 19) {
+    await rawDb.dropTable('Bip44Wrapper');
   }
 }
