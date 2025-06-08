@@ -4,7 +4,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { TransactionResult } from '../../../transaction-review/common/types';
@@ -67,13 +67,13 @@ export const GovernanceStatusSelection = () => {
   const statusRawText = mapStatus[governanceStatus.status || ''];
   const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-  const params: any = useLocation();
+  const location = useLocation();
 
   React.useEffect(() => {
-    if (params?.delegateToYoroiDrep) {
+    if (location.search.includes('delegateToYoroiDrep=true')) {
       handleYoroiDelegate();
     }
-  }, [params]);
+  }, [useLocation]);
 
   const handleDelegate = async () => {
     if (!governanceManager) {
@@ -313,11 +313,6 @@ export const GovernanceStatusSelection = () => {
 
       <Stack gap="17px" mt="42px">
         {error && <Alert severity="error"> {error}</Alert>}
-        {governanceStatus.drep !== null && (
-          <Typography variant="body2" align="center" color="ds.text_gray_medium" gutterBottom>
-            {strings.drepId} {governanceStatus.drep}
-          </Typography>
-        )}
         <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
           {strings.learnMore}
         </Link>

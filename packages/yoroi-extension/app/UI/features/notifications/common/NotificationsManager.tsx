@@ -1,4 +1,3 @@
-import React from 'react';
 import { ToastContainer } from 'react-toastify'
 import NotificationsStyles, { FadeInOut } from './NotificationsStyles';
 /* import { useNotifications } from '../module/NotificationsProvider';
@@ -14,11 +13,11 @@ export default function NotificationsManager() {
       <NotificationsStyles />
       <ToastContainer
         position="top-right"
-        hideProgressBar={true}
-        newestOnTop={true}
+        hideProgressBar
+        newestOnTop
         transition={FadeInOut}
         pauseOnFocusLoss={false}
-        pauseOnHover={true}
+        pauseOnHover
         closeButton={false}
         closeOnClick={false}
       />

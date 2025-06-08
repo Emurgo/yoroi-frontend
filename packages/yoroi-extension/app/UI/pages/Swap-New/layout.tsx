@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
@@ -8,18 +8,17 @@ import SwapTabs from '../../features/swap-new/useCases/SwapTabs/SwapTabs';
 
 type Props = {
   stores: any;
-  actions: any;
   children: ReactNode;
 };
 
-const SwapLayout = ({ stores, actions, children }: Props): JSX.Element => {
+const SwapLayout = ({ stores, children }: Props): JSX.Element => {
   const { isTestnet } = stores.wallets.selectedOrFail;
   const location = useLocation();
 
   const menu = isTestnet ? null : (
     <SwapTabs
       onItemClick={route => {
-        stores.app.goToRoute({ route });
+        stores.routing.goToRoute({ route });
       }}
       isActiveItem={route => typeof route === 'string' && location.pathname === route}
     />
@@ -28,8 +27,7 @@ const SwapLayout = ({ stores, actions, children }: Props): JSX.Element => {
   return (
     <GeneralPageLayout
       stores={stores}
-      actions={actions}
-      navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title="Swap" />} menu={menu} />}
+      navbar={<NavBarContainerRevamp stores={stores} title={<NavBarTitle title="Swap" />} menu={menu} />}
     >
       <PortfolioTokenActivityProvider>{children}</PortfolioTokenActivityProvider>
     </GeneralPageLayout>

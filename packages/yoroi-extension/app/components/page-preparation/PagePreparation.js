@@ -56,7 +56,7 @@ export default class PagePreparation extends Component<StoresProps> {
         <Button
           variant="primary"
           onClick={() => {
-            this.props.stores.app.goToRoute({ route: ROUTES.SWAP.ROOT });
+            this.props.stores.routing.goToRoute({ route: ROUTES.SWAP.ROOT });
           }}
         >
           {this.context.intl.formatMessage(messages.back)}

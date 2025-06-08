@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { ROUTES } from '../../routes-config';
 import { Stack, Typography, Box, useTheme } from '@mui/material';
 import { NETWORK_BADGES } from '../../containers/NavBarContainerRevamp';

@@ -73,7 +73,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
     this.props.stores.wallets.setActiveWallet({
       publicDeriverId,
     });
-    this.props.stores.app.goToRoute({
+    this.props.stores.routing.goToRoute({
       route: ROUTES.WALLETS.TRANSACTIONS,
     });
   };

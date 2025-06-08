@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ampli } from '../../../../../../ampli/index';

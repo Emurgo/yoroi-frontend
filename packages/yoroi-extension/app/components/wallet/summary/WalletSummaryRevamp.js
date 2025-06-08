@@ -60,7 +60,7 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
-  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
+  +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
   +stores: StoresMap,
 |};
@@ -206,6 +206,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const { goToRoute, selectedWallet } = this.props;
     const { isBannerVisible } = this.state;
 
+    const onClose = () => {
+      this.setState({ isBannerVisible: false });
+      localStorage.setBringBannerClosed('true');
+    }
+
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
 
@@ -213,11 +218,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
 
     return (
       <BringBanner
-        onClose={() => {
-          this.setState({ isBannerVisible: false });
-          localStorage.setBringBannerClosed('true');
+        onClose={onClose}
+        onClick={() => {
+          goToRoute({ route: ROUTES.CASHBACK.ROOT });
+          onClose();
         }}
-        onClick={() => goToRoute({ route: ROUTES.CASHBACK.ROOT })}
         displayIllustration={false}
       />
     );

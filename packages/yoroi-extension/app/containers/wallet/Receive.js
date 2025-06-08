@@ -31,19 +31,19 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
     const rootRoute = buildRoute(ROUTES.WALLETS.RECEIVE.ROOT);
 
     const storesForWallet = allAddressSubgroups.filter(store => store.isRelated());
-    if (stores.app.currentRoute === rootRoute) {
+    if (stores.routing.currentRoute === rootRoute) {
       // if no store is specified, we just send the user to the first store in the list
       const firstRoute = routeForStore(storesForWallet[0].name);
       // we redirect otherwise it would break the back button
-      stores.app.redirect({ route: firstRoute });
+      stores.routing.replaceRoute({ route: firstRoute });
     } else {
       const currentSelectedStore = storesForWallet.find(
-        store => routeForStore(store.name) === stores.app.currentRoute
+        store => routeForStore(store.name) === stores.routing.currentRoute
       );
       // if user switched to a different wallet that doesn't support the store type selected
       if (currentSelectedStore == null) {
         // just send user to the first store supported by this wallet
-        stores.app.redirect({
+        stores.routing.replaceRoute({
           route: routeForStore(storesForWallet[0].name),
         });
       }
@@ -70,11 +70,11 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
       })
       .filter(storeInfo => !storeInfo.meta.isHidden({ result: storeInfo.request.all }))
       .map(storeInfo => ({
-        isActiveStore: stores.app.currentRoute.startsWith(
+        isActiveStore: stores.routing.currentRoute.startsWith(
           routeForStore(storeInfo.meta.name)
         ),
         setAsActiveStore: () =>
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: routeForStore(storeInfo.meta.name),
           }),
         name: storeInfo.meta.name,
