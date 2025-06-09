@@ -681,6 +681,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     letterSpacing: '0.2px',
                   },
                 }}
+                value={this.props.memo}
               />
               <Typography
                 component="div"
