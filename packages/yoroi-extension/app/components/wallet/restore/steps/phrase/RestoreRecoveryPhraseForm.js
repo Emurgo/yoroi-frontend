@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import validWords from 'bip39/src/wordlists/english.json';
 import LocalizableError from '../../../../../i18n/LocalizableError';
@@ -72,10 +71,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     initialRecoveryPhrase: '',
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     mounted: false,
   };
@@ -133,7 +129,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isValidMnemonic, numberOfMnemonics } = this.props;
     const { form } = this;
     const { recoveryPhrase } = form.values();

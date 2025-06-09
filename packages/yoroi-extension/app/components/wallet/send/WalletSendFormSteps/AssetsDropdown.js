@@ -4,8 +4,7 @@ import type { Node } from 'react';
 import { ReactComponent as ArrowUpIcon } from '../../../../assets/images/arrow-up.inline.svg';
 import { ReactComponent as ArrowDownIcon } from '../../../../assets/images/arrow-down.inline.svg';
 import globalMessages from '../../../../i18n/global-messages';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
 import { Box, Typography, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
@@ -115,10 +114,7 @@ type State = {|
 |};
 
 export default class AssetsDropdown extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isTokensOpen: false,
     isNftsOpen: false,
@@ -212,7 +208,7 @@ export default class AssetsDropdown extends Component<Props, State> {
   render(): Node {
     const { tokens, nfts } = this.props;
     const { isTokensOpen, isNftsOpen } = this.state;
-    const { intl } = this.context;
+    const intl = this.context;
     const tokensToggleBoxTitle = `${intl.formatMessage(globalMessages.tokens)} (${tokens.length})`;
     const nftsToggleBoxTitle = `${intl.formatMessage(globalMessages.nfts)} (${nfts.length})`;
     return (

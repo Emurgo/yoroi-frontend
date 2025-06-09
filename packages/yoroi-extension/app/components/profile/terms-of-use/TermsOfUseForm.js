@@ -4,8 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './TermsOfUseForm.scss';
 import globalMessages from '../../../i18n/global-messages';
@@ -44,10 +43,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     areTermsOfUseAccepted: false,
     showing: 'form',
@@ -68,6 +64,8 @@ export default class TermsOfUseForm extends Component<Props, State> {
     } else if (target.id === 'privacyLink') {
       this.setState({ showing: 'privacy' });
     }
+
+    return undefined;
   };
 
   onClickBack: () => void = () => {
@@ -75,7 +73,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   };
 
   renderForm(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isSubmitting, error } = this.props;
     const { areTermsOfUseAccepted } = this.state;
     return (
@@ -110,7 +108,13 @@ export default class TermsOfUseForm extends Component<Props, State> {
                     },
                   }}
                 >
-                  <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+                  <FormattedMessage
+                    {...globalMessages.tosAgreement}
+                    values={{
+                      tosLink: chunks => (<a href="." id="tosLink">{chunks}</a>),
+                      privacyLink: chunks => (<a href="." id="privacyLink">{chunks}</a>),
+                    }}
+                  />
                 </Box>
               }
               control={
@@ -153,7 +157,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
   }
 
   renderMarkdown(markdown: string): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">

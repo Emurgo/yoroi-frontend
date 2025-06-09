@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import RegisterDialog from '../../../../components/wallet/voting/RegisterDialog';
 import type { StoresProps } from '../../../../stores';
 
@@ -20,10 +19,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class RegisterDialogContainer extends Component<AllProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { submit, cancel, onError, stepsList, stores, goBack } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;

@@ -2,13 +2,12 @@
 import type { Node } from 'react';
 import type { AddressFilterKind, StandardAddress } from '../../types/AddressFilterTypes';
 import type { Notification } from '../../types/notification.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import type { TokenEntry, TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import { ReactComponent as VerifyIcon } from '../../assets/images/revamp/verify-icon.inline.svg';
 import { ReactComponent as GenerateURIIcon } from '../../assets/images/revamp/generate-uri.inline.svg';
@@ -87,9 +86,8 @@ type Props = {|
 
 @observer
 export default class WalletReceiveRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
+
   locationId: string = 'wallet:receive:infoPanel:footer';
 
   getAmount: TokenEntry => ?Node = tokenEntry => {
@@ -119,7 +117,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
     if (this.props.addressBook) {
       return { header: undefined, body: () => undefined };
     }
-    const { intl } = this.context;
+    const intl = this.context;
 
     const header = (
       <Typography component="h2" variant="body2" color="grayscale.500" textAlign="right">
@@ -142,7 +140,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
 
   render(): Node {
     const { walletAddresses, onVerifyAddress, onGeneratePaymentURI, onCopyAddressTooltip, notification } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const valueBlock = this.getValueBlock();
     const walletReceiveContent = (
       <div className={styles.generatedAddresses}>
