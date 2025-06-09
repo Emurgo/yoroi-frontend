@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
 import type { Notification } from '../../../types/notification.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { LoadingButton } from '@mui/lab';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { Box, Typography, styled } from '@mui/material';
@@ -53,17 +52,14 @@ export default class StandardHeaderRevamp extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   submit: void => Promise<void> = async () => {
     await this.props.onGenerateAddress();
   };
 
   render(): Node {
     const { walletAddress, isSubmitting, error, isWalletAddressUsed, onCopyAddressTooltip, notification } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const mainAddressNotificationId = 'mainAddress-copyNotification';
     const locationId = 'wallet:receive:infoPanel:header';
 
@@ -147,7 +143,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Box>
 
             <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
-              <FormattedHTMLMessage {...messages.walletReceiveInstructions} />
+              <FormattedMessage {...messages.walletReceiveInstructions} values={{ newLine: (<br/>) }}/>
             </Typography>
 
             {generateAddressForm}

@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -14,7 +14,6 @@ import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './ChangeWalletPasswordDialog.scss';
 import config from '../../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitleChangePassword: {
@@ -47,22 +46,19 @@ type Props = {|
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         currentPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.currentPasswordLabel),
+          label: this.context.formatMessage(messages.currentPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.currentPasswordValue,
         },
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+          label: this.context.formatMessage(globalMessages.newPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.newPasswordValue,
           validators: [
@@ -73,14 +69,14 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
               }
               return [
                 isValidWalletPassword(field.value),
-                this.context.intl.formatMessage(globalMessages.invalidWalletPassword),
+                this.context.formatMessage(globalMessages.invalidWalletPassword),
               ];
             },
           ],
         },
         repeatPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+          label: this.context.formatMessage(globalMessages.repeatPasswordLabel),
           placeholder: '',
           value: this.props.dialogData.repeatedPasswordValue,
           validators: [
@@ -89,7 +85,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
               if (walletPassword.length === 0) return [true];
               return [
                 isValidRepeatPassword(walletPassword, field.value),
-                this.context.intl.formatMessage(globalMessages.invalidRepeatPassword),
+                this.context.formatMessage(globalMessages.invalidRepeatPassword),
               ];
             },
           ],
@@ -131,7 +127,7 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, isSubmitting, dialogData, error } = this.props;
 
     const dialogClasses = classnames(['changePasswordDialog', styles.dialog]);

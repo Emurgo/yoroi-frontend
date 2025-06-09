@@ -1,8 +1,7 @@
 // @flow
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
@@ -42,10 +41,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {| menu: void |} = {
     menu: undefined,
   };

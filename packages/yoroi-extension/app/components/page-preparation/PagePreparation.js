@@ -1,6 +1,5 @@
 import { Typography, Box, Button } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
 import { ROUTES } from '../../routes-config';
@@ -27,10 +26,7 @@ const messages = defineMessages({
 });
 
 export default class PagePreparation extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     return (
       <Box
@@ -45,13 +41,13 @@ export default class PagePreparation extends Component<StoresProps> {
       >
         <UnexpectedError />
         <Typography variant="h3" fontWeight={500} mt="32px" mb="4px" color="ds.gray_max">
-          {this.context.intl.formatMessage(messages.preparation)}
+          {this.context.formatMessage(messages.preparation)}
         </Typography>
         <Typography color="ds.gray_600" variant="body1">
-          {this.context.intl.formatMessage(messages.goBack)}
+          {this.context.formatMessage(messages.goBack)}
         </Typography>
         <Typography color="ds.gray_600" variant="body1" mb="16px">
-          {this.context.intl.formatMessage(messages.somethingWrong)}
+          {this.context.formatMessage(messages.somethingWrong)}
         </Typography>
         <Button
           variant="primary"
@@ -59,7 +55,7 @@ export default class PagePreparation extends Component<StoresProps> {
             this.props.stores.routing.goToRoute({ route: ROUTES.SWAP.ROOT });
           }}
         >
-          {this.context.intl.formatMessage(messages.back)}
+          {this.context.formatMessage(messages.back)}
         </Button>
       </Box>
     );

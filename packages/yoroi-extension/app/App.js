@@ -4,10 +4,9 @@ import type { StoresMap } from './stores';
 import { Component, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter, useLocation, useNavigate } from 'react-router';
-import { addLocaleData } from 'react-intl';
 import { observable, autorun, runInAction } from 'mobx';
 import { YoroiRoutes } from './Routes';
-import { locales, translations } from './i18n/translations';
+import { translations } from './i18n/translations';
 import { Logger } from './utils/logging';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
@@ -22,16 +21,13 @@ import Support from './components/widgets/Support';
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
-// $FlowIgnore: suppressing this error
-import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
 import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
-
 import 'react-tooltip/dist/react-tooltip.css';
+import { IntlProvider } from 'react-intl';
+import { filterByValues } from './coreUtils';
 
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
@@ -97,12 +93,17 @@ class App extends Component<Props, State> {
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
-      const _mergedMessages = {
-        ...(await translations['en-US']),
-        ...(await translations[locale]),
-      };
+
+      const englishMessages = await translations['en-US'];
+      const localeMessages = await translations[locale];
+
+      // clean wrong format strings from locale messages
+      // to be removed after all locale messages get updated
+      const fixedLocaleMessages = filterByValues(localeMessages,
+          v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='));
+
       runInAction(() => {
-        this.mergedMessages = _mergedMessages;
+        this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
       });
     });
   };
@@ -121,13 +122,7 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
-    const mergedMessages = this.mergedMessages;
-    if (mergedMessages === null) {
-      return null;
-    }
-
     const { stores } = this.props;
-    const locale = stores.profile.currentLocale;
 
     Logger.debug(`[yoroi] messages merged`);
 
@@ -143,16 +138,23 @@ class App extends Component<Props, State> {
     const muiTheme = MuiThemes[currentTheme];
     Logger.debug(`[yoroi] themes changed`);
 
+    const locale = stores.profile.currentLocale;
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     return (
       <div style={{ height: '100%' }}>
         <ColorModeProvider>
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProviderWrapper locale={locale} messages={mergedMessages}>
-            {this.getContent()}
-          </IntlProviderWrapper>
+          <HashRouter>
+            <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
+              {this.getContent()}
+            </IntlProvider>
+          </HashRouter>
         </ColorModeProvider>
       </div>
     );
@@ -167,8 +169,6 @@ class App extends Component<Props, State> {
       return <MaintenancePage stores={stores} />;
     }
     return (
-      <HashRouter>
-        <IntlContextProvider>
           <NotificationsProvider
             walletsStore={stores.wallets}
             appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
@@ -180,8 +180,6 @@ class App extends Component<Props, State> {
               <RoutingHelper stores={stores}/>
             </div>
           </NotificationsProvider>
-        </IntlContextProvider>
-      </HashRouter>
     );
   };
 }
