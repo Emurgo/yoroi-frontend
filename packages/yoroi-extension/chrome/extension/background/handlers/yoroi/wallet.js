@@ -20,7 +20,6 @@ import {
   asDisplayCutoff,
   asGetSigningKey,
   asGetAllAccounting,
-  asHasLevels,
   asGetPublicKey,
 } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
@@ -292,11 +291,7 @@ export const RemoveAllTransactions: HandlerType<
 
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-    const withLevels = asHasLevels(publicDeriver);
-    if (!withLevels) {
-      throw new Error('unexpected missing asHasLevels result');
-    }
-    await removeAllTransactions({ publicDeriver: withLevels });
+    await removeAllTransactions({ publicDeriver });
 
     const txs = await loadSubmittedTransactions();
     if (!txs) {
@@ -345,10 +340,6 @@ export const RefreshTransactions: HandlerType<
 
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-    const withLevels = asHasLevels(publicDeriver);
-    if (!withLevels) {
-      throw new Error('unexpected missing asHasLevels result');
-    }
 
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     const adaApi = new AdaApi();
@@ -356,7 +347,7 @@ export const RefreshTransactions: HandlerType<
       ...BaseGetTransactionsRequest,
       ...AdaGetTransactionsRequest,
     |} = {
-      publicDeriver: withLevels,
+      publicDeriver,
       isLocalRequest: true,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
       getTransactionsByHashes: stateFetcher.getTransactionsByHashes,

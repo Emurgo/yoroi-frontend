@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import Voting from '../../../components/wallet/voting/Voting';
 import VotingRegistrationDialogContainer from '../dialogs/voting/VotingRegistrationDialogContainer';
 import { handleExternalLinkClick } from '../../../utils/routing';
@@ -20,11 +19,6 @@ const messages: * = defineMessages({
   mainTitle: {
     id: 'wallet.registrationOver.mainTitle',
     defaultMessage: '!!!Registration is not available',
-  },
-  mainSubtitle: {
-    id: 'wallet.registrationOver.mainSubtitle',
-    defaultMessage:
-      '!!!The registration period for fund {roundNumber} has ended. For more information, check the <a href="https://projectcatalyst.io/get-involved/become-a-voter" target="_blank"> Catalyst app. </a>',
   },
   unavailableTitle: {
     id: 'wallet.registrationOver.unavailableTitle',
@@ -58,7 +52,7 @@ const messages: * = defineMessages({
 
 @observer
 class VotingPageContent extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
+  static contextType:any = IntlContext;
 
   onClose: void => void = () => {
     this.props.stores.uiDialogs.closeActiveDialog();
@@ -69,7 +63,7 @@ class VotingPageContent extends Component<StoresProps> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const {
       uiDialogs,

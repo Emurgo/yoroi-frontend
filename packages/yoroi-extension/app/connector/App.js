@@ -4,18 +4,7 @@ import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { HashRouter as Router } from 'react-router';
-import { addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import vi from 'react-intl/locale-data/vi';
+import { IntlProvider } from 'react-intl';
 import { autorun, observable, runInAction } from 'mobx';
 import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
@@ -26,23 +15,6 @@ import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 import { ColorModeProvider } from '../styles/context/mode';
-// $FlowIgnore: suppressing this error
-import { IntlProviderWrapper, IntlContextProvider } from '../UI/common/context/IntlContextProvider';
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...pt,
-  ...id,
-  ...es,
-  ...vi,
-]);
 
 type Props = {|
   +stores: StoresMap,
@@ -104,9 +76,9 @@ class App extends Component<Props, State> {
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager />
-          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+          <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProviderWrapper>
+          </IntlProvider>
         </ColorModeProvider>
       </div>
     );
@@ -119,9 +91,7 @@ class App extends Component<Props, State> {
     }
     return (
       <Router>
-        <IntlContextProvider>
-          <YoroiRoutes stores={stores} />
-        </IntlContextProvider>
+        <YoroiRoutes stores={stores} />
       </Router>
     );
   };
