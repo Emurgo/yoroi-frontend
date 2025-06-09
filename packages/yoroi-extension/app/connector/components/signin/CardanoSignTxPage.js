@@ -1,7 +1,6 @@
 // @flow
 /* eslint-disable no-nested-ternary */
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import type { DefaultTokenEntry, TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { NetworkRow, TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -11,7 +10,7 @@ import type { CardanoConnectorSignRequest, SignSubmissionErrorType } from '../..
 import type LocalizableError from '../../../i18n/LocalizableError';
 import type { WalletType, WalletState } from '../../../../chrome/extension/background/types';
 import { Component } from 'react';
-import { intlShape, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
@@ -123,10 +122,7 @@ type DisplayAmount = {|
 
 @observer
 class SignTxPage extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -136,13 +132,13 @@ class SignTxPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          label: this.context.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -175,7 +171,11 @@ class SignTxPage extends Component<Props, State> {
             })
             .catch(error => {
               if (error instanceof WrongPassphraseError) {
-                this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                this.form
+                  .$('walletPassword')
+                  .invalidate(
+                    this.context.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -338,7 +338,7 @@ class SignTxPage extends Component<Props, State> {
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
 
-    const { intl } = this.context;
+    const intl = this.context;
     const { txData, onCancel, connectedWebsite, signData } = this.props;
 
     const { isSubmitting } = this.state;

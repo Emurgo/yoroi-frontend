@@ -2,11 +2,11 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 
 import imgWarningIcon from '../../../assets/img/warning-icon.svg';
 import styles from './WebAuthnTopBlock.scss';
+import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   noteText: {
@@ -22,10 +22,7 @@ type Props = {|
 
 @observer
 export default class WebAuthnTopBlock extends React.Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const {
       showWebAuthnTop,
@@ -50,7 +47,7 @@ export default class WebAuthnTopBlock extends React.Component<Props> {
             alt="Warning Icon"
           />
           <div className={styles.text}>
-            {<FormattedHTMLMessage {...messages.noteText} />}
+            {<FormattedMessage {...messages.noteText} values={{ strong }}/>}
           </div>
         </div>
       </div>

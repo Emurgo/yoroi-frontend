@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import SidebarContainer from '../SidebarContainer';
 import BannerContainer from '../banners/BannerContainer';
@@ -36,10 +35,7 @@ type Props = {|
 
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {
@@ -69,7 +65,7 @@ navigateToMyWallets: string => void = destination => {
 
 render(): Node {
   const { stores } = this.props;
-  const { intl } = this.context;
+  const intl = this.context;
   const selectedWallet = stores.wallets.selectedOrFail;
   const warning = this.getWarning(selectedWallet.publicDeriverId);
   const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
@@ -126,7 +122,7 @@ render(): Node {
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
             <ModalProvider>
               <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxProvider stores={stores} intl={this.context}>
                 <ReviewTxModal />
                 {this.props.children}
                 {this.getDialogs(intl, currentPool)}{' '}
@@ -161,7 +157,6 @@ getDialogs: (any, any) => Node = (intl, currentPool) => {
   )
     return (
       <PoolTransitionDialog
-        intl={intl}
         onClose={() => {
           stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
         }}

@@ -4,12 +4,11 @@ import type { Node } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Label, ResponsiveContainer } from 'recharts';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import styles from './GraphWrapper.scss';
 import CardShadow from './CardShadow';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { readCssVar } from '../../../../styles/utils';
 import { Skeleton } from '@mui/material';
 
@@ -230,16 +229,13 @@ type State = {|
 
 @observer
 export default class GraphWrapper extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     selectedTab: 0,
   }
 
   _getEpochLengthLabel: void => string = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { epochLength } = this.props;
     if (epochLength == null) {
       return intl.formatMessage(globalMessages.epochLabel);
@@ -251,7 +247,7 @@ export default class GraphWrapper extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { tabs } = this.props;
 
     return (

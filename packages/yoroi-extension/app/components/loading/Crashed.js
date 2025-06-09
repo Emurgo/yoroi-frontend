@@ -4,9 +4,8 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import styles from './Crashed.scss';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import UnavailableDialog from '../widgets/UnavailableDialog';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import { Link, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -22,12 +21,9 @@ type Props = {|
 
 @observer
 export default class Crashed extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <UnavailableDialog title={intl.formatMessage(messages.title)}>
@@ -43,7 +39,7 @@ export default class Crashed extends Component<Props> {
   }
 
   _getErrorMessageComponent: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onDownloadLogs } = this.props;
 
     const downloadLogsLink = (

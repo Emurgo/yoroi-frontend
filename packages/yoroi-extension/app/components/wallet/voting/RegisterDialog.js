@@ -1,11 +1,10 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StepsList } from './types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
 import classnames from 'classnames';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
@@ -40,9 +39,8 @@ type Props = {|
 
 @observer
 export default class RegisterDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
+
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
   @action
@@ -50,7 +48,7 @@ export default class RegisterDialog extends Component<Props> {
     this.spendingPasswordForm = form;
   }
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo, cancel, isProcessing, goBack, error } = this.props;
 
     const dailogActions = [

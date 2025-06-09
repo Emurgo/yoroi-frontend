@@ -55,12 +55,12 @@ const messages = defineMessages({
 @observer
 export default class TestText extends Component {
 
-  static contextTypes = {
+  static contextType:anys = {
     intl: intlShape.isRequired,
   };
 
   render() {
-    const { intl } = this.context;
+    const intl = this.context;
     return (<div>{intl.formatMessage(messages.testText)}</div>);
   }
 }
