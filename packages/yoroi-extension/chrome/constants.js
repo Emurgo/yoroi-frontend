@@ -57,11 +57,6 @@ export function genCSP(request: {|
   // cashback domain whitelist
   connectSrc.push('https://raw.githubusercontent.com');
 
-  // Swap
-  connectSrc.push('https://daehx1qv45z7c.cloudfront.net/swapConfig.json');
-  connectSrc.push('https://api-us.dexhunterv3.app/swap/tokens');
-  connectSrc.push('https://aggregator-v2.muesliswap.com/tokens');
-
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [
