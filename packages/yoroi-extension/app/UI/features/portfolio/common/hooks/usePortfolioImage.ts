@@ -89,16 +89,15 @@ export const usePortfolioImage = ({
   const query = useQuery({
     enabled: isMediaTypeSupported,
     staleTime: Infinity,
-    queryKey,
     queryFn: () => {
-      const count = queryClient.getQueryState(queryKey)?.dataUpdateCount
-      const cache = count ? `&cache=${count}` : ''
-      const url = `https://${network}.processed-media.yoroiwallet.com/${policy}/${name}?width=${width}&height=${height}&kind=${kind}&fit=${contentFit}${cache}`
-        
-      setLoading(true)
-      return url
+      const count = queryClient.getQueryState(queryKey)?.dataUpdateCount;
+      const cache = count ? `&cache=${count}` : '';
+      const url = `https://${network}.processed-media.yoroiwallet.com/${policy}/${name}?width=${width}&height=${height}&kind=${kind}&fit=${contentFit}${cache}`;
+
+      setLoading(true);
+      return url;
     },
-  })
+  });
 
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
   useEffect(() => () => clearTimeout(timerRef.current), [])
