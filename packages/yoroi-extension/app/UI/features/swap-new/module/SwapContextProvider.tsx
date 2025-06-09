@@ -9,7 +9,7 @@ import { Api, Chain, Portfolio, Swap } from '@yoroi/types';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
-import { useTokenInfo } from '../common/hooks/useTokensInfo';
+import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
@@ -68,13 +68,13 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     });
   }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
-  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {} } = useTokenInfo({
+  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {} } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
-    wallet: { networkId: Chain.Network.Mainnet, portfolioPrimaryTokenInfo: primaryTokenInfo },
+    primaryTokenInfo: primaryTokenInfo,
+    networkId: Chain.Network.Mainnet,
     excludedTokens,
   });
-
 
   // React.useEffect(() => {
   //   setLoadingSwapPage(prev => {

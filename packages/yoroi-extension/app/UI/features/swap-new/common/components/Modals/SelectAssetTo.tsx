@@ -51,8 +51,7 @@ export const SelectAssetTo = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { tokenInfos, swapForm, primaryTokenInfo, tokenInfoList } = useSwapRevamp();
-  const { swapConfig } = useSwapConfig();
+  const { swapForm, primaryTokenInfo, tokenInfoList } = useSwapRevamp();
   const { closeModal } = useModal();
   const { currency } = useCurrencyPairing();
 
@@ -63,24 +62,6 @@ export const SelectAssetTo = () => {
   const {
     ptActivity: { close: ptPrice },
   } = useCurrencyPairing();
-  console.log('tokenInfos', tokenInfos.values());
-  const verifiedTokens = React.useMemo(() => swapConfig?.verifiedTokens?.filter(ti => tokenInfos.has(ti)) ?? [], [
-    swapConfig?.verifiedTokens,
-    tokenInfos,
-  ]);
-  const secondaryTokenInfos = React.useMemo(() => {
-    return Array.from(tokenInfos.values()).filter(({ id }) => !verifiedTokens.includes(id));
-  }, [tokenInfos, verifiedTokens]);
-
-  const verifiedList = verifiedTokens.map(ti => tokenInfos.get(ti)).filter(isNonNullable);
-  // .filter(({ id }) => !ownedTokens.includes(id));  // TODO add owned tokens
-
-  const filteredAssets =
-    secondaryTokenInfos.filter(a => {
-      if (a == null) return false;
-      if (!searchTerm) return true;
-      return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
-    }) || [];
 
   const handleAssetClick = (assetId: string) => {
     swapForm.action({ type: 'TokenOutIdChanged', tokenId: assetId });

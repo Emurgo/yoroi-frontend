@@ -5,6 +5,10 @@ import { TokenIcon } from './TokenIcon/TokenIcon';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { undefinedToken } from '../constants';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
+import { usePortfolioTokenActivity } from '../../../portfolio/module/PortfolioTokenActivityProvider';
+import { useCurrencyPairing } from '../../../../context/CurrencyContext';
+import { bigNumberToBigInt } from '../../../portfolio/useCases/TokensTable/TableColumnsChip';
+import { atomicBreakdown } from '@yoroi/common';
 
 type AssetInputProps = {
   direction: 'in' | 'out';
@@ -24,8 +28,29 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const label = direction === 'in' ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
   const touched = tokenInput.isTouched;
-
   const tokenQuantity = swapForm.tokenInInput?.formatedAmount;
+
+  const {
+    tokenActivity: { secondaryToken24Activity },
+  } = usePortfolioTokenActivity();
+
+  const {
+    ptActivity: { close: primaryTokenActivity },
+  } = useCurrencyPairing();
+
+  let totalPrice: string | undefined;
+  const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
+
+  if (direction === 'in' && primaryTokenActivity != null) {
+    try {
+      const quantityBigInt = bigNumberToBigInt(token.quantity);
+      const activityBN = new BigNumber(primaryTokenActivity.toString());
+
+      totalPrice = atomicBreakdown(quantityBigInt, decimals).bn.times(tokenPrice).times(activityBN).toFormat(decimals);
+    } catch (err) {
+      console.error('Failed to calculate totalPrice:', err);
+    }
+  }
 
   const assetInputName = React.useMemo(() => {
     if (direction === 'in') {
