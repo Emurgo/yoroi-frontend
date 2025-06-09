@@ -41,7 +41,7 @@ import type {
   IChangePasswordRequest, IChangePasswordResponse,
 } from '../common/interfaces';
 import type {
-  IHasPrivateDeriver, IHasLevels, IHasSign, IConceptualWallet,
+  IConceptualWallet,
 } from '../ConceptualWallet/interfaces';
 
 import {
@@ -138,66 +138,11 @@ import type {
 import { derivePublicByAddressing } from '../../../cardanoCrypto/deriveByAddressing';
 import { addressBech32ToHex } from '../../../cardanoCrypto/utils';
 
-interface Empty {}
-type HasPrivateDeriverDependencies = IPublicDeriver<ConceptualWallet & IHasPrivateDeriver>;
-const HasPrivateDeriverMixin = (
-  superclass: Class<HasPrivateDeriverDependencies>,
-) => (class HasPrivateDeriver extends superclass {
-});
-export const HasPrivateDeriver: * = Mixin<
-  HasPrivateDeriverDependencies,
-  Empty,
->(HasPrivateDeriverMixin);
-export function asHasPrivateDeriver<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasPrivateDeriver> & Rest) {
-  if (obj instanceof HasPrivateDeriver) {
-    return obj;
-  }
-  return undefined;
-}
-
-type HasLevelsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
-const HasLevelsMixin = (
-  superclass: Class<HasLevelsDependencies>,
-) => (class HasLevels extends superclass {
-});
-export const HasLevels: * = Mixin<
-  HasLevelsDependencies,
-  Empty,
->(HasLevelsMixin);
-export function asHasLevels<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasLevels> & Rest) {
-  if (obj instanceof HasLevels) {
-    return obj;
-  }
-  return undefined;
-}
-
-type HasSignDependencies = IPublicDeriver<ConceptualWallet & IHasSign>;
-const HasSignMixin = (
-  superclass: Class<HasSignDependencies>,
-) => (class HasSign extends superclass {
-});
-export const HasSign: * = Mixin<
-  HasSignDependencies,
-  Empty,
->(HasSignMixin);
-export function asHasSign<Wrapper: ConceptualWallet, Rest=Empty>(
-  obj: IPublicDeriver<Wrapper> & Rest
-): void | (IPublicDeriver<Wrapper & IHasSign> & Rest) {
-  if (obj instanceof HasSign) {
-    return obj;
-  }
-  return undefined;
-}
-
 // ===============
 //   GetAllUtxos
 // ===============
 
-type GetAllUtxosDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+type GetAllUtxosDependencies = IPublicDeriver<ConceptualWallet>;
 const GetAllUtxosMixin = (
   superclass: Class<GetAllUtxosDependencies>,
 ) => (class GetAllUtxos extends superclass implements IGetAllUtxos {
@@ -540,7 +485,7 @@ export function asGetAllUtxos<T: IPublicDeriver<any>>(
 // ====================
 
 type GetAllAccountingFuncs = IGetAllAccounting & IGetStakingKey;
-type GetAllAccountingDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+type GetAllAccountingDependencies = IPublicDeriver<ConceptualWallet>;
 const GetAllAccountingMixin = (
   superclass: Class<GetAllAccountingDependencies>,
 ) => (class GetAllAccounting extends superclass implements GetAllAccountingFuncs {
@@ -702,7 +647,7 @@ export function asGetStakingKey<T: IPublicDeriver<any>>(
 //   AddBip44FromPublic
 // =====================
 
-type AddBip44FromPublicDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+type AddBip44FromPublicDependencies = IPublicDeriver<ConceptualWallet>;
 const AddBip44FromPublicMixin = (
   superclass: Class<AddBip44FromPublicDependencies>,
 ) => (class AddBip44FromPublic extends superclass implements IAddBip44FromPublic {
@@ -811,7 +756,7 @@ export function asAddBip44FromPublic<T: IPublicDeriver<any>>(
 //   DisplayCutoff
 // =================
 
-type DisplayCutoffDependencies = IPublicDeriver<ConceptualWallet & IHasLevels>;
+type DisplayCutoffDependencies = IPublicDeriver<ConceptualWallet>;
 const DisplayCutoffMixin = (
   superclass: Class<DisplayCutoffDependencies>,
 ) => (class DisplayCutoff extends superclass implements IDisplayCutoff {
@@ -1083,10 +1028,7 @@ const CardanoBip44PickReceiveMixin = (
   pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
     body,
   ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -1165,10 +1107,7 @@ const Cip1852PickReceiveMixin = (
   pickReceive: IPickReceiveRequest => Promise<IPickReceiveResponse> = async (
     body,
   ) => {
-    const withLevels = asHasLevels<ConceptualWallet>(this);
-    const derivationTables = withLevels == null
-      ? new Map()
-      : withLevels.getParent().getDerivationTables();
+    const derivationTables = this.getParent().getDerivationTables();
     const deps = Object.freeze({
       GetPathWithSpecific,
       GetAddress,
@@ -1228,7 +1167,7 @@ export function asPickReceive<T: IPublicDeriver<any>>(
 //   HasUtxoChains
 // =================
 
-type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
+type HasUtxoChainsDependencies = IPublicDeriver<ConceptualWallet> &
   IPickReceive & IDisplayCutoff;
 const HasUtxoChainsMixin = (
   superclass: Class<HasUtxoChainsDependencies>,
@@ -1477,7 +1416,7 @@ export function asGetPublicKey<T: IPublicDeriver<any>>(
 //   GetSigningKey
 // ==================
 
-type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet & IHasLevels & IHasSign>;
+type GetSigningKeyDependencies = IPublicDeriver<ConceptualWallet>;
 const GetSigningKeyMixin = (
   superclass: Class<GetSigningKeyDependencies>,
 ) => (class GetSigningKey extends superclass implements IGetSigningKey {
@@ -1735,7 +1674,7 @@ export function asScanLegacyCardanoAccountUtxoInstance<
 // ==========================
 
 type ScanShelleyAccountUtxoDependencies =
-  IPublicDeriver<ConceptualWallet & IHasLevels> & IGetStakingKey;
+  IPublicDeriver<ConceptualWallet> & IGetStakingKey;
 const ScanShelleyAccountUtxoMixin = (
   superclass: Class<ScanShelleyAccountUtxoDependencies>,
 ) => (class ScanShelleyAccountUtxo extends superclass implements IScanAccountUtxo {
@@ -1813,7 +1752,7 @@ export function asScanShelleyAccountUtxoInstance<
 // ===================
 
 // Abstract way to scan for new addresses given wallet has functionality to scan UTXOs
-type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
+type ScanUtxoAccountAddressesDependencies = IPublicDeriver<ConceptualWallet> &
   IHasUtxoChains & IGetPublic & IScanAccountUtxo & IAddBip44FromPublic;
 const ScanUtxoAccountAddressesMixin = (
   superclass: Class<ScanUtxoAccountAddressesDependencies>,
@@ -1985,7 +1924,7 @@ export function asScanUtxoAccountAddressesInstance<
 // ==================
 
 // Abstract way to scan for new addresses given wallet has functionality to scan UTXOs
-type ScanUtxoChainAddressesDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> &
+type ScanUtxoChainAddressesDependencies = IPublicDeriver<ConceptualWallet> &
   IGetPublic & IScanChainUtxo & IAddBip44FromPublic;
 const ScanUtxoChainAddressesMixin = (
   superclass: Class<ScanUtxoChainAddressesDependencies>,
@@ -2139,7 +2078,7 @@ export function asScanUtxoChainAddressesInstance<
 //   GetUtxoBalance
 // ==================
 
-type GetUtxoBalanceDependencies = IPublicDeriver<ConceptualWallet & IHasLevels> & IGetAllUtxos;
+type GetUtxoBalanceDependencies = IPublicDeriver<ConceptualWallet> & IGetAllUtxos;
 const GetUtxoBalanceMixin = (
   superclass: Class<GetUtxoBalanceDependencies>,
 ) => (class GetUtxoBalance extends superclass implements IGetUtxoBalance {
@@ -2283,7 +2222,7 @@ type AddBip44TraitsRequest = {|
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IConceptualWallet & IHasLevels & IHasSign,
+  conceptualWallet: IConceptualWallet,
   startClass: Class<Bip44PublicDeriver>,
 |};
 type AddBip44TraitsResponse = {|
@@ -2315,9 +2254,6 @@ export async function addTraitsForCardanoBip44(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasPrivateDeriver(currClass);
-  currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
   currClass = (GetAllUtxos(currClass): Class<IGetAllUtxos & Bip44PublicDeriver>);
 
   let publicKey;
@@ -2432,7 +2368,7 @@ export async function addTraitsForCip1852Child(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
   pubDeriverKeyDerivation: $ReadOnly<KeyDerivationRow>,
-  conceptualWallet: IConceptualWallet & IHasLevels & IHasSign,
+  conceptualWallet: IConceptualWallet,
   startClass: Class<Cip1852PublicDeriver>,
 ): Promise<{|
   finalClass: Class<Cip1852PublicDeriver>,
@@ -2445,9 +2381,6 @@ export async function addTraitsForCip1852Child(
    * If a trait X is added after trait Y
    * X must come before Y in this file (even if X doesn't depend on Y)
    */
-  currClass = HasPrivateDeriver(currClass);
-  currClass = HasLevels(currClass);
-  currClass = HasSign(currClass);
   currClass = GetAllUtxos(currClass);
   currClass = GetStakingKey(GetAllAccounting(currClass));
 

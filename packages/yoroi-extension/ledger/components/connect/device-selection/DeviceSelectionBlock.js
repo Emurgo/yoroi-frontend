@@ -2,8 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 
 import type {
   DeviceCodeType,
@@ -18,6 +17,7 @@ import { getTutorialLink } from '../../../utils/cmn';
 import imgExternalLink from '../../../assets/img/external-link.svg';
 
 import styles from './DeviceSelectionBlock.scss';
+import { strong } from '../../../../app/i18n/htmlEmbeddedMessageHelper';
 
 const message = defineMessages({
   deviceNanos: {
@@ -79,10 +79,7 @@ type Props = {|
 
 @observer
 export default class DeviceSelectionBlock extends React.Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   onExecuteActionClicked: (DeviceCodeType) => void  = (deviceCode) => {
     this.props.executeAction(deviceCode);
   };
@@ -92,7 +89,7 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       knownDeviceCode,
       currentOperationName,
@@ -137,13 +134,13 @@ export default class DeviceSelectionBlock extends React.Component<Props> {
             <div className={styles.deviceKnown}>
               <div className={styles.knowInfoBlock}>
                 <div className={styles.knownInfoText}>
-                  <FormattedHTMLMessage {...message.knownInfo1} values={{ deviceName }} />
+                  <FormattedMessage {...message.knownInfo1} values={{ deviceName, strong }}/>
                 </div>
                 <div className={styles.knownInfoText}>
                   {intl.formatMessage(message.knownInfo2)}
                 </div>
                 <div className={styles.knownInfoText}>
-                  <FormattedHTMLMessage {...message.knownInfo3} />
+                  <FormattedMessage {...message.knownInfo3} values={{ strong }}/>
                 </div>
               </div>
               <div className={styles.continueButtonBlock}>

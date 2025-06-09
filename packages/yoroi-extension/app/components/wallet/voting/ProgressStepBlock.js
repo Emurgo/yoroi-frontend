@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext } from 'react-intl';
 
 import ProgressSteps from '../../widgets/ProgressSteps';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
@@ -17,12 +16,9 @@ type Props = {|
 @observer
 export default class ProgressStepBlock extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stepsList, progressInfo } = this.props;
 
     const currentStep = stepsList.findIndex(({ step }) => step === progressInfo.currentStep);

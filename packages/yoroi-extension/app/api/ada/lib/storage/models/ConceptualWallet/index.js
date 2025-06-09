@@ -28,6 +28,7 @@ import type {
 } from '../../database/primitives/tables';
 import type { DefaultTokenEntry } from '../../../../../common/lib/MultiToken';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
+import { Bip44TableMap } from '../../database/walletTypes/bip44/api/utils';
 
 /** Snapshot of a ConceptualWallet in the database */
 export class ConceptualWallet implements IConceptualWallet, IRename {
@@ -37,15 +38,28 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   db: lf$Database;
   #conceptualWalletId: number;
-  #protocolMagic: string;
+  #publicDeriverLevel: number;
+  #privateDeriverLevel: number | null;
+  #privateDeriverKeyDerivationId: number | null;
+  #signingLevel: number | null;
   walletType: WalletType;
   hardwareInfo: ?$ReadOnly<HwWalletMetaRow>;
   networkInfo: $ReadOnly<NetworkRow>;
   defaultToken: $ReadOnly<TokenRow>;
 
-  constructor(data: IConceptualWalletConstructor): IConceptualWallet {
+  constructor(
+    data: IConceptualWalletConstructor,
+    publicDeriverLevel: number,
+    signingLevel: number | null,
+    privateDeriverLevel: number | null,
+    privateDeriverKeyDerivationId: number | null,
+  ): IConceptualWallet {
     this.db = data.db;
     this.#conceptualWalletId = data.conceptualWalletId;
+    this.#publicDeriverLevel = publicDeriverLevel;
+    this.#privateDeriverLevel = privateDeriverLevel;
+    this.#privateDeriverKeyDerivationId = privateDeriverKeyDerivationId;
+    this.#signingLevel = signingLevel;
     this.walletType = data.walletType;
     this.hardwareInfo = data.hardwareInfo;
     this.networkInfo = data.networkInfo;
@@ -55,6 +69,27 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
 
   getDb(): lf$Database {
     return this.db;
+  }
+
+  getPublicDeriverLevel(): number {
+    return this.#publicDeriverLevel;
+  }
+
+  getPrivateDeriverLevel(): number | null {
+    return this.#privateDeriverLevel;
+  }
+
+  getPrivateDeriverKeyDerivationId(): number | null {
+    return this.#privateDeriverKeyDerivationId;
+  }
+
+  getDerivationTables: void => Map<number, string> = () => {
+    // recall: cip1852 is an extension of bip44 so the tables are the same
+    return Bip44TableMap;
+  }
+
+  getSigningLevel(): number | null {
+    return this.#signingLevel;
   }
 
   getNetworkInfo(): $ReadOnly<NetworkRow> {

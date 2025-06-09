@@ -1042,7 +1042,7 @@ const globalMessages: * = defineMessages({
   tosAgreement: {
     id: 'profile.languageSelect.tosAgreement',
     defaultMessage:
-      '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+      '!!!I agree with <tosLink>Terms of Service Agreement</tosLink> and <privacyLink>Privacy Notice</privacyLink>',
   },
   poolNotGenerating: {
     id: 'wallet.transitionDialog.poolNotGenerating',
