@@ -64,6 +64,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
    */
   constructor(data: IPublicDeriverConstructor<Parent>): PublicDeriver<Parent> {
     this.publicDeriverId = data.publicDeriverId;
+    // $FlowIgnore
     this.parent = data.parent;
     this.pathToPublic = data.pathToPublic;
     this.derivationId = data.derivationId;

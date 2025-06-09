@@ -1,19 +1,17 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedMessage, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
 import styles from './BaseWarningDialog.scss';
 
 const messages = defineMessages({
   explanation2: {
     id: 'wallet.debugwallet.explanation2',
-    defaultMessage: '!!!To avoid any issues, do not use this wallet.<br />Instead, use Yoroi to create a new wallet.',
+    defaultMessage: '!!!To avoid any issues, do not use this wallet.{newLine}Instead, use Yoroi to create a new wallet.',
   },
   explanation3: {
     id: 'wallet.debugwallet.explanation3',
@@ -29,13 +27,10 @@ type Props = {|
 
 @observer
 export default class BaseWarningDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const contactSupportLink = (
       <a
@@ -57,7 +52,7 @@ export default class BaseWarningDialog extends Component<Props> {
         <div className={styles.component}>
           <div className={styles.header}>
             {this.props.explanationHeader}
-            <FormattedHTMLMessage {...messages.explanation2} />
+            <FormattedMessage {...messages.explanation2} values={{ newLine: (<br/>) }}/>
           </div>
           <FormattedMessage {...messages.explanation3} values={{ contactSupportLink }} />
         </div>

@@ -1,4 +1,6 @@
+import { WebDriver } from 'selenium-webdriver';
 import { defaultRepeatPeriod, defaultWaitTimeout } from './timeConstants.js';
+import { Logger } from 'simple-node-logger';
 
 class WindowManagerError extends Error {}
 
@@ -19,8 +21,11 @@ export const browserWindowType = Object.freeze({
 
 export class WindowManager {
   constructor(driver, logger) {
+    /**@type {WebDriver} */
     this.driver = driver;
+    /**@type {Array<{title: string, handle: string}>} */
     this.windowHandles = [];
+    /**@type {Logger} */
     this.logger = logger;
   }
 

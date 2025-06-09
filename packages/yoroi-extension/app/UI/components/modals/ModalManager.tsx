@@ -3,7 +3,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import * as React from 'react';
 import { IconWrapper, Icons } from '../icons/index';
 import { useModal } from './ModalContext';
 
@@ -41,7 +40,7 @@ export const ModalManager = () => {
       id={`${modalId}-dialogWindow-presentation`}
     >
       <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${modalId}-modalTitle-text`}>
-        <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900">
+        <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900" sx={{ textTransform: 'uppercase' }}>
           {title}
         </Typography>
       </DialogTitle>

@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -21,7 +21,6 @@ import { ReactComponent as AboutPrerequisiteIconSVG } from '../../../../assets/i
 import { ReactComponent as AboutTrezorSvg } from '../../../../assets/images/hardware-wallet/trezor/check-modern.inline.svg';
 
 import { ProgressInfo } from '../../../../types/HWConnectStoreTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import styles from '../common/CheckDialog.scss';
 import { Link, Box, styled, Stack, Typography } from '@mui/material';
 
@@ -88,12 +87,9 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class CheckDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;
 
     const middleBlock = (

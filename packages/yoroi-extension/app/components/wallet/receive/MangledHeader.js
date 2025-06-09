@@ -2,12 +2,11 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import WarningHeader from './WarningHeader';
 import { Button } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { addressSubgroupName } from '../../../types/AddressFilterTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   warning1: {
@@ -28,12 +27,9 @@ type Props = {|
 
 @observer
 export default class MangledHeader extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <>
@@ -48,7 +44,7 @@ export default class MangledHeader extends Component<Props> {
               </div><br />
               <div>
                 {intl.formatMessage(addressSubgroupName.mangled)}&nbsp;
-                <FormattedHTMLMessage {...globalMessages.auditAddressWarning} />
+                <FormattedMessage {...globalMessages.auditAddressWarning} />
               </div>
             </>
           )}

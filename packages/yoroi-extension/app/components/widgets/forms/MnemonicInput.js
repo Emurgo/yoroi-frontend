@@ -3,13 +3,12 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { join } from 'lodash';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import Autocomplete from '../../common/Autocomplete';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 type Props = {|
   +setForm: ReactToolboxMobxForm => void,
@@ -21,32 +20,29 @@ type Props = {|
 @observer
 export default class MnemonicInput extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
+        label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: '',
         value: [],
         validators: [({ field }) => {
           const value = join(field.value, ' ');
-          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
           if (this.props.mnemonicLength != null) {
             const wordsLeft = this.props.mnemonicLength - field.value.length;
             if (wordsLeft > 0) {
               return [
                 false,
-                this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+                this.context.formatMessage(globalMessages.shortRecoveryPhrase,
                   { number: wordsLeft })
               ];
             }
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
+            this.context.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },
@@ -66,7 +62,7 @@ export default class MnemonicInput extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const {
       validWords,

@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { FailedIlustration } from './FailedIlustration';
 import { useModal } from '../../../../components/modals/ModalContext';
 

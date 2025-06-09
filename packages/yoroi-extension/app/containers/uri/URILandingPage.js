@@ -13,13 +13,13 @@ export default class URILandingPage extends Component<StoresProps> {
   onClose: void => void = () => {
     const { stores } = this.props;
     this.props.stores.uiDialogs.closeActiveDialog();
-    stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+    stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
     stores.loading.resetUriParams();
   };
 
   onConfirm: void => void = () => {
     // this will automatically reroute to the right page if no wallet exists
-    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.SEND });
+    this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.SEND });
   };
 
   render(): Node {

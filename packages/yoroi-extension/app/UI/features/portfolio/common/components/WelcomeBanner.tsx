@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled } from '@mui/material';
-import React from 'react';
 import { WelcomeWallet } from '../../../../components/ilustrations/WelcomeWallet';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import { useStrings } from '../hooks/useStrings';

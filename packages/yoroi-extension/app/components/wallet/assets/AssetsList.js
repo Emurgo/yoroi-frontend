@@ -2,10 +2,9 @@
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import BigNumber from 'bignumber.js';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import styles from './AssetsList.scss';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as NoAssetLogo } from '../../../assets/images/assets-page/asset-no.inline.svg';
 import { ReactComponent as ArrowsListFromBottom } from '../../../assets/images/assets-page/arrows-list-from-bottom.inline.svg';
 import { ReactComponent as ArrowsListFromTop } from '../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
@@ -104,10 +103,7 @@ export function compareNumbers(x: string, y: string, newSortDirection: string): 
 }
 @observer
 export default class AssetsList extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     assetsList: [...this.props.assetsList],
     sortingDirection: null,
@@ -202,7 +198,7 @@ export default class AssetsList extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { assetsList } = this.state;
     const { assetDeposit, network } = this.props;
 

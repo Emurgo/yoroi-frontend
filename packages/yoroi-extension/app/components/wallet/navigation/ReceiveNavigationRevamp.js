@@ -2,10 +2,9 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
 import ReceiveNavButtonRevamp from './ReceiveNavButtonRevamp';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import {
   addressGroupName,
   addressSubgroupName,
@@ -37,17 +36,14 @@ export type Props = {|
 
 @observer
 export default class ReceiveNavigationRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   genTooltip: AddressStoreSubset => Node = store => {
-    const { intl } = this.context;
+    const intl = this.context;
     return <InfoTooltip content={intl.formatMessage(addressGroupsTooltip[store.name.group])}/>
   };
 
   createAccordionForGroup: ($PropertyType<Props, 'addressStores'>) => Node = stores => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const store = stores[0];
     if (stores.length === 1 && stores[0].name.subgroup === AddressSubgroup.all) {
@@ -121,7 +117,7 @@ export default class ReceiveNavigationRevamp extends Component<Props> {
   };
 
   generateFilterSection: void => ?Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { activeFilter } = this.props;
 

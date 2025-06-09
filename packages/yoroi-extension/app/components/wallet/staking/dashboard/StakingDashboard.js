@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import GraphWrapper from './GraphWrapper';
 import type { GraphItems } from './GraphWrapper';
@@ -16,7 +16,6 @@ import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import { ReactComponent as InvalidURIImg } from '../../../../assets/images/uri/invalid-uri.inline.svg';
 import ErrorBlock from '../../../widgets/ErrorBlock';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Skeleton, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -80,16 +79,13 @@ type Props = {|
 
 @observer
 export default class StakingDashboard extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
 render(): Node {
   const { graphData, isUnregistered } = this.props;
 
   const pendingTxWarningComponent = this.props.hasAnyPending ? (
     <div className={styles.warningBox}>
-      <WarningBox>{this.context.intl.formatMessage(messages.pendingTxWarning)}</WarningBox>
+      <WarningBox>{this.context.formatMessage(messages.pendingTxWarning)}</WarningBox>
     </div>
   ) : null;
 
@@ -99,9 +95,9 @@ render(): Node {
       {/* <GraphWrapper
             themeVars={this.props.themeVars}
             tabs={[
-              this.context.intl.formatMessage(messages.positionsLabel),
-              this.context.intl.formatMessage(globalMessages.marginsLabel),
-              this.context.intl.formatMessage(messages.costsLabel),
+              this.context.formatMessage(messages.positionsLabel),
+              this.context.formatMessage(globalMessages.marginsLabel),
+              this.context.formatMessage(messages.costsLabel),
             ]}
             graphName="positions"
             data={graphData.positionsGraphData}
@@ -127,7 +123,7 @@ render(): Node {
 }
 
 _displayGraph: RewardsGraphData => Node = graphData => {
-  const { intl } = this.context;
+  const intl = this.context;
   if (graphData.error) {
     return (
       <div className={styles.poolError}>
@@ -169,7 +165,7 @@ displayStakePools: boolean => Node = isUnregistered => {
     !isUnregistered ? styles.stakePoolMaxWidth : null,
     styles.stakePool,
   ]);
-  const { intl } = this.context;
+  const intl = this.context;
   if (this.props.stakePools.error) {
     return (
       <div className={styles.poolError}>

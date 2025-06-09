@@ -13,7 +13,6 @@ export const ROUTES = {
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
-  SWITCH: '/switch',
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',
@@ -79,6 +78,12 @@ export const ROUTES = {
   EXCHANGE_END: '/exchange-end',
 
   // NEW UI ROUTES
+  SWAP_REVAMP: {
+    ASSET_SWAP: '/swap-revamp',
+    ORDERS: '/swap-revamp/orders',
+    // $FlowIgnore
+    ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
+  },
   Governance: {
     ROOT: '/governance',
     DELEGATE: '/governance/delagation',

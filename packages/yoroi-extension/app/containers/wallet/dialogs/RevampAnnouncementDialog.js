@@ -3,13 +3,12 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import Dialog from '../../../components/widgets/Dialog';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import bannerPng from '../../../assets/images/banner-yoroi-announcement-modal.png';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
 import styles from './RevampAnnouncementDialog.scss';
 import { Box, Stack, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import semver from 'semver/preload';
 
 const messages = defineMessages({
@@ -54,6 +53,14 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.7new',
     defaultMessage: '!!!Side menu scroll',
   },
+  update8: {
+    id: 'wallet.revampAnnouncement.updates.8new',
+    defaultMessage: '!!!In app notifications (receive notifications when a transactions is confirmed)',
+  },
+  update9: {
+    id: 'wallet.revampAnnouncement.updates.9new',
+    defaultMessage: '!!!Redesigned transaction preview interface (Review transactions at a glance before signing)',
+  },
   goToWalletLabel: {
     id: 'wallet.revampAnnouncement.goToWalletLabel',
     defaultMessage: '!!!Go to the wallet',
@@ -73,6 +80,8 @@ const ANNOUNCEMENT_MESSAGES: Array<[string, Object]> = [
   ['5.6.0', messages.update5],
   ['5.7.0', messages.update6],
   ['5.7.0', messages.update7],
+  ['5.8.0', messages.update8],
+  ['5.8.0', messages.update9],
 ];
 
 export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =
@@ -80,12 +89,9 @@ export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =
 
 @observer
 export class RevampAnnouncementDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onClose, lastAnnouncedFeatureVersion } = this.props;
     const actions = [
       {

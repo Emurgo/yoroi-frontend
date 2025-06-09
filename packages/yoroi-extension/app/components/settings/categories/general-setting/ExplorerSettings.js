@@ -5,12 +5,11 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Box, Typography } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './ExplorerSettings.scss';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ExplorerRow } from '../../../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
@@ -38,10 +37,7 @@ export default class ExplorerSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   selectExplorer: (string) => Promise<void> = async explorerId => {
     await this.props.onSelectExplorer({ explorerId });
   };
@@ -49,7 +45,7 @@ export default class ExplorerSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       explorerId: {
-        label: this.context.intl.formatMessage(globalMessages.blockchainExplorer),
+        label: this.context.formatMessage(globalMessages.blockchainExplorer),
         value: this.props.selectedExplorer.selected.ExplorerId,
       },
     },
@@ -57,7 +53,7 @@ export default class ExplorerSettings extends Component<Props> {
 
   render(): Node {
     const { isSubmitting, error } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const explorerId = form.$('explorerId');
     const componentClassNames = classNames([styles.component, 'explorer']);

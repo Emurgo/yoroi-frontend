@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { PasswordInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { Ilustration } from './Ilustration';

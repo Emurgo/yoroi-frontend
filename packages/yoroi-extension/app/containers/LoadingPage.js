@@ -7,9 +7,10 @@ import Loading from '../components/loading/Loading';
 import { handleExternalLinkClick } from '../utils/routing';
 import { downloadLogs } from '../utils/logging';
 import type { ConnectorStoresProps } from '../connector/stores';
+import type { StoresProps } from '../stores';
 
 @observer
-export default class LoadingPage extends Component<ConnectorStoresProps> {
+export default class LoadingPage extends Component<ConnectorStoresProps | StoresProps> {
 
   render(): Node {
     return (

@@ -286,7 +286,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
   const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, order: any) => {
     try {
       startLoadingTxReview();
-      const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+      const { signedTxHex: signedCancelTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
         wallet,
         transactionHex: cancelTxCbor,
         password: passswordInput,
@@ -322,7 +322,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
 
     try {
-      const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+      const { signedTxHex: signedCollateralReorgTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
         wallet,
         transactionHex: collateralReorgTxObj.cbor,
         password: passswordInput,

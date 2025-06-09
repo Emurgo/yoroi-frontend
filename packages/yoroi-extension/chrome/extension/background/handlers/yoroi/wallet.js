@@ -2,7 +2,7 @@
 import type { HandlerType } from './type';
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getNetworkById } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import AdaApi, { genOwnStakingKey } from '../../../../../app/api/ada';
+import AdaApi from '../../../../../app/api/ada';
 import { getDb, syncWallet } from '../../state';
 import { emitUpdateToSubscriptions } from '../../subscriptionManager';
 import type { WalletState } from '../../types';
@@ -20,7 +20,6 @@ import {
   asDisplayCutoff,
   asGetSigningKey,
   asGetAllAccounting,
-  asHasLevels,
   asGetPublicKey,
 } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import {
@@ -32,6 +31,7 @@ import type { AdaGetTransactionsRequest } from '../../../../../app/api/ada';
 import { updateProtocolParametersCacheFromNetwork } from './protocolParameters';
 import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet';
 import type { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver';
+import { genOwnStakingKey } from '../../../../../app/api/ada/staking';
 
 type CreateWalletRequest = {|
   networkId: number,
@@ -291,11 +291,7 @@ export const RemoveAllTransactions: HandlerType<
 
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-    const withLevels = asHasLevels(publicDeriver);
-    if (!withLevels) {
-      throw new Error('unexpected missing asHasLevels result');
-    }
-    await removeAllTransactions({ publicDeriver: withLevels });
+    await removeAllTransactions({ publicDeriver });
 
     const txs = await loadSubmittedTransactions();
     if (!txs) {
@@ -344,10 +340,6 @@ export const RefreshTransactions: HandlerType<
 
   handle: async (request) => {
     const publicDeriver = await getPublicDeriverById(request.publicDeriverId);
-    const withLevels = asHasLevels(publicDeriver);
-    if (!withLevels) {
-      throw new Error('unexpected missing asHasLevels result');
-    }
 
     const stateFetcher = await getCardanoStateFetcher(new LocalStorageApi());
     const adaApi = new AdaApi();
@@ -355,7 +347,7 @@ export const RefreshTransactions: HandlerType<
       ...BaseGetTransactionsRequest,
       ...AdaGetTransactionsRequest,
     |} = {
-      publicDeriver: withLevels,
+      publicDeriver,
       isLocalRequest: true,
       getRecentTransactionHashes: stateFetcher.getRecentTransactionHashes,
       getTransactionsByHashes: stateFetcher.getTransactionsByHashes,
