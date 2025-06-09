@@ -43,11 +43,10 @@ import {
   asGetPublicKey,
   asGetSigningKey,
   asGetStakingKey,
-  asHasLevels,
   asHasUtxoChains,
 } from './lib/storage/models/PublicDeriver/traits';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet/index';
-import { type IHasLevels, WalletTypeOption } from './lib/storage/models/ConceptualWallet/interfaces';
+import { WalletTypeOption } from './lib/storage/models/ConceptualWallet/interfaces';
 import type {
   Address,
   Addressing,
@@ -184,7 +183,7 @@ export type GetAllAddressesForDisplayResponse = Array<AddressDetails>;
 // getChainAddressesForDisplay
 
 export type GetChainAddressesForDisplayRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IHasUtxoChains & IDisplayCutoff,
   chainsRequest: IHasUtxoChainsRequest,
   type: CoreAddressT,
 |};
@@ -502,7 +501,7 @@ export type CreateHardwareWalletFunc = (
 // getTransactionRowsToExport
 
 export type GetTransactionRowsToExportRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
   getDefaultToken: number => $ReadOnly<TokenRow>,
 |};
 export type GetTransactionRowsToExportResponse = Array<TransactionExportRow>;
@@ -2540,12 +2539,8 @@ export async function getDRepKeyAndAddressing(
   if (withPubKey == null) {
     throw new Error('Unable to get public key from the wallet');
   }
-  const withLevels = asHasLevels(wallet);
-  if (withLevels == null) {
-    throw new Error('Unable to get derivation levels from the wallet');
-  }
   const publicKey = (await withPubKey.getPublicKey()).Hash;
-  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
+  const publicDeriverLevel = wallet.getParent().getPublicDeriverLevel();
   return pubKeyAndAddressingByChainAndIndex(
     {
       publicKey,
@@ -2619,11 +2614,6 @@ export async function walletSignData(
     password,
   });
 
-  const withLevels = asHasLevels(publicDeriver);
-  if (!withLevels) {
-    throw new Error('unable to get levels');
-  }
-
   const addressing = await getAddressing(publicDeriver, address);
   if (!addressing) {
     throw new Error('key derivation path does not exist');
@@ -2633,7 +2623,7 @@ export async function walletSignData(
     addressing: addressing.addressing,
     startingFrom: {
       key: RustModule.WalletV4.Bip32PrivateKey.from_hex(normalizedKey.prvKeyHex),
-      level: withLevels.getParent().getPublicDeriverLevel(),
+      level: publicDeriver.getParent().getPublicDeriverLevel(),
     },
   }).to_raw_key();
 
