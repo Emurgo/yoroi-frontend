@@ -1,6 +1,6 @@
 {
   "name": "yoroi-schema",
-  "version": 18,
+  "version": 19,
   "tables": {
     "Network": [
       {
