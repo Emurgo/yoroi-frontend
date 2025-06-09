@@ -52,7 +52,7 @@ export const Collapsible = ({ title, content, expanded: startExpanded }: Props) 
       <AccordionSummary
         aria-controls="panel1d-content"
         id="panel1d-header"
-        expandIcon={<IconWrapper icon={Icons.ChevronDown} asButton />}
+        expandIcon={<IconWrapper buttonProps={{style: {padding: '0px'}}} icon={Icons.ChevronDown} asButton />}
       >
         <Typography variant="body1" fontWeight="500">
           {title}
