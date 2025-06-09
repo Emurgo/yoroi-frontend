@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxStatusCodesType } from '../../../api/ada/lib/storage/database/primitives/enums';
@@ -14,7 +13,7 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import BigNumber from 'bignumber.js';
@@ -78,11 +77,7 @@ type State = {|
 
 @observer
 export default class TransactionRevamp extends Component<Props, State> {
-  static contextTypes: {|
-    intl: $npm$ReactIntl$IntlFormat,
-  |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
 
   state: State = {
     isExpanded: false,
@@ -92,14 +87,8 @@ export default class TransactionRevamp extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxType(
-    intl: $npm$ReactIntl$IntlFormat,
-    currency: string,
-    data: WalletTransaction
-  ): {|
-    icon: string,
-    msg: string,
-  |} {
+  getTxType(currency: string, data: WalletTransaction): {| icon: string, msg: string |} {
+    const intl = this.context;
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return { icon: 'send', msg: intl.formatMessage(messages.sent, { currency }) };
@@ -151,7 +140,8 @@ export default class TransactionRevamp extends Component<Props, State> {
     return { icon: '', msg: '???' };
   }
 
-  getStatusString(intl: $npm$ReactIntl$IntlFormat, state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+  getStatusString(state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+    const intl = this.context;
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
     }
@@ -391,7 +381,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     return (
       <Typography component="div" variant="body2" fontWeight={500} color="ds.text_gray_medium">
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.formatMessage(globalMessages.assets)}
       </Typography>
     );
   };
@@ -487,7 +477,7 @@ export default class TransactionRevamp extends Component<Props, State> {
     const data = this.props.data;
     const { state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
-    const { intl } = this.context;
+    const intl = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
     const isFailedTransaction = state < 0 && !isSubmittedTransaction;
     const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
@@ -499,8 +489,8 @@ export default class TransactionRevamp extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
-    const txType = this.getTxType(intl, this.getTicker(data.amount.getDefaultEntry()), data);
+    const status = this.getStatusString(state, assuranceLevel, isValidTransaction);
+    const txType = this.getTxType(this.getTicker(data.amount.getDefaultEntry()), data);
 
     const txIdBasePart = `${this.props.id}:transaction_${this.props.txIndex}`;
     const txIdFullInfoBasePart = `${txIdBasePart}:txFullInfo`;
@@ -840,7 +830,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = address => {
-    const { intl } = this.context;
+    const intl = this.context;
     const addressInfo = this.props.addressLookup(address);
     if (addressInfo == null) {
       return (
@@ -869,7 +859,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
+    const intl = this.context;
     const kind = certificate.Kind;
     return RustModule.WasmScope(Scope => {
       switch (kind) {
@@ -915,7 +905,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getWithdrawals: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
-    const { intl } = this.context;
+    const intl = this.context;
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
     }
@@ -973,7 +963,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getCertificate: (WalletTransaction, string) => ?Node = (data, txIdFullInfoBasePart) => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
       <Box display="flex" flexDirection="column" gap="8px" mb="16px">
@@ -1007,7 +997,7 @@ export default class TransactionRevamp extends Component<Props, State> {
   };
 
   getMetadata: WalletTransaction => ?Node = data => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata != null) {
       let metadata;

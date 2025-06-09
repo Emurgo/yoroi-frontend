@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
-import { useIntl } from '../../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -156,7 +156,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return React.useRef({
     tolatValue: intl.formatMessage(messages.tolatValue),
     confirmHardware: intl.formatMessage(messages.confirmHardware),

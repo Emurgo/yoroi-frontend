@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
-import { intlShape, } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -15,7 +15,6 @@ import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswo
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type {
@@ -51,10 +50,7 @@ type LocalProps = {|
 @observer
 export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };
@@ -127,7 +123,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -158,7 +154,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
         />
       ) : null;
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <TransferSummaryPage

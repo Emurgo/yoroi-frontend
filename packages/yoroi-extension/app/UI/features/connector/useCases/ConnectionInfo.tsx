@@ -1,7 +1,7 @@
 import type { WhitelistEntryType, WalletStateType } from '../types';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { useIntl } from '../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import NoDapp from '../../../../UI/components/ilustrations/NoDapp';
 import ConnectedWallet from './ConnectedWallet';
@@ -19,7 +19,7 @@ const messages = {
 };
 
 const ConnectionInfo: React.FC<Props> = ({ connectedWebsite, connectedWallet }) => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   const url = connectedWebsite?.url ?? '';
   const faviconUrl = connectedWebsite?.image ?? '';
 
