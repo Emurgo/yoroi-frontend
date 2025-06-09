@@ -26,6 +26,7 @@ import { ROUTES } from './routes-config';
 import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
+import { filterByValues } from './coreUtils';
 
 
 type Props = {|
@@ -92,12 +93,17 @@ class App extends Component<Props, State> {
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
-      const _mergedMessages = {
-        ...(await translations['en-US']),
-        ...(await translations[locale]),
-      };
+
+      const englishMessages = await translations['en-US'];
+      const localeMessages = await translations[locale];
+
+      // clean wrong format strings from locale messages
+      // to be removed after all locale messages get updated
+      const fixedLocaleMessages = filterByValues(localeMessages,
+          v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='));
+
       runInAction(() => {
-        this.mergedMessages = _mergedMessages;
+        this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
       });
     });
   };
