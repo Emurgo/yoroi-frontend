@@ -110,10 +110,10 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
 
       <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
-          {intl.formatMessage(globalMessages.bannerTitle)}
+          {intl.formatMessage(globalMessages.governanceBannerTitle)}
         </Typography>
         <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
-          {intl.formatMessage(globalMessages.bannerText)}
+          {intl.formatMessage(globalMessages.governanceBannerText)}
         </Typography>
         <Button
           //  @ts-ignore

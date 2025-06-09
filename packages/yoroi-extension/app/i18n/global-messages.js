@@ -200,11 +200,11 @@ const globalMessages: * = defineMessages({
     id: 'governance.considerDelegating',
     defaultMessage: '!!!Consider delegating to Yoroi?',
   },
-  bannerTitle: {
+  governanceBannerTitle: {
     id: 'governance.banner.title',
     defaultMessage: '!!!New to Governance? Start here',
   },
-  bannerText: {
+  governanceBannerText: {
     id: 'governance.banner.text',
     defaultMessage: '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.',
   },
