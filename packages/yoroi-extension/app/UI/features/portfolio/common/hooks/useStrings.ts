@@ -101,9 +101,9 @@ export const messages = Object.freeze(
       id: 'portfolio.tokenInfo.marketPrice',
       defaultMessage: '!!!Market price',
     },
-    description: {
-      id: 'portfolio.tokenInfo.overview.description',
-      defaultMessage: '!!!Description',
+    info: {
+      id: 'portfolio.tokenInfo.overview.info',
+      defaultMessage: '!!!Info',
     },
     website: {
       id: 'portfolio.tokenInfo.overview.website',
@@ -341,7 +341,7 @@ export const useStrings = () => {
     lendAndBorrow: intl.formatMessage(messages.lendAndBorrow),
     balance: intl.formatMessage(messages.balance),
     marketPrice: intl.formatMessage(messages.marketPrice),
-    description: intl.formatMessage(messages.description),
+    info: intl.formatMessage(messages.info),
     website: intl.formatMessage(messages.website),
     policyId: intl.formatMessage(messages.policyId),
     fingerprint: intl.formatMessage(messages.fingerprint),
@@ -365,7 +365,7 @@ export const useStrings = () => {
     '1M': intl.formatMessage(messages['1M']),
     '6M': intl.formatMessage(messages['6M']),
     '1Y': intl.formatMessage(messages['1Y']),
-    ALL: intl.formatMessage(messages['ALL']),
+    ALL: intl.formatMessage(messages.ALL),
     portfolio: intl.formatMessage(messages.portfolio),
     totalAmount: intl.formatMessage(messages.totalAmount),
     transactionHistory: intl.formatMessage(messages.transactionHistory),
