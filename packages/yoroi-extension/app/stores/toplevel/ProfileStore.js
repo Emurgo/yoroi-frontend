@@ -61,6 +61,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     },
     ...(this._isFirefox ? [] : [this._analyticsStep]),
     {
+      // <TODO:PENDING_REMOVAL>
       isDone: () => this.isComplexityLevelSelected,
       action: async () => {
         const route = ROUTES.PROFILE.COMPLEXITY_LEVEL;
@@ -73,11 +74,7 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
     {
       isDone: () => !environment.isNightly() || this.acceptedNightly,
       action: async () => {
-        const route = ROUTES.NIGHTLY_INFO;
-        if (this.stores.routing.currentRoute === route) {
-          return;
-        }
-        this.stores.routing.goToRoute({ route });
+        this.stores.routing.goToRoute({ route: ROUTES.NIGHTLY_INFO });
       },
     },
     {

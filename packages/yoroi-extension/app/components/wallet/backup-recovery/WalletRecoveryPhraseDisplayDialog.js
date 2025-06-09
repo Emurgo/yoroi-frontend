@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -11,7 +11,6 @@ import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseDisplayDialog.scss';
 import { ReactComponent as RecoveryPhraseSvg }  from '../../../assets/images/recovery-phrase.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   backupInstructions: {
@@ -35,12 +34,9 @@ type Props = {|
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       recoveryPhrase,
       onStartWalletBackup,
@@ -69,7 +65,7 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         <span className={styles.recoveryImage}><RecoveryPhraseSvg/></span>
 
         <WalletRecoveryInstructions
-          instructionsText={<FormattedHTMLMessage {...messages.backupInstructions} />}
+          instructionsText={<FormattedMessage {...messages.backupInstructions} />}
         />
         <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} />
       </Dialog>

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { getPrivateStakingKey, getProtocolParameters } from '../../../../api/thunk';
 import { useModal } from '../../../components/modals/ModalContext';
-import { IntlProvider } from '../../../context/IntlProvider';
 import { YoroiUnsignedTx } from '../../../types/yoroi';
 import { addressHexToBech32 } from '../../../utils/common';
 import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo';
@@ -48,12 +47,10 @@ export const ReviewTxProvider = ({
   children,
   initialState,
   stores,
-  intl,
 }: {
   children: React.ReactNode;
   initialState?: ModalState;
   stores: any;
-  intl: any;
 }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const [stakeKeyDeposit, setStakingKeyDeposit] = React.useState(0);
@@ -179,7 +176,7 @@ export const ReviewTxProvider = ({
 
   return (
     <ModalContext.Provider value={context}>
-      <IntlProvider intl={intl}>{children}</IntlProvider>
+      {children}
     </ModalContext.Provider>
   );
 };

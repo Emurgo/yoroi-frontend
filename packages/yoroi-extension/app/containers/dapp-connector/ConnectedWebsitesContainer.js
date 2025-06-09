@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -20,10 +19,7 @@ const ConnectedWebsitesPage = lazy(ConnectedWebsitesPagePromise);
 
 @observer
 export default class ConnectedWebsitesPageContainer extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   async componentDidMount() {
     await this.props.stores.connector.refreshActiveSites();
     await this.props.stores.connector.getConnectorWhitelist();
@@ -43,7 +39,7 @@ export default class ConnectedWebsitesPageContainer extends Component<StoresProp
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
     const wallets = this.props.stores.wallets.wallets;
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <TopBarLayout

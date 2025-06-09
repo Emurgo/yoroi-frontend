@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletRestoreVerifyDialog.scss';
 import DialogBackButton from '../widgets/DialogBackButton';
@@ -18,7 +18,6 @@ import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type { Notification } from '../../types/notification.types';
 import CenteredLayout from '../layout/CenteredLayout';
 import type { WalletChecksum } from '@emurgo/cip4-js';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateAddress } from '../../utils/formatters';
 import type { PlateWithMeta } from '../../stores/toplevel/WalletRestoreStore';
 import { Box, Typography } from '@mui/material';
@@ -65,10 +64,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   generatePlate(title: string, plate: WalletChecksum): Node {
     return (
       <Box key={title}>
@@ -131,7 +127,7 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { error, isSubmitting, onCancel, onNext, onCopyAddressTooltip, notification } = this.props;
 
     const dialogClasses = classnames(['walletRestoreVerifyDialog', styles.dialog]);
@@ -159,17 +155,17 @@ export default class WalletRestoreVerifyDialog extends Component<Props> {
         <ul>
           <li className={styles.smallTopMargin}>
             <Typography component="span" variant="body1" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine2} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine2} />
             </Typography>
           </li>
           <li className={styles.smallTopMargin}>
             <Typography component="span" variant="body1" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine3} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine3} />
             </Typography>
           </li>
           <li className={styles.smallTopMargin}>
             <Typography component="span" variant="body1" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...messages.walletRestoreVerifyIntroLine4} />
+              <FormattedMessage {...messages.walletRestoreVerifyIntroLine4} />
             </Typography>
           </li>
         </ul>
