@@ -1,5 +1,4 @@
 import { IconButton, styled } from '@mui/material';
-import React from 'react';
 import { Icons, IconWrapper } from '../../../../components';
 
 export const SwitchAssets = () => {

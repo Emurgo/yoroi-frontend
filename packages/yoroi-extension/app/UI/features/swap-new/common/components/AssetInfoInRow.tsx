@@ -1,5 +1,4 @@
 import { Stack, Typography, useTheme } from '@mui/material';
-import React from 'react';
 import { Icons, IconWrapper } from '../../../../components';
 
 export const AssetInfoInRow = () => {

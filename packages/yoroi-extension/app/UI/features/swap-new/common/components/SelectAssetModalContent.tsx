@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { useStrings } from '../hooks/useStrings';
@@ -81,4 +81,3 @@ export const SelectAssetModalContent = ({ assets = [] }: any) => {
     </Stack>
   );
 };
-
