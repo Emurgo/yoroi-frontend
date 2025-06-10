@@ -794,6 +794,7 @@
   "wallet.infoDialog.title": "提示",
   "wallet.insufficientFunds.subtitle": "参与需要至少{requiredBalance}{tokenName}，但你仅有{currentBalance}。未提取的奖励不计入此金额。",
   "wallet.insufficientFunds.title": "资金不足",
+  "wallet.insufficientFunds.subtitleHidden": "Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.",
   "wallet.loading": "加载中...",
   "wallet.nav.addButton": "添加新钱包",
   "wallet.nav.addNewWallet": "添加新钱包",
