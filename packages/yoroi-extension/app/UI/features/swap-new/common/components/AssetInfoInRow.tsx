@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import { TokenIcon } from './TokenIcon/TokenIcon';
 import { atomicBreakdown } from '@yoroi/common';
 import { Icons, IconWrapper } from '../../../../components';
+import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -46,8 +47,7 @@ export const AssetInfoInRow = React.memo(
     return (
       <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
         <Stack direction="row" alignItems="center" {...atoms.gap_lg}>
-          {/* Uncomment if TokenIcon should be shown */}
-          {/* <TokenIcon large tokenId={token.id} /> */}
+          <TokenInfoIcon info={{ id: token.id, policy: token?.fingerprint, name: token?.name }} size="md" />
           <Stack direction="column" justifyContent="space-between">
             <Typography variant="body1" color="ds.text_gray_medium">
               {token.name}

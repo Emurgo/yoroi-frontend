@@ -69,55 +69,62 @@ export const SelectAssetTo = () => {
     closeModal();
   };
 
-  return (
-    <Stack {...atoms.mb_2xl}>
-      <Stack {...atoms.pb_xl}>
-        <SearchWrapper>
-          <SearchIconWrapper>
-            <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
-          </SearchIconWrapper>
-          <SearchInput
-            component="input"
-            type="text"
-            placeholder="Search"
-            sx={{
-              borderColor: 'ds.el_gray_min',
-              backgroundColor: 'ds.bg_color_max',
-              color: 'ds.el_gray_low',
-              '&:focus': {
-                borderColor: 'ds.el_gray_max',
-              },
-            }}
-            onChange={e => {
-              setSearchTerm(e.target.value?.trim() ?? '');
-            }}
-          />
-        </SearchWrapper>
-        <AssetCountText variant="body2" color="ds.text_gray_low">
-          {strings.numYourAssets(tokenInfoList.length)}
-        </AssetCountText>
-      </Stack>
-      <Stack>
-        {tokenInfoList.map(asset => {
-          return (
-            <AssetInfoInRow
-              key={asset.id}
-              direction="out"
-              currency={currency}
-              token={{
-                decimals: asset.decimals,
-                name: asset.ticker ?? asset.name,
-                fingerprint: asset.fingerprint,
-                id: asset.id,
+    const filteredAssets =
+      tokenInfoList.filter(a => {
+        if (a == null) return false;
+        if (!searchTerm) return true;
+        return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
+      }) || [];
+
+    return (
+      <Stack {...atoms.mb_2xl}>
+        <Stack {...atoms.pb_xl}>
+          <SearchWrapper>
+            <SearchIconWrapper>
+              <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
+            </SearchIconWrapper>
+            <SearchInput
+              component="input"
+              type="text"
+              placeholder="Search"
+              sx={{
+                borderColor: 'ds.el_gray_min',
+                backgroundColor: 'ds.bg_color_max',
+                color: 'ds.el_gray_low',
+                '&:focus': {
+                  borderColor: 'ds.el_gray_max',
+                },
               }}
-              primaryTokenActivity={ptPrice}
-              secondaryToken24Activity={data24h && data24h[asset.id]}
-              primaryTokenInfo={primaryTokenInfo}
-              onAssetClick={() => handleAssetClick(asset.id)}
+              onChange={e => {
+                setSearchTerm(e.target.value?.trim() ?? '');
+              }}
             />
-          );
-        })}
+          </SearchWrapper>
+          <AssetCountText variant="body2" color="ds.text_gray_low">
+            {strings.numYourAssets(tokenInfoList.length)}
+          </AssetCountText>
+        </Stack>
+        <Stack>
+          {filteredAssets.map(asset => {
+            return (
+              <AssetInfoInRow
+                key={asset.id}
+                direction="out"
+                currency={currency}
+                token={{
+                  decimals: asset.decimals,
+                  name: asset.ticker ?? asset.name,
+                  fingerprint: asset.fingerprint,
+                  id: asset.id,
+                }}
+                primaryTokenActivity={ptPrice}
+                secondaryToken24Activity={data24h && data24h[asset.id]}
+                primaryTokenInfo={primaryTokenInfo}
+                onAssetClick={() => handleAssetClick(asset.id)}
+              />
+            );
+          })}
+        </Stack>
       </Stack>
-    </Stack>
-  );
+    );
 };

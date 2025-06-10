@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
-import { TokenIcon } from './TokenIcon/TokenIcon';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
-import { undefinedToken } from '../constants';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
 import { usePortfolioTokenActivity } from '../../../portfolio/module/PortfolioTokenActivityProvider';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -65,19 +63,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     return undefined;
   }, [direction, tokenInputInfo]);
 
-  console.log('AssetInput Info', {
-    tokenInput,
-    tokenInputInfo,
-    direction,
-    // inputRef,
-    // isTouched: tokenInput.isTouched,
-    // swapForm,
-    // tokenInInfo,
-    // tokenOutInfo,
-    // tokenIconId,
-    // assetInputName,
-  });
-
   const focusInput = () => {
     if (inputRef?.current) {
       inputRef.current.focus();
@@ -105,7 +90,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
           >
             {/* <TokenIcon tokenId={tokenIconId} /> */}
             <TokenInfoIcon
-              info={{ id: tokenInputInfo?.id, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
+              info={{ id: tokenInput.tokenId, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
               size="md"
             />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm} inline>

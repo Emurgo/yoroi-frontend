@@ -35,7 +35,6 @@ const cardanoIconSizeMap = {
 export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconProps) => {
   const theme: any = useTheme();
   const dimension = sizeMap[size];
-
   if (info.id === undefined) {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
@@ -55,7 +54,7 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
   }
 
   const [policy, name] = !info ? '.' : info.id.split('.');
-  const { uri, onError, onLoad, isError, crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
+  const { uri, onError, onLoad, crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
 
   return (
     <Box

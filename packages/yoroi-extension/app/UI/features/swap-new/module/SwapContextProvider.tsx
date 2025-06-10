@@ -128,14 +128,12 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapAction.TokenInIdChanged:
-        console.log('TokenInIdChanged ACTION', action);
         draft.tokenInInput.tokenId = action.tokenId;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
         break;
 
       case SwapAction.TokenOutIdChanged:
-        console.log('TokenInIdChanged ACTION', action);
         draft.tokenOutInput.tokenId = action.tokenId;
         draft.selectedProtocol.isTouched = false;
         draft.wantedPrice = '';
