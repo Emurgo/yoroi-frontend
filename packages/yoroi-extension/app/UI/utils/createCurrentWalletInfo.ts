@@ -294,14 +294,14 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
       if (metadataValues === null) {
         metadataValues = {};
       }
-      metadataValues.website = info?.url || info?.website;
+      metadataValues.website = info.url ?? info.website;
     }
 
     if (info?.desc) {
       if (metadataValues === null) {
         metadataValues = {};
       }
-      metadataValues.description = info?.desc;
+      metadataValues.description = info.desc;
     }
   }
 
