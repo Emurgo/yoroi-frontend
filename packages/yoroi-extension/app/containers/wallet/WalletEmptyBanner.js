@@ -35,17 +35,17 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
     <Box>
       <Box
         sx={{
-          background: theme => theme.palette.ds.bg_gradient_2,
+          background: theme => theme.palette.ds.bg_gradient_1,
           marginBottom: '40px',
           borderRadius: '8px',
           overflowY: 'hidden',
           position: 'relative',
           padding: '16px',
-          height: '156px',
+          height: 'auto',
         }}
         id="wallet|staking-emptyWalletBanner-box"
       >
-        <Box sx={{ position: 'absolute', right: '1%', top: '0%' }}>
+        <Box sx={{ position: 'absolute', right: '1%', top: 'auto', bottom: '-3px' }}>
           <CoverBg />
         </Box>
         <Box>
@@ -54,6 +54,13 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
           </Typography>
           <Typography component="div" variant="body1" color="ds.gray_max" mb="24px">
             {intl.formatMessage(isTestnet? globalMessages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
+            {isTestnet ?
+              <>
+                <br />
+                {intl.formatMessage(globalMessages.welcomeMessageSubtitleTestnetExtra)}
+              </>
+              : null
+            }
           </Typography>
         </Box>
         <Stack direction="row" gap="16px">
