@@ -794,6 +794,7 @@
   "wallet.infoDialog.title": "Gợi ý",
   "wallet.insufficientFunds.subtitle": "Việc tham gia yêu cầu ít nhất {requiredBalance} {tokenName}, nhưng bạn chỉ có {currentBalance}. Phần thưởng chưa rút không được bao gồm trong số tiền này.",
   "wallet.insufficientFunds.title": "Không đủ tiền",
+  "wallet.insufficientFunds.subtitleHidden": "Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.",
   "wallet.loading": "Đang tải...",
   "wallet.nav.addButton": "Thêm ví mới",
   "wallet.nav.addNewWallet": "Thêm ví mới",
