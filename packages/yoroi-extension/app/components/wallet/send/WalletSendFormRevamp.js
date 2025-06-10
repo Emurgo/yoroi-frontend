@@ -553,7 +553,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
   }
 
   avoidWhitespacesAddress(e: KeyboardEvent) {
-    if (e.key === " " && name.length === 0) {
+    if (e.key === " ") {
       e.preventDefault();
     }
   }
