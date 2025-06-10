@@ -13,12 +13,6 @@ import {
   DeleteAllTransactions,
 } from '../../database/walletTypes/core/api/write';
 import type { IConceptualWallet } from '../../models/ConceptualWallet/interfaces';
-import {
-  ConceptualWallet
-} from '../../models/ConceptualWallet/index';
-import {
-  asHasLevels,
-} from '../../models/PublicDeriver/traits';
 import { rawRemoveAllTransactions as cardanoRawRemoveAllTransactions } from '../updateTransactions';
 import {
   GetAddress,
@@ -65,7 +59,8 @@ export async function removePublicDeriver(request: {|
     ModifyUtxoAtSafePoint,
     ModifyUtxoDiffToBestBlock,
   });
-  const db = request.publicDeriver.getDb();
+  const publicDeriver = request.publicDeriver;
+  const db = publicDeriver.getDb();
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
@@ -79,76 +74,65 @@ export async function removePublicDeriver(request: {|
       ...depTables,
     ],
     async dbTx => {
-      const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-      if (withLevels != null) {
-        // 1) remove transactions
-
-        const network = request.publicDeriver.getParent().getNetworkInfo();
-        if (isCardanoHaskell(network)) {
-          await cardanoRawRemoveAllTransactions(
-            db, dbTx,
-            {
-              GetPathWithSpecific: deps.GetPathWithSpecific,
-              GetAddress: deps.GetAddress,
-              CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
-              CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
-              AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
-              AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
-              GetDerivationSpecific: deps.GetDerivationSpecific,
-              DeleteAllTransactions: deps.DeleteAllTransactions,
-              ModifyAddress: deps.ModifyAddress,
-              GetTransaction: deps.GetTransaction,
-              FreeBlocks: deps.FreeBlocks,
-              GetCertificates: deps.GetCertificates,
-              ModifyTokenList: deps.ModifyTokenList,
-            },
-            withLevels.getParent().getDerivationTables(),
-            {
-              publicDeriver: withLevels,
-            }
-          );
-        } else {
-          throw new Error(`${nameof(removePublicDeriver)} No implementation for wallet removal`);
-        }
-
-        // 2) remove addresses
-        // note: this won't actually delete all addresses
-        // only wallets associated with this wallet
-        // we depend on other things (like transaction deletion)
-        // to delete addresses only kept as metadata
-        const addresses = await rawGetAddressRowsForWallet(
-          dbTx,
+       // 1) remove transactions
+      const network = publicDeriver.getParent().getNetworkInfo();
+      if (isCardanoHaskell(network)) {
+        await cardanoRawRemoveAllTransactions(
+          db, dbTx,
           {
             GetPathWithSpecific: deps.GetPathWithSpecific,
             GetAddress: deps.GetAddress,
+            CardanoByronAssociateTxWithIOs: deps.CardanoByronAssociateTxWithIOs,
+            CardanoShelleyAssociateTxWithIOs: deps.CardanoShelleyAssociateTxWithIOs,
+            AssociateTxWithUtxoIOs: deps.AssociateTxWithUtxoIOs,
+            AssociateTxWithAccountingIOs: deps.AssociateTxWithAccountingIOs,
             GetDerivationSpecific: deps.GetDerivationSpecific,
+            DeleteAllTransactions: deps.DeleteAllTransactions,
+            ModifyAddress: deps.ModifyAddress,
+            GetTransaction: deps.GetTransaction,
+            FreeBlocks: deps.FreeBlocks,
+            GetCertificates: deps.GetCertificates,
+            ModifyTokenList: deps.ModifyTokenList,
           },
-          { publicDeriver: request.publicDeriver },
-          withLevels.getParent().getDerivationTables(),
+          publicDeriver.getParent().getDerivationTables(),
+          {
+            publicDeriver,
+          }
         );
-        const walletAddressIds = Object.keys(addresses)
-          .flatMap(key => addresses[key])
-          .map(row => row.address.AddressId);
-
-        await deps.ModifyAddress.remove(
-          db, dbTx,
-          walletAddressIds
-        );
+      } else {
+        throw new Error(`${nameof(removePublicDeriver)} No implementation for wallet removal`);
       }
+      const addresses = await rawGetAddressRowsForWallet(
+        dbTx,
+        {
+          GetPathWithSpecific: deps.GetPathWithSpecific,
+          GetAddress: deps.GetAddress,
+          GetDerivationSpecific: deps.GetDerivationSpecific,
+        },
+        { publicDeriver },
+        publicDeriver.getParent().getDerivationTables(),
+      );
+      const walletAddressIds = Object.keys(addresses)
+        .flatMap(key => addresses[key])
+        .map(row => row.address.AddressId);
+      await deps.ModifyAddress.remove(
+        db, dbTx,
+        walletAddressIds
+      );
 
       // 3) remove utxos
       await ModifyUtxoAtSafePoint.remove(
         db, dbTx,
-        request.publicDeriver.getPublicDeriverId()
+        publicDeriver.getPublicDeriverId()
       );
       await ModifyUtxoDiffToBestBlock.removeAll(
         db, dbTx,
-        request.publicDeriver.getPublicDeriverId()
+        publicDeriver.getPublicDeriverId()
       );
 
       await deps.RemovePublicDeriver.remove(
         db, dbTx,
-        { publicDeriverId: request.publicDeriver.getPublicDeriverId() }
+        { publicDeriverId: publicDeriver.getPublicDeriverId() }
       );
       if (request.conceptualWallet != null) {
         await request.conceptualWallet.rawRemove(db, dbTx);

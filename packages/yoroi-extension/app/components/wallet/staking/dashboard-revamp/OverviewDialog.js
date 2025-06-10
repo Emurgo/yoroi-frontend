@@ -3,11 +3,10 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import Dialog from '../../../widgets/Dialog';
 import DialogCloseButton from '../../../widgets/DialogCloseButton';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Link, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { HelperTooltip } from './StakePool/StakePool';
@@ -52,12 +51,9 @@ type Props = {|
 
 @observer
 export default class OverviewModal extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { withdrawRewards, onClose, totalRewards } = this.props;
 
     const actions = [
@@ -89,7 +85,7 @@ export default class OverviewModal extends Component<Props> {
     )
     return (
       <Dialog
-        title={this.context.intl.formatMessage(globalMessages.overview)}
+        title={this.context.formatMessage(globalMessages.overview)}
         dialogActions={actions}
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton onClose={onClose} />}

@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.8.0",
+  "version": "5.8.001",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -79,7 +79,6 @@
     "@emurgo/cross-csl-nodejs": "6.2.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
     "@types/chrome": "^0.0.268",
-    "@types/react-intl": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.4.0",
     "@yoroi/common": "1.5.4",
@@ -221,7 +220,7 @@
     "react-copy-to-clipboard": "5.0.3",
     "react-dom": "18.3.1",
     "react-helmet": "6.1.0",
-    "react-intl": "2.9.0",
+    "react-intl": "7.1.11",
     "react-markdown": "5.0.3",
     "react-query": "^3.39.3",
     "react-router": "7.5.1",

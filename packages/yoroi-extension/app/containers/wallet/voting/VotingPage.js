@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../../components/layout/TopBarLayout';
 import BannerContainer from '../../banners/BannerContainer';
 import SidebarContainer from '../../SidebarContainer';
@@ -18,11 +17,11 @@ const VotingPageContent = lazy(VotingPageContentPromise);
 
 @observer
 export default class VotingPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { stores } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const content = (
       <Suspense fallback={null}>

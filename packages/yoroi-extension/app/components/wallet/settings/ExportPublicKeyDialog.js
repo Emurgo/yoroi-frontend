@@ -1,16 +1,16 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import Dialog from '../../widgets/Dialog';
 import CodeBlock from '../../widgets/CodeBlock';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { Box, List, ListItem, Typography, styled } from '@mui/material';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 export const messages: * = defineMessages({
   publicKeyExplanationLine1: {
@@ -46,12 +46,9 @@ const SListItem = styled(ListItem)(({ theme }) => ({
 
 @observer
 export default class ExportPublicKeyDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const walletInfo = {
       publicKeyHex: this.props.publicKeyHex,
@@ -75,10 +72,10 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         >
           <Box marginBottom="20px">
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...messages.publicKeyExplanationLine1} />
+              <FormattedMessage {...messages.publicKeyExplanationLine1} values={{ strong }}/>
             </Typography>
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...globalMessages.publicKeyExplanation} />
+              <FormattedMessage {...globalMessages.publicKeyExplanation} />
             </Typography>
             <Typography variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.whyUse)}
@@ -128,7 +125,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
   };
 
   renderKey: string => Node = key => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
@@ -141,7 +138,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
   };
 
   renderPath: (Array<number>) => Node = addressing => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">

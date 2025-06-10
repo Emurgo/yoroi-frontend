@@ -1,8 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import { ReactComponent as BeginnerLevel } from '../../../assets/images/complexity-level/beginner-level.inline.svg';
 import { ReactComponent as AdvancedLevel } from '../../../assets/images/complexity-level/advanced-level.inline.svg';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -10,6 +9,7 @@ import { ComplexityLevels } from '../../../types/complexityLevelType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Box, Typography, styled } from '@mui/material';
 import { settingsMenuMessages } from '../../settings/menu/SettingsMenu';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   subtitle: {
@@ -89,12 +89,9 @@ export default class ComplexityLevel extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { complexityLevel } = this.props;
 
     const levels = [
@@ -150,12 +147,13 @@ export default class ComplexityLevel extends Component<Props> {
               },
             }}
           >
-            <FormattedHTMLMessage
+            <FormattedMessage
               {...messages.selectedLevelLabel}
               values={{
                 level: intl.formatMessage(
                   complexityLevel === ComplexityLevels.Advanced ? messages.titleAdvancedLevel : messages.titleSimpleLevel
                 ),
+                strong,
               }}
             />
           </Typography>

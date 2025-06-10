@@ -1,12 +1,11 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Tab, { tabClasses } from '@mui/material/Tab';
 import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import { Box, Typography, styled } from '@mui/material';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
@@ -187,10 +186,7 @@ const dialogTitle = environment.isDev() || environment.isNightly() ? messages.di
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isBuying: true,
     inputError: null,
@@ -332,15 +328,14 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   renderDisclaimerDialog: () => Node = () => {
-    const { intl } = this.context;
     const { onCancel } = this.props;
     return (
-      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} intl={intl} />
+      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel}/>
     )
   }
 
   renderBuySell(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
 
     const [providerLogo, providerName] = state.isBuying ? [banxaPng, 'Banxa'] : [encryptusPng, 'Encryptus'];
@@ -407,7 +402,7 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
     const { urlGenerationError, showDisclaimer } = state;
 

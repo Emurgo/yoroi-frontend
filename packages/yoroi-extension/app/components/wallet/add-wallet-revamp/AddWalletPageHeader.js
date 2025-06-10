@@ -3,9 +3,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { ReactComponent as YoroiLogo } from '../../../assets/images/yoroi-logo-shape-blue.inline.svg';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography, Box, Button, styled } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
@@ -44,12 +43,9 @@ type Props = {|
 
 @observer
 export default class AddWalletPageHeader extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { goToCurrentWallet, hasAnyWallets } = this.props;
 
     return (

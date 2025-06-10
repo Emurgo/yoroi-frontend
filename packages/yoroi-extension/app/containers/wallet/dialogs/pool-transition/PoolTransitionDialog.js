@@ -2,11 +2,10 @@
 import Dialog from '../../../../components/widgets/Dialog';
 import { Typography, Button, Grid, Stack, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
+import { useIntl } from 'react-intl';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 import { StakePoolCard } from './StakePoolCard';
 import { messages } from './dialog-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ReactComponent as ArrowRightSvg } from '../../../../assets/images/revamp/icons/arrow-right.inline.svg';
 
 type Props = {|
@@ -14,7 +13,6 @@ type Props = {|
   poolTransition: ?PoolTransition,
   onUpdatePool: () => void,
   currentPoolId?: string,
-  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 export const PoolTransitionDialog = ({
@@ -22,8 +20,8 @@ export const PoolTransitionDialog = ({
   poolTransition,
   onUpdatePool,
   currentPoolId,
-  intl,
 }: Props): React$Node => {
+  const intl = useIntl();
   const { currentPool, suggestedPool, deadlinePassed } = poolTransition || {};
 
   return (
@@ -46,7 +44,6 @@ export const PoolTransitionDialog = ({
           deadlineMilliseconds={poolTransition?.deadlineMilliseconds || 0}
           poolHash={currentPoolId}
           deadlinePassed={deadlinePassed}
-          intl={intl}
         />
 
         <Box px="8px">
@@ -61,7 +58,6 @@ export const PoolTransitionDialog = ({
           poolHash={suggestedPool?.hash}
           deadlinePassed={deadlinePassed}
           suggestedPool
-          intl={intl}
         />
       </Stack>
       <Grid container justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>

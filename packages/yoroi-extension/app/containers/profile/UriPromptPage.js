@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
 import TopBar from '../../components/topbar/TopBar';
@@ -16,7 +16,6 @@ import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import registerProtocols from '../../uri-protocols';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { noop } from '../../coreUtils';
 import type { StoresProps } from '../../stores';
 
@@ -26,10 +25,7 @@ export default class UriPromptPage extends Component<StoresProps> {
   @observable
   isAccepted: boolean = false;
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   onAccept: void => void = () => {
     registerProtocols();
     runInAction(() => {
@@ -74,7 +70,7 @@ export default class UriPromptPage extends Component<StoresProps> {
       ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(globalMessages.uriSchemeLabel)} />
+      <StaticTopbarTitle title={this.context.formatMessage(globalMessages.uriSchemeLabel)} />
     );
     const topbarElement = (
       <TopBar

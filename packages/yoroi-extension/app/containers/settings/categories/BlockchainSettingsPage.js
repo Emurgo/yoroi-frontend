@@ -2,12 +2,11 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import ExplorerSettings from '../../../components/settings/categories/general-setting/ExplorerSettings';
 import UriSettingsBlock from '../../../components/settings/categories/general-setting/UriSettingsBlock';
 import registerProtocols from '../../../uri-protocols';
 import environment from '../../../environment';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import NoWalletMessage from '../../wallet/NoWalletMessage';
 import { Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
@@ -15,10 +14,7 @@ import type { StoresProps } from '../../../stores';
 
 @observer
 export default class BlockchainSettingsPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { selected } = stores.wallets;
@@ -26,7 +22,7 @@ export default class BlockchainSettingsPage extends Component<StoresProps> {
       return <NoWalletMessage />;
 
     }
-    const { intl } = this.context;
+    const intl = this.context;
 
     const isSubmittingExplorer = stores.explorers.setSelectedExplorerRequest.isExecuting;
 

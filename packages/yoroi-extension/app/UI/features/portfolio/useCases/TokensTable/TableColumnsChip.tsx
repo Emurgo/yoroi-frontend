@@ -176,7 +176,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     ptPrice &&
     atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : new BigNumber(ptPrice))
+      .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
       .toFormat(decimals);
 
   const primaryAda = isPrimary && showingAda;

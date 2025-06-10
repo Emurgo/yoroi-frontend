@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import WalletAccountIcon from './WalletAccountIcon';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import { MultiToken } from '../../api/common/lib/MultiToken';
@@ -104,10 +103,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class WalletCard extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {|
     isCurrentWallet: boolean,
   |} = {
@@ -115,7 +111,7 @@ export default class WalletCard extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { shouldHideBalance, walletId, idx, unitOfAccountSetting, getCurrentPrice, id } = this.props;
 
     const [walletPlate, iconComponent] = maybe(this.props.plate, constructPlate40) ?? [];
