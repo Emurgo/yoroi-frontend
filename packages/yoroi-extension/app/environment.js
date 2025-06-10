@@ -85,8 +85,6 @@ function getVersion(): string {
   const content = genManifest.default !== undefined
     ? genManifest.default(true)
     : genManifest();
-
-  console.log("yes", CONFIG, content)
   return content.version;
 }
 
