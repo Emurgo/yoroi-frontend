@@ -8,3 +8,5 @@ export const RECEIVER_DOESNT_EXIST =
   "Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again";
 export const INVALID_ADDRESS = 'Please enter a valid receiver address, ADA Handle or domain';
 export const NOT_ENOUGH_BALANCE = 'Not enough balance';
+export const NO_NFTS_ADDED = 'No NFTs added to your wallet';
+export const NO_NFTS_FOUND = 'No NFTs found';

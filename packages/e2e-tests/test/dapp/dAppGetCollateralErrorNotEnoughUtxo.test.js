@@ -28,7 +28,7 @@ describe('dApp, getCollateral, error, empty wallet', function () {
 
   before(async function () {
     try {
-      webdriver = await driversPoolsManager.getDriverFromPool();
+      webdriver = await driversPoolsManager.getPreparedDriver();
       mockServer = await getMockServer({});
       logger = getTestLogger(this.test.parent.title);
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);

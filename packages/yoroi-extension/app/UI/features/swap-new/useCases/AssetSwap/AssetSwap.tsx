@@ -1,5 +1,4 @@
 import { Stack, styled, useTheme } from '@mui/material';
-import React from 'react';
 import { TopBarActions } from './TopBarActions';
 import { AssetInput } from '../../common/components/AssetInput';
 import { LoadingButton } from '@mui/lab';

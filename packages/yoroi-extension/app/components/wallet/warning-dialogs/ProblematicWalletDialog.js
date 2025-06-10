@@ -1,9 +1,8 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape, FormattedMessage, } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage, } from 'react-intl';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import BaseWarningDialog from './BaseWarningDialog';
 
 const messages = defineMessages({
@@ -21,10 +20,7 @@ type Props = {|
 
 @observer
 export default class ProblematicWalletDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { checksumTextPart } = this.props;

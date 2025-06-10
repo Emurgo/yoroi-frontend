@@ -1036,6 +1036,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
       );
     } catch (e) {
@@ -1084,7 +1085,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses);
+    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses).txHex;
   }
 
   async ledgerSignTx(
@@ -1115,6 +1116,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
         additionalRequiredSigners,
       );
@@ -1173,7 +1175,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       rawTxHex,
       ledgerSignResult.witnesses,
       publicKeyInfo,
-    );
+    ).txHex;
   }
 
   /**

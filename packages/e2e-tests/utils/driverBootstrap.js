@@ -43,7 +43,7 @@ export const getExtensionUrl = () => {
   return `${firefoxExtIdUrl}/main_window.html`;
 };
 
-export const getTransactionsURL = () => `${getExtensionUrl()}#/wallets/transactions`
+export const getTransactionsURL = () => `${getExtensionUrl()}#/wallets/transactions`;
 
 // builders
 const getBraveBuilder = () => {
@@ -67,7 +67,11 @@ const getBraveBuilder = () => {
 
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
-  const chromeOpts = new chrome.Options()
+  const chromeOpts = new chrome.Options({
+    'goog:chromeOptions': {
+      enableExtensionTargets: true,
+    },
+  })
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
@@ -75,12 +79,10 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .addArguments('--remote-debugging-pipe')
-    .setUserPreferences({ 'download.default_directory': downloadsDir });
+    .setUserPreferences({ 'download.default_directory': downloadsDir })
+    .setChromeBinaryPath(chromeBin);
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
-  }
-  if (isDapp()) {
-    chromeOpts.setChromeBinaryPath(chromeBin);
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
@@ -149,14 +151,34 @@ export const getBuilder = () => {
 };
 
 /**
- * Getting a driver with not prepared extension
+ * Getting a driver object
+ * @param {number} maxAttempts number of attempts to create a driver
+ * @param {number} retryDelay Delay between attempts to create a driver in milliseconds
  * @returns {WebDriver}
  */
-export const getDriver = () => {
-  const driver = getBuilder().build();
-  driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
-  if (isFirefox()) {
-    driver.manage().window().maximize();
+export const getDriver = (maxAttempts = 3, retryDelay = 2000) => {
+  let attempts = 0;
+  while (attempts < maxAttempts) {
+    try {
+      const driver = getBuilder().build();
+      driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
+      if (isFirefox()) {
+        driver.manage().window().maximize();
+      } else {
+        driver.manage().window().setRect({ width: 1440, height: 900 });
+      }
+      return driver;
+    } catch (error) {
+      if (error.message.includes('ECONNREFUSED') && attempts < maxAttempts - 1) {
+        console.error(`Connection error (attempt ${attempts + 1}):`, error.message);
+        const sleepPromise = new Promise(resolve => setTimeout(resolve, retryDelay));
+        sleepPromise.then(() => console.log('Waited for 2 seconds'));
+        attempts++;
+      } else {
+        console.error('No success to run the driver after all attempts:', error);
+        throw error;
+      }
+    }
   }
-  return driver;
+  throw new Error('Not able to get a driver. All attempts exhausted');
 };

@@ -2,14 +2,13 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { join } from 'lodash';
 import { action, observable } from 'mobx';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import MnemonicInput from '../../components/widgets/forms/MnemonicInput';
 import PaperPasswordInput from '../../components/widgets/forms/PaperPasswordInput';
 import BaseTransferPage from '../../components/transfer/BaseTransferPage';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   step0: {
@@ -34,10 +33,7 @@ type Props = {|
 @observer
 export default class YoroiPaperWalletFormPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   @observable mnemonicForm: void | ReactToolboxMobxForm;
   @observable paperPasswordForm: void | ReactToolboxMobxForm;
 
@@ -92,7 +88,7 @@ export default class YoroiPaperWalletFormPage extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <BaseTransferPage
         onSubmit={this.submit}
