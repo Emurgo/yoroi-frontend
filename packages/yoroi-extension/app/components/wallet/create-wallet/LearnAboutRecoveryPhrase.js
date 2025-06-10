@@ -14,14 +14,6 @@ import type { ManageDialogsProps } from './CreateWalletPage';
 import { messages as infoDialogMessages } from '../../widgets/infoDialog';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
-const messages: * = defineMessages({
-  description: {
-    id: 'wallet.create.firstStep.description',
-    defaultMessage:
-      '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.',
-  },
-});
-
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
 |};
@@ -125,6 +117,11 @@ const text: * = defineMessages({
     id: 'wallet.create.firstStep.fifthTip',
     defaultMessage:
       '!!!<strong>Yoroi NEVER</strong> asks for your <strong>recovery phrase</strong>. Watch out for scammers and impersonators',
+  },
+  description: {
+    id: 'wallet.create.firstStep.description',
+    defaultMessage:
+      '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.',
   },
 });
 
