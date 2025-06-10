@@ -4,8 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Button, Typography } from '@mui/material';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, FormattedHTMLMessage, intlShape } from 'react-intl';
+import { defineMessages, FormattedMessage, IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as NightlyIconRevamp } from '../../../assets/images/yoroi-nightly-icon-dark.inline.svg';
 
@@ -17,7 +16,7 @@ const messages = defineMessages({
   header: {
     id: 'profile.nightly.header',
     defaultMessage:
-      '!!!Yoroi Nightly automatically updates nightly with the latest in-progress features. Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
+      '!!!<strong>Yoroi Nightly is periodically updated with the latest in-progress features.</strong> Although we will never intentionally push bugs or broken code, features may still be in-progress or contain errors.',
   },
   warningHeader: {
     id: 'profile.nightly.warningHeader',
@@ -60,10 +59,7 @@ type State = {|
 
 @observer
 export default class NightlyForm extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     acknowledgedRisks: false,
   };
@@ -73,7 +69,7 @@ export default class NightlyForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onSubmit } = this.props;
 
     return (
@@ -104,7 +100,12 @@ export default class NightlyForm extends Component<Props, State> {
             }}
           >
             <Typography component="div" variant="body1" lineHeight="24px">
-              <FormattedHTMLMessage {...messages.header} />
+              <FormattedMessage
+                {...messages.header}
+                values={{
+                  strong: chunks => <strong>{chunks}</strong>
+                }}
+              />
             </Typography>
 
             <Box>

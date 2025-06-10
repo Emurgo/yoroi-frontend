@@ -5,8 +5,7 @@ import { observer } from 'mobx-react';
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Checkbox, FormControlLabel, MenuItem, Typography } from '@mui/material';
 import Select from '../../common/Select';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { FormattedHTMLMessage, intlShape } from 'react-intl';
+import { FormattedMessage, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../i18n/LocalizableError';
 import type { LanguageType } from '../../../i18n/translations';
@@ -40,10 +39,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   selectLanguage: string => void = locale => {
     this.props.onSelectLanguage({ locale });
   };
@@ -61,7 +57,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(globalMessages.languageSelectLabel),
+        label: this.context.formatMessage(globalMessages.languageSelectLabel),
         value: this.props.currentLocale,
       },
       tosAgreement: {
@@ -89,6 +85,8 @@ export default class LanguageSelectionForm extends Component<Props, State> {
         this.setState({ showing: 'privacy' });
       }
     }
+
+    return undefined;
   };
 
   onClickBack: () => void = () => {
@@ -96,7 +94,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   };
 
   renderForm(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const { languages, isSubmitting, currentLocale, error } = this.props;
     const languageId = form.$('languageId');
@@ -115,7 +113,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
       }}>
         <div className={styles.centeredBox}>
           <Typography component="div" variant="h5" fontWeight={500} mb="24px" textAlign="center">
-            {this.context.intl.formatMessage(globalMessages.languageSelectLabelShort)}
+            {this.context.formatMessage(globalMessages.languageSelectLabelShort)}
           </Typography>
           <Select
             formControlProps={{ sx: { marginBottom: '25px' } }}
@@ -152,12 +150,18 @@ export default class LanguageSelectionForm extends Component<Props, State> {
             label={
               <Box
                 sx={{
-                  '& span > span': {
+                  '& a': {
                     color: 'primary.600',
                   },
                 }}
               >
-                <FormattedHTMLMessage {...globalMessages.tosAgreement} />
+                <FormattedMessage
+                  {...globalMessages.tosAgreement}
+                  values={{
+                    tosLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="tosLink">{chunks}</a>),
+                    privacyLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="privacyLink">{chunks}</a>),
+                  }}
+                />
               </Box>
             }
             control={
@@ -219,7 +223,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
   }
 
   renderMarkdown(markdown: string): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <>
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">

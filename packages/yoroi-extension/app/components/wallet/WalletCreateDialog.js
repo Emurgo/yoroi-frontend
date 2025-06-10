@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -13,7 +13,6 @@ import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from 
 import globalMessages from '../../i18n/global-messages';
 import styles from './WalletCreateDialog.scss';
 import config from '../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   dialogTitle: {
@@ -53,10 +52,7 @@ type State = {|
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -71,19 +67,19 @@ export default class WalletCreateDialog extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletName: {
-        label: this.context.intl.formatMessage(messages.walletName),
+        label: this.context.formatMessage(messages.walletName),
         placeholder: '',
         value: '',
         validators: [({ field }) => (
           [
             isValidWalletName(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletName)
+            this.context.formatMessage(globalMessages.invalidWalletName)
           ]
         )],
       },
       walletPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
+        label: this.context.formatMessage(globalMessages.walletPasswordLabel),
         placeholder: '',
         value: '',
         validators: [({ field, form }) => {
@@ -93,20 +89,20 @@ export default class WalletCreateDialog extends Component<Props, State> {
           }
           return [
             isValidWalletPassword(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
+            this.context.formatMessage(globalMessages.invalidWalletPassword)
           ];
         }],
       },
       repeatPassword: {
         type: 'password',
-        label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
+        label: this.context.formatMessage(messages.repeatPasswordLabel),
         placeholder: '',
         value: '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
           return [
             isValidRepeatPassword(walletPassword, field.value),
-            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
+            this.context.formatMessage(globalMessages.invalidRepeatPassword)
           ];
         }],
       },
@@ -147,7 +143,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
   render(): Node {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, } = this.props;
     const { isSubmitting } = this.state;
     const dialogClasses = classnames([
@@ -168,7 +164,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.createPersonalWallet),
+        label: this.context.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
         disabled: isSubmitting || disabledCondition

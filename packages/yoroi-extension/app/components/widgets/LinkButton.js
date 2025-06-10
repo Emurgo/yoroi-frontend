@@ -2,8 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import styles from './LinkButton.scss';
 import { Typography, Box } from '@mui/material';
 
@@ -23,12 +23,9 @@ export default class LinkButton extends Component<Props> {
     svgClass: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { url, svg, message, svgClass, onExternalLinkClick, componentId } = this.props;
 
     const SvgElem = svg;

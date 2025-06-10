@@ -2,7 +2,7 @@
 import type { ComponentType, Node } from 'react';
 import { useState } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { defineMessages, FormattedHTMLMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import type { ManageDialogsProps } from '../../../dialogs/types';
 import { observer } from 'mobx-react';
 import { Box, Stack, Typography } from '@mui/material';
@@ -17,6 +17,7 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
+import { strong } from '../../../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   description: {
@@ -104,7 +105,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
         maxWidth={length === 15 ? '636px' : '760px'}
       >
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedHTMLMessage {...messages.description} />
+          <FormattedMessage {...messages.description} values={{ strong }}/>
         </Typography>
 
         <RestoreRecoveryPhraseForm

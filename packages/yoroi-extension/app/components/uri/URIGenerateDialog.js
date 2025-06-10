@@ -3,10 +3,9 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import NumericInputRP from '../common/NumericInputRP';
 import globalMessages from '../../i18n/global-messages';
@@ -51,12 +50,9 @@ type Props = {|
 
 @observer
 export default class URIGenerateDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   getAmountLabel: () => string = (): string => {
-    const label = this.context.intl.formatMessage(messages.uriGenerateDialogAmountLabel, {
+    const label = this.context.formatMessage(messages.uriGenerateDialogAmountLabel, {
       currency: truncateToken(getTokenName(this.props.tokenInfo)),
     });
 
@@ -68,7 +64,7 @@ export default class URIGenerateDialog extends Component<Props> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.uriGenerateDialogAddressLabel),
+          label: this.context.formatMessage(messages.uriGenerateDialogAddressLabel),
           value: this.props.walletAddress,
         },
         amount: {
@@ -79,7 +75,7 @@ export default class URIGenerateDialog extends Component<Props> {
             async ({ field }) => {
               const amountValue: string = field.value;
               if (amountValue === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               const formattedAmount = new BigNumber(
                 formattedAmountToNaturalUnits(amountValue, this.props.tokenInfo.Metadata.numberOfDecimals)
@@ -114,7 +110,7 @@ export default class URIGenerateDialog extends Component<Props> {
     const dialogClasses = classnames([styles.component, 'URIGenerateDialog']);
 
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const receiverField = form.$('receiver');
     const amountField = form.$('amount');
@@ -122,7 +118,7 @@ export default class URIGenerateDialog extends Component<Props> {
 
     const actions = [
       {
-        label: this.context.intl.formatMessage(messages.uriGenerateDialogConfirmLabel),
+        label: this.context.formatMessage(messages.uriGenerateDialogConfirmLabel),
         onClick: onGenerate.bind(this, receiverField.value, amountField.value),
         primary: true,
         disabled: !amountField.isValid,

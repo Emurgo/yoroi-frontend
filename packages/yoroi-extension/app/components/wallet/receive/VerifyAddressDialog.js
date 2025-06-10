@@ -3,14 +3,13 @@
 /* eslint react/jsx-one-expression-per-line: 0 */ // the &nbsp; in the html breaks this
 
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { toDerivationPathString } from '../../../api/ada/lib/cardanoCrypto/keys/path';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { truncateAddress } from '../../../utils/formatters';
@@ -62,12 +61,9 @@ type Props = {|
 
 @observer
 export default class VerifyAddressDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const dialogActions =
       !this.props.isHardware || (this.props.isHardware && this.props.isAddressBook)
@@ -103,7 +99,7 @@ export default class VerifyAddressDialog extends Component<Props> {
   }
 
   renderAddressBlock: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const notificationId = 'verify-address-notification';
     return (
       <>
@@ -160,7 +156,7 @@ export default class VerifyAddressDialog extends Component<Props> {
    *  because hardware wallets will display the staking key on the device
    */
   renderStakingKey: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { type: addrType, address } = this.props.addressInfo;
 
     const getStakingKey = (WasmScope: typeof RustModule) => {
@@ -190,7 +186,7 @@ export default class VerifyAddressDialog extends Component<Props> {
   };
 
   renderSpendingKey: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     // this is useful for querying servers & debugging. Not so useful for the average user.
     if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
@@ -227,7 +223,7 @@ export default class VerifyAddressDialog extends Component<Props> {
 
   /** hardware wallets display the pointer information on the device */
   renderPointer: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (this.props.addressInfo.type !== CoreAddressTypes.CARDANO_PTR) {
       return null;
@@ -263,7 +259,7 @@ export default class VerifyAddressDialog extends Component<Props> {
 
   renderPath: (void | $PropertyType<Addressing, 'addressing'>) => Node = addressing => {
     if (addressing == null) return null;
-    const { intl } = this.context;
+    const intl = this.context;
     const derivationClasses = classnames([styles.derivation]);
     return (
       <>

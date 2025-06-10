@@ -3,12 +3,11 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-
 import DangerousActionDialog from '../../../components/widgets/DangerousActionDialog';
 import type { StoresProps } from '../../../stores';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 type Props = {|
   +downloadIncludingKey: void => void,
@@ -32,10 +31,7 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresProps |}> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   @observable isChecked: boolean = false;
 
   @action
@@ -44,7 +40,7 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <DangerousActionDialog
@@ -71,8 +67,8 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
         }}
         id="includePublicKeyDialog"
       >
-        <div><FormattedHTMLMessage {...dialogMessages.includeKeyExplanationLine1} /></div>
-        <div><FormattedHTMLMessage {...globalMessages.publicKeyExplanation} /></div>
+        <div><FormattedMessage {...dialogMessages.includeKeyExplanationLine1} values={{ strong }}/></div>
+        <div><FormattedMessage {...globalMessages.publicKeyExplanation} values={{ strong }}/></div>
       </DangerousActionDialog>
     );
   }

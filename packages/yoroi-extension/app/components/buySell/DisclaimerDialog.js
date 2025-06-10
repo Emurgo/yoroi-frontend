@@ -1,8 +1,7 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { useState, useEffect } from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import { Box, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -56,13 +55,13 @@ const messages = defineMessages({
 
 type Props = {|
   onClose: void => void,
-    onAccept: void => void,
-      intl: $npm$ReactIntl$IntlFormat
-        |};
+  onAccept: void => void,
+|};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
+  const intl = useIntl();
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
-  const { onClose, onAccept, intl } = props;
+  const { onClose, onAccept } = props;
   const localStorageApi = new LocalStorageApi();
 
   useEffect(() => {

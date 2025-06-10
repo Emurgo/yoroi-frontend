@@ -9,8 +9,7 @@ import {
   AddressSubgroup,
   addressSubgroupName,
 } from '../../types/AddressFilterTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type {
   AddressSubgroupMeta,
   IAddressTypeStore,
@@ -45,7 +44,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletReceivePage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = { intl: intlShape.isRequired };
+  static contextType:any = IntlContext;
 
   @observable notificationElementId: string = '';
 
@@ -81,7 +80,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const { uiNotifications, uiDialogs, profile } = this.props.stores;
     const { hwVerifyAddress } = this.props.stores.substores.ada;
@@ -284,7 +283,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
                 // we don't impose a minimum value for the creation of the QR codes
                 // since validation happens when the QR code is scanned anyway
                 new BigNumber(0),
-                this.context.intl
+                this.context
               )
             }
           />

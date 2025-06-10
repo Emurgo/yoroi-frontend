@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { action, reaction } from 'mobx';
 import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { isValidMemoOptional } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -24,7 +24,6 @@ import {
 } from '../../../utils/formatters';
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   getTokenName,
@@ -246,10 +245,7 @@ type State = {|
 
 @observer
 export default class WalletSendFormRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
@@ -344,7 +340,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         this.setState({ domainResolverIsLoading: true });
         const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
         if (res == null) {
-          domainResolverMessage = this.context.intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+          domainResolverMessage = this.context.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
         } else if (res.address != null) {
           resolvedAddress = res.address;
           resolvedNameServer = res.nameServer;
@@ -354,11 +350,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             nameServer: res.nameServer,
           };
         } else if (res.error === 'forbidden') {
-          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
             messages.receiverFieldLabelForbiddenAccess
           )}`;
         } else {
-          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
             messages.receiverFieldLabelUnexpectedError
           )}`;
         }
@@ -382,7 +378,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
+          label: this.context.formatMessage(messages.receiverFieldLabelDefault),
           placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
@@ -398,7 +394,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     domainResolverMessage: null,
                     domainResolverIsLoading: false,
                   });
-                  return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                  return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
                 }
                 const updateReceiver = (isValid: boolean) => {
                   if (isValid) {
@@ -428,7 +424,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 updateReceiver(result);
                 const fieldError = isDomainResolvable
                   ? domainResolverMessage
-                  : this.context.intl.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
+                  : this.context.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
                 return [isValid[0], fieldError];
               } finally {
                 this.setState({
@@ -439,7 +435,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           ],
         },
         amount: {
-          label: this.context.intl.formatMessage(globalMessages.amountLabel),
+          label: this.context.formatMessage(globalMessages.amountLabel),
           placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
@@ -553,12 +549,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       values = error.values;
     }
 
-    return this.context.intl.formatMessage(errMsg, values);
+    return this.context.formatMessage(errMsg, values);
   }
 
   renderCurrentStep(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const {
       shouldSendAll,
@@ -943,7 +939,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
 
   renderCurrentFooter(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const { maxSendableAmount } = this.props;
 
