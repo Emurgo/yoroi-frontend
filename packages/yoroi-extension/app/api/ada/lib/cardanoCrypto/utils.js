@@ -269,12 +269,13 @@ function getCertificateStakeCredential(
   cert: RustModule.WalletV4.Certificate,
 ): ?{| keyHash: ?string, scriptHash: ?string |} {
   switch (cert.kind()) {
-    case RustModule.WalletV4.CertificateKind.StakeRegistration:
+    case RustModule.WalletV4.CertificateKind.StakeRegistration: {
       const stakeRegCert = forceNonNull(cert.as_stake_registration());
       if (!stakeRegCert.coin()) {
         return null;
       }
       return resolveCredential(stakeRegCert.stake_credential());
+    }
     case RustModule.WalletV4.CertificateKind.StakeDeregistration:
       return resolveCredential(forceNonNull(cert.as_stake_deregistration()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeDelegation:
