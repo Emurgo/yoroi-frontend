@@ -1078,7 +1078,7 @@ const globalMessages: * = defineMessages({
   },
   goToFaucetButton: {
     id: 'wallet.emptyWalletMessage.goToFaucet',
-    defaultMessage: '!!!GO TO TADA FAUCET',
+    defaultMessage: '!!!ADD TEST ADA',
   },
   welcomeMessageTestnet: {
     id: 'wallet.emptyWalletMessage.testnet',
@@ -1086,7 +1086,11 @@ const globalMessages: * = defineMessages({
   },
   welcomeMessageSubtitleTestnet: {
     id: 'wallet.emptyWalletMessageSubtitle.testnet',
-    defaultMessage: "!!!Get started with Cardano's test currency, TADA. It's your key to testing a new world of possibilities.",
+    defaultMessage: '!!!Stake your test ADA by participating in our testnet staking program.',
+  },
+  welcomeMessageSubtitleTestnetExtra: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnetExtra',
+    defaultMessage: "!!!Get your TADA. It's your key to testing a new world of possibilities.",
   },
   undelegatePool: {
     id: 'transaction.review.undelegatePool',
