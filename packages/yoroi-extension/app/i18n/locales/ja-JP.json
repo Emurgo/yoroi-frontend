@@ -794,6 +794,7 @@
   "wallet.infoDialog.title": "注意",
   "wallet.insufficientFunds.subtitle": "Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount",
   "wallet.insufficientFunds.title": "資金が足りません",
+  "wallet.insufficientFunds.subtitleHidden": "Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.",
   "wallet.loading": "読み込み中…",
   "wallet.nav.addButton": "新規のウォレットを追加する",
   "wallet.nav.addNewWallet": "新規のウォレットを追加する",
