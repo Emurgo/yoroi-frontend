@@ -270,7 +270,11 @@ function getCertificateStakeCredential(
 ): ?{| keyHash: ?string, scriptHash: ?string |} {
   switch (cert.kind()) {
     case RustModule.WalletV4.CertificateKind.StakeRegistration:
-      return resolveCredential(forceNonNull(cert.as_stake_registration()).stake_credential());
+      const stakeRegCert = forceNonNull(cert.as_stake_registration());
+      if (!stakeRegCert.coin()) {
+        return null;
+      }
+      return resolveCredential(stakeRegCert.stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeDeregistration:
       return resolveCredential(forceNonNull(cert.as_stake_deregistration()).stake_credential());
     case RustModule.WalletV4.CertificateKind.StakeDelegation:
