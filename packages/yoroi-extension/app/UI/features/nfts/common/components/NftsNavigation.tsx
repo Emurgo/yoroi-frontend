@@ -22,7 +22,7 @@ const NftsNavigation = ({ prevNftId, nextNftId, activeTab }: NftsNavigationProps
         to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab.id}`}
         onClick={() => handleNavigationEvent('Previous')}
       >
-        <Button aria-label="Previous" size="small">
+        <Button aria-label="Previous" size="small" id="nftDetails-previousNFT-button">
           <IconWrapper icon={Icons.ChevronLeft} />
         </Button>
       </Link>
@@ -30,7 +30,7 @@ const NftsNavigation = ({ prevNftId, nextNftId, activeTab }: NftsNavigationProps
         to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab.id}`}
         onClick={() => handleNavigationEvent('Next')}
       >
-        <Button aria-label="Next" size="small">
+        <Button aria-label="Next" size="small" id="nftDetails-nextNFT-button">
           <IconWrapper icon={Icons.ChevronRight} />
         </Button>
       </Link>

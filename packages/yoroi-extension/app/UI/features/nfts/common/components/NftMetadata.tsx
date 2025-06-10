@@ -30,12 +30,13 @@ export default function NftMetadata({ nftInfo }: { nftInfo: Nft | null }) {
         variant="text"
         onClick={handleCopy}
         endIcon={<IconWrapper color="ds.el_gray_medium" icon={isCopied ? Icons.Copied : Icons.Copy} />}
+        id="nftDetails:metadata-copy-button"
       >
         <Typography color="ds.el_gray_medium" variant="body2" lineHeight="22px">
           {strings.copyMetadata}
         </Typography>
       </Button>
-      <Typography component="pre" variant="body2" lineHeight="22px">
+      <Typography component="pre" variant="body2" lineHeight="22px" id="nftDetails:metadata-info-text">
         {JSON.stringify(mintMetadata, null, 2)}
       </Typography>
     </div>

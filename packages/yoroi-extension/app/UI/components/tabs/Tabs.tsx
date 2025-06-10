@@ -16,6 +16,7 @@ interface TabsProps {
   onTabChange?: (activeTab: TabItem | undefined) => void;
   headerSx?: SxProps;
   contentSx?: SxProps;
+  pathId?: string;
 }
 
 const StyledTab = styled(Tab)({
@@ -32,7 +33,7 @@ const StyledTab = styled(Tab)({
   },
 });
 
-export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx = {}, contentSx = {} }: TabsProps) => {
+export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx = {}, contentSx = {}, pathId = 'somethere' }: TabsProps) => {
   const [value, setValue] = useState(initialTabId || tabs[0]?.id || '0');
   const filteredTabs = tabs.filter(tab => tab.content !== null);
 
@@ -71,7 +72,7 @@ export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx
                 key={id}
                 disableRipple
                 label={
-                  <Typography component="div" variant="body1" fontWeight={500}>
+                  <Typography component="div" variant="body1" fontWeight={500} id={`${pathId}-${id}Tab-text`}>
                     {label}
                   </Typography>
                 }

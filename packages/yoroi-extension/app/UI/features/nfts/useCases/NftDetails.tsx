@@ -13,6 +13,8 @@ import NftsNavigation from '../common/components/NftsNavigation';
 import NftMetadata from '../common/components/NftMetadata';
 import NftDetailsOverview from '../common/components/NftDetailsOverview';
 
+const nftPathId = 'nftDetails';
+
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
@@ -24,6 +26,7 @@ const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => v
         width="100%"
         height="100%"
         contentHeight="550px"
+        nftPathId={nftPathId}
       />
     </Box>
   );
@@ -69,7 +72,7 @@ export default function NftDetails() {
     <>
       <Box sx={{ mb: '24px', width: '100%' }}>
         <Link to={ROUTES.NFT_GALLERY.ROOT}>
-          <Button variant="text" sx={{ px: '16px !important' }} startIcon={<IconWrapper icon={Icons.ChevronLeft} />}>
+          <Button variant="text" sx={{ px: '16px !important' }} startIcon={<IconWrapper icon={Icons.ChevronLeft} id={`${nftPathId}-backToGallery-button`} />}>
             <Typography color="ds.el_gray_medium" fontWeight="500" fontSize="14px">
               {strings.back}
             </Typography>
@@ -82,14 +85,14 @@ export default function NftDetails() {
         </Grid>
         <Grid item xs={6}>
           <Stack direction="row" mx="24px" justifyContent="space-between" spacing={2}>
-            <Typography variant="h2">{currentNft?.name}</Typography>
+            <Typography variant="h2" id={`${nftPathId}-nftName-text`}>{currentNft?.name}</Typography>
             <NftsNavigation
               prevNftId={nftsList[currentNftIndex === 0 ? nftsList.length - 1 : currentNftIndex - 1]?.id || ''}
               nextNftId={nftsList[currentNftIndex === nftsList.length - 1 ? 0 : currentNftIndex + 1]?.id || ''}
               activeTab={currentTab}
             />
           </Stack>
-          <Tabs initialTabId={tabSearchParam} onTabChange={handleTabChange} headerSx={{ mx: '24px' }} tabs={getTabs()} />
+          <Tabs initialTabId={tabSearchParam} onTabChange={handleTabChange} headerSx={{ mx: '24px' }} tabs={getTabs()} pathId={nftPathId} />
         </Grid>
       </Grid>
       <Modal
@@ -114,6 +117,7 @@ export default function NftDetails() {
             imageUrl={currentNft?.image}
             name={currentNft?.name || '-'}
             imageSx={{ maxWidth: '100%', maxHeight: '100%' }}
+            nftPathId={nftPathId + ':zoomedImage'}
           />
         </Box>
       </Modal>
