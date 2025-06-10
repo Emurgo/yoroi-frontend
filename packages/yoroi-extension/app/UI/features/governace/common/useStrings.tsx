@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
-import { useIntl } from '../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
@@ -154,7 +154,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
 
   return React.useRef({
     delegateToDRep: intl.formatMessage(messages.delegateToDRep),

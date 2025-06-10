@@ -2,11 +2,10 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import { ReactComponent as ExternalLinkSVG } from '../../../../assets/images/link-external.inline.svg';
 import styles from '../common/HelpLinkBlock.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Link, styled, Box } from '@mui/material';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
@@ -36,12 +35,9 @@ type Props = {|
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onExternalLinkClick } = this.props;
 
     return (

@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import TextField from '../../../common/TextField';
 
@@ -33,7 +33,6 @@ import { Logger } from '../../../../utils/logging';
 import styles from '../common/SaveDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
 import config from '../../../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   saveWalletNameInputBottomInfo: {
@@ -54,15 +53,12 @@ type Props = {|
 
 @observer
 export default class SaveDialog extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm;
 
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount() {
-    const { intl } = this.context;
+    const intl = this.context;
     const { defaultWalletName } = this.props;
 
     this.form = new ReactToolboxMobxForm({
@@ -92,7 +88,7 @@ export default class SaveDialog extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { walletName } = form.values();
     const {

@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
-import { intlShape, } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -15,7 +15,6 @@ import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswo
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
 import type { ConfigType } from '../../../config/config-types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type {
@@ -25,6 +24,7 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -50,10 +50,7 @@ type LocalProps = {|
 @observer
 export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };
@@ -67,10 +64,8 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
 
   componentWillUnmount() {
     const { stores } = this.props;
-    stores.wallets.sendMoneyRequest.reset();
+    stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.props.transactionRequest.reset();
-    stores.substores.ada.ledgerSend.cancel();
-    stores.substores.ada.trezorSend.cancel();
   }
 
   submit: void => Promise<void> = async () => {
@@ -81,34 +76,30 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     }
     const signRequest = this.props.transactionRequest.result;
     if (signRequest == null) return;
-    if (this.spendingPasswordForm == null) {
-      if (selected.type === 'trezor') {
-        await stores.substores.ada.trezorSend.sendUsingTrezor({
-          params: { signRequest },
-          wallet: selected,
-        });
+
+    const send = (password) => {
+      if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
+        throw new Error('unexpected signRequest type');
       }
-      if (selected.type === 'ledger') {
-        await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-          params: { signRequest },
-          wallet: selected,
-        });
-      }
-      if (stores.wallets.sendMoneyRequest.error == null) {
-        this.props.onSubmit.trigger();
-      }
-    } else {
-      this.spendingPasswordForm.submit({
-        onSuccess: async (form) => {
-          const { walletPassword } = form.values();
-          await stores.substores.ada.mnemonicSend.sendMoney({
-            signRequest,
-            password: walletPassword,
-            wallet: selected,
-          });
-          if (stores.wallets.sendMoneyRequest.error == null) {
+
+      stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: selected,
+        signRequest,
+        password,
+        callback: async () => {
+          if (stores.transactionProcessingStore.sendMoneyRequest.error == null) {
             this.props.onSubmit.trigger();
           }
+        },
+      });
+    }
+    if (this.spendingPasswordForm == null) {
+      send(null);
+    } else {
+      // why do we have to submit the form
+      this.spendingPasswordForm.submit({
+        onSuccess: async (form) => {
+          send(form.values().walletPassword);
         },
         onError: () => {}
       });
@@ -132,7 +123,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -159,11 +150,11 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
       ? (
         <SpendingPasswordInput
           setForm={(form) => this.setSpendingPasswordForm(form)}
-          isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         />
       ) : null;
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <TransferSummaryPage
@@ -178,9 +169,9 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
           label: this.props.onSubmit.label,
           trigger: this.submit,
         }}
-        isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+        isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         onCancel={this.props.onClose}
-        error={this.props.stores.wallets.sendMoneyRequest.error}
+        error={this.props.stores.transactionProcessingStore.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}

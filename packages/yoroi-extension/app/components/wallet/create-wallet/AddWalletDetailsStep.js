@@ -1,10 +1,9 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import StepController from './StepController';
@@ -18,6 +17,7 @@ import { observer } from 'mobx-react';
 import { Stack, Typography, Box, styled } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -67,10 +67,7 @@ type Props = {|
 
 @observer
 export default class AddWalletDetailsStep extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   componentDidMount(): void {
     if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
       this.props.openDialog(WalletNameAndPasswordTipsDialog);
@@ -81,15 +78,15 @@ export default class AddWalletDetailsStep extends Component<Props> {
     {
       fields: {
         walletName: {
-          label: this.context.intl.formatMessage(messages.enterWalletName),
+          label: this.context.formatMessage(messages.enterWalletName),
           value: '',
           validators: [
-            ({ field }) => [isValidWalletName(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletName)],
+            ({ field }) => [isValidWalletName(field.value), this.context.formatMessage(globalMessages.invalidWalletName)],
           ],
         },
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.enterPassword),
+          label: this.context.formatMessage(messages.enterPassword),
           value: '',
           validators: [
             ({ field, form }) => {
@@ -97,20 +94,20 @@ export default class AddWalletDetailsStep extends Component<Props> {
               if (repeatPasswordField.value.length > 0) {
                 repeatPasswordField.validate({ showErrors: true });
               }
-              return [isValidWalletPassword(field.value), this.context.intl.formatMessage(globalMessages.invalidWalletPassword)];
+              return [isValidWalletPassword(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)];
             },
           ],
         },
         repeatPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(messages.repeatPasswordLabel),
+          label: this.context.formatMessage(messages.repeatPasswordLabel),
           value: '',
           validators: [
             ({ field, form }) => {
               const walletPassword = form.$('walletPassword').value;
               return [
                 isValidRepeatPassword(walletPassword, field.value),
-                this.context.intl.formatMessage(globalMessages.invalidRepeatPassword),
+                this.context.formatMessage(globalMessages.invalidRepeatPassword),
               ];
             },
           ],
@@ -132,7 +129,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
     const { prevStep, recoveryPhrase, isDialogOpen, openDialog, closeDialog, selectedNetwork, isRecovery } = this.props;
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
-    const { intl } = this.context;
+    const intl = this.context;
 
     const walletNameField = form.$('walletName');
     const walletPasswordField = form.$('walletPassword');
@@ -152,7 +149,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography component="div" variant="body1" color="ds.text_gray_medium">
-              <FormattedHTMLMessage {...descriptionMessage} />
+              <FormattedMessage {...descriptionMessage} values={{ strong }}/>
             </Typography>
             <IconWrapper
               component="button"

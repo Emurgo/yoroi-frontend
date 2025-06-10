@@ -2,8 +2,7 @@
 import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 
 import type {
   DeviceCodeType,
@@ -40,10 +39,7 @@ type Props = {|
 
 @observer
 export default class CommonHintBlock extends React.Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const {
       deviceCode,

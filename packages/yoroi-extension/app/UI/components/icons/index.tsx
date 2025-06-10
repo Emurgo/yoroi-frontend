@@ -222,6 +222,7 @@ export enum Icons {
   GridDefault = 'GridDefault',
   GridDense = 'GridDense',
   Image = 'Image',
+  Indicator = 'Indicator',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
   LastSeen = 'LastSeen',

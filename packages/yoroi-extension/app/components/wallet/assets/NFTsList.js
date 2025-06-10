@@ -11,12 +11,14 @@ import { ReactComponent as DefaultNFT } from '../../../assets/images/default-nft
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
 import { urlResolveForIpfsAndCorsproxy } from '../../../coreUtils';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+// $FlowIgnore
+import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -73,6 +75,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
     }, SEARCH_ACTIVATE_DEBOUNCE_WAIT),
     []
   );
+  const componentPathId = 'nftsList';
 
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
@@ -96,7 +99,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-        <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px">
+        <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px" id={`${componentPathId}-nftsCount-text`}>
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
@@ -109,6 +112,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                 key={count}
                 onClick={() => setColumnsAndTrack({ count, Icon, imageDims })}
                 variant="segmented"
+                id={`${componentPathId}-${count}_columnView-button`}
               >
                 <Icon />
               </SButton>
@@ -126,12 +130,13 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             endAdornment={
               keyword !== '' && (
                 <InputAdornment position="end">
-                  <IconButton sx={{ mr: '-10px' }} onClick={() => setKeyword('')}>
+                  <IconButton sx={{ mr: '-10px' }} onClick={() => setKeyword('')} id={`${componentPathId}:search-clear-button`}>
                     <Close />
                   </IconButton>
                 </InputAdornment>
               )
             }
+            id={`${componentPathId}-search-input`}
           />
         </Box>
       </Box>
@@ -144,15 +149,16 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             justifyContent: 'center',
           }}
           spacing={2}
+          id={`${componentPathId}-emptyState-component`}
         >
           <NotFound />
-          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium">
+          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium" id={`${componentPathId}-noNfts-text`}>
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
       ) : (
         <Grid container columns={columns.count} spacing="24px">
-          {nftList.map(nft => {
+          {nftList.map((nft, index) => {
             return (
               <Grid
                 item
@@ -168,7 +174,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                     ampli.nftGalleryDetailsPageViewed();
                   }}
                 >
-                  <NftCardImage ipfsUrl={nft.image} name={nft.name} />
+                  <NftCardImage ipfsUrl={nft.image} name={nft.name} nftPathId={`${componentPathId}:nft_${index}`}/>
                 </SLink>
               </Grid>
             );
@@ -180,13 +186,6 @@ function NfTsList({ list, intl }: Props & Intl): Node {
 }
 
 export default (injectIntl(NfTsList): ComponentType<Props>);
-
-function imageExists(imageSrc: string, onload: void => void, onerror: void => void) {
-  const img = new Image();
-  img.onload = onload;
-  img.onerror = onerror;
-  img.src = imageSrc;
-}
 
 const SvgWrapper = styled(Box)(({ theme, height }) => ({
   display: 'flex',
@@ -207,12 +206,14 @@ export function NftImage({
   width,
   height,
   contentHeight,
+  nftPathId,
 }: {|
   imageUrl: ?string,
   name: string,
   width: string,
   height: string,
   contentHeight?: string,
+  nftPathId: string,
 |}): Node {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -235,7 +236,7 @@ export function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
+      <SvgWrapper height={contentHeight ? contentHeight : '100%'} id={`${nftPathId}-image-box`}>
         <DefaultNFT />
       </SvgWrapper>
     );
@@ -258,15 +259,16 @@ export function NftImage({
       src={url}
       alt={name}
       loading="lazy"
+      id={`${nftPathId}-image-component`}
     />
   );
 }
 
-function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string |}) {
+function NftCardImage({ ipfsUrl, name, nftPathId }: {| ipfsUrl: string | null, name: string, nftPathId: string |}) {
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} id={`${nftPathId}-component-button`}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" />
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId}/>
       </Box>
       <Box>
         <Typography
@@ -274,6 +276,7 @@ function NftCardImage({ ipfsUrl, name }: {| ipfsUrl: string | null, name: string
           mt="16px"
           sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           color="grayscale.900"
+          id={`${nftPathId}-name-text`}
         >
           {name}
         </Typography>

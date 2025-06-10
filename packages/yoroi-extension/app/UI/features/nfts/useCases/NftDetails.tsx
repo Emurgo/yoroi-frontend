@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Nft } from '../common/types';
 import { TabItem, Tabs } from '../../../components/tabs/Tabs';
 import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';

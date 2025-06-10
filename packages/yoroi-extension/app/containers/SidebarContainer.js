@@ -55,21 +55,21 @@ export default class SidebarContainer extends Component<StoresProps, State> {
     return (
       <SidebarRevamp
         onLogoClick={() => {
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: ROUTES.WALLETS.ROOT,
           });
         }}
         onCategoryClicked={category => {
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: category.route,
           });
         }}
-        isActiveCategory={category => stores.app.currentRoute.startsWith(category.route)}
+        isActiveCategory={category => stores.routing.currentRoute.startsWith(category.route)}
         categories={allCategoriesRevamp.filter(category =>
           category.isVisible({
             hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
             selected: this.props.stores.wallets.selected,
-            currentRoute: this.props.stores.app.currentRoute,
+            currentRoute: this.props.stores.routing.currentRoute,
             isRewardWallet: (wallet) =>
               stores.delegation.isRewardWallet(wallet.publicDeriverId),
           })

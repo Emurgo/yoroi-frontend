@@ -4,7 +4,11 @@ import { observable, action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse } from '../../api/ada';
+import type {
+  CreateDelegationTxFunc,
+  CreateWithdrawalTxResponse,
+  CreateDelegationTxResponse
+} from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
@@ -62,7 +66,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     wallet: WalletState,
     poolRequest?: string,
     drepCredential?: string,
-  |}) => Promise<any> = async request => {
+  |}) => Promise<CreateDelegationTxResponse> = async request => {
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
 
     const absSlotNumber = new BigNumber(
@@ -96,7 +100,7 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @action
   createWithdrawalTxForWallet: ({|
     wallet: WalletState,
-  |}) => Promise<any> = async request => {
+  |}) => Promise<CreateWithdrawalTxResponse> = async request => {
     this.createWithdrawalTx.reset();
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
@@ -137,52 +141,19 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
     password?: string,
     dialog?: any,
   |}) => Promise<void> = async request => {
-    const result = this.createDelegationTx.result;
-    if (result == null) {
+    const signRequest = this.createDelegationTx.result?.signTxRequest;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    const refreshWallet = () => {
-      this.stores.delegation.disablePoolTransitionState(request.wallet);
-      return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
-    };
     try {
-      if (request.wallet.type === 'ledger') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
-          broadcastRequest: {
-            ledger: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      if (request.wallet.type === 'trezor') {
-        await this.stores.substores.ada.wallets.adaSendAndRefresh({
-          broadcastRequest: {
-            trezor: {
-              signRequest: result.signTxRequest,
-              wallet: request.wallet,
-            },
-          },
-          refreshWallet,
-        });
-        return;
-      }
-      // normal password-based wallet
-      if (request.password == null) {
-        throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-      }
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          normal: {
-            wallet: request.wallet,
-            password: request.password,
-            signRequest: result.signTxRequest,
-          },
+      await this.stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: request.wallet,
+        signRequest,
+        password: request.password,
+        callback: () => {
+          this.stores.delegation.disablePoolTransitionState(request.wallet);
+          return this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId);
         },
-        refreshWallet,
       });
     } catch (error) {
       runInAction(() => {
@@ -200,12 +171,12 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
 
   goToDashboardRoute(): void {
     const route = buildRoute(ROUTES.STAKING);
-    this.stores.app.goToRoute({ route });
+    this.stores.routing.goToRoute({ route });
   }
 
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createDelegationTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

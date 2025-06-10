@@ -3,8 +3,7 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { ConfigType } from '../../../../config/config-types';
 import type { TokenEntry } from '../../../api/common/lib/MultiToken';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -35,10 +34,7 @@ type State = {|
 
 @observer
 export default class StakingPageContent extends Component<StoresProps, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     govStatusFetched: false,
   };
@@ -276,7 +272,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} intl={this.context.intl} />
+          <GovernanceParticipateDialog stores={stores} onClose={this.onClose}/>
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />

@@ -816,7 +816,7 @@ describe('Create signed transactions', () => {
       unsignedTxResponse.txBuilder.build().to_bytes(),
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set(),
+      null,
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -893,7 +893,7 @@ describe('Create signed transactions', () => {
       txBody,
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set(),
+      null,
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -962,14 +962,7 @@ describe('Create signed transactions', () => {
       unsignedTxResponse.txBuilder.build().to_bytes(),
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set([
-        RustModule.WalletV4.make_vkey_witness(
-          RustModule.WalletV4.FixedTransaction.from_hex(
-            unsignedTxResponse.txBuilder.build_tx().to_hex(),
-          ).transaction_hash(),
-          stakingKey,
-        ).to_hex()
-      ]),
+      stakingKey,
       undefined,
     );
     const witnesses = signedTx.witness_set();
@@ -1037,14 +1030,7 @@ describe('Create signed transactions', () => {
       unsignedTxResponse.txBuilder.build().to_bytes(),
       Bip44DerivationLevels.ACCOUNT.level,
       accountPrivateKey,
-      new Set([
-        RustModule.WalletV4.make_vkey_witness(
-          RustModule.WalletV4.FixedTransaction.from_hex(
-            unsignedTxResponse.txBuilder.build_tx().to_hex()
-          ).transaction_hash(),
-          stakingKey,
-        ).to_hex(),
-      ]),
+      stakingKey,
       undefined,
     );
     const witnesses = signedTx.witness_set();

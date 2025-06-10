@@ -25,7 +25,6 @@ import type {
   IDisplayCutoffPopResponse,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
-import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type {
   TransactionExportRow,
@@ -82,7 +81,7 @@ export async function getWallets(
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
 |};
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -103,7 +102,7 @@ export type RemoveAllTransactionsFunc = (
 // getForeignAddresses
 
 export type GetForeignAddressesRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
 |};
 export type GetForeignAddressesResponse = Array<{|
   address: string,
@@ -140,7 +139,7 @@ export type ReferenceTransaction = {
 };
 export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
   isLocalRequest: boolean,
   +beforeTx?: ?ReferenceTransaction,
   +afterTx?: ?ReferenceTransaction,
@@ -162,7 +161,7 @@ export type GetTransactionsDataResponse = {|
 
 export type GetTransactionsDataFunc = (
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
     isLocalRequest: boolean,
   |}
 ) => Promise<GetTransactionsDataResponse>;

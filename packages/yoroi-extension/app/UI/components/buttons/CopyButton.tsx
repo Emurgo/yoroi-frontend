@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Icons, IconWrapper } from '../icons/index';
 import { Tooltip } from '../Tooltip';
-import { useIntl } from '../../context/IntlProvider';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 
 export const messages = Object.freeze(
@@ -25,7 +25,7 @@ interface Props {
 
 export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   const [copied, setCopied] = useState(false);
-  const { intl } = useIntl();
+  const intl = useIntl();
   const strings = useRef({
     copyToClipboard: intl.formatMessage(messages.copyToClipboard),
     copied: intl.formatMessage(messages.copied),
@@ -41,7 +41,7 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
 
   return (
     <Box onClick={handleCopy} {...props}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow placement="bottom-start">
+      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="bottom-start">
         <IconWrapper
           disabled={disabled}
           buttonProps={{ sx: { padding: 0 } }}

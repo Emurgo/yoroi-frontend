@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Skeleton, styled, SxProps } from '@mui/material';
 import { urlResolveForIpfsAndCorsproxy } from '../../../../../coreUtils';
 import { checkImageLoads } from '../helpers/index';
@@ -12,6 +12,7 @@ interface NftImageProps {
   maxWidth?: string;
   maxHeight?: string;
   contentHeight?: string;
+  nftPathId: string
   imageSx?: SxProps;
 }
 
@@ -19,6 +20,7 @@ export default function NftImage({
   imageUrl,
   name,
   contentHeight,
+  nftPathId,
   width = 'auto',
   height = 'auto',
   imageSx = {},
@@ -44,7 +46,7 @@ export default function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height={contentHeight ? contentHeight : '100%'}>
+      <SvgWrapper height={contentHeight ? contentHeight : '100%'} id={`${nftPathId}-image-component`}>
         <DefaultNft />
       </SvgWrapper>
     );
@@ -64,6 +66,7 @@ export default function NftImage({
       src={url}
       alt={name}
       loading="lazy"
+      id={`${nftPathId}-image-component`}
     />
   );
 }

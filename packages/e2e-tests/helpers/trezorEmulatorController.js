@@ -1,4 +1,7 @@
 import ws from 'ws';
+import { fiveSeconds, halfSecond } from './timeConstants.js';
+import { sleep } from '../utils/utils.js';
+import { TrezorModels } from './trezorHelper.js';
 const { WebSocket } = ws;
 
 class TrezorEmulatorControllerError extends Error {}
@@ -10,7 +13,13 @@ export class TrezorEmulatorController {
   constructor(logger) {
     this.logger = logger;
     this.ws = null;
+    this.model = null;
+    this.label = null;
   }
+
+  isModelT = () => this.model === TrezorModels.ModelT;
+  isSafe3 = () => this.model === TrezorModels.Safe3;
+  isSafe5 = () => this.model === TrezorModels.Safe5;
 
   _customPromise(json, functionName) {
     return new Promise((resolve, reject) => {
@@ -98,10 +107,12 @@ export class TrezorEmulatorController {
     this.logger.info(`closeWsConnection: The connection is closed`);
   }
 
-  emulatorStart() {
+  emulatorStart(trezorModel) {
+    this.model = trezorModel;
     const requestJson = {
       type: 'emulator-start',
-      version: '2-master',
+      version: '2-main',
+      model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
@@ -133,6 +144,7 @@ export class TrezorEmulatorController {
   }
 
   emulatorSetup(mnemonic) {
+    this.label = this.isModelT() ? 'Homescreen' : 'Emulator';
     const requestJson = {
       type: 'emulator-setup',
       mnemonic:
@@ -152,6 +164,24 @@ export class TrezorEmulatorController {
     };
 
     return this._customPromise(requestJson, 'emulatorPressYes');
+  }
+
+  emulatorSwipeUp() {
+    const requestJson = {
+      type: 'emulator-swipe',
+      direction: 'up',
+    };
+
+    return this._customPromise(requestJson, 'emulatorSwipeUp');
+  }
+
+  emulatorSwipeDown() {
+    const requestJson = {
+      type: 'emulator-swipe',
+      direction: 'down',
+    };
+
+    return this._customPromise(requestJson, 'emulatorSwipeDown');
   }
 
   emulatorPressNo() {
@@ -181,7 +211,7 @@ export class TrezorEmulatorController {
   bridgeStart(bridgeVersion) {
     const requestJson = {
       type: 'bridge-start',
-      version: bridgeVersion || '2.0.31',
+      version: bridgeVersion || '2.0.33',
     };
 
     return this._customPromise(requestJson, 'bridgeStart');
@@ -240,5 +270,54 @@ export class TrezorEmulatorController {
     };
 
     return this._customPromise(requestJson, 'readAndConfirmMnemonic');
+  }
+
+  /**
+   * Getting the current screen content
+   * @returns {Promise<{title: string, body: string}>}
+   */
+  async getScreenContent() {
+    const requestJson = {
+      type: 'emulator-get-screen-content',
+    };
+
+    const content = await this._customPromise(requestJson, 'getScreenContent');
+
+    return content.response;
+  }
+
+  /**
+   * The function clicks "Yes" until all screens are confirmed. Also it collects all content from all shown screens and returns it in the end.
+   * @returns {Promise<Array<string>>}
+   */
+  async fullConfirmAndGetContent() {
+    const result = [];
+    let content = await this.getScreenContent();
+    const endTime = Date.now() + fiveSeconds;
+    while (content.body === this.label) {
+      if (Date.now() <= endTime) {
+        sleep(halfSecond);
+        content = await this.getScreenContent();
+        continue;
+      } else {
+        throw new TrezorEmulatorControllerError('The Trezor device is not ready');
+      }
+    }
+    while (content.body !== this.label) {
+      result.push(content.body);
+      if (this.isModelT() || this.isSafe3()) {
+        await this.emulatorSwipeUp();
+        const prevContent = result[result.length - 1];
+        const afterSwipeContent = (await this.getScreenContent()).body;
+        if (afterSwipeContent !== prevContent) {
+          const newContent = prevContent + afterSwipeContent;
+          result[result.length - 1] = newContent;
+        }
+      }
+      await this.emulatorPressYes();
+      content = await this.getScreenContent();
+    }
+
+    return result;
   }
 }

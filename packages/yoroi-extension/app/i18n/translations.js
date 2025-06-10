@@ -1,20 +1,4 @@
 // @flow
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
-import vi from 'react-intl/locale-data/vi';
 import globalMessages from './global-messages';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { ReactComponent as EnglishFlag }  from '../assets/images/flags/english.inline.svg';
@@ -24,34 +8,10 @@ import { ReactComponent as Chinese }  from '../assets/images/flags/chinese.inlin
 import { ReactComponent as RussianFlag }  from '../assets/images/flags/russian.inline.svg';
 import { ReactComponent as GermanFlag }  from '../assets/images/flags/german.inline.svg';
 import { ReactComponent as FrenchFlag }  from '../assets/images/flags/french.inline.svg';
-import { ReactComponent as DutchFlag }  from '../assets/images/flags/dutch.inline.svg';
 import { ReactComponent as BrazilFlag }  from '../assets/images/flags/brazil.inline.svg';
 import { ReactComponent as SpanishFlag }  from '../assets/images/flags/spanish.inline.svg';
-import { ReactComponent as ItalianFlag }  from '../assets/images/flags/italian.inline.svg';
 import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indonesian.inline.svg';
-import { ReactComponent as TurkishFlag }  from '../assets/images/flags/turkish.inline.svg';
-import { ReactComponent as CzechFlag }  from '../assets/images/flags/czech.inline.svg';
-import { ReactComponent as SlovakFlag }  from '../assets/images/flags/slovak.inline.svg';
 import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
-
-export const locales: any = Object.freeze([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...nl,
-  ...pt,
-  ...id,
-  ...es,
-  ...it,
-  ...tr,
-  ...cs,
-  ...sk,
-  ...vi,
-]);
 
 // This is essentially bulk require
 // $FlowExpectedError[prop-missing] require.context comes from webpack
@@ -93,11 +53,6 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: Chinese
   },
   {
-    value: 'zh-Hant',
-    label: globalMessages.languageChineseTraditional,
-    svg: Chinese
-  },
-  {
     value: 'ru-RU',
     label: globalMessages.languageRussian,
     svg: RussianFlag
@@ -113,11 +68,6 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: FrenchFlag
   },
   {
-    value: 'nl-NL',
-    label: globalMessages.languageDutch,
-    svg: DutchFlag
-  },
-  {
     value: 'pt-BR',
     label: globalMessages.languagePortuguese,
     svg: BrazilFlag
@@ -128,29 +78,9 @@ export const LANGUAGES: Array<LanguageType> = [
     svg: SpanishFlag
   },
   {
-    value: 'it-IT',
-    label: globalMessages.languageItalian,
-    svg: ItalianFlag
-  },
-  {
     value: 'id-ID',
     label: globalMessages.languageIndonesian,
     svg: IndonesianFlag
-  },
-  {
-    value: 'tr-TR',
-    label: globalMessages.languageTurkish,
-    svg: TurkishFlag
-  },
-  {
-    value: 'cs-CZ',
-    label: globalMessages.languageCzech,
-    svg: CzechFlag
-  },
-  {
-    value: 'sk-SK',
-    label: globalMessages.languageSlovak,
-    svg: SlovakFlag
   },
   {
     value: 'vi-VN',
