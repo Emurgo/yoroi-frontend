@@ -552,6 +552,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     return this.context.formatMessage(errMsg, values);
   }
 
+  avoidWhitespacesAddress(e: KeyboardEvent) {
+    if (e.key === " " && name.length === 0) {
+      e.preventDefault();
+    }
+  }
+
   renderCurrentStep(step: number): Node {
     const { form } = this;
     const intl = this.context;
@@ -632,6 +638,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                onKeyDown={this.avoidWhitespacesAddress}
               />
               {domainResolverResult != null ? (
                 <Typography
