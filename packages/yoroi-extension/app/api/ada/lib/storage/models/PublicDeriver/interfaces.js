@@ -5,7 +5,7 @@ import type {
 } from 'lovefield';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
-import type { IConceptualWallet, IHasLevels } from '../ConceptualWallet/interfaces';
+import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
 import {
   GetUtxoTxOutputsWithTx,
@@ -104,7 +104,7 @@ export interface IPublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> {
   constructor(data: IPublicDeriverConstructor<Parent>): IPublicDeriver<Parent>;
   getDb(): lf$Database;
   getPublicDeriverId(): number;
-  getParent(): Parent & IHasLevels;
+  getParent(): Parent;
   getPathToPublic(): Array<number>;
   getDerivationId(): number;
   getFullPublicDeriverInfo(): Promise<$ReadOnly<PublicDeriverRow>>;

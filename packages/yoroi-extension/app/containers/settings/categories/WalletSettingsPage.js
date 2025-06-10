@@ -1,6 +1,5 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresProps } from '../../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
@@ -16,19 +15,16 @@ import ResyncWalletDialogContainer from './ResyncWalletDialogContainer';
 import { isValidWalletName } from '../../../utils/validations';
 import ChangeWalletPasswordDialogContainer from '../../wallet/dialogs/ChangeWalletPasswordDialogContainer';
 import { Typography } from '@mui/material';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 // $FlowIgnore: suppressing this error
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const { walletSettings } = stores;
     const { renameModelRequest, lastUpdatedWalletField, walletFieldBeingEdited } = walletSettings;

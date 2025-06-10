@@ -2,10 +2,9 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import type { TransferTx } from '../../types/TransferTypes';
 import { genAddressLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
@@ -39,9 +38,7 @@ const messages = defineMessages({
 @observer
 export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { transferRequest } = this.props.stores.substores.ada.yoroiTransfer;
@@ -69,7 +66,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -119,7 +116,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     // CardanoMainnet.NetworkId is hardcoded here because the functionality is available only on mainnet
     const network = getNetworkById(networks.CardanoMainnet.NetworkId);
 
-    const { intl } = this.context;
+    const intl = this.context;
     const header = (
       <div>
         {intl.formatMessage(messages.explanation, {

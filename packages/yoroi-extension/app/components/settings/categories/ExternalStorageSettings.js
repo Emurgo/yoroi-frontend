@@ -2,12 +2,11 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import type { SelectedExternalStorageProvider } from '../../../domain/ExternalStorage';
 import type { ProvidersType } from '../../../api/externalStorage/index';
 import styles from './ExternalStorageSettings.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   sectionTitle: {
@@ -37,13 +36,10 @@ type Props = {|
 
 @observer
 export default class ExternalStorageSettings extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { onConnect, onDisconnect, externalStorageProviders, selectedExternalStorage } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const providersButtons = [];
     for (const provider of Object.keys(externalStorageProviders)) {
@@ -72,9 +68,9 @@ export default class ExternalStorageSettings extends Component<Props> {
     return (
       <div className={styles.component}>
         <Typography variant="h4" color="ds.text_gray_medium" mb="8px">
-          {this.context.intl.formatMessage(messages.sectionTitle)}
+          {this.context.formatMessage(messages.sectionTitle)}
         </Typography>
-        <div>{this.context.intl.formatMessage(messages.sectionIntro)}</div>
+        <div>{this.context.formatMessage(messages.sectionIntro)}</div>
         {providersButtons}
       </div>
     );

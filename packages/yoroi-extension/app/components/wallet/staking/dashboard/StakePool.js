@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { toSvg } from 'jdenticon';
 
 import { Button } from '@mui/material';
@@ -15,7 +15,6 @@ import ExplorableHashContainer from '../../../../containers/widgets/ExplorableHa
 import styles from './StakePool.scss';
 import { SelectedExplorer } from '../../../../domain/SelectedExplorer';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { truncateStakePool } from '../../../../utils/formatters';
 
 const messages = defineMessages({
@@ -99,12 +98,9 @@ type Props = {|
 
 @observer
 export default class StakePool extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { hash, poolName } = this.props;
 
@@ -222,7 +218,7 @@ export default class StakePool extends Component<Props> {
   }
 
   getMoreInfoButton: (?MoreInfoProp) => Node = info => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <>
