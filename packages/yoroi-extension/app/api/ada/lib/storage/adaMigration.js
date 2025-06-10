@@ -21,8 +21,8 @@ import { migrateFromStorageV1 } from './bridge/walletBuilder/byron';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 import { removeAllTransactions } from './bridge/updateTransactions';
 import { removePublicDeriver } from './bridge/walletBuilder/remove';
-import { asGetAllUtxos, asHasLevels, asGetPublicKey, } from './models/PublicDeriver/traits';
-import { ConceptualWallet, isLedgerNanoWallet, } from './models/ConceptualWallet/index';
+import { asGetAllUtxos, asGetPublicKey, } from './models/PublicDeriver/traits';
+import { isLedgerNanoWallet, } from './models/ConceptualWallet/index';
 import { loadWalletsFromStorage } from './models/load';
 import environment from '../../../../environment';
 import { KeyKind } from '../cardanoCrypto/keys/types';
@@ -268,14 +268,7 @@ export async function cardanoTxHistoryReset(
   }
 
   for (const publicDeriver of wallets) {
-    const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-    if (!isCardanoHaskell(publicDeriver.getParent().getNetworkInfo())) {
-      continue;
-    }
-    if (withLevels == null) {
-      throw new Error(`${nameof(cardanoTxHistoryReset)} missing levels`);
-    }
-    await removeAllTransactions({ publicDeriver: withLevels });
+    await removeAllTransactions({ publicDeriver });
   }
 
   return true;

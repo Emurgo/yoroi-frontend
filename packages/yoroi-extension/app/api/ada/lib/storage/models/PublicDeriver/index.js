@@ -43,7 +43,6 @@ import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
 import { networks } from '../../database/prepackaged/networks';
-import type { IHasLevels } from '../ConceptualWallet/interfaces';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
@@ -53,7 +52,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
    */
 
   publicDeriverId: number;
-  +parent: Parent & IHasLevels;
+  +parent: Parent;
   derivationId: number;
   pathToPublic: Array<number>;
   utxoService: UtxoService;
@@ -89,7 +88,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
     return this.publicDeriverId;
   }
 
-  getParent(): Parent & IHasLevels {
+  getParent(): Parent {
     return this.parent;
   }
 

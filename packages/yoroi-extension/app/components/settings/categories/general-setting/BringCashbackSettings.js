@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { MenuItem, Typography, Stack } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -14,7 +14,6 @@ import Dialog from '../../../widgets/Dialog';
 import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import WalletAccountIcon from '../../../topbar/WalletAccountIcon';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { RevampSwitch } from '../../../widgets/Switch';
@@ -52,21 +51,18 @@ class BringCashbackSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       cashbackWalletId: {
-        label: this.context.intl.formatMessage(messages.label),
+        label: this.context.formatMessage(messages.label),
       },
     },
   });
 
   render(): Node {
     const { cardanoWallets, error, currentValue, onSetUseSandbox } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const cashbackWalletId = form.$('cashbackWalletId');
     const componentClassNames = classNames([styles.component, 'currency']);
@@ -153,7 +149,7 @@ class BringCashbackSettings extends Component<Props> {
             {mainnetWallets.map(option => optionRenderer(option))}
           </Select>
           <Typography component="div" variant="caption1" display="inline-block" color="grayscale.700">
-            <FormattedHTMLMessage {...messages.note} />
+            <FormattedMessage {...messages.note} />
           </Typography>
         </Box>
         {onSetUseSandbox != null ? (

@@ -1,8 +1,8 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import type { MessageDescriptor, $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import type { MessageDescriptor } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import styles from './SideBarCategoryRevamp.scss';
@@ -26,12 +26,9 @@ const ItemWrapper = styled(Box)(({ theme, active }) => ({
 
 @observer
 export default class SideBarCategoryRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const { icon, active, onClick, label, route } = this.props;
 

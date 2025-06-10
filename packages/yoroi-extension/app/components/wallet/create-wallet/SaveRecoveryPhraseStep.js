@@ -1,7 +1,7 @@
 // @flow
 import { useEffect, useState } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box, styled } from '@mui/material';
@@ -12,6 +12,7 @@ import RecoveryPhrase from './RecoveryPhrase';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages: * = defineMessages({
   description: {
@@ -53,7 +54,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
           <Typography component="div" color="ds.text_gray_medium">
-            <FormattedHTMLMessage {...messages.description} />
+            <FormattedMessage {...messages.description} values={{ strong }}/>
           </Typography>
           <Box
             sx={{ cursor: 'pointer' }}
