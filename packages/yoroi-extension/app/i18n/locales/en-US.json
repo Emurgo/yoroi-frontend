@@ -1314,6 +1314,7 @@
   "portfolio.tokenInfo.menuLabel.overview": "Overview",
   "portfolio.tokenInfo.menuLabel.performance": "Performance",
   "portfolio.tokenInfo.overview.description": "Description",
+  "portfolio.tokenInfo.overview.info": "Info",
   "portfolio.tokenInfo.overview.website": "Website",
   "portfolio.tokenInfo.overview.policyId": "Policy ID",
   "portfolio.tokenInfo.overview.fingerprint": "Fingerprint",
