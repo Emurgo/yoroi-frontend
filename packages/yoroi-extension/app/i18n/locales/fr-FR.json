@@ -794,6 +794,7 @@
   "wallet.infoDialog.title": "Tips",
   "wallet.insufficientFunds.subtitle": "Votre participation requiert au moins {requiredBalance} {tokenName}, mais vous n'avez que {currentBalance}. Les récompenses non réclamées ne sont pas incluses dans ce montant",
   "wallet.insufficientFunds.title": "Fonds insuffisants",
+  "wallet.insufficientFunds.subtitleHidden": "Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.",
   "wallet.loading": "Chargement...",
   "wallet.nav.addButton": "Ajouter un nouveau wallet",
   "wallet.nav.addNewWallet": "Ajouter un nouveau wallet",
