@@ -38,7 +38,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         </Typography>
       </Stack>
 
-      <TokenOverviewSection label={strings.description} value={tokenInfo?.info.metadata?.description} />
+      <TokenOverviewSection label={strings.info} value={tokenInfo?.info.metadata?.description} />
 
       <TokenOverviewSection
         label={strings.website}
