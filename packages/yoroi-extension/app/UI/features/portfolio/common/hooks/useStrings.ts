@@ -365,7 +365,7 @@ export const useStrings = () => {
     '1M': intl.formatMessage(messages['1M']),
     '6M': intl.formatMessage(messages['6M']),
     '1Y': intl.formatMessage(messages['1Y']),
-    ALL: intl.formatMessage(messages.ALL),
+    ALL: intl.formatMessage(messages['ALL']),
     portfolio: intl.formatMessage(messages.portfolio),
     totalAmount: intl.formatMessage(messages.totalAmount),
     transactionHistory: intl.formatMessage(messages.transactionHistory),

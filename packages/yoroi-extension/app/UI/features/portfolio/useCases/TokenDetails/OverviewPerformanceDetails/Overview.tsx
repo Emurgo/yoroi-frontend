@@ -31,7 +31,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
             // @ts-ignore
             e.target.src = tokenPng;
           }}
-        />
+        ></Box>
 
         <Typography fontWeight="500" color="ds.gray_900">
           {tokenInfo?.info.name}
@@ -59,7 +59,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
       <TokenOverviewSection
         label={strings.detailsOn}
         value={`${tokenInfo.info.fingerprint}`}
-        isNetworkUrl
+        isNetworkUrl={true}
         isPrimary={isPrimary}
       />
     </Stack>
