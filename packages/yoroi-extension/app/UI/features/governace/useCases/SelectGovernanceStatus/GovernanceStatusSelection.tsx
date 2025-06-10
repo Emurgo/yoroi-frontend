@@ -70,7 +70,7 @@ export const GovernanceStatusSelection = () => {
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const strings = useStrings();
-  const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
+  const pageTitle = strings.registerGovernance;
   const pageSubtitle = strings.reviewSelection;
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
   const location = useLocation();
