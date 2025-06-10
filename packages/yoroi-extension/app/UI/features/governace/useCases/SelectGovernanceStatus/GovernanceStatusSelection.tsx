@@ -71,8 +71,7 @@ export const GovernanceStatusSelection = () => {
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const strings = useStrings();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
-  const statusRawText = mapStatus[governanceStatus.status || ''];
-  const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const pageSubtitle = strings.reviewSelection;
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
   const location = useLocation();
 
@@ -180,18 +179,14 @@ export const GovernanceStatusSelection = () => {
     {
       title: strings.delegateToYoroiDRep,
       titleHover: strings.delegateToYoroiDRep,
-      description: statusDelegatingToYoroi
-        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.delegateToYoroi,
-      descriptionHover: statusDelegatingToYoroi
-        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.delegateToYoroi,
-      extraInfo: statusDelegatingToYoroi ? governanceStatus.drep : null,
+      description: strings.delegateToYoroi,
+      descriptionHover: strings.delegateToYoroi,
       icon: <DRepIlustration />,
       selected: statusDelegatingToYoroi,
       onClick: handleYoroiDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegatingToYoroi,
+      blocked: statusDelegatingToYoroi,
       isVisible: Number(networkId) === 0,
       bottom: (
         <Stack direction="column" pt="16px" width="100%">
@@ -213,6 +208,7 @@ export const GovernanceStatusSelection = () => {
       extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,
       onClick: handleDelegate,
+      blocked: false,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegating,
       isVisible: true,
@@ -227,6 +223,7 @@ export const GovernanceStatusSelection = () => {
       onClick: handleAbstain,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_ABSTAIN,
+      blocked: false,
       isVisible: true,
     },
     {
@@ -236,6 +233,7 @@ export const GovernanceStatusSelection = () => {
       onClick: handleNoConfidence,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE,
+      blocked: false,
       isVisible: true,
     },
   ];
@@ -301,6 +299,7 @@ export const GovernanceStatusSelection = () => {
                   onClick={option.onClick}
                   pending={option.pending}
                   loading={option.loading}
+                  blocked={option.blocked}
                   isVisible={option.isVisible}
                   extraInfo={option.extraInfo}
                   bottom={option.bottom}
@@ -321,6 +320,7 @@ export const GovernanceStatusSelection = () => {
                   onClick={option.onClick}
                   pending={option.pending}
                   loading={option.loading}
+                  blocked={option.blocked}
                   smallCard={true}
                   isVisible={option.isVisible}
                 />

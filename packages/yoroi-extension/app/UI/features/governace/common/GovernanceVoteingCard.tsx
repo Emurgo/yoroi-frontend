@@ -17,13 +17,14 @@ type Props = {
   onClick: () => void;
   pending: boolean;
   loading: boolean;
+  blocked: boolean;
   smallCard?: boolean;
   isVisible?: boolean;
   extraInfo?: string | null;
   bottom?: React.ReactNode;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending, blocked, smallCard }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -42,7 +43,6 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selec
     backgroundImage: !pending && theme.palette.ds.bg_gradient_2,
     border: '2px solid transparent',
     backgroundOrigin: 'border-box',
-    pointerEvents: is_drep_selected !== 'true' && 'none',
   }),
   cursor: 'pointer',
   ...(pending && {
@@ -50,11 +50,10 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selec
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: theme.palette.ds.bg_gradient_1,
-    border: '2px solid transparent',
-    backgroundOrigin: 'border-box',
-    // background: !pending && theme.palette.ds.bg_gradient_2,
-    transition: 'opacity 1s ease-in-out',
+    backgroundImage: !blocked && theme.palette.ds.bg_gradient_1,
+    border: !blocked && '2px solid transparent',
+    backgroundOrigin: !blocked && 'border-box',
+    transition: !blocked && 'opacity 1s ease-in-out',
   },
 }));
 
@@ -86,6 +85,7 @@ export const GovernanceVoteingCard = ({
   smallCard,
   isVisible,
   extraInfo,
+  blocked,
   bottom,
 }: Props) => {
 
@@ -95,10 +95,10 @@ export const GovernanceVoteingCard = ({
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard
-        onClick={pending ? undefined : onClick}
+        onClick={pending || blocked ? undefined : onClick}
         pending={pending ? 'true' : undefined}
         selected={selected}
-        is_drep_selected={String(governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID)}
+        blocked={String(governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID)}
         smallCard={smallCard}
       >
         {loading && (
