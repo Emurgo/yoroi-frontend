@@ -117,22 +117,20 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
         </Typography>
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="450px">
+      <Stack direction="row" gap="8px" alignItems="flex-start" width="100%" display="flex">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" color="ds.text_gray_medium" maxWidth="450px" minWidth="0">
           {input.address}
         </Typography>
         <CopyButton textToCopy={input.address} />
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Stack direction="row" gap="8px" alignItems="flex-start">
-          <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="420px">
-            {input.txHash}
-          </Typography>
-          <Typography sx={{}} variant="body1" fontWeight={500}>
-            {`#${input.txIndex}`}
-          </Typography>
-        </Stack>
+      <Stack direction="row" gap="8px" alignItems="flex-start" width="100%" display="flex">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" color="ds.text_gray_medium" maxWidth="420px" minWidth="0">
+          {input.txHash}
+        </Typography>
+        <Typography variant="body1" fontWeight={500}>
+          {`#${input.txIndex}`}
+        </Typography>
         <CopyButton textToCopy={input.txHash} />
       </Stack>
 
@@ -170,8 +168,8 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
         </Typography>
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" maxWidth="450px">
+      <Stack direction="row" gap="8px" alignItems="flex-start" width="100%" display="flex">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" maxWidth="450px" minWidth="0">
           {output.address}
         </Typography>
         <CopyButton textToCopy={output.address} />
