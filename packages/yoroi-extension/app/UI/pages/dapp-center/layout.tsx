@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
-import { useIntl } from '../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 import { connectorMessages } from '../../../i18n/global-messages';
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
 };
 
 const DappCenterLayout = ({ stores, children }: Props): JSX.Element => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return (
     <GeneralPageLayout
       stores={stores}

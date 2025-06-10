@@ -1,7 +1,6 @@
 import { Typography , Box } from '@mui/material';
-import { useIntl } from '../../../../context/IntlProvider';
 import { connectorMessages } from '../../../../../i18n/global-messages';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import { NoDappsConnected as NoDappsConnectedIllustration } from '../../../../components/ilustrations';
 
 const messages = defineMessages({
@@ -12,7 +11,7 @@ const messages = defineMessages({
 });
 
 export default function NoDappsConnected() {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return (
     <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center">
       <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">

@@ -2,8 +2,7 @@ import { useEffect } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { ampli } from '../../../../../../ampli/index';
-import { useIntl } from '../../../../context/IntlProvider';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import NoDappsConnected from '../../common/components/NoDappsConnected';
 import ConnectionRow from '../../common/components/ConnectionRow';
 import { useDappConnections } from '../../common/hooks/useDappConnections';
@@ -30,7 +29,7 @@ const messages = defineMessages({
 
 const DappCenterDashboard = observer(() => {
   const theme = useTheme();
-  const { intl } = useIntl();
+  const intl = useIntl();
   //const strings = useStrings();
 
   useEffect(() => {
