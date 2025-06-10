@@ -1,8 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Stack, Button } from '@mui/material';
 import { ROUTES } from '../../../../../routes-config';
-import { IconWrapper, Icons } from '../../../../components/icons';
+import { IconWrapper, Icons } from '../../../../components';
 import { ampli } from '../../../../../../ampli';
 import { TabItem } from '../../../../components/tabs/Tabs';
 

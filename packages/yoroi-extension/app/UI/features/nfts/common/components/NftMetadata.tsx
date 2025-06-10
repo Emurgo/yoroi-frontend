@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Nft } from '../types';
 import { Button, Typography } from '@mui/material';
-import { IconWrapper, Icons } from '../../../../components/icons';
+import { IconWrapper, Icons } from '../../../../components';
 import { useStrings } from '../hooks/useStrings';
 
 export default function NftMetadata({ nftInfo }: { nftInfo: Nft | null }) {

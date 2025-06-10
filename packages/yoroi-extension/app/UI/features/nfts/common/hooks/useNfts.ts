@@ -8,10 +8,9 @@ import {
 } from '../../../../../utils/nftMetadata';
 import { useNftGallery } from '../../module/NftGalleryContextProvider';
 import { NetworkUrl, Nft } from '../types';
-import { useParams } from 'react-router-dom';
-import { getNetworkById } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { useParams } from 'react-router';
+import { getNetworkById , isCardanoHaskell } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { getNetworkUrl } from '../../../../utils/getNetworkUrl';
-import { isCardanoHaskell } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const useNfts = () => {
   const { spendableBalance, getTokenInfo, selectedWallet } = useNftGallery();
