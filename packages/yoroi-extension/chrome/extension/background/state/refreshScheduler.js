@@ -4,7 +4,6 @@ import { getWallets } from '../../../../app/api/common/index';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { getCardanoStateFetcher } from '../utils';
 import AdaApi from '../../../../app/api/ada';
-import { asHasLevels } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import environment from '../../../../app/environment';
 import { getDb } from './databaseManager';
 import { getSubscriptions, registerCallback, emitUpdateToSubscriptions } from '../subscriptionManager';
@@ -99,16 +98,11 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     const localStorageApi = new LocalStorageApi();
     const stateFetcher = await getCardanoStateFetcher(localStorageApi);
 
-    const withLevels = asHasLevels(publicDeriver);
-    if (!withLevels) {
-      throw new Error('unexpected missing asHasLevels result');
-    }
-
     const adaApi = new AdaApi();
     const localTxs = await adaApi.refreshTransactions({
       // skip
       limit: 1,
-      publicDeriver: withLevels,
+      publicDeriver,
       isLocalRequest: true,
       beforeTx: undefined,
       afterTx: undefined,
@@ -125,7 +119,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     const newTxs = await adaApi.refreshTransactions({
       // skip
       // number
-      publicDeriver: withLevels,
+      publicDeriver,
       isLocalRequest: false,
       beforeTx: undefined,
       afterTx: localTxs[0],

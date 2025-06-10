@@ -2,8 +2,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import CopyableAddress from '../../../../components/widgets/CopyableAddress';
@@ -34,11 +33,7 @@ type Props = {|
 
 @observer
 class CardanoUtxoDetails extends Component<Props> {
-  static contextTypes: {|
-    intl: $npm$ReactIntl$IntlFormat,
-  |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
@@ -165,7 +160,7 @@ class CardanoUtxoDetails extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { txData } = this.props;
     const foreignOutputs = txData.outputs.filter(o => o.isForeign);
 

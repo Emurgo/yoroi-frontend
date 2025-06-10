@@ -1,8 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { Box } from '@mui/material';
@@ -27,10 +26,7 @@ import { ampli } from '../../../ampli/index';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
       this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });

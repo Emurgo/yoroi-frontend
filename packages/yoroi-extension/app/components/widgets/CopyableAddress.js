@@ -2,7 +2,7 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { Node } from 'react';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { ReactComponent as IconCopy } from '../../assets/images/copy.inline.svg';
@@ -10,7 +10,6 @@ import { ReactComponent as IconCopied } from '../../assets/images/copied.inline.
 import styles from './CopyableAddress.scss';
 import { Box, Tooltip, Typography, styled } from '@mui/material';
 import type { Notification } from '../../types/notification.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const copyableMessages: Object = defineMessages({
   copyTooltipMessage: {
@@ -45,10 +44,7 @@ type Props = {|
 
 @observer
 export default class CopyableAddress extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {|
     darkVariant: boolean,
     elementId: void,
@@ -65,7 +61,7 @@ export default class CopyableAddress extends Component<Props> {
 
   render(): Node {
     const { hash, elementId, sx, onCopyAddress, notification, darkVariant, id } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const Icon = notification && notification.id === elementId ? IconCopied : IconCopy;
     const tooltipComponent = (

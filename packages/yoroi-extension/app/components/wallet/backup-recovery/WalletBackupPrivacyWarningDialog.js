@@ -4,14 +4,13 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import CheckboxLabel from '../../common/CheckboxLabel'
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';
 import { ReactComponent as RecoveryWatchingSvg }  from '../../../assets/images/recovery-watching.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   recoveryPhraseInstructions: {
@@ -38,12 +37,10 @@ type Props = {|
 @observer
 export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       countdownRemaining,
       canPhraseBeShown,
@@ -78,7 +75,7 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       >
         <span className={styles.recoveryImage}><RecoveryWatchingSvg/></span>
         <WalletRecoveryInstructions
-          instructionsText={<FormattedHTMLMessage {...messages.recoveryPhraseInstructions} />}
+          instructionsText={<FormattedMessage {...messages.recoveryPhraseInstructions} />}
         />
         <div className={styles.checkbox}>
           <CheckboxLabel

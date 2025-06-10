@@ -9,7 +9,6 @@ import {
   asGetAllUtxos,
   asGetBalance,
   asGetPublicKey,
-  asHasLevels,
   asHasUtxoChains,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import BigNumber from 'bignumber.js';
@@ -449,12 +448,8 @@ export async function connectorGetStakeKey(
   if (withPubKey == null) {
     throw new Error('Unable to get public key from the wallet');
   }
-  const withLevels = asHasLevels(wallet);
-  if (withLevels == null) {
-    throw new Error('Unable to get derivation levels from the wallet');
-  }
   const publicKey = (await withPubKey.getPublicKey()).Hash;
-  const publicDeriverLevel = withLevels.getParent().getPublicDeriverLevel();
+  const publicDeriverLevel = wallet.getParent().getPublicDeriverLevel();
   const stakeKey = pubKeyAndAddressingByChainAndIndex(
     { publicKey, publicDeriverLevel },
     ChainDerivations.CHIMERIC_ACCOUNT,

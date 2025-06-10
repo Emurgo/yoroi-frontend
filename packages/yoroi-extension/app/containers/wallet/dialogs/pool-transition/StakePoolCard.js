@@ -2,9 +2,8 @@
 import { forwardRef } from 'react';
 import { Typography, styled, Box, Stack } from '@mui/material';
 import { formatTimeSpan } from './helpers';
-
+import { useIntl } from 'react-intl';
 import { ReactComponent as WarningSvg } from '../../../../assets/images/revamp/icons/alert.inline.svg';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { messages } from './dialog-messages';
 import { toSvg } from 'jdenticon';
 
@@ -17,7 +16,6 @@ type Props = {|
   suggestedPool?: boolean,
   deadlinePassed: boolean,
   poolHash?: string,
-  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 export const StakePoolCard = ({
@@ -28,9 +26,9 @@ export const StakePoolCard = ({
   deadlineMilliseconds,
   deadlinePassed,
   suggestedPool = false,
-  intl,
   poolHash,
 }: Props): React$Node => {
+  const intl = useIntl();
   const avatarSource = toSvg(poolHash, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
   return (
