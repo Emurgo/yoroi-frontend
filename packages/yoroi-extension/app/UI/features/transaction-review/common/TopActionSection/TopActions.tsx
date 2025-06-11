@@ -1,5 +1,4 @@
 import { IconButton, Stack, styled, Typography } from '@mui/material';
-import React from 'react';
 import { Icon } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../hooks/useStrings';
@@ -50,7 +49,7 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
           <Icon.Back />
         </StyledButton>
       )}
-      <Typography variant="h4" my="24px" fontWeight="500" textAlign="center" id='txReview-title-text' sx={{ textTransform: 'uppercase' }}>
+      <Typography variant="button" my="24px" textAlign="center" id='txReview-title-text'>
         {getModalTitle()}
       </Typography>
       <StyledButton onClick={() => closeTxReviewModal({ type: 'close' })} sx={{ right: '24px' }} id='txReview-close-button'>

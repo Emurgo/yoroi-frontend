@@ -1,6 +1,5 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { SuccessIlustration } from './SuccessIlustration';
 // @ts-ignore
 import { ROUTES } from '../../../routes-config';
@@ -21,7 +20,7 @@ export const TransactionSubmitted = ({
   btnText?: string;
   onPress?: () => void;
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   return (
     <Stack width="100%" alignItems="center" pt="143px" sx={{ maxWidth: '500px', margin: '0 auto' }}>
       <SuccessIlustration />
@@ -41,7 +40,7 @@ export const TransactionSubmitted = ({
         //  @ts-ignore
         variant="primary"
         onClick={() => {
-          onPress ? onPress() : history.push(ROUTES.WALLETS.TRANSACTIONS);
+          onPress ? onPress() : navigate(ROUTES.WALLETS.TRANSACTIONS);
         }}
       >
         {btnText ? btnText : <FormattedMessage {...globalMessages.goToTransactions} />}

@@ -1,9 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './OptForAnalyticsForm.scss';
 import tosStyles from './TermsOfUseText.scss';
@@ -17,7 +16,7 @@ import { RevampSwitch } from '../../widgets/Switch';
 import environment from '../../../environment';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 import ReactMarkdown from 'react-markdown';
-
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   title: {
@@ -85,10 +84,7 @@ type State = {|
 
 @observer
 export default class OptForAnalyticsForm extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = { isSubmitting: false, showPrivacyNotice: false };
 
   onOpt: boolean => void = isOptIn => {
@@ -101,7 +97,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
   };
 
   renderPrivacyNotice(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const privacyNotice = this.props.privacyNotice;
     return (
       <>
@@ -129,7 +125,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { variant, isOptedIn } = this.props;
 
     if (this.state.showPrivacyNotice) {
@@ -189,7 +185,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                     <Icon />
                   </Box>
                   <Typography component="div" color="ds.text_gray_medium">
-                    <FormattedHTMLMessage {...msg} />
+                    <FormattedMessage {...msg} values={{ strong }}/>
                   </Typography>
                 </Box>
               ))}

@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -12,7 +12,6 @@ import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   deleteMemoContent: {
@@ -40,16 +39,13 @@ type State = {|
 @observer
 export default class DeleteMemoDialog extends Component<Props, State> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isSubmitting } = this.state;
     const {
       error,
@@ -62,13 +58,13 @@ export default class DeleteMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(globalMessages.cancel),
+        label: this.context.formatMessage(globalMessages.cancel),
         onClick: onCancel,
         disabled: isSubmitting,
       },
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.deleteMemoActionsDelete),
+        label: this.context.formatMessage(messages.deleteMemoActionsDelete),
         primary: true,
         onClick: () => onDelete(selectedTransaction.txid),
         isSubmitting,
@@ -87,7 +83,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
       >
         <div className={styles.content}>
           { error ? (<ErrorBlock error={error} />) : null }
-          <FormattedHTMLMessage {...messages.deleteMemoContent} />
+          <FormattedMessage {...messages.deleteMemoContent} />
         </div>
       </Dialog>);
   }

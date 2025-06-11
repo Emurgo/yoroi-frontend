@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, styled } from '@mui/material';
 
 const StyledCard = styled(Box)(({ theme }: any) => ({

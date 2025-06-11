@@ -1,14 +1,12 @@
 // @flow
 import type { Node } from 'react';
-import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
-import { Component } from 'react';
+import { Component, useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
-import { addLocaleData } from 'react-intl';
+import { HashRouter, useLocation, useNavigate } from 'react-router';
 import { observable, autorun, runInAction } from 'mobx';
-import { Routes } from './Routes';
-import { locales, translations } from './i18n/translations';
+import { YoroiRoutes } from './Routes';
+import { translations } from './i18n/translations';
 import { Logger } from './utils/logging';
 import { ColorModeProvider } from './styles/context/mode';
 import { CssBaseline } from '@mui/material';
@@ -23,21 +21,70 @@ import Support from './components/widgets/Support';
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
-// $FlowIgnore: suppressing this error
-import { IntlContextProvider, IntlProviderWrapper } from './UI/common/context/IntlContextProvider';
-
+import { ampli } from '../ampli/index';
+import { ROUTES } from './routes-config';
+import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
+import { IntlProvider } from 'react-intl';
+import { filterByValues } from './coreUtils';
 
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData(locales);
 
 type Props = {|
   +stores: StoresMap,
-  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,
 |};
+
+function RoutingHelper(props: Props) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  if (!props.stores.routing.navigate) {
+    props.stores.routing.navigate = navigate;
+  }
+
+  useEffect(() => {
+    const { pathname } = location;
+
+    runInAction(() => {
+      props.stores.routing.currentRoute = pathname;
+    });
+
+    if (pathname === ROUTES.ASSETS.ROOT) {
+      ampli.assetsPageViewed();
+    } else if (pathname === ROUTES.TRANSFER) {
+      ampli.claimAdaPageViewed();
+    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
+      ampli.createWalletLanguagePageViewed();
+    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
+      ampli.connectorPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ADD) {
+      ampli.createWalletSelectMethodPageViewed();
+    } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
+      ampli.receivePageViewed();
+    } else if (pathname === ROUTES.SETTINGS.ROOT) {
+      ampli.settingsPageViewed();
+    } else if (pathname === ROUTES.REVAMP.CATALYST_VOTING) {
+      ampli.votingPageViewed();
+    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
+      ampli.transactionsPageViewed();
+    } else if (pathname === ROUTES.STAKING) {
+      ampli.stakingCenterPageViewed();
+    } else if (pathname === ROUTES.WALLETS.ROOT) {
+      ampli.walletPageViewed();
+    } else if (pathname === ROUTES.Governance.ROOT) {
+      ampli.governanceDashboardPageViewed();
+    } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
+      const TAB = 'Wallet Token';
+      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
+    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
+      const TAB = 'Overview';
+      ampli.portfolioTokenDetails({ token_details_tab: TAB });
+    }
+  }, [location]);
+
+  return null;
+}
 
 @observer
 class App extends Component<Props, State> {
@@ -46,12 +93,17 @@ class App extends Component<Props, State> {
   componentDidMount: () => void = () => {
     autorun(async () => {
       const locale = this.props.stores.profile.currentLocale;
-      const _mergedMessages = {
-        ...(await translations['en-US']),
-        ...(await translations[locale]),
-      };
+
+      const englishMessages = await translations['en-US'];
+      const localeMessages = await translations[locale];
+
+      // clean wrong format strings from locale messages
+      // to be removed after all locale messages get updated
+      const fixedLocaleMessages = filterByValues(localeMessages,
+          v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='));
+
       runInAction(() => {
-        this.mergedMessages = _mergedMessages;
+        this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
       });
     });
   };
@@ -70,13 +122,7 @@ class App extends Component<Props, State> {
   }
 
   render(): Node {
-    const mergedMessages = this.mergedMessages;
-    if (mergedMessages === null) {
-      return null;
-    }
-
     const { stores } = this.props;
-    const locale = stores.profile.currentLocale;
 
     Logger.debug(`[yoroi] messages merged`);
 
@@ -92,23 +138,30 @@ class App extends Component<Props, State> {
     const muiTheme = MuiThemes[currentTheme];
     Logger.debug(`[yoroi] themes changed`);
 
+    const locale = stores.profile.currentLocale;
+    const mergedMessages = this.mergedMessages;
+    if (mergedMessages === null) {
+      return null;
+    }
+
     return (
       <div style={{ height: '100%' }}>
         <ColorModeProvider>
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager cssVariables={themeVars} />
-          {/* Automatically pass a theme prop to all components in this subtree. */}
-          <IntlProviderWrapper locale={locale} messages={mergedMessages}>
-            {this.getContent()}
-          </IntlProviderWrapper>
+          <HashRouter>
+            <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
+              {this.getContent()}
+            </IntlProvider>
+          </HashRouter>
         </ColorModeProvider>
       </div>
     );
   }
 
   getContent: void => ?Node = () => {
-    const { stores, history } = this.props;
+    const { stores } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
@@ -116,8 +169,6 @@ class App extends Component<Props, State> {
       return <MaintenancePage stores={stores} />;
     }
     return (
-      <Router history={history}>
-        <IntlContextProvider>
           <NotificationsProvider
             walletsStore={stores.wallets}
             appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
@@ -125,11 +176,10 @@ class App extends Component<Props, State> {
             <NotificationsManager />
             <div style={{ height: '100%' }}>
               <Support />
-              {Routes(stores)}
+              {YoroiRoutes(stores)}
+              <RoutingHelper stores={stores}/>
             </div>
           </NotificationsProvider>
-        </IntlContextProvider>
-      </Router>
     );
   };
 }

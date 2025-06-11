@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { CopyButton } from '../../../../../components';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -11,7 +10,7 @@ export const MetadataTab = ({ hash, metadata }) => {
         <Typography variant="body1" color="ds.gray_600">
           {strings.wallet}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" sx={{ wordWrap: 'break-word' }} maxWidth="450px">
+        <Typography variant="body1" color="ds.text_gray_medium" sx={{ wordWrap: 'break-word' }} maxWidth="426px">
           {hash}
         </Typography>
       </Stack>

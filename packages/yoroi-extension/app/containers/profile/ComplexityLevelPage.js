@@ -4,12 +4,11 @@ import type { Node } from 'react';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import TopBar from '../../components/topbar/TopBar';
 import StaticTopbarTitle from '../../components/topbar/StaticTopbarTitle';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import TestnetWarningBanner from '../../components/topbar/banners/TestnetWarningBanner';
 import ServerErrorBanner from '../../components/topbar/banners/ServerErrorBanner';
 import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import ComplexityLevel from '../../components/profile/complexity-level/ComplexityLevelForm';
 import type { StoresProps } from '../../stores';
 
@@ -22,10 +21,7 @@ const messages = defineMessages({
 
 @observer
 export default class ComplexityLevelPage extends Component<StoresProps> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;
@@ -37,7 +33,7 @@ export default class ComplexityLevelPage extends Component<StoresProps> {
       : <ServerErrorBanner errorType={checkAdaServerStatus} />;
 
     const topbarTitle = (
-      <StaticTopbarTitle title={this.context.intl.formatMessage(messages.title)} />
+      <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />
     );
 
     const topbarElement = (

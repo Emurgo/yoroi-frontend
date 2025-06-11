@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable, runInAction } from 'mobx';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import WalletSendFormRevamp from '../../components/wallet/send/WalletSendFormRevamp';
 import MemoNoExternalStorageDialog from '../../components/wallet/memos/MemoNoExternalStorageDialog';
@@ -33,10 +32,7 @@ import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   @observable showMemo: boolean = false;
   @observable showSupportedAddressDomainBanner: boolean = true;
 
@@ -47,7 +43,7 @@ export default class WalletSendPage extends Component<StoresProps> {
       window.document.location = redirect;
     } else {
       this.props.stores.uiDialogs.closeActiveDialog();
-      stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+      stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     }
   };
 
@@ -136,7 +132,7 @@ export default class WalletSendPage extends Component<StoresProps> {
       <ModalProvider>
         <ModalManager />
         <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-          <ReviewTxProvider stores={stores} intl={this.context.intl}>
+          <ReviewTxProvider stores={stores} intl={this.context}>
             <ReviewTxModal />
             <WalletSendFormRevamp
               stores={this.props.stores}
@@ -245,7 +241,7 @@ export default class WalletSendPage extends Component<StoresProps> {
         onCancel={stores.memos.closeMemoDialog}
         addExternal={() => {
           stores.memos.closeMemoDialog();
-          stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+          stores.routing.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
         }}
         onAcknowledge={() => {
           this.props.stores.uiDialogs.getParam<(void) => void>('continuation')?.();

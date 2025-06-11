@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { FormattedNFTDisplay, FormattedTokenDisplay } from '../../../../utils/wallet';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 import { ReactComponent as RemoveIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
@@ -31,10 +30,7 @@ type Props = {|
   +nfts: FormattedNFTDisplay[],
 |};
 export default class IncludedTokens extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   renderItems(items: FormattedNFTDisplay[] | FormattedTokenDisplay[]): Node {
     return items.map(item => {
       const numberOfDecimals = item.info?.Metadata.numberOfDecimals || 0;
@@ -180,7 +176,7 @@ export default class IncludedTokens extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { tokens, nfts } = this.props;
     return (
       <Box mt="24px">

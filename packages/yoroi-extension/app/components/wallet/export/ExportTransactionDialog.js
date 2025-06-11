@@ -2,9 +2,8 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -46,10 +45,7 @@ type State = {|
 
 @observer
 export default class ExportTransactionDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     startDate: null,
     endDate: null,
@@ -62,7 +58,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { isActionProcessing, error, submit, cancel, toggleIncludeTxIds, shouldIncludeTxIds } = this.props;
     const { startDate, endDate } = this.state;
     const infoBlock = (

@@ -1,8 +1,7 @@
 // @flow
-import type { Node } from 'react';
+import { Route, Routes, useLocation } from 'react-router';
 import type { StoresMap } from './stores/index';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Route, Switch, useLocation } from 'react-router-dom';
 import { ROUTES } from './routes-config';
 import Helmet from 'react-helmet';
 import { injectIntl } from 'react-intl';
@@ -20,36 +19,43 @@ type Props = {| stores: StoresMap |};
 
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-export const Routes: React$ComponentType<Props> = injectIntl(
-  observer((props: Props & Intl) => {
-    const { stores, intl } = props;
-    const title = intl.formatMessage(
-      useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ? messages.yoroiConnector : messages.yoroiDappConnector
-    );
+export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((props: Props & Intl) => {
+  const { stores, intl } = props;
+  const title = intl.formatMessage(
+    useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ?
+      messages.yoroiConnector : messages.yoroiDappConnector
+  );
 
-    return (
-      <>
-        <Helmet>
-          <title>{title}</title>
-        </Helmet>
-        {stores.loading.isLoading ? <LoadingPage stores={stores} /> : wrapPages(getContent(stores), stores)}
-      </>
-    );
-  })
-);
+  return (
+    <>
+      <Helmet><title>{title}</title></Helmet>
+      {stores.loading.isLoading ? (
+        <LoadingPage stores={(stores: StoresMap)} />
+      ) : (
+        <ConnectorLayout
+          networkId={stores.profile.getCurrentNetworkId()}
+          intl={intl}
+        >
+          {getContent(stores)}
+        </ConnectorLayout>
+      )}
+    </>
+  );
+}));
 
-const getContent = stores => (
-  <Switch>
-    <Route exact path={ROUTES.ROOT} component={props => <ConnectContainer {...props} stores={stores} />} />
-    <Route exact path={ROUTES.SIGNIN_TRANSACTION} component={props => <SignTxContainer {...props} stores={stores} />} />
+const getContent = (stores) => (
+  <Routes>
     <Route
-      exact
-      path={ROUTES.SELECT_CASHBACK_WALLET}
-      component={props => <SelectCashbackWalletContainer {...props} stores={stores} />}
+      path={ROUTES.ROOT}
+      element={<ConnectContainer stores={stores} />}
     />
-  </Switch>
+    <Route
+      path={ROUTES.SIGNIN_TRANSACTION}
+      element={<SignTxContainer stores={stores} />}
+    />
+    <Route
+      path={ROUTES.SELECT_CASHBACK_WALLET}
+      element={<SelectCashbackWalletContainer stores={stores} />}
+    />
+  </Routes>
 );
-
-function wrapPages(children: Node, stores: StoresMap): Node {
-  return <ConnectorLayout networkId={stores.profile.getCurrentNetworkId()}>{children}</ConnectorLayout>;
-}

@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { useNavigateTo } from '../hooks/useNavigateTo';
 import { SuccessIlustration } from './SuccessIlustration';
 import { useModal } from '../../../../components/modals/ModalContext';

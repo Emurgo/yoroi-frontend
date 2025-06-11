@@ -3,7 +3,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import * as React from 'react';
 import { IconWrapper, Icons } from '../icons/index';
 import { useModal } from './ModalContext';
 

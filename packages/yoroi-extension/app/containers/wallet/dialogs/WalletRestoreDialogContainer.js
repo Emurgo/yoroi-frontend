@@ -10,8 +10,7 @@ import WalletRestoreVerifyDialog from '../../../components/wallet/WalletRestoreV
 import globalMessages from '../../../i18n/global-messages';
 import { CheckAddressesInUseApiError } from '../../../api/common/errors';
 import { RestoreSteps } from '../../../stores/toplevel/WalletRestoreStore';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import { genLookupOrFail } from '../../../stores/stateless/tokenHelpers';
 import WalletAlreadyExistDialog from '../../../components/wallet/WalletAlreadyExistDialog';
@@ -30,10 +29,7 @@ type LocalProps = {|
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {| introMessage: void |} = {
     introMessage: undefined,
   };
@@ -73,7 +69,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
     this.props.stores.wallets.setActiveWallet({
       publicDeriverId,
     });
-    this.props.stores.app.goToRoute({
+    this.props.stores.routing.goToRoute({
       route: ROUTES.WALLETS.TRANSACTIONS,
     });
   };

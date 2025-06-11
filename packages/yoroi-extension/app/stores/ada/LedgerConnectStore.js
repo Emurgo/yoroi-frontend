@@ -407,7 +407,7 @@ export default class LedgerConnectStore
     await stores.wallets.addHwWallet(wallet);
     stores.wallets.setActiveWallet({ publicDeriverId: wallet.publicDeriverId });
     if (stores.substores.ada.yoroiTransfer.transferRequest.result == null) {
-      stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+      stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
       // show success notification
       stores.wallets.showLedgerWalletIntegratedNotification();
@@ -421,7 +421,7 @@ export default class LedgerConnectStore
 
   finishTransfer: void => void = () => {
     this.stores.uiDialogs.closeActiveDialog();
-    this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+    this.stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
 
     // show success notification
     this.stores.wallets.showLedgerWalletIntegratedNotification();

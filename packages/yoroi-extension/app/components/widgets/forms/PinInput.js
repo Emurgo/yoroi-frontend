@@ -2,13 +2,12 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import globalMessages from '../../../i18n/global-messages';
 import config from '../../../config';
 import TextField from '../../common/TextField';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Box } from '@mui/material';
 
 type Props = {|
@@ -40,10 +39,7 @@ export default class PinInput extends Component<Props> {
     done: undefined,
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       [this.props.fieldName]: {
@@ -54,16 +50,16 @@ export default class PinInput extends Component<Props> {
         validators: [({ field }) => {
           return [
             this.props.pinMatches(field.value),
-            this.context.intl.formatMessage(globalMessages.pinDoesNotMatch)
+            this.context.formatMessage(globalMessages.pinDoesNotMatch)
           ];
         },
         ({ field }) => ([
           this.props.allowEmptyInput || field.value.length >= 0,
-          this.context.intl.formatMessage(globalMessages.fieldIsRequired)
+          this.context.formatMessage(globalMessages.fieldIsRequired)
         ]),
         ({ field }) => ([
           this.props.validCheck(field.value),
-          this.context.intl.formatMessage(globalMessages.invalidPin)
+          this.context.formatMessage(globalMessages.invalidPin)
         ]),
         ],
       },

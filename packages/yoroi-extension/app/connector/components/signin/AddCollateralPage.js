@@ -2,8 +2,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import { Button, Typography, Alert, Link } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
@@ -67,10 +66,7 @@ type State = {|
 
 @observer
 class AddCollateralPage extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -80,13 +76,13 @@ class AddCollateralPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          label: this.context.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -119,7 +115,11 @@ class AddCollateralPage extends Component<Props, State> {
             })
             .catch(error => {
               if (error instanceof WrongPassphraseError) {
-                this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+                this.form
+                  .$('walletPassword')
+                  .invalidate(
+                    this.context.formatMessage(messages.incorrectWalletPasswordError)
+                  );
               } else {
                 throw error;
               }
@@ -191,7 +191,7 @@ class AddCollateralPage extends Component<Props, State> {
     const { txData, onCancel, submissionError } = this.props;
     if (!txData) return null;
 
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
     const { isSubmitting } = this.state;

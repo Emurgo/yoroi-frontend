@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const NoConfidance = () => {
   return (
     <svg width="157" height="180" viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg">

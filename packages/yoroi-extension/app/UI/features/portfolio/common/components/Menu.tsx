@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, useTheme } from '@mui/material';
-import React from 'react';
 import { SubMenuOption } from '../types';
 
 interface Props {
