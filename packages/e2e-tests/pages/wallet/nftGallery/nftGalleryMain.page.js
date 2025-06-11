@@ -173,8 +173,15 @@ export default class NftGalleryTab extends WalletCommonBase {
   async setFourColumnsView() {
     this.logger.info(`NftGalleryTab::setFourColumnsView is called`);
     await this.click(this.fourColumnViewBtnLocator);
+    await this.hover(this.nftsCountTextLocator);
+    await this.sleep(quarterSecond);
   }
-  async fourColumnsViewIsSelected() {}
+  async fourColumnsViewIsSelected() {
+    this.logger.info(`NftGalleryTab::fourColumnsViewIsSelected is called`);
+    const backgroundValue = await this.getCssValue(this.fourColumnViewBtnLocator, 'background-color');
+    this.logger.info(`NftGalleryTab::fourColumnsViewIsSelected. backgroundValue: ${backgroundValue}`);
+    return backgroundValue !== 'rgba(0, 0, 0, 0)';
+  }
   /**
    * Selecting appearance NFTs in 6 rows
    * @returns {Promise<void>}
@@ -182,8 +189,15 @@ export default class NftGalleryTab extends WalletCommonBase {
   async setSixColumnsView() {
     this.logger.info(`NftGalleryTab::setSixColumnsView is called`);
     await this.click(this.sixColumnViewBtnLocator);
+    await this.hover(this.nftsCountTextLocator);
+    await this.sleep(quarterSecond);
   }
-  async sixColumnsViewIsSelected() {}
+  async sixColumnsViewIsSelected() {
+    this.logger.info(`NftGalleryTab::sixColumnsViewIsSelected is called`);
+    const backgroundValue = await this.getCssValue(this.sixColumnViewBtnLocator, 'background-color');
+    this.logger.info(`NftGalleryTab::sixColumnsViewIsSelected. backgroundValue: ${backgroundValue}`);
+    return backgroundValue !== 'rgba(0, 0, 0, 0)';
+  }
   /**
    * Searching for a NFT
    * @param {string} searchValue
