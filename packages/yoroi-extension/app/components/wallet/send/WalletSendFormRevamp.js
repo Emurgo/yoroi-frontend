@@ -383,6 +383,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
+              field.value = field.value.trim();
               const inputFieldValue = field.value;
               let handle = undefined;
               let receiverValue = inputFieldValue;
@@ -473,7 +474,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER
       },
       plugins: {
         vjf: vjf(),
@@ -550,12 +551,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     }
 
     return this.context.formatMessage(errMsg, values);
-  }
-
-  avoidWhitespacesAddress(e: KeyboardEvent) {
-    if (e.key === ' ') {
-      e.preventDefault();
-    }
   }
 
   renderCurrentStep(step: number): Node {
@@ -638,7 +633,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
-                onKeyDown={this.avoidWhitespacesAddress}
               />
               {domainResolverResult != null ? (
                 <Typography
