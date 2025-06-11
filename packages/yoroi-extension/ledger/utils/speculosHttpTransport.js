@@ -65,8 +65,9 @@ export default class HttpTransport extends Transport {
       );
     }
 
-    const data = await response.text();
-    return Buffer.from(data, "hex");
+    const responseText = await response.text();
+    const data = JSON.parse(responseText);
+    return Buffer.from(data.data, "hex");
   }
 
   setScrambleKey() {}
