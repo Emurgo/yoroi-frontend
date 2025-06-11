@@ -69,7 +69,7 @@ export const messages = Object.freeze(
     },
     reviewSelection: {
       id: 'governance.reviewSelection',
-      defaultMessage: '!!!Review the selections carefully to assign yourself a Governance Status',
+      defaultMessage: `!!!Your delegation helps shape Cardano's future.\nYou may change your governance status at any time.`,
     },
     statusSelected: {
       id: 'governance.statusSelected',
@@ -104,7 +104,17 @@ export const messages = Object.freeze(
     designatedSomeone: {
       id: 'governance.designatedSomeone',
       defaultMessage:
-        '!!! You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+        '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+    },
+    delegateToYoroi: {
+      id: 'governance.delegateToYoroi',
+      defaultMessage:
+        '!!!Support the Commercial and Technical adoption of the Cardano roadmap.\nPlease note Yoroi is part of the EMURGO Group.',
+    },
+    yoroiVotingRecordLink: {
+      id: 'governance.yoroiVotingRecordLink',
+      defaultMessage:
+        '!!!See Yoroi’s voting record',
     },
     total: {
       id: 'wallet.send.confirmationDialog.totalLabel',
@@ -194,5 +204,7 @@ export const useStrings = () => {
     goToGovernance: intl.formatMessage(messages.goToGovernance),
     goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
     notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
+    delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
+    yoroiVotingRecordLink: intl.formatMessage(messages.yoroiVotingRecordLink),
   }).current;
 };

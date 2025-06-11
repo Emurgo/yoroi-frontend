@@ -21,8 +21,6 @@ import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../../UI/components/modals/ModalManager';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
@@ -57,7 +55,6 @@ class StakingPage extends Component<StoresProps> {
               <ModalManager />
               <ReviewTxProvider stores={stores} intl={this.context}>
                 <ReviewTxModal />
-                <DrepPromotionBanner stores={stores} page="staking" intl={this.context} />
                 <StakingPageContent stores={this.props.stores} />
               </ReviewTxProvider>
             </ModalProvider>
