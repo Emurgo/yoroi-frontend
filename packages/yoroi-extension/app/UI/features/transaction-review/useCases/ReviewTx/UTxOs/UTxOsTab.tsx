@@ -38,8 +38,9 @@ interface OutputProps {
 
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
+
   return (
-    <Stack direction="column" sx={{ padding: '24px', direction: 'collumn', marginBottom: '100px' }}>
+    <Stack direction="column" sx={{ padding: '24px 0 24px 24px', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
       <FeeDisplay fee={tx.fee.quantity} primaryTokenInfo={primaryTokenInfo} />
       <Outputs outputs={tx.outputs} />

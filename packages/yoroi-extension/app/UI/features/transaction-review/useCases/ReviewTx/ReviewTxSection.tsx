@@ -1,4 +1,4 @@
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import * as React from 'react';
 
 import { Box, Divider } from '@mui/material';
@@ -25,7 +25,6 @@ export interface SubMenuOption {
 }
 
 export const ReviewTxSection = () => {
-  const theme = useTheme();
   const { unsignedTx, cborTx, receiverCustomTitle } = useTxReviewModal();
 
   const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
@@ -67,7 +66,7 @@ export const ReviewTxSection = () => {
 
   return (
     <Box sx={{ position: 'relative', height: '100vh' }}>
-      <Box sx={{ backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>
+      <Box sx={{ backgroundColor: 'ds.bg_color_max' }}>
         <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
         <Divider />
       </Box>
