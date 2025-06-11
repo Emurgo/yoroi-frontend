@@ -151,7 +151,7 @@ class BasePage {
   }
   /**
    * Finding all suitable WebElements by the locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
@@ -160,7 +160,7 @@ class BasePage {
   }
   /**
    * Getting a text by element locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<string>}
    */
   async getText(locator) {
@@ -781,16 +781,18 @@ class BasePage {
   }
   /**
    * Getting an element size
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {{height: number, width: number}}
    */
   async getSize(locator) {
+    this.logger.info(`BasePage::getSize is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     const rect = await element.getRect();
+    this.logger.info(`BasePage::getSize is called. Result: ${JSON.stringify(rect)}`);
     return {
       height: rect.height,
       width: rect.width,
-    }
+    };
   }
 }
 
