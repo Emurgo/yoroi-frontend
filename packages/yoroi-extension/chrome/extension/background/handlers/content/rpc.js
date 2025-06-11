@@ -147,8 +147,28 @@ class NewHandler {
   static withSyncedWallet<ParamT, ReturnT>(
     handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>
   ): Handler<ParamT, ReturnT> {
-    return { needConnectedWallet: true, syncConnectedWallet: true, handle };
+    return { needConnectedWallet: true, syncConnectedWallet: true, handle: request => checkWalletIsStillConnected(handle, request) };
   }
+}
+
+const checkWalletIsStillConnected = async (handle: HandleFuncType<PublicDeriver<>, ParamT, ReturnT>, request: RequestType<WalletType, ParamT>) => {
+  const {message} = request;
+  const whitelistedEntry = await findWhitelistedConnection(
+      message.url,
+      false,
+      new LocalStorageApi(),
+  )
+
+  if (!whitelistedEntry) {
+    return {
+      err: {
+        code: APIErrorCodes.API_REFUSED,
+        info: 'Wallet is disconnected'
+      }
+    }
+  }
+
+  return handle(request);
 }
 
 const signDataHandler = NewHandler.withSyncedWallet<
