@@ -1,37 +1,38 @@
 import { portfolioApiMaker, portfolioTokenManagerMaker } from '@yoroi/portfolio';
-import { App, Chain, Portfolio } from '@yoroi/types';
+import { Chain, Portfolio } from '@yoroi/types';
 import { freeze } from 'immer';
 
 const buildPortfolioTokenManager = ({ network }: { network: Chain.SupportedNetworks }) => {
-
   const api = portfolioApiMaker({
     network,
     maxConcurrentRequests: 3,
     maxIdsPerRequest: 120,
   });
 
+  const storage = {
+    token: {
+      infos: {
+        save: () => {},
+        read: (keys: readonly `${string}.${string}`[]) => {
+          return keys.map(key => [key, null] as [`${string}.${string}`, null]);
+        },
+        all: () => {
+          return [];
+        },
+        keys: () => [],
+        clear: () => {},
+      },
+    },
+    clear: () => {},
+  };
+
   const tokenManager = portfolioTokenManagerMaker({
     api,
-    storage: {
-      token: {
-        infos: {
-          save: () => {},
-          read: (keys: readonly `${string}.${string}`[]) => {
-            return keys.map(key => [key, null] as [`${string}.${string}`, null]);
-          },
-          all: () => {
-            return [];
-          },
-          keys: () => [],
-          clear: () => {},
-        },
-      },
-      clear: () => {},
-    },
+    storage,
   });
 
   tokenManager.hydrate({ sourceId: 'initial' });
-  return { tokenManager };
+  return { tokenManager, storage };
 };
 
 export const buildPortfolioTokenManagers = () => {
@@ -52,11 +53,7 @@ export const buildPortfolioTokenManagers = () => {
     true
   );
 
-  const tokenStorages: Readonly<{
-    [Chain.Network.Mainnet]: App.Storage<false, Portfolio.Token.Id>;
-    [Chain.Network.Preprod]: App.Storage<false, Portfolio.Token.Id>;
-    [Chain.Network.Preview]: App.Storage<false, Portfolio.Token.Id>;
-  }> = freeze(
+  const tokenStorages = freeze(
     {
       [Chain.Network.Mainnet]: mainnetPortfolioTokenManager.storage,
       [Chain.Network.Preprod]: preprodPortfolioTokenManager.storage,

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 import { useCallback } from 'react';
 import { Chain } from '@yoroi/types';
 
@@ -27,7 +27,6 @@ export const usePortfolioImage = ({
   contentFit = 'cover',
   kind = 'metadata',
 }: UsePortfolioImageProps) => {
-  const queryClient = useQueryClient();
   const network = Chain.Network.Mainnet;
 
   const w = getClosestSize(width);

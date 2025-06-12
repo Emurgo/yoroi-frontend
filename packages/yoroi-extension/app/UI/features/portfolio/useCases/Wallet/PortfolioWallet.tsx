@@ -8,7 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from '../TokensTable/StatsTable';
 
-const PortfolioWallet = ({ stores }): JSX.Element => {
+const PortfolioWallet = ({ stores }): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { walletBalance, ftAssetList, showWelcomeBanner, isTestnet } = usePortfolio();

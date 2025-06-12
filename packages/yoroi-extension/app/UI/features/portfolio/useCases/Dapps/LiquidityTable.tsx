@@ -69,7 +69,7 @@ interface Props {
   isLoading: boolean;
 }
 
-const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
+const LiquidityTable = ({ data, isLoading }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, primaryTokenInfo } = usePortfolio();

@@ -1,4 +1,3 @@
-import { Portfolio } from '@yoroi/types';
 import React from 'react';
 import { Box, styled, useTheme } from '@mui/material';
 
@@ -18,19 +17,19 @@ const sizeMap = {
   xl: 80,
 } as const;
 
-const iconSizeMap = {
-  sm: 18,
-  md: 20,
-  lg: 24,
-  xl: 42,
-} as const;
+// const iconSizeMap = {
+//   sm: 18,
+//   md: 20,
+//   lg: 24,
+//   xl: 42,
+// } as const;
 
-const cardanoIconSizeMap = {
-  sm: 20,
-  md: 28,
-  lg: 35,
-  xl: 70,
-} as const;
+// const cardanoIconSizeMap = {
+//   sm: 20,
+//   md: 28,
+//   lg: 35,
+//   xl: 70,
+// } as const;
 
 export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconProps) => {
   const theme: any = useTheme();

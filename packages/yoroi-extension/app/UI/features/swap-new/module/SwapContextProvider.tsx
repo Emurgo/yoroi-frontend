@@ -75,7 +75,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
   });
 
-  const context = React.useMemo(
+  const context: any = React.useMemo(
     () => ({
       swapForm: { action, ...state },
       tokenInfos,
@@ -121,15 +121,19 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapAction.TokenInIdChanged:
-        draft.tokenInInput.tokenId = action.tokenId;
-        draft.selectedProtocol.isTouched = false;
-        draft.wantedPrice = '';
+        if ('value' in action) {
+          draft.tokenInInput.tokenId = action.value;
+          draft.selectedProtocol.isTouched = false;
+          draft.wantedPrice = '';
+        }
         break;
 
       case SwapAction.TokenOutIdChanged:
-        draft.tokenOutInput.tokenId = action.tokenId;
-        draft.selectedProtocol.isTouched = false;
-        draft.wantedPrice = '';
+        if ('value' in action) {
+          draft.tokenOutInput.tokenId = action.value;
+          draft.selectedProtocol.isTouched = false;
+          draft.wantedPrice = '';
+        }
         break;
 
       case SwapAction.TokenInAmountChanged:
@@ -384,6 +388,13 @@ export type SwapContext = SwapState & {
   managerSettings: Swap.ManagerSettings;
   assignManagerSettings: Swap.Manager['assignSettings'];
   refetchOrders: () => void;
+  // TODO define after
+  ftAssetList: any;
+  tokenInfoList: any;
+  swapForm: any;
+  primaryTokenInfo: any;
+  loadingTokenList: boolean;
+  explorer: { tokenInfo: { name: string; baseUrl: string } };
 };
 
 const SwapContext = React.createContext<SwapContext>({
@@ -400,6 +411,12 @@ const SwapContext = React.createContext<SwapContext>({
   managerSettings: { routingPreference: 'auto', slippage: 1 },
   assignManagerSettings: () => ({ routingPreference: 'auto', slippage: 1 }),
   refetchOrders: () => null,
+  ftAssetList: [],
+  tokenInfoList: [],
+  swapForm: {},
+  primaryTokenInfo: {},
+  loadingTokenList: false,
+  explorer: { tokenInfo: { name: '', baseUrl: '' } },
 });
 
 const parseNumber = (text: string) =>

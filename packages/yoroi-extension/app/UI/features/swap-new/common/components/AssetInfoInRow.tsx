@@ -1,7 +1,6 @@
 import React from 'react';
 import { Stack, Typography, useTheme, styled } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { TokenIcon } from './TokenIcon/TokenIcon';
 import { atomicBreakdown } from '@yoroi/common';
 import { Icons, IconWrapper } from '../../../../components';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
@@ -11,7 +10,11 @@ import TokenInfoModal from './Modals/TokenInfoModal';
 interface AssetInfoInRowProps {
   token: any;
   currency: string;
-  secondaryToken24Activity?: [any, { price?: { close?: number } }];
+  secondaryToken24Activity?: {
+    price?: {
+      close?: number | BigNumber;
+    };
+  };
   primaryTokenActivity?: number | string;
   primaryTokenInfo: { decimals: number };
   onAssetClick: () => void;

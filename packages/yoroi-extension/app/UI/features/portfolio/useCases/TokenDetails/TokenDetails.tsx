@@ -24,7 +24,7 @@ interface Props {
 }
 
 const TokenDetails = observer(
-  ({ tokenInfo, stores }: Props): JSX.Element => {
+  ({ tokenInfo, stores }: Props): React.ReactNode => {
     const theme: any = useTheme();
     const navigateTo = useNavigateTo();
     const strings = useStrings();

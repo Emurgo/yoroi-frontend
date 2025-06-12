@@ -25,8 +25,8 @@ export const useSyncedTokenInfos = ({
       const res = await swapManager.api.tokens();
       if (!isRight(res)) return { tokenIds: [], tokenInfosArray: [] };
 
-      // Normalize and filter token IDs
-      const tokenIds = res.value.data
+      const value = res.value as { data: Array<{ id: string | { id: string } }> };
+      const tokenIds = value.data
         .map(({ id }) => (typeof id === 'string' ? id.trim().replace(/:$/, '') : id?.id))
         .filter((id): id is string => !!id && id !== '.' && !excludedTokens.includes(id));
 
@@ -50,7 +50,7 @@ export const useSyncedTokenInfos = ({
 
         for (const [id, info] of response) {
           if (id && id !== '.' && !excludedTokens.includes(id)) {
-            tokenInfosArray.push([id, info?.record ?? createUnknownTokenInfo({ id })]);
+            tokenInfosArray.push([id, info?.record ?? createUnknownTokenInfo({ id, name: id })]);
           }
         }
 

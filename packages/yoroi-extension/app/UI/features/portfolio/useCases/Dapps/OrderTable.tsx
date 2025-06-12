@@ -66,7 +66,7 @@ interface Props {
   isLoading: boolean;
 }
 
-const OrderTable = ({ data, isLoading }: Props): JSX.Element => {
+const OrderTable = ({ data, isLoading }: Props): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount, primaryTokenInfo } = usePortfolio();

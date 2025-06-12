@@ -18,7 +18,7 @@ interface Props {
   isDragging?: boolean;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): JSX.Element => {
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): React.ReactNode => {
   const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const theme: any = useTheme();
   const strings = useStrings();

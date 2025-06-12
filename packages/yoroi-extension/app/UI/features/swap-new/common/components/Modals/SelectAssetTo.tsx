@@ -57,7 +57,7 @@ export const SelectAssetTo = () => {
   } = useCurrencyPairing();
 
   const handleAssetClick = (assetId: string) => {
-    swapForm.action({ type: 'TokenOutIdChanged', tokenId: assetId });
+    swapForm.action({ type: 'TokenOutIdChanged', value: assetId });
     swapForm.action({ type: 'TokenOutInputTouched', value: assetId });
     closeModal();
   };

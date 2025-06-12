@@ -9,18 +9,12 @@ type Props = {
   children: ReactNode;
 };
 
-const DappCenterLayout = ({ stores, actions, children }: Props): JSX.Element => {
+const DappCenterLayout = ({ stores, actions, children }: Props): React.ReactNode => {
   return (
     <GeneralPageLayout
       stores={stores}
       actions={actions}
-      navbar={
-        <NavBarContainerRevamp
-          actions={actions}
-          stores={stores}
-          title={<NavBarTitle title={'dApp Center'} />}
-        />
-      }
+      navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'dApp Center'} />} />}
     >
       {children}
     </GeneralPageLayout>

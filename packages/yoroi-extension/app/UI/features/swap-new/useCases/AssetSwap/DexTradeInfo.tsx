@@ -1,5 +1,4 @@
 import { Link, Stack, Typography, useTheme } from '@mui/material';
-import React from 'react';
 import { DisplayInfoInRow } from '../../common/components/DisplayInfoInRow';
 import { useStrings } from '../../common/hooks/useStrings';
 

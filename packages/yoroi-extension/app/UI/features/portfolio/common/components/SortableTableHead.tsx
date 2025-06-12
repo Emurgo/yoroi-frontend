@@ -10,7 +10,7 @@ interface Props {
   onRequestSort: (id: string) => void;
 }
 
-const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): JSX.Element => {
+const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): React.ReactNode => {
   const theme = useTheme();
 
   return (

@@ -18,7 +18,7 @@ const Container = styled(Box)(() => ({
   margin: '30px 0',
 }));
 
-const TransactionTable = ({ history, tokenName }: { history: TransactionItemType[]; tokenName: string }): JSX.Element => {
+const TransactionTable = ({ history, tokenName }: { history: TransactionItemType[]; tokenName: string }): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();

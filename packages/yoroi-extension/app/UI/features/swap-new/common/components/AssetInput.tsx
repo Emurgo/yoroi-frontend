@@ -21,7 +21,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
 
   const tokenInput = swapForm[direction === 'in' ? 'tokenInInput' : 'tokenOutInput'];
-  const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
+  // const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
   const error = direction === 'in' ? tokenInput.error : null;
 
   const label = direction === 'in' ? 'From' : 'To';
@@ -29,7 +29,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const touched = tokenInput.isTouched;
 
   const {
-    tokenActivity: { secondaryToken24Activity },
+    tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
   const {
@@ -39,7 +39,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   let totalPrice: string | undefined;
   let selectedToken: any;
-  const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
+  const tokenPrice = data24h?.[1]?.price?.close ?? 1;
 
   if (direction === 'in' && primaryTokenActivity != null) {
     const normalizeId = (id?: string | null) => (id === '' ? '.' : id);
@@ -74,14 +74,15 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     return undefined;
   }, [direction, tokenInputInfo]);
 
-  const focusInput = () => {
-    if (inputRef?.current) {
-      inputRef.current.focus();
-    }
-  };
+  // const focusInput = () => {
+  //   if (inputRef?.current) {
+  //     inputRef.current.focus();
+  //   }
+  // };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
+    console.log('value', value);
   };
 
   return (

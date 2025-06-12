@@ -1,5 +1,5 @@
 import { createUnknownTokenInfo, isPrimaryToken } from '@yoroi/portfolio';
-import { Portfolio, Chain } from '@yoroi/types';
+import { Portfolio } from '@yoroi/types';
 import { useQuery, UseQueryOptions } from 'react-query';
 import React from 'react';
 
@@ -27,7 +27,7 @@ export const usePortfolioTokenInfos = (
       ]);
 
       for (const [id, tokenInfo] of response) {
-        result.set(id, tokenInfo?.record ?? createUnknownTokenInfo({ id }));
+        result.set(id, tokenInfo?.record ?? createUnknownTokenInfo({ id, name: id }));
       }
 
       return result;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Stack, Typography, useTheme, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../../components';
 import { useStrings } from '../../hooks/useStrings';
@@ -65,7 +65,7 @@ export const SelectAssetFrom = () => {
     }) || [];
 
   const handleAssetClick = (assetId: string) => {
-    swapForm.action({ type: 'TokenInIdChanged', tokenId: assetId });
+    swapForm.action({ type: 'TokenInIdChanged', value: assetId });
     swapForm.action({ type: 'TokenInInputTouched', value: assetId });
     closeModal();
   };
@@ -122,4 +122,4 @@ export const SelectAssetFrom = () => {
       </Stack>
     </Stack>
   );
-};;
+};

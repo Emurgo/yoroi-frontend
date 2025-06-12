@@ -15,7 +15,7 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
+const OverviewPerformance = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
 

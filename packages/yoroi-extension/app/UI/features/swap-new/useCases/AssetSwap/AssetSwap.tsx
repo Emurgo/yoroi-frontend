@@ -7,12 +7,10 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom';
 import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
-import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
-  const { primaryTokenInfo, loadingSwapPage } = useSwapRevamp();
 
   const openSelectAssetModal = (direction: 'in' | 'out') => {
     openModal({
@@ -51,7 +49,7 @@ export const AssetSwap = () => {
       </LoadingButton>
     </Content>
   );
-}
+};
 
 const Content = styled(Stack)(({ theme }: any) => ({
   ...theme.atoms.pt_xl,
