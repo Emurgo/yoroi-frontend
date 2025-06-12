@@ -67,7 +67,6 @@ export const SelectAssetFrom = () => {
   const handleAssetClick = (assetId: string) => {
     swapForm.action({ type: 'TokenInIdChanged', tokenId: assetId });
     swapForm.action({ type: 'TokenInInputTouched', value: assetId });
-
     closeModal();
   };
 
@@ -114,6 +113,7 @@ export const SelectAssetFrom = () => {
                 id: asset.info.id,
                 formatedAmount: asset.formatedAmount,
                 quantity: asset.quantity,
+                ...asset,
               }}
               onAssetClick={() => handleAssetClick(asset.info.id)}
             />

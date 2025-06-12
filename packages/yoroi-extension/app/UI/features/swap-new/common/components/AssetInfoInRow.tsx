@@ -5,6 +5,8 @@ import { TokenIcon } from './TokenIcon/TokenIcon';
 import { atomicBreakdown } from '@yoroi/common';
 import { Icons, IconWrapper } from '../../../../components';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
+import { useModal } from '../../../../components/modals/ModalContext';
+import TokenInfoModal from './Modals/TokenInfoModal';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -27,9 +29,10 @@ export const AssetInfoInRow = React.memo(
     direction,
   }: AssetInfoInRowProps) => {
     const { atoms }: any = useTheme();
-    const isPrimary = token.id === '-';
+    const isPrimary = token.id === '-' || token.id === '';
     const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
     const decimals = isPrimary ? primaryTokenInfo.decimals : token.decimals;
+    const { openModal } = useModal();
 
     let totalPrice: string | undefined;
 
@@ -43,6 +46,15 @@ export const AssetInfoInRow = React.memo(
         console.error('Failed to calculate totalPrice:', err);
       }
     }
+
+    const openTokenInfo = () => {
+      openModal({
+        title: 'Asset details',
+        content: <TokenInfoModal token={token} />,
+        height: '624px',
+        width: '612px',
+      });
+    };
 
     return (
       <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
@@ -68,7 +80,13 @@ export const AssetInfoInRow = React.memo(
             </Typography>
           </Stack>
         ) : (
-          <IconWrapper icon={Icons.InfoCircle} />
+          <IconWrapper
+            icon={Icons.InfoCircle}
+            onClick={e => {
+              e.stopPropagation(); // 🔥 prevent triggering the row click
+              openTokenInfo();
+            }}
+          />
         )}
       </RowWrapper>
     );

@@ -1,5 +1,5 @@
 //@flow
-import { Box, Typography, styled } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from 'legacySwap';
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';

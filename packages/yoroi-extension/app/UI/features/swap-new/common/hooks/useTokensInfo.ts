@@ -7,7 +7,7 @@ type UseSyncedTokenInfosProps = {
   swapManager: any;
   tokenManager: any;
   primaryTokenInfo: Portfolio.Token.Info;
-  networkId: Chain.NetworkId;
+  networkId: Chain.Network;
   excludedTokens: string[];
 };
 
@@ -18,16 +18,17 @@ export const useSyncedTokenInfos = ({
   networkId,
   excludedTokens,
 }: UseSyncedTokenInfosProps) => {
-  return useQuery({
+  const queryResult = useQuery({
     queryKey: ['syncedTokenInfos', networkId, primaryTokenInfo.id, ...excludedTokens],
 
     queryFn: async () => {
       const res = await swapManager.api.tokens();
       if (!isRight(res)) return { tokenIds: [], tokenInfosArray: [] };
 
+      // Normalize and filter token IDs
       const tokenIds = res.value.data
         .map(({ id }) => (typeof id === 'string' ? id.trim().replace(/:$/, '') : id?.id))
-        .filter((id): id is string => !!id && !excludedTokens.includes(id));
+        .filter((id): id is string => !!id && id !== '.' && !excludedTokens.includes(id));
 
       const secondaryTokenIds = tokenIds.filter(id => !isPrimaryToken(id));
 
@@ -37,24 +38,45 @@ export const useSyncedTokenInfos = ({
           sourceId: 'SwapProvider',
         });
 
-        const tokenInfosArray: Array<[string, Portfolio.Token.Info]> = [[primaryTokenInfo.id, primaryTokenInfo]];
+        const tokenInfosArray: Array<[string, Portfolio.Token.Info]> = [];
+
+        // Only include primary token if its ID is valid and not excluded
+        const isValidPrimaryId =
+          !!primaryTokenInfo.id && primaryTokenInfo.id !== '.' && !excludedTokens.includes(primaryTokenInfo.id);
+
+        if (isValidPrimaryId) {
+          tokenInfosArray.push([primaryTokenInfo.id, primaryTokenInfo]);
+        }
 
         for (const [id, info] of response) {
-          tokenInfosArray.push([id, info?.record ?? createUnknownTokenInfo({ id })]);
+          if (id && id !== '.' && !excludedTokens.includes(id)) {
+            tokenInfosArray.push([id, info?.record ?? createUnknownTokenInfo({ id })]);
+          }
         }
 
         return { tokenIds, tokenInfosArray };
       } catch (err: any) {
         if (err?.response?.status === 404) {
           console.warn('🛑 tokenManager.sync 404 - skip fetch');
-          return { tokenIds: [], tokenInfosArray: [[primaryTokenInfo.id, primaryTokenInfo]] };
+
+          const tokenInfosArray: Array<[string, Portfolio.Token.Info]> = [];
+
+          if (!!primaryTokenInfo.id && primaryTokenInfo.id !== '.' && !excludedTokens.includes(primaryTokenInfo.id)) {
+            tokenInfosArray.push([primaryTokenInfo.id, primaryTokenInfo]);
+          }
+
+          return { tokenIds: [], tokenInfosArray };
         }
+
         throw err;
       }
     },
 
     select: data => {
-      const tokenInfoMap = new Map(data.tokenInfosArray);
+      // Defensive filtering again
+      const tokenInfosArray = data.tokenInfosArray.filter(([id]) => !!id && id !== '.' && !excludedTokens.includes(id));
+
+      const tokenInfoMap = new Map(tokenInfosArray);
       const tokenInfoList = Array.from(tokenInfoMap.values());
 
       return {
@@ -71,4 +93,12 @@ export const useSyncedTokenInfos = ({
     staleTime: Infinity,
     cacheTime: 5 * 60 * 1000,
   });
+
+  return {
+    ...queryResult,
+    isLoading: queryResult.isLoading,
+    isFetching: queryResult.isFetching,
+    data: queryResult.data,
+    error: queryResult.error,
+  };
 };

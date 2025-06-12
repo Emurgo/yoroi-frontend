@@ -44,7 +44,7 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
     );
   }
 
-  if (info.id === '.') {
+  if (info.id === '.' || info.id === '') {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.primary_500} style={imageStyle}>
         <IconWrapper icon={Icons.AdaToken} />

@@ -7,6 +7,7 @@ import { usePortfolioTokenActivity } from '../../../portfolio/module/PortfolioTo
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { bigNumberToBigInt } from '../../../portfolio/useCases/TokensTable/TableColumnsChip';
 import { atomicBreakdown } from '@yoroi/common';
+import BigNumber from 'bignumber.js';
 
 type AssetInputProps = {
   direction: 'in' | 'out';
@@ -17,7 +18,7 @@ type AssetInputProps = {
 export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
-  const { primaryTokenInfo, swapForm, tokenInfos } = useSwapRevamp();
+  const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
 
   const tokenInput = swapForm[direction === 'in' ? 'tokenInInput' : 'tokenOutInput'];
   const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
@@ -26,7 +27,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const label = direction === 'in' ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
   const touched = tokenInput.isTouched;
-  const tokenQuantity = swapForm.tokenInInput?.formatedAmount;
 
   const {
     tokenActivity: { secondaryToken24Activity },
@@ -34,17 +34,28 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const {
     ptActivity: { close: primaryTokenActivity },
+    currency,
   } = useCurrencyPairing();
 
   let totalPrice: string | undefined;
+  let selectedToken: any;
   const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
 
   if (direction === 'in' && primaryTokenActivity != null) {
+    const normalizeId = (id?: string | null) => (id === '' ? '.' : id);
+    selectedToken = ftAssetList.filter(token => {
+      return normalizeId(token.info.id) === swapForm.tokenInInput?.tokenId;
+    })[0];
+    const selectedTokenDecimals = selectedToken?.info?.numberOfDecimals ?? 0;
+
     try {
-      const quantityBigInt = bigNumberToBigInt(token.quantity);
+      const quantityBigInt = bigNumberToBigInt(selectedToken.quantity);
       const activityBN = new BigNumber(primaryTokenActivity.toString());
 
-      totalPrice = atomicBreakdown(quantityBigInt, decimals).bn.times(tokenPrice).times(activityBN).toFormat(decimals);
+      totalPrice = atomicBreakdown(quantityBigInt, selectedTokenDecimals)
+        .bn.times(tokenPrice)
+        .times(activityBN)
+        .toFormat(selectedTokenDecimals);
     } catch (err) {
       console.error('Failed to calculate totalPrice:', err);
     }
@@ -124,17 +135,28 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
           />
         </Stack>
 
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
-            <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
-            <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
-              {tokenQuantity} {tokenInputInfo?.name}
+        {direction === 'in' ? (
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
+              <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
+              <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
+                {selectedToken?.formatedAmount} {selectedToken?.info.name}
+              </Typography>
+            </Stack>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {totalPrice} {currency}
             </Typography>
           </Stack>
-          <Typography variant="body2" color="ds.text_gray_low">
-            0 USD
-          </Typography>
-        </Stack>
+        ) : (
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
+              <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
+              <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
+                0
+              </Typography>
+            </Stack>
+          </Stack>
+        )}
       </Stack>
     </Wrapper>
   );

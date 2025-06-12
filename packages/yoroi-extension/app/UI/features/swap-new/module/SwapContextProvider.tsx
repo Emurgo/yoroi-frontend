@@ -27,12 +27,11 @@ export const useAddressHex = address => {
 };
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
-  const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet } = currentWallet;
+  const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet, explorer } = currentWallet;
   if (selectedWallet === undefined) {
     return <></>;
   }
   const [stakingKey, setStakingKey] = React.useState(null);
-  const [loadingSwapPage, setLoadingSwapPage] = React.useState(true);
   const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
@@ -68,20 +67,13 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     });
   }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
 
-  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {} } = useSyncedTokenInfos({
+  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
     primaryTokenInfo: primaryTokenInfo,
     networkId: Chain.Network.Mainnet,
-    excludedTokens,
+    excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
   });
-
-  // React.useEffect(() => {
-  //   setLoadingSwapPage(prev => {
-  //     const next = isLoading || isFetching;
-  //     return prev !== next ? next : prev;
-  //   });
-  // }, [isLoading, isFetching]);
 
   const context = React.useMemo(
     () => ({
@@ -93,14 +85,15 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       ftAssetList: ftAssetList || [],
       primaryTokenInfo,
       assetsStore: stores.substores.ada.swapStore.assets,
-      loadingSwapPage: loadingSwapPage,
       tokenManager,
+      loadingTokenList,
+      explorer,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
 
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
-};;
+};
 
 export const useSwapRevamp = () =>
   React.useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
