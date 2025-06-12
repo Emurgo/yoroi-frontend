@@ -168,12 +168,16 @@ class BasePage {
     return await this.waitPresentedAndAct(locator, async () => {
       let element = await this.findElement(locator);
       try {
-        return await element.getText();
+        const result = await element.getText();
+        this.logger.info(`BasePage::getText. Result: ${result}`);
+        return result;
       } catch (error) {
         if (error.name === 'StaleElementReferenceError') {
           this.logger.info(`BasePage::getText Re-try because of StaleElementReferenceError`);
           element = await this.findElement(locator);
-          return await element.getText();
+          const result = await element.getText();
+          this.logger.info(`BasePage::getText. Result: ${result}`);
+          return result;
         } else {
           throw error;
         }
@@ -184,11 +188,16 @@ class BasePage {
     this.logger.info(
       `BasePage::getCssValue is called. Locator: ${JSON.stringify(locator)}, property: ${cssStyleProperty}`
     );
-    return await this.driver.findElement(getByLocator(locator)).getCssValue(cssStyleProperty);
+    const element = await this.driver.findElement(getByLocator(locator));
+    const result = element.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValue Result: ${result}`);
+    return result;
   }
   async getCssValueElement(webElement, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
-    return await webElement.getCssValue(cssStyleProperty);
+    const result = await webElement.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
+    return result;
   }
   async getAttribute(locator, property) {
     this.logger.info(
