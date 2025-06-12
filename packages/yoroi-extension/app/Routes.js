@@ -9,7 +9,7 @@ import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
-import type { StoresMap, StoresProps } from './stores/index';
+import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -41,8 +41,6 @@ import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextPr
 import { PortfolioContextProvider } from './UI/features/portfolio/module/PortfolioContextProvider';
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
-// $FlowIgnore: suppressing this error
-import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 // $FlowIgnore: suppressing this error

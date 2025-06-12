@@ -1,5 +1,4 @@
-import * as React from 'react';
-
+import { useMemo, useReducer, useContext, useRef, useState, useEffect, createContext, RefObject, Dispatch } from 'react';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
@@ -12,9 +11,6 @@ import { tokenManagers } from '../../portfolio/common/helpers/build-token-manage
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
-  // const address = await RustModule.WalletV4.Address.from_bech32(bech32Address);
-  // const bytes = await address.to_bytes();
-  // return await Buffer.from(bytes).toString('hex');
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
 };
 
@@ -31,19 +27,17 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   if (selectedWallet === undefined) {
     return <></>;
   }
-  const [stakingKey, setStakingKey] = React.useState(null);
+  const [stakingKey, setStakingKey] = useState(null);
   const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
 
-  // const addressHex = useAddressHex(walletAddresses[0]);
+  const tokenOutInputRef = useRef<any | null>(null);
+  const tokenInInputRef = useRef<any | null>(null);
 
-  const tokenOutInputRef = React.useRef<any | null>(null);
-  const tokenInInputRef = React.useRef<any | null>(null);
+  const [state, action] = useReducer(swapReducer, defaultState);
 
-  const [state, action] = React.useReducer(swapReducer, defaultState);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
     const skey = unwrapStakingKey(stakignAddr).to_keyhash()?.to_hex();
     if (skey == null) {
@@ -52,7 +46,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     setStakingKey(skey);
   }, []);
 
-  const swapManager = React.useMemo(() => {
+  const swapManager = useMemo(() => {
     const storage = swapStorageMaker();
 
     return swapManagerMaker({
@@ -75,7 +69,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
   });
 
-  const context: any = React.useMemo(
+  const context: any = useMemo(
     () => ({
       swapForm: { action, ...state },
       tokenInfos,
@@ -95,8 +89,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
 };
 
-export const useSwapRevamp = () =>
-  React.useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
+export const useSwapRevamp = () => useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
 
 const swapReducer = (state: SwapState, action: SwapAction) => {
   return produce(state, draft => {
@@ -378,11 +371,11 @@ export type SwapContext = SwapState & {
   isLoading: boolean;
   limitOptions?: Swap.LimitOptionsResponse;
   tokenInfos: Map<Portfolio.Token.Id, Portfolio.Token.Info>;
-  tokenInInputRef: React.RefObject<any> | undefined;
-  tokenOutInputRef: React.RefObject<any> | undefined;
-  wantedPriceInputRef: React.RefObject<any> | undefined;
+  tokenInInputRef: RefObject<any> | undefined;
+  tokenOutInputRef: RefObject<any> | undefined;
+  wantedPriceInputRef: RefObject<any> | undefined;
   orders?: Array<Swap.Order>;
-  action: React.Dispatch<SwapAction>;
+  action: Dispatch<SwapAction>;
   create: () => void;
   cancel: Swap.Api['cancel'];
   managerSettings: Swap.ManagerSettings;
@@ -397,7 +390,7 @@ export type SwapContext = SwapState & {
   explorer: { tokenInfo: { name: string; baseUrl: string } };
 };
 
-const SwapContext = React.createContext<SwapContext>({
+const SwapContext = createContext<SwapContext>({
   ...defaultState,
   isLoading: false,
   tokenInfos: new Map<Portfolio.Token.Id, Portfolio.Token.Info>(),

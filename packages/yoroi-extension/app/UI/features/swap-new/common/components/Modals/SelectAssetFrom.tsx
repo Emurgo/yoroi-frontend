@@ -113,7 +113,7 @@ export const SelectAssetFrom = () => {
                 id: asset.info.id,
                 formatedAmount: asset.formatedAmount,
                 quantity: asset.quantity,
-                ...asset,
+                ...asset.info,
               }}
               onAssetClick={() => handleAssetClick(asset.info.id)}
             />
