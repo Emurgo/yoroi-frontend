@@ -88,6 +88,8 @@ import { VisibilityOn } from './VisibilityOn';
 import { Voting } from './Voting';
 import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
+import { Refresh } from './Refresh';
+import { Swap } from './Swap';
 
 export const Icon = {
   Assets,
@@ -145,6 +147,7 @@ export const Icon = {
   QuestionCircle,
   Receive,
   Reporting,
+  Refresh,
   Sandbox,
   Script,
   Search,
@@ -178,6 +181,7 @@ export const Icon = {
   Voting,
   Wallet,
   Wallets,
+  Swap,
 };
 
 export enum Icons {
@@ -238,6 +242,7 @@ export enum Icons {
   QuestionCircle = 'QuestionCircle',
   Receive = 'Receive',
   Reporting = 'Reporting',
+  Refresh = 'Refresh',
   Sandbox = 'Sandbox',
   Script = 'Script',
   Search = 'Search',
@@ -266,6 +271,7 @@ export enum Icons {
   Voting = 'Voting',
   Wallet = 'Wallet',
   Wallets = 'Wallets',
+  Swap = 'Swap',
 }
 
 interface IconWrapperProps {

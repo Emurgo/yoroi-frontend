@@ -200,6 +200,14 @@ const globalMessages: * = defineMessages({
     id: 'governance.considerDelegating',
     defaultMessage: '!!!Consider delegating to Yoroi?',
   },
+  governanceBannerTitle: {
+    id: 'governance.banner.title',
+    defaultMessage: '!!!New to Governance? Start here',
+  },
+  governanceBannerText: {
+    id: 'governance.banner.text',
+    defaultMessage: '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.',
+  },
   publicKeyExplanation: {
     id: 'global.publicKey.explanation',
     defaultMessage: `!!!Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)`,
