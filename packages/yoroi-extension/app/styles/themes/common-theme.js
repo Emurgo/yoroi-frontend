@@ -19,6 +19,7 @@ export const commonTheme: Object = {
    * To create the "medium" vairant, you can overwrite the font-weight to be
    * "fontWeight: 500".
    */
+  spacing: 1,
   typography: {
     htmlFontSize: 14,
     fontSize: 14,
@@ -32,9 +33,9 @@ export const commonTheme: Object = {
     },
     // DS name: heading-2-regular
     h2: {
-      fontSize: '1.75rem', // 28px
+      fontSize: '28px', // 28px
       lineHeight: '32px',
-      fontWeight: 400,
+      fontWeight: 500,
       fontFamily,
     },
     // DS name: heading-3-regular
@@ -53,9 +54,9 @@ export const commonTheme: Object = {
     },
     // DS name: heading-5-regular
     h5: {
-      fontSize: '1.125rem', // 18px
+      fontSize: '18px', // 18px
       lineHeight: '26px',
-      fontWeight: 400,
+      fontWeight: 500,
       fontFamily,
     },
     // DS name: button-1
