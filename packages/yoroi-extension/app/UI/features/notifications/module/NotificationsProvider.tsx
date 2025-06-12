@@ -127,7 +127,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:
-        if (location.pathname === ROUTES.WALLETS.TRANSACTIONS) {
+        if (location.pathname === ROUTES.WALLETS.TRANSACTIONS || location.pathname === ROUTES.ROOT) {
           return;
         }
         break;
