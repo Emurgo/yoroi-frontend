@@ -586,12 +586,13 @@ export class TransactionsSubTab extends WalletTab {
     const result = [];
     const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
     for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      await this.scrollIntoView(this.txFeeTextLocator(groupIndex, txIndex));
       const txFeeString = await this.getText(this.txFeeTextLocator(groupIndex, txIndex));
       const txAmountRawString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
-      const txAmountString = txAmountRawString.split(' ')[0];
+      const [adaAmountStr, fiatAmountStr] = txAmountRawString.split('\n');
 
       const txFeeHiddenState = txFeeString === balanceReplacer || txFeeString === '-';
-      const txAmountHiddenState = txAmountString === balanceReplacer;
+      const txAmountHiddenState = adaAmountStr.startsWith(balanceReplacer) && fiatAmountStr.startsWith(balanceReplacer);
 
       result.push(txFeeHiddenState && txAmountHiddenState);
     }
