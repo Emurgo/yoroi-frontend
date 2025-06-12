@@ -34,33 +34,42 @@ const sizeMap = {
 export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconProps) => {
   const theme: any = useTheme();
   const dimension = sizeMap[size];
-  if (info.id === undefined) {
+
+  if (!info?.id) {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={Icons.Assets1} />
-        {/* <Icon.Coins2 color={theme.color.gray_600} size={iconSizeMap[size]} /> */}
+        <IconWrapper icon={Icons.Assets} />
       </StyledIconBox>
     );
   }
 
-  if (info.id === '.' || info.id === '') {
+  if (info.id === '' || info.id === '.') {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.primary_500} style={imageStyle}>
         <IconWrapper icon={Icons.AdaToken} />
-        {/* <Icon.Cardano color="white" size={cardanoIconSizeMap[size]} /> */}
       </StyledIconBox>
     );
   }
 
-  const [policy, name] = !info ? '.' : info.id.split('.');
+  const [policy, name] = info.id.split('.');
   const { uri, onError, onLoad, crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
+
+  if (!uri) {
+    return (
+      <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
+        <IconWrapper icon={Icons.Assets} />
+      </StyledIconBox>
+    );
+  }
 
   return (
     <Box
       component="img"
       src={uri}
       onLoad={onLoad}
-      onError={onError}
+      onError={() => {
+        onError();
+      }}
       alt={name}
       crossOrigin={crossOrigin}
       sx={{
