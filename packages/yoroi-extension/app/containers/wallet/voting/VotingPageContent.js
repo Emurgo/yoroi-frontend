@@ -125,6 +125,7 @@ class VotingPageContent extends Component<StoresProps> {
             -tokenInfo.Metadata.numberOfDecimals
           )}
           tokenName={getTokenName(tokenInfo)}
+          shouldHideBalance={stores.profile.shouldHideBalance}
         />
       );
     }
