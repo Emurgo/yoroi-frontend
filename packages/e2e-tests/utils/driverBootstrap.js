@@ -16,7 +16,6 @@ import {
   getTargetBrowser,
   isBrave,
   isChrome,
-  isDapp,
   isFirefox,
   isHeadless,
 } from './utils.js';
