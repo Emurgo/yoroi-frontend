@@ -24,7 +24,7 @@ const StyledButton = styled(Box, {
   padding: '6px 0px',
   borderBottom: '3px solid transparent',
   width: 'initial',
-  marginRight: '24px',
+  ...theme.atoms.pr_xl,
   color: active ? theme.palette.ds.text_primary_medium : theme.palette.ds.text_gray_low,
   borderBottomColor: active ? theme.palette.ds.text_primary_medium : 'transparent',
   cursor: 'pointer',

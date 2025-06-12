@@ -1,7 +1,7 @@
 // @flow
 import { useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
-import { defineMessages, injectIntl, FormattedMessage } from 'react-intl';
+import { defineMessages, injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { Stack, Typography, Box, Link } from '@mui/material';
@@ -13,14 +13,6 @@ import globalMessages from '../../../i18n/global-messages';
 import type { ManageDialogsProps } from './CreateWalletPage';
 import { messages as infoDialogMessages } from '../../widgets/infoDialog';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
-
-const messages: * = defineMessages({
-  description: {
-    id: 'wallet.create.firstStep.description',
-    defaultMessage:
-      '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.',
-  },
-});
 
 type Intl = {|
   intl: $npm$ReactIntl$IntlShape,
@@ -49,7 +41,7 @@ function _LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center">
       <Stack direction="column" alignItems="center" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1">
-          <FormattedMessage {...messages.description} values={{ strong }}/>
+          {intl.formatMessage(text.description, {strong: chunks => <strong>{chunks}</strong>})}
           <Box
             component="span"
             sx={{
@@ -126,6 +118,11 @@ const text: * = defineMessages({
     defaultMessage:
       '!!!<strong>Yoroi NEVER</strong> asks for your <strong>recovery phrase</strong>. Watch out for scammers and impersonators',
   },
+  description: {
+    id: 'wallet.create.firstStep.description',
+    defaultMessage:
+      '!!!A recovery phrase is a secret series of words that can be used to recover your Yoroi Wallet. See the video below how to <strong>use a recovery phrase</strong>.',
+  },
 });
 
 function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
@@ -136,7 +133,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1" color="ds.text_gray_medium">
-          <FormattedMessage {...text.shortDescription} />
+           {intl.formatMessage(text.shortDescription, {strong: chunks => <strong>{chunks}</strong>})}
         </Typography>
 
         <Stack
@@ -157,7 +154,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
                 <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
-                  <FormattedMessage {...tip} />
+                   {intl.formatMessage(tip, {strong: chunks => <strong>{chunks}</strong>})}
                 </Typography>
               </Box>
             ))}

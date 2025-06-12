@@ -574,7 +574,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         }
         const stakeRegistration = cert.as_stake_registration();
         if (stakeRegistration) {
-          const coin = stakeRegistration.coin()?.toString() ?? null;
+          const coin = stakeRegistration.coin()?.to_str() ?? null;
           cip95Info.push({
             type: 'StakeRegistrationCert',
             coin,
@@ -583,7 +583,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         }
         const stakeDeregistration = cert.as_stake_deregistration();
         if (stakeDeregistration) {
-          const coin = stakeDeregistration.coin()?.toString() ?? null;
+          const coin = stakeDeregistration.coin()?.to_str() ?? null;
           cip95Info.push({
             type: 'StakeDeregistrationCert',
             coin,
