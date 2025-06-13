@@ -40,7 +40,8 @@
     "translations:purge": "rimraf ./translations/messages",
     "metrics:pull": "ampli pull extension",
     "metrics:status": "babel-node scripts/checkMetrics.js",
-    "tsc": "tsc --project tsconfig.json --noEmit"
+    "tsc": "tsc --project tsconfig.json --noEmit",
+    "check": "npm run flow && npm run eslint && npm run tsc"
   },
   "repository": {
     "type": "git",
