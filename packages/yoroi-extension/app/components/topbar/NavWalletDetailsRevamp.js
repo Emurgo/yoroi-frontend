@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { truncateLongName } from '../../utils/formatters';
 
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -15,7 +15,6 @@ import { maybe } from '../../coreUtils';
 import AmountDisplay from '../common/AmountDisplay';
 import styles from './NavWalletDetailsRevamp.scss';
 import { constructPlate32 } from './WalletCard';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
@@ -61,10 +60,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     showEyeIcon: true,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const {
       shouldHideBalance,

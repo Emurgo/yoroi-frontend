@@ -3,11 +3,11 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import styles from './UriAccept.scss';
 import { ReactComponent as UriPrompt }  from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { strong, em } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   seePrompt: {
@@ -23,12 +23,9 @@ type Props = {|
 
 @observer
 export default class UriAccept extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <div className={styles.component}>
@@ -38,7 +35,7 @@ export default class UriAccept extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            <FormattedHTMLMessage {...messages.seePrompt} />
+            <FormattedMessage {...messages.seePrompt} values={{ strong, em }}/>
           </div>
 
           <div className={styles.buttonsWrapper}>

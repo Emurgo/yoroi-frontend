@@ -61,7 +61,7 @@ export default class SupportSettingsPage extends Component<StoresProps> {
         <SupportSettings
           onExternalLinkClick={handleExternalLinkClick}
           onDownloadLogs={this.handleDownloadLogs}
-          onPaperWalletTransfer={() => stores.app.redirect({ route: ROUTES.TRANSFER.ROOT })}
+          onPaperWalletTransfer={() => stores.routing.replaceRoute({ route: ROUTES.TRANSFER.ROOT })}
         />
       </>
     );

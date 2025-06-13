@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import FullscreenMessage from '../../components/wallet/layouts/FullscreenMessage';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 export const messages: * = defineMessages({
   title: {
@@ -22,12 +21,9 @@ type Props = {|
 
 @observer
 export default class NoWalletMessage extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <FullscreenMessage

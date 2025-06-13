@@ -1,4 +1,3 @@
-import React from 'react';
 import { Warning } from '../../components/Warning/Warning';
 
 export const useWarningSection = ({ warning, title, content }) => {

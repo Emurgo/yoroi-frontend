@@ -8,8 +8,6 @@ import { ampli } from '../../../../../ampli/index';
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
   const {
     openTxReviewModal,
-    walletType,
-    isHardwareWallet,
     stopLoadingTxReview,
     startLoadingTxReview,
     showTxResultModal,
@@ -33,7 +31,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
   const createWithdrawalTx = async () => {
     const walletSelect = stores.wallets.selectedOrFail;
     stores.substores.ada.delegationTransaction.setShouldDeregister(false);
-    const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
+    const { unsignedTx } = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: walletSelect });
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -47,42 +45,23 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
         ],
         kind: 'withdraw',
       },
-      unsignedTx: unsignedTx.unsignedTx,
+      unsignedTx,
     });
   };
 
-  const submitTx = async passswordInput => {
-    const selected = stores.wallets.selected;
+  const submitTx = async password => {
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
     try {
       startLoadingTxReview();
-      if (isHardwareWallet) {
-        if (walletType === 'trezor') {
-          await stores.substores.ada.trezorSend.sendUsingTrezor({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-          });
-        }
-        if (walletType === 'ledger') {
-          await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-          });
-        }
-      } else {
-        await stores.substores.ada.mnemonicSend.sendMoney({
-          signRequest,
-          password: passswordInput,
-          wallet: selected,
-        });
-      }
+
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: stores.wallets.selected,
+        signRequest,
+        password,
+        callback: async () => {},
+      });
+
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.SUCCESS);
 

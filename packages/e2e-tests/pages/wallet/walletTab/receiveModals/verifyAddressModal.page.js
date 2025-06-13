@@ -30,20 +30,28 @@ class VerifyAddressModal extends BasePage {
     locator: 'verifyAddressDialog-stakingKeyHash-text',
     method: 'id',
   };
+  verifyOnHWWButtonLocator = {
+    locator: 'verifyAddressDialog-verifyonhardwarewallet-button',
+    method: 'id',
+  };
   // methods
   // isDisplayed
   async isDisplayed() {
     this.logger.info(`ReceiveSubTab::VerifyAddressModal::isDisplayed is called.`);
-    const modalIsFound = await this.customWaitIsPresented(
+    const modalIsFoundPromise = this.customWaitIsPresented(
       this.verifyAddressModalLocator,
       fiveSeconds,
       quarterSecond
     );
-    const titleIsFound = await this.customWaitIsPresented(
+    const titleIsFoundPromise = this.customWaitIsPresented(
       this.verifyAddressModalTitleLocator,
       fiveSeconds,
       quarterSecond
     );
+    const [modalIsFound, titleIsFound] = await Promise.all([
+      modalIsFoundPromise,
+      titleIsFoundPromise,
+    ]);
     return modalIsFound && titleIsFound;
   }
   // closeModal
@@ -77,6 +85,10 @@ class VerifyAddressModal extends BasePage {
       derivationPath,
       stakingKeyHash,
     };
+  }
+  async clickVerifyOnHWW() {
+    this.logger.info(`ReceiveSubTab::VerifyAddressModal::clickVerifyOnHWW is called.`);
+    await this.click(this.verifyOnHWWButtonLocator);
   }
 }
 

@@ -1,12 +1,12 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../../../routes-config';
 
 export const useNavigateTo = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   return React.useRef({
-    nftGallery: () => history.push(ROUTES.NFT_GALLERY.ROOT),
-    nftDetails: (tokenId: string) => history.push(`${ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', tokenId)}`),
+    nftGallery: () => navigate(ROUTES.NFT_GALLERY.ROOT),
+    nftDetails: (tokenId: string) => navigate(`${ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', tokenId)}`),
   }).current;
 };

@@ -37,7 +37,7 @@ export function urlResolveForIpfsAndCorsproxy<T: ?string>(url: T): T {
   // $FlowIgnore
   return maybe(url, (u: string): string => u.startsWith('ipfs://')
     ? u.replace('ipfs://', 'https://ipfs.io/ipfs/')
-    : `https://corsproxy.io/?${u}`);
+    : `https://corsproxy.io/?url=${u}`);
 }
 
 /**
@@ -246,6 +246,20 @@ export function sanitizeForLog(v: any): any {
 export function ensureArray<T>(t: T | Array<T>): Array<T> {
   // $FlowIgnore
   return Array.isArray(t) ? t : [t];
+}
+
+/**
+ * Filter map object entries by value
+ *
+ * @param obj: {string:V} - some map with keys and values
+ * @param predicate - accepts a value from the obj and returns a booolen
+ * @return {string:V} - a copy of obj but only with entries where value passes the predicate
+ */
+export function filterByValues<V>(obj: { [string]: V }, predicate: V => boolean): { [string]: V } {
+  // $FlowIgnore
+  return (Object.entries(obj): Array<[string, V]>)
+    .filter(([,v]) => predicate(v))
+    .reduce((acc, [k,v]) => ({ ...acc, [k]: v }), {});
 }
 
 export type LenGet<T> = { +len: () => number, +get: number => T, ... };

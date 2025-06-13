@@ -15,6 +15,14 @@ class TrezorConnect extends BasePage {
     locator: '.confirm',
     method: 'css',
   };
+  exportAddressTitleTextLocator = {
+    locator: '#container > div > div:nth-child(1) > h3',
+    method: 'css',
+  }
+  exportAddressButtonLocator = {
+    locator: 'button.confirm[data-testid="@export-address/confirm-button"]',
+    css: 'css',
+  }
   // functions
   async tickCheckbox() {
     this.logger.info(`TrezorConnect::tickCheckbox is called`);
@@ -31,7 +39,7 @@ class TrezorConnect extends BasePage {
     if (result) {
       const allCheckboxes = await this.findElements(this.dontAskAgainCheckboxLocator);
       // this conditions was found empirically
-      await allCheckboxes[0].click();
+      await this.clickElementByScript(allCheckboxes[0]);
     } else {
       this.logger.error(`TrezorConnect::tickCheckbox A correct checkbox is not found`);
       throw new Error('A correct checkbox is not found');
@@ -46,6 +54,14 @@ class TrezorConnect extends BasePage {
     this.logger.info(`TrezorConnect::allowPubKeysExport is called`);
     await this.waitForElement(this.exportTrezorButtonLocator);
     await this.clickByScript(this.exportTrezorButtonLocator);
+  }
+  async exportAddressPageIsDisplayed() {
+    this.logger.info(`TrezorConnect::exportAddressPageIsDisplayed is called`);
+    return await this.customWaitIsPresented(this.exportAddressTitleTextLocator);
+  }
+  async confirmExportAddress() {
+    this.logger.info(`TrezorConnect::exportAddressPageIsDisplayed is called`);
+    await this.clickByScript(this.exportAddressButtonLocator);
   }
 }
 

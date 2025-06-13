@@ -17,7 +17,7 @@ import { getPublicDeriverById } from '../../../chrome/extension/background/handl
 import Dialog from '../../components/widgets/Dialog';
 import DialogCloseButton from '../../components/widgets/DialogCloseButton';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { useTheme, Box, TextField, Typography, DialogContentText } from '@mui/material';
+import { useTheme, Box, TextField, Typography, DialogContentText, IconButton, styled } from '@mui/material';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
@@ -32,6 +32,7 @@ import { constructPlate32 } from '../../components/topbar/WalletCard';
 import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 import type { BringConfigType, ConfigType } from '../../../config/config-types';
+import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
 
 const messages = defineMessages({
   claim: {
@@ -364,7 +365,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
 
   useEffect(() => {
     if (environment.isLight) {
-      stores.app.goToRoute({
+      stores.routing.goToRoute({
         route: ROUTES.WALLETS.ROOT,
       });
     }
@@ -381,18 +382,15 @@ const CashbackPageContainer = observer((props: AllProps) => {
   // wallet, to be shown in a warning dialog.
   const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
 
-  useEffect(() => {
-    stores.wallets.getCashbackWalletRequest
-      .execute()
-      .then(currentCashbackWallet => {
-        if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
-          setShownCashbackWallet(currentCashbackWallet);
-          setPopup(true);
-        }
-        return 'nonsense';
-      })
-      .catch(console.error);
-  }, []);
+  const getCashbackWalletRequest = () => stores.wallets.getCashbackWalletRequest
+    .execute()
+    .then(currentCashbackWallet => {
+      if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
+        setShownCashbackWallet(currentCashbackWallet);
+      }
+      return 'nonsense';
+    })
+    .catch(console.error);
 
   const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
 
@@ -403,8 +401,9 @@ const CashbackPageContainer = observer((props: AllProps) => {
       .then(result => {
         if (!result) {
           setShouldShowDisclaimer(true);
-          setPopup(true);
+          return 'nonsense';
         }
+        getCashbackWalletRequest()
         return 'nonsense';
       })
       .catch(console.error);
@@ -440,13 +439,12 @@ const CashbackPageContainer = observer((props: AllProps) => {
       <Suspense fallback={null}>
         {shouldShowDisclaimer && (
           <DisclaimerDialog
+            closeButton={<CloseButton onClick={() => stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT })} />}
             onProceed={() => {
               setShouldShowDisclaimer(false);
-              if (!shownCashbackWallet) {
-                setPopup(false);
-              }
               const localStorageApi = new LocalStorageApi();
               localStorageApi.setShownDisclaimer('cashback');
+              getCashbackWalletRequest();
             }}
           />
         )}
@@ -457,10 +455,11 @@ const CashbackPageContainer = observer((props: AllProps) => {
             onSetCurrentAsCashbackWallet={() => {
               stores.wallets.setCashbackWallet(forceNonNull(stores.wallets.selected).publicDeriverId);
               setShownCashbackWallet(null);
-              setPopup(false);
             }}
             onSwitchToCashbackWallet={() => {
               stores.wallets.setActiveWallet({ publicDeriverId: shownCashbackWallet.publicDeriverId });
+              setShownCashbackWallet(null);
+              setPopup(false);
             }}
           />
         )}
@@ -553,5 +552,23 @@ const CashbackPageContainer = observer((props: AllProps) => {
     </TopBarLayout>
   );
 });
+
+
+const CloseButton = ({onClick}) => {
+  return (
+    <SIconBtn onClick={onClick}>
+      <CloseCrossRevamp />
+    </SIconBtn>
+  )
+}
+
+const SIconBtn = styled(IconButton)(({ theme, active }) => ({
+  backgroundColor: active && theme.palette.ds.gray_200,
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
 
 export default (injectIntl(CashbackPageContainer): React$ComponentType<StoresProps>);
