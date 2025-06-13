@@ -29,8 +29,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
-  const tokenOutInputRef = useRef<any | null>(null);
-  const tokenInInputRef = useRef<any | null>(null);
+  const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
+  const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
   const [state, action] = useReducer(swapReducer, defaultState);
 
@@ -88,7 +88,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
 };
 
-export const useSwapRevamp = () => useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
+export const useSwapRevamp = () =>
+  useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
 
 const swapReducer = (state: SwapState, action: SwapAction) => {
   return produce(state, draft => {
@@ -207,7 +208,7 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapAction.ResetForm:
-        draft = defaultState;
+        Object.assign(draft, defaultState);
         break;
 
       case SwapAction.EstimateResponse:
@@ -380,7 +381,6 @@ export type SwapContext = SwapState & {
   managerSettings: Swap.ManagerSettings;
   assignManagerSettings: Swap.Manager['assignSettings'];
   refetchOrders: () => void;
-  // TODO define after
   ftAssetList: any;
   tokenInfoList: any;
   swapForm: any;
