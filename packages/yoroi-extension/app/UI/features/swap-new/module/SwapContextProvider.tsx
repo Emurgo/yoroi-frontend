@@ -24,14 +24,11 @@ export const useAddressHex = address => {
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
   const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet, explorer } = currentWallet;
-  if (selectedWallet === undefined) {
-    return <></>;
-  }
-  const [stakingKey, setStakingKey] = useState(null);
+
+  const [stakingKey, setStakingKey] = useState<string | null>(null);
   const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
-
   const tokenOutInputRef = useRef<any | null>(null);
   const tokenInInputRef = useRef<any | null>(null);
 
@@ -55,19 +52,21 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       stakingKey: String(stakingKey),
       address: walletAddresses[0],
       addressHex: String(stakingKey),
-      primaryTokenInfo: primaryTokenInfo,
-      isPrimaryToken: isPrimaryToken,
+      primaryTokenInfo,
+      isPrimaryToken,
       partners,
     });
-  }, [stakingKey, primaryTokenInfo, stakingKey, partners, walletAddresses[0]]);
+  }, [stakingKey, primaryTokenInfo, partners, walletAddresses[0]]);
 
   const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
-    primaryTokenInfo: primaryTokenInfo,
+    primaryTokenInfo,
     networkId: Chain.Network.Mainnet,
     excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
   });
+
+  if (!selectedWallet) return null;
 
   const context: any = useMemo(
     () => ({

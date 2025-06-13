@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, styled, useTheme } from '@mui/material';
 
 import { usePortfolioImage } from '../hooks/usePortfolioImage';
@@ -17,23 +17,21 @@ const sizeMap = {
   xl: 80,
 } as const;
 
-// const iconSizeMap = {
-//   sm: 18,
-//   md: 20,
-//   lg: 24,
-//   xl: 42,
-// } as const;
-
-// const cardanoIconSizeMap = {
-//   sm: 20,
-//   md: 28,
-//   lg: 35,
-//   xl: 70,
-// } as const;
-
 export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconProps) => {
   const theme: any = useTheme();
   const dimension = sizeMap[size];
+  const [fallback, setFallback] = useState(false);
+
+  const id = typeof info?.id === 'string' ? info.id : '';
+  const isAda = id === '' || id === '.';
+  const [policy, name] = id.includes('.') ? id.split('.') : ['unknown', 'unknown'];
+
+  const { uri, onError, onLoad, crossOrigin } = usePortfolioImage({
+    policy,
+    name,
+    width: 64,
+    height: 64,
+  });
 
   if (!info?.id) {
     return (
@@ -43,21 +41,10 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
     );
   }
 
-  if (info.id === '' || info.id === '.') {
+  if (fallback || !uri) {
     return (
-      <StyledIconBox size={dimension} bg={theme.palette.ds.primary_500} style={imageStyle}>
-        <IconWrapper icon={Icons.AdaToken} />
-      </StyledIconBox>
-    );
-  }
-
-  const [policy, name] = info.id.split('.');
-  const { uri, onError, onLoad, crossOrigin } = usePortfolioImage({ policy, name, width: 64, height: 64 });
-
-  if (!uri) {
-    return (
-      <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={Icons.Assets} />
+      <StyledIconBox size={dimension} bg={isAda ? theme.palette.ds.primary_500 : theme.palette.ds.gray_200} style={imageStyle}>
+        <IconWrapper icon={isAda ? Icons.AdaToken : Icons.Assets} />
       </StyledIconBox>
     );
   }
@@ -69,6 +56,7 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
       onLoad={onLoad}
       onError={() => {
         onError();
+        setFallback(true);
       }}
       alt={name}
       crossOrigin={crossOrigin}
