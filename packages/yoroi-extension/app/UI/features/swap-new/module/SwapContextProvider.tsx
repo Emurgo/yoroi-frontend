@@ -66,8 +66,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
   });
 
-  if (!selectedWallet) return null;
-
   const context: any = useMemo(
     () => ({
       swapForm: { action, ...state },
@@ -84,6 +82,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
+
+  if (!selectedWallet) return null;
 
   return <SwapContext.Provider value={context}>{children}</SwapContext.Provider>;
 };
