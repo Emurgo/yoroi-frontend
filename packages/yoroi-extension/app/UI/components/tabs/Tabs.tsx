@@ -16,6 +16,7 @@ interface TabsProps {
   onTabChange?: (activeTab: TabItem | undefined) => void;
   headerSx?: SxProps;
   contentSx?: SxProps;
+  tabListSx?: SxProps;
   pathId?: string;
 }
 
@@ -33,7 +34,7 @@ const StyledTab = styled(Tab)({
   },
 });
 
-export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx = {}, contentSx = {}, pathId = 'somethere' }: TabsProps) => {
+export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx = {}, contentSx = {}, tabListSx = {}, pathId = 'somethere' }: TabsProps) => {
   const [value, setValue] = useState(initialTabId || tabs[0]?.id || '0');
   const filteredTabs = tabs.filter(tab => tab.content !== null);
 
@@ -61,6 +62,7 @@ export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx
               width: '100%',
               boxShadow: 'none',
               '&.MuiTabs-indicator': { height: '2px' },
+              ...tabListSx,
             }}
             textColor="primary"
             indicatorColor="primary"
