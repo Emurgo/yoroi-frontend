@@ -114,7 +114,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
     icon: dappConnectorIcon,
     label: connectorMessages.connector,
-    isVisible: always,
+    isVisible: () => !environment.isDev(),
+  },
+  {
+    className: 'dapp-center',
+    route: ROUTES.DAPP_CONNECTOR.DAPP_CENTER,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'governance',
