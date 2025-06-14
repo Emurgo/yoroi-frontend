@@ -51,7 +51,7 @@ module.exports = {
     'react/destructuring-assignment': 0,
     'react/no-array-index-key': 1,
     'react/jsx-no-bind': 'off',
-    'react/jsx-filename-extension': ['error', { 'extensions': ['.js', '.jsx', '.ts', '.tsx'] }],
+    'react/jsx-filename-extension': ['error', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
     'react/jsx-closing-bracket-location': 1,
     'react/jsx-one-expression-per-line': 'off',
     'react/jsx-wrap-multilines': 'off',

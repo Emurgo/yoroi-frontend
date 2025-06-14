@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import NftImage from './NftImage';
 
 interface NftCardProps {
-  ipfsUrl: string | null;
+  ipfsUrl: string | undefined;
   name: string;
   onClick: () => void;
   nftPathId: string;
