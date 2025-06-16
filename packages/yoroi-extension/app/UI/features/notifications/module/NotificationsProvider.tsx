@@ -127,7 +127,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     const currentLocation = locationRef.current;
 
     if (!notifyWallet) return;
-
+// return if we're on the same route as the event redirection
     switch (type) {
       case NotificationTypes.Intrawallet:
       case NotificationTypes.Income:
