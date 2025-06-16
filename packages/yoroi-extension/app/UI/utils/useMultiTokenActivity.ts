@@ -1,5 +1,4 @@
 import { Portfolio } from '@yoroi/types';
-import axios, { AxiosError } from 'axios';
 import { useQuery, UseQueryResult } from 'react-query';
 
 interface ApiError {
@@ -11,18 +10,20 @@ export const useMultiTokenActivity = (
   tokenIds: string[],
   interval: '24h' | '7d' | '30d',
   backend: string
-): UseQueryResult<Portfolio.Api.TokenActivityResponse, AxiosError<ApiError>> => {
+): UseQueryResult<Portfolio.Api.TokenActivityResponse, ApiError> => {
   const fetchTokenActivity = async (): Promise<Portfolio.Api.TokenActivityResponse> => {
-    const response = await axios.post(`${backend}/tokens/activity/multi/${interval}`, tokenIds, {
+    const response = await fetch(`${backend}/tokens/activity/multi/${interval}`, {
+      method: 'POST',
+      body: JSON.stringify(tokenIds),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
     });
-    return response.data;
+    return response.json();
   };
 
-  return useQuery<Portfolio.Api.TokenActivityResponse, AxiosError<ApiError>>(
+  return useQuery<Portfolio.Api.TokenActivityResponse, ApiError>(
     ['multiTokenActivity', tokenIds, interval],
     fetchTokenActivity,
     {
