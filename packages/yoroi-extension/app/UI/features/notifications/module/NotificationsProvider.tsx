@@ -121,7 +121,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     locationRef.current = location;
   }, [location]);
 
-  const createNotification = React.useCallback(async (type: NotificationTypes, id?: string) => {
+  const createNotification = async (type: NotificationTypes, id?: string) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
     // Early returns:
@@ -152,7 +152,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
       type,
       id: id || String(Date.now()),
     });
-  }, []);
+  };
 
   const handleSubscription = async (topic, data) => {
 
