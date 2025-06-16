@@ -128,7 +128,6 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     // return if settings are off
     const currentLocation = locationRef.current;
 
-
     if (!notifyWallet) return;
     // return if we're on the same route as the event redirection
 
