@@ -72,7 +72,7 @@ const HeaderSection = observer(
 
     return (
       <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
-        <Typography fontWeight="500" color="ds.gray_900">
+        <Typography variant="h5" fontWeight="500" color="ds.gray_900">
           {strings.balance}
         </Typography>
 

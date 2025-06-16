@@ -1,4 +1,3 @@
-import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
 

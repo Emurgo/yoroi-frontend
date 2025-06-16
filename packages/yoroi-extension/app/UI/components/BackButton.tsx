@@ -1,6 +1,5 @@
 import { Button, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React from 'react';
 import { ReactComponent as BackIcon } from '../../assets/images/assets-page/back-arrow.inline.svg';
 
 const SButton = styled(Button)(({ theme }: any) => ({

@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
 import type { Notification } from '../../types/notification.types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages } from 'react-intl';
 import { buildURI } from '../../utils/URIHandling';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import { Box, Typography, styled, useTheme } from '@mui/material';
@@ -51,14 +50,11 @@ type Props = {|
 
 @observer
 export default class URIDisplayDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { onClose, onBack, notification, onCopyAddressTooltip, address, amount } = this.props;
 
-    const { intl } = this.context;
+    const intl = this.context;
 
     const uri = buildURI(address, amount);
     const uriNotificationId = 'uri-copyNotification';

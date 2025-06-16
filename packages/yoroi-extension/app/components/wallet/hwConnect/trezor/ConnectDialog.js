@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 
 import globalMessages from '../../../../i18n/global-messages';
@@ -26,7 +26,6 @@ import { Logger } from '../../../../utils/logging';
 
 import styles from '../common/ConnectDialog.scss';
 import headerMixin from '../../../mixins/HeaderBlock.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -52,12 +51,9 @@ type Props = {|
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel } = this.props;
 
     const introBlock = (

@@ -2,8 +2,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { intlShape, defineMessages, FormattedMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import { Button, Typography, Alert, Link } from '@mui/material';
 import TextField from '../../../components/common/TextField';
 import globalMessages from '../../../i18n/global-messages';
@@ -14,11 +13,7 @@ import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import {
-  getTokenName,
-  getTokenIdentifierIfExists,
-  assetNameFromIdentifier,
-} from '../../../stores/stateless/tokenHelpers';
+import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
 import BigNumber from 'bignumber.js';
 import ExplorableHashContainer from '../../../containers/widgets/ExplorableHashContainer';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
@@ -52,7 +47,8 @@ const messages = defineMessages({
   },
   reorgMessage: {
     id: 'connector.signin.reorg.message',
-    defaultMessage: '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
+    defaultMessage:
+      '!!!To interact with {smartContractsLink} in Cardano you should add collateral, which means to make a 0 ADA transaction.{lineBreak}{lineBreak}It is a guarantee that prevent from failing smart contracts and scams. {learnMoreLink} about collateral.',
   },
   sendError: {
     id: 'connector.signin.error.sendError',
@@ -70,10 +66,7 @@ type State = {|
 
 @observer
 class AddCollateralPage extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -83,13 +76,13 @@ class AddCollateralPage extends Component<Props, State> {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.passwordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.passwordLabel),
+          label: this.context.formatMessage(globalMessages.passwordLabel),
+          placeholder: this.context.formatMessage(globalMessages.passwordLabel),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -125,7 +118,7 @@ class AddCollateralPage extends Component<Props, State> {
                 this.form
                   .$('walletPassword')
                   .invalidate(
-                    this.context.intl.formatMessage(messages.incorrectWalletPasswordError)
+                    this.context.formatMessage(messages.incorrectWalletPasswordError)
                   );
               } else {
                 throw error;
@@ -150,12 +143,7 @@ class AddCollateralPage extends Component<Props, State> {
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
     return fingerprint !== undefined ? (
-      <ExplorableHashContainer
-        selectedExplorer={this.props.selectedExplorer}
-        hash={fingerprint}
-        light
-        linkType="token"
-      >
+      <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={fingerprint} light linkType="token">
         <span>{truncateToken(getTokenName(tokenInfo))}</span>
       </ExplorableHashContainer>
     ) : (
@@ -184,19 +172,12 @@ class AddCollateralPage extends Component<Props, State> {
 
     const numberOfDecimals = tokenInfo ? tokenInfo.Metadata.numberOfDecimals : 0;
     const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
-    const ticker = tokenInfo
-      ? this.getTicker(tokenInfo)
-      : assetNameFromIdentifier(request.entry.identifier);
+    const ticker = tokenInfo ? this.getTicker(tokenInfo) : assetNameFromIdentifier(request.entry.identifier);
 
-    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-      shiftedAmount,
-      numberOfDecimals
-    );
+    const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, numberOfDecimals);
 
     // we may need to explicitly add + for positive values
-    const adjustedBefore = beforeDecimalRewards.startsWith('-')
-      ? beforeDecimalRewards.replace('-', '')
-      : beforeDecimalRewards;
+    const adjustedBefore = beforeDecimalRewards.startsWith('-') ? beforeDecimalRewards.replace('-', '') : beforeDecimalRewards;
 
     return (
       <div>
@@ -210,7 +191,7 @@ class AddCollateralPage extends Component<Props, State> {
     const { txData, onCancel, submissionError } = this.props;
     if (!txData) return null;
 
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const walletPasswordField = form.$('walletPassword');
     const { isSubmitting } = this.state;
@@ -258,7 +239,8 @@ class AddCollateralPage extends Component<Props, State> {
     return (
       <Box overflowWrap="break-word" display="flex" height="100%" flexDirection="column">
         <Box maxWidth={480} margin="0 auto" padding="32px" flex="1" flexGrow="1" overflow="auto">
-          <Typography component="div"
+          <Typography
+            component="div"
             textAlign="center"
             color="gray.900"
             variant="h4"
@@ -286,7 +268,8 @@ class AddCollateralPage extends Component<Props, State> {
             <Box
               width="100%"
               padding="16px"
-              border="1px solid var(--yoroi-palette-gray-100)"
+              border="1px solid"
+              borderColor="ds.gray_100"
               borderRadius="6px"
               display="flex"
               flexDirection="column"
@@ -320,22 +303,15 @@ class AddCollateralPage extends Component<Props, State> {
           </Box>
           {walletType === 'mnemonic' && (
             <Box mt="24px">
-              <TextField
-                type="password"
-                {...walletPasswordField.bind()}
-                error={walletPasswordField.error}
-                id="walletPassword"
-              />
-              {submissionError === 'SEND_TX_ERROR' && (
-                <Alert severity="error">{intl.formatMessage(messages.sendError)}</Alert>
-              )}
+              <TextField type="password" {...walletPasswordField.bind()} error={walletPasswordField.error} id="walletPassword" />
+              {submissionError === 'SEND_TX_ERROR' && <Alert severity="error">{intl.formatMessage(messages.sendError)}</Alert>}
             </Box>
           )}
         </Box>
 
         {this.props.hwWalletError && <ErrorBlock error={this.props.hwWalletError} />}
 
-        <Box borderTop="1px solid var(--yoroi-palette-gray-300)">
+        <Box borderTop="1px solid" borderColor="ds.gray_300">
           <Box
             sx={{
               display: 'grid',

@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import environment from '../../environment';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import LanguageSelectionForm from '../../components/profile/language-selection/LanguageSelectionForm';
@@ -16,10 +15,7 @@ import type { StoresProps } from '../../stores';
 @observer
 export default class LanguageSelectionPage extends Component<StoresProps> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   async componentDidMount() {
     const profileStore = this.props.stores.profile;
     // if user uses back button to get back to this page

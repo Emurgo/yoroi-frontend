@@ -200,6 +200,14 @@ const globalMessages: * = defineMessages({
     id: 'governance.considerDelegating',
     defaultMessage: '!!!Consider delegating to Yoroi?',
   },
+  governanceBannerTitle: {
+    id: 'governance.banner.title',
+    defaultMessage: '!!!New to Governance? Start here',
+  },
+  governanceBannerText: {
+    id: 'governance.banner.text',
+    defaultMessage: '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.',
+  },
   publicKeyExplanation: {
     id: 'global.publicKey.explanation',
     defaultMessage: `!!!Public keys allow seeing the wallet history for the wallet, but does <strong>not</strong> allow to spend or move the funds in any way (private key is <strong>not</strong> included)`,
@@ -1034,7 +1042,7 @@ const globalMessages: * = defineMessages({
   tosAgreement: {
     id: 'profile.languageSelect.tosAgreement',
     defaultMessage:
-      '!!!I agree with <span id="tosLink">Terms of Service Agreement</span> and <span id="privacyLink">Privacy Notice</span>',
+      '!!!I agree with <tosLink>Terms of Service Agreement</tosLink> and <privacyLink>Privacy Notice</privacyLink>',
   },
   poolNotGenerating: {
     id: 'wallet.transitionDialog.poolNotGenerating',
@@ -1070,7 +1078,7 @@ const globalMessages: * = defineMessages({
   },
   goToFaucetButton: {
     id: 'wallet.emptyWalletMessage.goToFaucet',
-    defaultMessage: '!!!GO TO TADA FAUCET',
+    defaultMessage: '!!!ADD TEST ADA',
   },
   welcomeMessageTestnet: {
     id: 'wallet.emptyWalletMessage.testnet',
@@ -1078,7 +1086,11 @@ const globalMessages: * = defineMessages({
   },
   welcomeMessageSubtitleTestnet: {
     id: 'wallet.emptyWalletMessageSubtitle.testnet',
-    defaultMessage: "!!!Get started with Cardano's test currency, TADA. It's your key to testing a new world of possibilities.",
+    defaultMessage: '!!!Stake your test ADA by participating in our testnet staking program.',
+  },
+  welcomeMessageSubtitleTestnetExtra: {
+    id: 'wallet.emptyWalletMessageSubtitle.testnetExtra',
+    defaultMessage: "!!!Get your TADA. It's your key to testing a new world of possibilities.",
   },
   undelegatePool: {
     id: 'transaction.review.undelegatePool',

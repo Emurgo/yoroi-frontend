@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { ROUTES } from '../../routes-config';
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -31,13 +30,12 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletSummaryPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
+
   @observable notificationElementId: string = '';
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { stores } = this.props;
     const {
       hasAny,
@@ -123,7 +121,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             addressLookup={genAddressLookup(
               selected.networkId,
               intl,
-              route => stores.app.goToRoute({ route }),
+              route => stores.routing.goToRoute({ route }),
               stores.addresses.addressSubgroupMap
             )}
             onCopyAddressTooltip={onCopyAddressTooltip}
@@ -167,6 +165,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
     return (
       <Box>
         <WalletSummaryRevamp
+          stores={stores}
           pendingAmount={unconfirmedAmount}
           shouldHideBalance={profile.shouldHideBalance}
           isLoadingTransactions={
@@ -188,7 +187,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             />
           }
           selectedWallet={selected}
-          goToRoute={stores.app.goToRoute}
+          goToRoute={stores.routing.goToRoute}
         />
 
         {walletTransactions}
@@ -216,7 +215,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             onCancel={stores.memos.closeMemoDialog}
             addExternal={() => {
               stores.memos.closeMemoDialog();
-              stores.app.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
+              stores.routing.goToRoute({ route: ROUTES.SETTINGS.EXTERNAL_STORAGE });
             }}
             onAcknowledge={() => {
               stores.uiDialogs.getParam<(void) => void>('continuation')?.();

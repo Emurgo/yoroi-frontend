@@ -1,6 +1,5 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack } from '@mui/material';
-import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../hooks/useStrings';
 

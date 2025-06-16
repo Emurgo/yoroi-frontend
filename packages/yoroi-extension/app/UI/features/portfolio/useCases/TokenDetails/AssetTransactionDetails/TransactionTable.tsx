@@ -2,9 +2,9 @@ import { Box, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRo
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Card } from '../../../../../components';
-import { Icon } from '../../../../../components/icons';
+import { Icon, Icons, IconWrapper } from '../../../../../components/icons';
 import { formatNumber } from '../../../common/helpers/formatHelper';
 import { mapStrings } from '../../../common/helpers/transactionHelper';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -153,9 +153,9 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             {row.type === HistoryItemType.RECEIVED && (
               <Icon.Send stroke={theme.palette.ds.secondary_600} style={{ transform: 'rotate(180deg)' }} />
             )}
-            {row.type === HistoryItemType.ERROR && <Icon.Cancel fill={theme.palette.ds.sys_magenta_500} />}
-            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_600} />}
-            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_500} />}
+            {row.type === HistoryItemType.ERROR && <IconWrapper color="ds.sys_magenta_500" icon={Icons.Cancel} />}
+            {row.type === HistoryItemType.WITHDRAW && <IconWrapper color="ds.secondary_600" icon={Icons.Staking} />}
+            {row.type === HistoryItemType.DELEGATE &&<IconWrapper color="ds.primary_500" icon={Icons.Staking} />}
           </IconButton>
           <Stack direction="column">
             <Typography color="ds.gray_900">{row.label}</Typography>

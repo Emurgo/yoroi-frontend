@@ -1,9 +1,8 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { Component, lazy, Suspense } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../banners/BannerContainer';
 import SidebarContainer from '../SidebarContainer';
@@ -24,10 +23,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class Transfer extends Component<AllProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -38,7 +34,7 @@ export default class Transfer extends Component<AllProps> {
     const navbar = (
       <NavBarContainerRevamp
         stores={stores}
-        title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.sidebarTransfer)} />}
+        title={<NavBarTitle title={this.context.formatMessage(globalMessages.sidebarTransfer)} />}
       />
     );
 

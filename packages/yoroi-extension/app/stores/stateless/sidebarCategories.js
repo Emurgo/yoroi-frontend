@@ -13,12 +13,13 @@ import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import environment from '../../environment';
 
 type isVisibleFunc = ({|
   hasAnyWallets: boolean,
-    selected: ?WalletState,
-      currentRoute: string,
-        isRewardWallet: isRewardWalletFunc,
+  selected: ?WalletState,
+  currentRoute: string,
+  isRewardWallet: isRewardWalletFunc,
 |}) => boolean;
 
 type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
@@ -26,14 +27,16 @@ type isRewardWalletFunc = ({ publicDeriverId: number, ... }) => boolean;
 export type SidebarCategoryRevamp = {|
   +className: string,
   +route: string,
-    +icon: string,
-      +label ?: MessageDescriptor,
-      +isVisible: isVisibleFunc,
-        +featureFlagName ?: string,
+  +icon: string,
+  +label?: MessageDescriptor,
+  +isVisible: isVisibleFunc,
+  +featureFlagName?: string,
 |};
 
+const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
+const isDev = (): boolean => environment.isDev();
 const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
@@ -65,6 +68,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: isOnMainnet,
   },
   {
+    className: 'swap',
+    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
+    icon: swapIcon,
+    label: { id: 'sidebar.swap2', defaultMessage: '!!!Swap2' },
+    isVisible: isDev,
+  },
+  {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
@@ -77,6 +87,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
     isVisible: existsSelectedWallet,
+  },
+  {
+    className: 'nft-gallery',
+    route: ROUTES.NFT_GALLERY.ROOT,
+    icon: nftsIcon,
+    label: globalMessages.sidebarNfts,
+    isVisible: isDev,
   },
   {
     className: 'voting',
@@ -97,7 +114,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
     icon: dappConnectorIcon,
     label: connectorMessages.connector,
-    isVisible: () => true,
+    isVisible: () => !environment.isDev(),
+  },
+  {
+    className: 'dapp-center',
+    route: ROUTES.DAPP_CONNECTOR.DAPP_CENTER,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'governance',
@@ -111,7 +135,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: () => true,
+    isVisible: always,
   },
 ];
 

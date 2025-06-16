@@ -4,9 +4,9 @@ import { Button, Grid, IconButton, Link as LinkMui, Modal, Stack, Tab, Typograph
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';
@@ -22,6 +22,8 @@ import { getNetworkUrl, tokenMessages } from './TokenDetails';
 import { CopyAddress, TruncatedText } from './TruncatedText';
 import type { CardanoAssetMintMetadata, NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
+// $FlowIgnore
+import { imageExists } from '../../../UI/tsUiCoreUtils';
 
 type Props = {|
   nftInfo: void | {
@@ -130,6 +132,8 @@ const STypography = styled(Typography)(({ theme }) => ({
 
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
+  const nftImageUrl = nftImage ? urlResolveForIpfsAndCorsproxy(nftImage) : null;
+
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
   const setActiveTabAndTrack = function (tabId: string) {
@@ -140,8 +144,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   };
   const [open, setOpen] = useState(false);
   const [isCopied, setCopy] = useState(false);
+  const [isImageValid, setIsImageValid] = useState(false);
   const below1400 = useMediaQuery('(max-width:1400px)');
   const below1250 = useMediaQuery('(max-width:1250px)');
+  const nftPathId = 'nftDetails';
+  const nftOverviewPathId = `${nftPathId}:overview`;
 
   const onCopyMetadata = async () => {
     if (nftInfo?.metadata == null) return;
@@ -170,12 +177,27 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
 
     return addr;
   }
+
+  useEffect(() => {
+      if (nftImageUrl !== null) {
+        imageExists(
+          String(nftImageUrl),
+          () => {
+            setIsImageValid(true)
+          }, // on-success
+          () => {
+            setIsImageValid(false)
+          } // on-error
+        );
+      }
+  }, [nftImageUrl]);
+
   // Todo: Should be handling by displaying an error page
   if (nftInfo == null) return null;
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
-      <SButton LinkComponent={Link} to={ROUTES.NFTS.ROOT} startIcon={<BackArrow />}>
+      <SButton LinkComponent={Link} to={ROUTES.NFTS.ROOT} startIcon={<BackArrow />} id={`${nftPathId}-backToGallery-button`}>
         <Typography fontWeight="500" fontSize="14px">
           {intl.formatMessage(messages.back)}
         </Typography>
@@ -193,7 +215,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
         <Grid item xs={4}>
           <ImageItem
             sx={{
-              cursor: nftImage !== null ? 'zoom-in' : 'auto',
+              cursor: isImageValid ? 'zoom-in' : 'auto',
               paddingY: '24px',
               display: 'block',
               img: {
@@ -201,9 +223,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               },
               backgroundColor: 'ds.bg_color_max',
             }}
-            onClick={() => nftImage !== null && setOpenAndTrack()}
+            onClick={() => isImageValid && setOpenAndTrack()}
+            id={`${nftPathId}-image-box`}
           >
-            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" />
+            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" nftPathId={nftPathId} />
           </ImageItem>
         </Grid>
 
@@ -231,6 +254,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                   fontWeight={500}
                   sx={{ width: below1400 ? '200px' : '400px' }}
                   color="ds.el_gray_medium"
+                  id={`${nftPathId}-nftName-text`}
                 >
                   {nftInfo.name}
                 </TruncatedText>
@@ -245,7 +269,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)' }}>
+                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)' }} id={`${nftPathId}-previousNFT-button`}>
                     <Chevron />
                   </SImageButton>
                 </Link>
@@ -257,7 +281,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                     });
                   }}
                 >
-                  <SImageButton aria-label="Next">
+                  <SImageButton aria-label="Next" id={`${nftPathId}-nextNFT-button`}>
                     <Chevron />
                   </SImageButton>
                 </Link>
@@ -291,7 +315,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                       fontWeight: 500,
                     }}
                     label={
-                      <Typography variant="body1" fontWeight="500" pb="6px">
+                      <Typography variant="body1" fontWeight="500" pb="6px" id={`${nftPathId}-${id}Tab-text`}>
                         {intl.formatMessage(label)}
                       </Typography>
                     }
@@ -312,16 +336,18 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               value={tabs[0].id}
             >
               <Stack spacing="24px">
-                <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} />
-                <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} />
+                <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} pathId={`${nftOverviewPathId}-description-text`}/>
+                <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} pathId={`${nftOverviewPathId}-author-text`}/>
                 <LabelWithValue
                   label={intl.formatMessage(globalMessages.fingerprint)}
-                  value={<CopyAddress text={nftInfo.id}>{displayAddr(nftInfo.id)}</CopyAddress>}
+                  value={<CopyAddress text={nftInfo.id} pathId={`${nftOverviewPathId}:fingerprint`}>{displayAddr(nftInfo.id)}</CopyAddress>}
+                  pathId={`${nftOverviewPathId}-fingerprint-component`}
                 />
 
                 <LabelWithValue
                   label={intl.formatMessage(tokenMessages.policyId)}
-                  value={<CopyAddress text={nftInfo.policyId}>{displayAddr(nftInfo.policyId)}</CopyAddress>}
+                  value={<CopyAddress text={nftInfo.policyId} pathId={`${nftOverviewPathId}:policyId`}>{displayAddr(nftInfo.policyId)}</CopyAddress>}
+                  pathId={`${nftOverviewPathId}-policyId-component`}
                 />
 
                 {isCardanoHaskell(network) && (
@@ -342,6 +368,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                         {intl.formatMessage(globalMessages.cardanoscan)}
                       </LinkMui>
                     }
+                    pathId={`${nftOverviewPathId}-explorer-link`}
                   />
                 )}
               </Stack>
@@ -357,11 +384,11 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
-                <CopyButton onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />}>
+                <CopyButton onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />} id={`${nftPathId}:metadata-copy-button`}>
                   {intl.formatMessage(messages.copyMetadata)}
                 </CopyButton>
               )}
-              <STypography component="pre" variant="body2" lineHeight="22px">
+              <STypography component="pre" variant="body2" lineHeight="22px" id={`${nftPathId}:metadata-info-text`}>
                 {nftInfo.metadata ? JSON.stringify(nftInfo.metadata, null, 2) : intl.formatMessage(messages.missingMetadata)}
               </STypography>
             </TabPanel>
@@ -417,13 +444,13 @@ const ImageItem = styled(Box)({
   },
 });
 
-function LabelWithValue({ label, value }: {| label: string | Node, value: string | Node |}): Node {
+function LabelWithValue({ label, value, pathId }: {| label: string | Node, value: string | Node, pathId: string |}): Node {
   return (
     <Box>
       <Typography component="div" color="ds.el_gray_low">
         {label}
       </Typography>
-      <Typography component="div" color="ds.el_gray_medium">
+      <Typography component="div" color="ds.el_gray_medium" id={pathId}>
         {value}
       </Typography>
     </Box>

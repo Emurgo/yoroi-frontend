@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import InlineEditingInput from '../../widgets/forms/InlineEditingInput';
 import globalMessages from '../../../i18n/global-messages';
@@ -41,17 +40,14 @@ export default class WalletNameSetting extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   componentWillUnmount(): void {
     // This call is used to prevent display of old successfully-updated messages
     this.props.onCancelEditing();
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       walletName,
       error,
