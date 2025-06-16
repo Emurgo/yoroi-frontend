@@ -124,7 +124,10 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   const createNotification = React.useCallback(async (type: NotificationTypes, id?: string) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
+    // Early returns:
+    // return if settings are off
     const currentLocation = locationRef.current;
+
 
     if (!notifyWallet) return;
 // return if we're on the same route as the event redirection
