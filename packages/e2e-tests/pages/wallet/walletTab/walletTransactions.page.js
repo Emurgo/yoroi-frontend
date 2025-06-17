@@ -255,6 +255,7 @@ export class TransactionsSubTab extends WalletTab {
     const result = [];
     const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
     for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      await this.scrollIntoViewElement(allTxs[txIndex]);
       const txType = await this.getText(this.txTypeTextLocator(groupIndex, txIndex));
       const txTimePrettified = await this.getText(this.txTimeTextLocator(groupIndex, txIndex));
       const txTime = convertPrettyTimeToNormal(txTimePrettified);
@@ -333,6 +334,8 @@ export class TransactionsSubTab extends WalletTab {
       const txsInfoInGroup = await this.__getAllTxsInGroup(group);
       allTxsInfo.push(...txsInfoInGroup);
     }
+    this.logger.info(`TransactionsSubTab::getTxsInfo. allTxsInfo:`);
+    this.logger.info(JSON.stringify(allTxsInfo));
     return allTxsInfo;
   }
   async getAmountOfTxs() {

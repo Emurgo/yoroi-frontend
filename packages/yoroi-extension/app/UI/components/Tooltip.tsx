@@ -17,6 +17,7 @@ interface Props
   place?: ReactTooltipProps['place'];
   isOpen?: ReactTooltipProps['isOpen'];
   positionStrategy?: PositionStrategy;
+  arrow?: boolean;
 }
 
 export const Tooltip = ({

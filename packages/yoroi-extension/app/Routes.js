@@ -42,6 +42,8 @@ import { PortfolioContextProvider } from './UI/features/portfolio/module/Portfol
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
+import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
+// $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
@@ -57,6 +59,8 @@ import NftsPage from './UI/pages/nfts/NftsPage';
 import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
+import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
@@ -210,9 +214,24 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
-          <Route path={ROUTES.WALLETS.RESTORE_WALLET} element={<RestoreWalletPage stores={stores} />} />
-          <Route path={ROUTES.WALLETS.CREATE_NEW_WALLET} element={<CreateWalletPage stores={stores} />} />
-          <Route path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES} element={<ConnectedWebsitesPage stores={stores} />} />
+          <Route
+            path={ROUTES.WALLETS.RESTORE_WALLET}
+            element={<RestoreWalletPage stores={stores} />}
+          />
+          <Route
+            path={ROUTES.WALLETS.CREATE_NEW_WALLET}
+            element={<CreateWalletPage stores={stores} />}
+          />
+          <Route
+            path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
+            element={<ConnectedWebsitesPage stores={stores} />}
+          />
+          <Route element={<DappCenterSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
+              element={<DappCenterPage stores={stores} />}
+            />
+          </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -370,6 +389,12 @@ const AssetsSubpages = ({ stores }) => (
       <Outlet />
     </Suspense>
   </AssetsWrapper>
+);
+
+const DappCenterSubpages = ({ stores }) => (
+  <DappCenterContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </DappCenterContextProvider>
 );
 
 // NEW UI - TODO: to be refactred
