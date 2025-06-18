@@ -2,6 +2,9 @@
 import Store from '../base/Store';
 import environment from '../../environment';
 import { observable, runInAction, } from 'mobx';
+import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
+
+const DEFAULT_DURATION = 4;
 
 const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
 
@@ -15,11 +18,25 @@ export type PushSubscription = {|
 |}
 
 export default class PushNotificationStore<
-  StoresMapType: { ... }, // no dependency on other stores
+  StoresMapType: {
+    +loading: {
+      +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void,
+      ...
+    },
+    ...
+  },
 > extends Store<StoresMapType> {
+  @observable metadata: PushNotificationMetadata | null = null;
   @observable subscription: PushSubscription | null = null;
 
   setup(): void {
+    this.stores.loading.registerBlockingLoadingRequest((async () => {
+      const metadata = await (new LocalStorageApi()).getPushNotificationMetadata();
+      runInAction(() => {
+        this.metadata = metadata;
+      });
+    })(), 'load push notification metadata');
+
     (async () => {
       if (environment.isDev() || environment.isNightly()) {
         const result = await Notification.requestPermission();
@@ -46,6 +63,26 @@ export default class PushNotificationStore<
     })().catch(error => {
       console.error('error when setting up push', error);
     })
+  }
+
+  get duration(): number {
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    return this.metadata.duration ?? DEFAULT_DURATION;
+  }
+  set duration(duration:number): void {
+    runInAction(() => {
+      if (!this.metadata) {
+        throw new Error('push notification metadata not loaded');
+      }
+
+      this.metadata.duration = duration;
+    });
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    (new LocalStorageApi()).savePushNotificationMetadata(this.metadata);
   }
 }
 
