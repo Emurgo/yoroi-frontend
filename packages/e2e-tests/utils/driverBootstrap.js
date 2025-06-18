@@ -16,7 +16,6 @@ import {
   getTargetBrowser,
   isBrave,
   isChrome,
-  isDapp,
   isFirefox,
   isHeadless,
 } from './utils.js';
@@ -72,6 +71,7 @@ const getChromeBuilder = () => {
       enableExtensionTargets: true,
     },
   })
+    .setChromeBinaryPath(chromeBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
@@ -80,7 +80,7 @@ const getChromeBuilder = () => {
     .addArguments('--start-maximized')
     .addArguments('--remote-debugging-pipe')
     .setUserPreferences({ 'download.default_directory': downloadsDir })
-    .setChromeBinaryPath(chromeBin);
+    .addArguments('disable-infobars');
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
   }

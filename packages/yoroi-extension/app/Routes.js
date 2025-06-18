@@ -9,7 +9,7 @@ import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
-import type { StoresMap, StoresProps } from './stores/index';
+import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -59,6 +59,8 @@ import NftsPage from './UI/pages/nfts/NftsPage';
 import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
+import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
@@ -233,6 +235,12 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
             element={<ConnectedWebsitesPage stores={stores} />}
           />
+          <Route element={<DappCenterSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
+              element={<DappCenterPage stores={stores} />}
+            />
+          </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -402,6 +410,12 @@ const AssetsSubpages = ({ stores }) => (
   </AssetsWrapper>
 );
 
+const DappCenterSubpages = ({ stores }) => (
+  <DappCenterContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </DappCenterContextProvider>
+);
+
 // NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
@@ -428,17 +442,3 @@ const GovernanceSubpages = ({ stores }) => {
     </CurrencyProvider>
   );
 };
-
-export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
-
-  const openDialogWrapper = (dialog): void => {
-    dappCenterProps.stores.uiDialogs.open({ dialog });
-  };
-
-  return (
-    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </DappCenterContextProvider>
-  );
-}

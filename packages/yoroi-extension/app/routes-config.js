@@ -63,6 +63,7 @@ export const ROUTES = {
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
+    DAPP_CENTER: '/connector/dapp-center',
   },
   // Revamp specific routes:
   REVAMP: {
