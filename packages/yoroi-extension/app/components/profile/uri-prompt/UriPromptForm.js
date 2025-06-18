@@ -3,11 +3,10 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import styles from './UriPromptForm.scss';
 import { ReactComponent as AboutUri }  from '../../../assets/images/uri/about-url.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   uriHeading: {
@@ -27,12 +26,9 @@ type Props = {|
 
 @observer
 export default class UriPromptForm extends Component<Props> {
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <div className={styles.component}>

@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 
 import DelegationSendForm from '../../../components/wallet/send/DelegationSendForm';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -43,10 +42,7 @@ type State = {|
 @observer
 export default class CardanoStakingPage extends Component<AllProps, State> {
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     firstPool: undefined,
     selectedPoolId: undefined,
@@ -82,7 +78,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
   render(): null | Node {
     const { urlTemplate } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) {
@@ -189,7 +185,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _displayPoolInfo: void => void | Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet == null) return null;
 
@@ -264,7 +260,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
   };
 
   _errorDialog: LocalizableError => Node = error => {
-    const { intl } = this.context;
+    const intl = this.context;
     const dialogBackButton = [
       {
         label: intl.formatMessage(globalMessages.backButtonLabel),

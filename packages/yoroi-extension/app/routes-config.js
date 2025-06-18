@@ -13,7 +13,6 @@ export const ROUTES = {
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
-  SWITCH: '/switch',
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',
@@ -64,6 +63,7 @@ export const ROUTES = {
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
+    DAPP_CENTER: '/connector/dapp-center',
   },
   // Revamp specific routes:
   REVAMP: {

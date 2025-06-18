@@ -17,29 +17,6 @@ export default class AdaWalletRestoreStore extends Store<StoresMap> {
     this.reset();
   }
 
-  transferFromLegacy: void => Promise<void> = async () => {
-    const phrase = this.stores.walletRestore.recoveryResult?.phrase;
-    if (phrase == null) {
-      throw new Error(
-        `${nameof(this.transferFromLegacy)} no recovery phrase set. Should never happen`
-      );
-    }
-    const network = this.stores.profile.selectedNetwork;
-    if (network == null) {
-      throw new Error(`${nameof(this.transferFromLegacy)} no network selected`);
-    }
-    await this.stores.yoroiTransfer.transferFunds({
-      next: async () => {
-        await this.startWalletRestore();
-      },
-      network,
-      getDestinationAddress: () => Promise.resolve(this._getFirstCip1852InternalAddr()),
-      // funds in genesis block should be either entirely claimed or not claimed
-      // so if another wallet instance claims the funds, it's not a big deal
-      rebuildTx: false,
-    });
-  };
-
   _getFirstCip1852InternalAddr: void => {| ...Address, ...InexactSubset<Addressing> |} = () => {
     throw new ApiMethodNotYetImplementedError();
   };

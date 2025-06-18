@@ -1,6 +1,6 @@
 import { Box, Table as MuiTable, Stack, TableBody, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { ReactElement, ReactNode, cloneElement } from 'react';
+import { ReactElement, ReactNode, cloneElement } from 'react';
 import noResultsPng from '../assets/illustrations/no-results.png';
 import { useStrings } from '../hooks/useStrings';
 import { IHeadCell } from '../types/table';

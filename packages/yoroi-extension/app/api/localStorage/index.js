@@ -2,7 +2,7 @@
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import environment from '../../environment';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
-import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
+import { DEFAULT_CURRENCY_PAIR } from '../../types/unitOfAccountType';
 
 import { getLocalItem, isEmptyStorage, removeLocalItem, setLocalItem } from './primitives';
 import { TabIdKeys } from '../../utils/tabManager';
@@ -306,7 +306,7 @@ unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storag
   getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = async () => {
     const unitOfAccount = await getLocalItem(storageKeys.UNIT_OF_ACCOUNT);
     if (unitOfAccount == null) {
-      return unitOfAccountDisabledValue;
+      return DEFAULT_CURRENCY_PAIR;
     }
     return JSON.parse(unitOfAccount);
   };

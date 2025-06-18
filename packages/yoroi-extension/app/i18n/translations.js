@@ -1,15 +1,4 @@
 // @flow
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import vi from 'react-intl/locale-data/vi';
 import globalMessages from './global-messages';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { ReactComponent as EnglishFlag }  from '../assets/images/flags/english.inline.svg';
@@ -23,20 +12,6 @@ import { ReactComponent as BrazilFlag }  from '../assets/images/flags/brazil.inl
 import { ReactComponent as SpanishFlag }  from '../assets/images/flags/spanish.inline.svg';
 import { ReactComponent as IndonesianFlag }  from '../assets/images/flags/indonesian.inline.svg';
 import { ReactComponent as VietnameseFlag }  from '../assets/images/flags/vietnamese.inline.svg';
-
-export const locales: any = Object.freeze([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...pt,
-  ...id,
-  ...es,
-  ...vi,
-]);
 
 // This is essentially bulk require
 // $FlowExpectedError[prop-missing] require.context comes from webpack

@@ -177,11 +177,6 @@ const rules /*: boolean => Array<*> */ = _isDev => [
     test: /\.md$/,
     use: ['html-loader', 'markdown-loader'],
   },
-  {
-    test: /\.tsx?$/,
-    use: 'ts-loader',
-    exclude: /node_modules/,
-  },
 ];
 
 const optimization = {

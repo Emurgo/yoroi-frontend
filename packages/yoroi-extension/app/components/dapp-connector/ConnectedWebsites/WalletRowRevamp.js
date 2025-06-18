@@ -3,14 +3,13 @@
 import type { Node } from 'react';
 import type { MultiToken, TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 import { Component } from 'react';
 import { getTokenName } from '../../../stores/stateless/tokenHelpers';
 import { hiddenAmount } from '../../../utils/strings';
 import { ReactComponent as DeleteIcon } from '../../../assets/images/revamp/delete.inline.svg';
 import { ReactComponent as NoDappImage } from '../../../assets/images/dapp-connector/no-dapp.inline.svg';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { Box, Typography, styled } from '@mui/material';
 import { constructPlate40 } from '../../topbar/WalletCard';
@@ -33,10 +32,7 @@ type State = {|
 |};
 
 export default class WalletRowRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     showDeleteIcon: false,
   };

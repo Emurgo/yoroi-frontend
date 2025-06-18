@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './UnitOfAccountSettings.scss';
@@ -14,9 +14,9 @@ import Dialog from '../../../widgets/Dialog';
 import VerticalFlexContainer from '../../../layout/VerticalFlexContainer';
 import LoadingSpinner from '../../../widgets/LoadingSpinner';
 import globalMessages from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
+import { strong } from '../../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   unitOfAccountTitle: {
@@ -68,21 +68,18 @@ export default class UnitOfAccountSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
-        label: this.context.intl.formatMessage(messages.revampInputLabel),
+        label: this.context.formatMessage(messages.revampInputLabel),
       },
     },
   });
 
   render(): Node {
     const { currencies, error, currentValue, lastUpdatedTimestamp } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const coinPriceCurrencyId = form.$('coinPriceCurrencyId');
     const componentClassNames = classNames([styles.component, 'currency']);
@@ -187,7 +184,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
           {(
             <>
               <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
-                <FormattedHTMLMessage {...messages.noteRevamp} />
+                <FormattedMessage {...messages.noteRevamp} />
               </Typography>
               <Typography
                 component="div"
@@ -200,7 +197,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                 mb="35px"
                 color="ds.text_gray_medium"
               >
-                <FormattedHTMLMessage {...messages.lastUpdated} values={{ lastUpdated }} />
+                <FormattedMessage {...messages.lastUpdated} values={{ lastUpdated, strong }} />
               </Typography>
             </>
           )}

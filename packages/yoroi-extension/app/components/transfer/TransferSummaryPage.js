@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import styles from './TransferSummaryPage.scss';
 import LocalizableError from '../../i18n/LocalizableError';
 import RawHash from '../widgets/hashWrappers/RawHash';
@@ -13,7 +13,6 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import { truncateAddress, truncateToken } from '../../utils/formatters';
 import type { TransferTx } from '../../types/TransferTypes';
@@ -83,10 +82,7 @@ type Props = {|
 @observer
 export default class TransferSummaryPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {|header: void|} = {
     header: undefined
   };
@@ -122,7 +118,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   getHeader: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     const { transferTx, } = this.props;
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
 
@@ -298,7 +294,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { transferTx, isSubmitting, error, unitOfAccountSetting, } = this.props;
 
     const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
@@ -453,7 +449,7 @@ export default class TransferSummaryPage extends Component<Props> {
   }
 
   _getTxIdNode: string => Node = (txId) => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Box mb="20px">
         <STypography variant="body2">

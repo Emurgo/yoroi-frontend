@@ -5,7 +5,7 @@ import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, isHardwareWallet, walletType } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
   const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
@@ -25,51 +25,19 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
     });
   };
 
-  const submitTx = async (passswordInput, signTxRequest) => {
-    const selectedWallet = stores.wallets.selected;
-
+  const submitTx = async (password, signRequest) => {
     try {
       startLoadingTxReview();
-      if (isHardwareWallet) {
-        if (walletType === 'ledger') {
-          const ledgerSendStore = stores.substores.ada.ledgerSend;
-          await ledgerSendStore.sendUsingLedgerWallet({
-            params: { signRequest: signTxRequest },
-            onSuccess: () => {
-              onSuccess();
-              showTxResultModal(TransactionResult.SUCCESS);
-            },
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-            wallet: selectedWallet,
-          });
-        }
-        if (walletType === 'trezor') {
-          const trezorSendStore = stores.substores.ada.trezorSend;
-          await trezorSendStore.sendUsingTrezor({
-            params: { signRequest: signTxRequest },
-            onSuccess: () => {
-              onSuccess();
-              showTxResultModal(TransactionResult.SUCCESS);
-            },
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-            wallet: selectedWallet,
-          });
-        }
-      } else {
-        await stores.substores.ada.mnemonicSend.sendMoney({
-          signRequest: signTxRequest,
-          password: passswordInput,
-          wallet: selectedWallet,
-          onSuccess: () => {
-            onSuccess();
-            showTxResultModal(TransactionResult.SUCCESS);
-          },
-        });
-      }
+
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: stores.wallets.selected,
+        signRequest,
+        password,
+        callback: async () => {
+          onSuccess();
+          showTxResultModal(TransactionResult.SUCCESS);
+        },
+      });
     } catch (error) {
       console.log('Send Sign Error', error);
       showTxResultModal(TransactionResult.FAIL);

@@ -1,6 +1,5 @@
 // @flow
 import { action, observable } from 'mobx';
-import AppStore from './toplevel/AppStore';
 import ProfileStore from './toplevel/ProfileStore';
 import WalletBackupStore from './toplevel/WalletBackupStore';
 import UiDialogsStore from './toplevel/UiDialogsStore';
@@ -17,7 +16,6 @@ import TransactionBuilderStore from './toplevel/TransactionBuilderStore';
 import DelegationStore from './toplevel/DelegationStore';
 import type { AdaStoresMap } from './ada/index';
 import setupAdaStores from './ada/index';
-import { RouterStore } from 'mobx-react-router';
 import type { Api } from '../api/index';
 import StateFetchStore from './toplevel/StateFetchStore';
 import CoinPriceStore from './toplevel/CoinPriceStore';
@@ -27,6 +25,8 @@ import ServerConnectionStore from './toplevel/ServerConnectionStore';
 import ConnectorStore from './toplevel/DappConnectorStore'
 import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
 import PushNotificationStore from './toplevel/PushNotificationStore';
+import TransactionProcessingStore from './toplevel/TransactionProcessingStore';
+import RoutingStore from './toplevel/RoutingStore';
 
 /** Map of var name to class. Allows dynamic lookup of class so we can init all stores one loop */
 const storeClasses = Object.freeze({
@@ -35,7 +35,6 @@ const storeClasses = Object.freeze({
   tokenInfoStore: TokenInfoStore,
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
-  app: AppStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore,
@@ -53,7 +52,9 @@ const storeClasses = Object.freeze({
   connector: ConnectorStore,
   protocolParameters: ProtocolParametersStore,
   pushNotificationStore: PushNotificationStore,
-  // note: purposely exclude substores and router
+  transactionProcessingStore: TransactionProcessingStore,
+  routing: RoutingStore,
+  // note: purposely exclude substores
 });
 
 export type StoresMap = {|
@@ -62,7 +63,6 @@ export type StoresMap = {|
   tokenInfoStore: TokenInfoStore<StoresMap>,
   profile: ProfileStore,
   serverConnectionStore: ServerConnectionStore,
-  app: AppStore,
   memos: MemosStore,
   walletBackup: WalletBackupStore,
   uiDialogs: UiDialogsStore<{||}>,
@@ -81,10 +81,10 @@ export type StoresMap = {|
   substores: {|
     ada: AdaStoresMap,
   |},
-  // $FlowFixMe[value-as-type]
-  router: RouterStore,
   protocolParameters: ProtocolParametersStore<StoresMap>,
   pushNotificationStore: PushNotificationStore<StoresMap>,
+  transactionProcessingStore: TransactionProcessingStore,
+  routing: RoutingStore,
 |};
 
 /** Constant that represents the stores across the lifetime of the application */
@@ -97,7 +97,6 @@ const stores: StoresMap = (observable({
   tokenInfoStore: null,
   profile: null,
   serverConnectionStore: null,
-  app: null,
   sidebar: null,
   memos: null,
   walletBackup: null,
@@ -115,10 +114,11 @@ const stores: StoresMap = (observable({
   yoroiTransfer: null,
   explorers: null,
   substores: null,
-  router: null,
   connector: null,
   protocolParameters: null,
   pushNotificationStore: null,
+  transactionProcessingStore: null,
+  routingStore: null,
 }): any);
 
 function initializeSubstore<T: {...}>(
@@ -132,11 +132,7 @@ function initializeSubstore<T: {...}>(
 
 /** Set up and return the stores for this app -> also used to reset all stores to defaults */
 export default (action(
-  async (
-    api: Api,
-    // $FlowFixMe[value-as-type]
-    router: RouterStore
-  ): Promise<StoresMap> => {
+  async (api: Api): Promise<StoresMap> => {
     /** Note: `stores` sets all values to null to start
      * However this is incompatible with the `StoresMap` types
      * We don't make `StoresMap` fields optional as it would bloat the code with null checks
@@ -147,8 +143,6 @@ export default (action(
      *
      * Therefore, we instead typecast to `any` so Flow doesn't complain about this hack */
 
-    // Assign mobx-react-router only once
-    if (stores.router == null) stores.router = router;
     // All other stores have our lifecycle
     const storeNames = Object.keys(storeClasses);
     storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
@@ -178,7 +172,7 @@ export default (action(
     return loadedStores;
   }
   // $FlowFixMe[value-as-type]
-): (Api, RouterStore) => StoresMap);
+): (Api) => StoresMap);
 
 export type StoresProps = {|
   +stores: StoresMap,

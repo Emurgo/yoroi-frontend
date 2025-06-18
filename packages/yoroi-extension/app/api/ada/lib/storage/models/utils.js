@@ -34,7 +34,6 @@ import type {
 } from './PublicDeriver/interfaces';
 
 import { ConceptualWallet } from './ConceptualWallet/index';
-import type { IHasLevels } from './ConceptualWallet/interfaces';
 import type {
   CanonicalAddressRow,
 } from '../database/primitives/tables';
@@ -321,7 +320,7 @@ export async function rawGetChainAddressesForDisplay(
 }
 export async function getChainAddressesForDisplay(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IHasUtxoChains & IDisplayCutoff,
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IHasUtxoChains & IDisplayCutoff,
     chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
   |},

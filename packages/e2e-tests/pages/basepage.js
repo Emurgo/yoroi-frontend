@@ -20,6 +20,7 @@ import {
   quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
+import { ElementLocator } from './locator.js';
 import { Logger } from 'simple-node-logger';
 
 const writeFile = promisify(fs.writeFile);
@@ -149,25 +150,34 @@ class BasePage {
     return await this.driver.findElement(getByLocator(locator));
   }
   /**
-   * Finding all suitable elements by locator
-   * @param {{locator: string, method: string}} locator
+   * Finding all suitable WebElements by the locator
+   * @param {ElementLocator} locator
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
     this.logger.info(`BasePage::findElements is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElements(getByLocator(locator));
   }
+  /**
+   * Getting a text by element locator
+   * @param {ElementLocator} locator
+   * @returns {Promise<string>}
+   */
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
     return await this.waitPresentedAndAct(locator, async () => {
       let element = await this.findElement(locator);
       try {
-        return await element.getText();
+        const result = await element.getText();
+        this.logger.info(`BasePage::getText. Result: ${result}`);
+        return result;
       } catch (error) {
         if (error.name === 'StaleElementReferenceError') {
           this.logger.info(`BasePage::getText Re-try because of StaleElementReferenceError`);
           element = await this.findElement(locator);
-          return await element.getText();
+          const result = await element.getText();
+          this.logger.info(`BasePage::getText. Result: ${result}`);
+          return result;
         } else {
           throw error;
         }
@@ -178,11 +188,16 @@ class BasePage {
     this.logger.info(
       `BasePage::getCssValue is called. Locator: ${JSON.stringify(locator)}, property: ${cssStyleProperty}`
     );
-    return await this.driver.findElement(getByLocator(locator)).getCssValue(cssStyleProperty);
+    const element = await this.driver.findElement(getByLocator(locator));
+    const result = element.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValue Result: ${result}`);
+    return result;
   }
   async getCssValueElement(webElement, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
-    return await webElement.getCssValue(cssStyleProperty);
+    const result = await webElement.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
+    return result;
   }
   async getAttribute(locator, property) {
     this.logger.info(
@@ -452,7 +467,7 @@ class BasePage {
   }
   /**
    * The function wait until the passed element is found and call the passed function
-   * @param {{locator: string, method: id}} locator Element locator
+   * @param {ElementLocator} locator Element locator
    * @param {object} funcToCall A function that should be called when the element is found
    * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
    * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
@@ -772,6 +787,21 @@ class BasePage {
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
+  }
+  /**
+   * Getting an element size
+   * @param {ElementLocator} locator
+   * @returns {{height: number, width: number}}
+   */
+  async getSize(locator) {
+    this.logger.info(`BasePage::getSize is called. Value: ${JSON.stringify(locator)}`);
+    const element = await this.findElement(locator);
+    const rect = await element.getRect();
+    this.logger.info(`BasePage::getSize is called. Result: ${JSON.stringify(rect)}`);
+    return {
+      height: rect.height,
+      width: rect.width,
+    };
   }
 }
 

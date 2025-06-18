@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import classNames from 'classnames';
 import Select from '../../../common/Select';
 import { Box, Typography } from '@mui/material';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import LocalizableError from '../../../../i18n/LocalizableError';
 import styles from './GeneralSettings.scss';
@@ -13,7 +13,6 @@ import type { LanguageType } from '../../../../i18n/translations';
 import FlagLabel from '../../../widgets/FlagLabel';
 import { tier1Languages } from '../../../../config/languagesConfig';
 import globalMessages, { listOfTranslators } from '../../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { GlobalStyledScrollbar } from '../../../common/commonStyles/GlobalStylesScrollbar';
 import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 
@@ -42,10 +41,7 @@ export default class GeneralSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   selectLanguage: string => Promise<void> = async locale => {
     await this.props.onSelectLanguage({ locale });
   };
@@ -53,7 +49,7 @@ export default class GeneralSettings extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       languageId: {
-        label: this.context.intl.formatMessage(messages.languageSelectLabel),
+        label: this.context.formatMessage(messages.languageSelectLabel),
         value: this.props.currentLocale,
       },
     },
@@ -61,7 +57,7 @@ export default class GeneralSettings extends Component<Props> {
 
   render(): Node {
     const { languages, isSubmitting, error } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const languageId = form.$('languageId');
     const languageOptions = languages.map(language => ({

@@ -28,7 +28,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import CopyToClipboardLabel from '../../widgets/CopyToClipboardLabel';
 import { ListEmpty } from './ListEmpty';

@@ -66,7 +66,7 @@ const baseDevConfig = (
     rules: [
       ...commonConfig.rules(true),
       {
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
