@@ -31,7 +31,6 @@ export default function NftMetadata({ nftInfo }: { nftInfo: Nft | null }) {
         onClick={handleCopy}
         endIcon={<IconWrapper color="ds.el_gray_medium" icon={isCopied ? Icons.Copied : Icons.Copy} />}
         id="nftDetails:metadata-copy-button"
-        style={{ padding: '13px 0 13px 0' }}
       >
         <Typography color="ds.el_gray_medium" variant="body2" lineHeight="22px">
           {strings.copyMetadata}
