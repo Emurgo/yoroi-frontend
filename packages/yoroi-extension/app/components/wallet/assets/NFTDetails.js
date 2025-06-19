@@ -332,6 +332,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 bgcolor: 'transparent',
                 maxHeight: '400px',
                 overflow: 'auto',
+                p: '16px 24px 24px 24px',
               }}
               value={tabs[0].id}
             >
@@ -380,11 +381,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 bgcolor: 'transparent',
                 overflow: 'auto',
                 backgroundColor: 'ds.bg_color_max',
+                px: '24px',
               }}
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
-                <CopyButton onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />} id={`${nftPathId}:metadata-copy-button`}>
+                <CopyButton style={{ padding: '16px 0 16px 0' }} onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />} id={`${nftPathId}:metadata-copy-button`}>
                   {intl.formatMessage(messages.copyMetadata)}
                 </CopyButton>
               )}

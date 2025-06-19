@@ -92,7 +92,7 @@ export default function NftDetails() {
               activeTab={currentTab}
             />
           </Stack>
-          <Tabs initialTabId={tabSearchParam} onTabChange={handleTabChange} headerSx={{ mx: '24px' }} tabs={getTabs()} pathId={nftPathId} />
+          <Tabs initialTabId={tabSearchParam} onTabChange={handleTabChange} headerSx={{ mx: '24px' }} contentSx={{ px: '24px' }} tabs={getTabs()} pathId={nftPathId} />
         </Grid>
       </Grid>
       <Modal

@@ -28,9 +28,13 @@ const StyledTab = styled(Tab)({
     paddingBottom: '11px',
     marginRight: '24px',
     minWidth: 0,
+    w: 0,
   },
   '&.MuiTab-root:hover': {
     color: 'ds.primary_blue',
+  },
+  "&.Mui-selected": {
+    color: "ds.text_primary_medium",
   },
 });
 
@@ -61,11 +65,12 @@ export const Tabs = observer(({ title, tabs, initialTabId, onTabChange, headerSx
             sx={{
               width: '100%',
               boxShadow: 'none',
-              '&.MuiTabs-indicator': { height: '2px' },
+              '&.MuiTabs-indicator': {
+                height: '2px',
+                backgroundColor: "ds.text_primary_medium",
+              },
               ...tabListSx,
             }}
-            textColor="primary"
-            indicatorColor="primary"
             onChange={handleChange}
             aria-label="Tabs"
           >
