@@ -216,10 +216,10 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
 
-    const getRewardAmountArray= token => {
-      return maybe(token, t => formatTokenEntry(t.getDefaultEntry(),getTokenInfo));
-    }; 
-    const stakingRewardsArray = getRewardAmountArray(delegatedRewards)
+    const getRewardAmountArray = token => {
+      return maybe(token, t => formatTokenEntry(t.getDefaultEntry(), getTokenInfo));
+    };
+    const stakingRewardsArray = getRewardAmountArray(delegatedRewards);
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -237,7 +237,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       primaryTokenInfo: { ...primaryTokenInfo, quantity: shiftedAmount },
       stakingAddress: selectedWallet.stakingAddress,
       walletBalance: {
-      ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
+        ada: `${beforeDecimalRewards}${afterDecimalRewards}`,
       },
       ftAssetList: ftAssetList,
       nftAssetList: nftAssetList,
@@ -247,7 +247,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
       isStakeRegistered,
-      stakingRewards:combineStringsToDecimal(stakingRewardsArray),
+      stakingRewards: combineStringsToDecimal(stakingRewardsArray),
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
@@ -286,23 +286,36 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   const tokenInfo = Object.values(metadataObj.metadata).flatMap(chain =>
     Object.values(chain).flatMap(tokens => Object.values(tokens))
   );
+
+  let metadataValues: null | { website?: string; description?: string } = null;
+
   for (const info of tokenInfo) {
-    return { website: info?.url || info?.website, description: info?.desc };
+    if (info?.url || info?.website) {
+      if (metadataValues === null) {
+        metadataValues = {};
+      }
+      metadataValues.website = info.url ?? info.website;
+    }
+
+    if (info?.desc) {
+      if (metadataValues === null) {
+        metadataValues = {};
+      }
+      metadataValues.description = info.desc;
+    }
   }
 
-  return null;
+  return metadataValues;
 };
 
-
-const formatTokenEntry = (tokenEntry,getTokenInfo) => {
-      const tokenInfo = getTokenInfo(tokenEntry);
-      let splitAmountValue = tokenEntry.amount
-        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-        .toFormat(tokenInfo.Metadata.numberOfDecimals)
-        .split('.');
-      return splitAmountValue
-}
-
+const formatTokenEntry = (tokenEntry, getTokenInfo) => {
+  const tokenInfo = getTokenInfo(tokenEntry);
+  const splitAmountValue = tokenEntry.amount
+    .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+    .toFormat(tokenInfo.Metadata.numberOfDecimals)
+    .split('.');
+  return splitAmountValue;
+};
 
 export const combineStringsToDecimal = (array: [number, number]): BigNumber => {
   const [integerPart, decimalPart] = array;
