@@ -71,15 +71,15 @@ if (environment.isFirefox()) {
   });
 }
 
-self.addEventListener("push", (event) => {
-  if (!(self.Notification && self.Notification.permission === "granted")) {
+self.addEventListener('push', (event) => {
+  if (!(self.Notification && self.Notification.permission === 'granted')) {
     return;
   }
 
   const data = event.data?.json() ?? {};
-  const title = data.title || "Something Has Happened";
+  const title = data.title || 'Something Has Happened';
   const message =
-    data.message || "Here's something you might want to check out.";
+    data.message || 'Here\'s something you might want to check out.';
 
   self.registration.showNotification(title, { body: message });
 });
