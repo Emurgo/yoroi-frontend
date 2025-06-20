@@ -41,7 +41,7 @@ describe('Search NFTs by name', function () {
         .equal(testWalletNFTsAllNfts.length);
   });
 
-  it('Search for NFT', async function () {
+  it('Search for NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.search(testNFTName);
   });
