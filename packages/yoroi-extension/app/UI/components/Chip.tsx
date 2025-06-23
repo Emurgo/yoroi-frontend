@@ -1,4 +1,3 @@
-import React from 'react';
 import { Chip as MuiChip, useTheme } from '@mui/material';
 
 export const ChipTypes = Object.freeze({

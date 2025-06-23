@@ -352,8 +352,8 @@ class ReceiveSubTab extends WalletTab {
   }
   async callVerifyAddress(rowindex) {
     this.logger.info(`ReceiveSubTab::callVerifyAddress is called.`);
-    const verifuAddrBtnLocator = this.verifyAddressButtonInRowLocator(rowindex);
-    await this.clickByScript(verifuAddrBtnLocator);
+    const verifyAddrBtnLocator = this.verifyAddressButtonInRowLocator(rowindex);
+    await this.clickByScript(verifyAddrBtnLocator);
     return new VerifyAddressModal(this.driver, this.logger);
   }
 }

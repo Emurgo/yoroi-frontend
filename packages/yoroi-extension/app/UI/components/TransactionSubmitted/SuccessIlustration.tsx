@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const SuccessIlustration = () => {
   return (
     <svg width="128" height="168" viewBox="0 0 128 168" fill="none">

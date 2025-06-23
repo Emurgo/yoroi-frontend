@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
-import React from 'react';
 import { Chip, ChipTypes, Icon } from '../../../../components';
 import WalletAccountIcon from '../../../../components/WalletAccountIcon/WalletAccountIcon';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';

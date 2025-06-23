@@ -9,7 +9,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
 
     /* Type Checking */
     "moduleResolution": "node",

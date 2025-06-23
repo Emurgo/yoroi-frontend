@@ -4,14 +4,13 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { Box, Stack, Typography } from '@mui/material';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import BorderedBox from '../../widgets/BorderedBox';
 import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import LocalizableError from '../../../i18n/LocalizableError';
 import { bech32 } from 'bech32';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
@@ -61,16 +60,13 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         poolId: {
-          label: this.context.intl.formatMessage(globalMessages.stakePoolHash),
+          label: this.context.formatMessage(globalMessages.stakePoolHash),
           placeholder: '',
           value: '',
           validators: [
@@ -78,13 +74,13 @@ export default class DelegationSendForm extends Component<Props> {
               const poolIdValue = field.value;
               if (poolIdValue === '') {
                 this.props.updatePool(undefined);
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               const isValid = validateAndSetPool(poolIdValue, this.props.updatePool);
               if (this.props.poolQueryError != null) {
                 return [false]; // no error message since container already displays one
               }
-              return [isValid, this.context.intl.formatMessage(messages.invalidPoolId)];
+              return [isValid, this.context.formatMessage(messages.invalidPoolId)];
             },
           ],
         },
@@ -105,7 +101,7 @@ export default class DelegationSendForm extends Component<Props> {
 
   render(): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const poolIdField = form.$('poolId');
 

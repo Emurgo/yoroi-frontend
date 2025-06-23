@@ -44,7 +44,7 @@ class WalletCommonBase extends BasePage {
   navBarPageTitleLocator = {
     locator: 'topBar-pageTitle-text',
     method: 'id',
-  }
+  };
   // selected wallet panel
   selectedWalletButtonLocator = {
     locator: '.NavWalletDetailsRevamp_contentWrapper',
@@ -134,6 +134,10 @@ class WalletCommonBase extends BasePage {
   };
   //
   // functions
+  /**
+   * Getting the selected wallet info from the top-right corner of the app
+   * @returns {Promise<{name: string, plate: string, balance: number, fiatBalance: number, fiatCurrency: string}>}
+   */
   async getSelectedWalletInfo() {
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo is called`);
 
@@ -199,7 +203,7 @@ class WalletCommonBase extends BasePage {
     const state = await this.customWaitIsNotPresented(
       this.walletIsLoadingLogo,
       oneMinute,
-      halfSecond,
+      halfSecond
     );
     if (!state) {
       this.logger.error(
@@ -340,6 +344,16 @@ class WalletCommonBase extends BasePage {
   async getPageTitle() {
     this.logger.info(`WalletCommonBase::getPageTitle is called`);
     return await this.getText(this.navBarPageTitleLocator);
+  }
+  /**
+   * Checking a page title
+   * @param {string} expectedPageTitle 
+   * @returns {Promise<boolean>}
+   */
+  async titleIsCorrect(expectedPageTitle) {
+    this.logger.info(`WalletCommonBase::titleIsCorrect is called`);
+    const displayedTitle = await this.getPageTitle();
+    return displayedTitle === expectedPageTitle;
   }
 }
 

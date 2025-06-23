@@ -86,9 +86,8 @@ import {
   PRIMARY_ASSET_CONSTANTS,
 } from '../database/primitives/enums';
 import {
-  asScanAddresses, asHasLevels, asGetAllUtxos,
+  asScanAddresses, asGetAllUtxos,
 } from '../models/PublicDeriver/traits';
-import type { IHasLevels } from '../models/ConceptualWallet/interfaces';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
 import type {
   IPublicDeriver,
@@ -414,7 +413,7 @@ export async function rawGetTransactions(
 
 export async function getAllTransactions(
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
     skip?: number,
     limit?: number,
   |},
@@ -474,7 +473,7 @@ export async function getAllTransactions(
 }
 
 export async function getPendingTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
@@ -552,7 +551,7 @@ export async function rawGetTokenListIds(
   |},
   derivationTables: Map<number, string>,
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
   |},
 ): Promise<Array<number>> {
   const relatedIds = await rawGetAllTxIds(
@@ -614,7 +613,7 @@ export async function rawGetForeignAddresses(
   |},
   derivationTables: Map<number, string>,
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
   |},
 ): Promise<Array<number>> {
   const relatedIds = await rawGetAllTxIds(
@@ -678,7 +677,7 @@ export async function rawGetForeignAddresses(
   return Array.from(new Set(unownedAddresses));
 }
 export async function getForeignAddresses(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
 ): Promise<Array<{|
   address: string,
   type: CoreAddressT,
@@ -759,7 +758,7 @@ export async function rawRemoveAllTransactions(
   |},
   derivationTables: Map<number, string>,
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+    publicDeriver: IPublicDeriver<ConceptualWallet>,
   |},
 ): ReturnType<typeof rawGetAllTxIds> {
   const unownedAddresses = await rawGetForeignAddresses(
@@ -840,7 +839,7 @@ export async function rawRemoveAllTransactions(
 }
 
 export async function removeAllTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>, |},
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
 ): ReturnType<typeof rawGetAllTxIds> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -904,10 +903,7 @@ export async function updateUtxos(
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
 ): Promise<void> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map<number, string>()
-    : withLevels.getParent().getDerivationTables();
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
 
   // sync our address set with remote to make sure txs are identified as ours
   const scanAddrTables = Object.freeze({
@@ -1034,10 +1030,7 @@ export async function updateTransactions(
   after?: ?ReferenceTx,
   before?: ?ReferenceTx,
 ): Promise<TxData> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map<number, string>()
-    : withLevels.getParent().getDerivationTables();
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
 
   try {

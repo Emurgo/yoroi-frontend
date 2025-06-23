@@ -103,11 +103,6 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
 const rules /*: boolean => Array<*> */ = _isDev => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
-    test: /\.tsx?$/,
-    use: 'ts-loader',
-    exclude: /node_modules/,
-  },
-  {
     test: /pdf\.worker(\.min)?\.js$/,
     use: 'raw-loader',
   },

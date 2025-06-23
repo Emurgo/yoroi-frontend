@@ -3,10 +3,10 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { Typography } from '@mui/material';
 import { Box, Stack } from '@mui/system';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { ReactComponent as AttentionIcon } from '../../../assets/images/attention-modern.inline.svg';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   maxNumberAllowed: {
@@ -20,12 +20,9 @@ type Props = {|
 |};
 
 export default class MaxAssetsError extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     return (
       <Box sx={{ backgroundColor: 'ds.sys_magenta_100', padding: '12px 16px', borderRadius: '8px' }}>
@@ -36,7 +33,10 @@ export default class MaxAssetsError extends Component<Props> {
           </Typography>
         </Stack>
         <Typography component="div" variant="body1" color="grayscale.900">
-          <FormattedHTMLMessage {...messages.maxNumberAllowed} values={{ number: this.props.maxAssetsAllowed }} />
+          <FormattedMessage
+            {...messages.maxNumberAllowed}
+            values={{ number: String(this.props.maxAssetsAllowed), strong }}
+          />
         </Typography>
       </Box>
     );

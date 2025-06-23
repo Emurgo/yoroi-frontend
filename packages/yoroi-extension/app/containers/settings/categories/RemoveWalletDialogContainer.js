@@ -3,8 +3,8 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 import { messages } from '../../../components/wallet/settings/RemoveWallet';
 
@@ -56,10 +56,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
     acceptText: null,
   }
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.removeWalletRequest.reset();
   }
@@ -96,7 +93,7 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const settingsStore = this.props.stores.walletSettings;
 
     const { warning1Text, warning2Text, acceptText } = this.state;

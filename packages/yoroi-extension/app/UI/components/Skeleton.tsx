@@ -1,4 +1,3 @@
-import React from 'react';
 import { Skeleton as MuiSkeleton, SkeletonProps, styled } from '@mui/material';
 
 const StyledSkeleton = styled(MuiSkeleton)(({ theme }: any) => ({

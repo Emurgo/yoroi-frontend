@@ -8,7 +8,7 @@ import { ReactComponent as ArrowLeft } from '../../../assets/images/assets-page/
 import moment from 'moment';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { assetsMessage } from './AssetsList';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { isTestnet } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -74,6 +74,7 @@ export const getNetworkUrl: ($ReadOnly<NetworkRow>) => string | void = network =
 function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
   if (tokenInfo == null) return null;
   const networkUrl = getNetworkUrl(network);
+  const componentPathId = 'assets:tokenDetails';
 
   return (
     <Box>
@@ -159,7 +160,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
                 },
               }}
             >
-              <CopyAddress text={tokenInfo.id}>{tokenInfo.id}</CopyAddress>
+              <CopyAddress text={tokenInfo.id} pathId={`${componentPathId}:fingerprint`}>{tokenInfo.id}</CopyAddress>
             </Box>
           }
         />
@@ -178,7 +179,7 @@ function TokenDetails({ tokenInfo, network, intl }: Props & Intl): Node {
                 },
               }}
             >
-              <CopyAddress text={tokenInfo.policyId}>{tokenInfo.policyId}</CopyAddress>
+              <CopyAddress text={tokenInfo.policyId} pathId={`${componentPathId}:policyId`}>{tokenInfo.policyId}</CopyAddress>
             </Box>
           }
         />

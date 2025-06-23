@@ -173,7 +173,7 @@ export default class VotingStore extends Store<StoresMap> {
 
   @action finishQRCode: void => void = () => {
     this.stores.uiDialogs.closeActiveDialog();
-    this.stores.app.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
+    this.stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     this.reset({ justTransaction: false });
   }
 
@@ -307,48 +307,15 @@ export default class VotingStore extends Store<StoresMap> {
     password?: string,
     wallet: WalletState,
   |}) => Promise<void> = async request => {
-    const result = this.createVotingRegTx.result;
-    if (result == null) {
+    const signRequest = this.createVotingRegTx.result;
+    if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
     }
-    if (request.wallet.type === 'ledger') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          ledger: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-    if (request.wallet.type === 'trezor') {
-      await this.stores.substores.ada.wallets.adaSendAndRefresh({
-        broadcastRequest: {
-          trezor: {
-            signRequest: result,
-            wallet: request.wallet,
-          },
-        },
-        refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
-      });
-      return;
-    }
-
-    // normal password-based wallet
-    if (request.password == null) {
-      throw new Error(`${nameof(this.signTransaction)} missing password for non-hardware signing`);
-    }
-    await this.stores.substores.ada.wallets.adaSendAndRefresh({
-      broadcastRequest: {
-        normal: {
-          wallet: request.wallet,
-          password: request.password,
-          signRequest: result,
-        },
-      },
-      refreshWallet: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
+    await this.stores.transactionProcessingStore.adaSendAndRefresh({
+      wallet: request.wallet,
+      signRequest,
+      password: request.password,
+      callback: () => this.stores.wallets.refreshWalletFromRemote(request.wallet.publicDeriverId),
     });
   };
 
@@ -382,7 +349,7 @@ export default class VotingStore extends Store<StoresMap> {
       stepState: StepState.LOAD,
     };
     this.error = null;
-    this.stores.wallets.sendMoneyRequest.reset();
+    this.stores.transactionProcessingStore.sendMoneyRequest.reset();
     this.createVotingRegTx.reset();
     if (!request.justTransaction) {
       this.isStale = false;

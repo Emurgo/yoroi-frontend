@@ -2,10 +2,9 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { TransferStatusT } from '../../types/TransferTypes';
 import { TransferStatus } from '../../types/TransferTypes';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Dialog from '../../components/widgets/Dialog';
 
 import AnnotatedLoader from '../../components/transfer/AnnotatedLoader';
@@ -36,12 +35,9 @@ type Props = {|
 @observer
 export default class YoroiTransferWaitingPage extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { status } = this.props;
 
     return (
@@ -50,16 +46,14 @@ export default class YoroiTransferWaitingPage extends Component<Props> {
       >
         <AnnotatedLoader
           title={intl.formatMessage(messages.title)}
-          details={this.getMessage(intl, status)}
+          details={this.getMessage(status)}
         />
       </Dialog>
     );
   }
 
-  getMessage(
-    intl: $npm$ReactIntl$IntlFormat,
-    status: TransferStatusT,
-  ): string {
+  getMessage(status: TransferStatusT ): string {
+    const intl = this.context;
     switch (status) {
       case TransferStatus.RESTORING_ADDRESSES:
         return intl.formatMessage(messages.restoringAddresses);

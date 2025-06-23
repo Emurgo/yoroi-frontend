@@ -104,7 +104,7 @@ function RestoreWalletPage(props: Props & Intl): Node {
   };
 
   function handleGoToRoute(route) {
-    stores.app.goToRoute(route);
+    stores.routing.goToRoute(route);
   }
 
   function goToAddWalletScreen() {

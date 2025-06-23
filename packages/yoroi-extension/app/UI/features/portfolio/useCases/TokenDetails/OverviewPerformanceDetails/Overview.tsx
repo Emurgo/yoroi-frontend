@@ -1,6 +1,5 @@
 import { Box, Link as LinkMui, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React from 'react';
 import { CopyButton } from '../../../../../components';
 import tokenPng from '../../../common/assets/images/token.png';
 import { isPrimaryToken } from '../../../common/helpers/isPrimary';
@@ -39,7 +38,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         </Typography>
       </Stack>
 
-      <TokenOverviewSection label={strings.description} value={tokenInfo?.info.metadata?.description} />
+      <TokenOverviewSection label={strings.info} value={tokenInfo?.info.metadata?.description} />
 
       <TokenOverviewSection
         label={strings.website}

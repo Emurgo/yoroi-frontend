@@ -1,7 +1,7 @@
 import { Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { dRepNormalize } from '../../../api/ada/lib/cardanoCrypto/utils';
 import LocalStorageApi from '../../../api/localStorage/index';
 import globalMessages from '../../../i18n/global-messages';
@@ -90,7 +90,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
   if (
     !isVisible ||
     stores.delegation.governanceStatus === undefined ||
-    (governanceInfo.isDelegatingToYoroiDrep && governanceInfo.isParticipatingToGovernance)
+    governanceInfo.isParticipatingToGovernance
   ) {
     return null;
   }
@@ -110,12 +110,10 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
 
       <Stack direction="column" p="16px" alignItems="flex-start">
         <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
-          {!governanceInfo.isParticipatingToGovernance
-            ? intl.formatMessage(globalMessages.delegateToYoroiDRep)
-            : intl.formatMessage(globalMessages.considerDelegating)}
+          {intl.formatMessage(globalMessages.governanceBannerTitle)}
         </Typography>
         <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
-          {intl.formatMessage(globalMessages.delegateToYoroi)}
+          {intl.formatMessage(globalMessages.governanceBannerText)}
         </Typography>
         <Button
           //  @ts-ignore
@@ -128,9 +126,9 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
             },
           }}
           onClick={() => {
-            stores.app.goToRoute({
+            stores.routing.goToRoute({
               route: ROUTES.Governance.ROOT,
-              delegateToYoroiDrep: true,
+              query: { delegateToYoroiDrep: true },
             });
           }}
         >

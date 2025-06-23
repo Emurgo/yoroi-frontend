@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme } from '@mui/material';
 import {
   Tooltip as ReactTooltip,
@@ -39,8 +38,9 @@ export const Tooltip = ({
 
       <ReactTooltip
         id={id}
+        opacity='1'
         style={{
-          color: theme.palette.ds.white_static,
+          color: theme.palette.ds.gray_min,
           backgroundColor: theme.palette.ds.gray_900,
           borderRadius: `${theme.shape.borderRadius / 2}px`,
           padding: '5px 12px',

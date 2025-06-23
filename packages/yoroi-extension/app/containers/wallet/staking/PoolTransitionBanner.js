@@ -3,16 +3,11 @@
 import type { Node } from 'react';
 import { styled } from '@mui/system';
 import { Alert, Typography } from '@mui/material';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
+import { useIntl } from 'react-intl';
 
-export const PoolTransitionBanner = ({
-  intl,
-  showBanner,
-}: {|
-  intl: $npm$ReactIntl$IntlFormat,
-  showBanner?: boolean,
-|}): Node => {
+export const PoolTransitionBanner = ({ showBanner }: {| showBanner?: boolean |}): Node => {
+  const intl = useIntl();
   if (!showBanner) return null;
   return (
     <SAlert
