@@ -186,14 +186,14 @@ const dialogTitle = environment.isDev() || environment.isNightly() ? messages.di
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isBuying: true,
     inputError: null,
     urlGenerationError: null,
     amountAda: '',
     isSubmitting: false,
-    showDisclaimer: true
+    showDisclaimer: true,
   };
 
   urlGenerationTimeout: null | TimeoutID = null;
@@ -202,7 +202,7 @@ export default class BuySellDialog extends Component<Props, State> {
     ampli.exchangePageViewed();
   }
 
-  onSubmit: () => Promise < void> = async () => {
+  onSubmit: () => Promise<void> = async () => {
     const { state, props } = this;
 
     this.setState({ isSubmitting: true, urlGenerationError: null });
@@ -291,7 +291,7 @@ export default class BuySellDialog extends Component<Props, State> {
     });
   };
 
-  onChangeAmount: (SyntheticInputEvent < HTMLInputElement >) => void = event => {
+  onChangeAmount: (SyntheticInputEvent<HTMLInputElement>) => void = event => {
     const { value } = event.target;
 
     if (!value.match(/^\d*$/)) {
@@ -325,14 +325,12 @@ export default class BuySellDialog extends Component<Props, State> {
 
   setDisclaimerAccepted: () => void = () => {
     this.setState({ showDisclaimer: false });
-  }
+  };
 
   renderDisclaimerDialog: () => Node = () => {
     const { onCancel } = this.props;
-    return (
-      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel}/>
-    )
-  }
+    return <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} />;
+  };
 
   renderBuySell(): Node {
     const intl = this.context;
@@ -365,7 +363,7 @@ export default class BuySellDialog extends Component<Props, State> {
                     </Typography>
                   </div>
                   <Box color="ds.text_gray_low" sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
-                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
+                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda.toString() })}
                   </Box>
                 </div>
               </InputAdornment>
