@@ -216,7 +216,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
 
-    const getRewardAmountArray = token => {
+    const getRewardAmount = token => {
       return maybe(token, t => formatTokenEntry(t.getDefaultEntry(), getTokenInfo));
     };
 
@@ -246,7 +246,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
       isStakeRegistered,
-      stakingRewards: getRewardAmountArray(delegatedRewards),
+      stakingRewards: getRewardAmount(delegatedRewards),
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
