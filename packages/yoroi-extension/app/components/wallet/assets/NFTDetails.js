@@ -42,6 +42,7 @@ type Props = {|
   nextNftId: string,
   prevNftId: string,
   tab: string | null,
+  nftsCount: number,
 |};
 
 type Intl = {|
