@@ -16,6 +16,8 @@ import LocalStorageApi from '../../../api/localStorage/index';
 import environment from '../../../environment';
 import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
 import type { StoresProps } from '../../../stores';
+// $FlowIgnore: suppressing this error
+import EnableNotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/EnableNotificationsSettings';
 
 // $FlowIgnore[cannot-resolve-module]
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
@@ -155,6 +157,10 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             />
           )}
           <ThemeSettingsBlock />
+          <EnableNotificationsSettings
+            isEnabled={stores.pushNotificationStore.isEnabled}
+            toggle={stores.pushNotificationStore.toggleEnabled}
+          />
           <AboutYoroiSettingsBlock
             wallet={stores.wallets.selected}
             pushSubscription={stores.pushNotificationStore.subscription}

@@ -433,6 +433,8 @@
   "notifications.settings.duration.line2": "Adjust the display duration of in-app notifications to suit your preferences.",
   "notifications.settings.duration.title": "Display duration",
   "notifications.settings.durationDescription": "Display during {duration} seconds",
+  "notifications.settings.enablePushNotificationsDesc": "Allow push notifications",
+  "notifications.settings.enablePushNotificationsTitle": "Push notifications",
   "settings.cashback.title": "Cashback rewards wallet",
   "settings.cashback.note": "Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet or select “None” to decline this service.",
   "settings.cashback.label": "Connected wallet",

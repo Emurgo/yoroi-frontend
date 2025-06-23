@@ -4,6 +4,8 @@ import environment from '../../environment';
 import { observable, runInAction, } from 'mobx';
 import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
 
+const localStorageApi = new LocalStorageApi();
+
 const DEFAULT_DURATION = 4;
 
 const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
@@ -31,10 +33,13 @@ export default class PushNotificationStore<
 
   setup(): void {
     this.stores.loading.registerBlockingLoadingRequest((async () => {
-      const metadata = await (new LocalStorageApi()).getPushNotificationMetadata();
+      const metadata = await localStorageApi.getPushNotificationMetadata();
       runInAction(() => {
         this.metadata = metadata;
       });
+      if (this.metadata?.isEnabled === undefined) {
+        this._enableNotifications();
+      }
     })(), 'load push notification metadata');
 
     (async () => {
@@ -82,7 +87,36 @@ export default class PushNotificationStore<
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
-    (new LocalStorageApi()).savePushNotificationMetadata(this.metadata);
+    localStorageApi.savePushNotificationMetadata(this.metadata);
+  }
+
+  get isEnabled(): boolean {
+    // we treat unset value has enabled because we requested notifications permission in manifest.json
+    return this.metadata?.isEnabled !== false;
+  }
+
+  toggleEnabled: () => void = () => {
+    runInAction(() => {
+      if (!this.metadata) {
+        throw new Error('push notification metadata not loaded');
+      }
+      this.metadata.isEnabled = !this.metadata.isEnabled;
+    });
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    localStorageApi.savePushNotificationMetadata(this.metadata);
+    if (!this.isEnabled) {
+      this._enableNotifications();
+    } else {
+      this._disableNotifications();
+    }
+  }
+
+  _enableNotifications(): void {
+  }
+
+  _disableNotifications(): void {
   }
 }
 
