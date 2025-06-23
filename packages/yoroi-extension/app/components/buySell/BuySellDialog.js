@@ -1,12 +1,11 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import Tab, { tabClasses } from '@mui/material/Tab';
 import Tabs, { tabsClasses } from '@mui/material/Tabs';
 import { Box, Typography, styled } from '@mui/material';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { ReactComponent as YoroiIcon } from '../../assets/images/yoroi-logo-shape-blue.inline.svg';
 import { ReactComponent as FailIcon } from '../../assets/images/service-unavailable-error.svg';
 import { exchangeApiMaker, exchangeManagerMaker } from '@yoroi/exchange';
@@ -187,17 +186,14 @@ const dialogTitle = environment.isDev() || environment.isNightly() ? messages.di
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-  intl: intlShape.isRequired,
-  };
-
+  static contextType: any = IntlContext;
   state: State = {
     isBuying: true,
     inputError: null,
     urlGenerationError: null,
     amountAda: '',
     isSubmitting: false,
-    showDisclaimer: true
+    showDisclaimer: true,
   };
 
   urlGenerationTimeout: null | TimeoutID = null;
@@ -206,7 +202,7 @@ export default class BuySellDialog extends Component<Props, State> {
     ampli.exchangePageViewed();
   }
 
-  onSubmit: () => Promise < void> = async () => {
+  onSubmit: () => Promise<void> = async () => {
     const { state, props } = this;
 
     this.setState({ isSubmitting: true, urlGenerationError: null });
@@ -295,7 +291,7 @@ export default class BuySellDialog extends Component<Props, State> {
     });
   };
 
-  onChangeAmount: (SyntheticInputEvent < HTMLInputElement >) => void = event => {
+  onChangeAmount: (SyntheticInputEvent<HTMLInputElement>) => void = event => {
     const { value } = event.target;
 
     if (!value.match(/^\d*$/)) {
@@ -329,18 +325,15 @@ export default class BuySellDialog extends Component<Props, State> {
 
   setDisclaimerAccepted: () => void = () => {
     this.setState({ showDisclaimer: false });
-  }
+  };
 
   renderDisclaimerDialog: () => Node = () => {
-    const { intl } = this.context;
     const { onCancel } = this.props;
-    return (
-      <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} intl={intl} />
-    )
-  }
+    return <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} />;
+  };
 
   renderBuySell(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
 
     const [providerLogo, providerName] = state.isBuying ? [banxaPng, 'Banxa'] : [encryptusPng, 'Encryptus'];
@@ -370,7 +363,7 @@ export default class BuySellDialog extends Component<Props, State> {
                     </Typography>
                   </div>
                   <Box color="ds.text_gray_low" sx={{ position: 'absolute', right: '0px', fontSize: '12px' }}>
-                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda })}
+                    {intl.formatMessage(messages.currentBalance, { amount: props.currentBalanceAda.toString() })}
                   </Box>
                 </div>
               </InputAdornment>
@@ -407,7 +400,7 @@ export default class BuySellDialog extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { state, props } = this;
     const { urlGenerationError, showDisclaimer } = state;
 

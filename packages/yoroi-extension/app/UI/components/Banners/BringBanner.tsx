@@ -1,4 +1,3 @@
-import React from 'react';
 import { Cashback } from '../ilustrations/Cashback';
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';

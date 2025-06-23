@@ -2,47 +2,16 @@
 import React, { Suspense, lazy } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { addLocaleData, IntlProvider } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import pt from 'react-intl/locale-data/pt';
-
+import { IntlProvider } from 'react-intl';
 import RootStore from './stores';
 
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 
-import {
-  HashRouter,
-  Switch,
-  Route,
-  Redirect,
-} from 'react-router-dom';
+import { Navigate, HashRouter, Routes, Route } from 'react-router';
 
 import { translations } from './i18n/translations';
 import { DEFAULT_LOCALE } from './const';
 import styleVariables from './cmn-style/style-variables';
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([
-  ...en,
-  ...ko,
-  ...ja,
-  ...zh,
-  ...ru,
-  ...de,
-  ...fr,
-  ...id,
-  ...es,
-  ...it,
-  ...pt,
-]);
 
 // https://reactjs.org/docs/code-splitting.html#reactlazy
 const ConnectPage = lazy(() => import('./containers/ConnectPage'));
@@ -82,12 +51,9 @@ export default class App extends React.Component<Props> {
         <Suspense fallback={loadingSpinner}>
           <StyleVariableLoader variables={styleVariables} />
           <HashRouter basename={process.env.PUBLIC_URL}>
-            <Switch>
-              <Route exact path="/">
-                <ConnectPage rootStore={this.props.rootStore} />
-              </Route>
-              <Redirect to="/" />
-            </Switch>
+            <Routes>
+              <Route path="/" element={<ConnectPage rootStore={this.props.rootStore} />}/>
+            </Routes>
           </HashRouter>
         </Suspense>
       </IntlProvider>

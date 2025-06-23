@@ -1,19 +1,10 @@
 // @flow
 
 import '../../lib/test-config.forTests';
-import BigNumber from 'bignumber.js';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import {
-  createTrezorSignTxPayload,
-  toTrezorAddressParameters,
-} from './trezorTx';
+import { toTrezorSignRequest, toTrezorAddressParameters } from './trezorTx';
 import { networks } from '../../lib/storage/database/prepackaged/networks';
-import { HaskellShelleyTxSignRequest } from './HaskellShelleyTxSignRequest';
-import {
-  byronAddrToHex,
-  getCardanoSpendingKeyHash,
-  normalizeToAddress,
-} from '../../lib/storage/bridge/utils';
+import { getCardanoSpendingKeyHash, normalizeToAddress } from '../../lib/storage/bridge/utils';
 import {
   CardanoCertificateType,
   CardanoAddressType,
@@ -172,7 +163,7 @@ test('Create Trezor transaction', async () => {
         RustModule.WalletV4.ByronAddress.from_base58(utxo.receiver),
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
-          1
+          utxo.tx_index,
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
@@ -181,7 +172,7 @@ test('Create Trezor transaction', async () => {
         keyHash,
         RustModule.WalletV4.TransactionInput.new(
           RustModule.WalletV4.TransactionHash.from_hex(utxo.tx_hash),
-          1
+          utxo.tx_index,
         ),
         RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str(utxo.amount))
       );
@@ -189,7 +180,7 @@ test('Create Trezor transaction', async () => {
   }
   txBuilder.add_output(
     RustModule.WalletV4.TransactionOutput.new(
-      RustModule.WalletV4.Address.from_hex(byronAddrToHex('Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe')),
+      RustModule.WalletV4.Address.from_bech32('addr1stvpskppsdvpezg6ex464jvekztus84rcpzskramdy7sh53jh67q7j3er7sqqxhjlalzzsk0pgc'),
       RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('6323634'))
     )
   );
@@ -214,52 +205,39 @@ test('Create Trezor transaction', async () => {
     .reduce((acc, next) => Object.assign(acc, next), {});
   const { ByronNetworkId, ChainNetworkId } = baseConfig;
 
-  const response = await createTrezorSignTxPayload(
-    new HaskellShelleyTxSignRequest({
-      unsignedTx: txBuilder,
-      changeAddr: [],
-      senderUtxos,
-      metadata: undefined,
-      networkSettingSnapshot: {
-        ChainNetworkId: Number.parseInt(baseConfig.ChainNetworkId, 10),
-        PoolDeposit: new BigNumber(baseConfig.PoolDeposit),
-        KeyDeposit: new BigNumber(baseConfig.KeyDeposit),
-        NetworkId: network.NetworkId,
-      },
-      neededStakingKeyHashes: {
-        neededHashes: new Set([stakeCredential.to_hex()]),
-        wits: new Set() // not needed for this test, but something should be here
-      },
-    }),
-    ByronNetworkId,
+  const response = toTrezorSignRequest(
+    txBuilder.build().to_hex(),
     Number.parseInt(ChainNetworkId, 10),
+    ByronNetworkId,
+    _address => [2147483692, 2147485463, 2147483648, 2, 0],
+    [],
+    senderUtxos,
   );
   expect(response).toStrictEqual({
     fee: '2000',
     ttl: '500',
     networkId: 1,
     protocolMagic: 764824073,
-    scriptDataHash: undefined,
-    validityIntervalStart: undefined,
+    includeNetworkId: false,
     inputs: [{
-      path: `m/44'/1815'/0'/1/1`,
+      path: [2147483692, 2147485463, 2147483648, 1, 1],
       prev_hash: '058405892f66075d83abd1b7fe341d2d5bfd2f6122b2f874700039e5078e0dd5',
       prev_index: 1,
     }, {
-      path: `m/44'/1815'/0'/0/7`,
+      path: [2147483692, 2147485463, 2147483648, 0, 7],
       prev_hash: '1029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3657',
       prev_index: 0,
     }, {
-      path: `m/44'/1815'/0'/0/7`,
+      path: [2147483692, 2147485463, 2147483648, 0, 7],
       prev_hash: '2029eef5bb0f06979ab0b9530a62bac11e180797d08cab980fe39389d42b3658',
       prev_index: 0,
     }, {
-      path: `m/44'/1815'/0'/1/2`,
+      path: [2147483692, 2147485463, 2147483648, 1, 2],
       prev_hash: '3677e75c7ba699bfdc6cd57d42f246f86f69aefd76025006ac78313fad2bba20',
       prev_index: 1,
     }],
     outputs: [{
-      address: 'Ae2tdPwUPEZAVDjkPPpwDhXMSAjH53CDmd2xMwuR9tZMAZWxLhFphrHKHXe',
+      address: 'addr1stvpskppsdvpezg6ex464jvekztus84rcpzskramdy7sh53jh67q7j3er7sqqxhjlalzzsk0pgc',
       amount: `6323634`
     }],
     certificates: [{

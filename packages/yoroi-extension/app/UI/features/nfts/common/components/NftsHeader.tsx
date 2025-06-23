@@ -1,8 +1,5 @@
-import { InputAdornment } from '@mui/material';
-import React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
-import { SearchInput } from '../../../../components/Input/SearchInput';
-import { Icons, IconWrapper } from '../../../../components/icons';
+import { InputAdornment, Box, Stack, Typography } from '@mui/material';
+import { SearchInput, Icons, IconWrapper } from '../../../../components';
 import { ListColumnView } from '../types';
 import { useStrings } from '../hooks/useStrings';
 
@@ -28,7 +25,7 @@ export default function NftsHeader({ numNfts, columns, search, listColumnViews }
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-      <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px">
+      <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px" id="nftsList-nftsCount-text">
         {numNfts === 0 ? strings.nfts : strings.nftsCount(numNfts)}
       </Typography>
       <Box display="flex" alignItems="center">
@@ -38,6 +35,7 @@ export default function NftsHeader({ numNfts, columns, search, listColumnViews }
               key={col.count}
               sx={{ bgcolor: col.count === columns.count ? 'ds.gray_200' : 'transparent', borderRadius: '8px' }}
               onClick={() => columns.setColumns(col)}
+              id={`nftsList-${col.count}_columnView-button`}
             >
               {col.Icon}
             </Box>
@@ -50,10 +48,11 @@ export default function NftsHeader({ numNfts, columns, search, listColumnViews }
           endAdornment={
             search.keyword !== '' && (
               <InputAdornment position="end" sx={{ cursor: 'pointer' }}>
-                <IconWrapper icon={Icons.Cross} onClick={() => search.setKeyword('')} />
+                <IconWrapper icon={Icons.Cross} onClick={() => search.setKeyword('')} id="nftsList:search-clear-button" />
               </InputAdornment>
             )
           }
+          id="nftsList-search-input"
         />
       </Box>
     </Box>

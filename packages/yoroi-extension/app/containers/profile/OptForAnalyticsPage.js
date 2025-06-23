@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { StoresProps } from '../../stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { Box } from '@mui/material';
 import IntroBanner from '../../components/profile/language-selection/IntroBanner';
 import environment from '../../environment';
@@ -12,10 +11,7 @@ import OptForAnalyticsForm from '../../components/profile/terms-of-use/OptForAna
 
 @observer
 export default class OptForAnalyticsPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
 
     return (

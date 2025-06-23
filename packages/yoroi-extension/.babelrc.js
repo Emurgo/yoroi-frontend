@@ -41,6 +41,27 @@ module.exports = function (api /*: ApiType */) /*: * */ {
         },
       ],
     ],
+    overrides: [
+      {
+        test: /\.tsx?$/,
+        presets: [
+          '@babel/preset-env',
+          [
+            '@babel/preset-react',
+            {
+              runtime: 'automatic',
+            },
+          ],
+          [
+            '@babel/preset-typescript',
+            {
+              allExtensions: true,
+              isTSX: true,
+            },
+          ],
+        ],
+      },
+    ],
     plugins: [
       '@babel/plugin-proposal-nullish-coalescing-operator',
       '@babel/plugin-proposal-optional-chaining',

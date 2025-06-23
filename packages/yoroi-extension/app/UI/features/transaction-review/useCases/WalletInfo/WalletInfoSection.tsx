@@ -1,5 +1,4 @@
 import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
-import React from 'react';
 import { Chip, ChipTypes, Icon } from '../../../../components';
 import WalletAccountIcon from '../../../../components/WalletAccountIcon/WalletAccountIcon';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -108,9 +107,9 @@ const WalletAssetsSection = ({ data, label }) => {
   return (
     <Stack
       direction="column"
-      height="160px"
+      height="152px"
       width="233px"
-      sx={{ border: '1px solid gray', borderRadius: '8px', position: 'relative' }}
+      sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px', position: 'relative' }}
       p="16px"
       gap="16px"
     >
@@ -119,7 +118,7 @@ const WalletAssetsSection = ({ data, label }) => {
       </Typography>
       <Stack direction="column" justifyContent="space-between" gap="8px">
         <Typography variant="h3" fontSize="28px" fontWeight={500}>
-          {data.length > 0 ? data.length : '-'}
+          {data.length > 0 ? data.length : '0'}
         </Typography>
         <AssetCarousel data={data} />
       </Stack>

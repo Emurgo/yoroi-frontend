@@ -1,6 +1,6 @@
 import { Box, Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import adaPng from '../../../../../assets/images/ada.png';
 import { Skeleton } from '../../../../components';
 import hoskyPng from '../../common/assets/images/hosky-token.png';

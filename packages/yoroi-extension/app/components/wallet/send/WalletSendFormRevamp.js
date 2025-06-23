@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { action, reaction } from 'mobx';
 import { Button, Typography, TextField as MemoTextField, Box, styled } from '@mui/material';
 import TextField from '../../common/TextField';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { isValidMemoOptional } from '../../../utils/validations';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -24,7 +24,6 @@ import {
 } from '../../../utils/formatters';
 import config from '../../../config';
 import LocalizableError from '../../../i18n/LocalizableError';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import {
   getTokenName,
@@ -48,18 +47,14 @@ import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType'
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
-import WalletSendPreviewStepContainer from './WalletSendFormSteps/WalletSendPreviewStepContainer';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
 import { ampli } from '../../../../ampli/index';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
-import type { SendMoneyRequest } from '../../../stores/toplevel/WalletStore';
 import type { MaxSendableAmountRequest } from '../../../stores/toplevel/TransactionBuilderStore';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
-import LedgerSendStore from '../../../stores/ada/send/LedgerSendStore';
-import TrezorSendStore from '../../../stores/ada/send/TrezorSendStore';
 import { SendTokensButton } from './SendTokensButton';
 
 const messages = defineMessages({
@@ -212,21 +207,6 @@ type Props = {|
   +signRequest: null | ISignRequest<any>,
   +staleTx: boolean,
   +openTransactionSuccessDialog: void => void,
-  +sendMoneyRequest: SendMoneyRequest,
-  +sendMoney: (params: {|
-    password: string,
-    +wallet: {
-      publicDeriverId: number,
-      +plate: { TextPart: string, ... },
-      ...
-    },
-    signRequest: ISignRequest<any>,
-    onSuccess?: void => void,
-  |}) => Promise<void>,
-  +ledgerSendError: null | LocalizableError,
-  +trezorSendError: null | LocalizableError,
-  +ledgerSend: LedgerSendStore,
-  +trezorSend: TrezorSendStore,
 |};
 
 const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
@@ -265,10 +245,7 @@ type State = {|
 
 @observer
 export default class WalletSendFormRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
@@ -363,7 +340,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         this.setState({ domainResolverIsLoading: true });
         const res: ?DomainResolverResponse = await resolveDomainAddress(handle);
         if (res == null) {
-          domainResolverMessage = this.context.intl.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
+          domainResolverMessage = this.context.formatMessage(messages.receiverFieldLabelUnresolvedAddress);
         } else if (res.address != null) {
           resolvedAddress = res.address;
           resolvedNameServer = res.nameServer;
@@ -373,11 +350,11 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             nameServer: res.nameServer,
           };
         } else if (res.error === 'forbidden') {
-          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
             messages.receiverFieldLabelForbiddenAccess
           )}`;
         } else {
-          domainResolverMessage = `${res.nameServer}: ${this.context.intl.formatMessage(
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
             messages.receiverFieldLabelUnexpectedError
           )}`;
         }
@@ -401,11 +378,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     {
       fields: {
         receiver: {
-          label: this.context.intl.formatMessage(messages.receiverFieldLabelDefault),
+          label: this.context.formatMessage(messages.receiverFieldLabelDefault),
           placeholder: '',
           value: this.props.uriParams ? this.props.uriParams.address : '',
           validators: [
             async ({ field }) => {
+              field.value = field.value.trim();
               const inputFieldValue = field.value;
               let handle = undefined;
               let receiverValue = inputFieldValue;
@@ -417,7 +395,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     domainResolverMessage: null,
                     domainResolverIsLoading: false,
                   });
-                  return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                  return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
                 }
                 const updateReceiver = (isValid: boolean) => {
                   if (isValid) {
@@ -447,7 +425,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                 updateReceiver(result);
                 const fieldError = isDomainResolvable
                   ? domainResolverMessage
-                  : this.context.intl.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
+                  : this.context.formatMessage(errorType === 1 ? messages.receiverFieldLabelInvalidAddress : errorMessage);
                 return [isValid[0], fieldError];
               } finally {
                 this.setState({
@@ -458,7 +436,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
           ],
         },
         amount: {
-          label: this.context.intl.formatMessage(globalMessages.amountLabel),
+          label: this.context.formatMessage(globalMessages.amountLabel),
           placeholder: '',
           value: (() => {
             const formatValue = genFormatTokenAmount(this.props.getTokenInfo);
@@ -496,7 +474,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER
       },
       plugins: {
         vjf: vjf(),
@@ -572,12 +550,12 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       values = error.values;
     }
 
-    return this.context.intl.formatMessage(errMsg, values);
+    return this.context.formatMessage(errMsg, values);
   }
 
   renderCurrentStep(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const {
       shouldSendAll,
@@ -700,6 +678,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     letterSpacing: '0.2px',
                   },
                 }}
+                value={this.props.memo}
               />
               <Typography
                 component="div"
@@ -955,29 +934,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             />
           </Box>
         );
-      case SEND_FORM_STEP.PREVIEW:
-        return (
-          <WalletSendPreviewStepContainer
-            signRequest={this.props.signRequest}
-            staleTx={this.props.staleTx}
-            isDefaultIncluded={this.props.isDefaultIncluded}
-            unitOfAccountSetting={this.props.unitOfAccountSetting}
-            openTransactionSuccessDialog={this.props.openTransactionSuccessDialog}
-            minAda={this.props.minAda}
-            plannedTxInfoMap={this.props.plannedTxInfoMap}
-            onUpdateStep={this.onUpdateStep.bind(this)}
-            sendMoneyRequest={this.props.sendMoneyRequest}
-            sendMoney={this.props.sendMoney}
-            getTokenInfo={this.props.getTokenInfo}
-            getCurrentPrice={this.props.getCurrentPrice}
-            ledgerSendError={this.props.ledgerSendError}
-            trezorSendError={this.props.trezorSendError}
-            ledgerSend={this.props.ledgerSend}
-            trezorSend={this.props.trezorSend}
-            selectedExplorer={this.props.selectedExplorer}
-            selectedWallet={this.props.selectedWallet}
-          />
-        );
       default:
         throw Error(`${step} is not a valid step`);
     }
@@ -985,7 +941,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
 
   renderCurrentFooter(step: number): Node {
     const { form } = this;
-    const { intl } = this.context;
+    const intl = this.context;
     const { invalidMemo } = this.state;
     const { maxSendableAmount } = this.props;
 
@@ -1051,21 +1007,19 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             >
               {this.renderCurrentStep(currentStep)}
             </Box>
-            {currentStep !== SEND_FORM_STEP.PREVIEW && (
-              <Box
-                borderTop={bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'}
-                borderColor="grayscale.200"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                gap="24px"
-                p="24px"
-                mx="-24px"
-                mt="30px"
-              >
-                {this.renderCurrentFooter(currentStep)}
-              </Box>
-            )}
+            <Box
+              borderTop={bodyRef && bodyRef.scrollHeight > bodyRef.clientHeight ? '1px solid' : '0'}
+              borderColor="grayscale.200"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              gap="24px"
+              p="24px"
+              mx="-24px"
+              mt="30px"
+            >
+              {this.renderCurrentFooter(currentStep)}
+            </Box>
           </Box>
         </Box>
       </>
@@ -1079,17 +1033,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
       this.maxStep = step;
       if (step === SEND_FORM_STEP.AMOUNT) {
         ampli.sendSelectAssetPageViewed();
-      } else if (step === SEND_FORM_STEP.PREVIEW) {
-        const { totalInput } = this.props;
-        if (totalInput == null) {
-          throw new Error('expect totalInput');
-        }
-        ampli.sendSelectAssetSelected({
-          asset_count: totalInput.nonDefaultEntries().length,
-        });
-        ampli.sendSummaryPageViewed({
-          asset_count: totalInput.nonDefaultEntries().length,
-        });
       }
     }
   }

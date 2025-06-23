@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import { HiddenAmount } from '../../common/components/HiddenAmount';
@@ -177,7 +176,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     ptPrice &&
     atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : new BigNumber(ptPrice))
+      .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
       .toFormat(decimals);
 
   const primaryAda = isPrimary && showingAda;

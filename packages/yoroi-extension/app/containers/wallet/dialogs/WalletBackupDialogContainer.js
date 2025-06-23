@@ -58,7 +58,7 @@ export default class WalletBackupDialogContainer extends Component<{| ...Props, 
         onAcceptTermRecovery={stores.walletBackup.acceptWalletBackupTermRecovery}
         onAddWord={stores.walletBackup.addWordToWalletBackupVerification}
         onClear={stores.walletBackup.clearEnteredRecoveryPhrase}
-        onFinishBackup={stores.substores.ada.wallets.finishWalletBackup}
+        onFinishBackup={stores.substores.ada.mnemonicWalletCreationStore.finishWalletBackup}
         removeWord={() => {
           stores.walletBackup.removeOneMnemonicWord();
         }}

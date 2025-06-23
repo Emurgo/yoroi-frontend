@@ -13,6 +13,8 @@ import { CheckmarkFilled } from './CheckmarkFilled';
 import { CheckmarkOutlined } from './CheckmarkOutlined';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
+import { ChevronLeft } from './ChevronLeft';
+import { ChevronRight } from './ChevronRight';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
 import { CloseCircleIcon } from './CloseCircleIcon';
@@ -88,6 +90,8 @@ import { VisibilityOn } from './VisibilityOn';
 import { Voting } from './Voting';
 import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
+import { Refresh } from './Refresh';
+import { Swap } from './Swap';
 
 export const Icon = {
   Assets,
@@ -102,6 +106,8 @@ export const Icon = {
   CheckmarkOutlined,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   ChipArrowDown,
   ChipArrowUp,
   CloseCircleIcon,
@@ -145,6 +151,7 @@ export const Icon = {
   QuestionCircle,
   Receive,
   Reporting,
+  Refresh,
   Sandbox,
   Script,
   Search,
@@ -178,6 +185,7 @@ export const Icon = {
   Voting,
   Wallet,
   Wallets,
+  Swap,
 };
 
 export enum Icons {
@@ -193,6 +201,8 @@ export enum Icons {
   CheckmarkOutlined = 'CheckmarkOutlined',
   ChevronDown = 'ChevronDown',
   ChevronUp = 'ChevronUp',
+  ChevronLeft = 'ChevronLeft',
+  ChevronRight = 'ChevronRight',
   ChipArrowDown = 'ChipArrowDown',
   ChipArrowUp = 'ChipArrowUp',
   CloseCircleIcon = 'CloseCircleIcon',
@@ -216,6 +226,7 @@ export enum Icons {
   GridDefault = 'GridDefault',
   GridDense = 'GridDense',
   Image = 'Image',
+  Indicator = 'Indicator',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
   LastSeen = 'LastSeen',
@@ -237,6 +248,7 @@ export enum Icons {
   QuestionCircle = 'QuestionCircle',
   Receive = 'Receive',
   Reporting = 'Reporting',
+  Refresh = 'Refresh',
   Sandbox = 'Sandbox',
   Script = 'Script',
   Search = 'Search',
@@ -265,6 +277,7 @@ export enum Icons {
   Voting = 'Voting',
   Wallet = 'Wallet',
   Wallets = 'Wallets',
+  Swap = 'Swap',
 }
 
 interface IconWrapperProps {

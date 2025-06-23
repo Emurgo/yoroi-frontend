@@ -2,12 +2,12 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import Dialog from '../../widgets/Dialog';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat, $npm$ReactIntl$MessageDescriptor } from 'react-intl';
+import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import { Typography } from '@mui/material';
 import Select from '../../common/Select';
 import { MenuItemStyled } from '../../common/commonStyles/MenuItemStyled';
@@ -43,21 +43,18 @@ type Props = {|
 
 @observer
 export default class Switch extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       selectedNetwork: {
-        label: this.context.intl.formatMessage(messages.selectLabel),
+        label: this.context.formatMessage(messages.selectLabel),
         value: this.props.currentNetworkId,
       },
     },
   });
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onCancel, onApply, networks } = this.props;
     const baseComponentPath = 'switchNetworkDialog';
 
