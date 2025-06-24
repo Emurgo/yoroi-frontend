@@ -108,7 +108,7 @@ export default class NftGalleryTab extends WalletCommonBase {
       quarterSecond
     );
     const searchIsDisplayedPromise = this.customWaitIsPresented(
-      this.nftsCountTextLocator,
+      this.searchInputLocator,
       fiveSeconds,
       quarterSecond
     );
