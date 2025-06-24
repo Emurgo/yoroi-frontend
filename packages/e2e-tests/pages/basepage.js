@@ -510,7 +510,11 @@ class BasePage {
       return false;
     }
   }
-  // The method is for debugging
+  /**
+   * Highlighting the web element with red border and yellow backgorund.
+   * !!IT IS ONLY FOR DEBUGGING!!
+   * @param {WebElement} webElement
+   */
   async highlightElement(webElement) {
     this.logger.info(
       `Webdriver::highlightElement: Highlighting element "${JSON.stringify(webElement)}"`
@@ -802,6 +806,26 @@ class BasePage {
       height: rect.height,
       width: rect.width,
     };
+  }
+
+  /**
+   * Reading a buffer info
+   * @returns {Promise<string>}
+   */
+  async getClipboardData() {
+    // Используйте executeAsyncScript для асинхронного чтения буфера
+    this.logger.info(`BasePage::getClipboardData is called.`);
+    const clipboardText = await this.driver.executeAsyncScript(async callback => {
+      try {
+        const text = await navigator.clipboard.readText();
+        callback(text);
+      } catch (error) {
+        console.error('Failed to read clipboard:', error);
+        callback(null);
+      }
+    });
+    this.logger.info(`BasePage::getClipboardData is called. Result: ${clipboardText}`);
+    return clipboardText;
   }
 }
 
