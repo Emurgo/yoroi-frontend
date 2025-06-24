@@ -17,6 +17,7 @@ import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
 import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
 import type { StoresMap } from '../../../stores';
+import environment from '../../../environment';
 
 const messages = defineMessages({
   invalidPoolId: {
@@ -60,7 +61,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -105,6 +106,8 @@ export default class DelegationSendForm extends Component<Props> {
 
     const poolIdField = form.$('poolId');
 
+    const isDevTestOrNightly = environment.isDev() || environment.isTest() || environment.isNightly();
+
     const pendingTxWarningComponent = (
       <div className={styles.warningBox}>
         <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
@@ -112,7 +115,7 @@ export default class DelegationSendForm extends Component<Props> {
     );
 
     const poolQueryError =
-      this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
+      this.props.poolQueryError !== null && !isDevTestOrNightly ? intl.formatMessage(this.props.poolQueryError) : null;
 
     return (
       <Box className={styles.component}>
