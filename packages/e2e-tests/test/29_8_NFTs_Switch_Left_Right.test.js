@@ -49,7 +49,8 @@ describe('Switch between NFTs', function () {
     const nextNftName = await nftDetailsPage.getName();
     expect(nextNftName !== testNFT.name, 'The same name is displayed').to.be.true;
     const nextNftFingerprint = await nftDetailsPage.getFingerprint();
-    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be.true;
+    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be
+      .true;
   });
 
   it('Switch left', async function () {
@@ -69,7 +70,8 @@ describe('Switch between NFTs', function () {
     const nextNftName = await nftDetailsPage.getName();
     expect(nextNftName !== testNFT.name, 'The same name is displayed').to.be.true;
     const nextNftFingerprint = await nftDetailsPage.getFingerprint();
-    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be.true;
+    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be
+      .true;
   });
 
   afterEach(async function () {
