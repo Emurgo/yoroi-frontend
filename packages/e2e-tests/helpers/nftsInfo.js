@@ -6,9 +6,9 @@ export const NFT1 = Object.freeze({
   src: 'ipfs://QmegAgSKuyJVLZSkkGcELDBXjpny9fMYoArNVL7NFdj3FV',
 });
 export const NFT2 = Object.freeze({
-  title: 'Ub2AdaGang180',
+  name: 'Ub2AdaGang180',
   description:
-    '{\\n Artist: "Ugly Bros",\\n Collection: "Ugly Bros 2 ADA Gang",\\n ID: "180",\n Type: "Atlantic",\\n Variation: "Astronaut",\\n character: "Roll"}',
+    '{\\n Artist: "Ugly Bros",\\n Collection: "Ugly Bros 2 ADA Gang",\\n ID: "180",\\n Type: "Atlantic",\\n Variation: "Astronaut",\\n character: "Roll"}',
   fingerprint: 'asset1htswaqwf4077hff5p0xdtxf5zjjf6rzwuzn50s',
   policyId: '6af53d37a0fc0e8cf39f481d8edc014f779493d9b0b91c38afc3a39e',
   src: 'ipfs://QmUQ8Dmiep2jar4fhMnuGrv3TyNq4MFpZ3qvEafm7oFWsG',
