@@ -80,8 +80,8 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   overviewExplorerLinkLocator = {
-    locator: '#nftDetails:overview-explorer-link > a',
-    method: 'css',
+    locator: 'nftDetails:overview-explorer-link',
+    method: 'id',
   };
   /**@type {ElementLocator} */
   metadataCopyBtnLocator = {
@@ -228,6 +228,16 @@ export default class NftDetails extends WalletCommonBase {
         fingerprint,
         policyId
     }
+  }
+  /**
+   * Getting the explorer URL
+   * @returns {Promise<string>}
+   */
+  async getExplorerLink() {
+    this.logger.info(`NftDetails::getExplorerLink is called`);
+    const linkText = await this.getLinkFromComponent(this.overviewExplorerLinkLocator)
+    this.logger.info(`NftDetails::getExplorerLink. Result: ${linkText}`);
+    return linkText;
   }
   /**
    * Copying a nft metadata by pressing the copy button
