@@ -34,6 +34,7 @@ type Props = {|
   +poolName: string,
   +selectedPoolId: ?string,
   +stores: StoresMap,
+  +isTestnet: boolean,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -106,8 +107,6 @@ export default class DelegationSendForm extends Component<Props> {
 
     const poolIdField = form.$('poolId');
 
-    const isDevTestOrNightly = environment.isDev() || environment.isTest() || environment.isNightly();
-
     const pendingTxWarningComponent = (
       <div className={styles.warningBox}>
         <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
@@ -115,7 +114,7 @@ export default class DelegationSendForm extends Component<Props> {
     );
 
     const poolQueryError =
-      this.props.poolQueryError !== null && !isDevTestOrNightly ? intl.formatMessage(this.props.poolQueryError) : null;
+      this.props.poolQueryError !== null && !this.props.isTestnet ? intl.formatMessage(this.props.poolQueryError) : null;
 
     return (
       <Box className={styles.component}>
