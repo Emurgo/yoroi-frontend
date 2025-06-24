@@ -47,13 +47,21 @@ describe('Check the Overview tab', function () {
     await nftDetailsPage.selectOverview();
 
     const displayedNftName = await nftDetailsPage.getName();
-    expect(displayedNftName, 'A wrong name is displayed on NFT details page').to.equal(testNFT.name);
+    expect(displayedNftName, 'A wrong name is displayed on NFT details page').to.equal(
+      testNFT.name
+    );
     const nftDescription = await nftDetailsPage.getDescription();
-    expect(nftDescription, 'A wrong description is displayed on NFT details page').to.equal(testNFT.description);
+    expect(nftDescription, 'A wrong description is displayed on NFT details page').to.equal(
+      testNFT.description
+    );
     const nftFingerprint = await nftDetailsPage.getFingerprint();
-    expect(nftFingerprint, 'A wrong fingerprint is displayed on NFT details page').to.equal(testNFT.fingerprint);
+    expect(nftFingerprint, 'A wrong fingerprint is displayed on NFT details page').to.equal(
+      testNFT.fingerprint
+    );
     const nftPolicyId = await nftDetailsPage.getPolicyId();
-    expect(nftPolicyId, 'A wrong policyId is displayed on NFT details page').to.equal(testNFT.policyId);
+    expect(nftPolicyId, 'A wrong policyId is displayed on NFT details page').to.equal(
+      testNFT.policyId
+    );
   });
 
   it('Check copying fingerprint', async function () {
@@ -61,7 +69,9 @@ describe('Check the Overview tab', function () {
     await nftDetailsPage.selectOverview();
     await nftDetailsPage.copyFingerprint();
     const copiedFingerprint = await nftDetailsPage.getClipboardData();
-    expect(copiedFingerprint, 'A wrong fingerprint is copied on NFT details page').to.equal(testNFT.fingerprint);
+    expect(copiedFingerprint, 'A wrong fingerprint is copied on NFT details page').to.equal(
+      testNFT.fingerprint
+    );
   });
 
   it('Check copying policyId', async function () {
@@ -69,7 +79,9 @@ describe('Check the Overview tab', function () {
     await nftDetailsPage.selectOverview();
     await nftDetailsPage.copyPolicyId();
     const copiedPolicyId = await nftDetailsPage.getClipboardData();
-    expect(copiedPolicyId, 'A wrong policyId is copied on NFT details page').to.equal(testNFT.policyId);
+    expect(copiedPolicyId, 'A wrong policyId is copied on NFT details page').to.equal(
+      testNFT.policyId
+    );
   });
 
   it('Check explorer URL', async function () {
@@ -82,7 +94,6 @@ describe('Check the Overview tab', function () {
     const combinedPolicyAndName = testNFT.policyId + testNFT.nameHex;
     expect(policyAndName, 'Wrong NFT link is displayed').to.equal(combinedPolicyAndName);
   });
-
 
   afterEach(async function () {
     customAfterEach(this, webdriver, logger);
