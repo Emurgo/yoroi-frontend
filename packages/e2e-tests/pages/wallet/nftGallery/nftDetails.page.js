@@ -15,8 +15,23 @@ export default class NftDetails extends WalletCommonBase {
     method: 'id',
   };
   /**@type {ElementLocator} */
+  nftImageBoxLocator = {
+    locator: 'nftDetails-image-box',
+    method: 'id',
+  };
+  /**@type {ElementLocator} */
+  nftImageZoomedBoxLocator = {
+    locator: 'nftDetails:zoomed-image-box',
+    method: 'id',
+  };
+  /**@type {ElementLocator} */
   nftImageLocator = {
     locator: 'nftDetails-image-component',
+    method: 'id',
+  };
+  /**@type {ElementLocator} */
+  nftImageZoomedLocator = {
+    locator: 'nftDetails:zoomed-image-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -223,11 +238,11 @@ export default class NftDetails extends WalletCommonBase {
     const fingerprint = await this.getFingerprint();
     const policyId = await this.getPolicyId();
     return {
-        author,
-        description,
-        fingerprint,
-        policyId
-    }
+      author,
+      description,
+      fingerprint,
+      policyId,
+    };
   }
   /**
    * Getting the explorer URL
@@ -235,7 +250,7 @@ export default class NftDetails extends WalletCommonBase {
    */
   async getExplorerLink() {
     this.logger.info(`NftDetails::getExplorerLink is called`);
-    const linkText = await this.getLinkFromComponent(this.overviewExplorerLinkLocator)
+    const linkText = await this.getLinkFromComponent(this.overviewExplorerLinkLocator);
     this.logger.info(`NftDetails::getExplorerLink. Result: ${linkText}`);
     return linkText;
   }
@@ -253,5 +268,36 @@ export default class NftDetails extends WalletCommonBase {
   async getMetadata() {
     this.logger.info(`NftDetails::getMetadata is called`);
     return await this.getText(this.metadataInfoTextLocator);
+  }
+  /**
+   * Getting the NFT image link
+   * @returns {Promise<string>}
+   */
+  async getImageLink() {
+    this.logger.info(`NftDetails::getImageLink is called`);
+    const result = await this.getAttribute(this.nftImageLocator, 'src');
+    this.logger.info(`NftGalleryTab::getImageLink. Result: ${result}`);
+    return result;
+  }
+  /**
+   * Zooming the image
+   */
+  async zoomImage() {
+    this.logger.info(`NftDetails::zoomImage is called`);
+    await this.click(this.nftImageBoxLocator);
+  }
+  /**
+   * Getting the zoomed NFT image link
+   * @returns {Promise<string>}
+   */
+  async getZoomedImageLink() {
+    this.logger.info(`NftDetails::getZoomedImageLink is called`);
+    const result = await this.getAttribute(this.nftImageZoomedLocator, 'src');
+    this.logger.info(`NftGalleryTab::getZoomedImageLink. Result: ${result}`);
+    return result;
+  }
+  async unzoomImage() {
+    this.logger.info(`NftDetails::unzoomImage is called`);
+    await this.click(this.nftImageZoomedBoxLocator);
   }
 }
