@@ -226,6 +226,7 @@ export default class NftGalleryTab extends WalletCommonBase {
     this.logger.info(`NftGalleryTab::clearSearch is called.`);
     await this.waitPresentedAndAct(this.clearSearchBtnLocator, async () => {
       await this.click(this.clearSearchBtnLocator);
+      await this.sleep(quarterSecond);
     });
   }
   async _getAllNfts() {
