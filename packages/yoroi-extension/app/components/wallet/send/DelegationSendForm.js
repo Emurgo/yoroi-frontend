@@ -17,7 +17,6 @@ import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import { bytesToHex } from '../../../coreUtils';
 import { DelegateButton } from '../staking/dashboard-revamp/DelegateButton';
 import type { StoresMap } from '../../../stores';
-import environment from '../../../environment';
 
 const messages = defineMessages({
   invalidPoolId: {
