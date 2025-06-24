@@ -68,7 +68,7 @@
 
 ## 12. 委任とステーキング
 
-12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+12.1 **報酬** ユーザーが委任により獲得できる報酬額は、ユーザーの参加、ステークプールの利鞘、委任されるADAの量などに様々な要素によって決まります。上記の諸要素により、ユーザーが委任により報酬を得られない可能性もあります。報酬は、Cardanoブロックチェーンの第三エポックの開始以降発生します。
 
 12.2 **委任** ユーザーは、そのステークを当社の複数のステークプールの一つまたは第三者のステークプールに委任することができます。ユーザーは、ステークプールへ委任する量を決定する単独の権利を持ち、随時その参加レベルを上昇・下降させることができます。当社が共有するパフォーマンスメトリクスおよび報酬を含むステークプールに関するあらゆる情報は参考目的であり、正確ではありません。ユーザーは、設定プロセスの時点で更新済みのDaedalusまたは更新済みのYoroiウォレットにADAを保有している場合にのみ自身のステークをステークプールに委任することができます。ユーザーは、そのステークを委任する結果として報酬を得るいかなる権利も自動的に得られるものではありません。
 
