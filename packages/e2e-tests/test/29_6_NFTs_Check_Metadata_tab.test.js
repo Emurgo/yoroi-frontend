@@ -48,7 +48,6 @@ describe('Check the Metadata tab', function () {
     await nftDetailsPage.selectMetadata();
     const displayedMetadata = await nftDetailsPage.getMetadata();
     const parsedMetadata = parseNftMetadata(displayedMetadata, testNFT.policyId, testNFT.name);
-
     expect(parsedMetadata.description, 'Incorrect description in metadata').to.equal(
       testNFT.description
     );

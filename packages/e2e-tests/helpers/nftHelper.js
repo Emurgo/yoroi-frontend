@@ -8,8 +8,13 @@
 export const parseNftMetadata = (metadata, tokenPolicyId, tokenName) => {
   const metadataObj = JSON.parse(metadata);
   const metadataInfo = metadataObj['721'][tokenPolicyId][tokenName];
+  let description = metadataInfo.description;
+  if (typeof metadataInfo.description === 'object' && metadataInfo.description.length !== 0) {
+    // JSON.parse adds additional whitespaces when parses the NFT2
+    description = metadataInfo.description.join('').split('         ').join('');
+  }
   return {
-    description: metadataInfo.description,
+    description,
     image: metadataInfo.image,
     mediaType: metadataInfo.mediaType,
     name: metadataInfo.name,
