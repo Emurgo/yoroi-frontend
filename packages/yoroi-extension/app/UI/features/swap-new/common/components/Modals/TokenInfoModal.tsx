@@ -6,7 +6,6 @@ import { truncateAddressShort } from '../../../../../../utils/formatters';
 import { useSwapRevamp } from '../../../module/SwapContextProvider';
 
 const TokenInfoModal = ({ token }) => {
-  console.log('token', token);
   const isPrimary = isPrimaryToken(token.id);
   const { explorer } = useSwapRevamp();
   return (

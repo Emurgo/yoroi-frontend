@@ -47,7 +47,6 @@ export const SelectAssetFrom = () => {
   const { ftAssetList, primaryTokenInfo, swapForm } = useSwapRevamp();
   const { currency } = useCurrencyPairing();
   const { closeModal } = useModal();
-  // console.log('useCurrencyPairing', currency);
 
   const {
     tokenActivity: { data24h },
