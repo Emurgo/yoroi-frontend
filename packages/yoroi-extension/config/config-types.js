@@ -6,6 +6,7 @@ export type ConfigType = {|
   app: AppConfigType,
   bring: BringConfigType,
   bringSandbox: BringConfigType,
+  fcm: FCMConfig,
 |};
 
 export type BringConfigType = {|
@@ -53,3 +54,13 @@ export const NetworkType: {|
   MAINNET: 'mainnet',
   TEST: 'test',
 };
+
+type FCMConfig = {|
+  apiKey: string,
+  authDomain: string,
+  projectId: string,
+  storageBucket: string,
+  messagingSenderId: string,
+  appId: string,
+|};
+

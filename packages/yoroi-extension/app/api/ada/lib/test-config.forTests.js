@@ -31,6 +31,14 @@ const CONFIG: ConfigType = {
     identifier: '',
     apiEndpoint: ''
   },
+  fcm: {
+    apiKey: '',
+    authDomain: '',
+    projectId: '',
+    storageBucket: '',
+    messagingSenderId: '',
+    appId: '',
+  },
 };
 
 global.CONFIG = CONFIG;
