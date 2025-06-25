@@ -55,7 +55,7 @@ export const NFT6 = Object.freeze({
   src: 'ipfs://QmVpCYBbFYbUXVqYA76ceXbree9LY8XQ7aUKd2fp5THm7x',
 });
 export const NFT7 = Object.freeze({
-  name: 'TestYoroiNFTDaVinci',
+  name: 'DaVinci',
   nameHex: '54657374596f726f694e4654446156696e6369',
   description: 'Upside-down DaVinci',
   fingerprint: 'asset1jlxwnwgj0vj88m4ks8zhs4p78mg4vje69ad623',
