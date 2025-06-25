@@ -57,7 +57,7 @@ export const PasswordInput = ({ id, label, onChange, value, error, disabled, hel
         error={error}
       />
       {error && (
-        <FormHelperText error id="labe-error">
+        <FormHelperText error id="password-errorMessage-text">
           {helperText}
         </FormHelperText>
       )}
