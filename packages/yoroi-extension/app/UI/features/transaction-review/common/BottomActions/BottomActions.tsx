@@ -36,6 +36,8 @@ export const BottomActions = () => {
           sx={{ width: '100%' }}
           onClick={async () => {
             const response = await checkUserPassword(passswordInput);
+            // Do this for YOEXT-1950
+            console.log(response);
             if (response?.name === 'WrongPassphraseError') {
               console.log('WrongPassphraseError', response);
               setInputError({ type: 'setInputError', inputError: true });
