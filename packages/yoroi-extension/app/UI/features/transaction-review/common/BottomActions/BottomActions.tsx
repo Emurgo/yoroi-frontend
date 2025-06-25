@@ -2,6 +2,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack } from '@mui/material';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../hooks/useStrings';
+import { WrongPassphraseError } from '../../../../../../app/api/ada/lib/cardanoCrypto/cryptoErrors.js';
 
 export const BottomActions = () => {
   const strings = useStrings();
@@ -36,9 +37,7 @@ export const BottomActions = () => {
           sx={{ width: '100%' }}
           onClick={async () => {
             const response = await checkUserPassword(passswordInput);
-            // Do this for YOEXT-1950
-            console.log(response);
-            if (response?.name === 'WrongPassphraseError') {
+            if (response instanceof WrongPassphraseError) {
               console.log('WrongPassphraseError', response);
               setInputError({ type: 'setInputError', inputError: true });
             } else {
