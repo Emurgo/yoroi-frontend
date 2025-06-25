@@ -63,7 +63,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     tokenManager,
     primaryTokenInfo,
     networkId: Chain.Network.Mainnet,
-    excludedTokens: excludedTokens.concat(ftAssetList.map(asset => asset.info.id)),
+    excludedTokens: excludedTokens,
   });
 
   const context: any = useMemo(

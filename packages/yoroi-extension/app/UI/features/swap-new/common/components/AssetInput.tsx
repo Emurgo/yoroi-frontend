@@ -100,9 +100,8 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
             }}
             sx={{ cursor: 'pointer' }}
           >
-            {/* <TokenIcon tokenId={tokenIconId} /> */}
             <TokenInfoIcon
-              info={{ id: tokenInput.tokenId, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
+              info={{ id: tokenInputInfo?.id, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
               size="md"
             />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm} inline>
