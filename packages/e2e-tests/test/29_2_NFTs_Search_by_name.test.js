@@ -17,7 +17,7 @@ describe('Search NFTs by name', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
-  const testNFTName = getRandomItem(testWalletNFTsAllNfts).name;
+  const testNFTName = getRandomItem(testWalletNFTsAllNfts).title;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
