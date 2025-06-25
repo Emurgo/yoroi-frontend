@@ -45,7 +45,7 @@ const DappCenterDashboard = observer(() => {
       direction="column"
       alignItems="center"
       justifyContent="center"
-      spacing={theme.spacing(3)}
+      spacing={theme.spacing(24)}
       sx={{ minHeight: 'calc(100vh - 220px)' }}
     >
       <NoDappsConnected />

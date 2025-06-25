@@ -10,7 +10,7 @@ interface Props {
   onRequestSort: (id: string) => void;
 }
 
-const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): JSX.Element => {
+const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): React.ReactNode => {
   const theme = useTheme();
 
   return (
@@ -25,11 +25,11 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
       <TableRow>
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
-            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(2)}` }}>
+            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(14)}` }}>
               <Stack
                 direction="row"
                 alignItems="center"
-                spacing={theme.spacing(1)}
+                spacing={theme.spacing(8)}
                 onClick={() => (isPadding ? null : disabledSort ? null : onRequestSort(id))}
                 // @ts-ignore
                 sx={{

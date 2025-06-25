@@ -24,7 +24,7 @@ interface Props {
 }
 
 const TokenDetails = observer(
-  ({ tokenInfo, stores }: Props): JSX.Element => {
+  ({ tokenInfo, stores }: Props): React.ReactNode => {
     const theme: any = useTheme();
     const navigateTo = useNavigateTo();
     const strings = useStrings();
@@ -34,15 +34,15 @@ const TokenDetails = observer(
       <Box sx={{ width: '100%' }}>
         <Header>
           <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
-          <Stack direction="row" spacing={theme.spacing(2)}>
+          <Stack direction="row" spacing={theme.spacing(16)}>
             <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
             <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
             <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
           </Stack>
         </Header>
 
-        <Stack direction="column" spacing={theme.spacing(3)} sx={{ marginTop: theme.spacing(2) }}>
-          <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(3)}>
+        <Stack direction="column" spacing={theme.spacing(24)} sx={{ marginTop: theme.spacing(16) }}>
+          <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(24)}>
             <Card>
               <HeaderSection tokenInfo={tokenInfo} stores={stores} />
               <Divider />
