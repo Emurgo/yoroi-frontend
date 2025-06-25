@@ -82,7 +82,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    console.log('value', value);
+    console.log('[handleInputChange]', value);
   };
 
   return (
