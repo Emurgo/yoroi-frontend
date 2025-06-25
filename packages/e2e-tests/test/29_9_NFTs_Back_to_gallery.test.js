@@ -1,6 +1,7 @@
+import { describe, it } from 'mocha';
 import { customAfterEach } from '../utils/customHooks.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../utils/utils.js';
+import { getRandomItem, getTestLogger } from '../utils/utils.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
@@ -10,14 +11,15 @@ import BasePage from '../pages/basepage.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
+import NftDetails from '../pages/wallet/nftGallery/nftDetails.page.js';
 
-describe('Counting shown NFTs', function () {
+describe('Return to Gallery', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
-  const expectedNFTsAmount = testWalletNFTsAllNfts.length;
+  const testNFT = getRandomItem(testWalletNFTsAllNfts);
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
@@ -33,18 +35,19 @@ describe('Counting shown NFTs', function () {
     expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
-  it('Check number in the title', async function () {
+  it('Select NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const numberInTitle = await nftsMainPage.getNftsAmountFromTitle();
-    expect(numberInTitle, 'Different number of NFTs in title').to.equal(expectedNFTsAmount);
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
+    const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
+    expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });
 
-  it('Check number of displayed NFTs', async function () {
+  it('Back to gallery', async function () {
+    const nftDetailsPage = new NftDetails(webdriver, logger);
+    await nftDetailsPage.backToNftsGallery();
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      expectedNFTsAmount
-    );
+    const nftsPageIsDisplayed = await nftsMainPage.isDisplayed();
+    expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
   afterEach(async function () {
