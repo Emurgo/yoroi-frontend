@@ -813,7 +813,6 @@ class BasePage {
    * @returns {Promise<string>}
    */
   async getClipboardData() {
-    // Используйте executeAsyncScript для асинхронного чтения буфера
     this.logger.info(`BasePage::getClipboardData is called.`);
     const clipboardText = await this.driver.executeAsyncScript(async callback => {
       try {
