@@ -9,15 +9,16 @@ import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import BasePage from '../pages/basepage.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
+import { getTestString } from '../helpers/constants.js';
 import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
 
-describe('Counting shown NFTs', function () {
+describe('Search NFTs no matches', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
-  const expectedNFTsAmount = testWalletNFTsAllNfts.length;
+  const randomStr = getTestString('', 10, true);
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
@@ -33,17 +34,31 @@ describe('Counting shown NFTs', function () {
     expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
-  it('Check number in the title', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const numberInTitle = await nftsMainPage.getNftsAmountFromTitle();
-    expect(numberInTitle, 'Different number of NFTs in title').to.equal(expectedNFTsAmount);
-  });
-
   it('Check number of displayed NFTs', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
     expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      expectedNFTsAmount
+      testWalletNFTsAllNfts.length
+    );
+  });
+
+  it('Search for NFT by random value', async function () {
+    const nftsMainPage = new NftGalleryTab(webdriver, logger);
+    await nftsMainPage.search(randomStr);
+  });
+
+  it('Check search result', async function () {
+    const nftsMainPage = new NftGalleryTab(webdriver, logger);
+    const notFoundIsDisplayed = await nftsMainPage.noNftsAreFoundIsDisplayed();
+    expect(notFoundIsDisplayed, 'The message "NFTs not found" is not dispayed').to.be.true;
+  });
+
+  it('Clean the search', async function () {
+    const nftsMainPage = new NftGalleryTab(webdriver, logger);
+    await nftsMainPage.clearSearch();
+    const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
+      testWalletNFTsAllNfts.length
     );
   });
 
