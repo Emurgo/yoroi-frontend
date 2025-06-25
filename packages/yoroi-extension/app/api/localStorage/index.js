@@ -73,6 +73,7 @@ type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 export type PushNotificationMetadata = {|
   duration?: number,
   isEnabled?: boolean,
+  fcmToken?: string,
 |};
 /**
  * This api layer provides access to the electron local storage

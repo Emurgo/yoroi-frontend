@@ -3,21 +3,14 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import { observable, runInAction, } from 'mobx';
 import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
+import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken } from "firebase/messaging";
 
 const localStorageApi = new LocalStorageApi();
 
 const DEFAULT_DURATION = 4;
 
 const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
-
-export type PushSubscription = {|
-  endpoint: string,
-  expirationTime: null | DOMHighResTimeStamp,
-  keys: {|
-    p256dh: string,
-    auth: string,
-  |},
-|}
 
 export default class PushNotificationStore<
   StoresMapType: {
@@ -29,7 +22,6 @@ export default class PushNotificationStore<
   },
 > extends Store<StoresMapType> {
   @observable metadata: PushNotificationMetadata | null = null;
-  @observable subscription: PushSubscription | null = null;
 
   setup(): void {
     this.stores.loading.registerBlockingLoadingRequest((async () => {
@@ -41,33 +33,6 @@ export default class PushNotificationStore<
         this._enableNotifications();
       }
     })(), 'load push notification metadata');
-
-    (async () => {
-      if (environment.isDev() || environment.isNightly()) {
-        const result = await Notification.requestPermission();
-        if (result === 'denied') {
-          // todo: save and don't ask again
-          return;
-        }
-        if (result === 'granted') {
-          console.info('The user accepted the permission request.');
-        }
-        const registration = await navigator.serviceWorker?.getRegistration();
-        if (!registration) {
-          throw new Error('unexpectedly missing service worker registration');
-        }
-        let subscription  = await registration.pushManager.getSubscription();
-        if (!subscription) {
-          subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
-          });
-        }
-        runInAction(() => { this.subscription = JSON.parse(JSON.stringify(subscription)); });
-      }
-    })().catch(error => {
-      console.error('error when setting up push', error);
-    })
   }
 
   get duration(): number {
@@ -113,10 +78,33 @@ export default class PushNotificationStore<
     }
   }
 
-  _enableNotifications(): void {
+  async _enableNotifications(): Promise<void> {
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCzwU3ybOxkhW2sWTiryF4CYxwh2lxvZSM',
+      authDomain: 'yoroi-extension-14826.firebaseapp.com',
+      projectId: 'yoroi-extension-14826',
+      storageBucket: 'yoroi-extension-14826.firebasestorage.app',
+      messagingSenderId: '290850618958',
+      appId: '1:290850618958:web:8bd5fa25dc80522b9acd1f'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const token = await getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY });
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    runInAction(() => {
+      this.metadata.fcmToken = token;
+    });
+    localStorageApi.savePushNotificationMetadata(this.metadata);
   }
 
   _disableNotifications(): void {
+  }
+
+  get fcmToken(): ?string {
+    return this.metadata?.fcmToken;
   }
 }
 
