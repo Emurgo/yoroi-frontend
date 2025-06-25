@@ -38,7 +38,6 @@ export const BottomActions = () => {
           onClick={async () => {
             const response = await checkUserPassword(passswordInput);
             if (response instanceof WrongPassphraseError) {
-              console.log('WrongPassphraseError', response);
               setInputError({ type: 'setInputError', inputError: true });
             } else {
               submitTx(passswordInput);
