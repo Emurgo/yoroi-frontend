@@ -216,10 +216,9 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
     const primaryTokenInfo = networkConfigs[networkId].primaryTokenInfo;
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(selectedWallet);
 
-    const getRewardAmountArray = token => {
+    const getRewardAmount = token => {
       return maybe(token, t => formatTokenEntry(t.getDefaultEntry(), getTokenInfo));
     };
-    const stakingRewardsArray = getRewardAmountArray(delegatedRewards);
 
     return {
       currentPool: walletCurrentPoolInfo,
@@ -247,7 +246,7 @@ export const createCurrrentWalletInfo = (stores: any): CurrentWalletType | undef
       selectedExplorer: selectedExplorer,
       walletType: selectedWallet.type,
       isStakeRegistered,
-      stakingRewards: combineStringsToDecimal(stakingRewardsArray),
+      stakingRewards: getRewardAmount(delegatedRewards),
     };
   } catch (error) {
     console.warn('ERROR trying to create wallet info', error);
@@ -304,26 +303,10 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
       metadataValues.description = info.desc;
     }
   }
-
   return metadataValues;
 };
 
 const formatTokenEntry = (tokenEntry, getTokenInfo) => {
   const tokenInfo = getTokenInfo(tokenEntry);
-  const splitAmountValue = tokenEntry.amount
-    .shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
-    .toFormat(tokenInfo.Metadata.numberOfDecimals)
-    .split('.');
-  return splitAmountValue;
-};
-
-export const combineStringsToDecimal = (array: [number, number]): BigNumber => {
-  const [integerPart, decimalPart] = array;
-
-  const intStr = integerPart.toString();
-  const decStr = decimalPart.toString();
-
-  const combined = `${intStr}.${decStr}`;
-
-  return new BigNumber(combined);
+  return tokenEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 };

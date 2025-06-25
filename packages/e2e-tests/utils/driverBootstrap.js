@@ -79,8 +79,14 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .addArguments('--remote-debugging-pipe')
-    .setUserPreferences({ 'download.default_directory': downloadsDir })
-    .addArguments('disable-infobars');
+    .setUserPreferences({
+      'download.default_directory': downloadsDir,
+      'profile.content_settings.exceptions.clipboard': {
+        '*': { last_modified: Date.now(), setting: 1 },
+      },
+    })
+    .addArguments('disable-infobars')
+    .addArguments('--enable-clipboard');
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
   }
