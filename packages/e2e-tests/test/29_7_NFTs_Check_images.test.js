@@ -39,7 +39,7 @@ describe('Check the NFT image links', function () {
 
   it('Get NFT image link by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const nftImageLink = await nftsMainPage.getImageLinkByName(testNFT.name);
+    const nftImageLink = await nftsMainPage.getImageLinkByName(testNFT.title);
     const compareResult = isImageIdsSame(nftImageLink, testNFT.src);
     expect(compareResult, 'Image Id is different from the expected').to.be.true;
     initialImageLink = nftImageLink;
@@ -47,7 +47,7 @@ describe('Check the NFT image links', function () {
 
   it('Check image link on NFT Details', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.name);
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
     const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
     expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
     const nftDetailsImageLink = await nftDetailsPage.getImageLink();

@@ -37,7 +37,7 @@ describe('Return to Gallery', function () {
 
   it('Select NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.name);
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
     const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
     expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });

@@ -37,7 +37,7 @@ describe('Check the Overview tab', function () {
 
   it('Select NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.name);
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
     const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
     expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });
@@ -48,7 +48,7 @@ describe('Check the Overview tab', function () {
 
     const displayedNftName = await nftDetailsPage.getName();
     expect(displayedNftName, 'A wrong name is displayed on NFT details page').to.equal(
-      testNFT.name
+      testNFT.title
     );
     const nftDescription = await nftDetailsPage.getDescription();
     expect(nftDescription, 'A wrong description is displayed on NFT details page').to.equal(

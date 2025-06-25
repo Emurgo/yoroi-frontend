@@ -37,7 +37,7 @@ describe('Switch between NFTs', function () {
 
   it('Select NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.name);
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
     const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
     expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });
@@ -47,7 +47,7 @@ describe('Switch between NFTs', function () {
     await nftDetailsPage.selectOverview();
     await nftDetailsPage.switchToNextNft();
     const nextNftName = await nftDetailsPage.getName();
-    expect(nextNftName !== testNFT.name, 'The same name is displayed').to.be.true;
+    expect(nextNftName !== testNFT.title, 'The same name is displayed').to.be.true;
     const nextNftFingerprint = await nftDetailsPage.getFingerprint();
     expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be
       .true;
@@ -58,7 +58,7 @@ describe('Switch between NFTs', function () {
     await nftDetailsPage.selectOverview();
     await nftDetailsPage.switchToPreviousNft();
     const nftName = await nftDetailsPage.getName();
-    expect(nftName, 'A wrong nft name is displayed').to.equal(testNFT.name);
+    expect(nftName, 'A wrong nft name is displayed').to.equal(testNFT.title);
     const fingerprint = await nftDetailsPage.getFingerprint();
     expect(fingerprint, 'A wrong nft fingerprint is displayed').to.equal(testNFT.fingerprint);
   });
@@ -68,7 +68,7 @@ describe('Switch between NFTs', function () {
     await nftDetailsPage.selectOverview();
     await nftDetailsPage.switchToPreviousNft();
     const nextNftName = await nftDetailsPage.getName();
-    expect(nextNftName !== testNFT.name, 'The same name is displayed').to.be.true;
+    expect(nextNftName !== testNFT.title, 'The same name is displayed').to.be.true;
     const nextNftFingerprint = await nftDetailsPage.getFingerprint();
     expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be
       .true;

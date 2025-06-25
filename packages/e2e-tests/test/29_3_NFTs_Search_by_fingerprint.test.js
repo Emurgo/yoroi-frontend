@@ -51,7 +51,7 @@ describe('Search NFTs by fingerprint', function () {
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
     expect(numberOfDisplayedNFTs, 'Wrong amount of NFTs is displayed').to.equal(1);
     const displayedNFTName = await nftsMainPage.getNftName(0);
-    expect(displayedNFTName, 'A wrong NFT is found').to.equal(testNFT.name);
+    expect(displayedNFTName, 'A wrong NFT is found').to.equal(testNFT.title);
   });
 
   it('Clean the search', async function () {
