@@ -405,6 +405,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 bgcolor: 'transparent',
                 overflow: 'auto',
                 backgroundColor: 'ds.bg_color_max',
+                marginTop: '16px',
+                marginLeft: '24px',
               }}
               value={tabs[1].id}
             >
