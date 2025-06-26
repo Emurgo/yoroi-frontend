@@ -88,7 +88,7 @@ export default function NftDetails() {
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
         <Grid item xs={6}>
-          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={2}>
+          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={16}>
             <Typography variant="h2" id={`${nftPathId}-nftName-text`}>
               {currentNft?.name}
             </Typography>

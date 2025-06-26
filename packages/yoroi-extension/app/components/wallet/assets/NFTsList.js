@@ -99,13 +99,20 @@ function NfTsList({ list, intl }: Props & Intl): Node {
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-        <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px" id={`${componentPathId}-nftsCount-text`}>
+        <Typography
+          component="div"
+          variant="h5"
+          color="ds.el_gray_medium"
+          fontWeight={500}
+          fontSize="18px"
+          id={`${componentPathId}-nftsCount-text`}
+        >
           {list.length === 0
             ? intl.formatMessage(globalMessages.sidebarNfts)
             : intl.formatMessage(messages.nftsCount, { number: list.length })}
         </Typography>
         <Box display="flex" alignItems="center">
-          <Stack direction="row" spacing={1} marginRight="30px">
+          <Stack direction="row" spacing={8} marginRight="30px">
             {listColumnViews.map(({ count, Icon, imageDims }) => (
               <SButton
                 active={count === columns.count}
@@ -148,11 +155,17 @@ function NfTsList({ list, intl }: Props & Intl): Node {
             alignItems: 'center',
             justifyContent: 'center',
           }}
-          spacing={2}
+          spacing={8}
           id={`${componentPathId}-emptyState-component`}
         >
           <NotFound />
-          <Typography component="div" variant="h5" fontWeight={500} color="ds.text_gray_medium" id={`${componentPathId}-noNfts-text`}>
+          <Typography
+            component="div"
+            variant="h5"
+            fontWeight={500}
+            color="ds.text_gray_medium"
+            id={`${componentPathId}-noNfts-text`}
+          >
             {intl.formatMessage(!list.length ? messages.noNFTsAdded : messages.noResultsFound)}
           </Typography>
         </Stack>
@@ -174,7 +187,7 @@ function NfTsList({ list, intl }: Props & Intl): Node {
                     ampli.nftGalleryDetailsPageViewed();
                   }}
                 >
-                  <NftCardImage ipfsUrl={nft.image} name={nft.name} nftPathId={`${componentPathId}:nft_${index}`}/>
+                  <NftCardImage ipfsUrl={nft.image} name={nft.name} nftPathId={`${componentPathId}:nft_${index}`} />
                 </SLink>
               </Grid>
             );
