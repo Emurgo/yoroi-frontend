@@ -28,7 +28,7 @@ const Table = ({
   isLoading,
   TableRowSkeleton,
   children,
-}: Props): JSX.Element => {
+}: Props): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
 
@@ -36,14 +36,12 @@ const Table = ({
     <MuiTable aria-label={`${name} table`}>
       <SortableTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
       <TableBody>
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, index) => cloneElement(TableRowSkeleton, { key: index, theme }))
-          : children}
+        {isLoading ? Array.from({ length: 6 }).map((_, index) => cloneElement(TableRowSkeleton, { key: index })) : children}
       </TableBody>
     </MuiTable>
   ) : (
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+      <Stack direction="column" alignItems="center" spacing={theme.spacing(24)}>
         <Box component="img" src={noResultsPng}></Box>
         <Typography variant="h4" fontWeight="500" color="ds.text_gray_medium" sx={{ lineHeight: '26px' }}>
           {strings.noResultsForThisSearch}

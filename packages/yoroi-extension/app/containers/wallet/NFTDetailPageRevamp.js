@@ -65,7 +65,14 @@ function NFTDetailPageRevamp(props: StoresProps) {
 
   return (
     <Box sx={{ width: '100%', backgroundColor: 'ds.bg_color_max' }}>
-      <NFTDetails nftInfo={nftInfo} network={network} nextNftId={nextNftId} prevNftId={prevNftId} tab={tab} />
+      <NFTDetails
+        nftInfo={nftInfo}
+        network={network}
+        nextNftId={nextNftId}
+        prevNftId={prevNftId}
+        tab={tab}
+        nftsCount={nftsCount}
+      />
     </Box>
   );
 }
