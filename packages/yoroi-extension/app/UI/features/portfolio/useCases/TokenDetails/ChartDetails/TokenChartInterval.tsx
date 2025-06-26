@@ -94,8 +94,8 @@ export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
   return (
     <Stack
       direction="column"
-      spacing={theme.spacing(4)}
-      sx={{ width: '100%', px: theme.spacing(3), pt: theme.spacing(2.5), pb: theme.spacing(3), height: '317px' }}
+      spacing={theme.spacing(32)}
+      sx={{ width: '100%', px: theme.spacing(24), pt: theme.spacing(28), pb: theme.spacing(3), height: '317px' }}
     >
       <TokenMarketPriceOverview
         chartData={chartData}
@@ -158,7 +158,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
           </Box>
         )}
 
-        <Stack direction="row" justifyContent="space-between" sx={{ marginTop: theme.spacing(3) }}>
+        <Stack direction="row" justifyContent="space-between" sx={{ marginTop: theme.spacing(24) }}>
           {Object.keys(TOKEN_CHART_INTERVAL).map(interval => (
             <StyledButton
               key={interval}

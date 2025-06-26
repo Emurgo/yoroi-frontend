@@ -67,7 +67,7 @@ export const ReviewTxSection = () => {
 
   return (
     <Box sx={{ position: 'relative', height: '100vh' }}>
-      <Box sx={{ backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(3) }}>
+      <Box sx={{ backgroundColor: 'ds.bg_color_max', marginX: theme.spacing(24) }}>
         <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
         <Divider />
       </Box>
