@@ -90,7 +90,7 @@ export const ReviewTxSection = () => {
         initialTabId={tabSearchParam}
         tabs={getTabs()}
         pathId={pathId}
-        tabListSx={{ padding: '0 24px 0 24px' }}
+        headerSx={{ mx: '24px' }}
         contentSx={{ padding: 0 }}
       />
     </Box>
