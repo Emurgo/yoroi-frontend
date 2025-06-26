@@ -66,6 +66,37 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens,
   });
 
+  console.log('IN CONTEXT swapManager', swapManager);
+  useEffect(() => {
+    action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
+  }, [swapManager.settings.slippage]);
+
+  const { data: limitOptions } = useQuery(
+    [
+      'useSwapLimitOptions',
+      network,
+      swapManager.settings.routingPreference,
+      state.tokenInInput.tokenId,
+      state.tokenOutInput.tokenId,
+    ],
+    async () => {
+      if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) throw Error();
+
+      const res = await swapManager.api.limitOptions({
+        tokenIn: state.tokenInInput.tokenId,
+        tokenOut: state.tokenOutInput.tokenId,
+      });
+
+      if (isRight(res)) return res.value.data;
+      return undefined;
+    },
+    {
+      enabled:
+        state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
+    }
+  );
+
+
   const context: any = useMemo(
     () => ({
       swapForm: { action, ...state },
