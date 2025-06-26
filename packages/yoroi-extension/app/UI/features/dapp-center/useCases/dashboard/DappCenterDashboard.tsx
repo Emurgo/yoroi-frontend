@@ -63,6 +63,7 @@ const DappCenterDashboard = observer(() => {
           display: 'flex',
           gap: '24px',
           py: '12px',
+          pl: '8px',
           alignItems: 'center',
           borderBottom: '1px solid',
           borderBottomColor: 'ds.gray_200',
@@ -76,7 +77,7 @@ const DappCenterDashboard = observer(() => {
           <Typography variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
         </Box>
       </Box>
-      <Box mt="16px">
+      <Box>
         {cardanoNodes.map((node, entryIndex) => (
           <ConnectionRow key={node.url} id={'walletRow_' + entryIndex} {...node} />
         ))}

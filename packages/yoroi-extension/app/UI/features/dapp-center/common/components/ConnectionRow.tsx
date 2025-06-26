@@ -38,7 +38,6 @@ const ConnectionRow = ({ id, url, image, wallet, balance, tokenName }: Connectio
         alignItems: 'center',
         color: 'ds.gray_800',
         padding: '8px',
-        borderRadius: '8px',
         '&:hover': {
           backgroundColor: 'ds.bg_color_contrast_min',
         },
