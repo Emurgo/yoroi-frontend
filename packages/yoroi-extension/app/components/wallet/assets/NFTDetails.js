@@ -226,7 +226,14 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
             onClick={() => isImageValid && setOpenAndTrack()}
             id={`${nftPathId}-image-box`}
           >
-            <NftImage imageUrl={nftImage} name={nftInfo.name || '-'} width="100%" height="auto" contentHeight="502px" nftPathId={nftPathId} />
+            <NftImage
+              imageUrl={nftImage}
+              name={nftInfo.name || '-'}
+              width="100%"
+              height="auto"
+              contentHeight="502px"
+              nftPathId={nftPathId}
+            />
           </ImageItem>
         </Grid>
 
@@ -332,21 +339,39 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 bgcolor: 'transparent',
                 maxHeight: '400px',
                 overflow: 'auto',
+                marginTop: '16px',
+                marginLeft: '24px',
               }}
               value={tabs[0].id}
             >
               <Stack spacing="24px">
-                <LabelWithValue label={intl.formatMessage(messages.description)} value={nftInfo.description || '-'} pathId={`${nftOverviewPathId}-description-text`}/>
-                <LabelWithValue label={intl.formatMessage(messages.author)} value={nftInfo.author || '-'} pathId={`${nftOverviewPathId}-author-text`}/>
+                <LabelWithValue
+                  label={intl.formatMessage(messages.description)}
+                  value={nftInfo.description || '-'}
+                  pathId={`${nftOverviewPathId}-description-text`}
+                />
+                <LabelWithValue
+                  label={intl.formatMessage(messages.author)}
+                  value={nftInfo.author || '-'}
+                  pathId={`${nftOverviewPathId}-author-text`}
+                />
                 <LabelWithValue
                   label={intl.formatMessage(globalMessages.fingerprint)}
-                  value={<CopyAddress text={nftInfo.id} pathId={`${nftOverviewPathId}:fingerprint`}>{displayAddr(nftInfo.id)}</CopyAddress>}
+                  value={
+                    <CopyAddress text={nftInfo.id} pathId={`${nftOverviewPathId}:fingerprint`}>
+                      {displayAddr(nftInfo.id)}
+                    </CopyAddress>
+                  }
                   pathId={`${nftOverviewPathId}-fingerprint-component`}
                 />
 
                 <LabelWithValue
                   label={intl.formatMessage(tokenMessages.policyId)}
-                  value={<CopyAddress text={nftInfo.policyId} pathId={`${nftOverviewPathId}:policyId`}>{displayAddr(nftInfo.policyId)}</CopyAddress>}
+                  value={
+                    <CopyAddress text={nftInfo.policyId} pathId={`${nftOverviewPathId}:policyId`}>
+                      {displayAddr(nftInfo.policyId)}
+                    </CopyAddress>
+                  }
                   pathId={`${nftOverviewPathId}-policyId-component`}
                 />
 
@@ -384,7 +409,12 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
               value={tabs[1].id}
             >
               {nftInfo.metadata && (
-                <CopyButton onClick={onCopyMetadata} color="inherit" endIcon={isCopied ? <IconCopied /> : <IconCopy />} id={`${nftPathId}:metadata-copy-button`}>
+                <CopyButton
+                  onClick={onCopyMetadata}
+                  color="inherit"
+                  endIcon={isCopied ? <IconCopied /> : <IconCopy />}
+                  id={`${nftPathId}:metadata-copy-button`}
+                >
                   {intl.formatMessage(messages.copyMetadata)}
                 </CopyButton>
               )}
