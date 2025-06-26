@@ -1,3 +1,4 @@
+import { describe, it } from 'mocha';
 import { customAfterEach } from '../utils/customHooks.js';
 import { expect } from 'chai';
 import { getRandomItem, getTestLogger } from '../utils/utils.js';
@@ -10,8 +11,9 @@ import BasePage from '../pages/basepage.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
+import NftDetails from '../pages/wallet/nftGallery/nftDetails.page.js';
 
-describe('Search NFTs by fingerprint', function () {
+describe('Return to Gallery', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
@@ -33,34 +35,19 @@ describe('Search NFTs by fingerprint', function () {
     expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
-  it('Check number of displayed NFTs', async function () {
+  it('Select NFT by name', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    const nftDetailsPage = await nftsMainPage.selectNftByName(testNFT.title);
+    const detailsIsDisplayed = await nftDetailsPage.isDisplayed();
+    expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });
 
-  it('Search for NFT by fingerprint', async function () {
+  it('Back to gallery', async function () {
+    const nftDetailsPage = new NftDetails(webdriver, logger);
+    await nftDetailsPage.backToNftsGallery();
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    await nftsMainPage.search(testNFT.fingerprint);
-  });
-
-  it('Check search result', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Wrong amount of NFTs is displayed').to.equal(1);
-    const displayedNFTName = await nftsMainPage.getNftName(0);
-    expect(displayedNFTName, 'A wrong NFT is found').to.equal(testNFT.title);
-  });
-
-  it('Clean the search', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
-    await nftsMainPage.clearSearch();
-    const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    const nftsPageIsDisplayed = await nftsMainPage.isDisplayed();
+    expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
   afterEach(async function () {

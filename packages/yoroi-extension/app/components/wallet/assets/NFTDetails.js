@@ -447,6 +447,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
             cursor: 'zoom-out',
           }}
           onClick={onClose}
+          id={`${nftPathId}:zoomed-image-box`}
         >
           <img
             style={{ objectFit: 'cover', maxWidth: '100%', maxHeight: '100%' }}
@@ -454,6 +455,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
             alt={nftInfo.name}
             title={nftInfo.name}
             loading="lazy"
+            id={`${nftPathId}:zoomed-image-component`}
           />
         </Box>
       </Modal>
