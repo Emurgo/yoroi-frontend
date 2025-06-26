@@ -4,7 +4,7 @@ import { Button, Grid, IconButton, Link as LinkMui, Modal, Stack, Tab, Typograph
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
-import { useState , useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Link } from 'react-router';
 import { ampli } from '../../../../ampli/index';
@@ -42,6 +42,7 @@ type Props = {|
   nextNftId: string,
   prevNftId: string,
   tab: string | null,
+  nftsCount: number,
 |};
 
 type Intl = {|
@@ -130,7 +131,7 @@ const STypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.ds.el_gray_medium,
 }));
 
-function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props & Intl): Node {
+function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCount }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
   const nftImageUrl = nftImage ? urlResolveForIpfsAndCorsproxy(nftImage) : null;
 
@@ -179,17 +180,17 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
   }
 
   useEffect(() => {
-      if (nftImageUrl !== null) {
-        imageExists(
-          String(nftImageUrl),
-          () => {
-            setIsImageValid(true)
-          }, // on-success
-          () => {
-            setIsImageValid(false)
-          } // on-error
-        );
-      }
+    if (nftImageUrl !== null) {
+      imageExists(
+        String(nftImageUrl),
+        () => {
+          setIsImageValid(true);
+        }, // on-success
+        () => {
+          setIsImageValid(false);
+        } // on-error
+      );
+    }
   }, [nftImageUrl]);
 
   // Todo: Should be handling by displaying an error page
@@ -267,32 +268,38 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab }: Props
                 </TruncatedText>
               </Box>
 
-              <Stack direction="row" spacing={2}>
-                <Link
-                  to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
-                  onClick={() => {
-                    ampli.nftGalleryDetailsNavigation({
-                      nft_navigation: 'Previous',
-                    });
-                  }}
-                >
-                  <SImageButton aria-label="Previous" sx={{ transform: 'rotate(180deg)' }} id={`${nftPathId}-previousNFT-button`}>
-                    <Chevron />
-                  </SImageButton>
-                </Link>
-                <Link
-                  to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
-                  onClick={() => {
-                    ampli.nftGalleryDetailsNavigation({
-                      nft_navigation: 'Next',
-                    });
-                  }}
-                >
-                  <SImageButton aria-label="Next" id={`${nftPathId}-nextNFT-button`}>
-                    <Chevron />
-                  </SImageButton>
-                </Link>
-              </Stack>
+              {nftsCount > 1 ? (
+                <Stack direction="row" spacing={2}>
+                  <Link
+                    to={ROUTES.NFTS.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab}`}
+                    onClick={() => {
+                      ampli.nftGalleryDetailsNavigation({
+                        nft_navigation: 'Previous',
+                      });
+                    }}
+                  >
+                    <SImageButton
+                      aria-label="Previous"
+                      sx={{ transform: 'rotate(180deg)' }}
+                      id={`${nftPathId}-previousNFT-button`}
+                    >
+                      <Chevron />
+                    </SImageButton>
+                  </Link>
+                  <Link
+                    to={ROUTES.NFTS.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab}`}
+                    onClick={() => {
+                      ampli.nftGalleryDetailsNavigation({
+                        nft_navigation: 'Next',
+                      });
+                    }}
+                  >
+                    <SImageButton aria-label="Next" id={`${nftPathId}-nextNFT-button`}>
+                      <Chevron />
+                    </SImageButton>
+                  </Link>
+                </Stack>
+              ) : null}
             </Stack>
           </Box>
           <TabContext value={activeTab}>

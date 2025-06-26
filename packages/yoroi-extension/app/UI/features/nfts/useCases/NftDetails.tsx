@@ -88,15 +88,17 @@ export default function NftDetails() {
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
         <Grid item xs={6}>
-          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={16}>
+          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={2}>
             <Typography variant="h2" id={`${nftPathId}-nftName-text`}>
               {currentNft?.name}
             </Typography>
-            <NftsNavigation
-              prevNftId={nftsList[currentNftIndex === 0 ? nftsList.length - 1 : currentNftIndex - 1]?.id || ''}
-              nextNftId={nftsList[currentNftIndex === nftsList.length - 1 ? 0 : currentNftIndex + 1]?.id || ''}
-              activeTab={currentTab}
-            />
+            {nftsList.length > 1 ? (
+              <NftsNavigation
+                prevNftId={nftsList[currentNftIndex === 0 ? nftsList.length - 1 : currentNftIndex - 1]?.id || ''}
+                nextNftId={nftsList[currentNftIndex === nftsList.length - 1 ? 0 : currentNftIndex + 1]?.id || ''}
+                activeTab={currentTab}
+              />
+            ) : null}
           </Stack>
           <Tabs
             initialTabId={tabSearchParam}
