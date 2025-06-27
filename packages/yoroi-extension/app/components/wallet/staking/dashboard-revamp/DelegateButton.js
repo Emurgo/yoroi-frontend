@@ -84,14 +84,14 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
 const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
   const strings =  useStrings();
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{strings.stakeWalletBalance}</Typography>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={8} alignItems="center">
           <Box
             sx={{
               width: '24px',

@@ -115,6 +115,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
             display: 'flex',
             gap: '24px',
             py: '12px',
+            pl: '8px',
             alignItems: 'center',
             borderBottom: '1px solid',
             borderBottomColor: 'grayscale.200',
@@ -128,7 +129,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
             <Typography variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
           </Box>
         </Box>
-        <Box mt="16px">{cardanoNodes}</Box>
+        <Box>{cardanoNodes}</Box>
       </Box>
     );
   }
