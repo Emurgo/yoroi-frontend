@@ -122,7 +122,10 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
           placeholder="0"
           bgcolor="ds.bg_color_max"
           value={strings.durationDescription(duration)}
-          onClick={openDurationDialog}
+          onClick={(event) => {
+            event.target.blur();
+            openDurationDialog();
+          }}
         />
       </Box>
 
