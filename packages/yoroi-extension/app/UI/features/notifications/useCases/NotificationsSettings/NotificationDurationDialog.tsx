@@ -56,7 +56,7 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
             {intl.formatMessage(messages.line2)}
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="flex-start" mb="32px">
+        <Box display="flex" justifyContent="flex-start">
           <Tabs
             tabs={defaultDurations
               .map(val => ({
