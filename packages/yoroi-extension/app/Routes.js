@@ -222,8 +222,8 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
-            <Route exact path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
@@ -285,13 +285,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.TRANSFER.ROOT} element={<Transfer stores={stores} />} />
           <Route path={ROUTES.SEND_FROM_URI.ROOT} element={<URILandingPage stores={stores} />} />
           <Route path={ROUTES.REVAMP.CATALYST_VOTING} element={<VotingPage stores={stores} />} />
-          <Route
-            exact
-            path={ROUTES.CATALYST_REGISTRATION.ROOT}
-            component={props =>
-              wrapCatalystRegistration({ ...props, stores }, <CatalystRegistration {...props} stores={stores} />)
-            }
-          />
+          <Route element={<CatalystRegistrationSubpages stores={stores} />}>
+            <Route path={ROUTES.CATALYST_REGISTRATION.ROOT} element={<CatalystRegistration stores={stores} />} />
+          </Route>
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
@@ -427,6 +423,12 @@ const DappCenterSubpages = ({ stores }) => (
   </DappCenterContextProvider>
 );
 
+const CatalystRegistrationSubpages = ({ stores }) => (
+  <CatalystRegistrationContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </CatalystRegistrationContextProvider>
+);
+
 // NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
@@ -453,11 +455,3 @@ const GovernanceSubpages = ({ stores }) => {
     </CurrencyProvider>
   );
 };
-
-export function wrapCatalystRegistration(catalystRegistrationProps: StoresProps, children: Node): Node {
-  return (
-    <CatalystRegistrationContextProvider stores={catalystRegistrationProps.stores}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </CatalystRegistrationContextProvider>
-  );
-}
