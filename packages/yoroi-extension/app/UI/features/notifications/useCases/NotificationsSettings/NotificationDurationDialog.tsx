@@ -44,6 +44,14 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
       styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
+      dialogActions={[{
+        label: intl.formatMessage(globalMessages.apply),
+        onClick: () => onSetDuration(Number(currentDuration)),
+        primary: true,
+        disabled: !/^[1-9]\d*(\.\d+)?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
+      }]}
+      forceBottomDivider
+      forceTopDivider
     >
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ bg: 'ds.bg_color_max' }}>
@@ -135,17 +143,6 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
             value={currentDuration}
           />
         </Box>
-
-        <Button
-          sx={{ marginTop: 'auto' }}
-          disabled={!/^[1-9]\d*(\.\d+)?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION}
-          fullWidth
-          onClick={() => onSetDuration(Number(currentDuration)) }
-          variant="contained"
-        >
-          {intl.formatMessage(globalMessages.apply)}
-        </Button>
-
       </Box>
     </Dialog>
   );
