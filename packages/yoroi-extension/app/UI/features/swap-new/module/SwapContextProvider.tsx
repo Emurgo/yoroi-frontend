@@ -9,6 +9,8 @@ import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
+import { isLeft, isRight } from '@yoroi/common';
+import { normalizeTokenId } from '../common/helpers';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -74,7 +76,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const { data: limitOptions } = useQuery(
     [
       'useSwapLimitOptions',
-      network,
+      'mainet',
       swapManager.settings.routingPreference,
       state.tokenInInput.tokenId,
       state.tokenOutInput.tokenId,
@@ -96,6 +98,76 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     }
   );
 
+  console.log('limitOptions', limitOptions);
+
+  useEffect(() => {
+    const value = limitOptions?.defaultProtocol;
+    if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
+      action({ type: 'ProtocolChanged', value });
+    } else {
+      const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
+      if (state.selectedProtocol.isTouched === true && current === undefined) {
+        action({ type: 'ProtocolChanged', value });
+      }
+    }
+
+    const wantedPrice = limitOptions?.wantedPrice;
+    if (wantedPrice !== undefined && wantedPrice > 0 && state.selectedProtocol.value === limitOptions?.defaultProtocol)
+      action({ type: 'WantedPriceInputChanged', value: String(wantedPrice) });
+  }, [
+    limitOptions?.defaultProtocol,
+    limitOptions?.options,
+    limitOptions?.wantedPrice,
+    state.selectedProtocol.isTouched,
+    state.selectedProtocol.value,
+  ]);
+
+  useEffect(() => {
+    const tokenAmount = ftAssetList.find(asset => normalizeTokenId(asset.info.id) === state.tokenInInput.tokenId);
+    const hasEnoughBalance = Number(tokenAmount.formatedAmount) >= Number(state.tokenInInput.value);
+
+    if (!hasEnoughBalance) {
+      action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
+    } else {
+      action({ type: 'TokenInErrorChanged', value: null });
+    }
+  }, [ftAssetList, state.tokenInInput.tokenId, state.tokenInInput.value]);
+
+  useEffect(() => {
+    if (!state.needsNewEstimate) return;
+
+    if (
+      state.tokenInInput.tokenId === undefined ||
+      state.tokenOutInput.tokenId === undefined ||
+      (state.tokenInInput.value === '' && state.tokenOutInput.value === '')
+    )
+      return;
+
+    swapManager.api
+      .estimate({
+        slippage: state.slippageInput.value,
+        tokenIn: state.tokenInInput.tokenId,
+        tokenOut: state.tokenOutInput.tokenId,
+        ...(state.lastInputTouched === 'in'
+          ? {
+              amountIn: Number(state.tokenInInput.value),
+              ...(state.orderType === 'limit' && { wantedPrice: Number(state.wantedPrice) }),
+            }
+          : {
+              amountOut: Number(state.tokenOutInput.value),
+            }),
+        blockedProtocols: [],
+        protocol: state.selectedProtocol.value,
+      })
+      .then(response => {
+        console.log('API ESTIMATED RESPONSE', response);
+        if (isLeft(response)) {
+          action({ type: SwapAction.EstimateError, value: response.error });
+        } else {
+          action({ type: SwapAction.EstimateResponse, value: response.value.data });
+        }
+      });
+  }, [state, swapManager.api]);
 
   const context: any = useMemo(
     () => ({
@@ -449,3 +521,6 @@ const parseNumber = (text: string) =>
         .replace(/^0+(.+)/, '$1')
         .replace(/^\.$/, '0.')
     : '0';
+
+
+

@@ -21,8 +21,12 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
 
   const tokenInput = swapForm[direction === 'in' ? 'tokenInInput' : 'tokenOutInput'];
-  // const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
+  const value = tokenInput.value;
+
+  const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
   const error = direction === 'in' ? tokenInput.error : null;
+
+  console.log('error', error);
 
   const label = direction === 'in' ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
@@ -74,15 +78,16 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     return undefined;
   }, [direction, tokenInputInfo]);
 
-  // const focusInput = () => {
-  //   if (inputRef?.current) {
-  //     inputRef.current.focus();
-  //   }
-  // };
+  const focusInput = () => {
+    if (inputRef?.current) {
+      inputRef.current.focus();
+    }
+  };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     console.log('[handleInputChange]', value);
+    swapForm.action({ type: direction === 'in' ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
 
   return (
@@ -126,12 +131,12 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
             padding="0"
             textAlign="right"
             onChange={handleInputChange}
-            // value={disabled ? '' : value}
+            value={value}
             onFocus={() => setFocusState(true)}
             onBlur={() => setFocusState(false)}
-            // onPress={() => {
-            //   focusInput();
-            // }}
+            onClick={() => {
+              focusInput();
+            }}
           />
         </Stack>
 

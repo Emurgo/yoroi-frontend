@@ -2,7 +2,7 @@ import { Stack, styled, useTheme } from '@mui/material';
 import { TopBarActions } from './TopBarActions';
 import { AssetInput } from '../../common/components/AssetInput';
 import { LoadingButton } from '@mui/lab';
-import { DexTradeInfo } from './DexTradeInfo';
+import { EstimateSummary } from './EstimateSummary';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom';
 import { SwitchAssets } from '../../common/components/SwitchAssets';
@@ -39,7 +39,7 @@ export const AssetSwap = () => {
         <SwitchAssets />
         <AssetInput direction="out" onAssetSelect={() => openSelectAssetModal('out')} />
         <Stack {...atoms.pt_lg} />
-        <DexTradeInfo />
+        <EstimateSummary />
       </Stack>
       <LoadingButton
         //  @ts-ignore
