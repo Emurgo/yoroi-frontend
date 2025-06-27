@@ -21,6 +21,7 @@ const messages = defineMessages({
 });
 
 const defaultDurations = [2, 4, 6, 8, 10, 12].map(String);
+const MAX_ALLOWED_DURATION = 60;
 
 interface Props {
   onClose: () => void,
@@ -137,7 +138,7 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
 
         <Button
           sx={{ marginTop: 'auto' }}
-          disabled={!/^[1-9]\d*(\.\d+)?$/.test(currentDuration)}
+          disabled={!/^[1-9]\d*(\.\d+)?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION}
           fullWidth
           onClick={() => onSetDuration(Number(currentDuration)) }
           variant="contained"
