@@ -48,7 +48,7 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
         label: intl.formatMessage(globalMessages.apply),
         onClick: () => onSetDuration(Number(currentDuration)),
         primary: true,
-        disabled: !/^[1-9]\d*(\.\d+)?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
+        disabled: !/^[1-9]\d*$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
       }]}
       forceBottomDivider
       forceTopDivider
