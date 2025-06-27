@@ -10,7 +10,7 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const Overview = ({ tokenInfo }: Props): JSX.Element => {
+const Overview = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const isPrimary = isPrimaryToken(tokenInfo);
