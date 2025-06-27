@@ -226,7 +226,7 @@ export const DelagationForm = () => {
 };
 
 type OperationInfoProps = {
-  label: string | JSX.Element;
+  label: string | React.ReactNode;
   fee: string;
   defaultTokenName: string;
 };

@@ -6,6 +6,6 @@ const StyledSkeleton = styled(MuiSkeleton)(({ theme }: any) => ({
   opacity: 0.8,
 }));
 
-export const Skeleton = ({ width, height, ...props }: SkeletonProps): JSX.Element => {
+export const Skeleton = ({ width, height, ...props }: SkeletonProps): React.ReactNode => {
   return <StyledSkeleton width={width} height={height} variant="rectangular" animation={false} {...props} />;
 };

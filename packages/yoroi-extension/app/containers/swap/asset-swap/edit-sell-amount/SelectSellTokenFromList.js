@@ -1,7 +1,7 @@
 //@flow
 import type { Node } from 'react';
 import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import SwapStore from '../../../../stores/ada/SwapStore';

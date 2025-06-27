@@ -1,7 +1,7 @@
 // @flow
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { FormattedTokenValue, OrderAsset } from './util';
-import { useSwap, } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { useQuery } from 'react-query';
 import { useMemo } from 'react';
 import { Quantities } from '../../../utils/quantities';

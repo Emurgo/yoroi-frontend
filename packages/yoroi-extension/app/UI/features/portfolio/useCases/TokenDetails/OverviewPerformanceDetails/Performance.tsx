@@ -13,7 +13,7 @@ interface Props {
   isLoading?: boolean;
 }
 
-const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+const Performance = ({ tokenInfo, isLoading }: Props): React.ReactNode => {
   console.log({ tokenInfo, isLoading });
   const theme = useTheme();
   const strings = useStrings();
