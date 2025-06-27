@@ -11,6 +11,7 @@ import { tokenManagers } from '../../portfolio/common/helpers/build-token-manage
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { normalizeTokenId } from '../common/helpers';
+import { ASSET_DIRECTION_IN } from '../common/constants';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -145,7 +146,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         slippage: state.slippageInput.value,
         tokenIn: state.tokenInInput.tokenId,
         tokenOut: state.tokenOutInput.tokenId,
-        ...(state.lastInputTouched === 'in'
+        ...(state.lastInputTouched === ASSET_DIRECTION_IN
           ? {
               amountIn: Number(state.tokenInInput.value),
               ...(state.orderType === 'limit' && { wantedPrice: Number(state.wantedPrice) }),
@@ -193,7 +194,7 @@ export const useSwapRevamp = () =>
 const swapReducer = (state: SwapState, action: SwapAction) => {
   return produce(state, draft => {
     draft.needsNewEstimate = true;
-    draft.lastInputTouched = 'in';
+    draft.lastInputTouched = ASSET_DIRECTION_IN;
 
     switch (action.type) {
       case SwapAction.ChangeOrderType:
@@ -317,7 +318,7 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         draft.tokenOutInput.error = null;
         draft.canSwap = true;
 
-        if (state.lastInputTouched === 'in') {
+        if (state.lastInputTouched === ASSET_DIRECTION_IN) {
           draft.tokenOutInput.value = String(action.value.totalOutputWithoutSlippage ?? 0);
         } else {
           draft.tokenInInput.value = String(action.value.totalInput ?? 0);
@@ -405,7 +406,7 @@ export type SwapAction = {
 const defaultState: SwapState = Object.freeze({
   needsNewEstimate: false,
   orderType: 'market',
-  lastInputTouched: 'in',
+  lastInputTouched: ASSET_DIRECTION_IN,
   tokenInInput: {
     isTouched: true,
     tokenId: primaryTokenId,
@@ -438,7 +439,7 @@ const defaultState: SwapState = Object.freeze({
 type SwapState = {
   needsNewEstimate: boolean;
   orderType: 'market' | 'limit';
-  lastInputTouched: 'in' | 'out';
+  lastInputTouched: ASSET_DIRECTION_IN | 'out';
   tokenInInput: {
     isTouched: boolean;
     tokenId?: Portfolio.Token.Id;

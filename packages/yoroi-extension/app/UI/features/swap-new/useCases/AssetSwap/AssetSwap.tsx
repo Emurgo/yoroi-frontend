@@ -7,15 +7,17 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom';
 import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
+import { AssetDirectionType } from '../../common/types';
+import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
 
-  const openSelectAssetModal = (direction: 'in' | 'out') => {
+  const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
-      title: `SWAP ${direction === 'in' ? 'FROM' : 'TO'}`,
-      content: direction === 'in' ? <SelectAssetFrom /> : <SelectAssetTo />,
+      title: `SWAP ${direction === ASSET_DIRECTION_IN ? 'FROM' : 'TO'}`,
+      content: direction === ASSET_DIRECTION_IN ? <SelectAssetFrom /> : <SelectAssetTo />,
       height: '624px',
       width: '612px',
     });
@@ -34,10 +36,10 @@ export const AssetSwap = () => {
       <Stack position="relative">
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
-        <AssetInput direction="in" onAssetSelect={() => openSelectAssetModal('in')} />
+        <AssetInput direction={ASSET_DIRECTION_IN} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_IN)} />
         <Stack {...atoms.pt_sm} />
         <SwitchAssets />
-        <AssetInput direction="out" onAssetSelect={() => openSelectAssetModal('out')} />
+        <AssetInput direction={ASSET_DIRECTION_OUT} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_OUT)} />
         <Stack {...atoms.pt_lg} />
         <EstimateSummary />
       </Stack>

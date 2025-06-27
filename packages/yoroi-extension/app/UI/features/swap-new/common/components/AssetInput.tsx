@@ -8,9 +8,11 @@ import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import { bigNumberToBigInt } from '../../../portfolio/useCases/TokensTable/TableColumnsChip';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
+import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../constants';
+import { AssetDirectionType } from '../types';
 
 type AssetInputProps = {
-  direction: 'in' | 'out';
+  direction: AssetDirectionType;
   selected?: boolean;
   onAssetSelect: () => void;
 };
@@ -20,13 +22,13 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const { atoms }: any = useTheme();
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
 
-  const tokenInput = swapForm[direction === 'in' ? 'tokenInInput' : 'tokenOutInput'];
+  const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
   const value = tokenInput.value;
 
-  const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
-  const error = direction === 'in' ? tokenInput.error : null;
+  const inputRef = direction === ASSET_DIRECTION_IN ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
+  const error = direction === ASSET_DIRECTION_IN ? tokenInput.error : null;
 
-  const label = direction === 'in' ? 'From' : 'To';
+  const label = direction === ASSET_DIRECTION_IN ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
   const touched = tokenInput.isTouched;
 
@@ -43,7 +45,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   let selectedToken: any;
   const tokenPrice = data24h?.[1]?.price?.close ?? 1;
 
-  if (direction === 'in' && primaryTokenActivity != null) {
+  if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
     const normalizeId = (id?: string | null) => (id === '' ? '.' : id);
     selectedToken = ftAssetList.filter(token => {
       return normalizeId(token.info.id) === swapForm.tokenInInput?.tokenId;
@@ -64,10 +66,10 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   }
 
   const assetInputName = React.useMemo(() => {
-    if (direction === 'in') {
+    if (direction === ASSET_DIRECTION_IN) {
       return tokenInputInfo?.ticker ? tokenInputInfo?.name : primaryTokenInfo.name;
     }
-    if (direction === 'out') {
+    if (direction === ASSET_DIRECTION_OUT) {
       if (!touched) {
         return 'Select token';
       }
@@ -84,7 +86,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    swapForm.action({ type: direction === 'in' ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
+    swapForm.action({ type: direction === ASSET_DIRECTION_IN ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
 
   return (
@@ -118,7 +120,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
               border: '0',
               outline: 'none',
               '::placeholder': { color: 'ds.gray_600' },
-              bgcolor: direction === 'in' ? 'ds.bg_color_max' : 'ds.bg_color_contrast_min',
+              bgcolor: direction === ASSET_DIRECTION_IN ? 'ds.bg_color_max' : 'ds.bg_color_contrast_min',
             }}
             component="input"
             type="text"
@@ -137,7 +139,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
           />
         </Stack>
 
-        {direction === 'in' ? (
+        {direction === ASSET_DIRECTION_IN ? (
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
               <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
@@ -170,7 +172,7 @@ const Wrapper = styled(Box, {
   selected: boolean;
   hasError: boolean;
   atoms: any;
-  direction: 'in' | 'out';
+  direction: AssetDirectionType;
 }>(({ selected, hasError, atoms, direction, theme }: any) => ({
   ...atoms.py_md,
   ...atoms.px_lg,
@@ -178,7 +180,7 @@ const Wrapper = styled(Box, {
   border: `2px solid ${
     hasError ? theme.palette.ds.text_error : selected ? theme.palette.ds.el_gray_max : theme.palette.ds.gray_200
   }`,
-  backgroundColor: direction === 'in' ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
+  backgroundColor: direction === ASSET_DIRECTION_IN ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
   height: '132px',
 
   '&:hover': {
