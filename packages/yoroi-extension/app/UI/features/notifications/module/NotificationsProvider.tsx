@@ -58,9 +58,10 @@ type Props = {
   children: ReactNode,
   appLoadedSlots: { [networkId: number]: number },
   walletsStore: any,
+  notificationToastTimeout: number,
 }
 
-export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore }: Props) {
+export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore, notificationToastTimeout }: Props) {
   const lsApi = new LocalStorageApi();
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
@@ -145,6 +146,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
       subtitle: strings.clickToView,
       type,
       id: id || String(Date.now()),
+      timeout: notificationToastTimeout,
     });
   };
 

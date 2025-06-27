@@ -172,6 +172,7 @@ class App extends Component<Props, State> {
           <NotificationsProvider
             walletsStore={stores.wallets}
             appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+            notificationToastTimeout={stores.pushNotificationStore.duration * 1000}
           >
             <NotificationsManager />
             <div style={{ height: '100%' }}>
