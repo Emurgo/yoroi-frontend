@@ -24,7 +24,7 @@ const messages = defineMessages({
   dappsLabel: {
     id: 'connector.connected-dapps.dappsLabel',
     defaultMessage: '!!!Dapps',
-  }
+  },
 });
 
 const DappCenterDashboard = observer(() => {

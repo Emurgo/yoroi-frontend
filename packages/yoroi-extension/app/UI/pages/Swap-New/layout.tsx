@@ -11,7 +11,7 @@ type Props = {
   children: ReactNode;
 };
 
-const SwapLayout = ({ stores, children }: Props): JSX.Element => {
+const SwapLayout = ({ stores, children }: Props): React.ReactNode => {
   const { isTestnet } = stores.wallets.selectedOrFail;
   const location = useLocation();
 

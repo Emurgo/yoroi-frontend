@@ -20,7 +20,7 @@ interface Props {
 }
 
 const HeaderSection = observer(
-  ({ tokenInfo, stores }: Props): JSX.Element => {
+  ({ tokenInfo, stores }: Props): React.ReactNode => {
     const theme: any = useTheme();
     const strings = useStrings();
     const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();

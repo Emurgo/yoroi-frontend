@@ -39,12 +39,12 @@ interface Props {
   walletBalance: WalletBalance;
   setKeyword: (keyword: string) => void;
   isLoading: boolean;
-  tooltipTitle: JSX.Element;
+  tooltipTitle: React.ReactNode;
   stores: any;
 }
 
 const PortfolioHeader = observer(
-  ({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): JSX.Element => {
+  ({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
     const [loading, setLoading] = React.useState(false);
     const strings = useStrings();
     const theme: any = useTheme();

@@ -67,7 +67,7 @@ const useChart = (data: IChartData) => {
     chartBottom: number;
     rectWidth: number;
     rectHeight: number;
-  }): JSX.Element | React.ReactElement => {
+  }): React.ReactNode | React.ReactElement => {
     let rectX = cx - rectWidth / 2;
     if (index === 0) {
       rectX = cx;
