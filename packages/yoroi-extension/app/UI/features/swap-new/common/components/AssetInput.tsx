@@ -26,8 +26,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const inputRef = direction === 'in' ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
   const error = direction === 'in' ? tokenInput.error : null;
 
-  console.log('error', error);
-
   const label = direction === 'in' ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
   const touched = tokenInput.isTouched;
@@ -86,7 +84,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    console.log('[handleInputChange]', value);
     swapForm.action({ type: direction === 'in' ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
 

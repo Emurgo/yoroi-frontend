@@ -160,7 +160,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         protocol: state.selectedProtocol.value,
       })
       .then(response => {
-        console.log('API ESTIMATED RESPONSE', response);
         if (isLeft(response)) {
           action({ type: SwapAction.EstimateError, value: response.error });
         } else {
