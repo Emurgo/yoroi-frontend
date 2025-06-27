@@ -1,19 +1,19 @@
 import BigNumber from 'bignumber.js';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Typography, Stack } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';
 import { PasswordInput } from '../../../../../components';
 import { AmountInput } from '../../../../../../components/common/NumericInputRP';
 import { useVoting } from '../../hooks/useVoting';
-import { useIntl } from '../../../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 
 export const TxStep = () => {
   const strings = useStrings();
   const [passwd, setPasswd] = useState('');
   const { votingNextStep, registrationState, votingRegTx, walletType } = useVoting();
   const { error } = registrationState;
-  const { intl } = useIntl();
+  const intl = useIntl();
 
   const handleSetPasswd = e => setPasswd(e.target.value);
 

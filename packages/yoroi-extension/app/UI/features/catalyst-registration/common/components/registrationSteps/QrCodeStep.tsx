@@ -1,4 +1,3 @@
-import React from 'react';
 import { RegistrationStepper } from '../RegistrationStepper';
 import { Button, Box, Stack, Typography } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';

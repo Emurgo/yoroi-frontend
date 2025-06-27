@@ -1,6 +1,5 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
-import { useIntl } from '../../../../context/IntlProvider';
+import { defineMessages , useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -193,7 +192,7 @@ export const messages = Object.freeze(
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return React.useRef({
     notAvailableTitle: intl.formatMessage(messages.notAvailableTitle),
     notAvailableSubtitle: (roundNumber: string) => intl.formatMessage(messages.notAvailableSubtitle, { roundNumber }),

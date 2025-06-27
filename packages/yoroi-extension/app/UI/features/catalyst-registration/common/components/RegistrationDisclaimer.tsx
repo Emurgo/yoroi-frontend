@@ -1,8 +1,7 @@
-import React from 'react';
 import { BaseBanner } from '../../../../components/Banners/BaseBanner';
 import { useStrings } from '../hooks/useStrings';
 import { Stack, Typography } from '@mui/material';
-import { IconWrapper, Icons } from '../../../../components/icons';
+import { IconWrapper, Icons } from '../../../../components';
 // import { useCatalystRegistration } from '../../module/CatalystRegistrationContextProvider';
 
 export default function RegistrationDisclaimer({ onClose }: { onClose: () => void }) {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box } from '@mui/material';
 import Stepper, { StepStates } from '../../../../components/stepper/Stepper';
 import { useStrings } from '../hooks/useStrings';

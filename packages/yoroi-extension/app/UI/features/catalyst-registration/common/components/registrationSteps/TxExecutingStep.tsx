@@ -1,8 +1,6 @@
-import React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography , CircularProgress } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';
 import { RegistrationStepper } from '../RegistrationStepper';
-import { CircularProgress } from '@mui/material';
 
 export const TxExecutingStep = () => {
   const strings = useStrings();
