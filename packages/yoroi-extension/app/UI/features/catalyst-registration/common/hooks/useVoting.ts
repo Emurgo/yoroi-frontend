@@ -33,65 +33,54 @@ export const useVoting = (): VotingHookType => {
   } = context as CatalystRegistrationContextType;
 
   const votingNextStep = async (value: string | null = null) => {
-    switch (stepState.currentStep) {
-      case -1:
-      case ProgressStep.QR_CODE:
+    setError(null);
+    try {
+      if (stepState.currentStep < 0 || stepState.currentStep === ProgressStep.QR_CODE) {
         dispatch({ type: 'RESET' });
         resetReg();
-        break;
-      case ProgressStep.GENERATE:
-      case ProgressStep.CONFIRM:
-        dispatch({ type: 'NEXT_STEP' });
-        break;
-      case ProgressStep.REGISTER:
-        try {
-          await createTransaction(value);
-          setError(null);
-          dispatch({ type: 'NEXT_STEP' });
-        } catch (error: any) {
-          setError(error);
-        }
-        break;
-      case ProgressStep.TRANSACTION:
-        try {
-          await signTransaction(value);
-          setError(null);
-          dispatch({ type: 'NEXT_STEP' });
-        } catch (error: any) {
-          setError(error);
-        }
-        break;
+        return;
+      }
+      if (stepState.currentStep === ProgressStep.REGISTER) {
+        await createTransaction(value);
+      } else if (stepState.currentStep === ProgressStep.TRANSACTION) {
+        await signTransaction(value);
+      }
+      dispatch({ type: 'NEXT_STEP' });
+    } catch (error) {
+      setError(error);
     }
   };
 
   const votingPrevStep = async () => {
-    if (stepState.currentStep === -1) return;
-
-    if (stepState.currentStep === ProgressStep.CONFIRM) {
-      dispatch({ type: 'PREVIOUS_STEP' });
+    if (stepState.currentStep === -1)
       return;
-    }
-
-    if (stepState.currentStep === ProgressStep.TRANSACTION) {
+    if (stepState.currentStep === ProgressStep.CONFIRM
+      || stepState.currentStep === ProgressStep.TRANSACTION) {
       dispatch({ type: 'PREVIOUS_STEP' });
-      return;
     }
   };
 
-  const startRegistration = async () => {
+  const startRegistration = () => {
     dispatch({ type: 'START_REGISTRATION' });
-    await generatePin();
+    generatePin()
+      .catch(err => console.error('Catalyst [generatePin] failed', err));
   };
 
-  const resetRegistration = async () => {
+  const resetRegistration = () => {
     dispatch({ type: 'RESET' });
   };
 
   return {
     startRegistration,
     resetRegistration,
-    votingNextStep,
-    votingPrevStep,
+    votingNextStep: (value) => {
+      votingNextStep(value)
+        .catch(err => console.error('Catalyst [votingNextStep] failed', err));
+    },
+    votingPrevStep: () => {
+      votingPrevStep()
+        .catch(err => console.error('Catalyst [votingPrevStep] failed', err));
+    },
     isDelegating,
     registrationState,
     votingRegTx,

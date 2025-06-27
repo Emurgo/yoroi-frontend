@@ -30,7 +30,7 @@ type CatalystRegistrationActions = {
   generatePin: () => Promise<void>;
   createTransaction: (password: string | null) => Promise<void>;
   signTransaction: (password: string | null) => Promise<void>;
-  setError: (error: string | null) => void;
+  setError: (error: any) => void;
   resetRegistration: () => void;
 };
 
