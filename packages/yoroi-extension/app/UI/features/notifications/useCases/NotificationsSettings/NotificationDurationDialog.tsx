@@ -18,6 +18,10 @@ const messages = defineMessages({
     id: 'notifications.settings.duration.line2',
     defaultMessage: '!!!Adjust the display duration of in-app notifications to suit your preferences.',
   },
+  manual: {
+    id: 'notifications.settings.manualLimit',
+    defaultMessage: '!!!Enter a value from 1 to 60.',
+  },
 });
 
 const defaultDurations = [2, 4, 6, 8, 10, 12].map(String);
@@ -143,6 +147,11 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
             value={currentDuration}
           />
         </Box>
+        {isManual && (
+          <Typography variant="body2" color="ds.text_gray_low">
+            {intl.formatMessage(messages.manual)}
+          </Typography>
+        )}
       </Box>
     </Dialog>
   );
