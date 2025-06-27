@@ -30,7 +30,7 @@ export const shelleyEraConfig: Readonly<Network.EraConfig> = freeze(
   {
     name: 'shelley',
     start: new Date('2020-07-29T21:44:51.000Z'),
-    end: new Date('9999-12-31T23:59:59.999Z'), // 🔥 fake "no end"
+    end: undefined,
     slotInSeconds: 1,
     slotsPerEpoch: 432000,
   },
@@ -52,7 +52,7 @@ export const shelleyPreprodEraConfig: Readonly<Network.EraConfig> = freeze(
   {
     name: 'shelley',
     start: new Date('2022-06-01T01:00:00.000Z'),
-    end: new Date('9999-12-31T23:59:59.999Z'), // 🔥 fake "no end"
+    end: undefined,
     slotInSeconds: 1,
     slotsPerEpoch: 432000,
   },
