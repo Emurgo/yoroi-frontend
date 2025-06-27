@@ -346,6 +346,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
                 bgcolor: 'transparent',
                 maxHeight: '400px',
                 overflow: 'auto',
+                marginTop: '16px',
+                marginLeft: '24px',
               }}
               value={tabs[0].id}
             >
@@ -410,6 +412,8 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
                 bgcolor: 'transparent',
                 overflow: 'auto',
                 backgroundColor: 'ds.bg_color_max',
+                marginTop: '16px',
+                marginLeft: '24px',
               }}
               value={tabs[1].id}
             >

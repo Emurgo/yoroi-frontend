@@ -16,8 +16,8 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
   const isPrimary = isPrimaryToken(tokenInfo);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(2)}>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+    <Stack direction="column" spacing={theme.spacing(16)}>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(8)}>
         <Box
           width="32px"
           height="32px"
@@ -94,7 +94,7 @@ const TokenOverviewSection = ({
 
   return (
     <Stack direction="row" alignItems="flex-end" gap="8px">
-      <Stack direction="column" spacing={theme.spacing(0.5)}>
+      <Stack direction="column" spacing={theme.spacing(4)}>
         <Typography fontWeight="500" color="ds.gray_900">
           {label}
         </Typography>

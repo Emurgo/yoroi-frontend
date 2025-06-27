@@ -18,7 +18,7 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden' }}>
+    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: 'auto' }}>
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
@@ -88,7 +88,7 @@ export default function NftDetails() {
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
         <Grid item xs={6}>
-          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={2}>
+          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={16}>
             <Typography variant="h2" id={`${nftPathId}-nftName-text`}>
               {currentNft?.name}
             </Typography>
@@ -106,6 +106,7 @@ export default function NftDetails() {
             headerSx={{ mx: '24px' }}
             tabs={getTabs()}
             pathId={nftPathId}
+            contentSx={{ mx: '24px', mt: '16px' }}
           />
         </Grid>
       </Grid>

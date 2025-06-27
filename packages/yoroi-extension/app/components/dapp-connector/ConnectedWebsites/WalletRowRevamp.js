@@ -98,7 +98,6 @@ export default class WalletRowRevamp extends Component<Props, State> {
           p: '8px',
           mb: '12px',
           position: 'relative',
-          borderRadius: '8px',
           '&:hover': {
             backgroundColor: 'ds.bg_color_contrast_min',
           },

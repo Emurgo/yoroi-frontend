@@ -23,9 +23,13 @@ export default function NftDetailsOverview({ nftInfo, networkUrl }: NftDetailsOv
   const truncate = below1250 ? 'short' : below1400 ? 'long' : 'none';
 
   return (
-    <Stack spacing="24px">
-      <LabelWithValue label={strings.description} value={nftInfo.description || '-'} pathId={`${nftOverviewPathId}-description-text`}/>
-      <LabelWithValue label={strings.author} value={nftInfo.author || '-'} pathId={`${nftOverviewPathId}-author-text`}/>
+    <Stack spacing={24}>
+      <LabelWithValue
+        label={strings.description}
+        value={nftInfo.description || '-'}
+        pathId={`${nftOverviewPathId}-description-text`}
+      />
+      <LabelWithValue label={strings.author} value={nftInfo.author || '-'} pathId={`${nftOverviewPathId}-author-text`} />
       <LabelWithValue
         label={strings.fingerprint}
         value={<CopyableText value={nftInfo.id}>{displayAddrTruncated(nftInfo.id, truncate)}</CopyableText>}

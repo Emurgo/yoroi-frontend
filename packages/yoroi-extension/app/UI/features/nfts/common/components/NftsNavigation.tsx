@@ -17,7 +17,7 @@ const NftsNavigation = ({ prevNftId, nextNftId, activeTab }: NftsNavigationProps
   };
 
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={16}>
       <Link
         to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab.id}`}
         onClick={() => handleNavigationEvent('Previous')}
