@@ -11,3 +11,4 @@ export const NOT_ENOUGH_BALANCE = 'Not enough balance';
 export const NO_NFTS_ADDED = 'No NFTs added to your wallet';
 export const NO_NFTS_FOUND = 'No NFTs found';
 export const WRONG_PASSWORD_TX_REVIEW = 'Wrong password';
+export const ADA_HANDLE_UNEXPECTED_ERROR = 'ADA Handle: unexpected error';
