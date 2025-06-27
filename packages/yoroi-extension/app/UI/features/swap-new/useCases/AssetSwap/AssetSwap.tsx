@@ -21,14 +21,6 @@ export const AssetSwap = () => {
     });
   };
 
-  // if (loadingSwapPage) {
-  //   return (
-  //     <Stack height="100%" width="100%" justifyContent="center" alignItems="center">
-  //       Loading...
-  //     </Stack>
-  //   );
-  // }
-
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
       <Stack position="relative">
