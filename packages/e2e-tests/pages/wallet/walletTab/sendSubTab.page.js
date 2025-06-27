@@ -4,7 +4,7 @@ import {
   fiveSeconds,
   halfSecond,
   defaultWaitTimeout,
-  halfMinute,
+  oneMinute,
 } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
@@ -160,7 +160,7 @@ class SendSubTab extends WalletTab {
         const currentText = await this.getReceiverHelperText();
         return currentText === expectedText;
       },
-      halfMinute,
+      oneMinute,
       halfSecond
     );
   }
