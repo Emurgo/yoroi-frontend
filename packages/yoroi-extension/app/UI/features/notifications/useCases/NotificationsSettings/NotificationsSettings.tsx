@@ -91,7 +91,7 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
           rowGap: '8px',
           maxHeight: '56px',
           width: '506px', /* to be consistent with components/wallet/settings/WalletNameSetting.js */
-          mt: '16px',
+          mt: '24px',
         }}
       >
         <Box
