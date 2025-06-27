@@ -6,14 +6,13 @@ import { useStrings } from '../../hooks/useStrings';
 import { PasswordInput } from '../../../../../components';
 import { AmountInput } from '../../../../../../components/common/NumericInputRP';
 import { useVoting } from '../../hooks/useVoting';
-import { useIntl } from 'react-intl';
+import { stringifyError } from '../../../../../../utils/logging';
 
 export const TxStep = () => {
   const strings = useStrings();
   const [passwd, setPasswd] = useState('');
   const { votingNextStep, registrationState, votingRegTx, walletType } = useVoting();
   const { error } = registrationState;
-  const intl = useIntl();
 
   const handleSetPasswd = e => setPasswd(e.target.value);
 
@@ -86,7 +85,7 @@ export const TxStep = () => {
             onChange={handleSetPasswd}
             id="confirm-passwd"
             error={!!error}
-            helperText={!!error ? intl.formatMessage(error) : ''}
+            helperText={!!error ? stringifyError(error) : ''}
             variant="outlined"
           />
         )}
