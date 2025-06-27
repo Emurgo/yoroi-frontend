@@ -286,7 +286,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
   const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, order: any) => {
     try {
       startLoadingTxReview();
-      const { signedTxHex: signedCancelTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+      const { signedTxHex: signedCancelTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
         wallet,
         transactionHex: cancelTxCbor,
         password: passswordInput,
@@ -322,7 +322,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
 
     try {
-      const { signedTxHex: signedCollateralReorgTx } = await props.stores.substores.ada.wallets.adaSignTransactionHexFromWallet({
+      const { signedTxHex: signedCollateralReorgTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
         wallet,
         transactionHex: collateralReorgTxObj.cbor,
         password: passswordInput,
@@ -557,7 +557,7 @@ const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
 
 const OperationsDetails = () => {
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Collateral creation</Typography>
       </Stack>

@@ -132,7 +132,7 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     // This is purely to automatically exit settings at the wallet switch
     if (this.stores.wallets.wallets.length > 0) {
       this.stores.wallets.setActiveWallet({ publicDeriverId: this.stores.wallets.wallets[0].publicDeriverId });
-      this.stores.app.goToRoute({ route: ROUTES.WALLETS.ROOT });
+      this.stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
     }
     // note: it's possible some other function was waiting for a DB lock
     //       and so it may fail if it runs now since underlying data was deleted

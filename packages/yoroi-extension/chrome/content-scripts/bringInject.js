@@ -110,7 +110,9 @@ const darkTheme = Object.freeze({
 });
 
 const lightTheme = Object.freeze({
-
+  // font
+  fontUrl: 'https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap',
+  fontFamily: '"Rubik", sans-serif',
   // Popup
   popupBg: "#FFFFFF",
   popupShadow: "0px 6px 20px 0px rgba(0, 0, 0, 0.10), 0px 1px 8px 0px rgba(0, 0, 0, 0.06)",

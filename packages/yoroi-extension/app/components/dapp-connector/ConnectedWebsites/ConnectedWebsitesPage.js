@@ -2,8 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import type { WhitelistEntry } from '../../../../chrome/extension/connector/types';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import { observer } from 'mobx-react';
@@ -51,12 +50,9 @@ const messages = defineMessages({
 
 @observer
 export default class ConnectedWebsitesPage extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const genNoResult = () => (
       <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center">
         <Box mt="-24px" display="flex" flexDirection="column" alignItems="center" gap="16px">
@@ -119,6 +115,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
             display: 'flex',
             gap: '24px',
             py: '12px',
+            pl: '8px',
             alignItems: 'center',
             borderBottom: '1px solid',
             borderBottomColor: 'grayscale.200',
@@ -132,7 +129,7 @@ export default class ConnectedWebsitesPage extends Component<Props> {
             <Typography variant="body2">{intl.formatMessage(messages.dappsLabel)}</Typography>
           </Box>
         </Box>
-        <Box mt="16px">{cardanoNodes}</Box>
+        <Box>{cardanoNodes}</Box>
       </Box>
     );
   }

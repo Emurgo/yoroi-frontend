@@ -7,19 +7,17 @@ import { useGovernance } from '../../features/governace/module/GovernanceContext
 
 type Props = {
   stores: any;
-  actions: any;
   children: React.ReactNode;
 };
 
-const GovernanceLayout = ({ stores, actions, children }: Props): any => {
+const GovernanceLayout = ({ stores, children }: Props): any => {
   const { governanceManager } = useGovernance();
 
   if (governanceManager)
     return (
       <GeneralPageLayout
         stores={stores}
-        actions={actions}
-        navbar={<NavBarContainerRevamp actions={actions} stores={stores} title={<NavBarTitle title={'Governance'} />} />}
+        navbar={<NavBarContainerRevamp stores={stores} title={<NavBarTitle title={'Governance'} />} />}
       >
         <GovernanceExternalPackageProvider manager={governanceManager}>{children}</GovernanceExternalPackageProvider>
       </GeneralPageLayout>

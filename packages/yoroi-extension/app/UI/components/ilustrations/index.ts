@@ -1,5 +1,6 @@
 export { NftsNotFound } from './NftsNotFound';
 export { DefaultNft } from './DefaultNft';
+export { NoDappsConnected } from './NoDappsConnected';
 export { DownloadApp } from './DownloadApp';
 export { AppStoreBadge } from './AppStoreBadge';
 export { PlayStoreBadge } from './PlayStoreBadge';

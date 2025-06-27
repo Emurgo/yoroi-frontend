@@ -3,7 +3,6 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import { HiddenAmount } from '../../common/components/HiddenAmount';
@@ -17,7 +16,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
   const theme = useTheme();
 
   return (
-    <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+    <Stack direction="row" alignItems="center" spacing={theme.spacing(16)}>
       <Box
         display="inline-flex"
         alignItems="center"
@@ -132,7 +131,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
   // TODO refactor this properly
   if (showWelcomeBanner) {
     return (
-      <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+      <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
         <Stack direction="column">
           <Typography color="ds.text_gray_normal">
             {0} {token.info.name}
@@ -177,7 +176,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     ptPrice &&
     atomicBreakdown(tokenQuantityAsBigInt, decimals)
       .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : new BigNumber(ptPrice))
+      .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
       .toFormat(decimals);
 
   const primaryAda = isPrimary && showingAda;
@@ -186,7 +185,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
   const totalTokenPrice = primaryAda ? '' : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
 
   return (
-    <Stack direction="row" spacing={theme.spacing(1.5)} sx={{ float: 'right' }}>
+    <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
       <Stack direction="column">
         <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>

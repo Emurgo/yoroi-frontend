@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ampli } from '../../../../../../ampli/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
@@ -51,7 +51,7 @@ const PortfolioWallet = ({ stores }): JSX.Element => {
   }, [keyword]);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
+    <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
         stores={stores}
         walletBalance={walletBalance || { ada: '0' }}

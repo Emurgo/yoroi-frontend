@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
 import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
-import { useHistory } from 'react-router';
+import { useNavigate, useLocation } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
 import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
@@ -65,7 +65,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const getSelectedWalletId =
     () => walletsStore.selected?.publicDeriverId;
@@ -98,7 +99,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     ampli.inAppNotificationOpened({ type: analyticsTypeValue });
     // redirect after analytics
     const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
-    history.push(redirectTo);
+    navigate(redirectTo);
   };
 
   const handleToastExpired = () => {
@@ -114,26 +115,32 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     return notifSettings[selectedWalletId] ?? true;
   };
 
+  const locationRef = React.useRef(location);
+
+  React.useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
+
   const createNotification = async (type: NotificationTypes, id?: string) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
     // Early returns:
     // return if settings are off
+    const currentLocation = locationRef.current;
+
     if (!notifyWallet) return;
     // return if we're on the same route as the event redirection
+
     switch (type) {
       case NotificationTypes.Intrawallet:
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:
-        if (history.location.pathname === ROUTES.WALLETS.TRANSACTIONS) {
-          return;
-        }
+        if (currentLocation.pathname === ROUTES.WALLETS.TRANSACTIONS) return;
         break;
       case NotificationTypes.Rewards:
-        if (history.location.pathname === ROUTES.STAKING) {
-          return;
-        }
+        if (currentLocation.pathname === ROUTES.STAKING) return;
+        break;
     }
 
     createToast({

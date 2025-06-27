@@ -16,7 +16,6 @@ import {
   getTargetBrowser,
   isBrave,
   isChrome,
-  isDapp,
   isFirefox,
   isHeadless,
 } from './utils.js';
@@ -68,10 +67,11 @@ const getBraveBuilder = () => {
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const chromeOpts = new chrome.Options({
-      'goog:chromeOptions': {
-        'enableExtensionTargets': true,
-      }
-    })
+    'goog:chromeOptions': {
+      enableExtensionTargets: true,
+    },
+  })
+    .setChromeBinaryPath(chromeBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
@@ -79,12 +79,16 @@ const getChromeBuilder = () => {
     .addArguments('--disable-setuid-sandbox')
     .addArguments('--start-maximized')
     .addArguments('--remote-debugging-pipe')
-    .setUserPreferences({ 'download.default_directory': downloadsDir });
+    .setUserPreferences({
+      'download.default_directory': downloadsDir,
+      'profile.content_settings.exceptions.clipboard': {
+        '*': { last_modified: Date.now(), setting: 1 },
+      },
+    })
+    .addArguments('disable-infobars')
+    .addArguments('--enable-clipboard');
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
-  }
-  if (isDapp()) {
-    chromeOpts.setChromeBinaryPath(chromeBin);
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
@@ -166,6 +170,8 @@ export const getDriver = (maxAttempts = 3, retryDelay = 2000) => {
       driver.manage().setTimeouts({ implicit: defaultWaitTimeout });
       if (isFirefox()) {
         driver.manage().window().maximize();
+      } else {
+        driver.manage().window().setRect({ width: 1440, height: 900 });
       }
       return driver;
     } catch (error) {

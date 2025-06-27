@@ -23,7 +23,18 @@ const poolIcons = {
 };
 
 export function SwapPoolIcon({ provider }: {| +provider: string |}): React$Node {
-  return <Box sx={{ width: '24px', height: '24px' }}>{poolIcons[provider] || <DefaultToken />}</Box>;
+  return (
+    <Box
+      sx={{
+        width: '24px',
+        height: '24px',
+        borderRadius: '8px',
+        overflow: 'hidden',
+      }}
+    >
+      {poolIcons[provider] || <DefaultToken />}
+    </Box>
+  );
 }
 
 export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: any, +isAutoPool?: boolean |}): React$Node {

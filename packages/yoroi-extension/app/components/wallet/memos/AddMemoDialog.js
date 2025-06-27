@@ -4,7 +4,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
@@ -19,7 +19,6 @@ import WalletTransaction from '../../../domain/WalletTransaction';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
 import config from '../../../config';
 import styles from './MemoDialogCommon.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   addMemoActionsSubmit: {
@@ -44,10 +43,7 @@ type State = {|
 @observer
 export default class AddMemoDialog extends Component<Props, State> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -58,13 +54,13 @@ export default class AddMemoDialog extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       memoContent: {
-        label: this.context.intl.formatMessage(memoMessages.memoLabel),
+        label: this.context.formatMessage(memoMessages.memoLabel),
         placeholder: '',
         value: '',
         validators: [({ field }) => (
           [
             isValidMemo(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
+            this.context.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
           ]
         )],
       },
@@ -102,7 +98,7 @@ export default class AddMemoDialog extends Component<Props, State> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const { memoContent } = form.values();
     const { isSubmitting } = this.state;
@@ -115,7 +111,7 @@ export default class AddMemoDialog extends Component<Props, State> {
     const actions = [
       {
         className: isSubmitting ? styles.isSubmitting : null,
-        label: this.context.intl.formatMessage(messages.addMemoActionsSubmit),
+        label: this.context.formatMessage(messages.addMemoActionsSubmit),
         primary: true,
         onClick: this.submit,
         isSubmitting,

@@ -3,9 +3,8 @@ import Dialog from '../../../components/widgets/Dialog';
 import { Typography, Button } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DialogCloseButton from '../../../components/widgets/DialogCloseButton';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { ROUTES } from '../../../routes-config';
 import type { StoresProps } from '../../../stores';
 
@@ -27,12 +26,12 @@ const messages = defineMessages({
 
 type Props = {|
   onClose: () => void,
-  intl: $npm$ReactIntl$IntlFormat,
 |};
 
 type AllProps = {| ...StoresProps, ...Props |};
 
-export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps): React$Node => {
+export const GovernanceParticipateDialog = ({ onClose, stores }: AllProps): React$Node => {
+  const intl = useIntl();
   return (
     <Dialog
       onClose={onClose}
@@ -52,7 +51,7 @@ export const GovernanceParticipateDialog = ({ onClose, stores, intl }: AllProps)
         width="100%"
         onClick={() => {
           onClose();
-          stores.app.goToRoute({
+          stores.routing.goToRoute({
             route: ROUTES.Governance.ROOT,
           });
         }}

@@ -2,14 +2,13 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
 import TextField from '../../common/TextField';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import styles from './InlineEditingInput.scss';
 import config from '../../../config';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   change: {
@@ -55,10 +54,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     isActive: false,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   validator: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
@@ -114,6 +110,8 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   onBlur: () => void = () => {
     if (this.state.isActive) {
+      const inputField = this.validator.$('inputField');
+      inputField.value = inputField.value.trim();
       this.submit();
       this.inputField.blur();
     }
@@ -139,7 +137,7 @@ export default class InlineEditingInput extends Component<Props, State> {
   render(): Node {
     const { validator } = this;
     const { className, inputFieldLabel, isActive, successfullyUpdated, id } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const inputField = validator.$('inputField');
     const componentStyles = classnames([
       className,

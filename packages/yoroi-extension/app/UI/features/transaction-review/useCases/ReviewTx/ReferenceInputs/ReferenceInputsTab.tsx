@@ -1,5 +1,4 @@
 import { Stack } from '@mui/material';
-import React from 'react';
 import { Inputs } from '../UTxOs/UTxOsTab';
 
 export const ReferenceInputsTab = ({ referenceInputs }) => {

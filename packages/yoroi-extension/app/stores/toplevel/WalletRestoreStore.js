@@ -44,7 +44,6 @@ export const RestoreSteps = Object.freeze({
   START: 0,
   WALLET_EXIST: 1,
   VERIFY_MNEMONIC: 2,
-  TRANSFER_TX_GEN: 4,
 });
 export type RestoreStepsType = $Values<typeof RestoreSteps>;
 export type PlateWithMeta = {|

@@ -1,9 +1,9 @@
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { getNetworkById, getCardanoHaskellBaseConfigCombined } from '../../api/ada/lib/storage/database/prepackaged/networks'
+import { getNetworkById, getCardanoHaskellBaseConfigCombined } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { truncateAddressShort, truncateAddress } from '../../utils/formatters';
 
 export const deriveRewardAddressFromAddress = (address: string, networkId: number): string => {
   try {
-
     const network = getNetworkById(networkId);
     const networkConfig = getCardanoHaskellBaseConfigCombined(network);
 
@@ -24,4 +24,18 @@ export const deriveRewardAddressFromAddress = (address: string, networkId: numbe
 
 export function addressHexToBech32(hex: string): string {
   return RustModule.WasmScope(Module => Module.WalletV4.Address.from_hex(hex).to_bech32());
+}
+
+type Truncate = 'short' | 'long' | 'none';
+
+export function displayAddrTruncated(addr: string, truncate: Truncate = 'none'): string {
+  if (truncate === 'short') {
+    return truncateAddressShort(addr);
+  }
+
+  if (truncate === 'long') {
+    return truncateAddress(addr);
+  }
+
+  return addr;
 }

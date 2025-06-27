@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import TextField from '../common/TextField';
 import Autocomplete from '../common/Autocomplete';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -22,7 +22,6 @@ import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
 import config from '../../config';
 import DialogBackButton from '../widgets/DialogBackButton';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   title: {
@@ -86,10 +85,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     introMessage: '',
   };
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired
-  };
-
+  static contextType:any = IntlContext;
   getInitRecoveryPhrase: void => Array<string> = () => {
     if (this.props.initValues) {
       const str: string = (this.props.initValues.recoveryPhrase || '').trim();
@@ -103,40 +99,40 @@ export default class WalletRestoreDialog extends Component<Props> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       walletName: this.props.isVerificationMode === true ? undefined : {
-        label: this.context.intl.formatMessage(messages.walletNameInputLabel),
+        label: this.context.formatMessage(messages.walletNameInputLabel),
         placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletName) || '',
         validators: [({ field }) => (
           [
             isValidWalletName(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletName)
+            this.context.formatMessage(globalMessages.invalidWalletName)
           ]
         )],
       },
       recoveryPhrase: {
-        label: this.context.intl.formatMessage(globalMessages.recoveryPhraseInputLabel),
+        label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
         placeholder: '',
         value: this.getInitRecoveryPhrase(),
         validators: [({ field }) => {
           const value = join(field.value, ' ');
           const wordsLeft = this.props.numberOfMnemonics - field.value.length;
-          if (value === '') return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+          if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
           if (wordsLeft > 0) {
             return [
               false,
-              this.context.intl.formatMessage(globalMessages.shortRecoveryPhrase,
+              this.context.formatMessage(globalMessages.shortRecoveryPhrase,
                 { number: wordsLeft })
             ];
           }
           return [
             this.props.mnemonicValidator(value),
-            this.context.intl.formatMessage(globalMessages.invalidRecoveryPhrase)
+            this.context.formatMessage(globalMessages.invalidRecoveryPhrase)
           ];
         }],
       },
       walletPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.newPasswordLabel),
+        label: this.context.formatMessage(globalMessages.newPasswordLabel),
         placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
@@ -146,20 +142,20 @@ export default class WalletRestoreDialog extends Component<Props> {
           }
           return [
             isValidWalletPassword(field.value),
-            this.context.intl.formatMessage(globalMessages.invalidWalletPassword)
+            this.context.formatMessage(globalMessages.invalidWalletPassword)
           ];
         }],
       },
       repeatPassword: this.props.isVerificationMode === true ? undefined : {
         type: 'password',
-        label: this.context.intl.formatMessage(globalMessages.repeatPasswordLabel),
+        label: this.context.formatMessage(globalMessages.repeatPasswordLabel),
         placeholder: '',
         value: (this.props.initValues && this.props.initValues.walletPassword) || '',
         validators: [({ field, form }) => {
           const walletPassword = form.$('walletPassword').value;
           return [
             isValidRepeatPassword(walletPassword, field.value),
-            this.context.intl.formatMessage(globalMessages.invalidRepeatPassword)
+            this.context.formatMessage(globalMessages.invalidRepeatPassword)
           ];
         }],
       },
@@ -216,7 +212,7 @@ export default class WalletRestoreDialog extends Component<Props> {
   // recoveryPhraseInput: Autocomplete;
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { form } = this;
     const {
       validWords,

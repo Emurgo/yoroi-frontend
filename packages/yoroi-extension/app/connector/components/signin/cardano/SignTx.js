@@ -194,7 +194,7 @@ const Panel = ({ children }): Node => (
 const RenderCip95Info = ({ cip95Info }): Node => {
   function renderCoin(c) {
     try {
-      return new BigNumber(c).div(1_000_000).toString();
+      return (new BigNumber(c)).div(1_000_000).toString();
     } catch (e) {
       console.error(e);
       return String(c);
@@ -210,7 +210,7 @@ const RenderCip95Info = ({ cip95Info }): Node => {
         return (
           <div key={`StakeRegistrationCert${i}`}>
             <span>Register stake credential</span>
-            {c.coin && <span>with {renderCoin(c.coin)} ADA deposit</span>}
+            {c.coin && <span> with {renderCoin(c.coin)} ADA deposit</span>}
           </div>
         );
       }),

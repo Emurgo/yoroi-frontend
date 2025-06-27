@@ -80,11 +80,11 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     // Save the landing route and go to the route that shows the loading screen
     runInAction(() => {
       this._originRoute = {
-        route: this.stores.app.currentRoute,
+        route: this.stores.routing.currentRoute,
         location: window.location.href,
       };
     });
-    this.stores.app.goToRoute({ route: ROUTES.ROOT });
+    this.stores.routing.goToRoute({ route: ROUTES.ROOT });
 
     if (this.fromUriScheme) {
       const networkId = networks.CardanoMainnet.NetworkId;

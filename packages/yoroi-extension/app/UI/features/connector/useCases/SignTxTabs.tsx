@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { connectorMessages } from '../../../../i18n/global-messages';
 import { Tabs, TabItem } from '../../../components/tabs/Tabs';
-import { useIntl } from '../../../context/IntlProvider';
+import { useIntl } from 'react-intl';
 import environment from '../../../../environment';
 
 interface Props {
@@ -16,7 +16,7 @@ const SignTxTabs = observer(({ connectionContent, utxosContent, detailsContent, 
   const isTestEnv = environment.isNightly() || environment.isTest();
   const containerHeight = isTestEnv ? 'calc(100vh - 306px - 46px)' : 'calc(100vh - 306px)';
 
-  const { intl } = useIntl();
+  const intl = useIntl();
 
   const tabs: TabItem[] = [
     {
@@ -38,9 +38,10 @@ const SignTxTabs = observer(({ connectionContent, utxosContent, detailsContent, 
 
   return (
     <Tabs
+      headerSx={{ mx: '32px' }}
       title={intl.formatMessage(connectorMessages[isDataSignin ? 'signData' : 'signTransaction'])}
       tabs={tabs}
-      containerHeight={containerHeight}
+      contentSx={{ height: containerHeight, p: '32px', pr: '12px' }}
     />
   );
 });

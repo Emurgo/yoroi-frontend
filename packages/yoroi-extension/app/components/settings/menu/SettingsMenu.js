@@ -2,11 +2,10 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import environmnent from '../../../environment';
 import { ROUTES } from '../../../routes-config';
 import globalMessages from '../../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SubMenu from '../../topbar/SubMenu';
 import type { SubMenuOption } from '../../topbar/SubMenu';
 
@@ -39,12 +38,9 @@ type Props = {|
 |};
 @observer
 export default class SettingsMenu extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { onItemClick, isActiveItem } = this.props;
     const isProduction = environmnent.isProduction();
     const settingOptions: Array<SubMenuOption> = [

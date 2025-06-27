@@ -1,7 +1,6 @@
 import React from 'react';
-import { defineMessages } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 import globalMessages from '../../../../../i18n/global-messages';
-import { useIntl } from '../../../../context/IntlProvider';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -101,9 +100,9 @@ export const messages = Object.freeze(
       id: 'portfolio.tokenInfo.marketPrice',
       defaultMessage: '!!!Market price',
     },
-    description: {
-      id: 'portfolio.tokenInfo.overview.description',
-      defaultMessage: '!!!Description',
+    info: {
+      id: 'portfolio.tokenInfo.overview.info',
+      defaultMessage: '!!!Info',
     },
     website: {
       id: 'portfolio.tokenInfo.overview.website',
@@ -311,13 +310,13 @@ export const messages = Object.freeze(
     },
     welcomeBannerDesc: {
       id: 'portfolio.welcomeBanner.description',
-      defaultMessage: '!!!Get started with Cardanos native currency, ADA. Its your key to  unlocking a world of possibilities',
+      defaultMessage: '!!!Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities',
     },
   })
 );
 
 export const useStrings = () => {
-  const { intl } = useIntl();
+  const intl = useIntl();
   return React.useRef({
     mainHeaderText: intl.formatMessage(messages.mainHeaderText),
     detailHeaderText: intl.formatMessage(messages.detailHeaderText),
@@ -341,7 +340,7 @@ export const useStrings = () => {
     lendAndBorrow: intl.formatMessage(messages.lendAndBorrow),
     balance: intl.formatMessage(messages.balance),
     marketPrice: intl.formatMessage(messages.marketPrice),
-    description: intl.formatMessage(messages.description),
+    info: intl.formatMessage(messages.info),
     website: intl.formatMessage(messages.website),
     policyId: intl.formatMessage(messages.policyId),
     fingerprint: intl.formatMessage(messages.fingerprint),

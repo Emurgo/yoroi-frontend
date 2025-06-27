@@ -1,8 +1,8 @@
 import { LoadingButton } from '@mui/lab';
 import { Box, Button, Stack } from '@mui/material';
-import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../hooks/useStrings';
+import { WrongPassphraseError } from '../../../../../../app/api/ada/lib/cardanoCrypto/cryptoErrors.js';
 
 export const BottomActions = () => {
   const strings = useStrings();
@@ -37,8 +37,7 @@ export const BottomActions = () => {
           sx={{ width: '100%' }}
           onClick={async () => {
             const response = await checkUserPassword(passswordInput);
-            if (response?.name === 'WrongPassphraseError') {
-              console.log('WrongPassphraseError', response);
+            if (response instanceof WrongPassphraseError) {
               setInputError({ type: 'setInputError', inputError: true });
             } else {
               submitTx(passswordInput);

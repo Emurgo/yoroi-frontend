@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import { useStrings } from '../../common/hooks/useStrings';
 import { ITabButtonProps, LiquidityItemType, OrderItemType } from '../../common/types/index';
@@ -93,7 +93,7 @@ const PortfolioDapps = ({ data, stores }: Props) => {
   };
 
   return (
-    <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
+    <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
         stores={stores}
         walletBalance={{ ada: '0' }}
@@ -123,7 +123,7 @@ const PortfolioDapps = ({ data, stores }: Props) => {
               height: '2.5rem',
               textTransform: 'none',
               color: theme.palette.ds.gray_max,
-              padding: `${theme.spacing(1)} !important`,
+              padding: `${theme.spacing(8)} !important`,
               backgroundColor: button.active ? theme.palette.ds.gray_200 : 'transparent',
               borderRadius: `${theme.shape.borderRadius}px`,
               cursor: 'pointer',
