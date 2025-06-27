@@ -68,7 +68,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens,
   });
 
-  console.log('IN CONTEXT swapManager', swapManager);
   useEffect(() => {
     action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
   }, [swapManager.settings.slippage]);
@@ -97,8 +96,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
     }
   );
-
-  console.log('limitOptions', limitOptions);
 
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
