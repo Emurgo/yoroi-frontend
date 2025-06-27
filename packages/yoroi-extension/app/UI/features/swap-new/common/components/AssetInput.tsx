@@ -129,9 +129,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
             // value={disabled ? '' : value}
             onFocus={() => setFocusState(true)}
             onBlur={() => setFocusState(false)}
-            // onPress={() => {
-            //   focusInput();
-            // }}
           />
         </Stack>
 
