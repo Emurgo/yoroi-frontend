@@ -12,6 +12,7 @@ import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { normalizeTokenId } from '../common/helpers';
 import { ASSET_DIRECTION_IN } from '../common/constants';
+import { AssetDirectionType } from '../common/types';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -439,7 +440,7 @@ const defaultState: SwapState = Object.freeze({
 type SwapState = {
   needsNewEstimate: boolean;
   orderType: 'market' | 'limit';
-  lastInputTouched: ASSET_DIRECTION_IN | 'out';
+  lastInputTouched: AssetDirectionType;
   tokenInInput: {
     isTouched: boolean;
     tokenId?: Portfolio.Token.Id;
