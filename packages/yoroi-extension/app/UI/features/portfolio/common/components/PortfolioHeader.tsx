@@ -134,7 +134,7 @@ const PortfolioHeader = observer(
     return (
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
-          <Stack direction="row" spacing={theme.spacing(0.5)} alignItems="flex-end">
+          <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end">
             {isLoading ? (
               <Skeleton width="146px" height="24px" />
             ) : (
@@ -150,7 +150,7 @@ const PortfolioHeader = observer(
             />
           </Stack>
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }}>
             {loading || isLoading ? (
               <Skeleton width="64px" height="13px" />
             ) : (
@@ -202,7 +202,7 @@ const CurrencyDisplay = ({ from, handleCurrencyChange }) => (
 );
 
 const Skeletons = ({ theme }) => (
-  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
+  <Stack direction="row" alignItems="center" spacing={theme.spacing(8)} sx={{ marginLeft: theme.spacing(16) }}>
     <Skeleton width="47px" height="20px" />
     <Skeleton width="65px" height="20px" />
   </Stack>

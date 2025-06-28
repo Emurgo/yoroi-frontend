@@ -41,7 +41,7 @@ const Table = ({
     </MuiTable>
   ) : (
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
-      <Stack direction="column" alignItems="center" spacing={theme.spacing(3)}>
+      <Stack direction="column" alignItems="center" spacing={theme.spacing(24)}>
         <Box component="img" src={noResultsPng}></Box>
         <Typography variant="h4" fontWeight="500" color="ds.text_gray_medium" sx={{ lineHeight: '26px' }}>
           {strings.noResultsForThisSearch}

@@ -10,15 +10,7 @@ export const useSwapConfig = () => {
   });
 
   const swapConfig = query.data;
-
-  // const candidateTokenId = swapConfig?.initialPair?.tokenOut
-
-  // const {tokenInfos} = useSwapRevamp()
-
-  // const tokenOutId = tokenInfos.has(candidateTokenId ?? undefinedToken) ? candidateTokenId : undefined
-
   const partners = swapConfig?.partners;
-
   const excludedTokens = swapConfig?.excludedTokens ?? [];
 
   return {

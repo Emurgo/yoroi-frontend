@@ -115,26 +115,32 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     return notifSettings[selectedWalletId] ?? true;
   };
 
+  const locationRef = React.useRef(location);
+
+  React.useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
+
   const createNotification = async (type: NotificationTypes, id?: string) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
     // Early returns:
     // return if settings are off
+    const currentLocation = locationRef.current;
+
     if (!notifyWallet) return;
     // return if we're on the same route as the event redirection
+
     switch (type) {
       case NotificationTypes.Intrawallet:
       case NotificationTypes.Income:
       case NotificationTypes.Outcome:
       case NotificationTypes.Cancelled:
-        if (location.pathname === ROUTES.WALLETS.TRANSACTIONS) {
-          return;
-        }
+        if (currentLocation.pathname === ROUTES.WALLETS.TRANSACTIONS) return;
         break;
       case NotificationTypes.Rewards:
-        if (location.pathname === ROUTES.STAKING) {
-          return;
-        }
+        if (currentLocation.pathname === ROUTES.STAKING) return;
+        break;
     }
 
     createToast({

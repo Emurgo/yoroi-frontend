@@ -27,7 +27,7 @@ export default function NftsEmptyState({ isSearch }: NftsEmptyStateProps) {
         alignItems: 'center',
         justifyContent: 'center',
       }}
-      spacing={2}
+      spacing={16}
       id="nftsList-emptyState-component"
     >
       <NftsNotFound />

@@ -25,11 +25,11 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
       <TableRow>
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
-            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(2)}` }}>
+            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(16)}` }}>
               <Stack
                 direction="row"
                 alignItems="center"
-                spacing={theme.spacing(1)}
+                spacing={theme.spacing(8)}
                 onClick={() => (isPadding ? null : disabledSort ? null : onRequestSort(id))}
                 // @ts-ignore
                 sx={{

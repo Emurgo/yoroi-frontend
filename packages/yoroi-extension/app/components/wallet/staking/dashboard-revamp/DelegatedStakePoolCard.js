@@ -39,7 +39,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
         paddingBottom: '24px',
       }}
     >
-      <Stack direction="row" px={4} py={2} alignItems="center">
+      <Stack direction="row" px={24} py={16} alignItems="center">
         <Typography component="div" variant="h5" color={theme.palette.ds.text_gray_medium} fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>

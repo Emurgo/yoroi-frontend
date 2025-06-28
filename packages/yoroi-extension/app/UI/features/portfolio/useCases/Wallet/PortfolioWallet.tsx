@@ -51,7 +51,7 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
   }, [keyword]);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
+    <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
         stores={stores}
         walletBalance={walletBalance || { ada: '0' }}
