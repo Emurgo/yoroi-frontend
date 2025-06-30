@@ -43,6 +43,8 @@ export const CatalystRegistrationProcess = () => {
         modalId,
         title,
         content: <TxExecutingStep />,
+        width: '648px',
+        height: '648px',
       });
       return;
     }
@@ -76,6 +78,8 @@ export const CatalystRegistrationProcess = () => {
       title,
       content,
       handleBack: hasBack ? votingPrevStep : undefined,
+      width: '648px',
+      height: '648px',
     });
   }, [currentVotingStep, votingRegTx]);
 
