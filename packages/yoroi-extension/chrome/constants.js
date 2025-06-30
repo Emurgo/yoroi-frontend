@@ -52,10 +52,6 @@ export function genCSP(request: {|
   // cashback domain whitelist
   connectSrc.push('https://raw.githubusercontent.com');
 
-  // Firebase cloud messaging
-  connectSrc.push('https://firebaseinstallations.googleapis.com/v1/projects/yoroi-extension-14826/');
-  connectSrc.push('https://fcmregistrations.googleapis.com/v1/projects/yoroi-extension-14826/');
-
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [

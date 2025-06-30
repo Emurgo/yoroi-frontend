@@ -74,10 +74,6 @@ export function genCSP(request: {|
   // cashback domain whitelist
   connectSrc.push('https://raw.githubusercontent.com');
 
-  // Firebase cloud messaging
-  connectSrc.push('https://firebaseinstallations.googleapis.com/v1/projects/yoroi-extension-14826/');
-  connectSrc.push('https://fcmregistrations.googleapis.com/v1/projects/yoroi-extension-14826/');
-
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293
   const evalSrc = "'wasm-eval'";
