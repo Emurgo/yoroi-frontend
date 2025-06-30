@@ -1,28 +1,12 @@
 // @flow
 import type { Node } from 'react';
-import type { RouterHistory } from 'react-router-dom';
 import type { StoresMap } from './stores';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { Router } from 'react-router-dom';
-import { addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import ko from 'react-intl/locale-data/ko';
-import ja from 'react-intl/locale-data/ja';
-import zh from 'react-intl/locale-data/zh';
-import ru from 'react-intl/locale-data/ru';
-import de from 'react-intl/locale-data/de';
-import fr from 'react-intl/locale-data/fr';
-import nl from 'react-intl/locale-data/nl';
-import pt from 'react-intl/locale-data/pt';
-import id from 'react-intl/locale-data/id';
-import es from 'react-intl/locale-data/es';
-import it from 'react-intl/locale-data/it';
-import tr from 'react-intl/locale-data/tr';
-import cs from 'react-intl/locale-data/cs';
-import sk from 'react-intl/locale-data/sk';
+import { HashRouter as Router } from 'react-router';
+import { IntlProvider } from 'react-intl';
 import { autorun, observable, runInAction } from 'mobx';
-import { Routes } from './Routes';
+import { YoroiRoutes } from './Routes';
 import { translations } from '../i18n/translations';
 import ThemeManager from '../ThemeManager';
 import CrashPage from '../containers/CrashPage';
@@ -31,15 +15,9 @@ import { globalStyles } from '../styles/globalStyles';
 import { CssBaseline } from '@mui/material';
 import { changeToplevelTheme, MuiThemes } from '../styles/themes';
 import { ColorModeProvider } from '../styles/context/mode';
-// $FlowIgnore: suppressing this error
-import { IntlProviderWrapper, IntlContextProvider } from '../UI/common/context/IntlContextProvider';
-
-// https://github.com/yahoo/react-intl/wiki#loading-locale-data
-addLocaleData([...en, ...ko, ...ja, ...zh, ...ru, ...de, ...fr, ...nl, ...pt, ...id, ...es, ...it, ...tr, ...cs, ...sk]);
 
 type Props = {|
   +stores: StoresMap,
-  +history: RouterHistory,
 |};
 type State = {|
   crashed: boolean,
@@ -98,24 +76,22 @@ class App extends Component<Props, State> {
           <CssBaseline />
           {globalStyles(muiTheme)}
           <ThemeManager />
-          <IntlProviderWrapper locale={locale} key={locale} messages={mergedMessages}>
+          <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
             {this.getContent()}
-          </IntlProviderWrapper>
+          </IntlProvider>
         </ColorModeProvider>
       </div>
     );
   }
 
   getContent: void => ?Node = () => {
-    const { stores, history } = this.props;
+    const { stores } = this.props;
     if (this.state.crashed === true) {
       return <CrashPage />;
     }
     return (
-      <Router history={history}>
-        <IntlContextProvider>
-          <Routes stores={stores} />
-        </IntlContextProvider>
+      <Router>
+        <YoroiRoutes stores={stores} />
       </Router>
     );
   };

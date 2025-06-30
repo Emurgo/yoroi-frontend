@@ -2,15 +2,12 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
-import type {
-  TransferTx,
-} from '../../types/TransferTypes';
-import { genAddressLookup, genAddressingLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
+import type { TransferTx } from '../../types/TransferTypes';
+import { genAddressLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import Dialog from '../../components/widgets/Dialog';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
@@ -41,26 +38,7 @@ const messages = defineMessages({
 @observer
 export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
-  submit: {|
-    signRequest: HaskellShelleyTxSignRequest,
-    publicKey: {|
-      key: RustModule.WalletV4.Bip32PublicKey,
-      ...Addressing,
-    |},
-    publicDeriverId: number,
-    addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
-    expectedSerial: string | void,
-    networkId: number,
-  |} => Promise<void> = async (request) => {
-    await this.props.stores.substores.ada.ledgerSend.sendUsingLedgerKey({
-      ...request,
-    });
-    this.props.onSubmit();
-  }
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { transferRequest } = this.props.stores.substores.ada.yoroiTransfer;
@@ -88,7 +66,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
   }
 
   getSpinner: void => Node = () => {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Dialog
         title={intl.formatMessage(globalMessages.processingLabel)}
@@ -138,7 +116,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     // CardanoMainnet.NetworkId is hardcoded here because the functionality is available only on mainnet
     const network = getNetworkById(networks.CardanoMainnet.NetworkId);
 
-    const { intl } = this.context;
+    const intl = this.context;
     const header = (
       <div>
         {intl.formatMessage(messages.explanation, {
@@ -153,8 +131,6 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
       </div>
     );
 
-    const expectedSerial = selected.hardwareWalletDeviceId || '';
-
     return (
       <TransferSummaryPage
         header={header}
@@ -165,24 +141,32 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
         transferTx={transferTx}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
         onSubmit={{
-          trigger: async () => await this.submit({
-            publicDeriverId: selected.publicDeriverId,
-            addressingMap: genAddressingLookup(
-              selected.networkId,
-              this.props.stores.addresses.addressSubgroupMap
-            ),
-            ...tentativeTx,
-            expectedSerial,
-            networkId: tentativeTx.signRequest.networkSettingSnapshot.NetworkId,
-          }),
+          trigger: async () => {
+            if (selected.type !== 'ledger') {
+              throw new Error('unexpected wallet type');
+            }
+            await this.props.stores.transactionProcessingStore.adaSendAndRefresh({
+              signRequest: tentativeTx.signRequest,
+              wallet: {
+                 ...selected,
+                 // when transfering ledger wallet Byron Utxos to Shelley, we should use the
+                 // Byron public key
+                 publicKey: tentativeTx.publicKey.key.to_hex(),
+                 pathToPublic: tentativeTx.publicKey.addressing.path,
+              },
+              password: null,
+              callback: async () => {},
+            });
+            this.props.onSubmit();
+          },
           label: intl.formatMessage(globalMessages.upgradeLabel),
         }}
-        isSubmitting={this.props.stores.wallets.sendMoneyRequest.isExecuting}
+        isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         onCancel={{
           trigger: this.props.onClose,
           label: intl.formatMessage(globalMessages.skipLabel),
         }}
-        error={this.props.stores.wallets.sendMoneyRequest.error}
+        error={this.props.stores.transactionProcessingStore.sendMoneyRequest.error}
         dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
         getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
         unitOfAccountSetting={this.props.stores.profile.unitOfAccount}

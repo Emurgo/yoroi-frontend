@@ -3,7 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
@@ -15,7 +15,6 @@ import ExplorableHashContainer from '../../containers/widgets/ExplorableHashCont
 import RawHash from '../widgets/hashWrappers/RawHash';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 import type {
   TokenLookupKey,
@@ -54,13 +53,10 @@ type Props = {|
 @observer
 export default class URIVerifyDialog extends Component<Props> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { onCancel, onSubmit, unitOfAccountSetting, } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const dialogClasses = classnames([
       styles.dialog,

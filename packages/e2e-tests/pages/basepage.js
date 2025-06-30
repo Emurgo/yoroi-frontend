@@ -1,4 +1,4 @@
-import { until, Key, logging, WebElement } from 'selenium-webdriver';
+import { until, Key, logging, WebElement, WebDriver } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
@@ -20,12 +20,21 @@ import {
   quarterSecond,
 } from '../helpers/timeConstants.js';
 import { dbSnapshotsDir } from '../helpers/constants.js';
+import { ElementLocator } from './locator.js';
+import { Logger } from 'simple-node-logger';
 
 const writeFile = promisify(fs.writeFile);
 
 class BasePage {
+  /**
+   *
+   * @param {WebDriver} webDriver
+   * @param {Logger} logger
+   */
   constructor(webDriver, logger) {
+    /**@type {WebDriver} */
     this.driver = webDriver;
+    /**@type {Logger} */
     this.logger = logger;
   }
 
@@ -89,7 +98,7 @@ class BasePage {
       }
     }
     if (!success) {
-      throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`)
+      throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`);
     }
   }
   async clickByScript(locator) {
@@ -104,10 +113,12 @@ class BasePage {
   async focus(locator) {
     this.logger.info(`BasePage::focus is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
-    await this.driver.executeScript("arguments[0].focus();", element);
+    await this.driver.executeScript('arguments[0].focus();', element);
   }
   async dispatchMouseDownEvent(locator) {
-    this.logger.info(`BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`);
+    this.logger.info(
+      `BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`
+    );
     const element = await this.findElement(locator);
     await this.driver.executeScript(
       `arguments[0].dispatchEvent(new MouseEvent('mousedown', {view: window, bubbles : true, cancelable: true}))`,
@@ -139,25 +150,34 @@ class BasePage {
     return await this.driver.findElement(getByLocator(locator));
   }
   /**
-   * 
-   * @param {{locator: string, method: string}} locator 
+   * Finding all suitable WebElements by the locator
+   * @param {ElementLocator} locator
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
     this.logger.info(`BasePage::findElements is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElements(getByLocator(locator));
   }
+  /**
+   * Getting a text by element locator
+   * @param {ElementLocator} locator
+   * @returns {Promise<string>}
+   */
   async getText(locator) {
     this.logger.info(`BasePage::getText is called. Locator: ${JSON.stringify(locator)}`);
     return await this.waitPresentedAndAct(locator, async () => {
       let element = await this.findElement(locator);
       try {
-        return await element.getText();
+        const result = await element.getText();
+        this.logger.info(`BasePage::getText. Result: ${result}`);
+        return result;
       } catch (error) {
         if (error.name === 'StaleElementReferenceError') {
           this.logger.info(`BasePage::getText Re-try because of StaleElementReferenceError`);
           element = await this.findElement(locator);
-          return await element.getText();
+          const result = await element.getText();
+          this.logger.info(`BasePage::getText. Result: ${result}`);
+          return result;
         } else {
           throw error;
         }
@@ -168,11 +188,16 @@ class BasePage {
     this.logger.info(
       `BasePage::getCssValue is called. Locator: ${JSON.stringify(locator)}, property: ${cssStyleProperty}`
     );
-    return await this.driver.findElement(getByLocator(locator)).getCssValue(cssStyleProperty);
+    const element = await this.driver.findElement(getByLocator(locator));
+    const result = element.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValue Result: ${result}`);
+    return result;
   }
   async getCssValueElement(webElement, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
-    return await webElement.getCssValue(cssStyleProperty);
+    const result = await webElement.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
+    return result;
   }
   async getAttribute(locator, property) {
     this.logger.info(
@@ -442,7 +467,7 @@ class BasePage {
   }
   /**
    * The function wait until the passed element is found and call the passed function
-   * @param {{locator: string, method: id}} locator Element locator
+   * @param {ElementLocator} locator Element locator
    * @param {object} funcToCall A function that should be called when the element is found
    * @param {number} timeout Total time of search in milliseconds. Default values is **5000** milliseconds
    * @param {number} repeatPeriod The time after which it is necessary to repeat the check. Default value is **250** milliseconds
@@ -485,7 +510,11 @@ class BasePage {
       return false;
     }
   }
-  // The method is for debugging
+  /**
+   * Highlighting the web element with red border and yellow backgorund.
+   * !!IT IS ONLY FOR DEBUGGING!!
+   * @param {WebElement} webElement
+   */
   async highlightElement(webElement) {
     this.logger.info(
       `Webdriver::highlightElement: Highlighting element "${JSON.stringify(webElement)}"`
@@ -734,7 +763,10 @@ class BasePage {
     }
     // set info into the chrome local storage
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
-    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(
+      browserStorageFileName,
+      useGeneralStorageInfo
+    );
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
@@ -747,15 +779,52 @@ class BasePage {
   }
   /**
    * Setting info into the browser local storage
-   * @param {string} templateName 
-   * @param {boolean} useGeneralStorageInfo 
+   * @param {string} templateName
+   * @param {boolean} useGeneralStorageInfo
    */
   async prepareBrowserLocalStorage(templateName, useGeneralStorageInfo) {
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
-    const browserStorageSnapshot = getSnapshotObjectFromJSON(browserStorageFileName, useGeneralStorageInfo);
+    const browserStorageSnapshot = getSnapshotObjectFromJSON(
+      browserStorageFileName,
+      useGeneralStorageInfo
+    );
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
+  }
+  /**
+   * Getting an element size
+   * @param {ElementLocator} locator
+   * @returns {{height: number, width: number}}
+   */
+  async getSize(locator) {
+    this.logger.info(`BasePage::getSize is called. Value: ${JSON.stringify(locator)}`);
+    const element = await this.findElement(locator);
+    const rect = await element.getRect();
+    this.logger.info(`BasePage::getSize is called. Result: ${JSON.stringify(rect)}`);
+    return {
+      height: rect.height,
+      width: rect.width,
+    };
+  }
+
+  /**
+   * Reading a buffer info
+   * @returns {Promise<string>}
+   */
+  async getClipboardData() {
+    this.logger.info(`BasePage::getClipboardData is called.`);
+    const clipboardText = await this.driver.executeAsyncScript(async callback => {
+      try {
+        const text = await navigator.clipboard.readText();
+        callback(text);
+      } catch (error) {
+        console.error('Failed to read clipboard:', error);
+        callback(null);
+      }
+    });
+    this.logger.info(`BasePage::getClipboardData is called. Result: ${clipboardText}`);
+    return clipboardText;
   }
 }
 

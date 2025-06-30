@@ -1,24 +1,24 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
 import GeneralPageLayout from '../../layout/GeneralPageLayout';
+import { useIntl } from 'react-intl';
+import { connectorMessages } from '../../../i18n/global-messages';
 
 type Props = {
   stores: any;
-  actions: any;
   children: ReactNode;
 };
 
-const DappCenterLayout = ({ stores, actions, children }: Props): JSX.Element => {
+const DappCenterLayout = ({ stores, children }: Props): JSX.Element => {
+  const intl = useIntl();
   return (
     <GeneralPageLayout
       stores={stores}
-      actions={actions}
       navbar={
         <NavBarContainerRevamp
-          actions={actions}
           stores={stores}
-          title={<NavBarTitle title={'dApp Center'} />}
+          title={<NavBarTitle title={intl.formatMessage(connectorMessages.dappConnector)} />}
         />
       }
     >

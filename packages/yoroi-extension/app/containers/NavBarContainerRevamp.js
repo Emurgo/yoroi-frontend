@@ -1,8 +1,7 @@
 // @flow
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Node } from 'react';
 import { Component } from 'react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../routes-config';
 import { genLookupOrFail } from '../stores/stateless/tokenHelpers';
@@ -42,10 +41,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   static defaultProps: {| menu: void |} = {
     menu: undefined,
   };
@@ -56,7 +52,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
 
   addNewWallet: void => Promise<void> = async () => {
     this.props.stores.uiDialogs.closeActiveDialog();
-    this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+    this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet) {
       await localStorage.unsetPortfolioFiatPair(selectedWallet.networkId);
@@ -64,29 +60,29 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
   };
 
   onSelectWallet: number => Promise<void> = async newWalletId => {
-    const { delegation, app } = this.props.stores;
+    const { delegation, routing } = this.props.stores;
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
-    const isStakingPage = app.currentRoute === ROUTES.STAKING;
+    const isStakingPage = routing.currentRoute === ROUTES.STAKING;
     this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet) {
       await localStorage.unsetPortfolioFiatPair(selectedWallet.networkId);
     }
-    const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : app.currentRoute;
-    this.props.stores.app.goToRoute({ route });
+    const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : routing.currentRoute;
+    this.props.stores.routing.goToRoute({ route });
   };
 
   // <TODO:GENERALIZE> This is a weird function to have for governance feature only.
   // This should be changed to some generic mechanic that drops user back to TOP routes
   checkAndResetGovRoutes: void => void = () => {
     const { stores } = this.props;
-    const currentRoute = stores.app.currentRoute;
+    const currentRoute = stores.routing.currentRoute;
     if (
       currentRoute === ROUTES.Governance.FAIL ||
       currentRoute === ROUTES.Governance.SUBMITTED
     ) {
-      stores.app.goToRoute({ route: ROUTES.Governance.ROOT });
+      stores.routing.goToRoute({ route: ROUTES.Governance.ROOT });
     }
   };
 
@@ -168,7 +164,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
                 if (isTestnet) {
                   window.open(links.testnetFaucet, '_blank');
                 } else {
-                  if (stores.router.location.pathname.startsWith(ROUTES.WALLETS.ROOT)) {
+                  if (stores.routing.currentRoute.startsWith(ROUTES.WALLETS.ROOT)) {
                     ampli.walletPageExchangeClicked();
                   }
                   this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
@@ -238,7 +234,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
         <BuySellDialog
           onCancel={this.props.stores.uiDialogs.closeActiveDialog}
           onExchangeCallback={() =>
-            stores.app.goToRoute({ route: ROUTES.EXCHANGE_END })
+            stores.routing.goToRoute({ route: ROUTES.EXCHANGE_END })
           }
           currentBalanceAda={
             selected.balance.getDefault().shiftedBy(-numberOfDecimals)

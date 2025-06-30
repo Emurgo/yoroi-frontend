@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { UnconfirmedAmount } from '../../../types/unconfirmedAmount.types';
@@ -9,7 +8,7 @@ import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletSummary.scss';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { formatValue } from '../../../utils/unit-of-account';
 import { splitAmount, truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
@@ -27,6 +26,9 @@ import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import environment from '../../../environment';
+// $FlowIgnore: suppressing this error
+import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
+import type { StoresMap } from '../../../stores';
 
 const messages = defineMessages({
   transactionType: {
@@ -57,8 +59,9 @@ type Props = {|
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
   +emptyBannerComponent: Node,
-  +goToRoute: ({| route: string, params?: Object, delegateToYoroiDrep?: null | boolean |}) => void,
+  +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
+  +stores: StoresMap,
 |};
 
 type State = {|
@@ -69,10 +72,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isBannerVisible: false,
   };
@@ -202,6 +202,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const { goToRoute, selectedWallet } = this.props;
     const { isBannerVisible } = this.state;
 
+    const onClose = () => {
+      this.setState({ isBannerVisible: false });
+      localStorage.setBringBannerClosed('true');
+    }
+
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
 
@@ -209,11 +214,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
 
     return (
       <BringBanner
-        onClose={() => {
-          this.setState({ isBannerVisible: false });
-          localStorage.setBringBannerClosed('true');
+        onClose={onClose}
+        onClick={() => {
+          goToRoute({ route: ROUTES.CASHBACK.ROOT });
+          onClose();
         }}
-        onClick={() => goToRoute({ route: ROUTES.CASHBACK.ROOT })}
         displayIllustration={false}
       />
     );
@@ -242,8 +247,9 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
       openExportTxToFileDialog,
       shouldShowEmptyBanner,
       emptyBannerComponent,
+      stores,
     } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
 
@@ -297,6 +303,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
+        <DrepPromotionBanner stores={stores} intl={intl} />
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}

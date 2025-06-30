@@ -1,5 +1,4 @@
 import { Button, Stack, Typography } from '@mui/material';
-import React from 'react';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { OperationIlustration } from './Ilustration';
 import { useStrings } from '../../common/hooks/useStrings';

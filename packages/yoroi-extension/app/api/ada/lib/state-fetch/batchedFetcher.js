@@ -72,7 +72,7 @@ declare var CONFIG: ConfigType;
 const addressesLimit = CONFIG.app.addressRequestSize;
 
 const MINT_METADATA_REQUEST_PAGE_SIZE = 100;
-
+const RECENT_TRANSACTION_HASH_PAGE_SIZE = 100;
 /**
  * Makes calls to Yoroi backend service
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
@@ -296,7 +296,16 @@ export function batchGetTransactionsHistoryForAddresses(
 function batchGetRecentTransactionHashes(
   getRecentTransactionHashes: GetRecentTransactionHashesFunc,
 ): GetRecentTransactionHashesFunc {
-  return getRecentTransactionHashes;
+  return async function(body: GetRecentTransactionHashesRequest): Promise<GetRecentTransactionHashesResponse> {
+    const responses = await Promise.all(chunk(body.addresses, RECENT_TRANSACTION_HASH_PAGE_SIZE).map(
+      batch => getRecentTransactionHashes({ ...body, addresses: batch })
+    ));
+    const result = {};
+    for (const response of responses) {
+      Object.assign(result, response);
+    }
+    return result;
+  }
 }
 
 function batchGetTransactionsByHashes(

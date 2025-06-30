@@ -1,6 +1,5 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React from 'react';
 import { useStrings } from '../../../common/hooks/useStrings';
 
 // const PerformanceItemType = {
@@ -14,7 +13,7 @@ interface Props {
   isLoading?: boolean;
 }
 
-const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
+const Performance = ({ tokenInfo, isLoading }: Props): React.ReactNode => {
   console.log({ tokenInfo, isLoading });
   const theme = useTheme();
   const strings = useStrings();
@@ -38,7 +37,7 @@ const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
 
   return (
     <Stack direction="column">
-      <Typography fontWeight="500" color="ds.gray_max" sx={{ marginBottom: theme.spacing(2) }}>
+      <Typography fontWeight="500" color="ds.gray_max" sx={{ marginBottom: theme.spacing(16) }}>
         {strings.marketData}
       </Typography>
       <Stack direction="column" spacing={1}>
@@ -70,7 +69,7 @@ const Performance = ({ tokenInfo, isLoading }: Props): JSX.Element => {
           </Stack>
         ))} */}
       </Stack>
-      <Stack direction="column" spacing={'0.375rem'} sx={{ marginTop: theme.spacing(1) }}>
+      <Stack direction="column" spacing={'0.375rem'} sx={{ marginTop: theme.spacing(8) }}>
         {/* {secondPerformanceItemList.map((item, index) => (
           <Stack key={item.id} direction="row" justifyContent="space-between" alignItems="center">
             <Typography color="ds.gray_600">{item.label}</Typography>

@@ -29,7 +29,7 @@ export const ModalProvider = ({ children, initialState }: { children: React.Reac
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const actions = React.useRef<ModalActions>({
     closeModal: () => {
-      dispatch({ type: 'close' });
+      dispatch({ type: 'close', title: '', content: null, height: '0px', width: '0px', modalId: '' });
     },
     openModal: (payload: any) => {
       dispatch({
@@ -84,7 +84,7 @@ const defaultState: ModalState = Object.freeze({
   isOpen: false,
   title: '',
   content: null,
-  height: '648px',
-  width: '648px',
+  height: '0px',
+  width: '0px',
   isLoading: false,
 });

@@ -4,8 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { observable, action } from 'mobx';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -19,6 +18,7 @@ import styles from './ConfirmPinDialog.scss';
 import type { StepsList } from './types';
 import { Typography } from '@mui/material';
 import Stepper from '../../common/stepper/Stepper';
+import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 const messages = defineMessages({
   line1: {
@@ -41,9 +41,8 @@ type Props = {|
 
 @observer
 export default class ConfirmPinDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
+  static contextType:any = IntlContext;
+
   @observable pinForm: void | ReactToolboxMobxForm;
 
   @action
@@ -52,7 +51,7 @@ export default class ConfirmPinDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       stepsList,
       progressInfo,
@@ -100,7 +99,7 @@ export default class ConfirmPinDialog extends Component<Props> {
               variant="body1"
               color="grayscale.900"
             >
-              <FormattedHTMLMessage {...messages.line1} />
+              <FormattedMessage {...messages.line1} values={{ strong }}/>
             </Typography>
           </>
         )}
@@ -111,7 +110,7 @@ export default class ConfirmPinDialog extends Component<Props> {
             pinMatches={pinValidation}
             fieldName="pin"
             validCheck={_pin => true}
-            placeholder={this.context.intl.formatMessage(globalMessages.confirmPin)}
+            placeholder={this.context.formatMessage(globalMessages.confirmPin)}
             allowEmptyInput={false}
           />
         </div>

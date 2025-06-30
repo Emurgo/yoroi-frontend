@@ -1,6 +1,6 @@
 // @flow
 import { Box, Typography, styled } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { capitalize } from 'lodash';
 import { useState } from 'react';
 import { ReactComponent as ChevronDownIcon } from '../../../../assets/images/revamp/icons/chevron-down.inline.svg';

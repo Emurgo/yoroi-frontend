@@ -40,7 +40,7 @@ type PortfolioProviderProps = {
     currency: CurrencyType;
     enabled: boolean;
   };
-  initialState: {
+  initialState?: {
     unitOfAccount: CurrencyType;
     accountPair: AccountPair;
   };

@@ -1,6 +1,5 @@
 import { Box, Link as LinkMui, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React from 'react';
 import { CopyButton } from '../../../../../components';
 import tokenPng from '../../../common/assets/images/token.png';
 import { isPrimaryToken } from '../../../common/helpers/isPrimary';
@@ -11,14 +10,14 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const Overview = ({ tokenInfo }: Props): JSX.Element => {
+const Overview = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const isPrimary = isPrimaryToken(tokenInfo);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(2)}>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+    <Stack direction="column" spacing={theme.spacing(16)}>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(8)}>
         <Box
           width="32px"
           height="32px"
@@ -39,7 +38,7 @@ const Overview = ({ tokenInfo }: Props): JSX.Element => {
         </Typography>
       </Stack>
 
-      <TokenOverviewSection label={strings.description} value={tokenInfo?.info.metadata?.description} />
+      <TokenOverviewSection label={strings.info} value={tokenInfo?.info.metadata?.description} />
 
       <TokenOverviewSection
         label={strings.website}
@@ -95,7 +94,7 @@ const TokenOverviewSection = ({
 
   return (
     <Stack direction="row" alignItems="flex-end" gap="8px">
-      <Stack direction="column" spacing={theme.spacing(0.5)}>
+      <Stack direction="column" spacing={theme.spacing(4)}>
         <Typography fontWeight="500" color="ds.gray_900">
           {label}
         </Typography>

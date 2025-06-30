@@ -8,7 +8,6 @@ import {
   asGetPublicKey,
   asGetSigningKey,
   asGetStakingKey,
-  asHasLevels,
   asHasUtxoChains,
 } from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits'
 import { getWalletChecksum } from '../../../../app/api/export/utils';
@@ -222,11 +221,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   }
   const allAddresses = await getAllAddressesForWallet(publicDeriver);
 
-  const withLevels = asHasLevels(publicDeriver);
-  if (withLevels == null) {
-    throw new Error('unexpected missing asHasLevels result');
-  }
-  const foreignAddresses = await getForeignAddresses({ publicDeriver: withLevels });
+  const foreignAddresses = await getForeignAddresses({ publicDeriver });
 
   const allUtxoAddresses = await withUtxos.getAllUtxoAddresses();
 
@@ -253,7 +248,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     signingKeyUpdateDate,
     stakingAddressing: { addressing: stakingKeyDbRow.addressing },
     stakingAddress: stakingKeyDbRow.addr.Hash,
-    publicDeriverLevel: withLevels.getParent().getPublicDeriverLevel(),
+    publicDeriverLevel: publicDeriver.getParent().getPublicDeriverLevel(),
     lastSyncInfo: await publicDeriver.getLastSyncInfo(),
     balance,
     assetDeposits,

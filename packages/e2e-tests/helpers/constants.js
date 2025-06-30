@@ -1,18 +1,13 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { isMacOS } from '../utils/utils.js';
+import { isMacOS, getRandomItem } from '../utils/utils.js';
 import * as fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const __englishCharacters = 'qwertyuiopasdfghjklzxcvbnm';
 const __digits = '1234567890';
-const __getRandomItem = arr => {
-  const randomIndex = Math.floor(Math.random() * arr.length);
-  const item = arr[randomIndex];
 
-  return item;
-};
 const __flipCoin = () => {
   const trueFalseArr = [true, false];
   const randomIndex = Math.floor(Math.random() * trueFalseArr.length);
@@ -22,10 +17,10 @@ const __getRandomChar = isCapital => {
   let randomChar = '';
   if (isCapital) {
     randomChar = __flipCoin()
-      ? __getRandomItem(__englishCharacters + __digits).toUpperCase()
-      : __getRandomItem(__englishCharacters + __digits);
+      ? getRandomItem(__englishCharacters + __digits).toUpperCase()
+      : getRandomItem(__englishCharacters + __digits);
   } else {
-    randomChar = __getRandomItem(__englishCharacters + __digits);
+    randomChar = getRandomItem(__englishCharacters + __digits);
   }
   return randomChar;
 };
@@ -59,7 +54,7 @@ export const firefoxBin =
     ? process.env.FIREFOX_BIN
     : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 export const chromeBin = isMacOS()
-  ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+  ? '/Applications/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
   : '/usr/local/bin/chromedriver';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',

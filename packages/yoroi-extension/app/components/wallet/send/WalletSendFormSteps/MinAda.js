@@ -2,8 +2,7 @@
 
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { Typography } from '@mui/material';
 
@@ -20,12 +19,9 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class MinAda extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { minAda } = this.props;
 
     return (

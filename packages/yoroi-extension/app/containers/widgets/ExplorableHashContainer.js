@@ -3,9 +3,8 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { handleExternalLinkClick } from '../../utils/routing';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { LinkType } from '../../api/ada/lib/storage/database/explorers/tables';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
 
@@ -33,12 +32,9 @@ export default class ExplorableHashContainer extends Component<Props> {
     light: undefined,
   };
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const explorerInfo = this.props.selectedExplorer.getOrDefault(this.props.linkType);
     if (explorerInfo == null) {

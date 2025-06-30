@@ -39,7 +39,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
         paddingBottom: '24px',
       }}
     >
-      <Stack direction="row" px={4} py={2} alignItems="center">
+      <Stack direction="row" px={24} py={16} alignItems="center">
         <Typography component="div" variant="h5" color={theme.palette.ds.text_gray_medium} fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
@@ -71,7 +71,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           )}
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography component="div" color={theme.palette.ds.text_gray_medium} variant="body1" fontWeight="medium" mb="3px">
+          <Typography component="div" color={theme.palette.ds.text_primary_medium} variant="body1" fontWeight="medium" mb="3px">
             {ticker != null ? `[${ticker}]` : ''} {name ?? truncateAddress(poolIdHexToBech32(id))}
           </Typography>
           <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />

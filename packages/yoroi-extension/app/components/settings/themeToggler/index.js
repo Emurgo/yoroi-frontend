@@ -4,8 +4,7 @@ import { Box, FormControlLabel, Radio, RadioGroup, Typography, useTheme, styled 
 import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages } from 'react-intl';
+import { useIntl, defineMessages } from 'react-intl';
 import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
@@ -26,7 +25,8 @@ const SRadio = styled(Radio)(({ theme }: any) => ({
   },
 }));
 
-const ThemeToggler = ({ intl }: {| intl: $npm$ReactIntl$IntlFormat |}): Node => {
+const ThemeToggler = (): Node => {
+  const intl = useIntl();
   const { toggleColorMode } = useThemeMode();
   const localStorageApi = new LocalStorageApi();
   const { name } = useTheme();

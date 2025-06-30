@@ -42,8 +42,6 @@ import type {
 
 import type { IFetcher } from './IFetcher.types';
 
-import type { $AxiosError } from 'axios';
-import axios from 'axios';
 import { Logger, stringifyError } from '../../../../utils/logging';
 import {
   CheckAddressesInUseApiError,
@@ -64,6 +62,7 @@ import type { ConfigType } from '../../../../../config/config-types';
 import { bech32, } from 'bech32';
 import { addressBech32ToHex } from '../cardanoCrypto/utils';
 import { bytesToBase64, bytesToHex, forceNonNull, last } from '../../../../coreUtils';
+import { makeTimeoutAbortSignal, fetchAndEnsureSuccess, type ServerError } from '../../../utils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -72,7 +71,7 @@ export const sendTx: ({|
   body: SignedRequest | SignedBatchRequest,
   lastLaunchVersion: string,
   currentLocale: string,
-  errorHandler?: $AxiosError<any, any> => void,
+  errorHandler?: ServerError => void,
 |}) => Promise<SignedResponse> = ({
   body,
   lastLaunchVersion,
@@ -85,15 +84,14 @@ export const sendTx: ({|
   const signedTx64: Array<string> = txs.map(t => bytesToBase64(t.encodedTx));
   const { BackendService } = body.network.Backend;
   if (BackendService == null) throw new Error(`${nameof(sendTx)} missing backend url`);
-  return axios(
+  return fetchAndEnsureSuccess(
     `${BackendService}/api/txs/signed`,
     {
-      method: 'post',
-      timeout: 2 * CONFIG.app.walletRefreshInterval,
-      data: ({
-        signedTx: signedTx64
-      }: SignedRequestInternal),
+      method: 'POST',
+      signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+      body: JSON.stringify(({ signedTx: signedTx64}: SignedRequestInternal)),
       headers: {
+        'content-type': 'application/json',
         'yoroi-version': lastLaunchVersion,
         'yoroi-locale': currentLocale,
       }
@@ -135,20 +133,19 @@ export class RemoteFetcher implements IFetcher {
   getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = async (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUTXOsForAddresses)} missing backend url`);
-    const result: AddressUtxoResponse = await axios(
+    const result: AddressUtxoResponse = await fetchAndEnsureSuccess(
       `${BackendService}/api/txs/utxoForAddresses`,
       {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
+        method: 'POST',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+        body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getUTXOsForAddresses)} error: ` + stringifyError(error));
         throw new GetUtxosForAddressesApiError();
@@ -169,19 +166,21 @@ export class RemoteFetcher implements IFetcher {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getTransactionsHistoryForAddresses)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/v2/txs/history`,
       {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: rest,
+        method: 'POST',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+        body: JSON.stringify(rest),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => {
-      return response.data.map((resp: RemoteTransaction) => {
+    ).then(response => response.json())
+     .then(data => {
+      return data.map((resp: RemoteTransaction) => {
         if (resp.type === 'shelley') {
           // unfortunately the backend returns Shelley addresses as bech32
           // this is a bad idea, and so we manually change them to raw payload
@@ -237,18 +236,19 @@ export class RemoteFetcher implements IFetcher {
       const { network, addresses, before } = body;
       const { BackendService } = network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getRecentTransactionHashes)} missing backend url`);
-      return axios(
+      return fetchAndEnsureSuccess(
         `${BackendService}/api/v2.1/txs/summaries`,
         {
-          method: 'post',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: { addresses, before },
+          method: 'POST',
+          signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+          body: JSON.stringify({ addresses, before }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => response.data);
+      ).then(response => response.json());
     }
 
   getTransactionsByHashes
@@ -257,20 +257,22 @@ export class RemoteFetcher implements IFetcher {
       const { network, txHashes } = body;
       const { BackendService } = network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getTransactionsByHashes)} missing backend url`);
-      return axios(
+      return fetchAndEnsureSuccess(
         `${BackendService}/api/v2/txs/get`,
         {
-          method: 'post',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: { txHashes },
+          method: 'POST',
+          signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+          body: JSON.stringify({ txHashes }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => {
+      ).then(response => response.json())
+       .then(data => {
         return (
-          (Object.values(response.data): any): Array<RemoteTransaction>
+          (Object.values(data): any): Array<RemoteTransaction>
         ).map((resp: RemoteTransaction) => {
           if (resp.type === 'shelley') {
             // unfortunately the backend returns Shelley addresses as bech32
@@ -315,36 +317,39 @@ export class RemoteFetcher implements IFetcher {
       const { network, txHashes } = body;
       const { BackendService } = network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getTransactionsByHashes)} missing backend url`);
-      return axios(
+      return fetchAndEnsureSuccess(
         `${BackendService}/api/v2.1/tx/status`,
         {
-          method: 'post',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
-          data: { txHashes },
+          method: 'POST',
+          signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+          body: JSON.stringify({ txHashes }),
           headers: {
+            'content-type': 'application/json',
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => response.data?.slot ?? {});
+      ).then(response => response.json())
+       .then(data => data?.slot ?? {});
     }
 
   getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => {
     const { network, ...rest } = body;
     const { BackendService } = network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getRewardHistory)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/account/rewardHistory`,
       {
-        method: 'post',
-        data: rest,
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'POST',
+        body: JSON.stringify(rest),
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getRewardHistory)} error: ` + stringifyError(error));
         throw new GetRewardHistoryApiError();
@@ -354,17 +359,17 @@ export class RemoteFetcher implements IFetcher {
   getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getBestBlock)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/v2/bestblock`,
       {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'GET',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getBestBlock)} error: ` + stringifyError(error));
         throw new GetBestBlockError();
@@ -382,20 +387,19 @@ export class RemoteFetcher implements IFetcher {
   checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.checkAddressesInUse)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/v2/addresses/filterUsed`,
       {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
+        method: 'POST',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+        body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkAddressesInUse)} error: ` + stringifyError(error));
         throw new CheckAddressesInUseApiError();
@@ -405,20 +409,19 @@ export class RemoteFetcher implements IFetcher {
   getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getAccountState)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/account/state`,
       {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          addresses: body.addresses
-        },
+        method: 'POST',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+        body: JSON.stringify({ addresses: body.addresses }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getAccountState)} error: ` + stringifyError(error));
         throw new GetAccountStateApiError();
@@ -428,20 +431,19 @@ export class RemoteFetcher implements IFetcher {
   getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getPoolInfo)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/pool/info`,
       {
-        method: 'post',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
-        data: {
-          poolIds: body.poolIds
-        },
+        method: 'POST',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
+        body: JSON.stringify({ poolIds: body.poolIds }),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getPoolInfo)} error: ` + stringifyError(error));
         throw new GetPoolInfoApiError();
@@ -451,13 +453,13 @@ export class RemoteFetcher implements IFetcher {
   getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = async (body) => {
     const { TokenInfoService } = body.network.Backend;
     if (TokenInfoService == null) return {};
-    const promises = body.tokenIds.map(id => axios(
+    const promises = body.tokenIds.map(id => fetchAndEnsureSuccess(
       `${TokenInfoService}/metadata/${id}`,
       {
-        method: 'get',
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'GET',
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
       }
-    ).then(response => ({ error: null, data: response.data }))
+    ).then(response => response.json()).then(data => ({ error: null, data }))
       .catch((error) => {
         if (error.response?.status === 404) {
           return { error: 'noMetadata', data: id };
@@ -499,12 +501,12 @@ export class RemoteFetcher implements IFetcher {
   {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getCatalystRoundInfo)} missing backend url`);
-    return await axios(
+    return await fetchAndEnsureSuccess(
       `${BackendService}/api/v0/catalyst/fundInfo`,
       {
-        method: 'get',
+        method: 'GET',
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
         throw new GetCatalystRoundInfoApiError();
@@ -515,15 +517,18 @@ export class RemoteFetcher implements IFetcher {
     => Promise<MultiAssetMintMetadataResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetMintMetadata)} missing backend url`);
-      return await axios(
+      return await fetchAndEnsureSuccess(
         `${BackendService}/api/multiAsset/metadata`,
         {
-          method: 'post',
-          data: {
+          method: 'POST',
+          body: JSON.stringify({
             assets: body.assets
-          }
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
         }
-      ).then(response => response.data)
+      ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetMintMetadata)} error: ` + stringifyError(error));
         return {};
@@ -534,15 +539,18 @@ export class RemoteFetcher implements IFetcher {
     => Promise<MultiAssetSupplyResponse> = async (body) => {
       const { BackendService } = body.network.Backend;
       if (BackendService == null) throw new Error(`${nameof(this.getMultiAssetSupply)} missing backend url`);
-      return await axios(
+      return await fetchAndEnsureSuccess(
         `${BackendService}/api/multiAsset/supply?numberFormat=string`,
         {
-          method: 'post',
-          data: {
+          method: 'POST',
+          body: JSON.stringify({
             assets: body.assets
-          }
+          }),
+          headers: {
+            'content-type': 'application/json',
+          },
         }
-      ).then(response => response.data.supplies)
+      ).then(response => response.json()).then(data => data.supplies)
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getMultiAssetSupply)} error: ` + stringifyError(error));
         return {};
@@ -553,17 +561,17 @@ export class RemoteFetcher implements IFetcher {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getUtxoData)} missing backend url`);
     return Promise.all(body.utxos.map(({ txHash, txIndex }) => {
-      return axios(
+      return fetchAndEnsureSuccess(
         `${BackendService}/api/txs/io/${txHash}/o/${txIndex}`,
         {
-          method: 'get',
-          timeout: 2 * CONFIG.app.walletRefreshInterval,
+          method: 'GET',
+          signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
           headers: {
             'yoroi-version': this.getLastLaunchVersion(),
             'yoroi-locale': this.getCurrentLocale()
           }
         }
-      ).then(response => response.data)
+      ).then(response => response.json())
         .catch((error) => {
           if (error.response.status === 404 && error.response.data === 'No outputs found') {
             return null;
@@ -577,20 +585,19 @@ export class RemoteFetcher implements IFetcher {
   getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getLatestBlockBySlot)} missing backend url`);
-    return axios(
+    return fetchAndEnsureSuccess(
       `${BackendService}/api/v2.1/lastBlockBySlot`,
       {
-        method: 'post',
-        data: {
-          slots: body.slots,
-        },
-        timeout: 2 * CONFIG.app.walletRefreshInterval,
+        method: 'POST',
+        body: JSON.stringify({ slots: body.slots }),
+        signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
         headers: {
+          'content-type': 'application/json',
           'yoroi-version': this.getLastLaunchVersion(),
           'yoroi-locale': this.getCurrentLocale()
         }
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
         return {
@@ -602,12 +609,12 @@ export class RemoteFetcher implements IFetcher {
   getSwapFeeTiers: GetSwapFeeTiersFunc = async (body: GetSwapFeeTiersRequest): Promise<GetSwapFeeTiersResponse> => {
     const { BackendService } = body.network.Backend;
     if (BackendService == null) throw new Error(`${nameof(this.getSwapFeeTiers)} missing backend url`);
-    return await axios(
+    return await fetchAndEnsureSuccess(
       `${BackendService}/api/v2.1/swap/feesInfo`,
       {
-        method: 'get',
+        method: 'GET',
       }
-    ).then(response => response.data)
+    ).then(response => response.json())
       .catch((error) => {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.getCatalystRoundInfo)} error: ` + stringifyError(error));
         throw new GetCatalystRoundInfoApiError();

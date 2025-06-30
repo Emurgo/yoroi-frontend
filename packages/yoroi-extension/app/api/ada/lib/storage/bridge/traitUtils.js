@@ -2,7 +2,7 @@
 
 import type { lf$Transaction, } from 'lovefield';
 
-import { asDisplayCutoff, asGetAllAccounting, asGetAllUtxos, asHasLevels, } from '../models/PublicDeriver/traits';
+import { asDisplayCutoff, asGetAllAccounting, asGetAllUtxos, } from '../models/PublicDeriver/traits';
 import { PublicDeriver } from '../models/PublicDeriver/index';
 import type {
   Address,
@@ -111,10 +111,8 @@ export async function getAllAddressesForDisplay(
     +ignoreCutoff?: ?boolean,
   |},
 ): Promise<Array<FullAddressPayload>> {
-  const withLevels = asHasLevels<ConceptualWallet>(request.publicDeriver);
-  const derivationTables = withLevels == null
-    ? new Map()
-    : withLevels.getParent().getDerivationTables();
+  const publicDeriver = request.publicDeriver;
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
     GetAddress,
@@ -124,13 +122,13 @@ export async function getAllAddressesForDisplay(
   const depTables = Object
     .keys(deps)
     .map(key => deps[key])
-    .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
+    .flatMap(table => getAllSchemaTables(publicDeriver.getDb(), table));
   return await raii<PromisslessReturnType<typeof getAllAddressesForDisplay>>(
-    request.publicDeriver.getDb(),
+    publicDeriver.getDb(),
     [
       ...depTables,
       ...mapToTables(
-        request.publicDeriver.getDb(),
+        publicDeriver.getDb(),
         derivationTables
       ),
     ],
@@ -138,7 +136,7 @@ export async function getAllAddressesForDisplay(
       tx,
       deps,
       {
-        publicDeriver: request.publicDeriver,
+        publicDeriver,
         type: request.type,
         ignoreCutoff: request.ignoreCutoff === true,
       },
@@ -158,11 +156,7 @@ export async function getAllAddressesForWallet(
   utxoAddresses: Array<$ReadOnly<AddressRowWithPath>>,
   accountingAddresses: Array<$ReadOnly<AddressRowWithPath>>,
 |}> {
-  const withLevels = asHasLevels<ConceptualWallet>(publicDeriver);
-  if (!withLevels) {
-    throw new Error(`${nameof(getAllAddressesForWallet)} publicDerviver traits missing`);
-  }
-  const derivationTables = withLevels.getParent().getDerivationTables();
+  const derivationTables = publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
     GetAddress,

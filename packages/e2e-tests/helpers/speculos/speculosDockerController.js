@@ -1,6 +1,6 @@
 import Docker from 'dockerode';
 import { LedgerModels } from '../ledgerHelper.js';
-import { fiveSeconds, halfSecond } from '../timeConstants.js';
+import { fiveSeconds, halfSecond, threeSeconds } from '../timeConstants.js';
 import { sleep } from '../../utils/utils.js';
 
 class SpeculosDockerControllerError extends Error {}
@@ -16,7 +16,7 @@ export class SpeculosDockerController {
 
   getContainerOptions = (model, seedPhrase, appFile) => {
     return {
-      Image: 'ghcr.io/ledgerhq/speculos:421a6d6053d4a6c758964f614b9165a83ffd75ee',
+      Image: 'ghcr.io/ledgerhq/speculos:4d320a7be879fba8d5f29a0c9516e47cb556fed8',
       ExposedPorts: {
         '5001/tcp': {},
       },
@@ -74,6 +74,8 @@ export class SpeculosDockerController {
         }
         await sleep(halfSecond);
       }
+      // we need to give some time for container to properly start
+      await sleep(threeSeconds);
     } catch (error) {
       this.logger.error('Error while running the container:');
       this.logger.error(JSON.stringify(error, null, 2));
@@ -105,7 +107,8 @@ export class SpeculosDockerController {
     }
     try {
       const containerLogs = await this.getContainerLogs();
-      this.logger.info(`killContainer: Container logs:\n${containerLogs}`);
+      this.logger.info(`killContainer: Container logs:`);
+      this.logger.info(containerLogs);
       this.logger.info(`killContainer: Killing container with Id: ${this.containerId}`);
       const container = this.docker.getContainer(this.containerId);
       await container.kill();

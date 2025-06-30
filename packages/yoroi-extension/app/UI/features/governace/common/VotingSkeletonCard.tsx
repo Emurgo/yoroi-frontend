@@ -1,6 +1,5 @@
 import { Skeleton, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import * as React from 'react';
 
 const StyledCard: any = styled(Stack)(({ theme, smallCard }: any) => ({
   position: 'relative',

@@ -1,3 +1,4 @@
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
 import driversPoolsManager from '../utils/driversPool.js';
@@ -9,7 +10,7 @@ import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import TxReviewOverviewTab from '../pages/transactionReviewPages/txReviewOverviewTab.page.js';
 import { getTestString } from '../helpers/constants.js';
-import { RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
+import { ADA_HANDLE_UNEXPECTED_ERROR, RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
 
 describe('Handle handles', function () {
   this.timeout(2 * oneMinute);
@@ -57,12 +58,12 @@ describe('Handle handles', function () {
       continue;
     }
     describe(`Positive case, ${testDatum.provider}`, function () {
-      it(`${testDatum.provider}. Refresh page`, async function () {
+      it(`Refresh page, ${testDatum.provider}`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.refreshPage();
       });
 
-      it(`${testDatum.provider}. Go to Send page`, async function () {
+      it(`Go to Send page, ${testDatum.provider}`, async function () {
         const walletPage = new TransactionsSubTab(webdriver, logger);
         await walletPage.goToSendSubMenu();
         const sendPage = new SendSubTab(webdriver, logger);
@@ -70,18 +71,26 @@ describe('Handle handles', function () {
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
       });
 
-      it(`${testDatum.provider}. Enter the value`, async function () {
+      it(`Enter the value, ${testDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         await sendStep1Page.enterReceiver(testDatum.userHandle);
       });
 
-      it(`${testDatum.provider}. Wait for domain resolver response`, async function () {
+      it(`Wait for domain resolver response, ${testDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         const greenMarkIsDisplayed = await sendStep1Page.receiverIsGood();
-        expect(greenMarkIsDisplayed, 'Receiver is not checked').to.be.true;
+        if (testDatum.provider === 'ADA Handle' && !greenMarkIsDisplayed) {
+          const helpText = await sendStep1Page.getReceiverHelperText();
+          if (helpText === ADA_HANDLE_UNEXPECTED_ERROR) {
+            console.warn(`The error "${helpText}" happen we can do nothing about it`);
+            this.skip();
+          }
+        } else {
+          expect(greenMarkIsDisplayed, 'Receiver is not checked').to.be.true;
+        }
       });
 
-      it(`${testDatum.provider}. Check displayed info and continue`, async function () {
+      it(`Check displayed info and continue, ${testDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         const helperText = await sendStep1Page.getReceiverHelperText();
         expect(helperText, 'A different provider is displayed').to.equal(testDatum.provider);
@@ -89,15 +98,19 @@ describe('Handle handles', function () {
         expect(handlerAddress, 'Address is in a wrong format').to.match(
           /addr1[a-z0-9]{5}\.{3}[a-z0-9]{10}/
         );
+        await sendStep1Page.takeScreenshot(
+          this.test.parent.parent.title,
+          `Check displayed info and continue_${testDatum.provider}`
+        );
         await sendStep1Page.clickNextToStep2();
       });
 
-      it(`${testDatum.provider}. Enter amount and continue`, async function () {
+      it(`Enter amount and continue, ${testDatum.provider}`, async function () {
         const sendStep2Page = new SendSubTab(webdriver, logger);
         await sendStep2Page.addAssets(1);
       });
 
-      it(`${testDatum.provider}. Check info on confirmation page`, async function () {
+      it(`Check info on confirmation page, ${testDatum.provider}`, async function () {
         const txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
         const userHandle = await txReviewOverview.getReceiver();
         expect(userHandle, 'User handler is different').to.equal(testDatum.userHandle);
@@ -110,12 +123,12 @@ describe('Handle handles', function () {
       continue;
     }
     describe(`Negative case, ${testNegativeDatum.provider}`, function () {
-      it(`${testNegativeDatum.provider}. Refresh page`, async function () {
+      it(`Refresh page, ${testNegativeDatum.provider}`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.refreshPage();
       });
 
-      it(`${testNegativeDatum.provider}. Go to Send page`, async function () {
+      it(`Go to Send page, ${testNegativeDatum.provider}`, async function () {
         const walletPage = new TransactionsSubTab(webdriver, logger);
         await walletPage.goToSendSubMenu();
         const sendPage = new SendSubTab(webdriver, logger);
@@ -123,14 +136,15 @@ describe('Handle handles', function () {
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
       });
 
-      it(`${testNegativeDatum.provider}. Enter the value`, async function () {
+      it(`Enter the value, ${testNegativeDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         await sendStep1Page.enterReceiver(testNegativeDatum.userHandle);
       });
 
-      it(`${testNegativeDatum.provider}. Wait and check displayed info`, async function () {
+      it(`Wait and check displayed info, ${testNegativeDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
-        const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
+        const errorMessageIsDisplayed =
+          await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
         expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
       });
     });
