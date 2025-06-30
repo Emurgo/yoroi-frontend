@@ -39,7 +39,7 @@ export type CatalystState = {
   encryptedKey: string;
   catalystPrivateKey: string;
   isStale: boolean;
-  error: string | null;
+  error: any | null;
 };
 
 export type CatalystRegistrationContextType = CatalystRegistrationState & CatalystRegistrationActions;

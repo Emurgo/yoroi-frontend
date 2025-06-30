@@ -13,12 +13,9 @@ import {
 } from '../../../../../config/numbersConfig';
 
 import {
+  IncorrectWalletPasswordError,
   UnusedAddressesError,
 } from '../../../../common/errors';
-import {
-  WrongPassphraseError,
-} from '../../cardanoCrypto/cryptoErrors';
-
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 
 import {
@@ -177,7 +174,7 @@ test('Can add and fetch address in wallet', async (done) => {
         });
         done.fail(new Error('Above function should have thrown'));
       } catch (e) {
-        expect(e).toBeInstanceOf(WrongPassphraseError);
+        expect(e).toBeInstanceOf(IncorrectWalletPasswordError);
       }
 
       // reset after test

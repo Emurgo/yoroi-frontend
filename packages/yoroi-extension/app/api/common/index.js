@@ -39,7 +39,6 @@ import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
-import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
 import { getAllTokenInfo } from './lib/tokens/utils';
@@ -314,9 +313,6 @@ export default class CommonApi {
       Logger.error(
         `${nameof(CommonApi)}::${nameof(this.changeModelPassword)} error: ` + stringifyError(error)
       );
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
-      }
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
