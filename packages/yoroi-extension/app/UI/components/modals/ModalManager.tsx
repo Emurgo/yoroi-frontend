@@ -43,7 +43,7 @@ export const ModalManager = () => {
       {handleBack && (
         <IconWrapper
           aria-label="back"
-          icon={Icons.ChevronDown}
+          icon={Icons.ChevronLeft}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
           asButton
