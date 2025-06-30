@@ -107,7 +107,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CATALYST_REGISTRATION.ROOT,
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
-    isVisible: existsSelectedWallet,
+    isVisible: isDev,
   },
   {
     className: 'cashback',
