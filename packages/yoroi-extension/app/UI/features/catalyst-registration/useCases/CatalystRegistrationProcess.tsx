@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
+import type { ReactNode } from 'react';
 import { Button } from '@mui/material';
 import PubSub from 'pubsub-js';
 import { useModal } from '../../../components/modals/ModalContext';
@@ -25,7 +27,9 @@ export const CatalystRegistrationProcess = () => {
       if (closedModalId === modalId) resetRegistration();
     });
 
-    return () => PubSub.unsubscribe('MODAL_CLOSED');
+    return () => {
+      PubSub.unsubscribe('MODAL_CLOSED');
+    };
   }, []);
 
   useEffect(() => {
@@ -43,7 +47,7 @@ export const CatalystRegistrationProcess = () => {
       return;
     }
 
-    let content: React.ReactNode | null = null;
+    let content: ReactNode | null = null;
 
     switch (currentVotingStep) {
       case ProgressStep.GENERATE:
