@@ -7,6 +7,8 @@
 **/dev
 **/i18n/
 packages/e2e-tests/helpers/wallet-dbSnapshots/
+packages/e2e-tests/testRunsData_*/
+packages/e2e-tests/mochawesome-report/
 packages/yoroi-extension/app/api/ada/lib/storage/tests/__yoroi_snapshots__/
 packages/yoroi-extension/ampli/
 packages/yoroi-extension/flow-typed
