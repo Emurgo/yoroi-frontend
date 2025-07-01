@@ -102,7 +102,7 @@ works as expected.
 */
 type GetEntryFuncType<HandlerT> = $PropertyType<HandlerT, 'handle'>;
 
-declare var chrome;
+declare var chrome: any;
 
 
 // UI -> background queries:

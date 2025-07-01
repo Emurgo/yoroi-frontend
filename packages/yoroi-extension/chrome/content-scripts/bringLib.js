@@ -1,5 +1,5 @@
 // @flow
-declare var chrome;
+declare var chrome: any;
 
 // We pass the RPC call inject.js and have it relay the request and reponse messages to the background,
 // instead of directly calling the background with chrome.runtime.sendMessage, so that this lib can also

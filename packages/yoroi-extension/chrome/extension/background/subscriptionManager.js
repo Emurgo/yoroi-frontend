@@ -46,7 +46,7 @@ export function subscribe(tabId: number, activeWalletId: ?number) {
 }
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 chrome.tabs.onRemoved.addListener((tabId: number, _info) => {
   const subscription = findSubscriptionByTabId(tabId);
@@ -64,7 +64,7 @@ export function registerCallback(callback: (Callback) => void) {
 }
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 export function emitUpdateToSubscriptions(data: Object): void {
   for (const { tabId } of getSubscriptions()) {

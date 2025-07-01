@@ -9,7 +9,7 @@ import environment from '../../environment';
  */
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 
 // =====

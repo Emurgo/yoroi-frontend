@@ -11,7 +11,7 @@ import { CoreAddressTypes } from '../../../../../app/api/ada/lib/storage/databas
 import { RustModule } from '../../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { networks } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 
-declare var chrome;
+declare var chrome: any;
 
 const handlers = Object.freeze({
   'get-theme-mode': async () => {

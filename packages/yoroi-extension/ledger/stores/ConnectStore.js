@@ -1,5 +1,5 @@
 // @flow //
-declare var chrome;
+declare var chrome: any;
 
 import { observable, action, runInAction, computed } from 'mobx';
 import AdaApp, {

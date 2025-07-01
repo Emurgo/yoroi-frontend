@@ -7,7 +7,7 @@ import userAgentInfo from './utils/userAgentInfo';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-declare var browser;
+declare var browser: any;
 
 const IS_FIREFOX_BROWSER_INFO: [boolean | null] = [null];
 if (typeof browser !== 'undefined') {

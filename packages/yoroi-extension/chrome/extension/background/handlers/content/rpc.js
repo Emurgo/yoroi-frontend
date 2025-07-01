@@ -59,7 +59,7 @@ import { getProtocolParameters } from '../yoroi/protocolParameters';
 import { hexToBytes } from '../../../../../app/coreUtils';
 import { transactionHexToHash } from '../../../../../app/api/ada/lib/cardanoCrypto/utils';
 
-declare var chrome;
+declare var chrome: any;
 
 async function confirmSign(
   tabId: number,

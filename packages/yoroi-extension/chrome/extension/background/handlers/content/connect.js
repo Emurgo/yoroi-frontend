@@ -14,7 +14,7 @@ import { getDb, syncWallet } from '../../state';
 import { networks } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 
-declare var chrome;
+declare var chrome: any;
 
 /**
  * we store the ID instead of an index

@@ -15,8 +15,8 @@ import type { ConfigType } from '../../../config/config-types';
 declare var CONFIG: ConfigType;
 
 /*::
-declare var chrome;
-declare var browser;
+declare var chrome: any;
+declare var browser: any;
 */
 
 // noinspection JSIgnoredPromiseFromCall

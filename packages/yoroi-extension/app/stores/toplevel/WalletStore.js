@@ -25,7 +25,7 @@ import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import { asAddressedUtxo } from '../../api/ada/transactions/utils';
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 
 /**

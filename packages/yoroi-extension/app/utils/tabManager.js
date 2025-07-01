@@ -6,7 +6,7 @@ import {
 } from '../api/localStorage/primitives';
 
 /*::
-declare var chrome;
+declare var chrome: any;
 */
 /**
  * We may run into bugs if the user has two copies of Yoroi running on the same localstorage

@@ -12,7 +12,7 @@ import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import type { ConnectorStoresProps } from '../stores';
 
-declare var chrome;
+declare var chrome: any;
 
 type State = {|
   isAppAuth: boolean,

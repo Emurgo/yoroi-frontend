@@ -22,7 +22,7 @@ import environment from '../../environment';
 import BuySellDisclaimerDialog from './DisclaimerDialog';
 import { ampli } from '../../../ampli/index';
 
-declare var chrome;
+declare var chrome: any;
 
 const messages = defineMessages({
   dialogTitle: {

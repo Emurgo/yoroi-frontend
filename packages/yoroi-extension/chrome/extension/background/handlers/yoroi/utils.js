@@ -14,7 +14,7 @@ export async function getPublicDeriverById(publicDeriverId: number): Promise<Pub
 }
 
 export function notifyAllTabsCashbackWalletChange() {
-  declare var chrome;
+  declare var chrome: any;
   chrome.tabs.query({}, (tabs) => {
     for (const tab of tabs) {
       chrome.tabs.sendMessage(

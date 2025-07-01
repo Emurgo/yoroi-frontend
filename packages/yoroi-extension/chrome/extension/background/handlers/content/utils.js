@@ -1,5 +1,5 @@
 // @flow
-declare var chrome;
+declare var chrome: any;
 
 export function sendToInjector(tabId: number, message: any) {
   chrome.tabs.sendMessage(tabId, message);

@@ -1213,7 +1213,7 @@ function deserializeAnchor(anchor: ?RustModule.WalletV4.Anchor): Anchor | null {
 
 
 function bringWindowToForeground(): void {
-  declare var chrome;
+  declare var chrome: any;
   chrome.windows.update(
     -2, // current window
     {
