@@ -1,0 +1,8 @@
+*/node_modules
+*/npm-debug.log
+.DS_Store
+.vscode/
+.idea/
+*/build
+*/dev
+packages/yoroi-extension/ledger
