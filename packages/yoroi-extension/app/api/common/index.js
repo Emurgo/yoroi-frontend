@@ -13,9 +13,7 @@ import {
 import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
-import {
-  GenericApiError, IncorrectWalletPasswordError,
-} from './errors';
+import { GenericApiError } from './errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   IPublicDeriver,
