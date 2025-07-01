@@ -40,5 +40,4 @@ jobs:
           . install-all.sh
         
       - name: Check code standards
-        working-directory: ./packages/yoroi-extension
         run: npm run fmt:check
