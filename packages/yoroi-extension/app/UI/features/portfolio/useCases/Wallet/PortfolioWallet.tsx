@@ -18,6 +18,10 @@ const PortfolioWallet = ({ stores }): JSX.Element => {
   const [tokenList, setTokenList] = useState(ftAssetList);
 
   useEffect(() => {
+    setTokenList(ftAssetList);
+  }, [ftAssetList]);
+
+  useEffect(() => {
     if (!keyword || showWelcomeBanner) {
       setTokenList(ftAssetList);
       return;
