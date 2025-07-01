@@ -8,3 +8,5 @@
 packages/yoroi-extension/flow-typed
 packages/e2e-tests/helpers/wallet-dbSnapshots/
 packages/yoroi-extension/app/api/ada/lib/storage/tests/__yoroi_snapshots__/
+packages/yoroi-extension/ampli/
+*/i18n/locales
