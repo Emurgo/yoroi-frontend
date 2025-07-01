@@ -1,5 +1,5 @@
 import { styled } from '@mui/material/styles';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -16,7 +16,7 @@ type StyledInputProps = {
   onChange: (event: any) => void;
   value?: string;
   error?: boolean;
-  helperText?: string;
+  helperText?: string | ReactNode;
   disabled?: boolean;
 };
 
