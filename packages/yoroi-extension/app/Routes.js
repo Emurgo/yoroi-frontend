@@ -42,6 +42,8 @@ import { PortfolioContextProvider } from './UI/features/portfolio/module/Portfol
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
+import { CatalystRegistrationContextProvider } from './UI/features/catalyst-registration/module/CatalystRegistrationContextProvider';
+// $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
@@ -55,6 +57,8 @@ import GovernanceTransactionSubmittedPage from './UI/pages/Governance/Governance
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import NftsPage from './UI/pages/nfts/NftsPage';
+// $FlowIgnore: suppressing this error
+import CatalystRegistration from './UI/pages/catalyst-registration/CatalystRegistration';
 // $FlowIgnore: suppressing this error
 import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
 // $FlowIgnore: suppressing this error
@@ -209,8 +213,8 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
-            <Route exact path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
@@ -266,6 +270,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.TRANSFER.ROOT} element={<Transfer stores={stores} />} />
           <Route path={ROUTES.SEND_FROM_URI.ROOT} element={<URILandingPage stores={stores} />} />
           <Route path={ROUTES.REVAMP.CATALYST_VOTING} element={<VotingPage stores={stores} />} />
+          <Route element={<CatalystRegistrationSubpages stores={stores} />}>
+            <Route path={ROUTES.CATALYST_REGISTRATION.ROOT} element={<CatalystRegistration stores={stores} />} />
+          </Route>
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
@@ -395,6 +402,12 @@ const DappCenterSubpages = ({ stores }) => (
   <DappCenterContextProvider stores={stores}>
     <Suspense fallback={null}><Outlet /></Suspense>
   </DappCenterContextProvider>
+);
+
+const CatalystRegistrationSubpages = ({ stores }) => (
+  <CatalystRegistrationContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </CatalystRegistrationContextProvider>
 );
 
 // NEW UI - TODO: to be refactred

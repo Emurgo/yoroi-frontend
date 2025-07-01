@@ -201,10 +201,14 @@ export class IncorrectWalletPasswordError extends LocalizableError {
     return messages.incorrectWalletPasswordError.id;
   }
 
+  static get defaultMessage(): string {
+    return messages.incorrectWalletPasswordError.defaultMessage;
+  }
+
   constructor() {
     super({
       id: IncorrectWalletPasswordError.errorId,
-      defaultMessage: messages.incorrectWalletPasswordError.defaultMessage || '',
+      defaultMessage: IncorrectWalletPasswordError.defaultMessage || '',
     });
   }
 }

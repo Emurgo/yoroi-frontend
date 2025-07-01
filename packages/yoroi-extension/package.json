@@ -80,6 +80,7 @@
     "@emurgo/cross-csl-nodejs": "6.2.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
     "@types/chrome": "^0.0.268",
+    "@types/pubsub-js": "1.8.6",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
     "@typescript-eslint/parser": "^8.4.0",
     "@yoroi/common": "2.0.0",
