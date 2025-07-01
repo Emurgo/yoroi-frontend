@@ -5,4 +5,4 @@
 .idea/
 */build
 */dev
-packages/yoroi-extension/ledger
+packages/yoroi-extension/flow-typed
