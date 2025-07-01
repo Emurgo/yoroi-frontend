@@ -9,6 +9,8 @@ import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
+import { isRight } from '@yoroi/common';
+import { undefinedToken } from '../common/constants';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -66,9 +68,31 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     excludedTokens: excludedTokens,
   });
 
+  const {data: orders = [], refetch: refetchOrders} = useQuery({
+    queryKey: ['useSwapOrders', stakingKey, swapManager.settings.routingPreference],
+    queryFn: async () => {
+      const res = await swapManager.api.orders()
+      if (isRight(res)) return res.value.data
+      return []
+    },
+  })
+
+  const {data: tokenIds = [], refetch: refetchTokens} = useQuery({
+    queryKey: ['useSwapTokenIds', swapManager.settings.routingPreference],
+    queryFn: async () => {
+      const res = await swapManager.api.tokens()
+      if (isRight(res)) {
+        const tokenIds = res.value.data.map(({id}) => id).filter((id) => excludedTokens.indexOf(id) === -1)
+        if (!tokenIds.includes(state.tokenOutInput.tokenId ?? undefinedToken)) action({type: 'ResetForm'})
+        return tokenIds
+      }
+      return []
+    },
+  })
+
   const context: any = useMemo(
     () => ({
-      swapForm: { action, ...state },
+      swapForm: { action, ...state, orders, refetchOrders, tokenIds, refetchTokens },
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
@@ -80,7 +104,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       loadingTokenList,
       explorer,
     }),
-    [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
+    [state.tokenInInput, state.tokenOutInput, action, tokenInfos, orders, refetchOrders, tokenIds, refetchTokens]
   );
 
   if (!selectedWallet) return null;
