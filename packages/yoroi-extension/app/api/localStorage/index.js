@@ -57,6 +57,7 @@ const storageKeys = {
   SHOWN_DISCLAIMERS: 'SHOWN_DISCLAIMERS',
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SELECTED_WALLET: 'SELECTED_WALLET',
+  PUSH_NOTIFICATION_METADATA: 'PUSH_NOTIFICATION_METADATA',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -69,6 +70,9 @@ export type WalletsNavigation = {|
 
 type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 
+export type PushNotificationMetadata = {|
+  duration?: number,
+|};
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -455,6 +459,18 @@ unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storag
   saveWalletListOrder: (Array<string>) => Promise<void> = async publicKeyList => {
     await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   };
+
+  getPushNotificationMetadata: () => Promise<PushNotificationMetadata> = async () => {
+    const raw = await getLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA);
+    if (!raw) {
+      return {...undefined/* just to please flow */};
+    }
+    return JSON.parse(raw);
+  }
+
+  savePushNotificationMetadata: (PushNotificationMetadata) => Promise<void> = async (metadata) => {
+    await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
+  }
 
   async reset(): Promise < void> {
     await this.unsetUserLocale();
