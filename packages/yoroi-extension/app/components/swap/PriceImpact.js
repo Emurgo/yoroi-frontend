@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import type { PriceImpact } from './types';
 import { Box, Button, Typography, useTheme, styled } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import { ReactComponent as ExclamationCircleIcon } from '../../assets/images/revamp/exclamation.circle.svg';
 import { useSwapForm } from '../../containers/swap/context/swap-form';

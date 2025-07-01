@@ -8,7 +8,7 @@ type Props = {
   children: ReactNode;
 };
 
-const NftsLayout = ({ stores, children }: Props): JSX.Element => {
+const NftsLayout = ({ stores, children }: Props): React.ReactNode => {
   return (
     <GeneralPageLayout
       stores={stores}
