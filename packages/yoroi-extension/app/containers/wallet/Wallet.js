@@ -28,6 +28,7 @@ import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../UI/components/modals/ModalManager';
+import { MidnightDialog } from '../../UI/components/Dialogs/MidnightDialog';
 
 type Props = {|
   +children: Node,
@@ -35,7 +36,7 @@ type Props = {|
 
 @observer
 export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
     if (lastAnnouncedVersion == null) {
@@ -45,116 +46,117 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
       this.props.stores.uiDialogs.open({ dialog: RevampAnnouncementDialog });
     }
 
-  const wallet = this.props.stores.wallets.selected;
-  if (wallet == null) {
-    throw new Error(`no public deriver. Should never happen`);
+    const wallet = this.props.stores.wallets.selected;
+    if (wallet == null) {
+      throw new Error(`no public deriver. Should never happen`);
+    }
+    this.props.stores.delegation
+      .checkGovernanceStatus(wallet)
+      .then(() => {
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to fetch governance status', e);
+      });
   }
-  this.props.stores.delegation
-    .checkGovernanceStatus(wallet)
-    .then(() => {
-      return null;
-    })
-    .catch(e => {
-      console.error('Failed to fetch governance status', e);
-    });
-}
 
-navigateToMyWallets: string => void = destination => {
-  this.props.stores.routing.goToRoute({ route: destination });
-};
-
-render(): Node {
-  const { stores } = this.props;
-  const intl = this.context;
-  const selectedWallet = stores.wallets.selectedOrFail;
-  const warning = this.getWarning(selectedWallet.publicDeriverId);
-  const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
-  const spendableBalance = stores.transactions.balance;
-  const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
-
-  const publicDeriver = stores.wallets.selected;
-  if (publicDeriver == null) {
-    throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
-  }
-  const currentPool = stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
-
-  const visibilityContext = {
-    selected: selectedWallet.publicDeriverId,
-    networkId: selectedWallet.networkId,
-    walletHasAssets,
+  navigateToMyWallets: string => void = destination => {
+    this.props.stores.routing.goToRoute({ route: destination });
   };
 
-  const menu = (
-    <SubMenu
-      options={allSubcategoriesRevamp
-        .filter(category => category.isVisible(visibilityContext))
-        .map(category => ({
-          className: category.className,
-          label: intl.formatMessage(category.label),
-          route: category.route,
-        }))}
-      onItemClick={route => stores.routing.goToRoute({ route })}
-      isActiveItem={route => stores.routing.currentRoute.startsWith(route)}
-      locationId="wallet"
-    />
-  );
+  render(): Node {
+    const { stores } = this.props;
+    const intl = this.context;
+    const selectedWallet = stores.wallets.selectedOrFail;
+    const warning = this.getWarning(selectedWallet.publicDeriverId);
+    const isInitialSyncing = selectedWallet.lastSyncInfo.Time == null;
+    const spendableBalance = stores.transactions.balance;
+    const walletHasAssets = !!spendableBalance?.nonDefaultEntries().length;
 
-  const sidebarContainer = <SidebarContainer stores={stores} />;
+    const publicDeriver = stores.wallets.selected;
+    if (publicDeriver == null) {
+      throw new Error(`${nameof(Wallet)} no public deriver. Should never happen`);
+    }
+    const currentPool = stores.delegation.getDelegatedPoolId(publicDeriver.publicDeriverId);
 
-  return (
-    <TopBarLayout
-      banner={<BannerContainer stores={stores} />}
-      sidebar={sidebarContainer}
-      navbar={
-        <NavBarContainerRevamp
-          stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
-          menu={isInitialSyncing ? null : menu}
-        />
-      }
-      showInContainer
-    >
-      {warning}
-      {isInitialSyncing ? (
-        <WalletLoadingAnimation />
-      ) : (
-        <>
-          <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
-            <ModalProvider>
-              <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context}>
-                <ReviewTxModal />
-                {this.props.children}
-                {this.getDialogs(intl, currentPool)}{' '}
-              </ReviewTxProvider>
-            </ModalProvider>
-          </CurrencyProvider>
-        </>
-      )}
-    </TopBarLayout>
-  );
-}
+    const visibilityContext = {
+      selected: selectedWallet.publicDeriverId,
+      networkId: selectedWallet.networkId,
+      walletHasAssets,
+    };
 
-getWarning: number => void | Node = publicDeriverId => {
-  const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriverId).dialogs;
-  if (warnings.length === 0) {
-    return undefined;
+    const menu = (
+      <SubMenu
+        options={allSubcategoriesRevamp
+          .filter(category => category.isVisible(visibilityContext))
+          .map(category => ({
+            className: category.className,
+            label: intl.formatMessage(category.label),
+            route: category.route,
+          }))}
+        onItemClick={route => stores.routing.goToRoute({ route })}
+        isActiveItem={route => stores.routing.currentRoute.startsWith(route)}
+        locationId="wallet"
+      />
+    );
+
+    const sidebarContainer = <SidebarContainer stores={stores} />;
+
+    return (
+      <TopBarLayout
+        banner={<BannerContainer stores={stores} />}
+        sidebar={sidebarContainer}
+        navbar={
+          <NavBarContainerRevamp
+            stores={stores}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.walletLabel)} />}
+            menu={isInitialSyncing ? null : menu}
+          />
+        }
+        showInContainer
+      >
+        {warning}
+        {isInitialSyncing ? (
+          <WalletLoadingAnimation />
+        ) : (
+          <>
+            <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
+              <ModalProvider>
+                <ModalManager />
+                <ReviewTxProvider stores={stores} intl={this.context}>
+                  <ReviewTxModal />
+                  {this.props.children}
+                  {this.getDialogs(intl, currentPool)}
+                  <MidnightDialog />
+                </ReviewTxProvider>
+              </ModalProvider>
+            </CurrencyProvider>
+          </>
+        )}
+      </TopBarLayout>
+    );
   }
-  return warnings[warnings.length - 1]();
-};
 
-getDialogs: (any, any) => Node = (intl, currentPool) => {
-  const { stores } = this.props;
-  const isOpen = stores.uiDialogs.isOpen;
-  const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
-  const selectedWallet = stores.wallets.selected;
-  const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
+  getWarning: number => void | Node = publicDeriverId => {
+    const warnings = this.props.stores.walletSettings.getWalletWarnings(publicDeriverId).dialogs;
+    if (warnings.length === 0) {
+      return undefined;
+    }
+    return warnings[warnings.length - 1]();
+  };
 
-  if (
-    stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
-    !isRevampDialogOpen &&
-    poolTransitionInfo?.shouldShowTransitionFunnel
-  )
+  getDialogs: (any, any) => Node = (intl, currentPool) => {
+    const { stores } = this.props;
+    const isOpen = stores.uiDialogs.isOpen;
+    const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
+    const selectedWallet = stores.wallets.selected;
+    const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
+
+    // if (
+    //   stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
+    //   !isRevampDialogOpen &&
+    //   poolTransitionInfo?.shouldShowTransitionFunnel
+    // )
     return (
       <PoolTransitionDialog
         onClose={() => {
@@ -187,6 +189,6 @@ getDialogs: (any, any) => Node = (intl, currentPool) => {
         />
       );
 
-  return null;
-};
+    return null;
+  };
 }
