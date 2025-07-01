@@ -244,7 +244,6 @@ class BasePage {
     );
     return await this.driver.executeScript(`return localStorage.${script}`);
   }
-  // !!!!
   async input(locator, value) {
     this.logger.info(
       `BasePage::input is called. Locator: ${JSON.stringify(locator)}, Value: ${value}`
