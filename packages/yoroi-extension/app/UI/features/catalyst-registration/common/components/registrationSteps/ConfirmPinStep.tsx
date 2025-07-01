@@ -1,0 +1,69 @@
+import { useState } from 'react';
+import { RegistrationStepper } from '../RegistrationStepper';
+import { Button, Box, Typography, Stack } from '@mui/material';
+import { useStrings } from '../../hooks/useStrings';
+import { TextInput } from '../../../../../components';
+import { useVoting } from '../../hooks/useVoting';
+import { useIntl } from 'react-intl';
+import globalMessages from '../../../../../../i18n/global-messages';
+
+export const ConfirmPinStep = () => {
+  const [pin, setPin] = useState('');
+  const strings = useStrings();
+  const intl = useIntl()
+  const { registrationState, votingNextStep } = useVoting();
+  const { pin: registrationPin } = registrationState;
+
+  const handleSetPin = e => {
+    setPin(e.target.value.slice(0, 4));
+  };
+
+  const errorPin = pin.length === 4 && pin !== registrationPin.join('');
+  const errorText = errorPin ? intl.formatMessage(globalMessages.invalidPin) : '';
+
+  return (
+    <Stack direction="column" gap="24px" height="100%" pb="24px">
+      <RegistrationStepper />
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          flexGrow: 1,
+          justifyContent: 'space-evenly',
+        }}
+      >
+        <Typography
+          component="div"
+          textAlign="center"
+          pt="24px"
+          pb="40px"
+          variant="body1"
+          color="ds.text_gray_medium"
+          dangerouslySetInnerHTML={{ __html: strings.confirmPinStep }}
+        />
+
+        <TextInput
+          error={errorPin}
+          helperText={errorText}
+          label={strings.confirmPinInputLabel}
+          value={pin}
+          onChange={handleSetPin}
+          id="confirm-pin"
+          variant="outlined"
+        />
+      </Box>
+
+      <Box>
+        <Button
+          // @ts-ignore
+          variant="primary"
+          fullWidth
+          onClick={votingNextStep}
+          disabled={pin !== registrationPin.join('')}
+        >
+          {strings.confirmPinStepButton}
+        </Button>
+      </Box>
+    </Stack>
+  );
+};
