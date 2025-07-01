@@ -37,8 +37,8 @@ export const testWallet4 = Object.freeze({
 });
 export const testWalletTrezor = Object.freeze({
   name: 'TrezorEmul',
-  plate: 'PXCA-2349',
-  mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
+  plate: 'OPLJ-6753',
+  mnemonic: 'bulk gaze broccoli stage extra chat lumber coil squirrel elder theory unlock',
   deviceId: '6495958994A4025BB5EE1DB0',
   balance: 0,
 });
