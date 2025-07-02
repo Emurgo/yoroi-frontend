@@ -1,6 +1,6 @@
 // @flow
 
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 // eslint-disable-next-line no-unused-vars
 import { action, configure } from 'mobx';
 import { setupApi } from '../../../app/api/index';
@@ -35,8 +35,8 @@ const initializeDappConnector: void => Promise<void> = async () => {
     }),
   };
 
-  const root = document.querySelector('#root-yoroi-connector');
-  if (root == null) {
+  const container = document.querySelector('#root-yoroi-connector');
+  if (container == null) {
     throw new Error('Root element not found.');
   }
   const AMPLI_FLUSH_INTERVAL_MS = 5000;
@@ -55,7 +55,8 @@ const initializeDappConnector: void => Promise<void> = async () => {
     },
   }: LoadOptionsWithEnvironment)).promise;
 
-  render(<App stores={stores} />, root);
+  const root = createRoot(container);
+  root.render(<App stores={stores} />);
 };
 
 addCloseListener(TabIdKeys.YoroiConnector);
