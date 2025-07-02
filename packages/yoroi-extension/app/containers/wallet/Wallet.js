@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
@@ -202,4 +202,4 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   };
 }
 
-export default withYoroiRemoteConfig(Wallet);
+export default (withYoroiRemoteConfig(Wallet): ComponentType<Props>);
