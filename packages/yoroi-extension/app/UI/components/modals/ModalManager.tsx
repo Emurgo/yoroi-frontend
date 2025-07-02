@@ -27,11 +27,14 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 }));
 
 export const ModalManager = () => {
-  const { height, width, closeModal, content, title, isOpen, modalId } = useModal();
+  const { height, width, closeModal, onClose, content, title, isOpen, modalId } = useModal();
 
   return (
     <BootstrapDialog
-      onClose={closeModal}
+      onClose={() => {
+        if (typeof onClose === 'function') onClose();
+        closeModal();
+      }}
       aria-labelledby={`${modalId}-dialogWindow-modalWindow`}
       open={isOpen}
       fullWidth

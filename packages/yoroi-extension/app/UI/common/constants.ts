@@ -1,0 +1,1 @@
+export const MIDNIGHT_DISTRIBUTION_URL = 'https://www.midnight.gd/';

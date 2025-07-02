@@ -1,15 +1,16 @@
 // @flow
-import { Typography, Button, Grid, Stack, Box, Link } from '@mui/material';
+import { Typography, Button, Grid, Stack, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
 import { useModal } from '../modals/ModalContext';
 import { useEffect } from 'react';
 import { MidnightIlustration } from './MidnightIlustration';
 import LocalStorageApi from '../../../api/localStorage/index';
+import { messages } from '../../common/hooks/useStrings';
+import { MIDNIGHT_DISTRIBUTION_URL } from '../../common/constants';
 
-export const MidnightDialog = (): React$Node => {
+export const MidnightDialog = () => {
   const intl = useIntl();
-
   const { openModal, closeModal } = useModal();
 
   useEffect(() => {
@@ -17,10 +18,9 @@ export const MidnightDialog = (): React$Node => {
       const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getMidnightModalClosed();
 
-      console.log('wasClosed', wasClosed);
       if (wasClosed === undefined || wasClosed === false) {
         openModal({
-          title: 'Important updates',
+          title: intl.formatMessage(messages.importantUpdates),
           height: '597px',
           width: '650px',
           content: (
@@ -32,6 +32,9 @@ export const MidnightDialog = (): React$Node => {
             />
           ),
           modalId: 'midnight',
+          onClose: () => {
+            localStorage.setMidnightModalClosed(true);
+          },
         });
       }
     };
@@ -41,30 +44,28 @@ export const MidnightDialog = (): React$Node => {
 };
 
 const MidnightDialogContent = ({ onClose }) => {
+  const intl = useIntl();
   return (
     <Stack>
       <Stack direction="column" alignItems="center" justifyContent="center" py="24px">
         <MidnightIlustration />
         <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mt="32px" mb="8px">
-          {/* {intl.formatMessage(messages.currentStakePool)} */}
-          Take part in the Midnight NIGHT token distribution
+          {intl.formatMessage(messages.takePartInMidnight)}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium" textAlign="center" mx="24px">
-          Yoroi will support Midnight’s multi-phase token distribution — a bold initiative to empower a diverse, global community.
+          {intl.formatMessage(messages.midnightSupport)}
         </Typography>
       </Stack>
 
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
-        <Link href="https://www.midnight.gd/" target="_blank" rel="noopener noreferrer">
+        <Link href={MIDNIGHT_DISTRIBUTION_URL} target="_blank" rel="noopener noreferrer">
           <CustomButton variant="contained" color="primary" onClick={() => {}}>
-            {/* {intl.formatMessage(messages.skipAndStop)} */}
-            LEARN MORE
+            {intl.formatMessage(messages.learnMore)}
           </CustomButton>
         </Link>
 
         <CustomButton variant="text" onClick={onClose} sx={{ marginTop: '8px' }}>
-          {/* {intl.formatMessage(messages.updateNow)} */}
-          skip
+          {intl.formatMessage(messages.skip)}
         </CustomButton>
       </Grid>
     </Stack>
