@@ -107,7 +107,7 @@ describe('Handle handles', function () {
 
       it(`Enter amount and continue, ${testDatum.provider}`, async function () {
         const sendStep2Page = new SendSubTab(webdriver, logger);
-        await sendStep2Page.addAssets(1);
+        await sendStep2Page.addAssets('1');
       });
 
       it(`Check info on confirmation page, ${testDatum.provider}`, async function () {

@@ -249,11 +249,17 @@ class BasePage {
       `BasePage::input is called. Locator: ${JSON.stringify(locator)}, Value: ${value}`
     );
     const input = await this.findElement(locator);
-    await input.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await input.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async inputElem(webElement, value) {
     this.logger.info(`BasePage::inputElem is called. Value: ${value}`);
-    await webElement.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await webElement.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async clearInput(locator) {
     this.logger.info(`BasePage::clearInput is called. Locator: ${JSON.stringify(locator)}`);

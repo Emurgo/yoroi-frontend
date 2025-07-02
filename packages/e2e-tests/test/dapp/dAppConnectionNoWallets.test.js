@@ -19,6 +19,7 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
 import DAppConnectWallet from '../../pages/dapp/dAppConnectWallet.page.js';
 import { collectInfo } from '../../helpers/restoreWalletHelper.js';
+import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, connection, no wallets', function () {
   this.timeout(2 * oneMinute);
@@ -30,7 +31,7 @@ describe('dApp, connection, no wallets', function () {
 
   before(async function () {
     try {
-      webdriver = getDriver();
+      webdriver = await driversPoolsManager.getDriverFromPool();
       mockServer = await getMockServer({});
       logger = getTestLogger(this.test.parent.title);
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
@@ -65,8 +66,6 @@ describe('dApp, connection, no wallets', function () {
 
   it('Pass initials steps and restore a wallet', async function () {
     await windowManager.findNewWindowAndSwitchTo(extensionTabName);
-    const initialStepsPage = new InitialStepsPage(webdriver, logger);
-    await initialStepsPage.skipInitialSteps();
     await restoreWallet(webdriver, logger, testWallet1);
   });
 
