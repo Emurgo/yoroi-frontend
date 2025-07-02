@@ -44,6 +44,7 @@ interface Props {
 
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
+  const isTrezor = true;
 
   let content;
   content = (<>
@@ -73,58 +74,69 @@ export default function AirdropPage({ stores }: Props) {
               0 NIGHT
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {intl.formatMessage(messages.destinationAddress)}
-            </Typography>
-            <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-              addr1q9es0m23htwehpcjjtqzyltkhj44lrdnpqcpfuhpthrcjy7v9j033m6ss9sg67yxptvrp5p5h7lhxvsurzwnyuskk7cqe778gt
-            </Typography>
-          </Box>
+          {!isTrezor && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
+              <Typography variant="body2" color="ds.text_gray_low">
+                {intl.formatMessage(messages.destinationAddress)}
+              </Typography>
+              <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+                addr1q9es0m23htwehpcjjtqzyltkhj44lrdnpqcpfuhpthrcjy7v9j033m6ss9sg67yxptvrp5p5h7lhxvsurzwnyuskk7cqe778gt
+              </Typography>
+            </Box>
+          )}
         </Box>
-        <Typography variant="body1" color="ds.text_gray_min">
-          {intl.formatMessage(messages.terms)}
-        </Typography>
-        <Typography variant="body1">
-          <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
+        {isTrezor ? (<>
+          <Typography variant="body1" color="ds.text_gray_min">
+            {intl.formatMessage(messages.terms)}
+          </Typography>
+          <Typography variant="body1">
+            <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
 
-          <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
+            <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
 
-           <Typography fontWeight={500}>2. Eligibility</Typography>
+             <Typography fontWeight={500}>2. Eligibility</Typography>
 
-           <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
+             <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
 
-           <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
-           <p>2.3 Verification: Participants may be required to undergo identity</p>
+             <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
+             <p>2.3 Verification: Participants may be required to undergo identity</p>
 
-           <Typography fontWeight={500}>3. Heading</Typography>
+             <Typography fontWeight={500}>3. Heading</Typography>
 
-           <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
-        </Typography>
-        <FormControlLabel
-          label={intl.formatMessage(messages.agree)}
-          control={
-            <Checkbox
-              checked={true}
-              onChange={()=>{}}
-              sx={{ marginRight: '8px' }}
-            />
-          }
-          sx={{
-            margin: '0px',
-            color: 'ds.text_gray_medium',
-          }}
-        />
+             <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
+          </Typography>
+          <FormControlLabel
+            label={intl.formatMessage(messages.agree)}
+            control={
+              <Checkbox
+                checked={true}
+                onChange={()=>{}}
+                sx={{ marginRight: '8px' }}
+              />
+            }
+            sx={{
+              margin: '0px',
+              color: 'ds.text_gray_medium',
+            }}
+          />
+        </>) : ( // if trezor
+          <Box
+          >
+            trezor
+          </Box>
+        )}
       </Box>
     </Box>
-    <Box sx={{ height: '96px', display: 'flex' }}>
-      <Button
-        variant="primary"
-        sx={{ margin: 'auto' }}
-      >
-        {intl.formatMessage(messages.claim)}
-      </Button>
-    </Box>
+    {!isTrezor && (
+      <Box sx={{ height: '96px', display: 'flex' }}>
+        <Button
+          variant="primary"
+          sx={{ margin: 'auto' }}
+        >
+          {intl.formatMessage(messages.claim)}
+        </Button>
+      </Box>
+    )}
   </>);
 
   content = (
@@ -141,14 +153,17 @@ export default function AirdropPage({ stores }: Props) {
       <Typography variant="h1xl">
         {intl.formatMessage(messages.noAllocTitle)}
       </Typography>
-      <Typography variant="body1">
-        {intl.formatMessage(messages.noAllocTitle)}
-      </Typography>
-      <Typography variant="body1">
-        <a href="">
-          {intl.formatMessage(globalMessages.learnMore)}
-        </a>
-      </Typography>
+      <Box>
+        <Typography variant="body1" as="span">
+          {intl.formatMessage(messages.noAllocTitle)}
+        </Typography>
+        &nbsp;
+        <Typography variant="body1" as="span">
+          <a href="">
+            {intl.formatMessage(globalMessages.learnMore)}
+          </a>
+        </Typography>
+      </Box>
     </Box>
   );
 
