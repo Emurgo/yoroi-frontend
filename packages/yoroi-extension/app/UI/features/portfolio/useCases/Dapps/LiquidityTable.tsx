@@ -21,7 +21,7 @@ const TableRowSkeleton = ({ theme, ...props }) => (
     }}
   >
     <TableCell>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(8)}>
         <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
           <Skeleton width="24px" height="24px" />
           <Skeleton width="24px" height="24px" sx={{ position: 'absolute', top: 0, left: '22px' }} />
@@ -31,21 +31,21 @@ const TableRowSkeleton = ({ theme, ...props }) => (
     </TableCell>
 
     <TableCell>
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(8)}>
         <Skeleton width="32px" height="32px" />
         <Skeleton width="126px" height="24px" />
       </Stack>
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)}>
+      <Stack direction="column" spacing={theme.spacing(2)}>
         <Skeleton width="146px" height="24px" />
         <Skeleton width="146px" height="16px" />
       </Stack>
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)}>
+      <Stack direction="column" spacing={theme.spacing(2)}>
         <Skeleton width="146px" height="24px" />
         <Skeleton width="146px" height="16px" />
       </Stack>
@@ -56,7 +56,7 @@ const TableRowSkeleton = ({ theme, ...props }) => (
     </TableCell>
 
     <TableCell>
-      <Stack direction="column" spacing={theme.spacing(0.25)} sx={{ float: 'right' }}>
+      <Stack direction="column" spacing={theme.spacing(2)} sx={{ float: 'right' }}>
         <Skeleton width="146px" height="24px" />
         <Skeleton width="146px" height="16px" />
       </Stack>
@@ -69,7 +69,7 @@ interface Props {
   isLoading: boolean;
 }
 
-const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
+const LiquidityTable = ({ data, isLoading }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, primaryTokenInfo } = usePortfolio();
@@ -120,7 +120,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           }}
         >
           <TableCell>
-            <Stack direction="row" alignItems="center" spacing={theme.spacing(1)}>
+            <Stack direction="row" alignItems="center" spacing={theme.spacing(8)}>
               <Stack direction="row" alignItems="center" sx={{ position: 'relative', width: '46px' }}>
                 <Box
                   width="24px"
@@ -154,7 +154,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
             <Stack
               direction="row"
               alignItems="center"
-              spacing={theme.spacing(1)}
+              spacing={theme.spacing(8)}
               onClick={() =>
                 chrome.tabs.create({
                   url: row.DEXLink,
@@ -178,7 +178,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell>
-            <Stack direction="column" spacing={theme.spacing(0.25)}>
+            <Stack direction="column" spacing={theme.spacing(2)}>
               <Typography color="ds.gray_900">
                 {formatNumber(row.firstTokenValue)} {row.firstToken.name}
               </Typography>
@@ -191,7 +191,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell>
-            <Stack direction="column" spacing={theme.spacing(0.25)}>
+            <Stack direction="column" spacing={theme.spacing(2)}>
               <Typography color="ds.gray_900">
                 {formatNumber(row.secondTokenValue)} {row.secondToken.name}
               </Typography>
@@ -208,7 +208,7 @@ const LiquidityTable = ({ data, isLoading }: Props): JSX.Element => {
           </TableCell>
 
           <TableCell>
-            <Stack direction="column" spacing={theme.spacing(0.25)}>
+            <Stack direction="column" spacing={theme.spacing(2)}>
               <Typography color="ds.gray_900" sx={{ textAlign: 'right' }}>
                 {formatNumber(row.totalValue)} {row.firstToken.name}
               </Typography>

@@ -11,7 +11,7 @@ import ExplorableHashContainer from '../../widgets/ExplorableHashContainer';
 import NoCompleteOrders from './NoCompleteOrders';
 import NoOpenOrders from './NoOpenOrders';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { useEffect, useState } from 'react';
 import { addressBech32ToHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 import { getTransactionFeeFromCbor, getTransactionTotalOutputFromCbor } from '../../../api/ada/transactions/utils';
@@ -557,7 +557,7 @@ const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
 
 const OperationsDetails = () => {
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Collateral creation</Typography>
       </Stack>

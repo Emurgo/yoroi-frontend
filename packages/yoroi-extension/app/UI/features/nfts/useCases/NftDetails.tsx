@@ -18,7 +18,7 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden' }}>
+    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: 'auto' }}>
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
@@ -72,7 +72,11 @@ export default function NftDetails() {
     <>
       <Box sx={{ mb: '24px', width: '100%' }}>
         <Link to={ROUTES.NFT_GALLERY.ROOT}>
-          <Button variant="text" sx={{ px: '16px !important' }} startIcon={<IconWrapper icon={Icons.ChevronLeft} id={`${nftPathId}-backToGallery-button`} />}>
+          <Button
+            variant="text"
+            sx={{ px: '16px !important' }}
+            startIcon={<IconWrapper icon={Icons.ChevronLeft} id={`${nftPathId}-backToGallery-button`} />}
+          >
             <Typography color="ds.el_gray_medium" fontWeight="500" fontSize="14px">
               {strings.back}
             </Typography>
@@ -84,15 +88,26 @@ export default function NftDetails() {
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
         <Grid item xs={6}>
-          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={2}>
-            <Typography variant="h2" id={`${nftPathId}-nftName-text`}>{currentNft?.name}</Typography>
-            <NftsNavigation
-              prevNftId={nftsList[currentNftIndex === 0 ? nftsList.length - 1 : currentNftIndex - 1]?.id || ''}
-              nextNftId={nftsList[currentNftIndex === nftsList.length - 1 ? 0 : currentNftIndex + 1]?.id || ''}
-              activeTab={currentTab}
-            />
+          <Stack direction="row" mx="24px" justifyContent="space-between" spacing={16}>
+            <Typography variant="h2" id={`${nftPathId}-nftName-text`}>
+              {currentNft?.name}
+            </Typography>
+            {nftsList.length > 1 ? (
+              <NftsNavigation
+                prevNftId={nftsList[currentNftIndex === 0 ? nftsList.length - 1 : currentNftIndex - 1]?.id || ''}
+                nextNftId={nftsList[currentNftIndex === nftsList.length - 1 ? 0 : currentNftIndex + 1]?.id || ''}
+                activeTab={currentTab}
+              />
+            ) : null}
           </Stack>
-          <Tabs initialTabId={tabSearchParam} onTabChange={handleTabChange} headerSx={{ mx: '24px' }} tabs={getTabs()} pathId={nftPathId} />
+          <Tabs
+            initialTabId={tabSearchParam}
+            onTabChange={handleTabChange}
+            headerSx={{ mx: '24px' }}
+            tabs={getTabs()}
+            pathId={nftPathId}
+            contentSx={{ mx: '24px', mt: '16px' }}
+          />
         </Grid>
       </Grid>
       <Modal

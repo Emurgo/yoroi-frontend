@@ -18,7 +18,7 @@ interface Props {
   isDragging?: boolean;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): JSX.Element => {
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): React.ReactNode => {
   const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const theme: any = useTheme();
   const strings = useStrings();
@@ -44,13 +44,13 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
       justifyContent="flex-start"
       alignItems="center"
       gap="16px"
-      sx={{ p: !isPrimaryToken && theme.spacing(3) }}
+      sx={{ p: !isPrimaryToken && theme.spacing(24) }}
     >
       <Typography fontWeight="500" color="ds.text_gray_medium">
         {strings.marketPrice}
       </Typography>
 
-      <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+      <Stack direction="row" alignItems="center" spacing={theme.spacing(16)}>
         <Stack direction="row" alignItems="center" gap="16px">
           <TokenPrice
             ptActivity={ptActivity}
