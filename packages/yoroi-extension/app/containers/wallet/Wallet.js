@@ -37,7 +37,8 @@ import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteCo
 
 type Props = {|
   +children: Node,
-  +yoroiRemoteConfigQuery: ReturnType<typeof useYoroiRemoteConfig>,
+  +stores?: any,
+  +yoroiRemoteConfigQuery?: ReturnType<typeof useYoroiRemoteConfig>,
 |};
 
 @observer
@@ -154,7 +155,8 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   getDialogs: (any, any) => Node = (intl, currentPool) => {
     const { stores } = this.props;
     const isOpen = stores.uiDialogs.isOpen;
-    const { data } = this.props.yoroiRemoteConfigQuery;
+    const query = this.props.yoroiRemoteConfigQuery;
+    const data = query?.data;
 
     const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
     const selectedWallet = stores.wallets.selected;
