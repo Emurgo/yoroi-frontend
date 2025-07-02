@@ -28,6 +28,7 @@ import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../UI/components/modals/ModalManager';
+// $FlowIgnore: suppressing this error
 import { MidnightDialog } from '../../UI/components/Dialogs/MidnightDialog';
 
 type Props = {|
