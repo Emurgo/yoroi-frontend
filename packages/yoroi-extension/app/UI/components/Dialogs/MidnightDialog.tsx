@@ -57,8 +57,8 @@ const MidnightDialogContent = ({ onClose }) => {
       </Stack>
 
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
-        <Link href={MIDNIGHT_DISTRIBUTION_URL} target="_blank" rel="noopener noreferrer">
-          <CustomButton variant="contained" color="primary" onClick={() => {}}>
+        <Link href={MIDNIGHT_DISTRIBUTION_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
+          <CustomButton variant="contained" color="primary">
             {intl.formatMessage(messages.learnMore)}
           </CustomButton>
         </Link>

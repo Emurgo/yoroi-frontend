@@ -148,14 +148,14 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
   getDialogs: (any, any) => Node = (intl, currentPool) => {
     const { stores } = this.props;
-    const isOpen = stores.uiDialogs.isOpen;
-    const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
+    // const isOpen = stores.uiDialogs.isOpen;
+    // const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
     const selectedWallet = stores.wallets.selected;
     const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
 
     if (
       stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
-      !isRevampDialogOpen &&
+      // !isRevampDialogOpen &&
       poolTransitionInfo?.shouldShowTransitionFunnel
     )
       return (
@@ -177,18 +177,18 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
         />
       );
 
-    if (isRevampDialogOpen)
-      return (
-        <RevampAnnouncementDialog
-          // $FlowIgnore[incompatible-type]
-          lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
-          // $FlowIgnore[incompatible-type]
-          onClose={async () => {
-            await stores.profile.setLastAnnouncedFeatureVersion(TOP_RECENT_ANNOUNCEMENT_VERSION);
-            this.props.stores.uiDialogs.closeActiveDialog();
-          }}
-        />
-      );
+    // if (isRevampDialogOpen)
+    //   return (
+    //     <RevampAnnouncementDialog
+    //       // $FlowIgnore[incompatible-type]
+    //       lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
+    //       // $FlowIgnore[incompatible-type]
+    //       onClose={async () => {
+    //         await stores.profile.setLastAnnouncedFeatureVersion(TOP_RECENT_ANNOUNCEMENT_VERSION);
+    //         this.props.stores.uiDialogs.closeActiveDialog();
+    //       }}
+    //     />
+    //   );
 
     return null;
   };
