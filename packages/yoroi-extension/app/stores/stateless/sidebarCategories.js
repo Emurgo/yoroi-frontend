@@ -61,6 +61,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
+    className: 'airdrop',
+    route: ROUTES.AIRDROP,
+    icon: stakingIcon,
+    label: globalMessages.airdrop,
+    isVisible: existsSelectedWallet,
+  },
+  {
     className: 'swap',
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,

@@ -1100,6 +1100,10 @@ const globalMessages: * = defineMessages({
     id: 'transaction.review.deregisteringStakingKey',
     defaultMessage: '!!!Undelegating from the pool',
   },
+  airdrop: {
+    id: 'airdrop.label',
+    defaultMessage: '!!!Airdrop',
+  },
 });
 export default globalMessages;
 
