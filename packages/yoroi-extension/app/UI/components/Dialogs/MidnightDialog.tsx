@@ -7,17 +7,19 @@ import { MidnightIlustration } from './MidnightIlustration';
 import LocalStorageApi from '../../../api/localStorage/index';
 import { messages } from '../../common/hooks/useStrings';
 import { MIDNIGHT_DISTRIBUTION_URL } from '../../common/constants';
+import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 
 export const MidnightDialog = () => {
   const intl = useIntl();
   const { openModal, closeModal } = useModal();
+  const { data } = useYoroiRemoteConfig();
 
   useEffect(() => {
     const checkModalState = async () => {
       const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getMidnightModalClosed();
 
-      if (wasClosed === undefined || wasClosed === false) {
+      if (data?.popups?.midnightDistribution?.display === true && (wasClosed === undefined || wasClosed === false)) {
         openModal({
           title: intl.formatMessage(messages.importantUpdates),
           height: '597px',
@@ -39,7 +41,7 @@ export const MidnightDialog = () => {
     };
 
     checkModalState();
-  }, []);
+  }, [data]);
 };
 
 const MidnightDialogContent = ({ onClose }) => {

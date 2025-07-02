@@ -30,13 +30,18 @@ import { ModalProvider } from '../../UI/components/modals/ModalContext';
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { MidnightDialog } from '../../UI/components/Dialogs/MidnightDialog';
+// $FlowIgnore: suppressing this error
+import { useYoroiRemoteConfig } from '../../UI/common/hooks/useYoroiRemoteConfig';
+// $FlowIgnore: suppressing this error
+import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteConfig';
 
 type Props = {|
   +children: Node,
+  +yoroiRemoteConfigQuery: ReturnType<typeof useYoroiRemoteConfig>,
 |};
 
 @observer
-export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
+class Wallet extends Component<{| ...Props, ...StoresProps |}> {
   static contextType: any = IntlContext;
   async componentDidMount() {
     const lastAnnouncedVersion = this.props.stores.profile.lastAnnouncedFeatureVersion;
@@ -148,15 +153,18 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
 
   getDialogs: (any, any) => Node = (intl, currentPool) => {
     const { stores } = this.props;
-    // const isOpen = stores.uiDialogs.isOpen;
-    // const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
+    const isOpen = stores.uiDialogs.isOpen;
+    const { data } = this.props.yoroiRemoteConfigQuery;
+
+    const isRevampDialogOpen = isOpen(RevampAnnouncementDialog);
     const selectedWallet = stores.wallets.selected;
     const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
 
     if (
       stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
-      // !isRevampDialogOpen &&
-      poolTransitionInfo?.shouldShowTransitionFunnel
+      !isRevampDialogOpen &&
+      poolTransitionInfo?.shouldShowTransitionFunnel &&
+      data?.popups.poolTransitionDialog.display === true
     )
       return (
         <PoolTransitionDialog
@@ -177,19 +185,21 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
         />
       );
 
-    // if (isRevampDialogOpen)
-    //   return (
-    //     <RevampAnnouncementDialog
-    //       // $FlowIgnore[incompatible-type]
-    //       lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
-    //       // $FlowIgnore[incompatible-type]
-    //       onClose={async () => {
-    //         await stores.profile.setLastAnnouncedFeatureVersion(TOP_RECENT_ANNOUNCEMENT_VERSION);
-    //         this.props.stores.uiDialogs.closeActiveDialog();
-    //       }}
-    //     />
-    //   );
+    if (isRevampDialogOpen && data?.popups?.generalFeaturesAnnouncement?.display === true)
+      return (
+        <RevampAnnouncementDialog
+          // $FlowIgnore[incompatible-type]
+          lastAnnouncedFeatureVersion={stores.profile.lastAnnouncedFeatureVersion ?? ''}
+          // $FlowIgnore[incompatible-type]
+          onClose={async () => {
+            await stores.profile.setLastAnnouncedFeatureVersion(TOP_RECENT_ANNOUNCEMENT_VERSION);
+            this.props.stores.uiDialogs.closeActiveDialog();
+          }}
+        />
+      );
 
     return null;
   };
 }
+
+export default withYoroiRemoteConfig(Wallet);
