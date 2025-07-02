@@ -49,7 +49,10 @@ export const ModalManager = () => {
       </DialogTitle>
       <IconWrapper
         aria-label="close"
-        onClick={closeModal}
+        onClick={() => {
+          if (typeof onClose === 'function') onClose();
+          closeModal();
+        }}
         icon={Icons.CloseIcon}
         color="ds.el_gray_max"
         borderColor="ds.el_gray_max"
