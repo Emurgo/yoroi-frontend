@@ -152,29 +152,29 @@ export default class Wallet extends Component<{| ...Props, ...StoresProps |}> {
     const selectedWallet = stores.wallets.selected;
     const poolTransitionInfo = stores.delegation.getPoolTransitionInfo(selectedWallet);
 
-    // if (
-    //   stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
-    //   !isRevampDialogOpen &&
-    //   poolTransitionInfo?.shouldShowTransitionFunnel
-    // )
-    return (
-      <PoolTransitionDialog
-        onClose={() => {
-          stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
-        }}
-        poolTransition={poolTransitionInfo}
-        currentPoolId={currentPool ?? ''}
-        onUpdatePool={() => {
-          stores.delegation.setPoolTransitionConfig(selectedWallet, {
-            show: 'idle',
-            shouldUpdatePool: true,
-          });
-          stores.routing.goToRoute({
-            route: ROUTES.STAKING,
-          });
-        }}
-      />
-    );
+    if (
+      stores.delegation.getPoolTransitionConfig(selectedWallet).show === 'open' &&
+      !isRevampDialogOpen &&
+      poolTransitionInfo?.shouldShowTransitionFunnel
+    )
+      return (
+        <PoolTransitionDialog
+          onClose={() => {
+            stores.delegation.setPoolTransitionConfig(selectedWallet, { show: 'idle' });
+          }}
+          poolTransition={poolTransitionInfo}
+          currentPoolId={currentPool ?? ''}
+          onUpdatePool={() => {
+            stores.delegation.setPoolTransitionConfig(selectedWallet, {
+              show: 'idle',
+              shouldUpdatePool: true,
+            });
+            stores.routing.goToRoute({
+              route: ROUTES.STAKING,
+            });
+          }}
+        />
+      );
 
     if (isRevampDialogOpen)
       return (

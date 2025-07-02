@@ -1,4 +1,3 @@
-// @flow
 import { Typography, Button, Grid, Stack, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useIntl } from 'react-intl';
