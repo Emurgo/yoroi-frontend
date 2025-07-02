@@ -94,7 +94,7 @@ export const messages = Object.freeze(
     },
     importantUpdates: {
       id: 'global.labels.importantUpdates',
-      defaultMessage: '!!!LImportant updates',
+      defaultMessage: '!!!Important updates',
     },
     skip: {
       id: 'global.labels.skip',
