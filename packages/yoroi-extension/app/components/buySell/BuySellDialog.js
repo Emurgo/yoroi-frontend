@@ -327,9 +327,19 @@ export default class BuySellDialog extends Component<Props, State> {
     this.setState({ showDisclaimer: false });
   };
 
+  setShowDisclaimer: () => void = () => {
+    this.setState({ showDisclaimer: true });
+  };
+
   renderDisclaimerDialog: () => Node = () => {
     const { onCancel } = this.props;
-    return <BuySellDisclaimerDialog onAccept={this.setDisclaimerAccepted} onClose={onCancel} />;
+    return (
+      <BuySellDisclaimerDialog
+        onAccept={this.setDisclaimerAccepted}
+        onClose={onCancel}
+        onNotAcceptedYet={this.setShowDisclaimer}
+      />
+    );
   };
 
   renderBuySell(): Node {

@@ -19,8 +19,7 @@ const messages = defineMessages({
   },
   pleaseNote: {
     id: 'buySell.disclaimer.pleaseNote',
-    defaultMessage:
-      '!!!Please note:',
+    defaultMessage: '!!!Please note:',
   },
   note1: {
     id: 'buySell.disclaimer.note1',
@@ -44,8 +43,7 @@ const messages = defineMessages({
   },
   checkboxLabel: {
     id: 'buySell.disclaimer.checkboxLabel',
-    defaultMessage:
-      '!!!I understand this disclaimer',
+    defaultMessage: '!!!I understand this disclaimer',
   },
   proceed: {
     id: 'buySell.actions.proceed',
@@ -56,12 +54,14 @@ const messages = defineMessages({
 type Props = {|
   onClose: void => void,
   onAccept: void => void,
+  onNotAcceptedYet: void => void,
 |};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const intl = useIntl();
-  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false)
-  const { onClose, onAccept } = props;
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { onClose, onAccept, onNotAcceptedYet } = props;
   const localStorageApi = new LocalStorageApi();
 
   useEffect(() => {
@@ -70,35 +70,43 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
 
       if (accepted === 'true') {
         handleAccepted();
+      } else {
+        onNotAcceptedYet();
       }
+
+      setIsLoaded(true);
     }
 
     // eslint-disable-next-line no-floating-promise/no-floating-promise
     checkAcceptanceStatus();
-  }, [])
+  }, []);
 
   const toggleDisclaimerAcceptance = () => {
-    setDisclaimerAccepted(prevAccepted => !prevAccepted)
-  }
+    setDisclaimerAccepted(prevAccepted => !prevAccepted);
+  };
 
   const handleAccepted = () => {
     localStorageApi.setBuySellDisclaimer('true');
     onAccept();
-  }
+  };
 
   const handleClose = () => {
     localStorageApi.setBuySellDisclaimer('false');
     onClose();
-  }
+  };
 
   const actions = [
     {
       label: intl.formatMessage(messages.proceed),
       onClick: handleAccepted,
       primary: true,
-      disabled: !disclaimerAccepted
+      disabled: !disclaimerAccepted,
     },
   ];
+
+  if (!isLoaded) {
+    return null;
+  }
 
   return (
     <Dialog
@@ -122,16 +130,18 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              flexFlow: 'column'
+              flexFlow: 'column',
             }}
           >
             {[messages.note1, messages.note2, messages.note3, messages.note4].map((message, i) => (
-              <Box sx={{
-                display: 'flex',
-                flexFlow: 'row nowrap',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start'
-              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexFlow: 'row nowrap',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                }}
+              >
                 <Typography component="div" variant="body1" color="grayscale.900">
                   {i + 1}.&nbsp;
                 </Typography>
@@ -143,13 +153,7 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
           </Box>
           <FormControlLabel
             label={intl.formatMessage(messages.checkboxLabel)}
-            control={
-              <Checkbox
-                checked={disclaimerAccepted}
-                onChange={toggleDisclaimerAcceptance}
-                sx={{ marginRight: '8px' }}
-              />
-            }
+            control={<Checkbox checked={disclaimerAccepted} onChange={toggleDisclaimerAcceptance} sx={{ marginRight: '8px' }} />}
             sx={{
               margin: '0px',
               color: 'ds.text_gray_medium',
