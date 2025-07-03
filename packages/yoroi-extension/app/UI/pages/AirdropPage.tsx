@@ -59,7 +59,7 @@ const messages = defineMessages({
     defaultMessage: '!!!sign message',
   },
   ledgerClaimDialogTitle: {
-    id: 'airdrop.claimDialogTitle',
+    id: 'airdrop.ledgerClaimDialogTitle',
     defaultMessage: '!!!sign message { index } of { total }',
   },
   wrongPassword: {
@@ -312,13 +312,13 @@ export default function AirdropPage({ stores }: Props) {
   );
 }
 
-function LedgerClaimDialog(props: { index: number, total: number, onClaim: () => Promise<void> }) {
+function LedgerClaimDialog(props: { index: number, total: number, onClaim: (_password: string) => Promise<void> }) {
   const [isClaiming, setClaiming] = useState(false);
   const intl = useIntl();
   const onClaim = async () => {
     setClaiming(true);
     try {
-      await props.onClaim(password);
+      await props.onClaim('');
     } finally {
       setClaiming(false);
     }
