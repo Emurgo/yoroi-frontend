@@ -7,6 +7,7 @@ import { NftGalleryContextType } from '../common/types';
 const defaultNftGalleryState = {
   spendableBalance: null,
   getTokenInfo: () => null,
+  selectedWallet: null,
 };
 export const NftGalleryContext = React.createContext<NftGalleryContextType>(defaultNftGalleryState);
 

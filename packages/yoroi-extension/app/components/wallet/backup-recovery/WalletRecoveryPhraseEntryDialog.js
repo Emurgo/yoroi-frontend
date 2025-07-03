@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import CheckboxLabel from '../../common/CheckboxLabel';
-import { defineMessages, intlShape, FormattedHTMLMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import WalletRecoveryPhraseMnemonic from './WalletRecoveryPhraseMnemonic';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import DialogBackButton from '../../widgets/DialogBackButton';
@@ -12,7 +12,6 @@ import Dialog from '../../widgets/Dialog';
 import MnemonicWord from './MnemonicWord';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseEntryDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 
 const messages = defineMessages({
   verificationInstructions: {
@@ -73,12 +72,9 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       recoveryPhraseSorted,
       enteredPhrase,
@@ -186,7 +182,7 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
           <div>
             <div className={styles.checkbox}>
               <CheckboxLabel
-                label={<FormattedHTMLMessage {...messages.termDevice} />}
+                label={<FormattedMessage {...messages.termDevice} />}
                 onChange={onAcceptTermDevice}
                 checked={isTermDeviceAccepted}
                 labelProps={{

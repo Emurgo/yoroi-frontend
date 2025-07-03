@@ -14,7 +14,7 @@ export default class WalletCreateDialogContainer extends Component<{| ...StoresP
   render(): Node {
     return (
       <WalletCreateDialog
-        onSubmit={request => this.props.stores.substores.ada.wallets.startWalletCreation(request)}
+        onSubmit={request => this.props.stores.substores.ada.mnemonicWalletCreationStore.startWalletCreation(request)}
         onCancel={this.props.onClose}
       />
     );

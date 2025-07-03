@@ -29,8 +29,8 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
       isPrimaryToken ? primaryTokenInfo.decimals : token.info.numberOfDecimals
     );
     const totalValue = tokenQuantity.bn
-      .times(new BigNumber(tokenPrice))
-      .times(new BigNumber(ptActivity?.close || 1))
+      .times(new BigNumber(tokenPrice.toString() || 1))
+      .times(new BigNumber(ptActivity?.close.toString() || 1))
       .toNumber();
 
     const unitPrice = parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));

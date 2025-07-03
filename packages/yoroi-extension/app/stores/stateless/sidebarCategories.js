@@ -33,8 +33,10 @@ export type SidebarCategoryRevamp = {|
   +featureFlagName?: string,
 |};
 
+const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
+const isDev = (): boolean => environment.isDev();
 const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
@@ -66,6 +68,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: isOnMainnet,
   },
   {
+    className: 'swap',
+    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
+    icon: swapIcon,
+    label: { id: 'sidebar.swap2', defaultMessage: '!!!Swap2' },
+    isVisible: isDev,
+  },
+  {
     className: 'portfolio',
     route: ROUTES.PORTFOLIO.ROOT,
     icon: portfolioIcon,
@@ -84,7 +93,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.NFT_GALLERY.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: () => environment.isDev(),
+    isVisible: isDev,
   },
   {
     className: 'voting',
@@ -92,6 +101,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: votingIcon,
     label: globalMessages.sidebarVoting,
     isVisible: existsSelectedWallet,
+  },
+  {
+    className: 'catalyst-registration',
+    route: ROUTES.CATALYST_REGISTRATION.ROOT,
+    icon: votingIcon,
+    label: globalMessages.sidebarVoting,
+    isVisible: isDev,
   },
   {
     className: 'cashback',
@@ -105,7 +121,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES,
     icon: dappConnectorIcon,
     label: connectorMessages.connector,
-    isVisible: () => true,
+    isVisible: () => !environment.isDev(),
+  },
+  {
+    className: 'dapp-center',
+    route: ROUTES.DAPP_CONNECTOR.DAPP_CENTER,
+    icon: dappConnectorIcon,
+    label: connectorMessages.connector,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'governance',
@@ -119,7 +142,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: '/settings',
     icon: settingIcon,
     label: globalMessages.sidebarSettings,
-    isVisible: () => true,
+    isVisible: always,
   },
 ];
 

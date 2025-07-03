@@ -1,4 +1,3 @@
-import React from 'react';
 import { ROUTES } from '../../../../../routes-config';
 import { useStrings } from '../hooks/useStrings';
 import mockData from '../mockData';
@@ -10,7 +9,7 @@ interface Props {
   isActiveItem: (itemId: string) => boolean;
 }
 
-const PortfolioMenu = (props: Props): JSX.Element => {
+const PortfolioMenu = (props: Props): React.ReactNode => {
   const strings = useStrings();
 
   const portfolioOptions: SubMenuOption[] = [

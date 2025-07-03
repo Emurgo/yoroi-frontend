@@ -15,8 +15,9 @@ export const TruncatedText: any = styled(Typography)({
   textOverflow: 'ellipsis',
 });
 
-export function CopyAddress({ text, children }: {| text: string, children: Node |}): Node {
+export function CopyAddress({ text, children, pathId }: {| text: string, children: Node, pathId: string |}): Node {
   const [isCopied, setCopy] = useState(false);
+  const localPathId = pathId ?? 'somewhere';
 
   const onCopy = async () => {
     setCopy(false);
@@ -24,7 +25,7 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
     try {
       await navigator.clipboard.writeText(text);
       setCopy(true);
-    } catch (error) {
+    } catch (_error) {
       setCopy(false);
     }
 
@@ -35,8 +36,8 @@ export function CopyAddress({ text, children }: {| text: string, children: Node 
 
   return (
     <Stack direction="row" alignItems="center">
-      <TruncatedText>{children}</TruncatedText>
-      <SButton onClick={onCopy}>{isCopied ? <IconCopied /> : <IconCopy />}</SButton>
+      <TruncatedText id={`${localPathId}-info-text`}>{children}</TruncatedText>
+      <SButton onClick={onCopy} id={`${localPathId}-copy-button`}>{isCopied ? <IconCopied /> : <IconCopy />}</SButton>
     </Stack>
   );
 }

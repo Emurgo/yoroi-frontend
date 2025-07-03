@@ -4,8 +4,6 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
-import { useGovernance } from '../module/GovernanceContextProvider';
-import { YOROI_DREP_ID } from './constants';
 
 type Props = {
   title: string;
@@ -17,33 +15,27 @@ type Props = {
   onClick: () => void;
   pending: boolean;
   loading: boolean;
+  blocked: boolean;
   smallCard?: boolean;
   isVisible?: boolean;
   extraInfo?: string | null;
+  bottom?: React.ReactNode;
 };
 
-const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selected, smallCard }: any) => ({
+const StyledCard: any = styled(Stack)(({ theme, selected, pending, blocked, smallCard }: any) => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   width: smallCard ? '298px' : '612px',
-  paddingTop: '16px',
-  paddingBottom: '16px',
-  maxHeight: '300px',
+  padding: '16px',
   minHeight: '126px',
   borderRadius: '8px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
-
-  ...(!selected &&
-    {
-      // backgroundColor: !pending && theme.palette.ds?.primary_100,
-    }),
-  ...(selected && {
-    backgroundImage: !pending && theme.palette.ds.bg_gradient_2,
+  ...(selected && !pending && {
+    backgroundImage: theme.palette.ds.bg_gradient_2,
     border: '2px solid transparent',
     backgroundOrigin: 'border-box',
-    pointerEvents: is_drep_selected !== 'true' && 'none',
   }),
   cursor: 'pointer',
   ...(pending && {
@@ -51,11 +43,10 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, is_drep_selec
     cursor: 'not-allowed',
   }),
   '&:hover': {
-    backgroundImage: theme.palette.ds.bg_gradient_1,
-    border: '2px solid transparent',
-    backgroundOrigin: 'border-box',
-    // background: !pending && theme.palette.ds.bg_gradient_2,
-    transition: 'opacity 1s ease-in-out',
+    backgroundImage: !blocked ? theme.palette.ds.bg_gradient_1 : undefined,
+    border: !blocked ?  '2px solid transparent' : undefined,
+    backgroundOrigin: !blocked ? 'border-box' : undefined,
+    transition: !blocked ? 'opacity 1s ease-in-out': undefined,
   },
 }));
 
@@ -65,7 +56,7 @@ const IconContainer = styled(Box)(() => ({
 }));
 
 const Description = styled(Typography)(({ theme }) => ({
-  marginTop: theme.spacing(1),
+  marginTop: theme.spacing(8),
 }));
 
 const SpinnerBox = styled(Box)(() => ({
@@ -84,20 +75,21 @@ export const GovernanceVoteingCard = ({
   onClick,
   pending = false,
   loading = false,
+  blocked = false,
   smallCard,
   isVisible,
   extraInfo,
+  bottom,
 }: Props) => {
   const [hover, onHover] = React.useState(false);
-  const { governanceStatus } = useGovernance();
   if (isVisible === false) return <></>;
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard
-        onClick={pending ? undefined : onClick}
+        onClick={pending || blocked ? undefined : onClick}
         pending={pending ? 'true' : undefined}
         selected={selected}
-        is_drep_selected={String(governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID)}
+        blocked={blocked}
         smallCard={smallCard}
       >
         {loading && (
@@ -110,7 +102,7 @@ export const GovernanceVoteingCard = ({
           <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color="ds.gray_800" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
+          <Description variant="body2" color="ds.gray_800"  whiteSpace="pre-line" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </Stack>
@@ -119,6 +111,7 @@ export const GovernanceVoteingCard = ({
             {extraInfo}
           </Typography>
         )}
+        {bottom}
       </StyledCard>
     </div>
   );

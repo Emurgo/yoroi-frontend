@@ -1,5 +1,5 @@
 import type { AssetAmount } from '../../../components/swap/types';
-import { useSwapTokensOnlyVerified } from '@yoroi/swap';
+import { useSwapTokensOnlyVerified } from 'legacySwap';
 import { useMemo } from 'react';
 import { comparatorByGetter } from '../../../coreUtils';
 import { useQueryClient } from 'react-query';

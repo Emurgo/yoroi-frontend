@@ -1,8 +1,6 @@
 // @flow
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { action, configure } from 'mobx';
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { createHashHistory } from 'history';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
 import { translations } from '../../app/i18n/translations';
@@ -12,9 +10,6 @@ import { addCloseListener, TabIdKeys } from '../../app/utils/tabManager';
 import { Logger } from '../../app/utils/logging';
 import { LazyLoadPromises } from '../../app/Routes';
 import environment from '../../app/environment';
-import { ampli } from '../../ampli/index';
-import { ROUTES } from '../../app/routes-config';
-import { pathToRegexp } from 'path-to-regexp';
 import { getCardanoHaskellBaseConfig, networks } from '../../app/api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../app/api/ada/lib/storage/bridge/timeUtils';
 
@@ -32,10 +27,7 @@ type SlotsProps = {|
 // Entry point into our application
 const initializeYoroi: void => Promise<void> = async () => {
   const api = await setupApi();
-  const router = new RouterStore();
-  const hashHistory = createHashHistory();
-  const history = syncHistoryWithStore(hashHistory, router);
-  const stores = await createStores(api, router);
+  const stores = await createStores(api);
 
   Logger.debug(`[yoroi] stores created`);
 
@@ -53,12 +45,12 @@ const initializeYoroi: void => Promise<void> = async () => {
     translations,
     stores,
     reset: action(async () => {
-      await createStores(api, router);
+      await createStores(api);
     }),
   };
 
-  const root = document.querySelector('#root');
-  if (root == null) {
+  const container = document.querySelector('#root');
+  if (container == null) {
     throw new Error('Root element not found.');
   }
   Logger.debug(`[yoroi] root located`);
@@ -73,41 +65,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     }
   }
 
-  render(<App stores={stores} history={history} />, root);
-
-  history.listen(({ pathname }) => {
-    if (pathname === ROUTES.ASSETS.ROOT) {
-      ampli.assetsPageViewed();
-    } else if (pathname === ROUTES.TRANSFER) {
-      ampli.claimAdaPageViewed();
-    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
-      ampli.createWalletLanguagePageViewed();
-    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
-      ampli.connectorPageViewed();
-    } else if (pathname === ROUTES.WALLETS.ADD) {
-      ampli.createWalletSelectMethodPageViewed();
-    } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
-      ampli.receivePageViewed();
-    } else if (pathname === ROUTES.SETTINGS.ROOT) {
-      ampli.settingsPageViewed();
-    } else if (pathname === ROUTES.REVAMP.CATALYST_VOTING) {
-      ampli.votingPageViewed();
-    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
-      ampli.transactionsPageViewed();
-    } else if (pathname === ROUTES.STAKING) {
-      ampli.stakingCenterPageViewed();
-    } else if (pathname === ROUTES.WALLETS.ROOT) {
-      ampli.walletPageViewed();
-    } else if (pathname === ROUTES.Governance.ROOT) {
-      ampli.governanceDashboardPageViewed();
-    } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
-      const TAB = 'Wallet Token';
-      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
-    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
-      const TAB = 'Overview';
-      ampli.portfolioTokenDetails({ token_details_tab: TAB });
-    }
-  });
+  const root = createRoot(container)
+  root.render(<App stores={stores}/>);
 };
 
 addCloseListener(TabIdKeys.Primary);

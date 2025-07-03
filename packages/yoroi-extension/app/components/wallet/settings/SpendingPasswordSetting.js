@@ -3,8 +3,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 // import styles from './SpendingPasswordSetting.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { Box, Button, Typography } from '@mui/material';
 
 const messages = defineMessages({
@@ -37,12 +36,9 @@ type Props = {|
 
 @observer
 export default class SpendingPasswordSetting extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     return (
       <Box mt="13px">
         <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900" mb="16px">

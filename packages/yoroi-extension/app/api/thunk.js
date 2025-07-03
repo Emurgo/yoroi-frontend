@@ -2,7 +2,6 @@
 
 import type { WalletState, ServerStatus } from '../../chrome/extension/background/types';
 import { HaskellShelleyTxSignRequest } from './ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { RustModule } from './ada/lib/cardanoCrypto/rustLoader';
 import WalletTransaction from '../domain/WalletTransaction';
 import type { WalletAuthEntry } from '../../chrome/extension/connector/types';
 import CardanoShelleyTransaction, {
@@ -195,7 +194,7 @@ export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (
 
 export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
   const resp = await callBackground({ type: ChangeSigningPassword.typeTag, request, });
-  if (resp?.error === WrongPassphraseError.defaultMessage) {
+  if (resp?.error === WrongPassphraseError.defaultMessage || resp?.error === IncorrectWalletPasswordError.defaultMessage) {
     throw new IncorrectWalletPasswordError();
   }
 }
@@ -218,21 +217,16 @@ export async function signAndBroadcastTransaction(
 ): Promise<{| txId: string |}> {
   const tx = request.signRequest.unsignedTx.build_tx();
   const txBody = tx.body();
-  const txHash = RustModule.WalletV4.FixedTransaction.from_hex(tx.to_hex()).transaction_hash();
 
   const serializableRequest: SignAndBroadcastTransactionRequestType = {
     senderUtxos: request.signRequest.senderUtxos,
     unsignedTx: tx.to_hex(),
     metadata: request.signRequest.metadata?.to_hex(),
-    neededHashes: [...request.signRequest.neededStakingKeyHashes.neededHashes],
-    wits: [...request.signRequest.neededStakingKeyHashes.wits],
     password: request.password,
     publicDeriverId: request.publicDeriverId,
-    txHash: txHash.to_hex(),
   };
-  tx.free();
   txBody.free();
-  txHash.free();
+  tx.free();
   const result = await callBackground({
     type: SignAndBroadcastTransaction.typeTag,
     request: serializableRequest,
@@ -254,7 +248,7 @@ export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
 ): Promise<string> {
   const result = await callBackground({ type: GetPrivateStakingKey.typeTag, request });
-  return handleWrongPassword(result, WrongPassphraseError);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export const getCardanoAssets: GetEntryFuncType<typeof GetCardanoAssets> = async (request) => {
@@ -337,7 +331,7 @@ export async function connectorCreateAuthEntry(
   request: ConnectorCreateAuthEntryRequestType
 ): Promise<?WalletAuthEntry> {
   const result = await callBackground({ type: CreateAuthEntry.typeTag, request });
-  return handleWrongPassword(result, WrongPassphraseError);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|

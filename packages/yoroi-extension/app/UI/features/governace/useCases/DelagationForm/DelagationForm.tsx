@@ -81,7 +81,7 @@ export const DelagationForm = () => {
   const strings = useStrings();
   const confirmDelegation = async () => {
     const response = await checkUserPassword(password);
-    if (response?.name === 'WrongPassphraseError') {
+    if (response?.name === 'WrongPassphraseError' || response?.name === 'IncorrectWalletPasswordError') {
       setIsIncorectPassword(true);
     } else {
       signGovernanceTx();
@@ -226,7 +226,7 @@ export const DelagationForm = () => {
 };
 
 type OperationInfoProps = {
-  label: string | JSX.Element;
+  label: string | React.ReactNode;
   fee: string;
   defaultTokenName: string;
 };

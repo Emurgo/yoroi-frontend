@@ -19,25 +19,16 @@ const baseDevConfig = (
   resolve: commonConfig.resolve(),
   devtool: 'source-map',
   entry: {
-    yoroi: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/index')
-    ],
-    connector: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/connector/index')
-    ],
-    ledger: [
-      customPath,
-      path.join(__dirname, '../ledger/index')
-    ],
+    yoroi: [customPath, path.join(__dirname, '../chrome/extension/index')],
+    connector: [customPath, path.join(__dirname, '../chrome/extension/connector/index')],
+    ledger: [customPath, path.join(__dirname, '../ledger/index')],
   },
   devServer: {
     port: 8080,
     devMiddleware: {
       publicPath: `js`,
       stats: {
-        colors: true
+        colors: true,
       },
       headers: { 'Access-Control-Allow-Origin': '*' },
       writeToDisk: true,
@@ -50,13 +41,7 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      networkName,
-      false,
-      isNightly,
-      Boolean(isLight),
-      Boolean(isE2E),
-    )),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
@@ -66,7 +51,7 @@ const baseDevConfig = (
     rules: [
       ...commonConfig.rules(true),
       {
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
@@ -83,11 +68,11 @@ const baseDevConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
       },
-    ]
-  }
+    ],
+  },
 });
 
 const backgroundServiceWorkerConfig = (
@@ -102,9 +87,7 @@ const backgroundServiceWorkerConfig = (
   // could not use the eval option because Chrome manifest v3 prohibits eval()
   devtool: 'source-map',
   entry: {
-    background: [
-      path.join(__dirname, '../chrome/extension/background/index')
-    ],
+    background: [path.join(__dirname, '../chrome/extension/background/index')],
   },
   devServer: {
     port: 8081,
@@ -126,25 +109,16 @@ const backgroundServiceWorkerConfig = (
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      networkName,
-      false,
-      isNightly,
-      Boolean(isLight),
-      Boolean(isE2E),
-    )),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/[\S]+.prod$/,
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /rustLoader/,
-      (resource) => {
-        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
-      }
-    ),
+    new webpack.NormalModuleReplacementPlugin(/rustLoader/, resource => {
+      resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground');
+    }),
   ],
   module: {
     rules: [
@@ -167,11 +141,11 @@ const backgroundServiceWorkerConfig = (
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
       },
-    ]
-  }
+    ],
+  },
 });
 
 const bringContentScriptConfig = (
@@ -184,9 +158,7 @@ const bringContentScriptConfig = (
   resolve: commonConfig.resolve(),
   devtool: 'source-map',
   entry: {
-    contentScript: [
-      path.join(__dirname, '../chrome/content-scripts/bringInject.js'),
-    ]
+    contentScript: [path.join(__dirname, '../chrome/content-scripts/bringInject.js')],
   },
   devServer: {
     devMiddleware: {
@@ -196,6 +168,11 @@ const bringContentScriptConfig = (
     liveReload: false,
     // HTTP is not actually used because injected code must always be written to `dev` dir
     port: 8082,
+    client: {
+      overlay: {
+        runtimeErrors: false,
+      },
+    },
   },
   output: {
     path: path.join(__dirname, '../dev/js'),
@@ -204,15 +181,9 @@ const bringContentScriptConfig = (
 
   plugins: [
     new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1
+      maxChunks: 1,
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      networkName,
-      false,
-      isNightly,
-      Boolean(isLight),
-      Boolean(isE2E),
-    )),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/[\S]+.dev$/}),
   ],
   module: {
@@ -223,10 +194,10 @@ const bringContentScriptConfig = (
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: []
-        }
+          presets: [],
+        },
       },
-    ]
+    ],
   },
 });
 

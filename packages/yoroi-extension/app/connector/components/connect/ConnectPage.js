@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -9,7 +9,6 @@ import type { ConnectingMessage } from '../../../../chrome/extension/connector/t
 import type { WalletState } from '../../../../chrome/extension/background/types';
 /* eslint-disable no-nested-ternary */
 import { Component } from 'react';
-import { defineMessages, intlShape } from 'react-intl';
 import styles from './ConnectPage.scss';
 import { Button, Stack, styled, Typography } from '@mui/material';
 import globalMessages, { connectorMessages } from '../../../i18n/global-messages';
@@ -62,7 +61,7 @@ const messages = defineMessages({
   },
   noWalletsFound: {
     id: 'connector.connect.noWalletsFound',
-    defaultMessage: '!!!Ooops, no {network} wallets found',
+    defaultMessage: '!!!Ooops, no wallets found',
   },
   incorrectWalletPasswordError: {
     id: 'api.errors.IncorrectPasswordError',
@@ -125,22 +124,19 @@ type Props = {|
 
 @observer
 export default class ConnectPage extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         walletPassword: {
           type: 'password',
-          label: this.context.intl.formatMessage(globalMessages.walletPasswordLabel),
-          placeholder: this.context.intl.formatMessage(globalMessages.walletPasswordFieldPlaceholder),
+          label: this.context.formatMessage(globalMessages.walletPasswordLabel),
+          placeholder: this.context.formatMessage(globalMessages.walletPasswordFieldPlaceholder),
           value: '',
           validators: [
             ({ field }) => {
               if (field.value === '') {
-                return [false, this.context.intl.formatMessage(globalMessages.fieldIsRequired)];
+                return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
               }
               return [true];
             },
@@ -173,7 +169,7 @@ export default class ConnectPage extends Component<Props> {
         if (deriver && checksum) {
           this.props.onConnect(deriver, checksum, walletPassword).catch(error => {
             if (error instanceof WrongPassphraseError) {
-              this.form.$('walletPassword').invalidate(this.context.intl.formatMessage(messages.incorrectWalletPasswordError));
+              this.form.$('walletPassword').invalidate(this.context.formatMessage(messages.incorrectWalletPasswordError));
             } else {
               throw error;
             }
@@ -199,7 +195,7 @@ export default class ConnectPage extends Component<Props> {
   };
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       loading,
       error,
@@ -231,7 +227,7 @@ export default class ConnectPage extends Component<Props> {
             <NoWalletImage />
           </div>
           <div>
-            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound, { networkId })}</div>
+            <div className={styles.noWalletsText}>{intl.formatMessage(messages.noWalletsFound)}</div>
             <button className={styles.createWallet} onClick={this.onCreateWallet} type="button">
               {intl.formatMessage(messages.createWallet)}
             </button>

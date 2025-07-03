@@ -9,12 +9,11 @@ import {
   splitAmount,
 } from '../../../../utils/formatters';
 import BigNumber from 'bignumber.js';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { AmountInputRevamp } from '../../../common/NumericInputRP';
 import { ReactComponent as CloseIcon } from '../../../../assets/images/forms/close-small.inline.svg';
 import type { FormattedTokenDisplay } from '../../../../utils/wallet';
 import type { TokenRow } from '../../../../api/ada/lib/storage/database/primitives/tables';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import classnames from 'classnames';
 import { Box, Typography, styled } from '@mui/material';
 import TokenImage from './TokenImage';
@@ -51,10 +50,7 @@ const messages = defineMessages({
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   constructor(props: Props) {
     super(props);
     // eslint-disable-next-line react/state-in-constructor
@@ -75,7 +71,7 @@ export default class SingleTokenRow extends Component<Props, State> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const { token, isValidAmount } = this.props;
     const isNotValid = !isValidAmount(token.info);
 

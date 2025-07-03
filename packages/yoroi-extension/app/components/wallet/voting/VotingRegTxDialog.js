@@ -9,7 +9,7 @@ import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
 import classnames from 'classnames';
 
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
@@ -17,7 +17,6 @@ import DialogBackButton from '../../widgets/DialogBackButton';
 import globalMessages from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import styles from './VotingRegTxDialog.scss';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import SpendingPasswordInput from '../../widgets/forms/SpendingPasswordInput';
 import { AmountInput } from '../../common/NumericInputRP';
 import { ProgressInfo } from '../../../stores/ada/VotingStore';
@@ -65,10 +64,7 @@ type Props = {|
 export default class VotingRegTxDialog extends Component<Props> {
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
     this.spendingPasswordForm = form;
@@ -90,9 +86,9 @@ export default class VotingRegTxDialog extends Component<Props> {
 
   renderInfoBlock(): Node {
     const { walletType } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
 
-    if (walletType === 'mnemonic') {
+    if (walletType !== 'mnemonic') {
       return (
         <Typography className={classnames([styles.lineText, styles.firstItem])} color="ds.text_gray_medium">
           {intl.formatMessage(messages.line1)}
@@ -102,7 +98,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     let infoLine1;
     let infoLine2;
-    if (walletType === 'trezorT') {
+    if (walletType === 'mnemonic') {
       infoLine1 = messages.txConfirmationTrezorTLine1;
       infoLine2 = globalMessages.txConfirmationTrezorTLine2;
     } else if (walletType === 'ledgerNano') {
@@ -129,10 +125,10 @@ export default class VotingRegTxDialog extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const spendingPasswordForm =
-      this.props.walletType === 'mnemonic' ? (
+      this.props.walletType !== 'mnemonic' ? (
         <SpendingPasswordInput
           setForm={form => this.setSpendingPasswordForm(form)}
           isSubmitting={this.props.isSubmitting}

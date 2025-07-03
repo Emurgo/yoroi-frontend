@@ -1,10 +1,9 @@
 // @flow
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { WalletType, StepsList } from '../../../../components/wallet/voting/types';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import VotingRegTxDialog from '../../../../components/wallet/voting/VotingRegTxDialog';
 import type { StoresProps } from '../../../../stores';
@@ -22,10 +21,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class TransactionDialogContainer extends Component<AllProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { stepsList, submit, cancel, goBack, onError, walletType, stores } = this.props;
     const wallet = stores.wallets.selected;
@@ -43,7 +39,7 @@ export default class TransactionDialogContainer extends Component<AllProps> {
           progressInfo={votingStore.progressInfo}
           staleTx={votingStore.isStale}
           transactionFee={votingRegTx.fee()}
-          isSubmitting={stores.wallets.sendMoneyRequest.isExecuting}
+          isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           onCancel={cancel}
           goBack={goBack}

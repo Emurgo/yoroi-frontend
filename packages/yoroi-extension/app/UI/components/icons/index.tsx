@@ -13,6 +13,8 @@ import { CheckmarkFilled } from './CheckmarkFilled';
 import { CheckmarkOutlined } from './CheckmarkOutlined';
 import { ChevronDown } from './ChevronDown';
 import { ChevronUp } from './ChevronUp';
+import { ChevronLeft } from './ChevronLeft';
+import { ChevronRight } from './ChevronRight';
 import { ChipArrowDown } from './ChipArrowDown';
 import { ChipArrowUp } from './ChipArrowUp';
 import { CloseCircleIcon } from './CloseCircleIcon';
@@ -88,10 +90,14 @@ import { VisibilityOn } from './VisibilityOn';
 import { Voting } from './Voting';
 import { Wallet } from './Wallet';
 import { Wallets } from './Wallets';
+import { Refresh } from './Refresh';
+import { Swap } from './Swap';
+import { AdaToken } from './AdaToken';
 
 export const Icon = {
   Assets,
   Assets1,
+  AdaToken,
   AssetsFilled,
   Bio,
   Bug,
@@ -102,6 +108,8 @@ export const Icon = {
   CheckmarkOutlined,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   ChipArrowDown,
   ChipArrowUp,
   CloseCircleIcon,
@@ -145,6 +153,7 @@ export const Icon = {
   QuestionCircle,
   Receive,
   Reporting,
+  Refresh,
   Sandbox,
   Script,
   Search,
@@ -178,11 +187,13 @@ export const Icon = {
   Voting,
   Wallet,
   Wallets,
+  Swap,
 };
 
 export enum Icons {
   Assets = 'Assets',
   Assets1 = 'Assets1',
+  AdaToken = 'AdaToken',
   AssetsFilled = 'AssetsFilled',
   Bio = 'Bio',
   Bug = 'Bug',
@@ -193,6 +204,8 @@ export enum Icons {
   CheckmarkOutlined = 'CheckmarkOutlined',
   ChevronDown = 'ChevronDown',
   ChevronUp = 'ChevronUp',
+  ChevronLeft = 'ChevronLeft',
+  ChevronRight = 'ChevronRight',
   ChipArrowDown = 'ChipArrowDown',
   ChipArrowUp = 'ChipArrowUp',
   CloseCircleIcon = 'CloseCircleIcon',
@@ -216,6 +229,7 @@ export enum Icons {
   GridDefault = 'GridDefault',
   GridDense = 'GridDense',
   Image = 'Image',
+  Indicator = 'Indicator',
   Info = 'Info',
   InfoCircle = 'InfoCircle',
   LastSeen = 'LastSeen',
@@ -237,6 +251,7 @@ export enum Icons {
   QuestionCircle = 'QuestionCircle',
   Receive = 'Receive',
   Reporting = 'Reporting',
+  Refresh = 'Refresh',
   Sandbox = 'Sandbox',
   Script = 'Script',
   Search = 'Search',
@@ -265,12 +280,14 @@ export enum Icons {
   Voting = 'Voting',
   Wallet = 'Wallet',
   Wallets = 'Wallets',
+  Swap = 'Swap',
 }
 
 interface IconWrapperProps {
   icon: Icons;
   iconProps?: React.SVGProps<SVGSVGElement>;
   asButton?: boolean;
+  iconButtonId?: string;
   [key: string]: any;
 }
 
@@ -279,6 +296,7 @@ export function IconWrapper({
   iconProps = {},
   asButton = false,
   buttonProps = {},
+  iconButtonId = '',
   ...props
 }: Readonly<IconWrapperProps>): React.ReactNode {
   const IconComponent = typeof icon === 'string' ? Icon[icon] : icon;

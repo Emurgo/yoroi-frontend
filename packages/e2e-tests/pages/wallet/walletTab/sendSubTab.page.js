@@ -1,5 +1,11 @@
 import WalletTab from './walletTab.page.js';
-import { quarterSecond, fiveSeconds, halfSecond, defaultWaitTimeout } from '../../../helpers/timeConstants.js';
+import {
+  quarterSecond,
+  fiveSeconds,
+  halfSecond,
+  defaultWaitTimeout,
+  oneMinute,
+} from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -129,11 +135,23 @@ class SendSubTab extends WalletTab {
   }
   async receiverIsGood() {
     this.logger.info(`SendSubTab::receiverIsGood is called.`);
-    return await this.customWaitIsPresented(this.receiverDoneIcon, defaultWaitTimeout, quarterSecond);
+    return await this.customWaitIsPresented(
+      this.receiverDoneIcon,
+      defaultWaitTimeout,
+      quarterSecond
+    );
   }
   async getReceiverHelperText() {
     this.logger.info(`SendSubTab::getReceiverHelperText is called.`);
-    return await this.getText(this.receiverHelperTextLocator);
+    const isPresented = await this.customWaitIsPresented(
+      this.receiverHelperTextLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    if (isPresented) {
+      return await this.getText(this.receiverHelperTextLocator);
+    }
+    throw new Error('Receiver helper text is not displayed');
   }
   async waitReceiverHelperTextEqual(expectedText) {
     this.logger.info(`SendSubTab::waitReceiverHelperTextEqual is called.`);
@@ -142,8 +160,8 @@ class SendSubTab extends WalletTab {
         const currentText = await this.getReceiverHelperText();
         return currentText === expectedText;
       },
-      defaultWaitTimeout,
-      quarterSecond
+      oneMinute,
+      halfSecond
     );
   }
   async getReceiverHandlerAddress() {
@@ -241,7 +259,7 @@ class SendSubTab extends WalletTab {
         return errMsg !== '';
       },
       fiveSeconds,
-      halfSecond,
+      halfSecond
     );
   }
 }
