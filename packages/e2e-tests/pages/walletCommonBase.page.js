@@ -178,6 +178,13 @@ class WalletCommonBase extends BasePage {
   }
   async waitPrepareWalletBannerIsClosed() {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
+    await this.sleep(halfSecond);
+    const displayedState = await this.customWaitIsPresented(this.prepareWalletBannerLocator, fiveSeconds, quarterSecond);
+    if (!displayedState) {
+      this.logger.error(
+        `WalletCommonBase::waitPrepareWalletBannerIsClosed The prepare wallet banner is not presented`);
+      throw new Error(`The prepare wallet banner is not presented`);
+    }
     const state = await this.customWaiter(
       async () => {
         const bannersElems = await this.findElements(this.prepareWalletBannerLocator);
