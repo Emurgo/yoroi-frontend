@@ -27,7 +27,7 @@ export const restoreWallet = async (
   logger,
   testWallet,
   shouldBeModalWindow = true,
-  preloadBrowserLocalStorage = true,
+  preloadBrowserLocalStorage = true
 ) => {
   if (preloadBrowserLocalStorage) {
     await preloadBrowserStorage(webdriver, logger);
@@ -55,11 +55,7 @@ export const restoreWallet = async (
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet);
 };
 
-export const checkCorrectWalletIsDisplayed = async (
-  webdriver,
-  logger,
-  testWallet
-) => {
+export const checkCorrectWalletIsDisplayed = async (webdriver, logger, testWallet) => {
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
   await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
@@ -159,13 +155,14 @@ export const preloadBrowserStorage = async (
   webdriver,
   logger,
   templateName = 'general',
-  useGeneralStorageInfo = true
+  useGeneralStorageInfo = true,
+  opts = {}
 ) => {
   logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
   expect(state, 'The Add new wallet page is not displayed').to.be.true;
-  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo);
+  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
   logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
 };
 
