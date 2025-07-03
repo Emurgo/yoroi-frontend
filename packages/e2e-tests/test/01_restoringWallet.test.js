@@ -11,6 +11,7 @@ import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
+import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
 
 describe('Restoring 15-wallet', function () {
   this.timeout(2 * oneMinute);
@@ -20,6 +21,7 @@ describe('Restoring 15-wallet', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadBrowserStorage(webdriver, logger);
   });
 
   it('Selecting Restore wallet 15-word', async function () {
@@ -67,7 +69,6 @@ describe('Restoring 15-wallet', function () {
   it('Check new wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
-    await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();

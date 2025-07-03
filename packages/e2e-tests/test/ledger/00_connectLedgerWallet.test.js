@@ -18,6 +18,7 @@ import { Logger } from 'simple-node-logger';
 import { SpeculosDockerController } from '../../helpers/speculos/speculosDockerController.js';
 import { LedgerModels } from '../../helpers/ledgerHelper.js';
 import { testWalletLedger } from '../../utils/testWallets.js';
+import { preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 
 for (const model in LedgerModels) {
   describe(`Connect Ledger HW wallet ${model}`, function () {
@@ -51,6 +52,7 @@ for (const model in LedgerModels) {
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
+      await preloadBrowserStorage(webdriver, logger);
     });
 
     it('Ledger is ready', async function () {
@@ -89,7 +91,6 @@ for (const model in LedgerModels) {
     it('Check new wallet', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.waitPrepareWalletBannerIsClosed();
-      await transactionsPage.closeUpdatesModalWindow();
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
       const walletInfo = await transactionsPage.getSelectedWalletInfo();

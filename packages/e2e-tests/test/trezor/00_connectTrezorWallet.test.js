@@ -17,6 +17,7 @@ import { oneMinute } from '../../helpers/timeConstants.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
+import { preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 
 for (const model in TrezorModels) {
   const modelName = TrezorModels[model];
@@ -39,6 +40,7 @@ for (const model in TrezorModels) {
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
+      await preloadBrowserStorage(webdriver, logger);
     });
 
     it('Trezor initialization', async function () {
@@ -71,7 +73,6 @@ for (const model in TrezorModels) {
     it('Check new wallet', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.waitPrepareWalletBannerIsClosed();
-      await transactionsPage.closeUpdatesModalWindow();
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
       const walletInfo = await transactionsPage.getSelectedWalletInfo();
