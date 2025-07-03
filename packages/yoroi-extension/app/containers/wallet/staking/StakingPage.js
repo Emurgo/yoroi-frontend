@@ -1,8 +1,7 @@
 // @flow
 import { Component, Suspense, lazy } from 'react';
 import type { Node } from 'react';
-import { intlShape } from 'react-intl';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import globalMessages from '../../../i18n/global-messages';
 import BannerContainer from '../../banners/BannerContainer';
@@ -22,18 +21,13 @@ import { CurrencyProvider } from '../../../UI/context/CurrencyContext';
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
 // $FlowIgnore: suppressing this error
 import { ModalManager } from '../../../UI/components/modals/ModalManager';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 
 export const StakingPageContentPromise: void => Promise<any> = () => import('./StakingPageContent');
 const StakingPageContent = lazy(StakingPageContentPromise);
 
 @observer
 class StakingPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
@@ -45,10 +39,9 @@ class StakingPage extends Component<StoresProps> {
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={this.context.intl.formatMessage(globalMessages.stakingDashboard)} />}
+            title={<NavBarTitle title={this.context.formatMessage(globalMessages.stakingDashboard)} />}
             pageBanner={
               <PoolTransitionBanner
-                intl={this.context.intl}
                 showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
               />
             }
@@ -60,9 +53,8 @@ class StakingPage extends Component<StoresProps> {
           <CurrencyProvider currency={this.props.stores.profile.unitOfAccount.currency || 'USD'}>
             <ModalProvider>
               <ModalManager />
-              <ReviewTxProvider stores={stores} intl={this.context.intl}>
+              <ReviewTxProvider stores={stores} intl={this.context}>
                 <ReviewTxModal />
-                <DrepPromotionBanner stores={stores} page="staking" intl={this.context.intl} />
                 <StakingPageContent stores={this.props.stores} />
               </ReviewTxProvider>
             </ModalProvider>

@@ -106,7 +106,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
     rules: [
       ...commonConfig.rules(false),
       {
-        test: /\.js$/,
+        test: /\.(js|ts|tsx)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {

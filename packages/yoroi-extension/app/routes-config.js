@@ -13,7 +13,6 @@ export const ROUTES = {
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
-  SWITCH: '/switch',
   WALLETS: {
     ROOT: '/wallets',
     ADD: '/wallets/add',
@@ -64,11 +63,15 @@ export const ROUTES = {
   },
   DAPP_CONNECTOR: {
     CONNECTED_WEBSITES: '/connector/connected-websites',
+    DAPP_CENTER: '/connector/dapp-center',
   },
   // Revamp specific routes:
   REVAMP: {
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
+  },
+  CATALYST_REGISTRATION: {
+    ROOT: '/catalyst-registration',
   },
   SWAP: {
     ROOT: '/swap',

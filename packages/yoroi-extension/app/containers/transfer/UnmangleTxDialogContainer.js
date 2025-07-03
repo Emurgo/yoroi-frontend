@@ -3,17 +3,12 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
-import type { ConfigType } from '../../../config/config-types';
 import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
 import TransferSendPage from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape, } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
-
-// populated by ConfigWebpackPlugin
-declare var CONFIG: ConfigType;
 
 type Props = {|
   +onClose: void => void,
@@ -22,10 +17,7 @@ type Props = {|
 @observer
 export default class UnmangleTxDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
 
-  static contextTypes: {|intl: $npm$ReactIntl$IntlFormat|} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   componentDidMount() {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) {
@@ -59,7 +51,7 @@ export default class UnmangleTxDialogContainer extends Component<{| ...Props, ..
 
   render(): Node {
     const { stores } = this.props;
-    const { intl } = this.context;
+    const intl = this.context;
     const txBuilder = this.props.stores.transactionBuilderStore;
     return (
       <TransferSendPage

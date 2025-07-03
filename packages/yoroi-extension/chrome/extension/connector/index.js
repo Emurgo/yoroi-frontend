@@ -1,10 +1,8 @@
 // @flow
 
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 // eslint-disable-next-line no-unused-vars
 import { action, configure } from 'mobx';
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';
-import { createHashHistory } from 'history';
 import { setupApi } from '../../../app/api/index';
 import createStores from '../../../app/connector/stores/index';
 // eslint-disable-next-line no-unused-vars
@@ -26,9 +24,6 @@ BigNumber.DEBUG = true;
 // Entry point into our application
 const initializeDappConnector: void => Promise<void> = async () => {
   const api = await setupApi();
-  const router = new RouterStore();
-  const hashHistory = createHashHistory();
-  const history = syncHistoryWithStore(hashHistory, router);
   const stores = await createStores(api);
 
   window.yoroi = {
@@ -40,8 +35,8 @@ const initializeDappConnector: void => Promise<void> = async () => {
     }),
   };
 
-  const root = document.querySelector('#root-yoroi-connector');
-  if (root == null) {
+  const container = document.querySelector('#root-yoroi-connector');
+  if (container == null) {
     throw new Error('Root element not found.');
   }
   const AMPLI_FLUSH_INTERVAL_MS = 5000;
@@ -60,7 +55,8 @@ const initializeDappConnector: void => Promise<void> = async () => {
     },
   }: LoadOptionsWithEnvironment)).promise;
 
-  render(<App stores={stores} history={history} />, root);
+  const root = createRoot(container);
+  root.render(<App stores={stores} />);
 };
 
 addCloseListener(TabIdKeys.YoroiConnector);

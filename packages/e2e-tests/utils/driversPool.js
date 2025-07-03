@@ -94,7 +94,11 @@ class DriversManager {
   async closeAllUnused() {
     for (const driverObject of poolOfDrivers) {
       this.logger.info(`DriversManager::closeAllUnused. Closing driver ${driverObject.driverId}`);
-      await driverObject.driver.quit();
+      const driverSessionId = (await driverObject.driver.getSession()).getId();
+      this.logger.info(`DriversManager::closeAllUnused. driverSessionId ${driverSessionId}`);
+      if (driverSessionId) {
+        await driverObject.driver.quit();
+      }
     }
   }
 }

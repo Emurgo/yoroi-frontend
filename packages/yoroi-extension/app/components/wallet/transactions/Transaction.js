@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import type { Node } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { TransactionDirectionType } from '../../../api/ada/transactions/types';
 import type { AssuranceLevel } from '../../../types/transactionAssurance.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
@@ -13,7 +12,7 @@ import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiTo
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import moment from 'moment';
 import classnames from 'classnames';
 import styles from './Transaction.scss';
@@ -251,10 +250,7 @@ type State = {|
 
 @observer
 export default class Transaction extends Component<Props, State> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   state: State = {
     isExpanded: false,
   };
@@ -263,7 +259,8 @@ export default class Transaction extends Component<Props, State> {
     this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
   };
 
-  getTxTypeMsg(intl: $npm$ReactIntl$IntlFormat, currency: string, data: WalletTransaction): string {
+  getTxTypeMsg(currency: string, data: WalletTransaction): string {
+    const intl = this.context;
     const { type } = data;
     if (type === transactionTypes.EXPEND) {
       return intl.formatMessage(messages.sent, { currency });
@@ -312,7 +309,8 @@ export default class Transaction extends Component<Props, State> {
     return '???';
   }
 
-  getStatusString(intl: $npm$ReactIntl$IntlFormat, state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+  getStatusString(state: number, assuranceLevel: AssuranceLevel, isValid: boolean): string {
+    const intl = this.context;
     if (!isValid) {
       return intl.formatMessage(stateTranslations.failed);
     }
@@ -532,7 +530,7 @@ export default class Transaction extends Component<Props, State> {
     return (
       <div className={classnames([styles.asset])}>
         {sign}
-        {request.assets.length} {this.context.intl.formatMessage(globalMessages.assets)}
+        {request.assets.length} {this.context.formatMessage(globalMessages.assets)}
       </div>
     );
   };
@@ -607,7 +605,7 @@ export default class Transaction extends Component<Props, State> {
     const data = this.props.data;
     const { isLastInList, state, assuranceLevel, onAddMemo, onEditMemo } = this.props;
     const { isExpanded } = this.state;
-    const { intl } = this.context;
+    const intl = this.context;
     const isSubmittedTransaction = state === TxStatusCodes.SUBMITTED;
     const isFailedTransaction = state < 0 && !isSubmittedTransaction;
     const isPendingTransaction = state === TxStatusCodes.PENDING || isSubmittedTransaction;
@@ -637,7 +635,7 @@ export default class Transaction extends Component<Props, State> {
 
     const arrowClasses = isExpanded ? styles.collapseArrow : styles.expandArrow;
 
-    const status = this.getStatusString(intl, state, assuranceLevel, isValidTransaction);
+    const status = this.getStatusString(state, assuranceLevel, isValidTransaction);
 
     return (
       <div className={componentStyles}>
@@ -646,7 +644,7 @@ export default class Transaction extends Component<Props, State> {
           <div className={styles.togglerContent}>
             <div className={styles.header}>
               <div className={styles.time}>{moment(data.date).format('hh:mm:ss A')}</div>
-              <div className={styles.type}>{this.getTxTypeMsg(intl, this.getTicker(data.amount.getDefaultEntry()), data)}</div>
+              <div className={styles.type}>{this.getTxTypeMsg(this.getTicker(data.amount.getDefaultEntry()), data)}</div>
               {state === TxStatusCodes.IN_BLOCK && isValidTransaction ? (
                 <div className={labelOkClasses}>{status}</div>
               ) : (
@@ -813,7 +811,7 @@ export default class Transaction extends Component<Props, State> {
   }
 
   generateAddressButton: string => ?Node = address => {
-    const { intl } = this.context;
+    const intl = this.context;
     const addressInfo = this.props.addressLookup(address);
     if (addressInfo == null) {
       return (
@@ -830,7 +828,7 @@ export default class Transaction extends Component<Props, State> {
   };
 
   shelleyCertificateToText: ($ReadOnly<CertificateRow>) => string = certificate => {
-    const { intl } = this.context;
+    const intl = this.context;
     const kind = certificate.Kind;
     return RustModule.WasmScope(Scope => {
       switch (kind) {
@@ -856,7 +854,7 @@ export default class Transaction extends Component<Props, State> {
   };
 
   getWithdrawals: WalletTransaction => ?Node = data => {
-    const { intl } = this.context;
+    const intl = this.context;
     if (!(data instanceof CardanoShelleyTransaction)) {
       return null;
     }
@@ -891,7 +889,7 @@ export default class Transaction extends Component<Props, State> {
   };
 
   getCertificate: WalletTransaction => ?Node = data => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     const wrapCertificateText = (node, manyCerts) => (
       <>
@@ -920,7 +918,7 @@ export default class Transaction extends Component<Props, State> {
   };
 
   getMetadata: WalletTransaction => ?Node = data => {
-    const { intl } = this.context;
+    const intl = this.context;
 
     if (data instanceof CardanoShelleyTransaction && data.metadata !== null) {
       let metadata;
@@ -929,12 +927,12 @@ export default class Transaction extends Component<Props, State> {
 
         try {
           jsonData = parseMetadata(data.metadata);
-        } catch (error) {
+        } catch (_error) {
           // try to parse schema using detailed conversion if advanced user
           if (this.props.complexityLevel === ComplexityLevels.Advanced) {
             try {
               jsonData = parseMetadataDetailed(data.metadata);
-            } catch (errDetailed) {
+            } catch (_errDetailed) {
               // discard error
               // can not parse metadata as json
               // show the metadata hex as is

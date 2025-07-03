@@ -1,6 +1,5 @@
 import type { IGetSigningKey, IGetStakingKey, IPublicDeriver } from './lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from './lib/storage/models/ConceptualWallet';
-import type { IHasLevels } from './lib/storage/models/ConceptualWallet/interfaces';
 import { RustModule } from './lib/cardanoCrypto/rustLoader';
 import { derivePrivateByAddressing } from './lib/cardanoCrypto/deriveByAddressing';
 import { Logger, stringifyError } from '../../utils/logging';
@@ -9,7 +8,7 @@ import { GenericApiError, IncorrectWalletPasswordError } from '../common/errors'
 import LocalizableError from '../../i18n/LocalizableError';
 
 export async function genOwnStakingKey(request: {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetSigningKey & IGetStakingKey,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetSigningKey & IGetStakingKey,
   password: string,
 |}): Promise<RustModule.WalletV4.PrivateKey> {
   try {

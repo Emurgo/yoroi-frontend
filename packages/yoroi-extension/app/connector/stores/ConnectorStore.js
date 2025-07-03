@@ -338,7 +338,7 @@ export default class ConnectorStore extends Store<StoresMap> {
             this.hwWalletError = new convertToLocalizableLedgerError(error);
             this.isHwWalletErrorRecoverable = true;
           });
-          return;
+          throw error;
         }
       } else {
         throw new Error('Not expected to reach here. Unexpectedly wallet type');
@@ -574,7 +574,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         }
         const stakeRegistration = cert.as_stake_registration();
         if (stakeRegistration) {
-          const coin = stakeRegistration.coin()?.toString() ?? null;
+          const coin = stakeRegistration.coin()?.to_str() ?? null;
           cip95Info.push({
             type: 'StakeRegistrationCert',
             coin,
@@ -583,7 +583,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         }
         const stakeDeregistration = cert.as_stake_deregistration();
         if (stakeDeregistration) {
-          const coin = stakeDeregistration.coin()?.toString() ?? null;
+          const coin = stakeDeregistration.coin()?.to_str() ?? null;
           cip95Info.push({
             type: 'StakeDeregistrationCert',
             coin,
@@ -1036,6 +1036,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
       );
     } catch (e) {
@@ -1084,7 +1085,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       throw new Error('hash mismatch');
     }
 
-    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses);
+    return buildSignedTrezorTransaction(rawTxHex, trezorSignTxResp.witnesses).txHex;
   }
 
   async ledgerSignTx(
@@ -1115,6 +1116,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         Number(config.ChainNetworkId),
         config.ByronNetworkId,
         s => ownAddressMap[s],
+        [],
         addressedUtxos,
         additionalRequiredSigners,
       );
@@ -1173,7 +1175,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       rawTxHex,
       ledgerSignResult.witnesses,
       publicKeyInfo,
-    );
+    ).txHex;
   }
 
   /**

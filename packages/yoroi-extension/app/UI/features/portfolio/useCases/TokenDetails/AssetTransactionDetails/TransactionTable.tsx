@@ -2,9 +2,9 @@ import { Box, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRo
 import { useTheme } from '@mui/material/styles';
 import _ from 'lodash';
 import moment from 'moment';
-import React, { Fragment, useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { Card } from '../../../../../components';
-import { Icon } from '../../../../../components/icons';
+import { Icon, Icons, IconWrapper } from '../../../../../components/icons';
 import { formatNumber } from '../../../common/helpers/formatHelper';
 import { mapStrings } from '../../../common/helpers/transactionHelper';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -18,7 +18,7 @@ const Container = styled(Box)(() => ({
   margin: '30px 0',
 }));
 
-const TransactionTable = ({ history, tokenName }: { history: TransactionItemType[]; tokenName: string }): JSX.Element => {
+const TransactionTable = ({ history, tokenName }: { history: TransactionItemType[]; tokenName: string }): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { unitOfAccount } = usePortfolio();
@@ -62,20 +62,20 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
   return (
     <Container>
       <Card>
-        <Box sx={{ padding: theme.spacing(3) }}>
+        <Box sx={{ padding: theme.spacing(24) }}>
           <Typography fontWeight="500" color="ds.gray_max">
             {strings.transactionHistory}
           </Typography>
           <Table
             sx={{
-              marginTop: theme.spacing(3),
+              marginTop: theme.spacing(24),
             }}
             aria-label="transaction history table"
           >
             <TableHead>
               <TableRow>
                 {headCells.map(({ id, align, label }, index) => (
-                  <TableCell key={id} align={align} sx={{ paddingX: index ? theme.spacing(2) : '0' }}>
+                  <TableCell key={id} align={align} sx={{ paddingX: index ? theme.spacing(16) : '0' }}>
                     <Typography variant="body2" color="ds.gray_600">
                       {label}
                     </Typography>
@@ -92,7 +92,7 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
                     key={item.title}
                     display="block"
                     sx={{
-                      marginTop: theme.spacing(3),
+                      marginTop: theme.spacing(24),
                     }}
                   >
                     <Typography key={item.title} component="th" variant="body2" color="ds.gray_600">
@@ -127,7 +127,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
   return (
     <TableRow key={`${row.label} ${index}`} sx={{ '& td, & th': { border: 0 } }}>
       <TableCell key={`${row.label} ${headCells[0].id}`} sx={{ paddingX: 0 }}>
-        <Stack direction="row" alignItems="center" spacing={theme.spacing(2)}>
+        <Stack direction="row" alignItems="center" spacing={theme.spacing(16)}>
           <IconButton
             disableRipple={true}
             sx={{
@@ -153,9 +153,9 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
             {row.type === HistoryItemType.RECEIVED && (
               <Icon.Send stroke={theme.palette.ds.secondary_600} style={{ transform: 'rotate(180deg)' }} />
             )}
-            {row.type === HistoryItemType.ERROR && <Icon.Cancel fill={theme.palette.ds.sys_magenta_500} />}
-            {row.type === HistoryItemType.WITHDRAW && <Icon.Staking fill={theme.palette.ds.secondary_600} />}
-            {row.type === HistoryItemType.DELEGATE && <Icon.Staking fill={theme.palette.ds.primary_500} />}
+            {row.type === HistoryItemType.ERROR && <IconWrapper color="ds.sys_magenta_500" icon={Icons.Cancel} />}
+            {row.type === HistoryItemType.WITHDRAW && <IconWrapper color="ds.secondary_600" icon={Icons.Staking} />}
+            {row.type === HistoryItemType.DELEGATE && <IconWrapper color="ds.primary_500" icon={Icons.Staking} />}
           </IconButton>
           <Stack direction="column">
             <Typography color="ds.gray_900">{row.label}</Typography>
@@ -188,7 +188,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
       <TableCell key={`${row.label} ${headCells[3].id}`}>
         <Stack
           direction="row"
-          spacing={theme.spacing(2)}
+          spacing={theme.spacing(16)}
           sx={{
             float: 'right',
             cursor: 'pointer',
@@ -239,7 +239,7 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
         <Icon.Expand
           onClick={() => setIsExpanded(!isExpanded)}
           style={{
-            marginTop: isExpanded ? 0 : theme.spacing(1),
+            marginTop: isExpanded ? 0 : theme.spacing(8),
             cursor: 'pointer',
             transition: 'all ease 0.3s',
             transform: isExpanded ? 'rotate(0deg)' : 'rotate(-180deg)',

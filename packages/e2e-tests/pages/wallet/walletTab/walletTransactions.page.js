@@ -255,6 +255,7 @@ export class TransactionsSubTab extends WalletTab {
     const result = [];
     const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
     for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      await this.scrollIntoViewElement(allTxs[txIndex]);
       const txType = await this.getText(this.txTypeTextLocator(groupIndex, txIndex));
       const txTimePrettified = await this.getText(this.txTimeTextLocator(groupIndex, txIndex));
       const txTime = convertPrettyTimeToNormal(txTimePrettified);
@@ -333,6 +334,8 @@ export class TransactionsSubTab extends WalletTab {
       const txsInfoInGroup = await this.__getAllTxsInGroup(group);
       allTxsInfo.push(...txsInfoInGroup);
     }
+    this.logger.info(`TransactionsSubTab::getTxsInfo. allTxsInfo:`);
+    this.logger.info(JSON.stringify(allTxsInfo));
     return allTxsInfo;
   }
   async getAmountOfTxs() {
@@ -586,12 +589,13 @@ export class TransactionsSubTab extends WalletTab {
     const result = [];
     const allTxs = await this.findElements(this.txsInGroupLocator(groupIndex));
     for (let txIndex = 0; txIndex < allTxs.length; txIndex++) {
+      await this.scrollIntoView(this.txFeeTextLocator(groupIndex, txIndex));
       const txFeeString = await this.getText(this.txFeeTextLocator(groupIndex, txIndex));
       const txAmountRawString = await this.getText(this.txAmountTextLocator(groupIndex, txIndex));
-      const txAmountString = txAmountRawString.split(' ')[0];
+      const [adaAmountStr, fiatAmountStr] = txAmountRawString.split('\n');
 
       const txFeeHiddenState = txFeeString === balanceReplacer || txFeeString === '-';
-      const txAmountHiddenState = txAmountString === balanceReplacer;
+      const txAmountHiddenState = adaAmountStr.startsWith(balanceReplacer) && fiatAmountStr.startsWith(balanceReplacer);
 
       result.push(txFeeHiddenState && txAmountHiddenState);
     }

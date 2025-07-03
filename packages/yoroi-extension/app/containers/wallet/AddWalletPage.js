@@ -1,8 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Component } from 'react';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
-import { intlShape } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { observer } from 'mobx-react';
 import { ROUTES } from '../../routes-config';
 import { Box } from '@mui/material';
@@ -27,13 +26,10 @@ import { ampli } from '../../../ampli/index';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
-      this.props.stores.app.goToRoute({ route: ROUTES.WALLETS.ADD });
+      this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
     }
     this.props.stores.uiDialogs.closeActiveDialog();
   };
@@ -145,7 +141,7 @@ export default class AddWalletPage extends Component<StoresProps> {
     }
 
     const { hasAnyWallets } = this.props.stores.wallets;
-    const goToRoute = stores.app.goToRoute;
+    const goToRoute = stores.routing.goToRoute;
     const addWalletPageComponent = (
       <>
         <AddWalletPageRevamp
@@ -176,7 +172,7 @@ export default class AddWalletPage extends Component<StoresProps> {
   }
 
   _goToSettingsRoot: () => void = () => {
-    this.props.stores.app.goToRoute({
+    this.props.stores.routing.goToRoute({
       route: ROUTES.SETTINGS.ROOT,
     });
   };

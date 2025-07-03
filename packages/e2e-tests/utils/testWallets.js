@@ -37,8 +37,8 @@ export const testWallet4 = Object.freeze({
 });
 export const testWalletTrezor = Object.freeze({
   name: 'TrezorEmul',
-  plate: 'PXCA-2349',
-  mnemonic: 'lyrics tray aunt muffin brisk ensure wedding cereal capital path replace weasel',
+  plate: 'OPLJ-6753',
+  mnemonic: 'bulk gaze broccoli stage extra chat lumber coil squirrel elder theory unlock',
   deviceId: '6495958994A4025BB5EE1DB0',
   balance: 0,
 });
@@ -48,6 +48,12 @@ export const testWalletLedger = Object.freeze({
   mnemonic: 'canal program butter sell isolate say doll document miss burger join owner fabric behave stomach theory sing math school force inhale vast sunset trouble',
   balance: 0,
 });
+export const testWalletNFTs = Object.freeze({
+  name: 'TestWalletNFTs',
+  plate: 'DCDT-7109',
+  mnemonic: 'eternal logic shrimp direct weasel heart relief tonight else expose lift lava barrel frame multiply',
+  balance: 3.24112,
+})
 
 export const getSpendableWallet = () => {
   const browserName = getTargetBrowser();

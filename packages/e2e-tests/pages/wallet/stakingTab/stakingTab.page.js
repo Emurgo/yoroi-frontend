@@ -38,14 +38,6 @@ class StakingTab extends WalletCommonBase {
     );
     return bannerState;
   }
-  /**
-   * @returns {Promise<string>}
-   */
-  async titleIsCorrect() {
-    this.logger.info(`StakingTab::titleIsCorrect is called`);
-    const displayedTitle = await this.getPageTitle();
-    return displayedTitle === pageTitle.staking;
-  }
 }
 
 export default StakingTab;

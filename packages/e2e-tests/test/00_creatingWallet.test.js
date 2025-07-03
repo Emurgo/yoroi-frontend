@@ -14,6 +14,8 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import StakingTab from '../pages/wallet/stakingTab/stakingTab.page.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import { pageTitle } from '../helpers/pageTitles.js';
+import WalletCommonBase from '../pages/walletCommonBase.page.js';
+import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 
 describe('Creating wallet', function () {
   this.timeout(2 * oneMinute);
@@ -84,7 +86,7 @@ describe('Creating wallet', function () {
     await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
-    const titleIsCorrect = await transactionsPage.titleIsCorrect();
+    const titleIsCorrect = await transactionsPage.titleIsCorrect(pageTitle.wallet);
     expect(titleIsCorrect, `Title is different from "${pageTitle.wallet}"`).to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
     expect(walletInfo.balance, 'The wallet balance should be 0 (zero)').to.equal(0);
@@ -118,15 +120,26 @@ describe('Creating wallet', function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToStakingTab();
     const stakingPage = new StakingTab(webdriver, logger);
-    const titleIsCorrect = await stakingPage.titleIsCorrect();
+    const titleIsCorrect = await stakingPage.titleIsCorrect(pageTitle.staking);
     expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
     const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
     expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;
   });
 
+  it('Check NFTs Gallery', async function () {
+    const walletBasePage = new WalletCommonBase(webdriver, logger);
+    await walletBasePage.goToNftsTab();
+    const nftsGalleryPage = new NftGalleryTab(webdriver, logger);
+    const titleIsCorrect = await nftsGalleryPage.titleIsCorrect(pageTitle.nfts);
+    expect(titleIsCorrect, `Title for NFTs Gallery is different from "${pageTitle.staking}"`).to.be.true;
+    const pageIsDisplayed = await nftsGalleryPage.isDisplayed();
+    expect(pageIsDisplayed, `NFTs Gallery dispalyed incorrectly`).to.be.true;
+    const noNftsIsDisplayed = await nftsGalleryPage.noNftsIsDisplayed();
+    expect(noNftsIsDisplayed, `No NFTs banner should be shown`).to.be.true;
+  });
+
   // check banners on Transactions page
   // Portfolio Start your crypto jounrney banner
-  // No NFTs banner on nfts page
   // Not enough funds for voting
   // "You don't have any websites connected yet" banner on Connector page
   // Governance

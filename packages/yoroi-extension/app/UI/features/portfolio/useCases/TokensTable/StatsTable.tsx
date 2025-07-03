@@ -1,6 +1,6 @@
 import { TableCell, TableRow, styled } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import Table from '../../common/components/Table';
 import { TableRowSkeleton } from '../../common/components/TableRowSkeleton';
@@ -35,7 +35,7 @@ interface Props {
   stores: any;
 }
 
-const StatsTable = ({ data, stores }: Props): JSX.Element => {
+const StatsTable = ({ data, stores }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const { showWelcomeBanner } = usePortfolio();
   const navigateTo = useNavigateTo();

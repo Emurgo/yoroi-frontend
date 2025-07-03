@@ -11,8 +11,6 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
   const {
     openTxReviewModal,
     startLoadingTxReview,
-    walletType,
-    isHardwareWallet,
     stakeKeyDeposit,
     primaryTokenInfo,
     showTxResultModal,
@@ -61,50 +59,26 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
     });
   };
 
-  const submitTx = async passswordInput => {
-    const selected = stores.wallets.selected;
+  const submitTx = async password => {
     const signRequest = stores.substores.ada.delegationTransaction.createWithdrawalTx.result;
     if (signRequest == null) return;
 
     try {
       startLoadingTxReview();
-      if (isHardwareWallet) {
-        if (walletType === 'trezor') {
-          await stores.substores.ada.trezorSend.sendUsingTrezor({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              return showTxResultModal(TransactionResult.FAIL);
-            },
-            onSuccess: () => {
-              return showTxResultModal(TransactionResult.SUCCESS);
-            },
-          });
-        }
-        if (walletType === 'ledger') {
-          await stores.substores.ada.ledgerSend.sendUsingLedgerWallet({
-            params: { signRequest },
-            wallet: selected,
-            onFail: () => {
-              showTxResultModal(TransactionResult.FAIL);
-            },
-            onSuccess: () => {
-              showTxResultModal(TransactionResult.SUCCESS);
-            },
-          });
-        }
-      } else {
-        await stores.substores.ada.mnemonicSend.sendMoney({
-          signRequest,
-          password: passswordInput,
-          wallet: selected,
-        });
-        showTxResultModal(TransactionResult.SUCCESS);
-      }
+
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet: stores.wallets.selected,
+        signRequest,
+        password,
+        callback: async () => {},
+      });
+
+      showTxResultModal(TransactionResult.SUCCESS);
+
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
       // });
-    } catch (error) {
+    } catch (_error) {
       showTxResultModal(TransactionResult.FAIL);
     }
   };

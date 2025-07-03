@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, intlShape } from 'react-intl';
+import { defineMessages, IntlContext } from 'react-intl';
 import { Button, Typography } from '@mui/material';
 import moment from 'moment';
 import styles from './WalletTransactionsListRevamp.scss';
@@ -14,7 +14,6 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import globalMessages from '../../../i18n/global-messages';
 import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos/tables';
-import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
 import type { Notification } from '../../../types/notification.types';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
@@ -57,10 +56,7 @@ type Props = {|
 
 @observer
 export default class WalletTransactionsListRevamp extends Component<Props> {
-  static contextTypes: {| intl: $npm$ReactIntl$IntlFormat |} = {
-    intl: intlShape.isRequired,
-  };
-
+  static contextType:any = IntlContext;
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount(): void {
     this.localizedDateFormat = moment.localeData().longDateFormat('LL');
@@ -98,7 +94,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
   }
 
   localizedDate(date: string): string {
-    const { intl } = this.context;
+    const intl = this.context;
     const today = moment().format(dateFormat);
     if (date === today) return intl.formatMessage(globalMessages.dateToday);
     const yesterday = moment().subtract(1, 'days').format(dateFormat);
@@ -117,7 +113,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
   }
 
   render(): Node {
-    const { intl } = this.context;
+    const intl = this.context;
     const {
       transactions,
       isLoadingTransactions,

@@ -4,14 +4,14 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { NoTransactions } from '../../../../components/ilustrations/NoTransactions';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID } from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -26,6 +26,13 @@ const Container = styled(Box)(() => ({
   alignItems: 'center',
   textAlign: 'center',
   paddingTop: '24px',
+}));
+
+const Divider = styled(Box)(({ theme }: any) => ({
+  backgroundColor:  theme.palette.ds.gray_200,
+  height: 2,
+  width: '100%',
+  marginBottom: '16px'
 }));
 
 export const mapStatus = {
@@ -57,22 +64,22 @@ export const GovernanceStatusSelection = () => {
     drepCredentialHex,
     setUnsignedTx,
     showTxResultModal,
+    setDrepId,
   } = useTxReviewModal();
 
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
   const strings = useStrings();
   const pageTitle = governanceStatus.status !== 'none' ? strings.governanceStatus : strings.registerGovernance;
-  const statusRawText = mapStatus[governanceStatus.status || ''];
-  const pageSubtitle = governanceStatus.status === 'none' ? strings.reviewSelection : strings.statusSelected(statusRawText);
+  const pageSubtitle = strings.reviewSelection;
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-  const params: any = useLocation();
+  const location = useLocation();
 
   React.useEffect(() => {
-    if (params?.delegateToYoroiDrep) {
+    if (location.search.includes('delegateToYoroiDrep=true')) {
       handleYoroiDelegate();
     }
-  }, [params]);
+  }, [useLocation]);
 
   const handleDelegate = async () => {
     if (!governanceManager) {
@@ -104,7 +111,8 @@ export const GovernanceStatusSelection = () => {
     const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
 
     governanceVoteChanged(vote);
-    createUnsignTx(dRepCredentialHex);
+    setDrepId({ drepID });
+    await createUnsignTx(dRepCredentialHex);
   };
 
   const handleAbstain = async () => {
@@ -171,19 +179,25 @@ export const GovernanceStatusSelection = () => {
     {
       title: strings.delegateToYoroiDRep,
       titleHover: strings.delegateToYoroiDRep,
-      description: statusDelegatingToYoroi
-        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.designatingSomeoneElse,
-      descriptionHover: statusDelegatingToYoroi
-        ? `You are designating Yoroi to cast your vote on your behalf for all proposals now and in the future`
-        : strings.designatingSomeoneElse,
-      extraInfo: statusDelegatingToYoroi ? governanceStatus.drep : null,
+      description: strings.delegateToYoroi,
+      descriptionHover: strings.delegateToYoroi,
       icon: <DRepIlustration />,
       selected: statusDelegatingToYoroi,
       onClick: handleYoroiDelegate,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegatingToYoroi,
+      blocked: statusDelegatingToYoroi,
       isVisible: Number(networkId) === 0,
+      bottom: (
+        <Stack direction="column" pt="16px" width="100%">
+          <Divider />
+          <Box>
+            <Link onClick={(event) => event.stopPropagation()} href={YOROI_VOTING_RECORD_LINK} target="_blank" rel="noopener" lineHeight="22px">
+              {strings.yoroiVotingRecordLink}
+            </Link>
+          </Box>
+        </Stack>
+      ),
     },
     {
       title: statusDelegating ? strings.delegatingToDRep : strings.delegateToDRep,
@@ -194,6 +208,7 @@ export const GovernanceStatusSelection = () => {
       extraInfo: statusDelegating ? governanceStatus.drep : null,
       selected: statusDelegating,
       onClick: handleDelegate,
+      blocked: false,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && statusDelegating,
       isVisible: true,
@@ -208,6 +223,7 @@ export const GovernanceStatusSelection = () => {
       onClick: handleAbstain,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_ABSTAIN,
+      blocked: false,
       isVisible: true,
     },
     {
@@ -217,6 +233,7 @@ export const GovernanceStatusSelection = () => {
       onClick: handleNoConfidence,
       pending: isPendindDrepDelegationTx || loadingUnsignTx,
       loading: loadingUnsignTx && governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE,
+      blocked: false,
       isVisible: true,
     },
   ];
@@ -264,7 +281,7 @@ export const GovernanceStatusSelection = () => {
       <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low">
+      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low" whiteSpace="pre-line">
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
@@ -282,8 +299,10 @@ export const GovernanceStatusSelection = () => {
                   onClick={option.onClick}
                   pending={option.pending}
                   loading={option.loading}
+                  blocked={option.blocked}
                   isVisible={option.isVisible}
                   extraInfo={option.extraInfo}
+                  bottom={option.bottom}
                 />
               );
             })
@@ -301,6 +320,7 @@ export const GovernanceStatusSelection = () => {
                   onClick={option.onClick}
                   pending={option.pending}
                   loading={option.loading}
+                  blocked={option.blocked}
                   smallCard={true}
                   isVisible={option.isVisible}
                 />
@@ -311,11 +331,6 @@ export const GovernanceStatusSelection = () => {
 
       <Stack gap="17px" mt="42px">
         {error && <Alert severity="error"> {error}</Alert>}
-        {governanceStatus.drep !== null && (
-          <Typography variant="body2" align="center" color="ds.text_gray_medium" gutterBottom>
-            {strings.drepId} {governanceStatus.drep}
-          </Typography>
-        )}
         <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
           {strings.learnMore}
         </Link>

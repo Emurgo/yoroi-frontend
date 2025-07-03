@@ -13,9 +13,7 @@ import {
 import {
   PublicDeriver,
 } from '../ada/lib/storage/models/PublicDeriver/index';
-import {
-  GenericApiError, IncorrectWalletPasswordError,
-} from './errors';
+import { GenericApiError } from './errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   IPublicDeriver,
@@ -25,7 +23,6 @@ import type {
   IDisplayCutoffPopResponse,
 } from '../ada/lib/storage/models/PublicDeriver/interfaces';
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
-import type { IHasLevels } from '../ada/lib/storage/models/ConceptualWallet/interfaces';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type {
   TransactionExportRow,
@@ -40,7 +37,6 @@ import type {
   IRenameFunc, IRenameRequest, IRenameResponse,
   IChangePasswordRequestFunc, IChangePasswordRequest, IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
-import { WrongPassphraseError } from '../ada/lib/cardanoCrypto/cryptoErrors';
 import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
 import { getAllTokenInfo } from './lib/tokens/utils';
@@ -82,7 +78,7 @@ export async function getWallets(
 // refreshPendingTransactions
 
 export type RefreshPendingTransactionsRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
 |};
 export type RefreshPendingTransactionsResponse = Array<WalletTransaction>;
 export type RefreshPendingTransactionsFunc = (
@@ -103,7 +99,7 @@ export type RemoveAllTransactionsFunc = (
 // getForeignAddresses
 
 export type GetForeignAddressesRequest = {|
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels>,
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
 |};
 export type GetForeignAddressesResponse = Array<{|
   address: string,
@@ -140,7 +136,7 @@ export type ReferenceTransaction = {
 };
 export type BaseGetTransactionsRequest = {|
   ...InexactSubset<GetTransactionsRequestOptions>,
-  publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
   isLocalRequest: boolean,
   +beforeTx?: ?ReferenceTransaction,
   +afterTx?: ?ReferenceTransaction,
@@ -162,7 +158,7 @@ export type GetTransactionsDataResponse = {|
 
 export type GetTransactionsDataFunc = (
   request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet & IHasLevels> & IGetLastSyncInfo,
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
     isLocalRequest: boolean,
   |}
 ) => Promise<GetTransactionsDataResponse>;
@@ -315,9 +311,6 @@ export default class CommonApi {
       Logger.error(
         `${nameof(CommonApi)}::${nameof(this.changeModelPassword)} error: ` + stringifyError(error)
       );
-      if (error instanceof WrongPassphraseError) {
-        throw new IncorrectWalletPasswordError();
-      }
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }

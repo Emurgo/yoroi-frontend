@@ -1,4 +1,3 @@
-import React from 'react';
 import TextField from '@mui/material/TextField';
 import { styled } from '@mui/material/styles';
 
@@ -24,6 +23,7 @@ const SInput = styled(TextField)(({ theme, error }: any) => ({
     position: 'absolute',
     bottom: -2,
     left: -10,
+    color: error && theme.palette.ds.sys_magenta_500,
   },
   '& .MuiInputLabel-root': {
     color: error && theme.palette.ds.sys_magenta_500,
