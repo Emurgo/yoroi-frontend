@@ -36,7 +36,7 @@ describe('Invalid amount for sending', function () {
   // Enter amount
   it('Enter invalid amount', async function () {
     const sendSubTab = new SendSubTab(webdriver, logger);
-    await sendSubTab.addAssets(10000, false);
+    await sendSubTab.addAssets('10000', false);
   });
   it(`Check displayed info`, async function () {
     const sendStep1Page = new SendSubTab(webdriver, logger);

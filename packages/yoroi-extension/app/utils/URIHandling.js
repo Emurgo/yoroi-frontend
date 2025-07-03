@@ -80,7 +80,7 @@ const extractAmount: (
         return null;
       }
       return asNum;
-    } catch (err) {
+    } catch (_err) {
       return null;
     }
   } else {

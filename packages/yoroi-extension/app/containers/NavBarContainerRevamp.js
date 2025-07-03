@@ -87,6 +87,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
   };
 
   render(): Node {
+    const { updateHideBalance } = this;
     const { stores, pageBanner, isErrorPage } = this.props;
     const { profile, wallets } = stores;
     const { selected, selectedWalletName } = wallets;
@@ -98,23 +99,23 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       }
       const { plate } = selected;
 
-      const rewards: MultiToken = this.props.stores.delegation.getRewardBalanceOrZero(selected);
+      const rewards: MultiToken = stores.delegation.getRewardBalanceOrZero(selected);
 
       return (
         <NavWalletDetailsRevamp
           plate={plate}
           name={selectedWalletName}
-          onUpdateHideBalance={this.updateHideBalance}
+          onUpdateHideBalance={updateHideBalance}
           shouldHideBalance={shouldHideBalance}
           rewards={rewards}
           walletAmount={selected.balance}
-          getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
-          defaultToken={this.props.stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId)}
+          getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
+          defaultToken={stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId)}
           unitOfAccountSetting={profile.unitOfAccount}
-          getCurrentPrice={this.props.stores.coinPriceStore.getCurrentPrice}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
             ampli.allWalletsPageViewed();
-            this.props.stores.uiDialogs.open({ dialog: WalletListDialog });
+            stores.uiDialogs.open({ dialog: WalletListDialog });
           }}
         />
       );
