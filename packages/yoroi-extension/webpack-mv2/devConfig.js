@@ -73,7 +73,7 @@ const baseDevConfig = (
     )),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
-      resourceRegExp: /[^/]+\/[\S]+.prod$/,
+      resourceRegExp: /[^/]+\/\S+.prod$/,
     }),
     new webpack.DefinePlugin({
       __HOST__: `'${host}'`,
@@ -149,7 +149,7 @@ const contentScriptConfig = (
       Boolean(isLight),
       Boolean(isE2E),
     )),
-    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/[\S]+.dev$/ }),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],
   module: {
     rules: [
