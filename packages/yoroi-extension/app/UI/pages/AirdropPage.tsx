@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
@@ -5,7 +6,16 @@ import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box, Stack, Typography, Checkbox, FormControlLabel, Button } from '@mui/material';
+import { Box, Stack, Typography, Checkbox, FormControlLabel, Button, TextField } from '@mui/material';
+import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
+import BigNumber from 'bignumber.js';
+import { getAllocatedAddresses, checkClaimForAddress, claimForAddress } from '../../api/ada/midnight';
+import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
+import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { LoadingButton } from '@mui/lab';
+import Dialog from '../../components/widgets/Dialog';
+import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 
 const messages = defineMessages({
   size: {
@@ -36,137 +46,239 @@ const messages = defineMessages({
     id: 'aidrop.noAllocText',
     defaultMessage: '!!!None of the addresses provided are eligible for an allocation',
   },
+  trezorTitle: {
+    id: 'airdrop.trezorTitle',
+    defaultMessage: '!!!Trezor not supported',
+  },
+  trezorText: {
+    id: 'airdrop.trezorText',
+    defaultMessage: '!!!Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.',
+  },
+  claimDialogTitle: {
+    id: 'airdrop.claimDialogTitle',
+    defaultMessage: '!!!sign message',
+  },
+  ledgerClaimDialogTitle: {
+    id: 'airdrop.claimDialogTitle',
+    defaultMessage: '!!!sign message { index } of { total }',
+  },
+  wrongPassword: {
+    id: 'airdrop.wrongPassword',
+    defaultMessage: '!!!Wrong password',
+  },
 });
 
 interface Props {
-  stores: {}
+  stores: {
+    wallets: {
+      selected: null | {
+        type: 'mnemonic' | 'ledger' | 'trezor',
+        allAddressesByType: {
+          address: string,
+        }[][],
+      },
+    },
+  }
 }
 
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
-  const isTrezor = true;
+  const wallet = stores.wallets.selected;
+  if (!wallet) {
+    return null;
+  }
+  const isTrezor = wallet.type === 'trezor';
+  const dstAddr = addressHexToBech32(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address);
+
+  // null means querying
+  const [alloc, setAlloc] = useState<BigNumber | null>(null);
+  const [isTermsAgreed, setTermsAgreed] = useState<boolean>(false);
+  const [unclaimedAddrs, setUnclaimedAddrs] = useState([]);
+  const [isClaimDialog, setClaimDialog] = useState(false);
+  const [isClaimDone, setClaimDone] = useState(false);
+  const [ledgerClamingIndex, setLedgerClaimingIndex] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const allocatedAddrs = await getAllocatedAddresses(wallet);
+      const unclaimedAddrs = [];
+      for (const addr of allocatedAddrs) {
+        const claimed = await checkClaimForAddress(addr.addrBech32);
+        if (!claimed) {
+          unclaimedAddrs.push(addr);
+        }
+      }
+
+      if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
+        setClaimDone(true);
+      }
+      setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
+      setUnclaimedAddrs(unclaimedAddrs);
+    })();
+    return () => {
+      // switch wallet
+      setAlloc(null);
+      setClaimDone(false);
+      setUnclaimedAddrs([]);
+      setLedgerClaimingIndex(0);
+    };
+  }, [wallet.publicDeriverId]);
+
+  const showClaimDialog = async () => {
+    setClaimDialog(true);
+  }
+
+  const claim = async (password) => {
+    if (wallet.type === 'mnemonic') {
+      for (const addr of unclaimedAddrs) {
+        await claimForAddress(wallet, addr, password, stores.profile.currentLocale);
+      }
+      setClaimDialog(false);
+      setClaimDone(true);
+    } else { // ledger
+      await claimForAddress(wallet, unclaimedAddrs[ledgerClamingIndex], password, stores.profile.currentLocale);
+      if (ledgerClamingIndex === unclaimedAddrs.length - 1) {
+        setClaimDialog(false);
+        setClaimDone(true);
+      } else {
+        setLedgerClaimingIndex(ledgerClamingIndex + 1);
+      }
+    }
+  }
 
   let content;
-  content = (<>
-    <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1}}>
+
+  if (!alloc) {
+    content = (<LoadingSpinner />);
+  } else if (alloc.isZero()) {
+    content = (
       <Box
         sx={{
           marginLeft: 'auto',
           marginRight: 'auto',
           width: '612px',
+          borderRadius: '8px',
+          bgcolor: 'ds.bg_color_contrast_min',
+          padding: '24px',
         }}
       >
+        <Typography variant="h1xl">
+        {intl.formatMessage(messages.noAllocTitle)}
+        </Typography>
+        <Box>
+          <Typography variant="body1" as="span">
+            {intl.formatMessage(messages.noAllocTitle)}
+          </Typography>
+          &nbsp;
+          <Typography variant="body1" as="span">
+            <a href="">
+              {intl.formatMessage(globalMessages.learnMore)}
+            </a>
+          </Typography>
+        </Box>
+      </Box>
+    );
+  } else {
+    content = (<>
+      <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1}}>
         <Box
           sx={{
-            borderRadius: '8px',
-            bgcolor: 'ds.bg_color_contrast_min',
-            padding: '24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            width: '612px',
           }}
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {intl.formatMessage(messages.size)}
-            </Typography>
-            <Typography variant="h1xl">
-              0 NIGHT
-            </Typography>
-          </Box>
-          {!isTrezor && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
+          <Box
+            sx={{
+              borderRadius: '8px',
+              bgcolor: 'ds.bg_color_contrast_min',
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px',
+            }}
+          >
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
               <Typography variant="body2" color="ds.text_gray_low">
-                {intl.formatMessage(messages.destinationAddress)}
+                {intl.formatMessage(messages.size)}
               </Typography>
-              <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                addr1q9es0m23htwehpcjjtqzyltkhj44lrdnpqcpfuhpthrcjy7v9j033m6ss9sg67yxptvrp5p5h7lhxvsurzwnyuskk7cqe778gt
+              <Typography variant="h1xl">
+                {alloc.toFormat()} NIGHT
+              </Typography>
+            </Box>
+            {!isTrezor && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                <Typography variant="body2" color="ds.text_gray_low">
+                  {intl.formatMessage(messages.destinationAddress)}
+                </Typography>
+                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+                  {dstAddr}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+          {!isTrezor ? (
+            !isClaimDone && (<>
+              <Terms />
+              <FormControlLabel
+                label={intl.formatMessage(messages.agree)}
+                control={
+                  <Checkbox
+                    checked={isTermsAgreed}
+                    onChange={()=>{ setTermsAgreed(!isTermsAgreed); }}
+                    sx={{ marginRight: '8px' }}
+                  />
+                }
+                sx={{
+                  margin: '0px',
+                  color: 'ds.text_gray_medium',
+                }}
+              />
+            </>)
+          ) : ( // if trezor
+            <Box
+              sx={{
+                borderRadius: '8px',
+                bgcolor: 'ds.sys_magenta_100',
+                padding: '24px',
+                marginTop: '24px',
+              }}
+            >
+              <Box>
+                <Box as="span" sx={{ verticalAlign: 'middle' }}>
+                  <ErrorTriangleIcon/>
+                </Box>
+                <Typography
+                  sx={{ verticalAlign: 'middle' }}
+                  as="span" variant="body1"
+                  fontWeight={500}
+                  color="ds.sys_magenta_500"
+                >
+                  {intl.formatMessage(messages.trezorTitle)}
+                </Typography>
+              </Box>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.trezorText)}
               </Typography>
             </Box>
           )}
         </Box>
-        {isTrezor ? (<>
-          <Typography variant="body1" color="ds.text_gray_min">
-            {intl.formatMessage(messages.terms)}
-          </Typography>
-          <Typography variant="body1">
-            <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
-
-            <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
-
-             <Typography fontWeight={500}>2. Eligibility</Typography>
-
-             <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
-
-             <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
-             <p>2.3 Verification: Participants may be required to undergo identity</p>
-
-             <Typography fontWeight={500}>3. Heading</Typography>
-
-             <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
-          </Typography>
-          <FormControlLabel
-            label={intl.formatMessage(messages.agree)}
-            control={
-              <Checkbox
-                checked={true}
-                onChange={()=>{}}
-                sx={{ marginRight: '8px' }}
-              />
-            }
-            sx={{
-              margin: '0px',
-              color: 'ds.text_gray_medium',
-            }}
-          />
-        </>) : ( // if trezor
-          <Box
+      </Box>
+      {!isTrezor && !isClaimDone && (
+        <Box sx={{ height: '96px', display: 'flex' }}>
+          <LoadingButton
+            variant="primary"
+            sx={{ margin: 'auto' }}
+            disabled={!isTermsAgreed || unclaimedAddrs.length === 0}
+            loading={isClaimDialog}
+            onClick={showClaimDialog}
           >
-            trezor
-          </Box>
-        )}
-      </Box>
-    </Box>
-    {!isTrezor && (
-      <Box sx={{ height: '96px', display: 'flex' }}>
-        <Button
-          variant="primary"
-          sx={{ margin: 'auto' }}
-        >
-          {intl.formatMessage(messages.claim)}
-        </Button>
-      </Box>
-    )}
-  </>);
-
-  content = (
-    <Box
-      sx={{
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        width: '612px',
-        borderRadius: '8px',
-        bgcolor: 'ds.bg_color_contrast_min',
-        padding: '24px',
-      }}
-    >
-      <Typography variant="h1xl">
-        {intl.formatMessage(messages.noAllocTitle)}
-      </Typography>
-      <Box>
-        <Typography variant="body1" as="span">
-          {intl.formatMessage(messages.noAllocTitle)}
-        </Typography>
-        &nbsp;
-        <Typography variant="body1" as="span">
-          <a href="">
-            {intl.formatMessage(globalMessages.learnMore)}
-          </a>
-        </Typography>
-      </Box>
-    </Box>
-  );
-
+            {intl.formatMessage(messages.claim)}
+          </LoadingButton>
+        </Box>
+      )}
+    </>);
+  }
   return (
     <TopBarLayout
       banner={<BannerContainer stores={stores}/>}
@@ -181,7 +293,127 @@ export default function AirdropPage({ stores }: Props) {
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {content}
+        {isClaimDialog && (
+          wallet.type === 'mnemonic' ? (
+            <ClaimDialog
+              isMnemonic={wallet.type==='mnemonic'}
+              onClaim={claim}
+            />
+          ) : (
+            <LedgerClaimDialog
+              index={ledgerClamingIndex + 1}
+              total={unclaimedAddrs.length}
+              onClam={claim}
+            />
+          )
+        )}
       </Box>
     </TopBarLayout>
   );
+}
+
+function LedgerClaimDialog(props: { index: number, total: number, onClaim: () => Promise<void> }) {
+  const [isClaiming, setClaiming] = useState(false);
+  const intl = useIntl();
+  const onClaim = async () => {
+    setClaiming(true);
+    try {
+      await props.onClaim(password);
+    } finally {
+      setClaiming(false);
+    }
+  }
+  const { index, total } = props;
+  return (
+    <Dialog
+      title={intl.formatMessage(messages.ledgerClaimDialogTitle, { index, total })}
+      dialogActions={[
+        {
+          label: intl.formatMessage(messages.claimDialogTitle),
+          primary: true,
+          disabled: isClaiming,
+          onClick: onClaim,
+        },
+      ]}
+    >
+    </Dialog>
+  );
+}
+
+function ClaimDialog(props: { onClaim: (password: string) => Promise<void> }) {
+  const intl = useIntl();
+  const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isClaiming, setClaiming] = useState(false);
+
+  const onClaim = async () => {
+    setClaiming(true);
+    try {
+      await props.onClaim(password);
+    } catch (error) {
+      if (error instanceof WrongPassphraseError) {
+        setError(wrongPasswordErrorMessage);
+      } else {
+        setError(error.message);
+      }
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  return (
+    <Dialog
+      title={intl.formatMessage(messages.claimDialogTitle)}
+      dialogActions={[
+        {
+          label: intl.formatMessage(messages.claimDialogTitle),
+          primary: true,
+          disabled: (password.length === 0) || isClaiming,
+          onClick: onClaim,
+        },
+      ]}
+    >
+      <TextField
+        className="walletPassword"
+        value={password}
+        label={intl.formatMessage(globalMessages.passwordLabel)}
+        type="password"
+        onChange={e => {
+          if (error === wrongPasswordErrorMessage) {
+            setError(null);
+          }
+          setPassword(e.target.value);
+        }}
+        error={error}
+        disabled={isClaiming}
+      />
+      {error}
+    </Dialog>
+  );
+}
+
+function Terms() {
+  const intl = useIntl();
+  return (<>
+    <Typography variant="body1" color="ds.text_gray_min">
+      {intl.formatMessage(messages.terms)}
+    </Typography>
+    <Typography variant="body1">
+      <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
+
+      <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
+
+       <Typography fontWeight={500}>2. Eligibility</Typography>
+
+       <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
+
+       <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
+       <p>2.3 Verification: Participants may be required to undergo identity</p>
+
+       <Typography fontWeight={500}>3. Heading</Typography>
+
+       <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
+    </Typography>
+  </>);
 }

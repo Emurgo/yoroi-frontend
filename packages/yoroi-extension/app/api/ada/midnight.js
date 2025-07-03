@@ -11,7 +11,7 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 
 const TC_HASH = '6bf2adf825baa496729e2eac1e895ebc77973744bce67f44276bf6006f5c21de863ed121e11828d8fc0241773191e26dc1134803a681a9a98ba0ae812553db24';
 const CHECK_ENDPOINT = 'https://proof-staging.provtree-midnight.com';
-const CLAIM_ENDPOINT = 'https://mgd-preprod-external-claim.midnight.iog.io';
+const CLAIM_ENDPOINT = 'https://external-claim.gd.midnighttge.io';
 
 type AddressClaimData = {|
   addrHex: string,
@@ -20,9 +20,10 @@ type AddressClaimData = {|
   value: number,
 |};
 
-export async function checkUsedAddresses(wallet: WalletState): Promise<Array<AddressClaimData>> {
+export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<AddressClaimData>> {
   const result = [];
-  for (const addr of wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE].filter(addr => addr.isUsed)) {
+
+  for (const addr of wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE]) {
     const addrBech32 = addressHexToBech32(addr.address);
     const resp = await fetch(`${CHECK_ENDPOINT}/check/cardano/${addrBech32}`);
     let value;
@@ -35,16 +36,43 @@ export async function checkUsedAddresses(wallet: WalletState): Promise<Array<Add
     } else {
       value = 0;
     }
-    result.push({
-      addrHex: addr.address,
-      addrBech32,
-      path: addr.addressing.path,
-      value
-    });
+    if (value !== 0) {
+      result.push({
+        addrHex: addr.address,
+        addrBech32,
+        path: addr.addressing.path,
+        value
+      });
+    }
   }
   return result;
 }
 
+export async function checkClaimForAddress(addrBech32: string): boolean {
+  const resp = await fetch(`https://external-claim.gd.midnighttge.io/claims/cardano?address=${addrBech32}`);
+  const data = await resp.json();
+  /* schema:
+    [
+      {
+        "address": "addr_test1qqx9dx3hhsrtt8p6m7ar076zl6pfj9lnudkplmd69g87yzrekjkpkn09av5l63z6kpr3akd0ueh84czwycjzwzvenweq0zkfsc",
+        "amount": 98,
+        "blockchain": "cardano",
+        "claim_id": "66639426-d98f-05c7-6703-42844ebeaa82",
+        "confirmation_blocks": null,
+        "dest_address": "addr_test1qzwzfc8cf4zd0xjheaq2fa49grn7hrjreyd80ycmzekvx5krpexes637f06zpytw2584z9x4554lzegr735jdaeuc9gqg476re",
+        "failure": null,
+        "leaf_index": 39237108,
+        "status": "queued",
+        "transaction_id": null
+      }
+    ]
+  */
+  if (Array.isArray(data) && data.length === 1 && data[0].address === addrBech32 && data[0].status === 'queued') {
+    return true;
+  }
+  return false;
+}
+  
 export async function claimForAddress(
   wallet: WalletState,
   addrClaimData: AddressClaimData,
@@ -111,7 +139,10 @@ export async function claimForAddress(
     `${CLAIM_ENDPOINT}/claims/cardano`,
     {
       method: 'POST',
-      data: [params],
+      body: JSON.stringify([params]),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
   );
   return resp.ok;
