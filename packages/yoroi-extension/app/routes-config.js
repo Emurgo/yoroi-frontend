@@ -70,6 +70,9 @@ export const ROUTES = {
     // `voting` is part of the sidebar
     CATALYST_VOTING: '/voting',
   },
+  CATALYST_REGISTRATION: {
+    ROOT: '/catalyst-registration',
+  },
   SWAP: {
     ROOT: '/swap',
     // $FlowIgnore

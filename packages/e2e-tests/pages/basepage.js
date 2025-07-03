@@ -249,11 +249,17 @@ class BasePage {
       `BasePage::input is called. Locator: ${JSON.stringify(locator)}, Value: ${value}`
     );
     const input = await this.findElement(locator);
-    await input.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await input.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async inputElem(webElement, value) {
     this.logger.info(`BasePage::inputElem is called. Value: ${value}`);
-    await webElement.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await webElement.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async clearInput(locator) {
     this.logger.info(`BasePage::clearInput is called. Locator: ${JSON.stringify(locator)}`);
@@ -510,7 +516,11 @@ class BasePage {
       return false;
     }
   }
-  // The method is for debugging
+  /**
+   * Highlighting the web element with red border and yellow backgorund.
+   * !!IT IS ONLY FOR DEBUGGING!!
+   * @param {WebElement} webElement
+   */
   async highlightElement(webElement) {
     this.logger.info(
       `Webdriver::highlightElement: Highlighting element "${JSON.stringify(webElement)}"`
@@ -802,6 +812,25 @@ class BasePage {
       height: rect.height,
       width: rect.width,
     };
+  }
+
+  /**
+   * Reading a buffer info
+   * @returns {Promise<string>}
+   */
+  async getClipboardData() {
+    this.logger.info(`BasePage::getClipboardData is called.`);
+    const clipboardText = await this.driver.executeAsyncScript(async callback => {
+      try {
+        const text = await navigator.clipboard.readText();
+        callback(text);
+      } catch (error) {
+        console.error('Failed to read clipboard:', error);
+        callback(null);
+      }
+    });
+    this.logger.info(`BasePage::getClipboardData is called. Result: ${clipboardText}`);
+    return clipboardText;
   }
 }
 

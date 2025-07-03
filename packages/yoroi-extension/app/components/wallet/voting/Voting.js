@@ -121,7 +121,7 @@ export default class Voting extends Component<Props, State> {
                 </SvgWrapper>
                 <Box sx={{ flexGrow: '1' }}>
                   <Typography component="div" variant="body1" fontWeight={500} color="grayscale.900">
-                    Disclamer
+                    Disclaimer
                   </Typography>
                 </Box>
                 <SvgWrapper sx={{ cursor: 'pointer' }} onClick={() => this.setState({ showDisclamer: false })}>

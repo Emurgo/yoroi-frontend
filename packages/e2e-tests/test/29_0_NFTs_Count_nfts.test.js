@@ -9,6 +9,7 @@ import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import BasePage from '../pages/basepage.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
+import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
 
 describe('Counting shown NFTs', function () {
   this.timeout(2 * oneMinute);
@@ -16,7 +17,7 @@ describe('Counting shown NFTs', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
-  const expectedNFTsAmount = 8;
+  const expectedNFTsAmount = testWalletNFTsAllNfts.length;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);

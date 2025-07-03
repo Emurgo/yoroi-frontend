@@ -4,7 +4,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { ReactComponent as InfoIcon } from '../../assets/images/revamp/icons/info.inline.svg';
 import Dialog from '../widgets/Dialog';
 import { FormattedMarketPrice, FormattedPrice } from './PriceImpact';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { useStrings } from '../../containers/swap/common/useStrings';
 
 type Props = {|
