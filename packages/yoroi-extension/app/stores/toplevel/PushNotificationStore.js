@@ -3,10 +3,10 @@ import Store from '../base/Store';
 import environment from '../../environment';
 import { observable, runInAction, } from 'mobx';
 import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
+import type { ConfigType } from '../../../config/config-types';
 
-const DEFAULT_DURATION = 4;
-
-const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
 
 export type PushSubscription = {|
   endpoint: string,
@@ -55,7 +55,7 @@ export default class PushNotificationStore<
         if (!subscription) {
           subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC_KEY)
+            applicationServerKey: urlB64ToUint8Array(CONFIG.notifications.vapidPublicKey)
           });
         }
         runInAction(() => { this.subscription = JSON.parse(JSON.stringify(subscription)); });
@@ -69,7 +69,7 @@ export default class PushNotificationStore<
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
-    return this.metadata.duration ?? DEFAULT_DURATION;
+    return this.metadata.duration ?? CONFIG.notifications.defaultDuration;
   }
   set duration(duration:number): void {
     runInAction(() => {
