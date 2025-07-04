@@ -21,7 +21,9 @@ describe('Restoring 15-wallet', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadBrowserStorage(webdriver, logger);
+    await preloadBrowserStorage(webdriver, logger, null, true, {
+      'test-CURRENT_NETWORK_ID': '0',
+    });
   });
 
   it('Selecting Restore wallet 15-word', async function () {
@@ -51,7 +53,9 @@ describe('Restoring 15-wallet', function () {
     await walletDetailsPage.repeatWalletPassword(walletPassword);
 
     const walletPlate = await walletDetailsPage.getWalletPlate();
-    expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1Mainnet.plate);
+    expect(walletPlate, 'Wallet plate is different from expected').to.equal(
+      testWallet1Mainnet.plate
+    );
 
     await walletDetailsPage.saveToLocalStorage('walletName', testWallet1Mainnet.name);
     await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
@@ -72,7 +76,9 @@ describe('Restoring 15-wallet', function () {
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet1Mainnet.balance);
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
+      testWallet1Mainnet.balance
+    );
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
     const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
     expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);
