@@ -1,6 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { defineMessages, useIntl } from 'react-intl';
 import { Box, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
