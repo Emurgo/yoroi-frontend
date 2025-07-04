@@ -59,7 +59,7 @@ type Props = {|
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const intl = useIntl();
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
-  const { onClose, onAccept, onNotAcceptedYet } = props;
+  const { onClose, onAccept } = props;
   const localStorageApi = new LocalStorageApi();
 
   const toggleDisclaimerAcceptance = () => {
