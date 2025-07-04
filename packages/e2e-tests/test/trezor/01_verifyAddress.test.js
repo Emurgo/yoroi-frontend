@@ -47,7 +47,9 @@ for (const model in TrezorModels) {
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
-      await preloadBrowserStorage(webdriver, logger);
+      await preloadBrowserStorage(webdriver, logger, null, true, {
+        'test-CURRENT_NETWORK_ID': '0',
+      });
     });
 
     it('Trezor initialization', async function () {
