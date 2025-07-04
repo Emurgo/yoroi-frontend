@@ -54,32 +54,13 @@ const messages = defineMessages({
 type Props = {|
   onClose: void => void,
   onAccept: void => void,
-  onNotAcceptedYet: void => void,
 |};
 
 export default function BuySellDisclaimerDialog(props: Props): Node {
   const intl = useIntl();
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { onClose, onAccept, onNotAcceptedYet } = props;
   const localStorageApi = new LocalStorageApi();
-
-  useEffect(() => {
-    async function checkAcceptanceStatus() {
-      const accepted = await localStorageApi.getBuySellDisclaimer();
-
-      if (accepted === 'true') {
-        handleAccepted();
-      } else {
-        onNotAcceptedYet();
-      }
-
-      setIsLoaded(true);
-    }
-
-    // eslint-disable-next-line no-floating-promise/no-floating-promise
-    checkAcceptanceStatus();
-  }, []);
 
   const toggleDisclaimerAcceptance = () => {
     setDisclaimerAccepted(prevAccepted => !prevAccepted);
@@ -103,10 +84,6 @@ export default function BuySellDisclaimerDialog(props: Props): Node {
       disabled: !disclaimerAccepted,
     },
   ];
-
-  if (!isLoaded) {
-    return null;
-  }
 
   return (
     <Dialog
