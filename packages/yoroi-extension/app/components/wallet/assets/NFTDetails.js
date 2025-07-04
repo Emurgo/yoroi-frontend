@@ -158,7 +158,7 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
     try {
       await navigator.clipboard.writeText(JSON.stringify(nftInfo.metadata, null, 2));
       setCopy(true);
-    } catch (error) {
+    } catch (_error) {
       setCopy(false);
     }
   };
