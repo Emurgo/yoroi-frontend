@@ -111,14 +111,6 @@ const defaultCatalystState: CatalystState = {
   isStale: false,
 };
 
-// currentBalance={balance
-//   .getDefaultEntry()
-//   .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
-// requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(
-//   -tokenInfo.Metadata.numberOfDecimals
-// )}
-// tokenName={getTokenName(tokenInfo)}
-
 export const CatalystRegistrationContextProvider = observer(({ children, stores }: CatalystRegistrationProviderProps) => {
   const { wallets, delegation, substores, tokenInfoStore, app, profile, transactions } = stores;
   const { votingStore: voting } = substores.ada;
