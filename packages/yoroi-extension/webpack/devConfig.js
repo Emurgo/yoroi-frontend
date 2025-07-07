@@ -44,7 +44,7 @@ const baseDevConfig = (
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
-      resourceRegExp: /[^/]+\/[\S]+.prod$/,
+      resourceRegExp: /[^/]+\/\S+.prod$/,
     }),
   ],
   module: {
@@ -111,7 +111,7 @@ const backgroundServiceWorkerConfig = (
     }),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.IgnorePlugin({
-      resourceRegExp: /[^/]+\/[\S]+.prod$/,
+      resourceRegExp: /[^/]+\/\S+.prod$/,
     }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
@@ -184,7 +184,7 @@ const bringContentScriptConfig = (
       maxChunks: 1,
     }),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/}),
   ],
   module: {
     rules: [

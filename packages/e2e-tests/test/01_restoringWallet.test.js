@@ -11,6 +11,7 @@ import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
+import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
 
 describe('Restoring 15-wallet', function () {
   this.timeout(2 * oneMinute);
@@ -20,6 +21,9 @@ describe('Restoring 15-wallet', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadBrowserStorage(webdriver, logger, null, true, {
+      'test-CURRENT_NETWORK_ID': '0',
+    });
   });
 
   it('Selecting Restore wallet 15-word', async function () {
@@ -49,7 +53,9 @@ describe('Restoring 15-wallet', function () {
     await walletDetailsPage.repeatWalletPassword(walletPassword);
 
     const walletPlate = await walletDetailsPage.getWalletPlate();
-    expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1Mainnet.plate);
+    expect(walletPlate, 'Wallet plate is different from expected').to.equal(
+      testWallet1Mainnet.plate
+    );
 
     await walletDetailsPage.saveToLocalStorage('walletName', testWallet1Mainnet.name);
     await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
@@ -67,11 +73,12 @@ describe('Restoring 15-wallet', function () {
   it('Check new wallet', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
-    await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
-    expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet1Mainnet.balance);
+    expect(walletInfo.balance, 'The wallet balance is different').to.equal(
+      testWallet1Mainnet.balance
+    );
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
     const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
     expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);

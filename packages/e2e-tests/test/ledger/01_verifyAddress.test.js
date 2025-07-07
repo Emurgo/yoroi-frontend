@@ -24,6 +24,7 @@ import { SpeculosDockerController } from '../../helpers/speculos/speculosDockerC
 import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
 import { convertVerifiedAddressesInfo, LedgerModels } from '../../helpers/ledgerHelper.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
+import { preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 
 for (const model in LedgerModels) {
   describe(`Verify address on Ledger ${model}`, function () {
@@ -57,6 +58,9 @@ for (const model in LedgerModels) {
       const wmLogger = getTestLogger('windowManager', this.test.parent.title);
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
+      await preloadBrowserStorage(webdriver, logger, null, true, {
+        'test-CURRENT_NETWORK_ID': '0',
+      });
     });
 
     it('Ledger is ready', async function () {
@@ -95,7 +99,6 @@ for (const model in LedgerModels) {
     it('Wait the wallet is loaded', async function () {
       const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.waitPrepareWalletBannerIsClosed();
-      await transactionsPage.closeUpdatesModalWindow();
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     });
