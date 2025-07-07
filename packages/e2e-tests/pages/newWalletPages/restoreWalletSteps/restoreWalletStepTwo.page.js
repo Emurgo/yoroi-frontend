@@ -58,8 +58,6 @@ class RestoreWalletStepTwo extends AddWalletBase {
   // functions
   _enterRecoveryPhrase = async (wordsAmount, recoveryPhrase) => {
     let phraseTemplate = null;
-    console.log('recoveryPhrase:', recoveryPhrase);
-    console.log('typeof recoveryPhrase', typeof recoveryPhrase);
     if (typeof recoveryPhrase === 'string') {
       phraseTemplate = recoveryPhrase.split(' ');
     } else {
