@@ -28,11 +28,16 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 }));
 
 export const ModalManager = () => {
-  const { height, width, closeModal, content, title, isOpen, modalId, handleBack } = useModal();
+  const { height, width, closeModal, onClose, content, title, isOpen, modalId, handleBack } = useModal();
+
+  const modalOnClose = () => {
+    if (typeof onClose === 'function') onClose();
+    closeModal();
+  }
 
   return (
     <BootstrapDialog
-      onClose={closeModal}
+      onClose={modalOnClose}
       aria-labelledby={`${modalId}-dialogWindow-modalWindow`}
       open={isOpen}
       fullWidth
@@ -65,6 +70,7 @@ export const ModalManager = () => {
       </DialogTitle>
       <IconWrapper
         aria-label="close"
+        onClick={modalOnClose}
         icon={Icons.CloseIcon}
         color="ds.el_gray_max"
         borderColor="ds.el_gray_max"

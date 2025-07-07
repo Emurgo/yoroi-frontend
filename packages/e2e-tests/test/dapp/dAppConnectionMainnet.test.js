@@ -14,7 +14,7 @@ import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/rest
 import { Logger } from 'simple-node-logger';
 import { WebDriver } from 'selenium-webdriver';
 
-describe('dApp, mainnet, connection in extension,', function () {
+describe('dApp, mainnet, connection in extension', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;

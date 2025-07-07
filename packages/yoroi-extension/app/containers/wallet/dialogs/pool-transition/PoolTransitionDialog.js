@@ -65,13 +65,7 @@ export const PoolTransitionDialog = ({
           {intl.formatMessage(messages.skipAndStop)}
         </CustomButton>
 
-        <CustomButton
-          variant="contained"
-          color="primary"
-          width="100%"
-          onClick={onUpdatePool}
-          sx={{ marginTop: '8px' }}
-        >
+        <CustomButton variant="contained" color="primary" width="100%" onClick={onUpdatePool} sx={{ marginTop: '8px' }}>
           {intl.formatMessage(messages.updateNow)}
         </CustomButton>
       </Grid>
