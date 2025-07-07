@@ -19,12 +19,10 @@ export const MidnightBanner = () => {
   const handleClick = () => {
     // Redirect to Airdrop page https://emurgo.atlassian.net/browse/YOEXT-2100
   };
-  console.log('bannerVisible', bannerVisible);
   useEffect(() => {
     const checkModalState = async () => {
       const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getMidnightBannerAnnouncementClosed();
-      console.log('wasClosed', { wasClosed, data: data?.banners });
 
       if (data?.banners?.midnightAnnouncement?.display === true && (wasClosed === undefined || wasClosed === false)) {
         setBannerVisible(true);
