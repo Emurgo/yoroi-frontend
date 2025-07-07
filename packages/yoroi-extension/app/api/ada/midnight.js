@@ -72,7 +72,11 @@ export async function checkClaimForAddress(addrBech32: string): boolean {
   }
   return false;
 }
-  
+
+export function getClaimMessage(addrClaimData: AddressClaimData) {
+  return 'STAR ' + String(addrClaimData.value) + ' to ' + addrClaimData.addrBech32 + ' ' + TC_HASH;
+}
+
 export async function claimForAddress(
   wallet: WalletState,
   addrClaimData: AddressClaimData,
@@ -80,7 +84,7 @@ export async function claimForAddress(
   locale: string, // only for Ledger
 ): Promise<boolean> {
   const  payload = Buffer.from(
-    'STAR ' + String(addrClaimData.value) + ' to ' + addrClaimData.addrBech32 + ' ' + TC_HASH,
+    getClaimMessage(addrClaimData),
     'ascii'
   ).toString('hex');
   let signResult;
