@@ -21,7 +21,7 @@ import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/tran
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 // $FlowIgnore: supressing this error
-import { BringBanner, UsdaBanner, SurveyBanner } from '../../../UI/components/Banners';
+import { BringBanner, UsdaBanner, MidnightBanner, SurveyBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
@@ -74,7 +74,7 @@ const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isBannerVisible: false,
     isSurveyVisible: false,
@@ -218,7 +218,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const onClose = () => {
       this.setState({ isBannerVisible: false });
       localStorage.setBringBannerClosed('true');
-    }
+    };
 
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
@@ -245,12 +245,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     if (true) return null;
 
     // noinspection UnreachableCodeJS
-    return (
-      <UsdaBanner
-        onClose={() => {}}
-        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
-      />
-    );
+    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
   }
 
   render(): Node {
@@ -321,6 +316,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
           {this.state.isSurveyVisible && (<SurveyBanner onClose={this.surveyClose} />)}
+          <MidnightBanner />
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
