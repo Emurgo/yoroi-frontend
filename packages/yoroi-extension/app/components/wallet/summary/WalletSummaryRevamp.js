@@ -21,7 +21,7 @@ import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/tran
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 // $FlowIgnore: supressing this error
-import { BringBanner, UsdaBanner } from '../../../UI/components/Banners';
+import { BringBanner, UsdaBanner, MidnightBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
 import LocalStorageApi from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
@@ -72,7 +72,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isBannerVisible: false,
   };
@@ -205,7 +205,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const onClose = () => {
       this.setState({ isBannerVisible: false });
       localStorage.setBringBannerClosed('true');
-    }
+    };
 
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
@@ -232,12 +232,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     if (true) return null;
 
     // noinspection UnreachableCodeJS
-    return (
-      <UsdaBanner
-        onClose={() => {}}
-        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
-      />
-    );
+    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
   }
 
   render(): Node {
@@ -307,6 +302,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
+          <MidnightBanner />
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
