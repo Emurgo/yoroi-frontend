@@ -83,7 +83,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
       : new Array(this.props.numberOfMnemonics).fill('');
   };
 
-  generateRecoveryPhrase: void => Array<{| value: string, label: string |}> = () => {
+  getInitRecoveryPhraseAsPropObjects: void => Array<{| value: string, label: string |}> = () => {
     return this.getInitRecoveryPhrase().map((word, _) => ({
       value: word,
       label: '',
@@ -95,7 +95,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        recoveryPhrase: this.generateRecoveryPhrase(),
+        recoveryPhrase: this.getInitRecoveryPhraseAsPropObjects(),
       },
     },
     {
@@ -139,7 +139,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
 
   checkIfInitialPhraseIsValid: () => void = () => {
     const { isValidMnemonic, numberOfMnemonics } = this.props;
-    const phrase = this.generateRecoveryPhrase();
+    const phrase = this.getInitRecoveryPhraseAsPropObjects();
     const allWordsEntered = this.checkAllWordsEntered(numberOfMnemonics, phrase);
     const isValidPhrase = allWordsEntered && isValidMnemonic(phrase);
     if (isValidPhrase) {
