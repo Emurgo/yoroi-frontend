@@ -9,7 +9,7 @@ import globalMessages from '../../i18n/global-messages';
 import { Box, Stack, Typography, Checkbox, FormControlLabel, Button, TextField } from '@mui/material';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import BigNumber from 'bignumber.js';
-import { getAllocatedAddresses, checkClaimForAddress, claimForAddress } from '../../api/ada/midnight';
+import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -66,6 +66,18 @@ const messages = defineMessages({
     id: 'airdrop.wrongPassword',
     defaultMessage: '!!!Wrong password',
   },
+  mnemonicClaimDialogText: {
+    id: 'airdrop.mnemonicClaimDialogText',
+    defaultMessage: '!!!Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.',
+  },
+  ledgerClaimDialogText: {
+    id: 'airdrop.ledgerClaimDialogText',
+    defaultMessage: '!!!Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address',
+  },
+  messageLabel: {
+    id: 'airdrop.messageLabel',
+    defaultMessage: '!!!Message',
+  },
 });
 
 interface Props {
@@ -96,7 +108,7 @@ export default function AirdropPage({ stores }: Props) {
   const [unclaimedAddrs, setUnclaimedAddrs] = useState([]);
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
-  const [ledgerClamingIndex, setLedgerClaimingIndex] = useState(0);
+  const [ledgerClaimingIndex, setLedgerClaimingIndex] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -128,6 +140,10 @@ export default function AirdropPage({ stores }: Props) {
     setClaimDialog(true);
   }
 
+  const closeClaimDialog = async () => {
+    setClaimDialog(false);
+  }
+
   const claim = async (password) => {
     if (wallet.type === 'mnemonic') {
       for (const addr of unclaimedAddrs) {
@@ -136,12 +152,18 @@ export default function AirdropPage({ stores }: Props) {
       setClaimDialog(false);
       setClaimDone(true);
     } else { // ledger
-      await claimForAddress(wallet, unclaimedAddrs[ledgerClamingIndex], password, stores.profile.currentLocale);
-      if (ledgerClamingIndex === unclaimedAddrs.length - 1) {
+      try {
+        await claimForAddress(wallet, unclaimedAddrs[ledgerClaimingIndex], password, stores.profile.currentLocale);
+      } catch {
+        setClaimDialog(false);
+        return;
+      }
+
+      if (ledgerClaimingIndex === unclaimedAddrs.length - 1) {
         setClaimDialog(false);
         setClaimDone(true);
       } else {
-        setLedgerClaimingIndex(ledgerClamingIndex + 1);
+        setLedgerClaimingIndex(ledgerClaimingIndex + 1);
       }
     }
   }
@@ -230,7 +252,7 @@ export default function AirdropPage({ stores }: Props) {
                   />
                 }
                 sx={{
-                  margin: '0px',
+                  marginTop: '24px',
                   color: 'ds.text_gray_medium',
                 }}
               />
@@ -296,14 +318,17 @@ export default function AirdropPage({ stores }: Props) {
         {isClaimDialog && (
           wallet.type === 'mnemonic' ? (
             <ClaimDialog
+              onClose={closeClaimDialog}
               isMnemonic={wallet.type==='mnemonic'}
               onClaim={claim}
             />
           ) : (
             <LedgerClaimDialog
-              index={ledgerClamingIndex + 1}
+              onClose={closeClaimDialog}
+              index={ledgerClaimingIndex + 1}
               total={unclaimedAddrs.length}
-              onClam={claim}
+              onClaim={claim}
+              message={getClaimMessage(unclaimedAddrs[ledgerClaimingIndex])}
             />
           )
         )}
@@ -312,35 +337,44 @@ export default function AirdropPage({ stores }: Props) {
   );
 }
 
-function LedgerClaimDialog(props: { index: number, total: number, onClaim: (_password: string) => Promise<void> }) {
-  const [isClaiming, setClaiming] = useState(false);
+function LedgerClaimDialog(props: {
+  onClose: () => void,
+  index: number,
+  total: number,
+  message: string,
+  onClaim: (_password: string) => Promise<void>
+}) {
   const intl = useIntl();
-  const onClaim = async () => {
-    setClaiming(true);
-    try {
-      await props.onClaim('');
-    } finally {
-      setClaiming(false);
-    }
-  }
+
+  useEffect(() => {
+    props.onClaim();
+    return () => {};
+  }, [props.index]);
+
   const { index, total } = props;
   return (
     <Dialog
+      withCloseButton
+      onClose={props.onClose}
       title={intl.formatMessage(messages.ledgerClaimDialogTitle, { index, total })}
-      dialogActions={[
-        {
-          label: intl.formatMessage(messages.claimDialogTitle),
-          primary: true,
-          disabled: isClaiming,
-          onClick: onClaim,
-        },
-      ]}
     >
+      <Typography variant="body1">
+        {intl.formatMessage(messages.ledgerClaimDialogText)}
+      </Typography>
+      <Box sx={{ marginTop: '16px', marginBottom: '16px' }}>
+        <LoadingSpinner />
+      </Box>
+      <Typography variant="body1" color="ds.text_gray_low">
+        {intl.formatMessage(messages.messageLabel)}
+      </Typography>
+      <Typography variant="body1">
+        {props.message}
+      </Typography>
     </Dialog>
   );
 }
 
-function ClaimDialog(props: { onClaim: (password: string) => Promise<void> }) {
+function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) => Promise<void> }) {
   const intl = useIntl();
   const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
   const [password, setPassword] = useState('');
@@ -364,6 +398,8 @@ function ClaimDialog(props: { onClaim: (password: string) => Promise<void> }) {
 
   return (
     <Dialog
+      withCloseButton
+      onClose={props.onClose}
       title={intl.formatMessage(messages.claimDialogTitle)}
       dialogActions={[
         {
@@ -374,6 +410,9 @@ function ClaimDialog(props: { onClaim: (password: string) => Promise<void> }) {
         },
       ]}
     >
+      <Typography variant="body1">
+        {intl.formatMessage(messages.mnemonicClaimDialogText)}
+      </Typography>
       <TextField
         className="walletPassword"
         value={password}
@@ -396,7 +435,7 @@ function ClaimDialog(props: { onClaim: (password: string) => Promise<void> }) {
 function Terms() {
   const intl = useIntl();
   return (<>
-    <Typography variant="body1" color="ds.text_gray_min">
+    <Typography variant="body1" color="ds.text_gray_min" sx={{ marginTop: '32px', marginBottom: '16px' }}>
       {intl.formatMessage(messages.terms)}
     </Typography>
     <Typography variant="body1">
@@ -404,6 +443,7 @@ function Terms() {
 
       <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
 
+       <p>&nbsp;</p>
        <Typography fontWeight={500}>2. Eligibility</Typography>
 
        <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
@@ -411,6 +451,7 @@ function Terms() {
        <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
        <p>2.3 Verification: Participants may be required to undergo identity</p>
 
+       <p>&nbsp;</p>
        <Typography fontWeight={500}>3. Heading</Typography>
 
        <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>

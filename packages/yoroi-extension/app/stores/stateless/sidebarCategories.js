@@ -10,6 +10,7 @@ import { ReactComponent as stakingIcon } from '../../assets/images/sidebar/revam
 import { ReactComponent as swapIcon } from '../../assets/images/sidebar/revamp/swap.inline.svg';
 import { ReactComponent as votingIcon } from '../../assets/images/sidebar/revamp/voting.inline.svg';
 import { ReactComponent as walletIcon } from '../../assets/images/sidebar/revamp/wallet.inline.svg';
+import { ReactComponent as airdropIcon } from '../../assets/images/sidebar/revamp/airdrop.inline.svg';
 import globalMessages, { connectorMessages } from '../../i18n/global-messages';
 import { ROUTES } from '../../routes-config';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -63,7 +64,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   {
     className: 'airdrop',
     route: ROUTES.AIRDROP,
-    icon: stakingIcon,
+    icon: airdropIcon,
     label: globalMessages.airdrop,
     isVisible: existsSelectedWallet,
   },
