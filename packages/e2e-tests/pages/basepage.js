@@ -151,7 +151,7 @@ class BasePage {
   }
   /**
    * Finding all suitable WebElements by the locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
@@ -160,7 +160,7 @@ class BasePage {
   }
   /**
    * Getting a text by element locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<string>}
    */
   async getText(locator) {
@@ -769,13 +769,14 @@ class BasePage {
    * @param {string} templateName
    * @param {boolean} useGeneralStorageInfo
    */
-  async prepareBrowserLocalStorage(templateName, useGeneralStorageInfo) {
+  async prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts = {}) {
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
     const browserStorageSnapshot = getSnapshotObjectFromJSON(
       browserStorageFileName,
       useGeneralStorageInfo
     );
-    for (const storageKey in browserStorageSnapshot) {
+    const snapshotObject = Object.assign(browserStorageSnapshot, opts);
+    for (const storageKey in snapshotObject) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
   }

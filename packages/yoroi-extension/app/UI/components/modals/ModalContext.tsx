@@ -7,10 +7,12 @@ type ModalState = {
   height: string;
   width: string;
   isLoading: boolean;
+  onClose?: () => void;
 };
+
 type ModalActions = {
   openModal: any;
-  closeModal: () => void;
+  closeModal: (onClose?: () => void) => void;
   startLoading: () => void;
   stopLoading: () => void;
 };
@@ -39,6 +41,7 @@ export const ModalProvider = ({ children, initialState }: { children: React.Reac
         height: payload.height,
         width: payload.width,
         modalId: payload.modalId,
+        onClose: payload.onClose,
       });
     },
     startLoading: () => dispatch({ type: 'startLoading' }),
@@ -64,6 +67,7 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         modalId: action.modalId,
         isOpen: true,
         isLoading: false,
+        onClose: action.onClose,
       };
 
     case 'close':
@@ -87,4 +91,5 @@ const defaultState: ModalState = Object.freeze({
   height: '648px',
   width: '648px',
   isLoading: false,
+  onClose: undefined,
 });
