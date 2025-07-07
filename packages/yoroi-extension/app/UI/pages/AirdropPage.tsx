@@ -6,7 +6,7 @@ import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box, Stack, Typography, Checkbox, FormControlLabel, Button, TextField } from '@mui/material';
+import { Box, Typography, Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import BigNumber from 'bignumber.js';
 import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
@@ -80,15 +80,26 @@ const messages = defineMessages({
   },
 });
 
+type AddressClaimData = {
+  addrHex: string,
+  addrBech32: string,
+  path: Array<number>,
+  value: number,
+};
+
 interface Props {
   stores: {
     wallets: {
       selected: null | {
+        publicDeriverId: number,
         type: 'mnemonic' | 'ledger' | 'trezor',
         allAddressesByType: {
           address: string,
         }[][],
       },
+    },
+    profile: {
+      currentLocale: string,
     },
   }
 }
@@ -100,20 +111,21 @@ export default function AirdropPage({ stores }: Props) {
     return null;
   }
   const isTrezor = wallet.type === 'trezor';
+  //  @ts-ignore
   const dstAddr = addressHexToBech32(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address);
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
   const [isTermsAgreed, setTermsAgreed] = useState<boolean>(false);
-  const [unclaimedAddrs, setUnclaimedAddrs] = useState([]);
+  const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
   const [ledgerClaimingIndex, setLedgerClaimingIndex] = useState(0);
 
   useEffect(() => {
     (async () => {
-      const allocatedAddrs = await getAllocatedAddresses(wallet);
-      const unclaimedAddrs = [];
+      const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(wallet);
+      const unclaimedAddrs: AddressClaimData[] = [];
       for (const addr of allocatedAddrs) {
         const claimed = await checkClaimForAddress(addr.addrBech32);
         if (!claimed) {
@@ -184,14 +196,17 @@ export default function AirdropPage({ stores }: Props) {
           padding: '24px',
         }}
       >
+        {/*  @ts-ignore */}
         <Typography variant="h1xl">
-        {intl.formatMessage(messages.noAllocTitle)}
+          {intl.formatMessage(messages.noAllocTitle)}
         </Typography>
         <Box>
+          {/*  @ts-ignore */}
           <Typography variant="body1" as="span">
             {intl.formatMessage(messages.noAllocTitle)}
           </Typography>
           &nbsp;
+          {/*  @ts-ignore */}
           <Typography variant="body1" as="span">
             <a href="">
               {intl.formatMessage(globalMessages.learnMore)}
@@ -224,6 +239,7 @@ export default function AirdropPage({ stores }: Props) {
               <Typography variant="body2" color="ds.text_gray_low">
                 {intl.formatMessage(messages.size)}
               </Typography>
+              {/*  @ts-ignore */}
               <Typography variant="h1xl">
                 {alloc.toFormat()} NIGHT
               </Typography>
@@ -267,9 +283,11 @@ export default function AirdropPage({ stores }: Props) {
               }}
             >
               <Box>
+                {/*  @ts-ignore */}
                 <Box as="span" sx={{ verticalAlign: 'middle' }}>
                   <ErrorTriangleIcon/>
                 </Box>
+                {/*  @ts-ignore */}
                 <Typography
                   sx={{ verticalAlign: 'middle' }}
                   as="span" variant="body1"
@@ -289,6 +307,7 @@ export default function AirdropPage({ stores }: Props) {
       {!isTrezor && !isClaimDone && (
         <Box sx={{ height: '96px', display: 'flex' }}>
           <LoadingButton
+            //  @ts-ignore
             variant="primary"
             sx={{ margin: 'auto' }}
             disabled={!isTermsAgreed || unclaimedAddrs.length === 0}
@@ -319,7 +338,6 @@ export default function AirdropPage({ stores }: Props) {
           wallet.type === 'mnemonic' ? (
             <ClaimDialog
               onClose={closeClaimDialog}
-              isMnemonic={wallet.type==='mnemonic'}
               onClaim={claim}
             />
           ) : (
@@ -347,7 +365,7 @@ function LedgerClaimDialog(props: {
   const intl = useIntl();
 
   useEffect(() => {
-    props.onClaim();
+    props.onClaim('');
     return () => {};
   }, [props.index]);
 
@@ -388,8 +406,10 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
         setError(wrongPasswordErrorMessage);
-      } else {
+      } else if (error instanceof Error) {
         setError(error.message);
+      } else {
+        setError(String(error));
       }
     } finally {
       setClaiming(false);
@@ -424,10 +444,9 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
           }
           setPassword(e.target.value);
         }}
-        error={error}
+        error={!!error}
         disabled={isClaiming}
       />
-      {error}
     </Dialog>
   );
 }
