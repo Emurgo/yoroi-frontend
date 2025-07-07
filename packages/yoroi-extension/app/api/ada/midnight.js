@@ -48,7 +48,7 @@ export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<
   return result;
 }
 
-export async function checkClaimForAddress(addrBech32: string): boolean {
+export async function checkClaimForAddress(addrBech32: string): Promise<boolean> {
   const resp = await fetch(`https://external-claim.gd.midnighttge.io/claims/cardano?address=${addrBech32}`);
   const data = await resp.json();
   /* schema:
@@ -73,7 +73,7 @@ export async function checkClaimForAddress(addrBech32: string): boolean {
   return false;
 }
 
-export function getClaimMessage(addrClaimData: AddressClaimData) {
+export function getClaimMessage(addrClaimData: AddressClaimData): string {
   return 'STAR ' + String(addrClaimData.value) + ' to ' + addrClaimData.addrBech32 + ' ' + TC_HASH;
 }
 
