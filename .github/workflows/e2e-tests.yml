@@ -197,6 +197,7 @@ jobs:
         working-directory: ./packages/e2e-tests
         env:
           FIRST_SMOKE_TEST_WALLET: ${{ secrets.FIRST_SMOKE_TEST_WALLET }}
+          TEST_WALLET_MAINNET_1: ${{ secrets.TEST_WALLET_MAINNET_1 }}
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
