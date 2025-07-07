@@ -1,14 +1,12 @@
 import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
-import { getSpendableWallet } from '../utils/testWallets.js';
+import { testWallet3 } from '../utils/testWallets.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { restoreWallet } from '../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../utils/driversPool.js';
-
-const testWallet = getSpendableWallet();
 
 describe('Show more txs', function () {
   this.timeout(5 * oneMinute);
@@ -20,8 +18,8 @@ describe('Show more txs', function () {
     logger = getTestLogger(this.test.parent.title);
   });
 
-  it(`Restore a 15-word test wallet ${testWallet.name}`, async function () {
-    await restoreWallet(webdriver, logger, testWallet);
+  it(`Restore a 15-word test wallet ${testWallet3.name}`, async function () {
+    await restoreWallet(webdriver, logger, testWallet3);
   });
 
   it('Check amount of auto-loaded transactions', async function () {
@@ -38,7 +36,7 @@ describe('Show more txs', function () {
     await transactionsPage.loadMoreTxs(1);
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
     expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(
-      testWallet.minTxs
+      testWallet3.minTxs
     );
   });
 
