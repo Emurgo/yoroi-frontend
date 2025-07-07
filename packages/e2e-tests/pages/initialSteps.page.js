@@ -85,8 +85,12 @@ class InitialStepsPage extends BasePage {
       async () => await this.click(this.agreeCheckboxLocator),
       defaultWaitTimeout
     );
-    const buttonElem = await this.waitEnable(this.tosContinueButtonLocator);
-    await buttonElem.click();
+    const btnState = await this.buttonIsEnabled(this.tosContinueButtonLocator);
+    if (btnState) {
+      await this.click(this.tosContinueButtonLocator);
+    } else {
+      throw new Error('The Continue button is disabled');
+    }
   }
   async cantProceedWithoutToS() {
     this.logger.info(`InitialStepsPage::cantProceedWithoutToS is called`);
