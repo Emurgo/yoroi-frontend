@@ -110,6 +110,8 @@ export default class InlineEditingInput extends Component<Props, State> {
 
   onBlur: () => void = () => {
     if (this.state.isActive) {
+      const inputField = this.validator.$('inputField');
+      inputField.value = inputField.value.trim();
       this.submit();
       this.inputField.blur();
     }

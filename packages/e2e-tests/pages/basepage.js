@@ -151,7 +151,7 @@ class BasePage {
   }
   /**
    * Finding all suitable WebElements by the locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<WebElement[]>}
    */
   async findElements(locator) {
@@ -160,7 +160,7 @@ class BasePage {
   }
   /**
    * Getting a text by element locator
-   * @param {ElementLocator} locator 
+   * @param {ElementLocator} locator
    * @returns {Promise<string>}
    */
   async getText(locator) {
@@ -168,12 +168,16 @@ class BasePage {
     return await this.waitPresentedAndAct(locator, async () => {
       let element = await this.findElement(locator);
       try {
-        return await element.getText();
+        const result = await element.getText();
+        this.logger.info(`BasePage::getText. Result: ${result}`);
+        return result;
       } catch (error) {
         if (error.name === 'StaleElementReferenceError') {
           this.logger.info(`BasePage::getText Re-try because of StaleElementReferenceError`);
           element = await this.findElement(locator);
-          return await element.getText();
+          const result = await element.getText();
+          this.logger.info(`BasePage::getText. Result: ${result}`);
+          return result;
         } else {
           throw error;
         }
@@ -184,11 +188,16 @@ class BasePage {
     this.logger.info(
       `BasePage::getCssValue is called. Locator: ${JSON.stringify(locator)}, property: ${cssStyleProperty}`
     );
-    return await this.driver.findElement(getByLocator(locator)).getCssValue(cssStyleProperty);
+    const element = await this.driver.findElement(getByLocator(locator));
+    const result = element.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValue Result: ${result}`);
+    return result;
   }
   async getCssValueElement(webElement, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
-    return await webElement.getCssValue(cssStyleProperty);
+    const result = await webElement.getCssValue(cssStyleProperty);
+    this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
+    return result;
   }
   async getAttribute(locator, property) {
     this.logger.info(
@@ -240,11 +249,17 @@ class BasePage {
       `BasePage::input is called. Locator: ${JSON.stringify(locator)}, Value: ${value}`
     );
     const input = await this.findElement(locator);
-    await input.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await input.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async inputElem(webElement, value) {
     this.logger.info(`BasePage::inputElem is called. Value: ${value}`);
-    await webElement.sendKeys(value);
+    for (let index = 0; index < value.length; index++) {
+      await webElement.sendKeys(value[index]);
+      await this.sleep(5);
+    }
   }
   async clearInput(locator) {
     this.logger.info(`BasePage::clearInput is called. Locator: ${JSON.stringify(locator)}`);
@@ -501,7 +516,11 @@ class BasePage {
       return false;
     }
   }
-  // The method is for debugging
+  /**
+   * Highlighting the web element with red border and yellow backgorund.
+   * !!IT IS ONLY FOR DEBUGGING!!
+   * @param {WebElement} webElement
+   */
   async highlightElement(webElement) {
     this.logger.info(
       `Webdriver::highlightElement: Highlighting element "${JSON.stringify(webElement)}"`
@@ -778,6 +797,40 @@ class BasePage {
     for (const storageKey in browserStorageSnapshot) {
       await this.setInfoBrowserLocalStorage(storageKey, browserStorageSnapshot[storageKey]);
     }
+  }
+  /**
+   * Getting an element size
+   * @param {ElementLocator} locator
+   * @returns {{height: number, width: number}}
+   */
+  async getSize(locator) {
+    this.logger.info(`BasePage::getSize is called. Value: ${JSON.stringify(locator)}`);
+    const element = await this.findElement(locator);
+    const rect = await element.getRect();
+    this.logger.info(`BasePage::getSize is called. Result: ${JSON.stringify(rect)}`);
+    return {
+      height: rect.height,
+      width: rect.width,
+    };
+  }
+
+  /**
+   * Reading a buffer info
+   * @returns {Promise<string>}
+   */
+  async getClipboardData() {
+    this.logger.info(`BasePage::getClipboardData is called.`);
+    const clipboardText = await this.driver.executeAsyncScript(async callback => {
+      try {
+        const text = await navigator.clipboard.readText();
+        callback(text);
+      } catch (error) {
+        console.error('Failed to read clipboard:', error);
+        callback(null);
+      }
+    });
+    this.logger.info(`BasePage::getClipboardData is called. Result: ${clipboardText}`);
+    return clipboardText;
   }
 }
 

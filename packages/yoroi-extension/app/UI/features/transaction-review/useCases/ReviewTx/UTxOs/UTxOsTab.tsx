@@ -38,8 +38,9 @@ interface OutputProps {
 
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
+
   return (
-    <Stack direction="column" sx={{ padding: '24px', direction: 'collumn', marginBottom: '100px' }}>
+    <Stack direction="column" sx={{ padding: '24px 0 24px 24px', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
       <FeeDisplay fee={tx.fee.quantity} primaryTokenInfo={primaryTokenInfo} />
       <Outputs outputs={tx.outputs} />
@@ -117,23 +118,25 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
         </Typography>
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="450px">
+      <Stack direction="row" gap="8px" alignItems="flex-start" width="100%" display="flex">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" color="ds.text_gray_medium" minWidth="0">
           {input.address}
         </Typography>
         <CopyButton textToCopy={input.address} />
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Stack direction="row" gap="8px" alignItems="flex-start">
-          <Typography sx={{ wordWrap: 'break-word' }} variant="body1" color="ds.text_gray_medium" maxWidth="420px">
-            {input.txHash}
-          </Typography>
-          <Typography sx={{}} variant="body1" fontWeight={500}>
+      <Stack direction="row" alignItems="flex-start" width="100%" display="flex" gap="8px">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" color="ds.text_gray_medium" minWidth="0">
+          {input.txHash}
+        </Typography>
+
+        <Stack display="flex" flexDirection="row" gap="8px">
+          <Typography variant="body1" fontWeight={500}>
             {`#${input.txIndex}`}
           </Typography>
+          <CopyButton textToCopy={input.txHash} />
         </Stack>
-        <CopyButton textToCopy={input.txHash} />
+
       </Stack>
 
       {input.assets.length > 0 && (
@@ -170,8 +173,8 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
         </Typography>
       </Stack>
 
-      <Stack direction="row" gap="8px" alignItems="flex-start">
-        <Typography sx={{ wordWrap: 'break-word' }} variant="body1" maxWidth="450px">
+      <Stack direction="row" gap="8px" alignItems="flex-start" width="100%" display="flex">
+        <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" minWidth="0">
           {output.address}
         </Typography>
         <CopyButton textToCopy={output.address} />

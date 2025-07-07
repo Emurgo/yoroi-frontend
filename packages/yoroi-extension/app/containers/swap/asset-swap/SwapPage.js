@@ -17,7 +17,7 @@ import globalMessages from '../../../i18n/global-messages';
 import { useEffect, useState } from 'react';
 import { Box, Button } from '@mui/material';
 import { CreateSwapOrder } from './CreateSwapOrder';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { runInAction } from 'mobx';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { ROUTES } from '../../../routes-config';

@@ -127,7 +127,7 @@ const updateOperationsCount = (operation: CertificateType, operationsCount: Oper
 export const AbstainOperation = ({ label, fee }: { label: string; fee: string | null }) => {
   const strings = useStrings();
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
           <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
@@ -143,7 +143,7 @@ export const AbstainOperation = ({ label, fee }: { label: string; fee: string | 
 export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: string | null }) => {
   const strings = useStrings();
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
           <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
@@ -156,13 +156,21 @@ export const NoConfidenceOperation = ({ label, fee }: { label: string; fee: stri
     </Stack>
   );
 };
-export const VoteDelegationOperation = ({ label, hash, fee }: { label: string; hash: string | undefined; fee: string | null }) => {
+export const VoteDelegationOperation = ({
+  label,
+  hash,
+  fee,
+}: {
+  label: string;
+  hash: string | undefined;
+  fee: string | null;
+}) => {
   const strings = useStrings();
   const normalizedDrep = hash == null || hash === '' ? null : dRepNormalize(hash);
   const drepTitle = normalizedDrep ? drepNames[normalizedDrep] ?? normalizedDrep : '-';
 
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       {fee && (
         <Stack direction="row" justifyContent="space-between">
           <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>

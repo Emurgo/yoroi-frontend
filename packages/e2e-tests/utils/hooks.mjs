@@ -35,11 +35,15 @@ export const mochaHooks = {
   async beforeEach(done) {
     // Check for nested descibe sections in case if any tests failed in a main describe
     const grandParent = this.currentTest.parent.parent;
-    if (grandParent?.tests.some(test => test.state === 'failed')) {
+    if (grandParent?.tests.some(test => test.state === 'failed' || test.state === 'pending')) {
       this.skip();
     }
     // Skip subsequent tests if the describe block failed
-    if (this.currentTest.parent.tests.some(test => test.state === 'failed')) {
+    if (
+      this.currentTest.parent.tests.some(
+        test => test.state === 'failed' || test.state === 'pending'
+      )
+    ) {
       this.skip();
     }
     done();

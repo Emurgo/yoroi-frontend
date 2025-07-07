@@ -24,7 +24,7 @@ export function decryptWithPassword(
   try {
     const decryptedHex = RustModule.WalletV4.decrypt_with_password(passwordHex, encryptedHex);
     return hexToBytes(decryptedHex);
-  } catch (err) {
+  } catch (_err) {
     throw new WrongPassphraseError();
   }
 }
