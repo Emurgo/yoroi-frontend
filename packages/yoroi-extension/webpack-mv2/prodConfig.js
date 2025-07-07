@@ -45,7 +45,7 @@ const contentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
       JSON.parse(env.isLight),
       JSON.parse(env.isE2E)
     )),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/}),
   ],
   module: {
     rules: [
@@ -100,7 +100,7 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       JSON.parse(env.isLight),
       JSON.parse(env.isE2E)
     )),
-    new webpack.IgnorePlugin(/[^/]+\/[\S]+.dev$/),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],
   module: {
     rules: [
