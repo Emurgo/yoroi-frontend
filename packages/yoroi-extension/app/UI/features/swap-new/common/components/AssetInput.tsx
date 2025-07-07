@@ -21,7 +21,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
-
   const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
   const value = tokenInput.value;
 
@@ -46,9 +45,8 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const tokenPrice = data24h?.[1]?.price?.close ?? 1;
 
   if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
-    const normalizeId = (id?: string | null) => (id === '' ? '.' : id);
     selectedToken = ftAssetList.filter(token => {
-      return normalizeId(token.info.id) === swapForm.tokenInInput?.tokenId;
+      return token.info.id === swapForm.tokenInInput?.tokenId;
     })[0];
     const selectedTokenDecimals = selectedToken?.info?.numberOfDecimals ?? 0;
 
@@ -78,6 +76,16 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     return undefined;
   }, [direction, tokenInputInfo]);
 
+  const AssetIdForIcon = React.useMemo(() => {
+    if (direction === ASSET_DIRECTION_IN) {
+      return tokenInput.tokenId ?? tokenInputInfo?.id;
+    }
+    if (direction === ASSET_DIRECTION_OUT) {
+      return tokenInputInfo?.id;
+    }
+    return undefined;
+  }, [direction, tokenInputInfo, tokenInput]);
+
   const focusInput = () => {
     if (inputRef?.current) {
       inputRef.current.focus();
@@ -105,7 +113,12 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
             sx={{ cursor: 'pointer' }}
           >
             <TokenInfoIcon
-              info={{ id: tokenInputInfo?.id, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
+              info={{
+                id: AssetIdForIcon,
+                direction,
+                // policy: tokenInputInfo?.fingerprint,
+                // name: tokenInputInfo?.name,
+              }}
               size="md"
             />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm} inline>

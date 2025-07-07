@@ -3,12 +3,15 @@ import { DisplayInfoInRow } from '../../common/components/DisplayInfoInRow';
 import { useStrings } from '../../common/hooks/useStrings';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { undefinedToken } from '../../common/constants';
+import { useModal } from '../../../../components/modals/ModalContext';
+import { DexRouteTable } from './DexRouteTable';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
   const { swapForm, tokenInfos, primaryTokenInfo } = useSwapRevamp();
-
+  const { openModal } = useModal();
+  console.log('EstimateSummary', { swapForm });
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
   const tokenOutInfo = tokenInfos.get(swapForm.tokenOutInput.tokenId ?? undefinedToken);
 
@@ -23,6 +26,19 @@ export const EstimateSummary = () => {
   const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
   const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
 
+  const openRouteModal = () => {
+    openModal({
+      title: 'Select Route',
+      content: (
+        <Stack direction="column" width="100%">
+          <DexRouteTable data={swapForm.estimate?.splits ?? []} />
+        </Stack>
+      ),
+      height: '327px',
+      width: '824px',
+    });
+  };
+
   return (
     <Stack direction="column" {...atoms.gap_md} width="100%" {...atoms.mt_lg}>
       <DisplayInfoInRow
@@ -30,7 +46,7 @@ export const EstimateSummary = () => {
         tooltip={strings.routePath}
         value={
           <Typography>
-            <Link>{protocol}</Link>
+            <Link onClick={openRouteModal}>{protocol}</Link>
           </Typography>
         }
       />

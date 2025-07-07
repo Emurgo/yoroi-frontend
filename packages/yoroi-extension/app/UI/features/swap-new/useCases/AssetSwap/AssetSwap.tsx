@@ -9,9 +9,11 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
+  const { createOrder } = useSwapRevamp();
   const { openModal } = useModal();
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {
@@ -38,6 +40,7 @@ export const AssetSwap = () => {
       <LoadingButton
         //  @ts-ignore
         variant="primary"
+        onClick={createOrder}
       >
         Swap
       </LoadingButton>

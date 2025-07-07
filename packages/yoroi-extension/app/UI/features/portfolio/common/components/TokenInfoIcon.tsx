@@ -36,15 +36,15 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
   if (!info?.id) {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={Icons.Assets} />
+        <IconWrapper icon={info?.id === '.' && fallback ? Icons.AdaToken : Icons.Assets} />
       </StyledIconBox>
     );
   }
 
-  if (fallback || !uri) {
+  if (isAda) {
     return (
       <StyledIconBox size={dimension} bg={isAda ? theme.palette.ds.primary_500 : theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={isAda ? Icons.AdaToken : Icons.Assets} />
+        <IconWrapper icon={Icons.AdaToken} />
       </StyledIconBox>
     );
   }
@@ -69,7 +69,7 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
       }}
     />
   );
-};
+};;;;;;;
 
 const StyledIconBox = styled(Box, {
   shouldForwardProp: prop => prop !== 'size' && prop !== 'bg',

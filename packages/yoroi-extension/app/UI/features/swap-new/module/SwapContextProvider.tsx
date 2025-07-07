@@ -1,4 +1,15 @@
-import { useMemo, useReducer, useContext, useRef, useState, useEffect, createContext, RefObject, Dispatch } from 'react';
+import {
+  useMemo,
+  useReducer,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+  createContext,
+  RefObject,
+  Dispatch,
+  useCallback,
+} from 'react';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
@@ -10,7 +21,7 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { normalizeTokenId } from '../common/helpers';
+import { normalizeTokenId, useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN } from '../common/constants';
 import { AssetDirectionType } from '../common/types';
 
@@ -36,7 +47,10 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
+  const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
+
   const [state, action] = useReducer(swapReducer, defaultState);
+  console.log('selectedWallet', { selectedWallet });
 
   useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -120,10 +134,12 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     state.selectedProtocol.isTouched,
     state.selectedProtocol.value,
   ]);
-
   useEffect(() => {
-    const tokenAmount = ftAssetList.find(asset => normalizeTokenId(asset.info.id) === state.tokenInInput.tokenId);
-    const hasEnoughBalance = Number(tokenAmount.formatedAmount) >= Number(state.tokenInInput.value);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+
+    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+
+    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
 
     if (!hasEnoughBalance) {
       action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
@@ -167,6 +183,56 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       });
   }, [state, swapManager.api]);
 
+  const create = useCallback(async () => {
+    if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
+
+    // setIsLoading(true);
+
+    const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
+    // const tokenOutInfo = tokenInfos.get(state.tokenOutInput.tokenId);
+
+    const quantityIn = Number(state.tokenInInput.value) * 10 ** (tokenInInfo?.decimals ?? 0);
+    const amountsIn = { [state.tokenInInput.tokenId]: `${quantityIn}` };
+    console.log('amountsIn', amountsIn);
+    const inputs = await getInputs(amountsIn);
+
+    console.log('CREATE DATA inputs', inputs);
+
+    // swapManager.api
+    //   .create({
+    //     tokenIn: state.tokenInInput.tokenId,
+    //     tokenOut: state.tokenOutInput.tokenId,
+    //     amountIn: Number(state.tokenInInput.value),
+    //     ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
+    //     blockedProtocols: [],
+    //     protocol: state.selectedProtocol.value,
+    //     // inputs,
+    //   })
+    //   .then(response => {
+    //     // setIsLoading(false);
+
+    //     if (isLeft(response)) {
+    //       action({ type: SwapAction.CreateError, value: response.error });
+    //     } else {
+    //       action({ type: SwapAction.CreateResponse, value: response.value.data });
+    //       // navigate.reviewSwap();
+    //     }
+    //   });
+  }, [
+    state.estimate?.splits,
+    state.estimate?.totalFee,
+    state.orderType,
+    state.selectedProtocol.value,
+    state.slippageInput.value,
+    state.tokenInInput.tokenId,
+    state.tokenInInput.value,
+    state.tokenOutInput.tokenId,
+    state.tokenOutInput.value,
+    state.wantedPrice,
+    swapManager.api,
+    tokenInfos,
+  ]);
+
   const context: any = useMemo(
     () => ({
       swapForm: { action, ...state },
@@ -180,6 +246,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       tokenManager,
       loadingTokenList,
       explorer,
+      createOrder: create,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
@@ -519,6 +586,3 @@ const parseNumber = (text: string) =>
         .replace(/^0+(.+)/, '$1')
         .replace(/^\.$/, '0.')
     : '0';
-
-
-
