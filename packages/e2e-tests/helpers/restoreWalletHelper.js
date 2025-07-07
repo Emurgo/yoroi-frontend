@@ -21,6 +21,9 @@ import {
 } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+import * as mocha from 'mocha';
 
 export const restoreWallet = async (
   webdriver,
@@ -213,6 +216,14 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
   logger.info(`--------------------- collectInfo END ---------------------`);
 };
 
+/**
+ * The function loads IndexedDB and local storage for the specified wallet
+ * @param {WebDriver} webdriver 
+ * @param {Logger} logger 
+ * @param {string} testWalletName 
+ * @param {mocha.Context} mochaContext 
+ * @param {boolean} useGeneralStorageInfo 
+ */
 export const prepareWallet = async (
   webdriver,
   logger,

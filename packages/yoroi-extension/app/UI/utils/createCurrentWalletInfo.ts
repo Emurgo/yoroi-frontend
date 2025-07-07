@@ -285,11 +285,25 @@ export const extractMetadataInfo = (metadataObj: Metadata) => {
   const tokenInfo = Object.values(metadataObj.metadata).flatMap(chain =>
     Object.values(chain).flatMap(tokens => Object.values(tokens))
   );
-  for (const info of tokenInfo) {
-    return { website: info?.url || info?.website, description: info?.desc };
-  }
 
-  return null;
+  let metadataValues: null | { website?: string; description?: string } = null;
+
+  for (const info of tokenInfo) {
+    if (info?.url || info?.website) {
+      if (metadataValues === null) {
+        metadataValues = {};
+      }
+      metadataValues.website = info.url ?? info.website;
+    }
+
+    if (info?.desc) {
+      if (metadataValues === null) {
+        metadataValues = {};
+      }
+      metadataValues.description = info.desc;
+    }
+  }
+  return metadataValues;
 };
 
 const formatTokenEntry = (tokenEntry, getTokenInfo) => {

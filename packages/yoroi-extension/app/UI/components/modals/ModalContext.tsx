@@ -1,4 +1,5 @@
 import React from 'react';
+import PubSub from 'pubsub-js';
 
 type ModalState = {
   isOpen: boolean;
@@ -8,6 +9,8 @@ type ModalState = {
   width: string;
   isLoading: boolean;
   onClose?: () => void;
+  modalId?: string;
+  handleBack?: () => void | null;
 };
 
 type ModalActions = {
@@ -17,21 +20,49 @@ type ModalActions = {
   stopLoading: () => void;
 };
 
-const ModalContext = React.createContext(undefined);
+type ModalContextType = ModalActions & ModalState;
 
-export const useModal = (): any => {
-  const value = React.useContext(ModalContext);
+const defaultActions: ModalActions = {
+  openModal: () => {},
+  closeModal: () => {},
+  startLoading: () => {},
+  stopLoading: () => {},
+};
+
+const defaultState: ModalState = Object.freeze({
+  isOpen: false,
+  title: '',
+  content: null,
+  height: '648px',
+  width: '648px',
+  isLoading: false,
+  onClose: undefined,
+});
+
+const ModalContext = React.createContext<ModalContextType>({
+  ...defaultState,
+  ...defaultActions,
+});
+
+export const useModal = (): ModalContextType => {
+  const value = React.useContext<ModalContextType>(ModalContext);
   if (!value) {
     throw new Error('useModal must be used within a ModalProvider');
   }
-  return value;
+
+  const handleCloseModal = () => {
+    PubSub.publish('MODAL_CLOSED', value.modalId);
+    value.closeModal();
+  };
+
+  return { ...value, closeModal: handleCloseModal };
 };
 
 export const ModalProvider = ({ children, initialState }: { children: React.ReactNode; initialState?: ModalState }) => {
   const [state, dispatch] = React.useReducer(modalReducer, { ...defaultState, ...initialState });
   const actions = React.useRef<ModalActions>({
     closeModal: () => {
-      dispatch({ type: 'close' });
+      dispatch({ type: 'close', title: '', content: null, height: '0px', width: '0px', modalId: '' });
     },
     openModal: (payload: any) => {
       dispatch({
@@ -42,13 +73,14 @@ export const ModalProvider = ({ children, initialState }: { children: React.Reac
         width: payload.width,
         modalId: payload.modalId,
         onClose: payload.onClose,
+        handleBack: payload.handleBack,
       });
     },
     startLoading: () => dispatch({ type: 'startLoading' }),
     stopLoading: () => dispatch({ type: 'stopLoading' }),
   }).current;
 
-  const context: any = React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
+  const context: ModalContextType = React.useMemo(() => ({ ...state, ...actions }), [state, actions]);
 
   return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
 };
@@ -65,11 +97,11 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
         width: action.width ?? defaultState.width,
         title: action.title,
         modalId: action.modalId,
+        handleBack: action.handleBack ?? null,
         isOpen: true,
         isLoading: false,
         onClose: action.onClose,
       };
-
     case 'close':
       return { ...defaultState };
 
@@ -83,13 +115,3 @@ const modalReducer = (state: ModalState, action: ModalAction) => {
       throw new Error(`modalReducer invalid action`);
   }
 };
-
-const defaultState: ModalState = Object.freeze({
-  isOpen: false,
-  title: '',
-  content: null,
-  height: '648px',
-  width: '648px',
-  isLoading: false,
-  onClose: undefined,
-});

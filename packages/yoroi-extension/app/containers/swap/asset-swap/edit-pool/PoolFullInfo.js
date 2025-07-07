@@ -1,7 +1,7 @@
 // @flow
 
 import { Box, Typography } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { useSwapForm } from '../../context/swap-form';
 import { Quantities } from '../../../../utils/quantities';
 import { useSwapFeeDisplay } from '../../hooks';
