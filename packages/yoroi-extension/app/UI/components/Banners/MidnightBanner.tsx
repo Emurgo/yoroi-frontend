@@ -8,10 +8,10 @@ import { MidnightIlustration } from '../Dialogs/MidnightIlustration';
 export const MidnightBanner = () => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
   const [bannerVisible, setBannerVisible] = useState(false);
+  const localStorage = new LocalStorageApi();
   const { data } = useYoroiRemoteConfig();
 
   const handleClose = async () => {
-    const localStorage = new LocalStorageApi();
     setBannerVisible(false);
     await localStorage.setMidnightBannerAnnouncementClosed(true);
   };
@@ -19,11 +19,10 @@ export const MidnightBanner = () => {
   const handleClick = () => {
     // Redirect to Airdrop page https://emurgo.atlassian.net/browse/YOEXT-2100
   };
+
   useEffect(() => {
     const checkModalState = async () => {
-      const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getMidnightBannerAnnouncementClosed();
-
       if (data?.banners?.midnightAnnouncement?.display === true && (wasClosed === undefined || wasClosed === false)) {
         setBannerVisible(true);
       }
