@@ -49,6 +49,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onSubmit: string => PossiblyAsync<void>,
+  +disableNext: void => void,
   +isValidMnemonic: (
     Array<{|
       value: string,
@@ -71,7 +72,7 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     initialRecoveryPhrase: '',
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     mounted: false,
   };
@@ -82,15 +83,19 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
       : new Array(this.props.numberOfMnemonics).fill('');
   };
 
+  getInitRecoveryPhraseAsPropObjects: void => Array<{| value: string, label: string |}> = () => {
+    return this.getInitRecoveryPhrase().map((word, _) => ({
+      value: word,
+      label: '',
+    }));
+  };
+
   inputRefs: Array<any> = [];
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
-        recoveryPhrase: this.getInitRecoveryPhrase().map((word, _) => ({
-          value: word,
-          label: '',
-        })),
+        recoveryPhrase: this.getInitRecoveryPhraseAsPropObjects(),
       },
     },
     {
@@ -125,8 +130,29 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
   //! hack to get the refs
   componentDidMount() {
     this.setState({ mounted: true });
-    if (environment.isDev()) console.log(this.state.mounted);
+    if (environment.isDev()) {
+      console.log(this.state.mounted);
+    }
+
+    this.checkIfInitialPhraseIsValid();
   }
+
+  checkIfInitialPhraseIsValid: () => void = () => {
+    const { isValidMnemonic, numberOfMnemonics } = this.props;
+    const phrase = this.getInitRecoveryPhraseAsPropObjects();
+    const allWordsEntered = this.checkAllWordsEntered(numberOfMnemonics, phrase);
+    const isValidPhrase = allWordsEntered && isValidMnemonic(phrase);
+    if (isValidPhrase) {
+      this.submit();
+    }
+  };
+
+  checkAllWordsEntered: (any, Array<{| value: string, label: string |}>) => boolean = (
+    numberOfMnemonics: any,
+    words: Array<{| value: string, label: string |}>
+  ) => {
+    return words.length === numberOfMnemonics && !words.some(word => !word.value);
+  };
 
   render(): Node {
     const intl = this.context;
@@ -134,13 +160,11 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
     const { form } = this;
     const { recoveryPhrase } = form.values();
 
-    const allWordsEntered = recoveryPhrase.length === numberOfMnemonics && !recoveryPhrase.some(word => !word.value);
+    const allWordsEntered = this.checkAllWordsEntered(numberOfMnemonics, recoveryPhrase);
     const isValidPhrase = allWordsEntered && isValidMnemonic(recoveryPhrase);
     const mnemonicError = intl.formatMessage(messages.incorrectRecoveryPhrase);
     const wordEntered = recoveryPhrase.some(word => Boolean(word.value));
     const clearAllButtonColor = wordEntered ? 'ds.text_primary_medium' : 'ds.text_primary_min';
-
-    if (isValidPhrase && !form.submitted) this.submit();
 
     return (
       <Box>
@@ -188,11 +212,18 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                     noResultsMessage={intl.formatMessage(globalMessages.recoveryPhraseNoResults)}
                     {...fieldBind}
                     onFocus={e => e.target.setSelectionRange(0, e.target.value?.length)}
-                    onChange={(newWord) => {
+                    onChange={newWord => {
                       fieldBind.onChange(newWord);
-                      if (newWord && idx === recoveryPhrase.length - 1) {
-                        const isValid = isValidMnemonic(form.values().recoveryPhrase);
+                      const phrase = form.values().recoveryPhrase;
+                      const isValid = isValidMnemonic(phrase);
+                      if (newWord && idx === phrase.length - 1) {
                         ampli.restoreWalletEnterPhraseStepStatus({ recovery_prhase_status: isValid });
+                      }
+
+                      if (isValid && this.checkAllWordsEntered(numberOfMnemonics, phrase)) {
+                        this.submit();
+                      } else {
+                        this.props.disableNext();
                       }
                     }}
                   />
