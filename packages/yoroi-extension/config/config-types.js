@@ -6,6 +6,12 @@ export type ConfigType = {|
   app: AppConfigType,
   bring: BringConfigType,
   bringSandbox: BringConfigType,
+  notifications: NotificationsConfigType,
+|};
+
+export type NotificationsConfigType = {|
+  defaultDuration: number,
+  vapidPublicKey: string,
 |};
 
 export type BringConfigType = {|

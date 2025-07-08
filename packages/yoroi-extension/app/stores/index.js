@@ -24,6 +24,7 @@ import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
 import ConnectorStore from './toplevel/DappConnectorStore'
 import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
+import PushNotificationStore from './toplevel/PushNotificationStore';
 import TransactionProcessingStore from './toplevel/TransactionProcessingStore';
 import RoutingStore from './toplevel/RoutingStore';
 
@@ -50,6 +51,7 @@ const storeClasses = Object.freeze({
   explorers: ExplorerStore,
   connector: ConnectorStore,
   protocolParameters: ProtocolParametersStore,
+  pushNotificationStore: PushNotificationStore,
   transactionProcessingStore: TransactionProcessingStore,
   routing: RoutingStore,
   // note: purposely exclude substores
@@ -80,6 +82,7 @@ export type StoresMap = {|
     ada: AdaStoresMap,
   |},
   protocolParameters: ProtocolParametersStore<StoresMap>,
+  pushNotificationStore: PushNotificationStore<StoresMap>,
   transactionProcessingStore: TransactionProcessingStore,
   routing: RoutingStore,
 |};
@@ -113,6 +116,7 @@ const stores: StoresMap = (observable({
   substores: null,
   connector: null,
   protocolParameters: null,
+  pushNotificationStore: null,
   transactionProcessingStore: null,
   routingStore: null,
 }): any);
