@@ -4,8 +4,6 @@ import { IconWrapper, Icons } from '../icons/index';
 import { Theme, toast } from 'react-toastify';
 import { NotificationTypes } from '../../types/notifications';
 
-const NOTIFICATION_TIMEOUT = 4000; // 4s
-
 export type NotificationProps = {
   title: string;
   subtitle: string;
@@ -14,6 +12,7 @@ export type NotificationProps = {
   id: string;
   onClick(props: any): void;
   onClose(props: any): void;
+  timeout: number;
 };
 type IconProps = {
   type: NotificationTypes;
@@ -117,11 +116,11 @@ const NotificationBody = ({ toastProps }: any) => {
   );
 };
 
-export function createToast({ title, subtitle, type, id, onClick = noop, onClose = noop, theme = 'light' }: NotificationProps) {
+export function createToast({ timeout, title, subtitle, type, id, onClick = noop, onClose = noop, theme = 'light' }: NotificationProps) {
   return toast(props => <NotificationBody {...props} />, {
     theme,
     toastId: id,
-    autoClose: NOTIFICATION_TIMEOUT,
+    autoClose: timeout,
     icon: () => <NotificationIcon type={type} />,
     data: { title, subtitle, type, onClick, onClose },
     draggable: false,

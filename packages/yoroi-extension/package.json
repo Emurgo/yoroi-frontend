@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.9.110",
+  "version": "5.9.200",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev-mv2": "rimraf dev/ && NODE_OPTIONS=--openssl-legacy-provider babel-node scripts-mv2/build --type=debug --env 'mainnet'",
@@ -136,8 +136,8 @@
     "style-loader": "2.0.0",
     "unused-webpack-plugin": "2.4.0",
     "url-loader": "4.1.1",
-    "webpack": "5.23.0",
-    "webpack-cli": "4.5.0",
+    "webpack": "5.99.9",
+    "webpack-cli": "6.0.1",
     "webpack-dev-middleware": "4.1.0",
     "webpack-dev-server": "^4.9.3",
     "webpack-hot-middleware": "2.25.0",

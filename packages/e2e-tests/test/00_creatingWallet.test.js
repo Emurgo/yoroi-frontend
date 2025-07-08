@@ -14,6 +14,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import StakingTab from '../pages/wallet/stakingTab/stakingTab.page.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import { pageTitle } from '../helpers/pageTitles.js';
+import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 
@@ -25,6 +26,7 @@ describe('Creating wallet', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadBrowserStorage(webdriver, logger);
   });
 
   it('Selecting Create wallet', async function () {
@@ -83,7 +85,6 @@ describe('Creating wallet', function () {
   it('Check new wallet info', async function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
-    await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
     const titleIsCorrect = await transactionsPage.titleIsCorrect(pageTitle.wallet);
@@ -123,7 +124,8 @@ describe('Creating wallet', function () {
     const titleIsCorrect = await stakingPage.titleIsCorrect(pageTitle.staking);
     expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
     const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
-    expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;
+    expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`)
+      .to.be.true;
   });
 
   it('Check NFTs Gallery', async function () {
