@@ -237,7 +237,7 @@ class SendSubTab extends WalletTab {
     this.logger.info(`SendSubTab::confirmTransaction is called. ` + `Password: ${password}`);
     if (!isHW) {
       await this.click(this.passwordInputLocator);
-      await this.input(this.passwordInputLocator, password);
+      await this.input(this.passwordInputLocator, password, true);
     }
     const nextButtonIsEnabled = await this.buttonIsEnabled(this.confirmTxButtonLocator);
     if (nextButtonIsEnabled) {
