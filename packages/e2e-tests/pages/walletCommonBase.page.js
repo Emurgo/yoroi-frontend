@@ -178,6 +178,7 @@ export default class WalletCommonBase extends BasePage {
   }
   async waitPrepareWalletBannerIsClosed() {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
+    await this.customWaitIsPresented(this.prepareWalletBannerLocator, oneSecond, quarterSecond);
     const state = await this.customWaiter(
       async () => {
         const bannersElems = await this.findElements(this.prepareWalletBannerLocator);
@@ -348,7 +349,7 @@ export default class WalletCommonBase extends BasePage {
   }
   /**
    * Checking a page title
-   * @param {string} expectedPageTitle 
+   * @param {string} expectedPageTitle
    * @returns {Promise<boolean>}
    */
   async titleIsCorrect(expectedPageTitle) {

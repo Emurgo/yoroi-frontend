@@ -274,7 +274,7 @@ export function toTrezorSignRequest(
 
     const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.from_address(addr);
     if (enterpriseAddr) {
-      const ownAddressPath = ownAddressMap(addr.to_bech32());
+      const ownAddressPath = ownAddressMap(addr.to_hex());
       if (ownAddressPath) {
         result = ({
           addressParameters: {
