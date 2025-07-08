@@ -1,0 +1,102 @@
+// @flow
+import Store from '../base/Store';
+import environment from '../../environment';
+import { observable, runInAction, } from 'mobx';
+import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
+import type { ConfigType } from '../../../config/config-types';
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
+
+export type PushSubscription = {|
+  endpoint: string,
+  expirationTime: null | DOMHighResTimeStamp,
+  keys: {|
+    p256dh: string,
+    auth: string,
+  |},
+|}
+
+export default class PushNotificationStore<
+  StoresMapType: {
+    +loading: {
+      +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void,
+      ...
+    },
+    ...
+  },
+> extends Store<StoresMapType> {
+  @observable metadata: PushNotificationMetadata | null = null;
+  @observable subscription: PushSubscription | null = null;
+
+  setup(): void {
+    this.stores.loading.registerBlockingLoadingRequest((async () => {
+      const metadata = await (new LocalStorageApi()).getPushNotificationMetadata();
+      runInAction(() => {
+        this.metadata = metadata;
+      });
+    })(), 'load push notification metadata');
+
+    (async () => {
+      if (environment.isDev() || environment.isNightly()) {
+        const result = await Notification.requestPermission();
+        if (result === 'denied') {
+          // todo: save and don't ask again
+          return;
+        }
+        if (result === 'granted') {
+          console.info('The user accepted the permission request.');
+        }
+        const registration = await navigator.serviceWorker?.getRegistration();
+        if (!registration) {
+          throw new Error('unexpectedly missing service worker registration');
+        }
+        let subscription  = await registration.pushManager.getSubscription();
+        if (!subscription) {
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlB64ToUint8Array(CONFIG.notifications.vapidPublicKey)
+          });
+        }
+        runInAction(() => { this.subscription = JSON.parse(JSON.stringify(subscription)); });
+      }
+    })().catch(error => {
+      console.error('error when setting up push', error);
+    })
+  }
+
+  get duration(): number {
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    return this.metadata.duration ?? CONFIG.notifications.defaultDuration;
+  }
+  set duration(duration:number): void {
+    runInAction(() => {
+      if (!this.metadata) {
+        throw new Error('push notification metadata not loaded');
+      }
+
+      this.metadata.duration = duration;
+    });
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    (new LocalStorageApi()).savePushNotificationMetadata(this.metadata);
+  }
+}
+
+function urlB64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
