@@ -152,8 +152,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
 
   const selectedExplorer = explorers.selectedExplorer.get(wallet.networkId) ?? fail('No explorer for wallet network');
 
-  console.log('selectedExplorer', selectedExplorer);
-
   const fetchTransactionTimestamps = txHashes => swapStore.fetchTransactionTimestamps({ wallet, txHashes });
   const { openOrders, completedOrders, transactionTimestamps, openOrdersLoading, completedOrdersLoading } = useRichOrders(
     defaultTokenInfo,
@@ -324,7 +322,9 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
 
     try {
-      const { signedTxHex: signedCollateralReorgTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+      const {
+        signedTxHex: signedCollateralReorgTx,
+      } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
         wallet,
         transactionHex: collateralReorgTxObj.cbor,
         password: passswordInput,
@@ -358,8 +358,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
   const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
 
   const sortedCompletedOrders = sortOrdersByDate(completedOrders);
-
-  console.log('openOrders', openOrders)
 
   return (
     <>
