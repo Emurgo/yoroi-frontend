@@ -21,6 +21,7 @@ import encryptusPng from '../../assets/images/encryptus.png';
 import environment from '../../environment';
 import BuySellDisclaimerDialog from './DisclaimerDialog';
 import { ampli } from '../../../ampli/index';
+import LocalStorageApi from '../../api/localStorage';
 
 declare var chrome;
 
@@ -90,6 +91,7 @@ type State = {|
   +urlGenerationError: null | 'longLoading' | 'timeout' | 'failed' | 'aborted',
   +amountAda: string,
   +isSubmitting: boolean,
+  +disclaimerDialogFlagLoaded: boolean,
 |};
 
 const MINIMUM_BUY_ADA = new BigNumber('100');
@@ -193,13 +195,25 @@ export default class BuySellDialog extends Component<Props, State> {
     urlGenerationError: null,
     amountAda: '',
     isSubmitting: false,
-    showDisclaimer: true,
+    showDisclaimer: false,
+    disclaimerDialogFlagLoaded: true,
   };
 
   urlGenerationTimeout: null | TimeoutID = null;
 
   componentDidMount() {
     ampli.exchangePageViewed();
+
+    const self = this;
+    async function checkAcceptanceStatus() {
+      const localStorageApi = new LocalStorageApi();
+      const accepted = await localStorageApi.getBuySellDisclaimer();
+
+      self.setState({ disclaimerDialogFlagLoaded: true, showDisclaimer: accepted !== 'true' });
+    }
+
+    // eslint-disable-next-line no-floating-promise/no-floating-promise
+    checkAcceptanceStatus();
   }
 
   onSubmit: () => Promise<void> = async () => {
@@ -402,7 +416,11 @@ export default class BuySellDialog extends Component<Props, State> {
   render(): Node {
     const intl = this.context;
     const { state, props } = this;
-    const { urlGenerationError, showDisclaimer } = state;
+    const { urlGenerationError, showDisclaimer, disclaimerDialogFlagLoaded } = state;
+
+    if (!disclaimerDialogFlagLoaded) {
+      return null;
+    }
 
     if (showDisclaimer) {
       return this.renderDisclaimerDialog();
