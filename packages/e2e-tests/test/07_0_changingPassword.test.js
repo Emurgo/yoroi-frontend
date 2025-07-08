@@ -10,12 +10,11 @@ import WalletSubTab from '../pages/wallet/settingsTab/walletSubTab.page.js';
 import { getPassword } from '../helpers/constants.js';
 import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
-import { WRONG_PASSWORD } from '../helpers/messages.js';
+import { WRONG_PASSWORD_TX_REVIEW } from '../helpers/messages.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import TxReviewOverviewTab from '../pages/transactionReviewPages/txReviewOverviewTab.page.js';
 import TxReviewSubmit from '../pages/transactionReviewPages/txReviewSubmit.page.js';
-import TxFailModal from '../pages/transactionReviewPages/modals/txFailModal.page.js';
 
 describe('Changing wallet password. Positive', function () {
   this.timeout(2 * oneMinute);
@@ -52,7 +51,7 @@ describe('Changing wallet password. Positive', function () {
   it('Filling send info', async function () {
     const sendSubTab = new SendSubTab(webdriver, logger);
     await sendSubTab.enterReceiverAndMemo(testWallet1.receiveAddress);
-    await sendSubTab.addAssets(1);
+    await sendSubTab.addAssets('1');
   });
   // Checking that the old password doesn't work anymore
   it("Checking the old wallet doesn't work anymore", async function () {
@@ -61,11 +60,8 @@ describe('Changing wallet password. Positive', function () {
     const txReviewSubmit = new TxReviewSubmit(webdriver, logger);
     await txReviewSubmit.enterPassword(oldPassword);
     await txReviewSubmit.submit();
-    // the tx fail modal should appears
-    // The behaviour will be changed when the issue https://emurgo.atlassian.net/browse/YOEXT-1950 is done
-    const txFailModal = new TxFailModal(webdriver, logger);
-    const modalIsDisplayed = await txFailModal.isDisplayed();
-    expect(modalIsDisplayed, 'The error modal is not displayed').to.be.true;
+    const errorMessage = await txReviewSubmit.getPasswordErrorMessage();
+    expect(errorMessage, 'Wrong error message').to.equal(WRONG_PASSWORD_TX_REVIEW);
   });
 
   afterEach(async function () {

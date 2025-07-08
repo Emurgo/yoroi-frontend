@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Icons, IconWrapper } from '../icons/index';
 import { Tooltip } from '../Tooltip';
 import { defineMessages, useIntl } from 'react-intl';
+import { Box } from '@mui/material';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -16,7 +16,6 @@ export const messages = Object.freeze(
     },
   })
 );
-
 
 interface Props {
   textToCopy: string;
@@ -33,16 +32,22 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
 
   const handleCopy = () => {
     setCopied(true);
+    navigator.clipboard.writeText(textToCopy);
     setTimeout(() => {
       setCopied(false);
     }, 2000);
   };
 
   return (
-    <CopyToClipboard text={textToCopy} onCopy={handleCopy} {...props}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} place="bottom-start">
-        <IconWrapper disabled={disabled} buttonProps={{ sx: { padding: 0 } }} icon={copied ? Icons.Copied : Icons.Copy} asButton />
+    <Box onClick={handleCopy} {...props}>
+      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="bottom-start">
+        <IconWrapper
+          disabled={disabled}
+          buttonProps={{ sx: { padding: 0 } }}
+          icon={copied ? Icons.Copied : Icons.Copy}
+          asButton
+        />
       </Tooltip>
-    </CopyToClipboard>
+    </Box>
   );
 };

@@ -8,7 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
 import StatsTable from '../TokensTable/StatsTable';
 
-const PortfolioWallet = ({ stores }): JSX.Element => {
+const PortfolioWallet = ({ stores }): React.ReactNode => {
   const theme = useTheme();
   const strings = useStrings();
   const { walletBalance, ftAssetList, showWelcomeBanner, isTestnet } = usePortfolio();
@@ -16,10 +16,6 @@ const PortfolioWallet = ({ stores }): JSX.Element => {
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(ftAssetList);
-
-  useEffect(() => {
-    setTokenList(ftAssetList);
-  }, [ftAssetList]);
 
   useEffect(() => {
     if (!keyword || showWelcomeBanner) {
@@ -52,10 +48,10 @@ const PortfolioWallet = ({ stores }): JSX.Element => {
     if (lowercaseKeyword.length > 0) sendMetrics();
 
     return () => clearTimeout(timeout);
-  }, [keyword]);
+  }, [keyword, ftAssetList]);
 
   return (
-    <Stack direction="column" spacing={theme.spacing(3)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
+    <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
       <PortfolioHeader
         stores={stores}
         walletBalance={walletBalance || { ada: '0' }}

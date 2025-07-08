@@ -9,7 +9,7 @@ import AddWalletPage from './containers/wallet/AddWalletPage';
 import StakingPage, { StakingPageContentPromise } from './containers/wallet/staking/StakingPage';
 import VotingPage, { VotingPageContentPromise } from './containers/wallet/voting/VotingPage';
 import { ROUTES } from './routes-config';
-import type { StoresMap, StoresProps } from './stores/index';
+import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -42,6 +42,8 @@ import { PortfolioContextProvider } from './UI/features/portfolio/module/Portfol
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
+import { CatalystRegistrationContextProvider } from './UI/features/catalyst-registration/module/CatalystRegistrationContextProvider';
+// $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
@@ -56,9 +58,13 @@ import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import NftsPage from './UI/pages/nfts/NftsPage';
 // $FlowIgnore: suppressing this error
+import CatalystRegistration from './UI/pages/catalyst-registration/CatalystRegistration';
+// $FlowIgnore: suppressing this error
 import NftDetailsPage from './UI/pages/nfts/NftsDetailPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
+// $FlowIgnore: suppressing this error
+import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
 import { ampli } from '../ampli/index';
 // $FlowIgnore: suppressing this error
@@ -192,20 +198,11 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
         <Routes>
           <Route path={ROUTES.ROOT} element={<LoadingPage stores={stores} />} />
           <Route path={ROUTES.NIGHTLY_INFO} element={<NightlyPage stores={stores} />} />
-          <Route
-            path={ROUTES.PROFILE.LANGUAGE_SELECTION}
-            element={<LanguageSelectionPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.PROFILE.COMPLEXITY_LEVEL}
-            element={<ComplexityLevelPage stores={stores} />}
-          />
+          <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} element={<LanguageSelectionPage stores={stores} />} />
+          <Route path={ROUTES.PROFILE.COMPLEXITY_LEVEL} element={<ComplexityLevelPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.TERMS_OF_USE} element={<TermsOfUsePage stores={stores} />} />
           <Route path={ROUTES.PROFILE.URI_PROMPT} element={<UriPromptPage stores={stores} />} />
-          <Route
-            path={ROUTES.PROFILE.OPT_FOR_ANALYTICS}
-            element={<OptForAnalyticsPage stores={stores} />}
-          />
+          <Route path={ROUTES.PROFILE.OPT_FOR_ANALYTICS} element={<OptForAnalyticsPage stores={stores} />} />
           <Route path={ROUTES.STAKING} element={<StakingPage stores={stores} />} />
           <Route element={<AssetsSubpages stores={stores} />}>
             <Route path={ROUTES.ASSETS.ROOT} element={<TokensPageRevamp stores={stores} />} />
@@ -216,8 +213,8 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
-            <Route exact path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route exact path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
@@ -233,6 +230,12 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
             element={<ConnectedWebsitesPage stores={stores} />}
           />
+          <Route element={<DappCenterSubpages stores={stores} />}>
+            <Route
+              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
+              element={<DappCenterPage stores={stores} />}
+            />
+          </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -252,20 +255,14 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.SETTINGS.BLOCKCHAIN} element={<BlockchainSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.TERMS_OF_USE} element={<TermsOfUseSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.WALLET} element={<WalletSettingsPage stores={stores} />} />
-            <Route
-              path={ROUTES.SETTINGS.EXTERNAL_STORAGE}
-              element={<ExternalStorageSettingsPage stores={stores} />}
-            />
+            <Route path={ROUTES.SETTINGS.EXTERNAL_STORAGE} element={<ExternalStorageSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.SUPPORT} element={<SupportSettingsPage stores={stores} />} />
-            <Route
-              path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY}
-              element={<ComplexityLevelSettingsPage stores={stores} />}
-            />
+            <Route path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY} element={<ComplexityLevelSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.ANALYTICS} element={<AnalyticsSettingsPage stores={stores} />} />
 
             <Route path={ROUTES.SETTINGS.ROOT} element={<Navigate to={ROUTES.SETTINGS.GENERAL} />} />
           </Route>
-          <Route element={<SwapSubpages stores={stores}/>}>
+          <Route element={<SwapSubpages stores={stores} />}>
             <Route path={ROUTES.SWAP.ROOT} element={<SwapPage stores={stores} />} />
             <Route path={ROUTES.SWAP.ORDERS} element={<SwapOrdersPage stores={stores} />} />
             <Route path={ROUTES.SWAP.ERROR} element={<PagePreparation stores={stores} />} />
@@ -273,50 +270,31 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.TRANSFER.ROOT} element={<Transfer stores={stores} />} />
           <Route path={ROUTES.SEND_FROM_URI.ROOT} element={<URILandingPage stores={stores} />} />
           <Route path={ROUTES.REVAMP.CATALYST_VOTING} element={<VotingPage stores={stores} />} />
+          <Route element={<CatalystRegistrationSubpages stores={stores} />}>
+            <Route path={ROUTES.CATALYST_REGISTRATION.ROOT} element={<CatalystRegistration stores={stores} />} />
+          </Route>
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
           <Route element={<SwapRevampSubpages stores={stores} />}>
-            <Route
-              path={ROUTES.SWAP_REVAMP.ASSET_SWAP}
-              element={<AssetSwapRevampPage stores={stores} />}
-            />
-            <Route
-              path={ROUTES.SWAP_REVAMP.ORDERS}
-              element={<SwapOrdersRevampPage stores={stores} />}
-            />
+            <Route path={ROUTES.SWAP_REVAMP.ASSET_SWAP} element={<AssetSwapRevampPage stores={stores} />} />
+            <Route path={ROUTES.SWAP_REVAMP.ORDERS} element={<SwapOrdersRevampPage stores={stores} />} />
           </Route>
 
-          <Route element={<GovernanceSubpages stores={stores}/>}>
+          <Route element={<GovernanceSubpages stores={stores} />}>
             <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
-            <Route
-              path={ROUTES.Governance.DELEGATE}
-              element={<GovernanceDelegationFormPage stores={stores} />}
-            />
-            <Route
-              path={ROUTES.Governance.SUBMITTED}
-              element={<GovernanceTransactionSubmittedPage stores={stores} />}
-            />
-            <Route
-              path={ROUTES.Governance.FAIL}
-              element={<GovernanceTransactionFailedPage stores={stores} />}
-            />
+            <Route path={ROUTES.Governance.DELEGATE} element={<GovernanceDelegationFormPage stores={stores} />} />
+            <Route path={ROUTES.Governance.SUBMITTED} element={<GovernanceTransactionSubmittedPage stores={stores} />} />
+            <Route path={ROUTES.Governance.FAIL} element={<GovernanceTransactionFailedPage stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DAPPS} element={<PortfolioDappsPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DETAILS} element={<PortfolioDetailPage stores={stores} />} />
           </Route>
-          <Route
-            path={ROUTES.TX_REVIEW.FAIL}
-            element={<TransactionReviewFailedPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.TX_REVIEW.FAIL}
-            element={<TransactionReviewFailedPage stores={stores} />}
-          />
+          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
+          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
         </Routes>
-
       </Suspense>
     </QueryClientProvider>
   );
@@ -334,11 +312,19 @@ const NftGallerySubPages = ({ stores }) => (
   </NftGalleryContextProvider>
 );
 
-const SwapRevampSubpages = ({ stores }) => (
-  <SwapContextProvider stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
-  </SwapContextProvider>
-);
+const SwapRevampSubpages = ({ stores }) => {
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const { unitOfAccount } = stores.profile;
+  return (
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <SwapContextProvider currentWallet={currentWalletInfo} stores={stores}>
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
+      </SwapContextProvider>
+    </CurrencyProvider>
+  );
+};
 
 const SwapSubpages = ({ stores }) => {
   // const queryClient = new QueryClient();
@@ -354,7 +340,9 @@ const SwapSubpages = ({ stores }) => {
     // <QueryClientProvider client={queryClient}>
     <SwapProvider publicDeriver={stores.wallets.selected}>
       <SwapPageContainer stores={stores}>
-        <Suspense fallback={loader}><Outlet /></Suspense>
+        <Suspense fallback={loader}>
+          <Outlet />
+        </Suspense>
       </SwapPageContainer>
     </SwapProvider>
     // </QueryClientProvider>
@@ -363,7 +351,9 @@ const SwapSubpages = ({ stores }) => {
 
 const SettingsSubpages = ({ stores }) => (
   <Settings stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </Settings>
 );
 
@@ -384,22 +374,40 @@ const PortfolioSubpages = ({ stores }) => {
         openDialogWrapper={openDialogWrapper}
         shouldHideBalance={shouldHideBalance}
       >
-        <Suspense fallback={null}><Outlet /></Suspense>
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </PortfolioContextProvider>
     </CurrencyProvider>
   );
 };
 
-const NFTsSubPages = ({ stores })=> (
+const NFTsSubPages = ({ stores }) => (
   <NFTsWrapper stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </NFTsWrapper>
 );
 
 const AssetsSubpages = ({ stores }) => (
   <AssetsWrapper stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </AssetsWrapper>
+);
+
+const DappCenterSubpages = ({ stores }) => (
+  <DappCenterContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </DappCenterContextProvider>
+);
+
+const CatalystRegistrationSubpages = ({ stores }) => (
+  <CatalystRegistrationContextProvider stores={stores}>
+    <Suspense fallback={null}><Outlet /></Suspense>
+  </CatalystRegistrationContextProvider>
 );
 
 // NEW UI - TODO: to be refactred
@@ -423,22 +431,11 @@ const GovernanceSubpages = ({ stores }) => {
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
         ampli={ampli}
       >
-        <Suspense fallback={null}><Outlet /></Suspense>;
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
+        ;
       </GovernanceContextProvider>
     </CurrencyProvider>
   );
 };
-
-export function wrapDappCenter(dappCenterProps: StoresProps, children: Node): Node {
-  const currentWalletInfo = createCurrrentWalletInfo(dappCenterProps.stores);
-
-  const openDialogWrapper = (dialog): void => {
-    dappCenterProps.stores.uiDialogs.open({ dialog });
-  };
-
-  return (
-    <DappCenterContextProvider currentWallet={currentWalletInfo} openDialogWrapper={openDialogWrapper}>
-      <Suspense fallback={null}>{children}</Suspense>
-    </DappCenterContextProvider>
-  );
-}

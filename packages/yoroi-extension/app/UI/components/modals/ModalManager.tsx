@@ -19,6 +19,7 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
   '& .MuiPaper-root': {
     maxWidth: width,
     height: height,
+    maxHeight: height,
     margin: 0,
   },
   '& .MuiDialogActions-root': {
@@ -27,11 +28,16 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
 }));
 
 export const ModalManager = () => {
-  const { height, width, closeModal, content, title, isOpen, modalId } = useModal();
+  const { height, width, closeModal, onClose, content, title, isOpen, modalId, handleBack } = useModal();
+
+  const modalOnClose = () => {
+    if (typeof onClose === 'function') onClose();
+    closeModal();
+  }
 
   return (
     <BootstrapDialog
-      onClose={closeModal}
+      onClose={modalOnClose}
       aria-labelledby={`${modalId}-dialogWindow-modalWindow`}
       open={isOpen}
       fullWidth
@@ -39,6 +45,24 @@ export const ModalManager = () => {
       height={height}
       id={`${modalId}-dialogWindow-presentation`}
     >
+      {handleBack && (
+        <IconWrapper
+          aria-label="back"
+          icon={Icons.ChevronLeft}
+          color="ds.el_gray_max"
+          borderColor="ds.el_gray_max"
+          asButton
+          buttonProps={{
+            onClick: handleBack,
+            sx: {
+              position: 'absolute',
+              left: 18,
+              top: 22,
+            },
+          }}
+          iconButtonId={`${modalId}-backButton-chevronLeftIconButton`}
+        />
+      )}
       <DialogTitle sx={{ textAlign: 'center', p: '24px', backgroundColor: 'ds.bg_color_max' }} id={`${modalId}-modalTitle-text`}>
         <Typography variant="body1" fontWeight="500" lineHeight="22px" color="ds.gray_900" sx={{ textTransform: 'uppercase' }}>
           {title}
@@ -46,12 +70,13 @@ export const ModalManager = () => {
       </DialogTitle>
       <IconWrapper
         aria-label="close"
-        onClick={closeModal}
+        onClick={modalOnClose}
         icon={Icons.CloseIcon}
         color="ds.el_gray_max"
         borderColor="ds.el_gray_max"
         asButton
         buttonProps={{
+          onClick: closeModal,
           sx: {
             position: 'absolute',
             right: 18,

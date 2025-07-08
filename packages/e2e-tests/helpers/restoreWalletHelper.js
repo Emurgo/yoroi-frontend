@@ -21,13 +21,16 @@ import {
 } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+import * as mocha from 'mocha';
 
 export const restoreWallet = async (
   webdriver,
   logger,
   testWallet,
   shouldBeModalWindow = true,
-  preloadBrowserLocalStorage = true,
+  preloadBrowserLocalStorage = true
 ) => {
   if (preloadBrowserLocalStorage) {
     await preloadBrowserStorage(webdriver, logger);
@@ -55,11 +58,7 @@ export const restoreWallet = async (
   await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet);
 };
 
-export const checkCorrectWalletIsDisplayed = async (
-  webdriver,
-  logger,
-  testWallet
-) => {
+export const checkCorrectWalletIsDisplayed = async (webdriver, logger, testWallet) => {
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
   await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
@@ -98,7 +97,6 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
   await walletDetailsPage.continue();
   const transactionsPage = new TransactionsSubTab(webdriver, logger);
-  await transactionsPage.closeUpdatesModalWindow();
   await transactionsPage.waitPrepareWalletBannerIsClosed();
   const txPageIsDisplayed = await transactionsPage.isDisplayed();
   expect(txPageIsDisplayed).to.be.true;
@@ -160,13 +158,14 @@ export const preloadBrowserStorage = async (
   webdriver,
   logger,
   templateName = 'general',
-  useGeneralStorageInfo = true
+  useGeneralStorageInfo = true,
+  opts = {}
 ) => {
   logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
   expect(state, 'The Add new wallet page is not displayed').to.be.true;
-  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo);
+  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
   logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
 };
 
@@ -217,6 +216,14 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
   logger.info(`--------------------- collectInfo END ---------------------`);
 };
 
+/**
+ * The function loads IndexedDB and local storage for the specified wallet
+ * @param {WebDriver} webdriver 
+ * @param {Logger} logger 
+ * @param {string} testWalletName 
+ * @param {mocha.Context} mochaContext 
+ * @param {boolean} useGeneralStorageInfo 
+ */
 export const prepareWallet = async (
   webdriver,
   logger,

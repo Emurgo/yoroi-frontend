@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Box, styled } from '@mui/material';
 import Tabs from '../../../../components/common/tabs/Tabs';
 import { ReactComponent as RefreshIcon } from '../../../../assets/images/revamp/icons/refresh.inline.svg';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { useSwapForm } from '../../context/swap-form';
 import { useStrings } from '../../common/useStrings';
 

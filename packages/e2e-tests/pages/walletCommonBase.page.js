@@ -9,7 +9,7 @@ import {
 } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
-class WalletCommonBase extends BasePage {
+export default class WalletCommonBase extends BasePage {
   // locators
   //
   // side panel
@@ -178,6 +178,7 @@ class WalletCommonBase extends BasePage {
   }
   async waitPrepareWalletBannerIsClosed() {
     this.logger.info(`WalletCommonBase::waitPrepareWalletBannerIsClosed is called`);
+    await this.customWaitIsPresented(this.prepareWalletBannerLocator, oneSecond, quarterSecond);
     const state = await this.customWaiter(
       async () => {
         const bannersElems = await this.findElements(this.prepareWalletBannerLocator);
@@ -222,6 +223,7 @@ class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::goToStakingTab is called`);
     await this.click(this.stakingTabButtonLocator);
   }
+  // TODO Portfolio should be here
   async goToAssetsTab() {
     this.logger.info(`WalletCommonBase::goToAssetsTab is called`);
     await this.click(this.assetsTabButtonLocator);
@@ -347,7 +349,7 @@ class WalletCommonBase extends BasePage {
   }
   /**
    * Checking a page title
-   * @param {string} expectedPageTitle 
+   * @param {string} expectedPageTitle
    * @returns {Promise<boolean>}
    */
   async titleIsCorrect(expectedPageTitle) {
@@ -356,5 +358,3 @@ class WalletCommonBase extends BasePage {
     return displayedTitle === expectedPageTitle;
   }
 }
-
-export default WalletCommonBase;

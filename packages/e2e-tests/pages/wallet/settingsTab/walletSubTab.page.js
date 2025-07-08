@@ -125,13 +125,13 @@ class WalletSubTab extends SettingsTab {
     await this.waitForElement(this.changePasswordDialogLocator);
 
     await this.click(this.changePasswordCurrentPaswordInputLocator);
-    await this.input(this.changePasswordCurrentPaswordInputLocator, oldPassword);
+    await this.input(this.changePasswordCurrentPaswordInputLocator, oldPassword, true);
 
     await this.click(this.changePasswordNewPaswordInputLocator);
-    await this.input(this.changePasswordNewPaswordInputLocator, newPassword);
+    await this.input(this.changePasswordNewPaswordInputLocator, newPassword, true);
 
     await this.click(this.changePasswordRepeatNewPaswordInputLocator);
-    await this.input(this.changePasswordRepeatNewPaswordInputLocator, repeatNewPassword);
+    await this.input(this.changePasswordRepeatNewPaswordInputLocator, repeatNewPassword, true);
 
     if (confirm) {
       await this.click(this.changePasswordSaveButtonLocator);
