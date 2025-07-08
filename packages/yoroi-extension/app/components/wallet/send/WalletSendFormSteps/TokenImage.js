@@ -72,7 +72,7 @@ export default class TokenImage extends Component<Props, State> {
         }}
       />
     ) : (
-      <img width={width} src={imageUrl} alt={name} loading="lazy" borderRadius="4px" />
+      <img width={width} src={imageUrl} alt={name} loading="lazy" style={{ borderRadius: '4px'}} />
     );
   }
 }
