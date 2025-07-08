@@ -325,7 +325,7 @@ function LabelWithValue({
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
-        sx={{ textDecoration: 'none' }}
+        sx={{ textDecoration: 'none', wordBreak: 'break-all'}}
         id={componentId || 'somewhere-someValue-text'}
       >
         {value}
