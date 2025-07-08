@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ampli } from '../../../../../../ampli/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
@@ -17,7 +17,7 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
   const [isLoading, _] = useState<boolean>(false);
   const [tokenList, setTokenList] = useState(ftAssetList);
 
-  useEffect(() => {
+  useMemo(() => {
     if (!keyword || showWelcomeBanner) {
       setTokenList(ftAssetList);
       return;
