@@ -86,6 +86,10 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
     }
   }
 
+  const disableNext = () => {
+    setEnableNext(false);
+  };
+
   const goBack = () => setCurrentStep(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
 
   function handleClose() {
@@ -97,15 +101,10 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
   const { length } = mode ?? fail('No mnemonic length is selected!');
 
   return (
-    <Stack alignItems="center" justifyContent="center" id='enterRecoveryPhraseStepComponent'>
-      <Stack
-        direction="column"
-        alignItems="left"
-        justifyContent="center"
-        maxWidth={length === 15 ? '636px' : '760px'}
-      >
+    <Stack alignItems="center" justifyContent="center" id="enterRecoveryPhraseStepComponent">
+      <Stack direction="column" alignItems="left" justifyContent="center" maxWidth={length === 15 ? '636px' : '760px'}>
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedMessage {...messages.description} values={{ strong }}/>
+          <FormattedMessage {...messages.description} values={{ strong }} />
         </Typography>
 
         <RestoreRecoveryPhraseForm
@@ -113,6 +112,7 @@ function EnterRecoveryPhraseStep(props: Props & Intl): Node {
           isValidMnemonic={checkMnemonic}
           onSubmit={handleSubmit}
           initialRecoveryPhrase={initialRecoveryPhrase}
+          disableNext={disableNext}
         />
 
         <Box mt="10px">
