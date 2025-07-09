@@ -70,7 +70,7 @@ type State = {|
 |};
 
 const localStorage = new LocalStorageApi();
-const surveyDismissedFlag = createStorageFlag('SUERVEY_DISMISSED', false);
+const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
