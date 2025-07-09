@@ -38,7 +38,7 @@ export const SurveyBanner = (props: { onClose: () => void, }) => {
         sx: {
           height: '154px',
           zIndex: 20,
-          marginRight: '100px',
+          marginRight: '5px',
         },
       }}
     />
