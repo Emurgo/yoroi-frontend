@@ -1,6 +1,6 @@
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
-import { SurveyIllustration } from './SurveyIllustration';
+import { ReactComponent as SurveyIllustration } from './survey-illustration.svg';
 
 export const SurveyBanner = (props: { onClose: () => void, }) => {
   const { surveyTitle, surveyDescription, surveyButton } = useStrings();
