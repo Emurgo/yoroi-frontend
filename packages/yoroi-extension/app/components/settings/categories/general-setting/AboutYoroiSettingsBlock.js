@@ -159,6 +159,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: 
   const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+  const displaySpecialInfo = environment.isDev() || environment.isNightly();
   const getNetworkValue = () => {
     const networkId = wallet && wallet.networkId;
     switch (networkId) {
@@ -176,7 +177,6 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: 
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
       if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
-        console.log('should open testnet info modal')
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
@@ -248,20 +248,11 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: 
           />
         )}
 
-        {pushSubscription && (
+        {pushSubscription && displaySpecialInfo && (
           <>
-            <LabelWithValue
-              label="Push endpoint:"
-              value={pushSubscription.endpoint}
-            />
-            <LabelWithValue
-              label="Push key:"
-              value={pushSubscription.keys.p256dh}
-            />
-            <LabelWithValue
-              label="Push auth:"
-              value={pushSubscription.keys.auth}
-            />
+            <LabelWithValue label="Push endpoint:" value={pushSubscription.endpoint} />
+            <LabelWithValue label="Push key:" value={pushSubscription.keys.p256dh} />
+            <LabelWithValue label="Push auth:" value={pushSubscription.keys.auth} />
           </>
         )}
       </Box>
@@ -324,7 +315,7 @@ function LabelWithValue({
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
-        sx={{ textDecoration: 'none' }}
+        sx={{ textDecoration: 'none', wordBreak: 'break-all' }}
         id={componentId || 'somewhere-someValue-text'}
       >
         {value}

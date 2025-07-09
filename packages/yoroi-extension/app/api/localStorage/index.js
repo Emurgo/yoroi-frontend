@@ -38,6 +38,7 @@ const storageKeys = {
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
+  MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -128,11 +129,14 @@ export default class LocalStorageApi {
 
   // ========== Portfolio FIAT Pair ========== //
 
-  getPortfolioFiatPair: number => Promise <?string> = networkId => getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
+  getPortfolioFiatPair: number => Promise<?string> = networkId =>
+    getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-  setSetPortfolioFiatPair: (number, string) => Promise <void> = (networkId, pair) => setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+  setSetPortfolioFiatPair: (number, string) => Promise<void> = (networkId, pair) =>
+    setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-  unsetPortfolioFiatPair: number => Promise <void> = networkId => removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
+  unsetPortfolioFiatPair: number => Promise<void> = networkId =>
+    removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
   // ========== Notifications Setting ========== //
 
@@ -149,6 +153,13 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
+  // ========== Midnight Modal ========== //
+  getMidnightModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+
+  setMidnightModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED, closed);
+
+  unsetMidnightModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
@@ -156,14 +167,16 @@ export default class LocalStorageApi {
 
   unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
-// ========== Testnet Modal Info  ========== //
-getTestnetModalDisplayed: void => Promise<boolean> = async () => (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
+  // ========== Testnet Modal Info  ========== //
+  getTestnetModalDisplayed: void => Promise<boolean> = async () =>
+    (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
 
-setTestnetModalDisplayed: boolean => Promise<void> = accepted => setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
+  setTestnetModalDisplayed: boolean => Promise<void> = accepted =>
+    setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
 
-unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
+  unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
 
-// ========== Theme Migration ========== //
+  // ========== Theme Migration ========== //
 
   getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
     (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
@@ -461,6 +474,7 @@ unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storag
     await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   };
 
+
   getPushNotificationMetadata: () => Promise<PushNotificationMetadata> = async () => {
     const raw = await getLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA);
     if (!raw) {
@@ -473,7 +487,8 @@ unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storag
     await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
   }
 
-  async reset(): Promise < void> {
+  async reset(): Promise<void> {
+
     await this.unsetUserLocale();
     await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();

@@ -39,12 +39,12 @@ interface Props {
   walletBalance: WalletBalance;
   setKeyword: (keyword: string) => void;
   isLoading: boolean;
-  tooltipTitle: JSX.Element;
+  tooltipTitle: React.ReactNode;
   stores: any;
 }
 
 const PortfolioHeader = observer(
-  ({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): JSX.Element => {
+  ({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
     const [loading, setLoading] = React.useState(false);
     const strings = useStrings();
     const theme: any = useTheme();
@@ -105,15 +105,15 @@ const PortfolioHeader = observer(
           const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
           if (portfolioStoragePairObj !== undefined) {
             changeUnitOfAccountPair({
-              from: {name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value},
-              to: {name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice},
+              from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
+              to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
             });
           } else {
             const pair = {
-              from: {name: primaryTokenInfo.name, value: walletBalance?.ada || '0'},
+              from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
               to: {
                 name: unitOfAccount || DEFAULT_FIAT_PAIR,
-                value: !showADA ? walletBalance.ada : totalTokenPrice || '0'
+                value: !showADA ? walletBalance.ada : totalTokenPrice || '0',
               },
             };
             changeUnitOfAccountPair(pair);
@@ -134,7 +134,7 @@ const PortfolioHeader = observer(
     return (
       <Stack direction="row" justifyContent="space-between">
         <Stack direction="column">
-          <Stack direction="row" spacing={theme.spacing(0.5)} alignItems="flex-end">
+          <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end">
             {isLoading ? (
               <Skeleton width="146px" height="24px" />
             ) : (
@@ -145,12 +145,12 @@ const PortfolioHeader = observer(
               </Typography>
             )}
             <CurrencyDisplay
-              from={showADA ? primaryTokenInfo.name : (unitOfAccount ?? DEFAULT_FIAT_PAIR)}
+              from={showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR}
               handleCurrencyChange={handleCurrencyChange}
             />
           </Stack>
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(1) }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }}>
             {loading || isLoading ? (
               <Skeleton width="64px" height="13px" />
             ) : (
@@ -202,7 +202,7 @@ const CurrencyDisplay = ({ from, handleCurrencyChange }) => (
 );
 
 const Skeletons = ({ theme }) => (
-  <Stack direction="row" alignItems="center" spacing={theme.spacing(1)} sx={{ marginLeft: theme.spacing(2) }}>
+  <Stack direction="row" alignItems="center" spacing={theme.spacing(8)} sx={{ marginLeft: theme.spacing(16) }}>
     <Skeleton width="47px" height="20px" />
     <Skeleton width="65px" height="20px" />
   </Stack>

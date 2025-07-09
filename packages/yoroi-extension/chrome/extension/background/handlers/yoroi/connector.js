@@ -188,7 +188,7 @@ export const UserSignConfirm: HandlerType<
             throw new Error('missing password or witness from connector dialog');
           }
           resp = { ok: signedTxWitnessSetHex };
-        } catch (error) {
+        } catch (_error) {
           resp = { err: 'transaction signing failed' };
         }
         if (responseData.continuationData.type !== 'cardano-tx') {

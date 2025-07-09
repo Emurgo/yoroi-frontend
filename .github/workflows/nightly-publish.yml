@@ -61,7 +61,7 @@ jobs:
     - name: Apply new version to package-lock
       working-directory: ./packages/yoroi-extension
       run: |
-        npm install
+        npm i --legacy-peer-deps
 
     - name: Build Nightly app
       working-directory: ./packages/yoroi-extension
@@ -75,17 +75,17 @@ jobs:
         client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
         client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
         refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
-        extension_id: '32-CHAR EXTENSION ID' # needs clarification
+        extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
         zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
 
     - name: Commit changes
       working-directory: ./packages/yoroi-extension
       run: |
-        git config --global user.name "github-actions[bot]" # needs clarification
-        git config --global user.email "github-actions[bot]@users.noreply.github.com" # needs clarification
+        git config --global user.name "emurgo-rnd"
+        git config --global user.email "rnd@emurgo.io"
         git add package*.json
         git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
         git push
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.RND_GITHUB_TOKEN }}
   

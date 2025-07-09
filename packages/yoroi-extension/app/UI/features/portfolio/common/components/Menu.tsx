@@ -11,7 +11,7 @@ const Menu = ({ options, onItemClick, isActiveItem }: Props) => {
   const theme: any = useTheme();
 
   return (
-    <Stack direction="row" spacing={theme.spacing(3)} sx={{ height: '3rem' }}>
+    <Stack direction="row" spacing={theme.spacing(24)} sx={{ height: '3rem' }}>
       {options
         .filter(item => item.showTab)
         .map((option, index) => (

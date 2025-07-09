@@ -1,5 +1,5 @@
 //@flow
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import type { Node } from 'react';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { PRICE_PRECISION } from '../../../../components/swap/common';

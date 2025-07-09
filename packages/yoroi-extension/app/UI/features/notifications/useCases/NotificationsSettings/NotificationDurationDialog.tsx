@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Dialog from '../../../../../components/widgets/Dialog';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { useState } from 'react';
@@ -18,9 +18,14 @@ const messages = defineMessages({
     id: 'notifications.settings.duration.line2',
     defaultMessage: '!!!Adjust the display duration of in-app notifications to suit your preferences.',
   },
+  manual: {
+    id: 'notifications.settings.manualLimit',
+    defaultMessage: '!!!Enter a value from 1 to 60.',
+  },
 });
 
 const defaultDurations = [2, 4, 6, 8, 10, 12].map(String);
+const MAX_ALLOWED_DURATION = 60;
 
 interface Props {
   onClose: () => void,
@@ -43,6 +48,14 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
       styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
+      dialogActions={[{
+        label: intl.formatMessage(globalMessages.apply),
+        onClick: () => onSetDuration(Number(currentDuration)),
+        primary: true,
+        disabled: !/^[1-9]\d?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
+      }]}
+      forceBottomDivider
+      forceTopDivider
     >
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
         <Box sx={{ bg: 'ds.bg_color_max' }}>
@@ -55,7 +68,7 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
             {intl.formatMessage(messages.line2)}
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="flex-start" mb="32px">
+        <Box display="flex" justifyContent="flex-start">
           <Tabs
             tabs={defaultDurations
               .map(val => ({
@@ -134,17 +147,11 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
             value={currentDuration}
           />
         </Box>
-
-        <Button
-          sx={{ marginTop: 'auto' }}
-          disabled={!/^[1-9]\d*(\.\d+)?$/.test(currentDuration)}
-          fullWidth
-          onClick={() => onSetDuration(Number(currentDuration)) }
-          variant="contained"
-        >
-          {intl.formatMessage(globalMessages.apply)}
-        </Button>
-
+        {isManual && (
+          <Typography variant="body2" color="ds.text_gray_low">
+            {intl.formatMessage(messages.manual)}
+          </Typography>
+        )}
       </Box>
     </Dialog>
   );

@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { useSwap } from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import {
   FormattedActualPrice,
   FormattedLimitPrice,

@@ -20,7 +20,7 @@ interface Props {
 }
 
 const HeaderSection = observer(
-  ({ tokenInfo, stores }: Props): JSX.Element => {
+  ({ tokenInfo, stores }: Props): React.ReactNode => {
     const theme: any = useTheme();
     const strings = useStrings();
     const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
@@ -71,13 +71,13 @@ const HeaderSection = observer(
     const ptValue = accountPair?.from.name === primaryTokenInfo.name ? accountPair?.to.value : accountPair?.from.value;
 
     return (
-      <Stack direction="column" spacing={theme.spacing(2)} sx={{ padding: theme.spacing(3) }}>
+      <Stack direction="column" spacing={theme.spacing(16)} sx={{ padding: theme.spacing(24) }}>
         <Typography variant="h5" fontWeight="500" color="ds.gray_900">
           {strings.balance}
         </Typography>
 
-        <Stack direction="column" spacing={theme.spacing(0.5)}>
-          <Stack direction="row" spacing={theme.spacing(0.25)} alignItems="flex-start">
+        <Stack direction="column" spacing={theme.spacing(4)}>
+          <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
             <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
               <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
             </Typography>
@@ -86,7 +86,7 @@ const HeaderSection = observer(
               fontWeight="500"
               color="ds.text_gray_medium"
               sx={{
-                paddingTop: `${theme.spacing(1.3)}`,
+                paddingTop: `${theme.spacing(18)}`,
               }}
             >
               {tokenInfo.info.name}

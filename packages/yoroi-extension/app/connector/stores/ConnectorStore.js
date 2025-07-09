@@ -338,7 +338,7 @@ export default class ConnectorStore extends Store<StoresMap> {
             this.hwWalletError = new convertToLocalizableLedgerError(error);
             this.isHwWalletErrorRecoverable = true;
           });
-          return;
+          throw error;
         }
       } else {
         throw new Error('Not expected to reach here. Unexpectedly wallet type');
