@@ -8,8 +8,8 @@ import { v4 as uuid } from 'uuid';
 
 interface Props
   extends Omit<ReactTooltipProps, 'id' | 'content' | 'offset' | 'open' | 'close' | 'activeAnchor' | 'place' | 'isOpen'> {
-  children: JSX.Element;
-  title: JSX.Element | string;
+  children: React.ReactNode;
+  title: React.ReactNode | string;
   offset?: number;
   open?: ReactTooltipProps['open'];
   close?: ReactTooltipProps['close'];
@@ -17,6 +17,7 @@ interface Props
   place?: ReactTooltipProps['place'];
   isOpen?: ReactTooltipProps['isOpen'];
   positionStrategy?: PositionStrategy;
+  arrow?: boolean;
 }
 
 export const Tooltip = ({
@@ -24,7 +25,7 @@ export const Tooltip = ({
   title,
   place = 'bottom',
   ...props
-}: Props): JSX.Element => {
+}: Props): React.ReactNode => {
   const theme: any = useTheme();
   const id = uuid();
 

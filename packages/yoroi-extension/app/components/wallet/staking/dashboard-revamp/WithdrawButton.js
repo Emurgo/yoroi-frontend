@@ -68,7 +68,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       // ampli.claimAdaTransactionSubmitted({
       //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
       // });
-    } catch (error) {
+    } catch (_error) {
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.FAIL);
     }
@@ -93,7 +93,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
 
 const OperationsDetails = () => {
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">Staking</Typography>
         <Typography color="ds.text_gray_medium">Rewards withdrawal</Typography>

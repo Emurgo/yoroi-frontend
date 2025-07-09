@@ -90,7 +90,7 @@ export const OverviewTab = ({ receiverCustomTitle = null, tx }) => {
   );
 
   return (
-    <Stack sx={{ padding: '24px' }}>
+    <Stack sx={{ padding: '24px 0 24px 24px' }}>
       {warningComp ? warningComp : <></>}
       <Stack direction="column" gap="8px" mt={warningComp ? '24px' : '0px'}>
         <InfoInline label="Wallet" value={waletInfoDisplay} />

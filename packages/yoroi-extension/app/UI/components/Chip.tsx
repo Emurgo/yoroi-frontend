@@ -7,12 +7,12 @@ export const ChipTypes = Object.freeze({
 });
 
 interface Props {
-  label: JSX.Element;
+  label: React.ReactNode;
   type: typeof ChipTypes[keyof typeof ChipTypes];
   sx?: any;
 }
 
-export const Chip = ({ label, type, sx, ...props }: Props): JSX.Element => {
+export const Chip = ({ label, type, sx, ...props }: Props): React.ReactNode => {
   const theme: any = useTheme();
 
   const palettes = {

@@ -5,7 +5,7 @@ import { ElementLocator } from '../../locator.js';
 import { NO_NFTS_ADDED, NO_NFTS_FOUND } from '../../../helpers/messages.js';
 import NftDetails from './nftDetails.page.js';
 
-class NftGalleryTab extends WalletCommonBase {
+export default class NftGalleryTab extends WalletCommonBase {
   // locators
   /** @type {ElementLocator} */
   nftsCountTextLocator = {
@@ -59,8 +59,8 @@ class NftGalleryTab extends WalletCommonBase {
    */
   allNftsLocator = {
     locator: '//div[starts-with(@id, "nftsList:nft_") and contains(@id, "-component-button")]',
-    method: 'xpath'
-  }
+    method: 'xpath',
+  };
   /**
    * Getting locator of a NFT by its name
    * @param {number} nftIndex
@@ -108,7 +108,7 @@ class NftGalleryTab extends WalletCommonBase {
       quarterSecond
     );
     const searchIsDisplayedPromise = this.customWaitIsPresented(
-      this.nftsCountTextLocator,
+      this.searchInputLocator,
       fiveSeconds,
       quarterSecond
     );
@@ -173,6 +173,19 @@ class NftGalleryTab extends WalletCommonBase {
   async setFourColumnsView() {
     this.logger.info(`NftGalleryTab::setFourColumnsView is called`);
     await this.click(this.fourColumnViewBtnLocator);
+    await this.hover(this.nftsCountTextLocator);
+    await this.sleep(quarterSecond);
+  }
+  async fourColumnsViewIsSelected() {
+    this.logger.info(`NftGalleryTab::fourColumnsViewIsSelected is called`);
+    const backgroundValue = await this.getCssValue(
+      this.fourColumnViewBtnLocator,
+      'background-color'
+    );
+    this.logger.info(
+      `NftGalleryTab::fourColumnsViewIsSelected. backgroundValue: ${backgroundValue}`
+    );
+    return backgroundValue !== 'rgba(0, 0, 0, 0)';
   }
   /**
    * Selecting appearance NFTs in 6 rows
@@ -181,6 +194,19 @@ class NftGalleryTab extends WalletCommonBase {
   async setSixColumnsView() {
     this.logger.info(`NftGalleryTab::setSixColumnsView is called`);
     await this.click(this.sixColumnViewBtnLocator);
+    await this.hover(this.nftsCountTextLocator);
+    await this.sleep(quarterSecond);
+  }
+  async sixColumnsViewIsSelected() {
+    this.logger.info(`NftGalleryTab::sixColumnsViewIsSelected is called`);
+    const backgroundValue = await this.getCssValue(
+      this.sixColumnViewBtnLocator,
+      'background-color'
+    );
+    this.logger.info(
+      `NftGalleryTab::sixColumnsViewIsSelected. backgroundValue: ${backgroundValue}`
+    );
+    return backgroundValue !== 'rgba(0, 0, 0, 0)';
   }
   /**
    * Searching for a NFT
@@ -198,12 +224,13 @@ class NftGalleryTab extends WalletCommonBase {
    */
   async clearSearch() {
     this.logger.info(`NftGalleryTab::clearSearch is called.`);
-    await this.waitPresentedAndAct(
-      this.clearSearchBtnLocator,
-      async () => {
-        await this.click(this.clearSearchBtnLocator);
-      }
-    );
+    await this.waitPresentedAndAct(this.clearSearchBtnLocator, async () => {
+      await this.click(this.clearSearchBtnLocator);
+      await this.sleep(quarterSecond);
+    });
+  }
+  async _getAllNfts() {
+    return await this.findElements(this.allNftsLocator);
   }
   /**
    * Counting displayed NFTs
@@ -211,7 +238,7 @@ class NftGalleryTab extends WalletCommonBase {
    */
   async countShownNfts() {
     this.logger.info(`NftGalleryTab::countShownNfts is called.`);
-    const allNftComponents = await this.findElements(this.allNftsLocator);
+    const allNftComponents = await this._getAllNfts();
 
     return allNftComponents.length;
   }
@@ -237,11 +264,11 @@ class NftGalleryTab extends WalletCommonBase {
   /**
    * Selecting a NFT by its name
    * @param {string} nftName
-   * @returns {NftDetails}
+   * @returns {Promise<NftDetails>}
    */
   async selectNftByName(nftName) {
     this.logger.info(`NftGalleryTab::selectNftByName is called. NFT's name: ${nftName}`);
-    const allNftComponents = await this.findElements(this.allNftsLocator);
+    const allNftComponents = await this._getAllNfts();
     for (let index = 0; index < allNftComponents.length; index++) {
       const receivedNftName = await this.getText(this.getNftNameLocator(index));
       if (receivedNftName === nftName) {
@@ -251,6 +278,45 @@ class NftGalleryTab extends WalletCommonBase {
     }
     throw new Error(`Suitable NFT with name "${nftName}" is not found`);
   }
+  /**
+   * Getting the nft card size
+   * @param {number} nftIndex
+   * @returns {{height: number, width: number}}
+   */
+  async getNftCardSize(nftIndex) {
+    this.logger.info(`NftGalleryTab::getNftCardSize is called. NFT's index: ${nftIndex}`);
+    const buttonLocator = this.getNftButtonLocator(nftIndex);
+    return this.getSize(buttonLocator);
+  }
+  /**
+   * Getting the nft's image link by NFT's index
+   * @param {number} nftIndex
+   * @returns {Promise<string>}
+   */
+  async getImageLinkByIndex(nftIndex) {
+    this.logger.info(`NftGalleryTab::getImageLinkByIndex is called. NFT's index: ${nftIndex}`);
+    const nftImageLocator = this.getNftImageLocator(index);
+    const result = await this.getAttribute(nftImageLocator, 'src');
+    this.logger.info(`NftGalleryTab::getImageLinkByIndex. Result: ${result}`);
+    return result;
+  }
+  /**
+   * Getting the nft's image link by NFT's name
+   * @param {string} nftName
+   * @returns {Promise<string>}
+   */
+  async getImageLinkByName(nftName) {
+    this.logger.info(`NftGalleryTab::getImageLinkByName is called. NFT's name: ${nftName}`);
+    const allNftComponents = await this._getAllNfts();
+    for (let index = 0; index < allNftComponents.length; index++) {
+      const receivedNftName = await this.getText(this.getNftNameLocator(index));
+      if (receivedNftName === nftName) {
+        const nftImageLocator = this.getNftImageLocator(index);
+        const result = await this.getAttribute(nftImageLocator, 'src');
+        this.logger.info(`NftGalleryTab::getImageLinkByName. Result: ${result}`);
+        return result;
+      }
+    }
+    throw new Error(`Suitable NFT with name "${nftName}" is not found`);
+  }
 }
-
-export default NftGalleryTab;

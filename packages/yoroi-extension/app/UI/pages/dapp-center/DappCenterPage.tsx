@@ -3,7 +3,6 @@ import DappCenterLayout from './layout';
 
 type Props = {
   stores: any;
-  actions: any;
 };
 
 const DappCenterPage = (props: Props) => {

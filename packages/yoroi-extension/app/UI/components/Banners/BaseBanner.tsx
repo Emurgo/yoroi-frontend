@@ -14,10 +14,10 @@ interface BaseBannerProps {
   onClose: () => void;
   title: string | React.ReactNode;
   description: string | React.ReactNode;
-  buttonText: string | React.ReactNode;
-  buttonProps: ButtonProps;
-  illustration: React.ReactNode;
-  illustrationProps: StackProps;
+  buttonText?: string | React.ReactNode;
+  buttonProps?: ButtonProps;
+  illustration?: React.ReactNode;
+  illustrationProps?: StackProps;
   displayIllustration?: boolean;
 }
 
@@ -39,7 +39,7 @@ export const BaseBanner = ({
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative', flex: 1 }}>
       <Stack sx={{ position: 'absolute', zIndex: 20, right: 10, top: 10 }}>
         <IconWrapper
-          onClick={handleClose}
+          buttonProps={{ onClick: handleClose }}
           icon={Icons.CloseCircleIcon}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
@@ -47,13 +47,17 @@ export const BaseBanner = ({
         />
       </Stack>
       <Stack direction="column" p="16px" alignItems="flex-start">
-        <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
-          {title}
-        </Typography>
-        <Typography variant="body1" mt="8px" mb="24px" color="ds.gray_max">
+        {typeof title === 'string' ? (
+          <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
+            {title}
+          </Typography>
+        ) : (
+          title
+        )}
+        <Typography variant="body1" mt="8px" mb={buttonText ? '24px' : '0px'} color="ds.gray_max">
           {description}
         </Typography>
-        <Button {...buttonProps}>{buttonText}</Button>
+        {buttonText && <Button {...buttonProps}>{buttonText}</Button>}
       </Stack>
       {displayIllustration && (
         <Stack height={125} {...illustrationProps}>

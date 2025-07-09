@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import  { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';
@@ -11,7 +11,7 @@ type Props = {
   children: ReactNode;
 };
 
-const SwapLayout = ({ stores, children }: Props): JSX.Element => {
+const SwapLayout = ({ stores, children }: Props): React.ReactNode => {
   const { isTestnet } = stores.wallets.selectedOrFail;
   const location = useLocation();
 

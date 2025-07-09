@@ -273,8 +273,8 @@ export const diffIsLessPerc = (valueA, valueB, percDiff) => {
 
 /**
  * Getting a JS object from json files stored in the snapshots folder
- * @param {string} dbSnapshotName 
- * @param {boolean} useGeneralStorageInfo 
+ * @param {string} dbSnapshotName
+ * @param {boolean} useGeneralStorageInfo
  * @returns {Object}
  */
 export const getSnapshotObjectFromJSON = (dbSnapshotName, useGeneralStorageInfo) => {
@@ -301,4 +301,13 @@ export const getCurrenciesPrices = async () => {
   }
 };
 
-export const filterTxs = (startDate, endDate) => {};
+/**
+ * Getting a random item from the array
+ * @template T - Type of an element of the array
+ * @param {T[]} arr - Array of T elements
+ * @returns {T} - A random element of T type
+ */
+export const getRandomItem = arr => {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+};
