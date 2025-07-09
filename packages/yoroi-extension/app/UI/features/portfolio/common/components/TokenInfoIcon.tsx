@@ -69,7 +69,7 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
       }}
     />
   );
-};;;;;;;
+}
 
 const StyledIconBox = styled(Box, {
   shouldForwardProp: prop => prop !== 'size' && prop !== 'bg',
