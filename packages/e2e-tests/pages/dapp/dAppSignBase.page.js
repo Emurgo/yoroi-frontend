@@ -47,7 +47,7 @@ class DAppSignBase extends DAppBase {
   async enterPassword(password) {
     this.logger.info(`DAppSignBase::enterPassword is called`);
     await this.waitForElement(this.passwordInputLocator);
-    await this.input(this.passwordInputLocator, password);
+    await this.input(this.passwordInputLocator, password, true);
   }
   async cancelSigning() {
     this.logger.info(`DAppSignBase::cancelSigning is called`);

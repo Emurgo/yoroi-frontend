@@ -49,3 +49,44 @@ export type YoroiMetadata = {
 };
 
 export type YoroiNftModerationStatus = 'consent' | 'blocked' | 'approved' | 'pending' | 'manual_review';
+
+
+export type YoroiRemoteConfig = {
+  pushLinkKeys?: {
+    internal?: Record<string, any>;
+    external?: Record<string, any>;
+  };
+  banners?: {
+    midnightAnnouncement?: {
+      display: boolean;
+    };
+  };
+  popups?: {
+    midnightDistribution?: {
+      display: boolean;
+    };
+  };
+  dapps?: {
+    recommended: {
+      id: string;
+      name: string;
+      description: string;
+      category: string;
+      logo: string;
+      uri: string;
+      origins: string[];
+      isSingleAddress?: boolean;
+    }[];
+    banned: string[];
+    filters?: Record<string, string[]>;
+  };
+  swap?: {
+    initialPair: {
+      tokenIn: string;
+      tokenOut: string;
+    };
+    excludedTokens: string[];
+    verifiedTokens: string[];
+    partners: Record<string, string>;
+  };
+};

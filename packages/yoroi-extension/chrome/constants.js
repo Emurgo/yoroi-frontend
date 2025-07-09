@@ -47,7 +47,7 @@ export function genCSP(request: {|
   connectSrc.push('https://onchain2.muesliswap.com/');
   connectSrc.push('https://aggregator-v2.muesliswap.com/');
   connectSrc.push('https://daehx1qv45z7c.cloudfront.net/');
-  connectSrc.push('https://api-us.dexhunterv3.app/swap/tokens');
+  connectSrc.push('https://api-us.dexhunterv3.app/');
   connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
   connectSrc.push('https://*.yoroiwallet.com');
 
