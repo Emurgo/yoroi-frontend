@@ -8,9 +8,11 @@ import { noop } from '../../../../../coreUtils'
 
 type Props = {
   selectedWalletId: number;
+  openDurationDialog: () => void;
+  duration: number;
 }
 
-const NotificationsSettings = ({ selectedWalletId }: Props) => {
+const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration }: Props) => {
   const strings = useStrings();
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
 
@@ -72,6 +74,61 @@ const NotificationsSettings = ({ selectedWalletId }: Props) => {
           gap: '16px'
         }}
       />
+
+      <Box
+        component="fieldset"
+        sx={{
+          border: '1px solid',
+          borderColor: 'grayscale.400',
+          borderRadius: '8px',
+          p: '16px',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          justifyContent: 'start',
+          position: 'relative',
+          bgcolor: 'ds.bg_color_max',
+          columnGap: '6px',
+          rowGap: '8px',
+          maxHeight: '56px',
+          width: '506px', /* to be consistent with components/wallet/settings/WalletNameSetting.js */
+          mt: '24px',
+        }}
+      >
+        <Box
+          component="legend"
+          sx={{
+            top: '-7px',
+            left: '16px',
+            position: 'absolute',
+            px: '4px',
+            bgcolor: 'ds.bg_color_max',
+            color: 'ds.text_gray_medium',
+          }}
+        >
+          {strings.duration}
+        </Box>
+
+        <Typography
+          sx={{
+            appearance: 'none',
+            border: '0',
+            outline: 'none',
+            '::placeholder': { color: 'grayscale.600' },
+          }}
+          component="input"
+          type="text"
+          variant="body1"
+          color="ds.text_gray_medium"
+          placeholder="0"
+          bgcolor="ds.bg_color_max"
+          value={strings.durationDescription(duration)}
+          onClick={(event) => {
+            event.currentTarget.blur();
+            openDurationDialog();
+          }}
+        />
+      </Box>
+
     </Box>
   );
 };

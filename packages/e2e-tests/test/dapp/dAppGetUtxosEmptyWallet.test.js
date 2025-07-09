@@ -8,7 +8,11 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { getTestWalletName } from '../../helpers/constants.js';
-import { collectInfo, createWallet } from '../../helpers/restoreWalletHelper.js';
+import {
+  collectInfo,
+  createWallet,
+  preloadBrowserStorage,
+} from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getUtxos, empty wallet', function () {
@@ -35,6 +39,7 @@ describe('dApp, getUtxos, empty wallet', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      await preloadBrowserStorage(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
