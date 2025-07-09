@@ -38,63 +38,64 @@ export const AssetInfoInRow = React.memo(
     const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
     const decimals = isPrimary ? primaryTokenInfo.decimals : token.decimals;
     const { openModal } = useModal();
+  const formatId = (id?: string | null) => (id === '' ? '.' : id);
 
-    let totalPrice: string | undefined;
+  let totalPrice: string | undefined;
 
-    if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
-      try {
-        const quantityBigInt = bigNumberToBigInt(token.quantity);
-        const activityBN = new BigNumber(primaryTokenActivity.toString());
+  if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
+    try {
+      const quantityBigInt = bigNumberToBigInt(token.quantity);
+      const activityBN = new BigNumber(primaryTokenActivity.toString());
 
-        totalPrice = atomicBreakdown(quantityBigInt, decimals).bn.times(tokenPrice).times(activityBN).toFormat(decimals);
-      } catch (err) {
-        console.error('Failed to calculate totalPrice:', err);
-      }
+      totalPrice = atomicBreakdown(quantityBigInt, decimals).bn.times(tokenPrice).times(activityBN).toFormat(decimals);
+    } catch (err) {
+      console.error('Failed to calculate totalPrice:', err);
     }
+  }
 
-    const openTokenInfo = () => {
-      openModal({
-        title: 'Asset details',
-        content: <TokenInfoModal token={token} />,
-        height: '624px',
-        width: '612px',
-      });
-    };
+  const openTokenInfo = () => {
+    openModal({
+      title: 'Asset details',
+      content: <TokenInfoModal token={token} />,
+      height: '624px',
+      width: '612px',
+    });
+  };
 
-    return (
-      <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
-        <Stack direction="row" alignItems="center" {...atoms.gap_lg}>
-          <TokenInfoIcon info={{ id: token.id, policy: token?.fingerprint, name: token?.name }} size="md" />
-          <Stack direction="column" justifyContent="space-between">
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {token.name}
-            </Typography>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {direction === ASSET_DIRECTION_IN ? token.name : token.fingerprint}
-            </Typography>
-          </Stack>
+  return (
+    <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
+      <Stack direction="row" alignItems="center" {...atoms.gap_lg}>
+        <TokenInfoIcon info={{ id: formatId(token.id), policy: token?.fingerprint, name: token?.name }} size="md" />
+        <Stack direction="column" justifyContent="space-between">
+          <Typography variant="body1" color="ds.text_gray_medium">
+            {token.name}
+          </Typography>
+          <Typography variant="body2" color="ds.text_gray_low">
+            {direction === ASSET_DIRECTION_IN ? token.name : token.fingerprint}
+          </Typography>
         </Stack>
+      </Stack>
 
-        {direction === ASSET_DIRECTION_IN ? (
-          <Stack direction="column" alignItems="flex-end">
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {token.formatedAmount} {token.name}
-            </Typography>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {totalPrice} {currency}
-            </Typography>
-          </Stack>
-        ) : (
-          <IconWrapper
-            icon={Icons.InfoCircle}
-            onClick={e => {
-              e.stopPropagation(); // 🔥 prevent triggering the row click
-              openTokenInfo();
-            }}
-          />
-        )}
-      </RowWrapper>
-    );
+      {direction === ASSET_DIRECTION_IN ? (
+        <Stack direction="column" alignItems="flex-end">
+          <Typography variant="body1" color="ds.text_gray_medium">
+            {token.formatedAmount} {token.name}
+          </Typography>
+          <Typography variant="body2" color="ds.text_gray_low">
+            {totalPrice} {currency}
+          </Typography>
+        </Stack>
+      ) : (
+        <IconWrapper
+          icon={Icons.InfoCircle}
+          onClick={e => {
+            e.stopPropagation(); // 🔥 prevent triggering the row click
+            openTokenInfo();
+          }}
+        />
+      )}
+    </RowWrapper>
+  );
   }
 );
 

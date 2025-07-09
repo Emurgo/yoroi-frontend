@@ -150,6 +150,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   useEffect(() => {
     if (!state.needsNewEstimate) return;
+    action({ type: SwapAction.EstimateError, value: { message: '', status: 0, responseData: null } });
 
     if (
       state.tokenInInput.tokenId === undefined ||

@@ -44,7 +44,7 @@ export const SelectAssetTo = () => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { swapForm, primaryTokenInfo, tokenInfoList, loadingTokenList } = useSwapRevamp();
+  const { swapForm, primaryTokenInfo, tokenInfoList, loadingTokenList, ftAssetList } = useSwapRevamp();
   const { closeModal } = useModal();
   const { currency } = useCurrencyPairing();
 
@@ -71,7 +71,7 @@ export const SelectAssetTo = () => {
 
   return (
     <Stack {...atoms.mb_2xl}>
-      <Stack {...atoms.pb_xl}>
+      <Stack {...atoms.pb_s}>
         <SearchWrapper>
           <SearchIconWrapper>
             <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
@@ -94,9 +94,35 @@ export const SelectAssetTo = () => {
           />
         </SearchWrapper>
         <AssetCountText variant="body2" color="ds.text_gray_low">
-          {strings.numYourAssets(tokenInfoList.length)}
+          {strings.numYourAssets(ftAssetList.length)}
         </AssetCountText>
       </Stack>
+      <Stack>
+        {ftAssetList.map(asset => {
+          return (
+            <AssetInfoInRow
+              direction="in"
+              currency={currency}
+              primaryTokenActivity={ptPrice}
+              secondaryToken24Activity={data24h && data24h[asset.info.id]}
+              primaryTokenInfo={primaryTokenInfo}
+              token={{
+                decimals: asset.info.numberOfDecimals,
+                name: asset.info.ticker ?? asset.info.name,
+                id: asset.info.id,
+                formatedAmount: asset.formatedAmount,
+                quantity: asset.quantity,
+                ...asset.info,
+              }}
+              onAssetClick={() => handleAssetClick(asset.info.id)}
+            />
+          );
+        })}
+      </Stack>
+      <Typography variant="body2" color="ds.text_gray_low" py={8}>
+        All assets ({filteredAssets.length})
+      </Typography>
+
       <Stack>
         {loadingTokenList ? (
           <Stack gap={16}>

@@ -13,6 +13,7 @@ import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
+import { ErrorMessage } from '../../common/components/ErrorMessage';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -93,6 +94,7 @@ export const AssetSwap = () => {
         <SwitchAssets />
         <AssetInput direction={ASSET_DIRECTION_OUT} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_OUT)} />
         <Stack {...atoms.pt_lg} />
+        <ErrorMessage />
         <EstimateSummary />
       </Stack>
       <LoadingButton
