@@ -49,7 +49,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
       return token.info.id === swapForm.tokenInInput?.tokenId;
     })[0];
     const selectedTokenDecimals = selectedToken?.info?.numberOfDecimals ?? 0;
-
     try {
       const quantityBigInt = bigNumberToBigInt(selectedToken.quantity);
       const activityBN = new BigNumber(primaryTokenActivity.toString());

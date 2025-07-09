@@ -287,12 +287,12 @@ function SwapPage(props: StoresProps & Intl): Node {
     setOpenedDialog('loadingOverlay');
 
     try {
-      await stores.transactionProcessingStore.adaSendAndRefresh({
-        wallet,
-        signRequest,
-        password,
-        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      });
+      // await stores.transactionProcessingStore.adaSendAndRefresh({
+      //   wallet,
+      //   signRequest,
+      //   password,
+      //   callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      // });
 
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);

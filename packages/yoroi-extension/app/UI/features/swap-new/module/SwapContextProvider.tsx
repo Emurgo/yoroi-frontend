@@ -21,7 +21,7 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { normalizeTokenId, useGetInputs } from '../common/helpers';
+import { useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN } from '../common/constants';
 import { AssetDirectionType } from '../common/types';
 
@@ -39,6 +39,7 @@ export const useAddressHex = address => {
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
   const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet, explorer } = currentWallet;
+  const [isCreateOrderLoading, setIsCreateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
   const { partners, excludedTokens } = useSwapConfig();
@@ -50,7 +51,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
 
   const [state, action] = useReducer(swapReducer, defaultState);
-  console.log('selectedWallet', { selectedWallet });
 
   useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -186,7 +186,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const create = useCallback(async () => {
     if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
 
-    // setIsLoading(true);
+    setIsCreateOrderLoading(true);
 
     const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
     // const tokenOutInfo = tokenInfos.get(state.tokenOutInput.tokenId);
@@ -196,28 +196,27 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     console.log('amountsIn', amountsIn);
     const inputs = await getInputs(amountsIn);
 
-    console.log('CREATE DATA inputs', inputs);
+    console.log('CREATE DATA inputs', { inputs, state });
 
-    // swapManager.api
-    //   .create({
-    //     tokenIn: state.tokenInInput.tokenId,
-    //     tokenOut: state.tokenOutInput.tokenId,
-    //     amountIn: Number(state.tokenInInput.value),
-    //     ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
-    //     blockedProtocols: [],
-    //     protocol: state.selectedProtocol.value,
-    //     // inputs,
-    //   })
-    //   .then(response => {
-    //     // setIsLoading(false);
-
-    //     if (isLeft(response)) {
-    //       action({ type: SwapAction.CreateError, value: response.error });
-    //     } else {
-    //       action({ type: SwapAction.CreateResponse, value: response.value.data });
-    //       // navigate.reviewSwap();
-    //     }
-    //   });
+    swapManager.api
+      .create({
+        tokenIn: state.tokenInInput.tokenId,
+        tokenOut: state.tokenOutInput.tokenId,
+        amountIn: Number(state.tokenInInput.value),
+        ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
+        blockedProtocols: [],
+        protocol: state.selectedProtocol.value,
+        inputs,
+      })
+      .then(response => {
+        setIsCreateOrderLoading(false);
+        console.log('CREATE DATA response', response);
+        if (isLeft(response)) {
+          action({ type: SwapAction.CreateError, value: response.error });
+        } else {
+          action({ type: SwapAction.CreateResponse, value: response.value.data });
+        }
+      });
   }, [
     state.estimate?.splits,
     state.estimate?.totalFee,
@@ -247,6 +246,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       loadingTokenList,
       explorer,
       createOrder: create,
+      isCreateOrderLoading,
+      stores,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
@@ -544,7 +545,7 @@ export type SwapContext = SwapState & {
   wantedPriceInputRef: RefObject<any> | undefined;
   orders?: Array<Swap.Order>;
   action: Dispatch<SwapAction>;
-  create: () => void;
+  createOrder: () => void;
   cancel: Swap.Api['cancel'];
   managerSettings: Swap.ManagerSettings;
   assignManagerSettings: Swap.Manager['assignSettings'];
@@ -566,7 +567,7 @@ const SwapContext = createContext<SwapContext>({
   wantedPriceInputRef: undefined,
   orders: undefined,
   action: () => null,
-  create: () => null,
+  createOrder: () => new Promise(res => res),
   cancel: () => new Promise(res => res),
   managerSettings: { routingPreference: 'auto', slippage: 1 },
   assignManagerSettings: () => ({ routingPreference: 'auto', slippage: 1 }),

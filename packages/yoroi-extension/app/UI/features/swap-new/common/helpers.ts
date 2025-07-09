@@ -1,14 +1,13 @@
 export const normalizeTokenId = (id?: string | null) => (id === '' ? '.' : id);
 
 // import {CSL} from '@emurgo/cardano-serialization-lib-browser'
+import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useGetInputs = (walletUtxos: any[]) => {
   const getInputs = async (amounts: { [tokenId: string]: string }) => {
-    // const {csl, release} = getCSL()
-    console.log('getInputs', {amounts, walletUtxos});
     try {
       const tokenId = Object.keys(amounts)[0];
-      const requiredAmount = BigInt(amounts[tokenId]);
+      const requiredAmount = BigInt(amounts[tokenId] * 1000000);
 
       const matching = walletUtxos
         .map(utxo => {
@@ -51,45 +50,33 @@ export const useGetInputs = (walletUtxos: any[]) => {
           const txHash = u.output.Transaction.Hash;
           const index = u.output.UtxoTransactionOutput.OutputIndex;
 
-          console.log('txHash', txHash, 'index', index);
-          //   const receiver = CSL.Address.from_bytes(Buffer.from(u.address, 'hex')).to_bech32()
+          const receiver = await RustModule.WalletV4.Address.from_bytes(Buffer.from(u.address, 'hex')).to_bech32();
 
-          //   const input = csl.TransactionInput.new(
-          //     csl.TransactionHash.fromHex(txHash),
-          //     index,
-          //   )
+          const input = RustModule.WalletV4.TransactionInput.new(RustModule.WalletV4.TransactionHash.from_hex(txHash), index);
 
-          //   const value = csl.Value.new(csl.BigNum.from_str('0'))
+          const value = RustModule.WalletV4.Value.new(RustModule.WalletV4.BigNum.from_str('0'));
 
-          //   for (const token of u.output.tokens) {
-          //     const amt = csl.BigNum.from_str(token.TokenList.Amount)
+          for (const token of u.output.tokens) {
+            const amt = RustModule.WalletV4.BigNum.from_str(token.TokenList.Amount);
 
-          //     if (token.Token.Metadata.ticker === 'ADA') {
-          //       value.set_coin(amt)
-          //     } else {
-          //       const policyId = csl.ScriptHash.fromHex(
-          //         token.Token.Metadata.policyId,
-          //       )
-          //       const assetName = csl.AssetName.new(
-          //         Buffer.from(token.Token.Metadata.assetName, 'hex'),
-          //       )
+            if (token.Token.Metadata.ticker === 'ADA') {
+              value.set_coin(amt);
+            } else {
+              const policyId = RustModule.WalletV4.ScriptHash.from_hex(token.Token.Metadata.policyId);
+              const assetName = RustModule.WalletV4.AssetName.new(Buffer.from(token.Token.Metadata.assetName, 'hex'));
 
-          //       const multiasset = value.multiasset() || csl.MultiAsset.new()
-          //       const assets =
-          //         multiasset.get(policyId) || csl.Assets.new()
-          //       assets.insert(assetName, amt)
-          //       multiasset.insert(policyId, assets)
-          //       value.set_multiasset(multiasset)
-          //     }
-          //   }
+              const multiasset = value.multiasset() || RustModule.WalletV4.MultiAsset.new();
+              const assets = multiasset.get(policyId) || RustModule.WalletV4.Assets.new();
+              assets.insert(assetName, amt);
+              multiasset.insert(policyId, assets);
+              value.set_multiasset(multiasset);
+            }
+          }
 
-          //   const output = csl.TransactionOutput.new(
-          //     csl.Address.from_bech32(receiver),
-          //     value,
-          //   )
+          const output = RustModule.WalletV4.TransactionOutput.new(RustModule.WalletV4.Address.from_bech32(receiver), value);
 
-          //   const utxo = csl.TransactionUnspentOutput.new(input, output)
-          //   return Buffer.from(utxo.to_bytes()).toString('hex')
+          const utxo = RustModule.WalletV4.TransactionUnspentOutput.new(input, output);
+          return Buffer.from(utxo.to_bytes()).toString('hex');
         })
       );
 

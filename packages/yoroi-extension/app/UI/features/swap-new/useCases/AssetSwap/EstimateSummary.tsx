@@ -4,14 +4,14 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { undefinedToken } from '../../common/constants';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { DexRouteTable } from './DexRouteTable';
+import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
   const { swapForm, tokenInfos, primaryTokenInfo } = useSwapRevamp();
   const { openModal } = useModal();
-  console.log('EstimateSummary', { swapForm });
+
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
   const tokenOutInfo = tokenInfos.get(swapForm.tokenOutInput.tokenId ?? undefinedToken);
 

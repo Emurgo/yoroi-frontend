@@ -1,27 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box } from '@mui/material';
-import { useSwapRevamp } from '../../module/SwapContextProvider';
-import { useModal } from '../../../../components/modals/ModalContext';
+import { useModal } from '../../../../../components/modals/ModalContext';
+import { useSwapRevamp } from '../../../module/SwapContextProvider';
 
 type DexRoute = {
   id: string;
-  logo: string;
-  route: string;
-  marketPrice: string;
-  tvl: string;
-  dexFee: string;
-  providerFee: string;
-}; // TDOO - replace with actual type from your data model
+  protocol: string;
+  finalPrice: string;
+  priceImpact: string;
+  batcherFee: string;
+  fee: string;
+};
 
 type Props = {
   data: DexRoute[];
 };
 
 export const DexRouteTable = ({ data }: Props) => {
-  const [selectedId, setSelectedId] = useState<string | null>(data?.[0]?.id ?? null);
   const { primaryTokenInfo, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
   const headers = ['Route', 'Market price', 'TVL', 'DEX fee', 'Provider fee'];
+  console.log('swapForm', { swapForm, data });
+
+  useEffect(() => {}, [data]);
 
   return (
     <TableContainer sx={{ boxShadow: 'none', border: 'none', padding: '2px' }}>
@@ -55,16 +56,15 @@ export const DexRouteTable = ({ data }: Props) => {
         </TableHead>
 
         <TableBody>
-          {data.map(row => {
-            const isSelected = row.id === selectedId;
+          {data.map((row, index) => {
+            const isSelected = index === 0;
             return (
               <TableRow
                 key={row.id}
-                x
                 onClick={() => {
-                  setSelectedId(row.id);
+                  // setSelectedId(row.id);
                   swapForm.action({ type: 'ProtocolSelected', value: row.protocol });
-                  closeModal()
+                  closeModal();
                 }}
                 sx={{
                   backgroundColor: 'transparent',

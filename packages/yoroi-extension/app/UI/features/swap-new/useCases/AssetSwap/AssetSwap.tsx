@@ -10,11 +10,16 @@ import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
+import { useEffect } from 'react';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
+import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
-  const { createOrder } = useSwapRevamp();
+  const { createOrder, swapForm, tokenInfos, stores } = useSwapRevamp();
   const { openModal } = useModal();
+  const { openTxReviewModal } = useTxReviewModal();
+  const wallet = stores.wallets.selectedOrFail;
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
@@ -24,6 +29,59 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
+
+  const handleSubmitTransaction = async password => {
+    console.log('handleSubmitTransaction', { swapForm, password });
+    const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
+    console.log('parsedCbor', parsedCbor);
+    const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
+      wallet,
+      swapState: swapForm,
+      tokenInfos,
+      parsedCbor,
+    });
+
+    console.log('unisgnedTxRequest', unisgnedTxRequest);
+
+    // try {
+    //   await stores.transactionProcessingStore.adaSendAndRefresh({
+    //     wallet,
+    //     signRequest: parsedCbor,
+    //     password,
+    //     callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+    //   });
+    //   console.log('Transaction submitted successfully');
+    // } catch (e) {
+    //   console.error('Error submitting transaction:', e);
+    // } finally {
+    // }
+  };
+
+  useEffect(() => {
+    if (swapForm.createTx?.cbor) {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: passswordInput => {
+          console.log('PASSWARDSUBMIT', passswordInput);
+          handleSubmitTransaction(passswordInput);
+        },
+        cborTx: swapForm.createTx.cbor,
+        // extraOverviewDetails: {
+        //   title: 'Cancel swap order details',
+        //   onClick: () => changeModalView({ modalView: 'extraDetails' }),
+        //   component: (
+        //     <SwapTxCancelInfo
+        //       formattedFeeValue={formattedFeeValue}
+        //       defaultTokenInfo={defaultTokenInfo}
+        //       order={order}
+        //       returnValues={totalCancelOutput}
+        //       swapPoolLabel={<SwapPoolLabel provider={order.provider} />}
+        //     />
+        //   ),
+        // },
+      });
+    }
+  }, [swapForm.createTx]);
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
