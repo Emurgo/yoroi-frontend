@@ -316,7 +316,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        <DrepPromotionBanner stores={stores} intl={intl} />
+        {!this.state.isSurveyVisible && (<DrepPromotionBanner stores={stores} intl={intl} />)}
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
