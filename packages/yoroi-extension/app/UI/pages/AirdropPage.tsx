@@ -6,7 +6,8 @@ import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box, Typography, Checkbox, FormControlLabel, TextField } from '@mui/material';
+import { Box, Typography, Checkbox, FormControlLabel, } from '@mui/material';
+import TextField from '../../components/common/TextField';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import BigNumber from 'bignumber.js';
 import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
@@ -434,18 +435,19 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
         {intl.formatMessage(messages.mnemonicClaimDialogText)}
       </Typography>
       <TextField
+        error={error}
+        type="password"
         className="walletPassword"
         value={password}
         label={intl.formatMessage(globalMessages.passwordLabel)}
-        type="password"
+        isLoading={isClaiming}
         onChange={e => {
           if (error === wrongPasswordErrorMessage) {
             setError(null);
           }
           setPassword(e.target.value);
         }}
-        error={!!error}
-        disabled={isClaiming}
+        autoFocus
       />
     </Dialog>
   );
