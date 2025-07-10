@@ -13,6 +13,14 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!Allow display of in-app notifications for key transactions',
     },
+    duration: {
+      id: 'notifications.settings.duration',
+      defaultMessage: '!!!Duration',
+    },
+    durationDescription: {
+      id: 'notifications.settings.durationDescription',
+      defaultMessage: '!!!Display during {duration} seconds',
+    },
   })
 );
 
@@ -22,5 +30,7 @@ export const useStrings = () => {
   return React.useRef({
     notifSettingsTitle: intl.formatMessage(messages.notifSettingsTitle),
     notifSettingsDesc: intl.formatMessage(messages.notifSettingsDesc),
+    duration: intl.formatMessage(messages.duration),
+    durationDescription: (duration: number) => intl.formatMessage(messages.durationDescription, { duration }),
   }).current;
 };

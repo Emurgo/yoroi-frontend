@@ -67,7 +67,7 @@ class RestoreWalletStepTwo extends AddWalletBase {
     for (let wordIndex = 0; wordIndex < wordsAmount; wordIndex++) {
       const phraseWord = phraseTemplate[wordIndex];
       const inputElement = allInputs[wordIndex];
-      await this.inputElem(inputElement, phraseWord + Key.RETURN);
+      await this.inputElem(inputElement, phraseWord + Key.RETURN, true);
     }
   };
   enterRecoveryPhrase15Words = async recoveryPhrase => {

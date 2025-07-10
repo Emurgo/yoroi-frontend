@@ -51,7 +51,7 @@ describe('Changing wallet password. Positive', function () {
   it('Filling send info', async function () {
     const sendSubTab = new SendSubTab(webdriver, logger);
     await sendSubTab.enterReceiverAndMemo(testWallet1.receiveAddress);
-    await sendSubTab.addAssets(1);
+    await sendSubTab.addAssets('1');
   });
   // Checking that the old password doesn't work anymore
   it("Checking the old wallet doesn't work anymore", async function () {

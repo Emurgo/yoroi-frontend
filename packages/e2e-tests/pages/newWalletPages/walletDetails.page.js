@@ -72,12 +72,12 @@ class WalletDetails extends AddWalletBase {
   async enterWalletPassword(password) {
     this.logger.info(`WalletDetails::enterWalletPassword is called`);
     await this.waitForElement(this.walletPasswordInputLocator);
-    await this.input(this.walletPasswordInputLocator, password);
+    await this.input(this.walletPasswordInputLocator, password, true);
   }
   async repeatWalletPassword(password) {
     this.logger.info(`WalletDetails::repeatWalletPassword is called`);
     await this.waitForElement(this.walletRepeatPasswordInputLocator);
-    await this.input(this.walletRepeatPasswordInputLocator, password);
+    await this.input(this.walletRepeatPasswordInputLocator, password, true);
   }
   async checkWalletNameHasNoError() {
     this.logger.info(`WalletDetails::checkWalletNameHasNoError is called`);
