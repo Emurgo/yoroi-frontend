@@ -194,7 +194,7 @@ export const removeWalletFromDb: GetEntryFuncType<typeof RemoveWallet> = async (
 
 export const changeSigningKeyPassword: GetEntryFuncType<typeof ChangeSigningPassword> = async (request) => {
   const resp = await callBackground({ type: ChangeSigningPassword.typeTag, request, });
-  if (resp?.error === WrongPassphraseError.defaultMessage) {
+  if (resp?.error === WrongPassphraseError.defaultMessage || resp?.error === IncorrectWalletPasswordError.defaultMessage) {
     throw new IncorrectWalletPasswordError();
   }
 }
@@ -248,7 +248,7 @@ export async function getPrivateStakingKey(
   request: {| publicDeriverId: number, password: string |}
 ): Promise<string> {
   const result = await callBackground({ type: GetPrivateStakingKey.typeTag, request });
-  return handleWrongPassword(result, WrongPassphraseError);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export const getCardanoAssets: GetEntryFuncType<typeof GetCardanoAssets> = async (request) => {
@@ -331,7 +331,7 @@ export async function connectorCreateAuthEntry(
   request: ConnectorCreateAuthEntryRequestType
 ): Promise<?WalletAuthEntry> {
   const result = await callBackground({ type: CreateAuthEntry.typeTag, request });
-  return handleWrongPassword(result, WrongPassphraseError);
+  return handleWrongPassword(result, IncorrectWalletPasswordError);
 }
 
 export async function getSelectedExplorer(): Promise<$ReadOnlyMap<number, {|

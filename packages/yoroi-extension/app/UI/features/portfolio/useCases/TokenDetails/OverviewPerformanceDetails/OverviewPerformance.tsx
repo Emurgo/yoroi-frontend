@@ -15,7 +15,7 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
+const OverviewPerformance = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
 
@@ -51,7 +51,7 @@ const OverviewPerformance = ({ tokenInfo }: Props): JSX.Element => {
         <Menu options={subMenuOptions} onItemClick={(route: string) => setSelectedTab(route)} isActiveItem={isActiveItem} />
         <Divider />
       </Box> */}
-      <Box sx={{ px: theme.spacing(3), pt: theme.spacing(3), pb: theme.spacing(2) }}>
+      <Box sx={{ px: theme.spacing(24), pt: theme.spacing(24), pb: theme.spacing(24) }}>
         {selectedTab === subMenuOptions[0]?.route ? (
           <TabContent>
             <TokenDetailOverview tokenInfo={tokenInfo} />

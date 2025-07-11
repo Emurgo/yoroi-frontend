@@ -39,6 +39,10 @@ const CONFIG: ConfigType = {
     messagingSenderId: '',
     appId: '',
   },
+  notifications: {
+    defaultDuration: 0,
+    vapidPublicKey: '',
+  },
 };
 
 global.CONFIG = CONFIG;

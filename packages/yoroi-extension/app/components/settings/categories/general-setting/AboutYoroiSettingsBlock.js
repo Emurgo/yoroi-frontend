@@ -158,6 +158,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
   const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
+  const displaySpecialInfo = environment.isDev() || environment.isNightly();
   const getNetworkValue = () => {
     const networkId = wallet && wallet.networkId;
     switch (networkId) {
@@ -175,7 +176,6 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
       if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
-        console.log('should open testnet info modal')
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
@@ -251,7 +251,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
           <>
             <LabelWithValue
               label="FCM Token:"
-              value={fcmToken ?? '...'}
+              value={fcmToken ?? ''}
             />
           </>
         )}
@@ -315,7 +315,7 @@ function LabelWithValue({
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
-        sx={{ textDecoration: 'none' }}
+        sx={{ textDecoration: 'none', wordBreak: 'break-all' }}
         id={componentId || 'somewhere-someValue-text'}
       >
         {value}

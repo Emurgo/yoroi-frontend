@@ -56,7 +56,7 @@ const IconContainer = styled(Box)(() => ({
 }));
 
 const Description = styled(Typography)(({ theme }) => ({
-  marginTop: theme.spacing(1),
+  marginTop: theme.spacing(8),
 }));
 
 const SpinnerBox = styled(Box)(() => ({

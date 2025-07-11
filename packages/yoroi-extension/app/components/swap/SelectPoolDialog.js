@@ -2,7 +2,7 @@
 import { Box, Typography } from '@mui/material';
 import Dialog from '../widgets/Dialog';
 import Table from '../common/table/Table';
-import { getMarketPrice } from '@yoroi/swap';
+import { getMarketPrice } from 'legacySwap';
 import { Quantities } from '../../utils/quantities';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 import { SwapPoolIcon } from './SwapPoolComponents';

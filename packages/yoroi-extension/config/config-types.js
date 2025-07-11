@@ -7,6 +7,12 @@ export type ConfigType = {|
   bring: BringConfigType,
   bringSandbox: BringConfigType,
   fcm: FCMConfig,
+  notifications: NotificationsConfigType,
+|};
+
+export type NotificationsConfigType = {|
+  defaultDuration: number,
+  vapidPublicKey: string,
 |};
 
 export type BringConfigType = {|

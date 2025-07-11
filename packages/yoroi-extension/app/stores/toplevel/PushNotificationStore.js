@@ -10,10 +10,6 @@ declare var CONFIG: ConfigType;
 
 const localStorageApi = new LocalStorageApi();
 
-const DEFAULT_DURATION = 4;
-
-const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
-
 const FIREBASE_SERVICE_WORKER_SCOPE = 'firebase-cloud-messaging-push-scope';
 
 export default class PushNotificationStore<
@@ -43,7 +39,7 @@ export default class PushNotificationStore<
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
-    return this.metadata.duration ?? DEFAULT_DURATION;
+    return this.metadata.duration ?? CONFIG.notifications.defaultDuration;
   }
   set duration(duration:number): void {
     runInAction(() => {
@@ -103,7 +99,7 @@ export default class PushNotificationStore<
     if (result === 'denied') {
       return false;
     }
-    const token = await getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY });
+    const token = await getToken(messaging, { vapidKey: CONFIG.notifications.vapidPublicKey });
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');

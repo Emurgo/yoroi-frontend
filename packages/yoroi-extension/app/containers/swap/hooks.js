@@ -1,7 +1,5 @@
 //@flow
-import {
-  useSwap,
-} from '@yoroi/swap';
+import { useSwap } from 'legacySwap';
 import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';

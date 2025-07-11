@@ -2,18 +2,22 @@ import { Stack, styled, useTheme } from '@mui/material';
 import { TopBarActions } from './TopBarActions';
 import { AssetInput } from '../../common/components/AssetInput';
 import { LoadingButton } from '@mui/lab';
-import { DexTradeInfo } from './DexTradeInfo';
+import { EstimateSummary } from './EstimateSummary';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { SelectAssetModalContent } from '../../common/components/SelectAssetModalContent';
+import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom';
 import { SwitchAssets } from '../../common/components/SwitchAssets';
+import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
+import { AssetDirectionType } from '../../common/types';
+import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
-  const openSelectAssetModal = (type: 'from' | 'to') => {
+
+  const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
-      title: `SWAP ${type === 'from' ? 'FROM' : 'TO'}`,
-      content: <SelectAssetModalContent />,
+      title: `SWAP ${direction === ASSET_DIRECTION_IN ? 'FROM' : 'TO'}`,
+      content: direction === ASSET_DIRECTION_IN ? <SelectAssetFrom /> : <SelectAssetTo />,
       height: '624px',
       width: '612px',
     });
@@ -24,12 +28,12 @@ export const AssetSwap = () => {
       <Stack position="relative">
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
-        <AssetInput type="from" assetName="ADA" onAssetSelect={() => openSelectAssetModal('from')} />
+        <AssetInput direction={ASSET_DIRECTION_IN} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_IN)} />
         <Stack {...atoms.pt_sm} />
         <SwitchAssets />
-        <AssetInput type="to" assetName="ADA" onAssetSelect={() => openSelectAssetModal('to')} />
+        <AssetInput direction={ASSET_DIRECTION_OUT} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_OUT)} />
         <Stack {...atoms.pt_lg} />
-        <DexTradeInfo />
+        <EstimateSummary />
       </Stack>
       <LoadingButton
         //  @ts-ignore
