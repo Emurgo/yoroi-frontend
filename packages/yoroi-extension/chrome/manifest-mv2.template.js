@@ -72,7 +72,6 @@ export default ({
       'tabs',
       '*://connect.trezor.io/*',
       'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*',
-      'notifications',
     ],
     content_scripts: [
       {
