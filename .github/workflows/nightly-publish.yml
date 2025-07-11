@@ -82,11 +82,10 @@ jobs:
       working-directory: ./packages/yoroi-extension
       run: |
         git config --global user.name "emurgo-rnd"
-        git config --global user.email "rnd@emurgo.io"
-        git checkout -b emurgo-rnd-first-commit
+        git config --global user.email "rnd@emurgo.io"        
         git add package*.json
         git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-        git push --set-upstream origin emurgo-rnd-first-commit
+        git push
       env:
         GITHUB_TOKEN: ${{ secrets.RND_GITHUB_TOKEN }}
   
