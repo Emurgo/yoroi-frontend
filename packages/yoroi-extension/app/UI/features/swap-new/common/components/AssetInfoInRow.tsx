@@ -6,6 +6,8 @@ import { Icons, IconWrapper } from '../../../../components';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
 import { useModal } from '../../../../components/modals/ModalContext';
 import TokenInfoModal from './Modals/TokenInfoModal';
+import { AssetDirectionType } from '../types';
+import { ASSET_DIRECTION_IN } from '../constants';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -18,7 +20,7 @@ interface AssetInfoInRowProps {
   primaryTokenActivity?: number | string;
   primaryTokenInfo: { decimals: number };
   onAssetClick: () => void;
-  direction: 'in' | 'out';
+  direction: AssetDirectionType;
 }
 
 export const AssetInfoInRow = React.memo(
@@ -39,7 +41,7 @@ export const AssetInfoInRow = React.memo(
 
     let totalPrice: string | undefined;
 
-    if (direction === 'in' && primaryTokenActivity != null) {
+    if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
       try {
         const quantityBigInt = bigNumberToBigInt(token.quantity);
         const activityBN = new BigNumber(primaryTokenActivity.toString());
@@ -68,12 +70,12 @@ export const AssetInfoInRow = React.memo(
               {token.name}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_low">
-              {direction === 'in' ? token.name : token.fingerprint}
+              {direction === ASSET_DIRECTION_IN ? token.name : token.fingerprint}
             </Typography>
           </Stack>
         </Stack>
 
-        {direction === 'in' ? (
+        {direction === ASSET_DIRECTION_IN ? (
           <Stack direction="column" alignItems="flex-end">
             <Typography variant="body1" color="ds.text_gray_medium">
               {token.formatedAmount} {token.name}

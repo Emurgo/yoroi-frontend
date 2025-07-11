@@ -112,6 +112,18 @@ export const messages = Object.freeze(
       id: 'banners.midnight.yoroiSupport',
       defaultMessage: '!!!Yoroi now supports the Midnight airdrop. Securely claim your NIGHT tokens today.',
     },
+    surveyTitle: {
+      id: 'survey.title',
+      defaultMessage: '!!!We’d love your feedback!',
+    },
+    surveyDescription: {
+      id: 'survey,description',
+      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
+    },
+    surveyButton: {
+      id: 'survey.button',
+      defaultMessage: '!!!take survey',
+    },
   })
 );
 
@@ -146,5 +158,8 @@ export const useStrings = () => {
     claimAnnouncement: intl.formatMessage(messages.claimAnnouncement),
     yoroiSupport: intl.formatMessage(messages.yoroiSupport),
     checkEligibility: intl.formatMessage(messages.checkEligibility),
+    surveyTitle: intl.formatMessage(messages.surveyTitle),
+    surveyDescription: intl.formatMessage(messages.surveyDescription),
+    surveyButton: intl.formatMessage(messages.surveyButton),
   }).current;
 };

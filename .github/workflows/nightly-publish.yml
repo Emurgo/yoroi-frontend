@@ -71,7 +71,7 @@ jobs:
     - name: Upload to Chrome Web Store
       uses: mobilefirstllc/cws-publish@latest
       with:
-        action: 'upload'  # one of: upload, publish, testers
+        action: 'publish'  # one of: upload, publish, testers
         client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
         client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
         refresh_token: ${{ secrets.NIGHTLY_TOKEN }}

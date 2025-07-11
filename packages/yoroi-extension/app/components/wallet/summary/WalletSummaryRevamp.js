@@ -21,9 +21,9 @@ import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/tran
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
 // $FlowIgnore: supressing this error
-import { BringBanner, UsdaBanner, MidnightBanner } from '../../../UI/components/Banners';
+import { BringBanner, UsdaBanner, MidnightBanner, SurveyBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
-import LocalStorageApi from '../../../api/localStorage';
+import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import environment from '../../../environment';
 // $FlowIgnore: suppressing this error
@@ -66,22 +66,37 @@ type Props = {|
 
 type State = {|
   isBannerVisible: boolean,
+  isSurveyVisible: boolean,
+  
 |};
 
 const localStorage = new LocalStorageApi();
+const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
   static contextType: any = IntlContext;
   state: State = {
     isBannerVisible: false,
+    isSurveyVisible: false,
+    isMidnightvisible: false,
   };
 
   UNSAFE_componentWillMount: void => Promise<void> = async () => {
+    if (!(await surveyDismissedFlag.get())) {
+      this.setState({ isSurveyVisible: true });
+      return;
+    }
+
     const wasClosed = await localStorage.getBringBannerClosed();
     if (!wasClosed) {
       this.setState({ isBannerVisible: true });
     }
+  };
+
+  surveyClose: () => void = () => {
+    surveyDismissedFlag.set(true);
+    this.setState({ isSurveyVisible: false });
   };
 
   renderAmountDisplay: ({|
@@ -299,10 +314,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
           </Typography>
         </Box>
         <MidnightBanner />
-        <DrepPromotionBanner stores={stores} intl={intl} />
+        {!this.state.isSurveyVisible && <DrepPromotionBanner stores={stores} intl={intl} />}
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
+          {this.state.isSurveyVisible && <SurveyBanner onClose={this.surveyClose} />}
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
