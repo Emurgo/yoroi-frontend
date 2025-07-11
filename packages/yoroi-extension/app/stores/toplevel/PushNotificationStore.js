@@ -14,6 +14,8 @@ const DEFAULT_DURATION = 4;
 
 const VAPID_PUBLIC_KEY = 'BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M';
 
+const FIREBASE_SERVICE_WORKER_SCOPE = 'firebase-cloud-messaging-push-scope';
+
 export default class PushNotificationStore<
   StoresMapType: {
     +loading: {
@@ -75,8 +77,7 @@ export default class PushNotificationStore<
     if (this.isEnabled) {
       success = await this._enableNotifications();
     } else {
-      this._disableNotifications();
-      success = true;
+      success = await this._disableNotifications();
     }
 
     if (!success) {
@@ -116,7 +117,19 @@ export default class PushNotificationStore<
     return true;
   }
 
-  _disableNotifications(): void {
+  async _disableNotifications(): Promise<boolean> {
+    const registrations = [...(await navigator.serviceWorker?.getRegistrations() || [])];
+    
+    const registration = registrations.find(reg => reg.scope.endsWith(FIREBASE_SERVICE_WORKER_SCOPE));
+
+    if (!registration) {
+      throw new Error('unexpectedly missing service worker registration');
+    }
+    let subscription  = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      throw new Error('unexpected missing subscription');
+    }
+    return await subscription.unsubscribe()
   }
 
   get fcmToken(): ?string {
