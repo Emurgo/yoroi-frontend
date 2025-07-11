@@ -262,8 +262,8 @@ export default class SwapStore extends Store<StoresMap> {
     console.log('createRevampUnsignedSwapTx', { sell, buy, swapState });
 
     const ptFees = {
-      deposit: String(swapState.createTx.deposits),
-      batcher: String(swapState.createTx.batcherFee),
+      deposit: String(swapState.createTx.deposits * 10**6), // assume ADA for now
+      batcher: String(swapState.createTx.batcherFee * 10**6), // assume ADA for now
     };
 
     const feFees = {
