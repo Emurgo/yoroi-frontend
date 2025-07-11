@@ -68,6 +68,19 @@ jobs:
       run: |
         npm run prod:nightly
 
+    - name: Configure Git
+      run: |
+        git config --global user.name "emurgo-rnd"
+        git config --global user.email "rnd@emurgo.io"
+
+    - name: Commit and push
+      working-directory: ./packages/yoroi-extension
+      run: |
+        BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+        git add package*.json
+        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+        git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
+
     #- name: Upload to Chrome Web Store
     #  uses: mobilefirstllc/cws-publish@latest
     #  with:
@@ -77,15 +90,3 @@ jobs:
     #    refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
     #    extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
     #    zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
-
-    - name: Commit changes
-      working-directory: ./packages/yoroi-extension
-      run: |
-        git config --global user.name "emurgo-rnd"
-        git config --global user.email "rnd@emurgo.io"        
-        git add package*.json
-        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.RND_GITHUB_TOKEN }}
-  
