@@ -62,27 +62,46 @@ export default class PushNotificationStore<
     return this.metadata?.isEnabled !== false;
   }
 
-  toggleEnabled: () => void = () => {
+  toggleEnabled: () => Promise<void> = async () => {
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');
       }
       this.metadata.isEnabled = !this.metadata.isEnabled;
     });
+
+
+    let success;
+    if (this.isEnabled) {
+      success = await this._enableNotifications();
+    } else {
+      this._disableNotifications();
+      success = true;
+    }
+
+    if (!success) {
+      runInAction(() => {
+        if (!this.metadata) {
+          throw new Error('push notification metadata not loaded');
+        }
+        this.metadata.isEnabled = !this.metadata.isEnabled;
+      });
+
+      return;
+    }
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
     localStorageApi.savePushNotificationMetadata(this.metadata);
-    if (!this.isEnabled) {
-      this._enableNotifications();
-    } else {
-      this._disableNotifications();
-    }
   }
 
-  async _enableNotifications(): Promise<void> {
+  async _enableNotifications(): Promise<boolean> {
     const app = initializeApp(CONFIG.fcm);
     const messaging = getMessaging(app);
+    const result = await Notification.requestPermission();
+    if (result === 'denied') {
+      return false;
+    }
     const token = await getToken(messaging, { vapidKey: VAPID_PUBLIC_KEY });
     runInAction(() => {
       if (!this.metadata) {
@@ -94,6 +113,7 @@ export default class PushNotificationStore<
       throw new Error('push notification metadata not loaded');
     }
     localStorageApi.savePushNotificationMetadata(this.metadata);
+    return true;
   }
 
   _disableNotifications(): void {
