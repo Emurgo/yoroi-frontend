@@ -68,15 +68,15 @@ jobs:
       run: |
         npm run prod:nightly
 
-    #- name: Upload to Chrome Web Store
-    #  uses: mobilefirstllc/cws-publish@latest
-    #  with:
-    #    action: 'publish'  # one of: upload, publish, testers
-    #    client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
-    #    client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
-    #    refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
-    #    extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
-    #    zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
+    - name: Upload to Chrome Web Store
+      uses: mobilefirstllc/cws-publish@latest
+      with:
+        action: 'publish'  # one of: upload, publish, testers
+        client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
+        client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
+        refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
+        extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
+        zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
 
     - name: Commit changes
       working-directory: ./packages/yoroi-extension
