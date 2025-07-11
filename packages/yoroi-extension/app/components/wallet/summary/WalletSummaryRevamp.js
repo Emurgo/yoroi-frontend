@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -29,6 +29,7 @@ import environment from '../../../environment';
 // $FlowIgnore: suppressing this error
 import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
+import { withYoroiRemoteConfig } from '../../../UI/common/helpers/withYoroiRemoteConfig';
 
 const messages = defineMessages({
   transactionType: {
@@ -73,7 +74,7 @@ const localStorage = new LocalStorageApi();
 const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
 
 @observer
-export default class WalletSummaryRevamp extends Component<Props, State> {
+class WalletSummaryRevamp extends Component<Props, State> {
   static contextType: any = IntlContext;
   state: State = {
     isBannerVisible: false,
@@ -81,7 +82,14 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
   };
 
   UNSAFE_componentWillMount: void => Promise<void> = async () => {
-    if (!await surveyDismissedFlag.get()) {
+    const midnightBannerState = await localStorage.getMidnightBannerAnnouncementClosed();
+    const query = this.props.yoroiRemoteConfigQuery;
+
+    if (midnightBannerState === undefined && query?.data?.banners.midnightAnnouncement.display === true) {
+      this.setState({ isMidnightvisible: true });
+    }
+
+    if (!(await surveyDismissedFlag.get())) {
       this.setState({ isSurveyVisible: true });
       return;
     }
@@ -95,7 +103,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
   surveyClose: () => void = () => {
     surveyDismissedFlag.set(true);
     this.setState({ isSurveyVisible: false });
-  }
+  };
+
+  midnightBannerClose: () => void = () => {
+    this.setState({ isMidnightvisible: false });
+  };
 
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
@@ -311,12 +323,12 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        {!this.state.isSurveyVisible && (<DrepPromotionBanner stores={stores} intl={intl} />)}
+        <MidnightBanner onClose={this.midnightBannerClose} />
+        {!this.state.isSurveyVisible && this.isMidnightvisible === false && <DrepPromotionBanner stores={stores} intl={intl} />}
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
-          {this.state.isSurveyVisible && (<SurveyBanner onClose={this.surveyClose} />)}
-          <MidnightBanner />
+          {this.state.isSurveyVisible && this.state.isMidnightvisible === false && <SurveyBanner onClose={this.surveyClose} />}
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
@@ -353,6 +365,9 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     );
   }
 }
+
+export default (withYoroiRemoteConfig(WalletSummaryRevamp): ComponentType<Props>);
+
 
 export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },

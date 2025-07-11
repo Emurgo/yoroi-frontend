@@ -5,15 +5,16 @@ import LocalStorageApi from '../../../api/localStorage/index';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 import { MidnightIlustration } from '../Dialogs/MidnightIlustration';
 
-export const MidnightBanner = () => {
+export const MidnightBanner = ({ onClose }) => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
   const [bannerVisible, setBannerVisible] = useState(false);
   const localStorage = new LocalStorageApi();
   const { data } = useYoroiRemoteConfig();
 
   const handleClose = async () => {
+    onClose();
     setBannerVisible(false);
-    await localStorage.setMidnightBannerAnnouncementClosed(true);
+    await localStorage.setMidnightBannerAnnouncementClosed('true');
   };
 
   const handleClick = () => {
