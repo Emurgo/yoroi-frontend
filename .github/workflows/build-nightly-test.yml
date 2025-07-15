@@ -1,7 +1,7 @@
 name: Build Nightly for Testing
 
 on:
-  workflow_dispatch:  # You can trigger manually from the GitHub Actions UI
+  workflow_dispatch:
 
 jobs:
   build-nightly:
@@ -33,18 +33,21 @@ jobs:
       - name: Run Tests
         run: npm run test
 
-      - name: Build Nightly App
+      - name: Build Nightly app
         working-directory: ./packages/yoroi-extension
         run: |
           npm run prod:nightly
 
-      - name: Zip Build Folder
-        working-directory: ./packages/yoroi-extension
+      - name: Check if the Nightly build output is correct
+        working-directory: ./packages/yoroi-extension/build/js
         run: |
-          cd dist && zip -r ../yoroi-nightly.zip . && cd ..
+          if [ ! -f inject.js ]; then
+            echo "Build failed: inject.js not found"
+            exit 1
+          fi
 
-      - name: Upload Build Artifact
+      - name: Upload Nightly Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: yoroi-nightly-build
-          path: ./packages/yoroi-extension/yoroi-nightly.zip
+          path: ./packages/yoroi-extension/Yoroi\ Nightly.zip
