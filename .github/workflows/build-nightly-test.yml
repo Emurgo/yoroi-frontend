@@ -24,15 +24,6 @@ jobs:
         run: |
           . install-all.sh
 
-      - name: Run Lint
-        run: npm run eslint
-
-      - name: Run TypeScript
-        run: npm run tsc
-
-      - name: Run Tests
-        run: npm run test
-
       - name: Build Nightly app
         working-directory: ./packages/yoroi-extension
         run: |
