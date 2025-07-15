@@ -10,8 +10,9 @@ import {
 import {
   PublicDeriver,
 } from './PublicDeriver/index';
-import { Cip1852Wallet } from './Cip1852Wallet/wrapper';
 import { GetAllCip1852Wallets } from '../database/walletTypes/cip1852/api/read';
+import { createAndRefreshCip1852Wallet } from './ConceptualWallet/traits';
+import { ConceptualWallet } from './ConceptualWallet';
 
 export async function loadWalletsFromStorage(
   db: lf$Database,
@@ -25,11 +26,11 @@ export async function loadWalletsFromStorage(
   );
   // Cip1852
   {
-    const cip1852Map = new Map<number, Cip1852Wallet>();
+    const cip1852Map = new Map<number, ConceptualWallet>();
     for (const entry of cip1852WalletsInStorage) {
       let cip1852Wallet = cip1852Map.get(entry.Cip1852Wrapper.ConceptualWalletId);
       if (cip1852Wallet == null) {
-        cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+        cip1852Wallet = await createAndRefreshCip1852Wallet(
           db,
           entry.Cip1852Wrapper,
         );
