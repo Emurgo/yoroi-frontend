@@ -51,6 +51,11 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     ROUTES.WALLETS.TRANSACTIONS,
     ({ currentRoute, hasAnyWallets }) => currentRoute === ROUTES.WALLETS.ADD && hasAnyWallets
   ),
+  // Open `/wallets/transactions` if the user is on the `/wallet/add`
+  makeWalletCategory(
+    ROUTES.WALLET.RECEIVE.ROOT,
+    ({ currentRoute, hasAnyWallets }) => isDev() && currentRoute !== ROUTES.WALLET.ADD && hasAnyWallets
+  ),
   // If user didn't restored any wallets, it should redirect to the add wallet page.
   makeWalletCategory(ROUTES.WALLETS.ADD, ({ hasAnyWallets }) => !hasAnyWallets),
   {

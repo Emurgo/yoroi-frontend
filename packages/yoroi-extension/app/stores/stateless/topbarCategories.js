@@ -37,3 +37,25 @@ export const allSubcategoriesRevamp: Array<TopbarCategory> = [
     isVisible: _request => true,
   },
 ];
+
+/** Revamp Wallet categoriess */
+export const allWalletSubcategories: Array<TopbarCategory> = [
+  {
+    className: 'summary',
+    route: ROUTES.WALLET.TRANSACTIONS,
+    label: globalMessages.transactions,
+    isVisible: _request => true,
+  },
+  {
+    className: 'send',
+    route: ROUTES.WALLET.SEND,
+    label: globalMessages.send,
+    isVisible: _request => true,
+  },
+  {
+    className: 'receive',
+    route: ROUTES.WALLET.RECEIVE.ROOT,
+    label: globalMessages.receive,
+    isVisible: _request => true,
+  },
+];

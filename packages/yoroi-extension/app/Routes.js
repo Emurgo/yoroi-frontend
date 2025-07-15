@@ -34,6 +34,8 @@ import PagePreparation from './components/page-preparation/PagePreparation';
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from './UI/utils/createCurrentWalletInfo';
 // $FlowIgnore: suppressing this error
+import { WalletContextProvider } from './UI/features/wallet/module/WalletContextProvider';
+// $FlowIgnore: suppressing this error
 import { GovernanceContextProvider } from './UI/features/governace/module/GovernanceContextProvider';
 // $FlowIgnore: suppressing this error
 import { SwapContextProvider } from './UI/features/swap-new/module/SwapContextProvider';
@@ -53,6 +55,8 @@ import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
 // $FlowIgnore: suppressing this error
 import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
+// $FlowIgnore: suppressing this error
+import WalletReceivePageTS from './UI/pages/wallet/WalletReceivePage';
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
@@ -212,30 +216,11 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.NFTS.ROOT} element={<NFTsPageRevamp stores={stores} />} />
             <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
-          <Route element={<NftGallerySubPages stores={stores} />}>
-            <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
-            <Route path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
-          </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
-          <Route
-            path={ROUTES.WALLETS.RESTORE_WALLET}
-            element={<RestoreWalletPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-            element={<CreateWalletPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-            element={<ConnectedWebsitesPage stores={stores} />}
-          />
-          <Route element={<DappCenterSubpages stores={stores} />}>
-            <Route
-              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
-              element={<DappCenterPage stores={stores} />}
-            />
-          </Route>
+          <Route path={ROUTES.WALLETS.RESTORE_WALLET} element={<RestoreWalletPage stores={stores} />} />
+          <Route path={ROUTES.WALLETS.CREATE_NEW_WALLET} element={<CreateWalletPage stores={stores} />} />
+          <Route path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES} element={<ConnectedWebsitesPage stores={stores} />} />
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -270,12 +255,33 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.TRANSFER.ROOT} element={<Transfer stores={stores} />} />
           <Route path={ROUTES.SEND_FROM_URI.ROOT} element={<URILandingPage stores={stores} />} />
           <Route path={ROUTES.REVAMP.CATALYST_VOTING} element={<VotingPage stores={stores} />} />
-          <Route element={<CatalystRegistrationSubpages stores={stores} />}>
-            <Route path={ROUTES.CATALYST_REGISTRATION.ROOT} element={<CatalystRegistration stores={stores} />} />
-          </Route>
           <Route path={ROUTES.EXCHANGE_END} element={<ExchangeEndPage stores={stores} />} />
 
           {/* NEW UI Routes */}
+          <Route element={<WalletSubpages stores={stores} />}>
+            {/* <Route path={ROUTES.WALLET.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} /> */}
+            {/* <Route path={ROUTES.WALLET.SEND} element={<WalletSendPage stores={stores} />} /> */}
+            <Route
+              path={ROUTES.WALLET.RECEIVE.ROOT + '/*'}
+              element={
+                // <Receive stores={stores}>
+                // TODO: rename after refactored
+                <WalletReceivePageTS stores={stores} />
+                // </Receive>
+              }
+            />
+            <Route path={ROUTES.WALLET.ROOT} element={<Navigate to={ROUTES.WALLET.RECEIVE.ROOT} />} />
+          </Route>
+          <Route element={<NftGallerySubPages stores={stores} />}>
+            <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
+            <Route path={ROUTES.NFT_GALLERY.DETAILS} element={<NftDetailsPage stores={stores} />} />
+          </Route>
+          <Route element={<DappCenterSubpages stores={stores} />}>
+            <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
+          </Route>
+          <Route element={<CatalystRegistrationSubpages stores={stores} />}>
+            <Route path={ROUTES.CATALYST_REGISTRATION.ROOT} element={<CatalystRegistration stores={stores} />} />
+          </Route>
           <Route element={<SwapRevampSubpages stores={stores} />}>
             <Route path={ROUTES.SWAP_REVAMP.ASSET_SWAP} element={<AssetSwapRevampPage stores={stores} />} />
             <Route path={ROUTES.SWAP_REVAMP.ORDERS} element={<SwapOrdersRevampPage stores={stores} />} />
@@ -305,6 +311,20 @@ const WalletsSubpages = ({ stores }) => (
     <Outlet />
   </Wallet>
 );
+
+const WalletSubpages = ({ stores }) => {
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const { unitOfAccount } = stores.profile;
+  return (
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <WalletContextProvider currentWallet={currentWalletInfo} stores={stores}>
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
+      </WalletContextProvider>
+    </CurrencyProvider>
+  );
+};
 
 const NftGallerySubPages = ({ stores }) => (
   <NftGalleryContextProvider stores={stores}>
@@ -400,13 +420,17 @@ const AssetsSubpages = ({ stores }) => (
 
 const DappCenterSubpages = ({ stores }) => (
   <DappCenterContextProvider stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </DappCenterContextProvider>
 );
 
 const CatalystRegistrationSubpages = ({ stores }) => (
   <CatalystRegistrationContextProvider stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </CatalystRegistrationContextProvider>
 );
 

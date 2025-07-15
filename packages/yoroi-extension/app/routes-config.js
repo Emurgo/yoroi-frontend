@@ -25,6 +25,18 @@ export const ROUTES = {
       ADDRESS_LIST: '/wallets/receive/:group/:name',
     },
   },
+  WALLET: {
+    ROOT: '/wallet',
+    ADD: '/wallet/add',
+    CREATE_NEW_WALLET: '/wallet/new',
+    RESTORE_WALLET: '/wallet/restore',
+    TRANSACTIONS: '/wallet/transactions',
+    SEND: '/wallet/send',
+    RECEIVE: {
+      ROOT: '/wallet/receive',
+      ADDRESS_LIST: '/wallet/receive/:group/:name',
+    },
+  },
   SETTINGS: {
     ROOT: '/settings',
     GENERAL: '/settings/general',
