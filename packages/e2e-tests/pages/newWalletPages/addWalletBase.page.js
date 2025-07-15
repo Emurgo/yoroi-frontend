@@ -11,9 +11,14 @@ class AddWalletBase extends BasePage {
   };
   async continue() {
     this.logger.info(`AddWalletBase::continue is called`);
-    await this.waitForElement(this.nextButtonLocator);
-    await this.waitEnable(this.nextButtonLocator);
-    await this.click(this.nextButtonLocator);
+    await this.waitPresentedAndAct(this.nextButtonLocator, async () => {
+      const btnEnabled = await this.buttonIsEnabled(this.nextButtonLocator);
+      if (btnEnabled) {
+        await this.click(this.nextButtonLocator);
+      } else {
+        throw new Error(`The button ${this.nextButtonLocator.locator} is disabled`);
+      }
+    });
   }
   async backOnPreviousStep() {
     this.logger.info(`AddWalletBase::backOnPreviousStep is called`);
