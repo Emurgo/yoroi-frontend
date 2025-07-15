@@ -71,7 +71,8 @@ export default ({
       'alarms',
       'tabs',
       '*://connect.trezor.io/*',
-      'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*'
+      'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*',
+      'notifications',
     ],
     content_scripts: [
       {

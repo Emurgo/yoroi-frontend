@@ -1100,6 +1100,14 @@ const globalMessages: * = defineMessages({
     id: 'transaction.review.deregisteringStakingKey',
     defaultMessage: '!!!Undelegating from the pool',
   },
+  manual: {
+    id: 'swap.manual',
+    defaultMessage: '!!!Manual',
+  },
+  apply: {
+    id: 'global.labels.apply',
+    defaultMessage: '!!!Apply',
+  },
 });
 export default globalMessages;
 

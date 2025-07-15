@@ -19,6 +19,8 @@ import { IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 // $FlowIgnore: suppressing this error
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
+// $FlowIgnore: suppressing this error
+import NotificationDurationDialog from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationDurationDialog';
 
 @observer
 export default class WalletSettingsPage extends Component <StoresProps> {
@@ -71,7 +73,15 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           nameValidator={name => isValidWalletName(name)}
         />
         {selectedWalletId != null ? (
-          <NotificationsSettings selectedWalletId={selectedWalletId} />
+          <NotificationsSettings
+            selectedWalletId={selectedWalletId}
+            duration={stores.pushNotificationStore.duration}
+            openDurationDialog={() => {
+              stores.uiDialogs.open({
+                dialog: NotificationDurationDialog,
+              });
+            }}
+          />
         ) : null}
         {selectedWallet.type === 'mnemonic' && (
           <SpendingPasswordSetting
@@ -141,6 +151,18 @@ export default class WalletSettingsPage extends Component <StoresProps> {
         <ResyncWalletDialogContainer
           stores={stores}
           publicDeriverId={publicDeriverId}
+        />
+      );
+    }
+    if (isOpen(NotificationDurationDialog)) {
+      return (
+        <NotificationDurationDialog
+          onClose={stores.uiDialogs.closeActiveDialog}
+          initialDuration={stores.pushNotificationStore.duration}
+          onSetDuration={(duration) => {
+            stores.pushNotificationStore.duration = duration;
+            stores.uiDialogs.closeActiveDialog();
+          }}
         />
       );
     }
