@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { Logger, stringifyData, stringifyError } from '../../utils/logging';
 import { loadWalletsFromStorage, } from '../ada/lib/storage/models/load';
 import { PublicDeriver, } from '../ada/lib/storage/models/PublicDeriver/index';
-import { GenericApiError, IncorrectWalletPasswordError, } from './errors';
+import { GenericApiError, } from './errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   IDisplayCutoffPopFunc,
