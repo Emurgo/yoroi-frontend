@@ -163,7 +163,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           />
           <AboutYoroiSettingsBlock
             wallet={stores.wallets.selected}
-            pushSubscription={stores.pushNotificationStore.subscription}
+            fcmToken={stores.pushNotificationStore.fcmToken}
             onSwitchNetwork={() =>
               stores.uiDialogs.open({
                 dialog: SwitchNetworkDialogContainer,
