@@ -1,6 +1,7 @@
 import type { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { VotingStore } from '../../../../stores/ada/VotingStore';
 import { StepState } from '../../../../components/widgets/ProgressSteps';
+import { BigNumber } from 'bignumber.js';
 
 export type StepAction =
   | { type: 'START_REGISTRATION' }
@@ -22,7 +23,12 @@ type CatalystRegistrationState = {
   isDelegating: boolean;
   stepState: StepStateType;
   registrationState: any;
+  shouldHideBalance: boolean;
   votingRegTx: any;
+  tokenDecimals: number;
+  tokenName: string;
+  balanceAmount: BigNumber;
+  votingMinAmount: BigNumber;
   dispatch: (action: StepAction) => void;
 };
 
