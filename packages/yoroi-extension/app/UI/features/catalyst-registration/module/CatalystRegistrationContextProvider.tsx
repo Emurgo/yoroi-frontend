@@ -7,6 +7,8 @@ import { getTokenName, genFormatTokenAmount, genLookupOrFail } from '../../../..
 import { truncateToken } from '../../../../utils/formatters';
 import { StepState } from '../../../../components/widgets/ProgressSteps';
 import { ROUTES } from '../../../../routes-config';
+import { CATALYST_MIN_AMOUNT } from '../../../../config/numbersConfig';
+import { BigNumber } from 'bignumber.js';
 
 const initialStepState: StepState = {
   currentStep: -1,
@@ -68,6 +70,11 @@ const defaultCatalystRegistrationValues = {
   isDelegating: false,
   stepState: initialStepState,
   registrationState: null,
+  shouldHideBalance: false,
+  tokenDecimals: 0,
+  tokenName: '',
+  balanceAmount: new BigNumber(0),
+  votingMinAmount: new BigNumber(0),
   votingRegTx: {},
   // @ts-ignore
   dispatch: (action: StepAction) => {},
@@ -105,12 +112,19 @@ const defaultCatalystState: CatalystState = {
 };
 
 export const CatalystRegistrationContextProvider = observer(({ children, stores }: CatalystRegistrationProviderProps) => {
-  const { wallets, delegation, substores, tokenInfoStore, app } = stores;
+  const { wallets, delegation, substores, tokenInfoStore, app, profile, transactions } = stores;
   const { votingStore: voting } = substores.ada;
+
+  const balance = transactions.balance.getDefaultEntry();
 
   const getTokenInfo = genLookupOrFail(tokenInfoStore.tokenInfo);
   const selectedWallet = wallets.selected;
   const isDelegating = delegation.isCurrentlyDelegating(selectedWallet?.publicDeriverId);
+  const defaultTokenInfo = getTokenInfo({
+    identifier: selectedWallet?.defaultTokenId,
+    networkId: selectedWallet?.networkId,
+  });
+  const tokenName = getTokenName(defaultTokenInfo);
 
   // voting tx info
   const createVotingRegTx = voting.createVotingRegTx.result;
@@ -141,6 +155,11 @@ export const CatalystRegistrationContextProvider = observer(({ children, stores 
     isDelegating,
     voting,
     stepState,
+    balanceAmount: balance.amount,
+    votingMinAmount: CATALYST_MIN_AMOUNT,
+    shouldHideBalance: profile.shouldHideBalance,
+    tokenDecimals: defaultTokenInfo.Metadata.numberOfDecimals,
+    tokenName,
     dispatch,
     registrationState: catalystState,
     votingRegTx,

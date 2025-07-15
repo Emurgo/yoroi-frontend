@@ -16,10 +16,6 @@ import type {
   IAdhocPublicDeriver,
 } from './interfaces';
 import { WalletTypeOption, } from './interfaces';
-import type {
-  Bip44WrapperRow,
-} from '../../database/walletTypes/bip44/tables';
-import type { IBip44Wallet } from '../Bip44Wallet/interfaces';
 import type { ICip1852Wallet } from '../Cip1852Wallet/interfaces';
 import { ConceptualWallet } from './index';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
@@ -434,43 +430,6 @@ export async function refreshCip1852WalletFunctionality<
 >(
   db: lf$Database,
   row: $ReadOnly<Cip1852WrapperRow>,
-  base: Class<T>,
-): Promise<T> {
-  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
-    db,
-    row.ConceptualWalletId,
-  );
-
-  let privateDeriverLevel = null;
-  let privateDeriverKeyDerivationId = null;
-
-  let currClass = base;
-
-  if (row.PrivateDeriverLevel != null && row.PrivateDeriverKeyDerivationId != null) {
-    currClass = PublicFromPrivate(currClass);
-    currClass = GetPrivateDeriverKey(currClass);
-    privateDeriverLevel = row.PrivateDeriverLevel;
-    privateDeriverKeyDerivationId = row.PrivateDeriverKeyDerivationId;
-  } else {
-    currClass = AdhocPublicDeriver(currClass);
-  }
-
-  const instance = new currClass(
-    db,
-    conceptualWalletCtorData,
-    row,
-    privateDeriverLevel,
-    privateDeriverKeyDerivationId,
-  );
-  return (instance: any);
-}
-
-// <TODO:PENDING_REMOVAL> bip44
-export async function refreshBip44WalletFunctionality<
-  T: ConceptualWallet & IBip44Wallet
->(
-  db: lf$Database,
-  row: $ReadOnly<Bip44WrapperRow>,
   base: Class<T>,
 ): Promise<T> {
   const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
