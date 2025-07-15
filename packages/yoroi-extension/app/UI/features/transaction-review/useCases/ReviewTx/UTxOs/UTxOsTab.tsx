@@ -152,7 +152,7 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
   const isOwnAdddress = output.ownAddress;
   const renderAssets = () => {
     if (!output.assets.length) return null;
-    console.log('output.assets', output.assets);
+
     return output.assets
       .filter(a => a !== null)
       .map(asset => (
