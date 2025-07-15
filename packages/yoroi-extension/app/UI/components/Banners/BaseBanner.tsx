@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, styled, Button, Stack, ButtonProps, StackProps } from '@mui/material';
+import { Typography, styled, Button, Stack, ButtonProps, StackProps, useTheme } from '@mui/material';
 import { IconWrapper, Icons } from '../icons';
 
 const Container = styled(Stack)(({ theme }: any) => ({
@@ -31,6 +31,8 @@ export const BaseBanner = ({
   illustrationProps,
   displayIllustration = true,
 }: BaseBannerProps) => {
+  const theme: any = useTheme();
+
   const handleClose = () => {
     onClose();
   };
@@ -43,6 +45,7 @@ export const BaseBanner = ({
           icon={Icons.CloseCircleIcon}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
+          iconProps={{fill: theme.palette.ds.el_gray_max}}
           asButton
         />
       </Stack>

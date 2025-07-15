@@ -1,6 +1,8 @@
 import type { WalletTypes, CatalystRegistrationContextType, CatalystState } from '../types';
 import { useCatalystRegistration } from '../../module/CatalystRegistrationContextProvider';
 import { ProgressStep } from '../../../../../stores/ada/VotingStore';
+import { BigNumber } from 'bignumber.js';
+import environment from '../../../../../environment';
 
 export type VotingHookType = {
   startRegistration: () => void;
@@ -13,6 +15,11 @@ export type VotingHookType = {
   registrationState: CatalystState;
   votingRegTx: any | null;
   votingKey: string | null;
+  shouldHideBalance: boolean;
+  tokenName: string;
+  balanceAmount: BigNumber;
+  votingMinAmount: BigNumber;
+  cantRegister: boolean;
 };
 
 export const useVoting = (): VotingHookType => {
@@ -29,8 +36,15 @@ export const useVoting = (): VotingHookType => {
     setError,
     votingRegTx,
     voting,
+    shouldHideBalance,
+    tokenDecimals,
+    tokenName,
+    balanceAmount,
+    votingMinAmount,
     resetRegistration: resetReg,
   } = context as CatalystRegistrationContextType;
+
+  const cantRegister = !environment.isTest() && balanceAmount.lt(votingMinAmount);
 
   const votingNextStep = async (value: string | null = null) => {
     setError(null);
@@ -52,18 +66,15 @@ export const useVoting = (): VotingHookType => {
   };
 
   const votingPrevStep = async () => {
-    if (stepState.currentStep === -1)
-      return;
-    if (stepState.currentStep === ProgressStep.CONFIRM
-      || stepState.currentStep === ProgressStep.TRANSACTION) {
+    if (stepState.currentStep === -1) return;
+    if (stepState.currentStep === ProgressStep.CONFIRM || stepState.currentStep === ProgressStep.TRANSACTION) {
       dispatch({ type: 'PREVIOUS_STEP' });
     }
   };
 
   const startRegistration = () => {
     dispatch({ type: 'START_REGISTRATION' });
-    generatePin()
-      .catch(err => console.error('Catalyst [generatePin] failed', err));
+    generatePin().catch(err => console.error('Catalyst [generatePin] failed', err));
   };
 
   const resetRegistration = () => {
@@ -73,13 +84,11 @@ export const useVoting = (): VotingHookType => {
   return {
     startRegistration,
     resetRegistration,
-    votingNextStep: (value) => {
-      votingNextStep(value)
-        .catch(err => console.error('Catalyst [votingNextStep] failed', err));
+    votingNextStep: value => {
+      votingNextStep(value).catch(err => console.error('Catalyst [votingNextStep] failed', err));
     },
     votingPrevStep: () => {
-      votingPrevStep()
-        .catch(err => console.error('Catalyst [votingPrevStep] failed', err));
+      votingPrevStep().catch(err => console.error('Catalyst [votingPrevStep] failed', err));
     },
     isDelegating,
     registrationState,
@@ -87,6 +96,11 @@ export const useVoting = (): VotingHookType => {
     currentVotingStep: stepState.currentStep,
     walletType: (selectedWallet?.type as WalletTypes) ?? 'mnemonic',
     votingKey: voting?.encryptedKey,
+    shouldHideBalance,
+    tokenName,
+    balanceAmount: balanceAmount.shiftedBy(-tokenDecimals),
+    votingMinAmount: votingMinAmount.shiftedBy(-tokenDecimals),
+    cantRegister,
   };
 };
 

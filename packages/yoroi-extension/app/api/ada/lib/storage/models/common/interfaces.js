@@ -2,9 +2,7 @@
 
 import type { lf$Transaction } from 'lovefield';
 
-import type {
-  KeyRow,
-} from '../../database/primitives/tables';
+import type { KeyRow, } from '../../database/primitives/tables';
 
 export type RawVariation<Func, Deps, Arg> = (
   tx: lf$Transaction,
@@ -33,11 +31,3 @@ export type IChangePasswordRequestFunc = (
   body: IChangePasswordRequest
 ) => Promise<IChangePasswordResponse>;
 
-export type IRenameRequest = {| newName: string, |};
-export type IRenameResponse = void;
-export type IRenameFunc = (
-  body: IRenameRequest
-) => Promise<IRenameResponse>;
-export interface IRename {
-  +rename: IRenameFunc;
-}
