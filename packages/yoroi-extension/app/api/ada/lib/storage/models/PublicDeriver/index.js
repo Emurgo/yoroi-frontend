@@ -4,7 +4,6 @@ import type {
   lf$Database, lf$Transaction,
 } from 'lovefield';
 
-import { Bip44Wallet } from '../Bip44Wallet/wrapper';
 import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
@@ -38,7 +37,7 @@ import type {
 import {
   GetKeyDerivation,
 } from '../../database/primitives/api/read';
-import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
+import { addTraitsForCip1852Child } from './traits';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
@@ -207,23 +206,6 @@ export async function refreshPublicDeriverFunctionality(
     pubDeriver.KeyDerivationId,
   );
 
-  if (parent instanceof Bip44Wallet) {
-    const result = await addTraitsForBip44Child({
-      db,
-      pubDeriver,
-      pubDeriverKeyDerivation: keyDerivation,
-      conceptualWallet: parent,
-      startClass: PublicDeriver,
-    });
-    const finalClass = result.finalClass;
-    const instance = new finalClass({
-      publicDeriverId: pubDeriver.PublicDeriverId,
-      parent,
-      pathToPublic: result.pathToPublic,
-      derivationId: keyDerivation.KeyDerivationId,
-    });
-    return instance;
-  }
   if (parent instanceof Cip1852Wallet) {
     const result = await addTraitsForCip1852Child(
       db,
@@ -272,5 +254,4 @@ async function getKeyDerivation(
   );
 }
 
-export type Bip44PublicDeriver = PublicDeriver<Bip44Wallet>;
 export type Cip1852PublicDeriver = PublicDeriver<Cip1852Wallet>;
