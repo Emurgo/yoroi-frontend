@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { PriceImpact } from '../../../components/swap/types';
-import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import type { StoresProps } from '../../../stores';
