@@ -31,6 +31,10 @@ const CONFIG: ConfigType = {
     identifier: '',
     apiEndpoint: ''
   },
+  notifications: {
+    defaultDuration: 0,
+    vapidPublicKey: '',
+  },
 };
 
 global.CONFIG = CONFIG;

@@ -100,6 +100,18 @@ export const messages = Object.freeze(
       id: 'global.labels.skip',
       defaultMessage: '!!!Skip',
     },
+    surveyTitle: {
+      id: 'survey.title',
+      defaultMessage: '!!!We’d love your feedback!',
+    },
+    surveyDescription: {
+      id: 'survey,description',
+      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
+    },
+    surveyButton: {
+      id: 'survey.button',
+      defaultMessage: '!!!take survey',
+    },
   })
 );
 
@@ -131,5 +143,8 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
+    surveyTitle: intl.formatMessage(messages.surveyTitle),
+    surveyDescription: intl.formatMessage(messages.surveyDescription),
+    surveyButton: intl.formatMessage(messages.surveyButton),
   }).current;
 };
