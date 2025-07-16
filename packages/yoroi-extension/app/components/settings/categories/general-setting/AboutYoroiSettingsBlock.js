@@ -158,7 +158,6 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
   const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
-  const displaySpecialInfo = environment.isDev() || environment.isNightly();
   const getNetworkValue = () => {
     const networkId = wallet && wallet.networkId;
     switch (networkId) {
