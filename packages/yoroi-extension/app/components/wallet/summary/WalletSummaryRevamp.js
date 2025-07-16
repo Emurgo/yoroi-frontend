@@ -23,13 +23,13 @@ import FullscreenLayout from '../../layout/FullscreenLayout';
 // $FlowIgnore: supressing this error
 import { BringBanner, UsdaBanner, MidnightBanner, SurveyBanner } from '../../../UI/components/Banners';
 import { ROUTES } from '../../../routes-config';
-import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 import environment from '../../../environment';
 // $FlowIgnore: suppressing this error
 import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
 import { withYoroiRemoteConfig } from '../../../UI/common/helpers/withYoroiRemoteConfig';
+import { BannerVisibilityManager } from '../../../UI/components/Banners/BannerVisibilityManager';
 
 const messages = defineMessages({
   transactionType: {
@@ -59,7 +59,6 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
-  +emptyBannerComponent: Node,
   +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
   +stores: StoresMap,
@@ -70,44 +69,9 @@ type State = {|
   isSurveyVisible: boolean,
 |};
 
-const localStorage = new LocalStorageApi();
-const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
-
 @observer
 class WalletSummaryRevamp extends Component<Props, State> {
   static contextType: any = IntlContext;
-  state: State = {
-    isBannerVisible: false,
-    isSurveyVisible: false,
-    isMidnightvisible: false,
-  };
-
-  UNSAFE_componentWillMount: void => Promise<void> = async () => {
-    const midnightBannerState = await localStorage.getMidnightBannerAnnouncementClosed();
-    const query = this.props.yoroiRemoteConfigQuery;
-
-    if (midnightBannerState === undefined && query?.data?.banners.midnightAnnouncement.display === true) {
-      this.setState({ isMidnightvisible: true });
-    }
-
-    if (!(await surveyDismissedFlag.get())) {
-      this.setState({ isSurveyVisible: true });
-      return;
-    }
-
-    const wasClosed = await localStorage.getBringBannerClosed();
-    if (!wasClosed) {
-      this.setState({ isBannerVisible: true });
-    }
-  };
-
-  surveyClose: () => void = () => {
-    surveyDismissedFlag.set(true);
-    this.setState({ isSurveyVisible: false });
-  };
-  midnightBannerClose: () => void = () => {
-    this.setState({ isMidnightvisible: false });
-  };
 
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
@@ -223,52 +187,8 @@ class WalletSummaryRevamp extends Component<Props, State> {
     );
   }
 
-  renderBringBanner(): Node {
-    const { goToRoute, selectedWallet } = this.props;
-    const { isBannerVisible } = this.state;
-
-    const onClose = () => {
-      this.setState({ isBannerVisible: false });
-      localStorage.setBringBannerClosed('true');
-    };
-
-    // <TODO:UNFLAG_LATER>
-    if (!environment.isDev()) return null;
-
-    if (selectedWallet.isTestnet || !isBannerVisible) return null;
-
-    return (
-      <BringBanner
-        onClose={onClose}
-        onClick={() => {
-          goToRoute({ route: ROUTES.CASHBACK.ROOT });
-          onClose();
-        }}
-        displayIllustration={false}
-      />
-    );
-  }
-
-  renderUsdaBanner(): Node {
-    const { goToRoute } = this.props;
-
-    // <TODO:UNBLOCK_LATER>
-    // noinspection PointlessBooleanExpressionJS
-    if (true) return null;
-
-    // noinspection UnreachableCodeJS
-    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
-  }
-
   render(): Node {
-    const {
-      pendingAmount,
-      isLoadingTransactions,
-      openExportTxToFileDialog,
-      shouldShowEmptyBanner,
-      emptyBannerComponent,
-      stores,
-    } = this.props;
+    const { pendingAmount, isLoadingTransactions, openExportTxToFileDialog, shouldShowEmptyBanner, stores } = this.props;
     const intl = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
@@ -323,14 +243,7 @@ class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        <MidnightBanner onClose={this.midnightBannerClose} />
-        {!this.state.isSurveyVisible && this.isMidnightvisible === false && <DrepPromotionBanner stores={stores} intl={intl} />}
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
-          {this.renderBringBanner()}
-          {this.renderUsdaBanner()}
-          {this.state.isSurveyVisible && this.state.isMidnightvisible === false && <SurveyBanner onClose={this.surveyClose} />}
-        </Box>
-        {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
+        <BannerVisibilityManager stores={stores} intl={intl} />
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
           <Grid
             container
