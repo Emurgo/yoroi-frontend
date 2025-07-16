@@ -21,7 +21,7 @@ const Wrapper = styled(IconButton)(({ theme }: any) => ({
   alignItems: 'center',
   backgroundColor: theme.palette.ds.bg_color_contrast_min,
   position: 'absolute',
-  top: '32%',
+  top: '50%',
   left: '45%',
   cursor: 'pointer',
   '&:hover': {
