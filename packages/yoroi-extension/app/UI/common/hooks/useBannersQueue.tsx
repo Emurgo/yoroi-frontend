@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
-import { BannerType } from '../constants';
+import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 
 const surveyDismissed = createStorageFlag('SURVEY_DISMISSED', false);
 
@@ -21,7 +21,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
       if (walletBalance === 0) {
         return BannerType.BuyAda;
       }
-      if (walletBalance > 5) {
+      if (walletBalance > DREP_BANNER_MIN_ADA) {
         return BannerType.DRep;
       }
 
