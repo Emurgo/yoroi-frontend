@@ -338,7 +338,7 @@ const SwapSubpages = ({ stores }) => {
   );
   return (
     // <QueryClientProvider client={queryClient}>
-    <SwapProvider publicDeriver={stores.wallets.selected}>
+    <SwapProvider publicDeriver={stores.wallets.selected} key={stores.wallets.selected?.publicDeriverId}>
       <SwapPageContainer stores={stores}>
         <Suspense fallback={loader}>
           <Outlet />
