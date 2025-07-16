@@ -292,10 +292,10 @@ export default class SwapStore extends Store<StoresMap> {
     entries.push({
       address: parsedCbor.outputs[0].address,
       amount: createSwapOrderAmount({ wallet, sell, ptFees }),
-      // dataHash: parsedCbor.outputs[0].plutus_data.DataHash,
-      dataHash: '43cc9d467515de3be4866666c65eb8285aa26eab13b72ed67c64467b1c9d2220',
-      data:
-        'd8799fd8799fd8799fd8799f581cfa99aefe8bc7ee1594d1c13035700e9bc2f49af6b57aa09ae5ecdc58ffd8799fd8799fd8799f581c5057994602c35c5f3f7a3ad149924e66b36ef0b48b653cb517419d40ffffffff581c804f5544c1962a40546827cab750a88404dc7108c0f588b72964754f445659464940401a00f1523bd879801a00286f90ffff',
+      dataHash: parsedCbor.auxiliary_data_hash,
+      // dataHash: '43cc9d467515de3be4866666c65eb8285aa26eab13b72ed67c64467b1c9d2220',
+      // data:
+      //   'd8799fd8799fd8799fd8799f581cfa99aefe8bc7ee1594d1c13035700e9bc2f49af6b57aa09ae5ecdc58ffd8799fd8799fd8799f581c5057994602c35c5f3f7a3ad149924e66b36ef0b48b653cb517419d40ffffffff581c804f5544c1962a40546827cab750a88404dc7108c0f588b72964754f445659464940401a00f1523bd879801a00286f90ffff',
     });
 
     if (swapState.createTx.frontendFee > 0) {
