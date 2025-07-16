@@ -55,6 +55,8 @@ export default class SignTxContainer extends Component<
     await this.props.stores.connector.confirmSignInTx(password);
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
+    // wait for the confirmation message to get to the service worker
+    await new Promise(resolve => setTimeout(resolve, 500));
     window.close();
   };
 
