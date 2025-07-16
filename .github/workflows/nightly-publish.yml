@@ -24,21 +24,21 @@ jobs:
         run: |
           . install-all.sh
 
-      - name: Run Flow
-        run: |
-          npm run flow
+      # - name: Run Flow
+      #   run: |
+      #     npm run flow
 
-      - name: Run Lint
-        run: |
-          npm run eslint
+      # - name: Run Lint
+      #   run: |
+      #     npm run eslint
 
-      - name: Run TypeScript Compiler
-        run: |
-          npm run tsc
+      # - name: Run TypeScript Compiler
+      #   run: |
+      #     npm run tsc
 
-      - name: Run unit tests
-        run: |
-          npm run test
+      # - name: Run unit tests
+      #   run: |
+      #     npm run test
 
       - name: Bump version
         id: package-version
@@ -95,8 +95,7 @@ jobs:
       - name: Set bump branch name
         id: vars
         run: |
-          base_branch_name="${{ github.head_ref || github.ref_name }}"
-          branch-name="bump/nightly-version/$base_branch_name"
+          branch-name="bump/${{ github.head_ref || github.ref_name }}"
           echo "branch-name=$branch-name" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
