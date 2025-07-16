@@ -83,38 +83,28 @@ jobs:
           git config --global user.name "emurgo-rnd"
           git config --global user.email "rnd@emurgo.io"
 
-      - name: Commit and push
-        if: github.ref_protected == false
-        working-directory: ./packages/yoroi-extension
-        run: |
-          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          git add package*.json
-          git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-          git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
+      # - name: Commit and push
+      #   if: github.ref_protected == false
+      #   working-directory: ./packages/yoroi-extension
+      #   run: |
+      #     BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+      #     git add package*.json
+      #     git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+      #     git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
 
-      - name: Create PR with bumped version
+      - name: Set bump branch name
+        id: vars
+        run: |
+          base_branch_name="${{ github.head_ref || github.ref_name }}"
+          branch-name="bump/nightly-version/$base_branch_name"
+          echo "branch-name=$branch-name" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
         if: github.ref_protected == true
-        working-directory: ./packages/yoroi-extension
-        run: |
-          PROTECTED_BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          git fetch
-          git pull
-          git checkout -b "bump/nightly-version-bump"
-          git add package*.json
-          git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-          git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD
-          PR_TITLE="[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          PR_BODY="This PR was created automatically by GitHub Actions.\nThis PR is based on the branch `$PROTECTED_BRANCH_NAME`"
-          BASE_BRANCH="$PROTECTED_BRANCH_NAME"
-          HEAD_BRANCH=$(git branch --show-current)
-
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.RND_GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls" \
-            -d '{
-              "title": "'"$PR_TITLE"'",
-              "body": "'"$PR_BODY"'",
-              "head": "'"$HEAD_BRANCH"'",
-              "base": "'"$BASE_BRANCH"'"
-            }'
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: ${{ secrets.RND_GITHUB_TOKEN }}
+          commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+          title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+          body: This PR was created automatically by GitHub Actions
+          branch: ${{ steps.vars.outputs.branch-name }}
