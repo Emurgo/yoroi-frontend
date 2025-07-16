@@ -100,7 +100,7 @@ jobs:
           echo "branch-name=$branch-name" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
-        if: github.ref_protected == true
+        # if: github.ref_protected == true
         uses: peter-evans/create-pull-request@v7.0.8
         with:
           token: ${{ secrets.RND_GITHUB_TOKEN }}
