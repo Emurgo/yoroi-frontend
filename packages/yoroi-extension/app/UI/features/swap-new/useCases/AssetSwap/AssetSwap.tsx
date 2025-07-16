@@ -9,17 +9,18 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
-import { useSwapRevamp } from '../../module/SwapContextProvider';
+import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
+import { TransactionResult } from '../../../transaction-review/common/types';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { createOrder, swapForm, tokenInfos, stores } = useSwapRevamp();
   const { openModal } = useModal();
-  const { openTxReviewModal } = useTxReviewModal();
+  const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
   const wallet = stores.wallets.selectedOrFail;
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {
@@ -32,9 +33,9 @@ export const AssetSwap = () => {
   };
 
   const handleSubmitTransaction = async password => {
-    console.log('handleSubmitTransaction', { swapForm, password });
     const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
-    console.log('parsedCbor', parsedCbor);
+
+    console.log('[parsedCbor]', { parsedCbor, password });
     const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
       wallet,
       swapState: swapForm,
@@ -42,7 +43,7 @@ export const AssetSwap = () => {
       parsedCbor,
     });
 
-    console.log('unisgnedTxRequest', unisgnedTxRequest);
+    console.log('[unisgnedTxRequest]', unisgnedTxRequest);
 
     try {
       await stores.transactionProcessingStore.adaSendAndRefresh({
@@ -52,9 +53,13 @@ export const AssetSwap = () => {
         callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
       });
       console.log('Transaction submitted successfully');
+      showTxResultModal(TransactionResult.SUCCESS);
     } catch (e) {
       console.error('Error submitting transaction:', e);
+      showTxResultModal(TransactionResult.FAIL);
     } finally {
+      swapForm.action({ type: SwapAction.ResetForm });
+      closeTxReviewModal();
     }
   };
 
@@ -106,7 +111,7 @@ export const AssetSwap = () => {
       </LoadingButton>
     </Content>
   );
-};
+};;
 
 const Content = styled(Stack)(({ theme }: any) => ({
   ...theme.atoms.pt_xl,

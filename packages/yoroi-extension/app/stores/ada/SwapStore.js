@@ -306,7 +306,7 @@ export default class SwapStore extends Store<StoresMap> {
     }
 
     const protocolParameters = await getProtocolParameters(wallet);
-    console.log('NEW DATA', {
+    console.log('NEW DATA FOR createSimpleTx', {
       publicDeriver: wallet,
       entries,
       metadata,
