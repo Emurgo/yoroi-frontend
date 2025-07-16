@@ -98,6 +98,13 @@ jobs:
           branch_name="bump/${{ github.head_ref || github.ref_name }}"
           echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
 
+      - name: Get base PR URL
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.target_pr
+        id: base-PR
+        run: |
+          base_pr="https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.target_pr }}"
+          echo "value=$base_pr" >> $GITHUB_OUTPUT
+
       - name: Create Pull Request
         # if: github.ref_protected == true
         uses: peter-evans/create-pull-request@v7.0.8
@@ -105,5 +112,5 @@ jobs:
           token: ${{ secrets.RND_GITHUB_TOKEN }}
           commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
           title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the version from the PR ${{ github.event.number }}"
+          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the version from the PR ${{ steps.base-PR.outputs.value }}"
           branch: ${{ steps.vars.outputs.branch-name }}
