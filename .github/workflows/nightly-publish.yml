@@ -78,14 +78,41 @@ jobs:
         extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
         zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
 
-    - name: Commit changes
-      working-directory: ./packages/yoroi-extension
+    - name: Configure Git
       run: |
         git config --global user.name "emurgo-rnd"
         git config --global user.email "rnd@emurgo.io"
+
+    - name: Commit and push
+      if: github.ref_protected == 'false'
+      working-directory: ./packages/yoroi-extension
+      run: |
+        BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
         git add package*.json
         git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.RND_GITHUB_TOKEN }}
-  
+        git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
+
+    - name: Create PR with bumped version
+      if: github.ref_protected == 'true'
+      working-directory: ./packages/yoroi-extension
+      run: |
+        PROTECTED_BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+        git checkout -b "bump/nightly-version-bump"
+        git add package*.json
+        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+        git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD
+        PR_TITLE="[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+        PR_BODY="This PR was created automatically by GitHub Actions.\nThe PR is based on the PR #${{ github.event.number }}"
+        BASE_BRANCH="$PROTECTED_BRANCH_NAME"
+        HEAD_BRANCH=$(git branch --show-current)
+
+        curl -X POST \
+          -H "Authorization: token ${{ secrets.RND_GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls" \
+          -d '{
+            "title": "'"$PR_TITLE"'",
+            "body": "'"$PR_BODY"'",
+            "head": "'"$HEAD_BRANCH"'",
+            "base": "'"$BASE_BRANCH"'"
+          }'
