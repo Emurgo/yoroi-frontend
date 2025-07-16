@@ -102,7 +102,7 @@ jobs:
           git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
           git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD
           PR_TITLE="[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          PR_BODY="This PR was created automatically by GitHub Actions.\nThis PR is based on the PR #${{ github.event.number }}"
+          PR_BODY="This PR was created automatically by GitHub Actions.\nThis PR is based on the branch `$PROTECTED_BRANCH_NAME`
           BASE_BRANCH="$PROTECTED_BRANCH_NAME"
           HEAD_BRANCH=$(git branch --show-current)
 
