@@ -23,8 +23,8 @@ jobs:
       - name: Get PR info
         run: |
           echo "Github repository: ${{ github.repository }}"
-          echo "Github event: ${{ github.event_name }}"
-          echo "PR URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          echo "Github event_name: ${{ github.event_name }}"
+          echo "Github event: ${{ github.event }}"
           
       # - name: Install dependencies
       #   run: |
