@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
-      - name: Install dependencies
-        run: |
-          . install-all.sh
+      # - name: Install dependencies
+      #   run: |
+      #     . install-all.sh
 
       # - name: Run Flow
       #   run: |
@@ -63,10 +63,10 @@ jobs:
         run: |
           npm i --legacy-peer-deps
 
-      - name: Build Nightly app
-        working-directory: ./packages/yoroi-extension
-        run: |
-          npm run prod:nightly
+      # - name: Build Nightly app
+      #   working-directory: ./packages/yoroi-extension
+      #   run: |
+      #     npm run prod:nightly
 
       # - name: Upload to Chrome Web Store
       #   uses: mobilefirstllc/cws-publish@latest
@@ -105,5 +105,5 @@ jobs:
           token: ${{ secrets.RND_GITHUB_TOKEN }}
           commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
           title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          body: This PR was created automatically by GitHub Actions
+          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the version from the PR ${{ github.event.number }}"
           branch: ${{ steps.vars.outputs.branch-name }}
