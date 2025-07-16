@@ -24,7 +24,8 @@ jobs:
         run: |
           echo "Github repository: ${{ github.repository }}"
           echo "Github event_name: ${{ github.event_name }}"
-          echo "Github event: ${{ github.event }}"
+          echo "Github event:"
+          echo ${{ github.event }} | jq .
           
       # - name: Install dependencies
       #   run: |
