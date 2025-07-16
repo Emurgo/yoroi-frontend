@@ -7,3 +7,4 @@ export { PlayStoreBadge } from './PlayStoreBadge';
 export { OpenApp } from './OpenApp';
 export { CatalystTrezor } from './CatalystTrezor';
 export { CatalystLedger } from './CatalystLedger';
+export { InsufficientFunds } from './InsufficientFunds';

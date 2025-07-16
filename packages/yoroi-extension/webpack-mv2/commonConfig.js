@@ -93,6 +93,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
         'types.js',
         'interfaces.js',
         'rustLoaderForBackground.js',
+        'UI/*',
       ],
       // Root directory (optional)
       root: __dirname,

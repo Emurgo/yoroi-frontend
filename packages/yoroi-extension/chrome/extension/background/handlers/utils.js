@@ -22,7 +22,6 @@ import {
 } from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { isLedgerNanoWallet, isAnyTrezorWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
-import { Bip44Wallet } from '../../../../app/api/ada/lib/storage/models/Bip44Wallet/wrapper';
 import {
   isCardanoHaskell,
   isTestnet,
@@ -260,7 +259,8 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
     internalAddressesByType,
     allAddresses,
     allUtxoAddresses,
-    isBip44Wallet: conceptualWallet instanceof Bip44Wallet,
+    // <TODO:PENDING_REMOVAL> bip44
+    isBip44Wallet: false,
     isTestnet: isTestnet(network),
     isCardanoHaskell: isCardanoHaskell(network),
     isRefreshing: refreshingWalletIdSet.has(publicDeriverId),
@@ -363,7 +363,8 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
     internalAddressesByType,
     allAddresses: { utxoAddresses: [], accountingAddresses: [] },
     allUtxoAddresses: [],
-    isBip44Wallet: publicDeriver.getParent() instanceof Bip44Wallet,
+    // <TODO:PENDING_REMOVAL> bip44
+    isBip44Wallet: false,
     isTestnet: isTestnet(network),
     isCardanoHaskell: isCardanoHaskell(network),
     isRefreshing: true,
