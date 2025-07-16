@@ -95,8 +95,8 @@ jobs:
       - name: Set bump branch name
         id: vars
         run: |
-          branch-name="bump/${{ github.head_ref || github.ref_name }}"
-          echo "branch-name=$branch-name" >> $GITHUB_OUTPUT
+          branch_name="bump/${{ github.head_ref || github.ref_name }}"
+          echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         # if: github.ref_protected == true
