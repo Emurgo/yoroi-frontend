@@ -44,18 +44,18 @@ export const AssetSwap = () => {
 
     console.log('unisgnedTxRequest', unisgnedTxRequest);
 
-    // try {
-    //   await stores.transactionProcessingStore.adaSendAndRefresh({
-    //     wallet,
-    //     signRequest: parsedCbor,
-    //     password,
-    //     callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-    //   });
-    //   console.log('Transaction submitted successfully');
-    // } catch (e) {
-    //   console.error('Error submitting transaction:', e);
-    // } finally {
-    // }
+    try {
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest: unisgnedTxRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
+      console.log('Transaction submitted successfully');
+    } catch (e) {
+      console.error('Error submitting transaction:', e);
+    } finally {
+    }
   };
 
   useEffect(() => {
