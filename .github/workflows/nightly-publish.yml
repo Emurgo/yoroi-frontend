@@ -97,6 +97,8 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: |
           PROTECTED_BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          git fetch
+          git pull
           git checkout -b "bump/nightly-version-bump"
           git add package*.json
           git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
