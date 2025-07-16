@@ -20,6 +20,12 @@ jobs:
         with:
           node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
+      - name: Get PR info
+        run: |
+          echo "Github repository: ${{ github.repository }}"
+          echo "Github event: ${{ github.event_name }}"
+          echo "PR URL: https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }}"
+          
       # - name: Install dependencies
       #   run: |
       #     . install-all.sh
@@ -40,28 +46,28 @@ jobs:
       #   run: |
       #     npm run test
 
-      - name: Bump version
-        id: package-version
-        working-directory: ./packages/yoroi-extension
-        run: |
-          CURRENT_VERSION=$(jq -r '.version' package.json)
-          PATCH_VERSION="${CURRENT_VERSION##*.}"
-          MAJOR_MINOR_VERSION="${CURRENT_VERSION%.*}"
-          REMINDER=$((PATCH_VERSION % 100))
-          if [ $REMINDER -eq 99 ]; then
-              NEW_PATCH_VERSION=$((PATCH_VERSION + 2))
-          else
-              NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
-          fi
-          NEW_VERSION="$MAJOR_MINOR_VERSION.$NEW_PATCH_VERSION"
-          jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > new_package.json && mv new_package.json package.json
-          echo "New version: $NEW_VERSION"
-          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      # - name: Bump version
+      #   id: package-version
+      #   working-directory: ./packages/yoroi-extension
+      #   run: |
+      #     CURRENT_VERSION=$(jq -r '.version' package.json)
+      #     PATCH_VERSION="${CURRENT_VERSION##*.}"
+      #     MAJOR_MINOR_VERSION="${CURRENT_VERSION%.*}"
+      #     REMINDER=$((PATCH_VERSION % 100))
+      #     if [ $REMINDER -eq 99 ]; then
+      #         NEW_PATCH_VERSION=$((PATCH_VERSION + 2))
+      #     else
+      #         NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
+      #     fi
+      #     NEW_VERSION="$MAJOR_MINOR_VERSION.$NEW_PATCH_VERSION"
+      #     jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > new_package.json && mv new_package.json package.json
+      #     echo "New version: $NEW_VERSION"
+      #     echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Apply new version to package-lock
-        working-directory: ./packages/yoroi-extension
-        run: |
-          npm i --legacy-peer-deps
+      # - name: Apply new version to package-lock
+      #   working-directory: ./packages/yoroi-extension
+      #   run: |
+      #     npm i --legacy-peer-deps
 
       # - name: Build Nightly app
       #   working-directory: ./packages/yoroi-extension
@@ -78,10 +84,10 @@ jobs:
       #     extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
       #     zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "emurgo-rnd"
-          git config --global user.email "rnd@emurgo.io"
+      # - name: Configure Git
+      #   run: |
+      #     git config --global user.name "emurgo-rnd"
+      #     git config --global user.email "rnd@emurgo.io"
 
       # - name: Commit and push
       #   if: github.ref_protected == false
@@ -92,25 +98,25 @@ jobs:
       #     git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
       #     git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
 
-      - name: Set bump branch name
-        id: vars
-        run: |
-          branch_name="bump/${{ github.head_ref || github.ref_name }}"
-          echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
+      # - name: Set bump branch name
+      #   id: vars
+      #   run: |
+      #     branch_name="bump/${{ github.head_ref || github.ref_name }}"
+      #     echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
 
-      - name: Get base PR URL
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.target_pr
-        id: base-PR
-        run: |
-          base_pr="https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.target_pr }}"
-          echo "value=$base_pr" >> $GITHUB_OUTPUT
+      # - name: Get base PR URL
+      #   if: github.event_name == 'workflow_dispatch' && github.event.inputs.target_pr
+      #   id: base-PR
+      #   run: |
+      #     base_pr="https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.target_pr }}"
+      #     echo "value=$base_pr" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request
-        # if: github.ref_protected == true
-        uses: peter-evans/create-pull-request@v7.0.8
-        with:
-          token: ${{ secrets.RND_GITHUB_TOKEN }}
-          commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-          title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the version from the PR ${{ steps.base-PR.outputs.value }}"
-          branch: ${{ steps.vars.outputs.branch-name }}
+      # - name: Create Pull Request
+      #   # if: github.ref_protected == true
+      #   uses: peter-evans/create-pull-request@v7.0.8
+      #   with:
+      #     token: ${{ secrets.RND_GITHUB_TOKEN }}
+      #     commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+      #     title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+      #     body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the version from the PR ${{ steps.base-PR.outputs.value }}"
+      #     branch: ${{ steps.vars.outputs.branch-name }}
