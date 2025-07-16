@@ -6,5 +6,6 @@
   "test-CURRENT_NETWORK_ID": "250",
   "test-DREP_YOROI_BANNER": "{'1':2525115600000}",
   "test-BRING_BANNER_CLOSED": "true",
-  "test-MIDNIGHT_MODAL_CLOSED": "true"
+  "test-MIDNIGHT_MODAL_CLOSED": "true",
+  "SURVEY_DISMISSED": "true"
 }
