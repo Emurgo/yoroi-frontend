@@ -3,7 +3,7 @@ import { customAfterEach } from '../../utils/customHooks.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
 import { oneMinute } from '../../helpers/timeConstants.js';
-import { collectInfo, createWallet } from '../../helpers/restoreWalletHelper.js';
+import { collectInfo, createWallet, preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
 import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
@@ -38,6 +38,7 @@ describe('dApp, getCollateral, error, empty wallet', function () {
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       const basePage = new BasePage(webdriver, logger);
       basePage.goToExtension();
+      await preloadBrowserStorage(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);

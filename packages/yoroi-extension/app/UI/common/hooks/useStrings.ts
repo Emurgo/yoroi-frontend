@@ -79,6 +79,39 @@ export const messages = Object.freeze(
       id: 'transaction.review.transactionReview',
       defaultMessage: '!!!Transaction Review',
     },
+    takePartInMidnight: {
+      id: 'banners.midnight.takePartInMidnight',
+      defaultMessage: '!!!Take part in the Midnight NIGHT token distribution',
+    },
+    midnightSupport: {
+      id: 'banners.midnight.midnightSupport',
+      defaultMessage:
+        '!!!Yoroi will support Midnight’s multi-phase token distribution — a bold initiative to empower a diverse, global community.',
+    },
+    learnMore: {
+      id: 'global.labels.LearnMore',
+      defaultMessage: '!!!Learn More',
+    },
+    importantUpdates: {
+      id: 'global.labels.importantUpdates',
+      defaultMessage: '!!!Important updates',
+    },
+    skip: {
+      id: 'global.labels.skip',
+      defaultMessage: '!!!Skip',
+    },
+    surveyTitle: {
+      id: 'survey.title',
+      defaultMessage: '!!!We’d love your feedback!',
+    },
+    surveyDescription: {
+      id: 'survey,description',
+      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
+    },
+    surveyButton: {
+      id: 'survey.button',
+      defaultMessage: '!!!take survey',
+    },
   })
 );
 
@@ -105,5 +138,13 @@ export const useStrings = () => {
     cardanoCNS: intl.formatMessage(messages.cardanoCNS),
     unstoppableDomains: intl.formatMessage(messages.unstoppableDomains),
     transactionReview: intl.formatMessage(messages.transactionReview),
+    takePartInMidnight: intl.formatMessage(messages.takePartInMidnight),
+    midnightSupport: intl.formatMessage(messages.midnightSupport),
+    learnMore: intl.formatMessage(messages.learnMore),
+    importantUpdates: intl.formatMessage(messages.importantUpdates),
+    skip: intl.formatMessage(messages.skip),
+    surveyTitle: intl.formatMessage(messages.surveyTitle),
+    surveyDescription: intl.formatMessage(messages.surveyDescription),
+    surveyButton: intl.formatMessage(messages.surveyButton),
   }).current;
 };
