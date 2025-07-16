@@ -454,6 +454,8 @@
   "notifications.settings.duration.line2": "Adjust the display duration of in-app notifications to suit your preferences.",
   "notifications.settings.duration.title": "Display duration",
   "notifications.settings.durationDescription": "Display during {duration} seconds",
+  "notifications.settings.enablePushNotificationsDesc": "Allow push notifications",
+  "notifications.settings.enablePushNotificationsTitle": "Push notifications",
   "settings.cashback.title": "キャッシュバク報酬ウォレット",
   "settings.cashback.note": "接続されたウォレットは、ADAキャッシュバック報酬を受け取るための指定ウォレットであり、すべての提携ウェブサイトに適用されます。キャッシュバックを希望するウォレットに確実に受け取るために、いつでも別のウォレットに切り替えることができます。または、「なし」を指定して、このサービスを拒否することもできます。",
   "settings.cashback.label": "ウォレットを接続",
