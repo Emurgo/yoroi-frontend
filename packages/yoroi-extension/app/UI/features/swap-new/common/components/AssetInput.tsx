@@ -107,7 +107,15 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   };
 
   return (
-    <Wrapper selected={focusState} hasError={!!error} atoms={atoms} direction={direction}>
+    <Wrapper
+      selected={focusState}
+      hasError={!!error}
+      atoms={atoms}
+      direction={direction}
+      onClick={() => {
+        direction === ASSET_DIRECTION_OUT && swapForm.tokenOutInput.value.length === 0 ? onAssetSelect() : undefined;
+      }}
+    >
       <Stack spacing={1} {...atoms.gap_sm}>
         <Label variant="body2">{label}</Label>
 
@@ -125,8 +133,6 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
               info={{
                 id: normalizeTokenId(AssetIdForIcon),
                 direction,
-                // policy: tokenInputInfo?.fingerprint,
-                // name: tokenInputInfo?.name,
               }}
               size="md"
             />

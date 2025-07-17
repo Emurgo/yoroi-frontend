@@ -18,7 +18,7 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
-  const { createOrder, swapForm, tokenInfos, stores } = useSwapRevamp();
+  const { createOrder, swapForm, tokenInfos, isCreateOrderLoading, stores } = useSwapRevamp();
   const { openModal } = useModal();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
   const wallet = stores.wallets.selectedOrFail;
@@ -106,6 +106,7 @@ export const AssetSwap = () => {
         //  @ts-ignore
         variant="primary"
         onClick={createOrder}
+        loading={isCreateOrderLoading}
       >
         Swap
       </LoadingButton>

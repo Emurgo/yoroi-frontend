@@ -1,4 +1,4 @@
-import { Link, Stack, Typography, useTheme } from '@mui/material';
+import { Link, Skeleton, Stack, Typography, useTheme } from '@mui/material';
 import { DisplayInfoInRow } from '../../common/components/DisplayInfoInRow';
 import { useStrings } from '../../common/hooks/useStrings';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
@@ -9,7 +9,7 @@ import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { swapForm, tokenInfos, primaryTokenInfo } = useSwapRevamp();
+  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading } = useSwapRevamp();
   const { openModal } = useModal();
 
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
@@ -17,6 +17,16 @@ export const EstimateSummary = () => {
 
   const tokenInTicker = tokenInInfo?.ticker ?? tokenInInfo?.name ?? '-';
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
+
+  if (isEstimateOrderLoading) {
+    return (
+      <Stack gap={12}>
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Skeleton key={index} variant="rectangular" width="100%" height="32px" sx={{ borderRadius: '8px' }} />
+        ))}
+      </Stack>
+    );
+  }
 
   if (swapForm.estimate === undefined) return null;
 

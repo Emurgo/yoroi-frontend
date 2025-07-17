@@ -40,6 +40,7 @@ export const useAddressHex = address => {
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
   const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet, explorer } = currentWallet;
   const [isCreateOrderLoading, setIsCreateOrderLoading] = useState(false);
+  const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
   const { partners, excludedTokens } = useSwapConfig();
@@ -158,7 +159,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       (state.tokenInInput.value === '' && state.tokenOutInput.value === '')
     )
       return;
-
+    setIsEstimateOrderLoading(true);
     swapManager.api
       .estimate({
         slippage: state.slippageInput.value,
@@ -181,6 +182,9 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         } else {
           action({ type: SwapAction.EstimateResponse, value: response.value.data });
         }
+      })
+      .finally(() => {
+        setIsEstimateOrderLoading(false);
       });
   }, [state, swapManager.api]);
 
@@ -248,6 +252,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       explorer,
       createOrder: create,
       isCreateOrderLoading,
+      isEstimateOrderLoading,
       stores,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
