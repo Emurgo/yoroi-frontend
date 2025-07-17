@@ -20,13 +20,7 @@ import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
-// $FlowIgnore: supressing this error
-import { BringBanner, UsdaBanner, MidnightBanner, SurveyBanner } from '../../../UI/components/Banners';
-import { ROUTES } from '../../../routes-config';
 import type { WalletState } from '../../../../chrome/extension/background/types';
-import environment from '../../../environment';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
 // $FlowIgnore: suppressing this error
 import { withYoroiRemoteConfig } from '../../../UI/common/helpers/withYoroiRemoteConfig';
