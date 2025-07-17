@@ -68,15 +68,15 @@ jobs:
         run: |
           npm run prod:nightly
 
-      # - name: Upload to Chrome Web Store
-      #   uses: mobilefirstllc/cws-publish@latest
-      #   with:
-      #     action: 'publish'  # one of: upload, publish, testers
-      #     client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
-      #     client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
-      #     refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
-      #     extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
-      #     zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
+      - name: Upload to Chrome Web Store
+        uses: mobilefirstllc/cws-publish@latest
+        with:
+          action: "publish" # one of: upload, publish, testers
+          client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
+          client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
+          extension_id: "poonlenmfdfbjfeeballhiibknlknepo"
+          zip_file: "./packages/yoroi-extension/Yoroi Nightly.zip"
 
       - name: Configure Git
         run: |
@@ -92,29 +92,21 @@ jobs:
           git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
           git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
 
-      - name: Create PR with bumped version
+      - name: Set bump branch name
         if: github.ref_protected == true
-        working-directory: ./packages/yoroi-extension
+        id: vars
         run: |
-          PROTECTED_BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
-          git fetch
-          git pull
-          git checkout -b "bump/nightly-version-bump"
-          git add package*.json
-          git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-          git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD
-          PR_TITLE="[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
-          PR_BODY="This PR was created automatically by GitHub Actions.\nThis PR is based on the branch `$PROTECTED_BRANCH_NAME`"
-          BASE_BRANCH="$PROTECTED_BRANCH_NAME"
-          HEAD_BRANCH=$(git branch --show-current)
+          base_branch_name="${{ github.head_ref || github.ref_name }}"
+          branch_name="bump/$base_branch_name"
+          echo "base-branch-name=$base_branch_name" >> $GITHUB_OUTPUT
+          echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
 
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.RND_GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls" \
-            -d '{
-              "title": "'"$PR_TITLE"'",
-              "body": "'"$PR_BODY"'",
-              "head": "'"$HEAD_BRANCH"'",
-              "base": "'"$BASE_BRANCH"'"
-            }'
+      - name: Create Pull Request
+        if: github.ref_protected == true
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: ${{ secrets.RND_GITHUB_TOKEN }}
+          commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+          title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the new nightly version from branch `${{ steps.vars.outputs.base-branch-name }}`"
+          branch: ${{ steps.vars.outputs.branch-name }}
