@@ -8,84 +8,105 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Read .nvmrc
-      id: nvm
-      run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
-    
-    - name: Setup node
-      uses: actions/setup-node@v4
-      with:
-        node-version: "${{ steps.nvm.outputs.NVMRC }}"
-    
-    - name: Install dependencies
-      run: |
-        . install-all.sh
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
-    - name: Run Flow
-      run: |
-        npm run flow
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
 
-    - name: Run Lint
-      run: |
-        npm run eslint
+      - name: Install dependencies
+        run: |
+          . install-all.sh
 
-    - name: Run TypeScript Compiler
-      run: |
-        npm run tsc
+      - name: Run Flow
+        run: |
+          npm run flow
 
-    - name: Run unit tests
-      run: |
-        npm run test
+      - name: Run Lint
+        run: |
+          npm run eslint
 
-    - name: Bump version
-      id: package-version
-      working-directory: ./packages/yoroi-extension
-      run: |
-        CURRENT_VERSION=$(jq -r '.version' package.json)
-        PATCH_VERSION="${CURRENT_VERSION##*.}"
-        MAJOR_MINOR_VERSION="${CURRENT_VERSION%.*}"
-        REMINDER=$((PATCH_VERSION % 100))
-        if [ $REMINDER -eq 99 ]; then
-            NEW_PATCH_VERSION=$((PATCH_VERSION + 2))
-        else
-            NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
-        fi
-        NEW_VERSION="$MAJOR_MINOR_VERSION.$NEW_PATCH_VERSION"
-        jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > new_package.json && mv new_package.json package.json
-        echo "New version: $NEW_VERSION"
-        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-    
-    - name: Apply new version to package-lock
-      working-directory: ./packages/yoroi-extension
-      run: |
-        npm i --legacy-peer-deps
+      - name: Run TypeScript Compiler
+        run: |
+          npm run tsc
 
-    - name: Build Nightly app
-      working-directory: ./packages/yoroi-extension
-      run: |
-        npm run prod:nightly
+      - name: Run unit tests
+        run: |
+          npm run test
 
-    - name: Upload to Chrome Web Store
-      uses: mobilefirstllc/cws-publish@latest
-      with:
-        action: 'publish'  # one of: upload, publish, testers
-        client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
-        client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
-        refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
-        extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
-        zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
+      - name: Bump version
+        id: package-version
+        working-directory: ./packages/yoroi-extension
+        run: |
+          CURRENT_VERSION=$(jq -r '.version' package.json)
+          PATCH_VERSION="${CURRENT_VERSION##*.}"
+          MAJOR_MINOR_VERSION="${CURRENT_VERSION%.*}"
+          REMINDER=$((PATCH_VERSION % 100))
+          if [ $REMINDER -eq 99 ]; then
+              NEW_PATCH_VERSION=$((PATCH_VERSION + 2))
+          else
+              NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
+          fi
+          NEW_VERSION="$MAJOR_MINOR_VERSION.$NEW_PATCH_VERSION"
+          jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > new_package.json && mv new_package.json package.json
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-    - name: Commit changes
-      working-directory: ./packages/yoroi-extension
-      run: |
-        git config --global user.name "emurgo-rnd"
-        git config --global user.email "rnd@emurgo.io"
-        git add package*.json
-        git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.RND_GITHUB_TOKEN }}
-  
+      - name: Apply new version to package-lock
+        working-directory: ./packages/yoroi-extension
+        run: |
+          npm i --legacy-peer-deps
+
+      - name: Build Nightly app
+        working-directory: ./packages/yoroi-extension
+        run: |
+          npm run prod:nightly
+
+      - name: Upload to Chrome Web Store
+        uses: mobilefirstllc/cws-publish@latest
+        with:
+          action: "publish" # one of: upload, publish, testers
+          client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
+          client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
+          refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
+          extension_id: "poonlenmfdfbjfeeballhiibknlknepo"
+          zip_file: "./packages/yoroi-extension/Yoroi Nightly.zip"
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "emurgo-rnd"
+          git config --global user.email "rnd@emurgo.io"
+
+      - name: Commit and push
+        if: github.ref_protected == false
+        working-directory: ./packages/yoroi-extension
+        run: |
+          BRANCH_NAME="${{ github.head_ref || github.ref_name }}"
+          git add package*.json
+          git commit -m "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+          git push "https://${{ github.actor }}:${{ secrets.RND_GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" HEAD:$BRANCH_NAME
+
+      - name: Set bump branch name
+        if: github.ref_protected == true
+        id: vars
+        run: |
+          base_branch_name="${{ github.head_ref || github.ref_name }}"
+          branch_name="bump/$base_branch_name"
+          echo "base-branch-name=$base_branch_name" >> $GITHUB_OUTPUT
+          echo "branch-name=$branch_name" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: github.ref_protected == true
+        uses: peter-evans/create-pull-request@v7.0.8
+        with:
+          token: ${{ secrets.RND_GITHUB_TOKEN }}
+          commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
+          title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+          body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the new nightly version from branch `${{ steps.vars.outputs.base-branch-name }}`"
+          branch: ${{ steps.vars.outputs.branch-name }}

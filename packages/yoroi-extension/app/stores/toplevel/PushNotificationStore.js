@@ -1,21 +1,16 @@
 // @flow
 import Store from '../base/Store';
-import environment from '../../environment';
 import { observable, runInAction, } from 'mobx';
 import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
+import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken } from 'firebase/messaging';
 import type { ConfigType } from '../../../config/config-types';
 
-// populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
-export type PushSubscription = {|
-  endpoint: string,
-  expirationTime: null | DOMHighResTimeStamp,
-  keys: {|
-    p256dh: string,
-    auth: string,
-  |},
-|}
+const localStorageApi = new LocalStorageApi();
+
+const FIREBASE_SERVICE_WORKER_SCOPE = 'firebase-cloud-messaging-push-scope';
 
 export default class PushNotificationStore<
   StoresMapType: {
@@ -27,42 +22,17 @@ export default class PushNotificationStore<
   },
 > extends Store<StoresMapType> {
   @observable metadata: PushNotificationMetadata | null = null;
-  @observable subscription: PushSubscription | null = null;
 
   setup(): void {
     this.stores.loading.registerBlockingLoadingRequest((async () => {
-      const metadata = await (new LocalStorageApi()).getPushNotificationMetadata();
+      const metadata = await localStorageApi.getPushNotificationMetadata();
       runInAction(() => {
         this.metadata = metadata;
       });
-    })(), 'load push notification metadata');
-
-    (async () => {
-      if (environment.isDev() || environment.isNightly()) {
-        const result = await Notification.requestPermission();
-        if (result === 'denied') {
-          // todo: save and don't ask again
-          return;
-        }
-        if (result === 'granted') {
-          console.info('The user accepted the permission request.');
-        }
-        const registration = await navigator.serviceWorker?.getRegistration();
-        if (!registration) {
-          throw new Error('unexpectedly missing service worker registration');
-        }
-        let subscription  = await registration.pushManager.getSubscription();
-        if (!subscription) {
-          subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlB64ToUint8Array(CONFIG.notifications.vapidPublicKey)
-          });
-        }
-        runInAction(() => { this.subscription = JSON.parse(JSON.stringify(subscription)); });
+      if (this.metadata?.isEnabled === undefined) {
+        this._enableNotifications();
       }
-    })().catch(error => {
-      console.error('error when setting up push', error);
-    })
+    })(), 'load push notification metadata');
   }
 
   get duration(): number {
@@ -82,21 +52,83 @@ export default class PushNotificationStore<
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
-    (new LocalStorageApi()).savePushNotificationMetadata(this.metadata);
+    localStorageApi.savePushNotificationMetadata(this.metadata);
   }
-}
 
-function urlB64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
+  get isEnabled(): boolean {
+    // we treat unset value has enabled because we requested notifications permission in manifest.json
+    return this.metadata?.isEnabled !== false;
   }
-  return outputArray;
+
+  toggleEnabled: () => Promise<void> = async () => {
+    runInAction(() => {
+      if (!this.metadata) {
+        throw new Error('push notification metadata not loaded');
+      }
+      this.metadata.isEnabled = !this.metadata.isEnabled;
+    });
+
+
+    let success;
+    if (this.isEnabled) {
+      success = await this._enableNotifications();
+    } else {
+      success = await this._disableNotifications();
+    }
+
+    if (!success) {
+      runInAction(() => {
+        if (!this.metadata) {
+          throw new Error('push notification metadata not loaded');
+        }
+        this.metadata.isEnabled = !this.metadata.isEnabled;
+      });
+
+      return;
+    }
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    localStorageApi.savePushNotificationMetadata(this.metadata);
+  }
+
+  async _enableNotifications(): Promise<boolean> {
+    const app = initializeApp(CONFIG.fcm);
+    const messaging = getMessaging(app);
+    const result = await Notification.requestPermission();
+    if (result === 'denied') {
+      return false;
+    }
+    const token = await getToken(messaging, { vapidKey: CONFIG.notifications.vapidPublicKey });
+    runInAction(() => {
+      if (!this.metadata) {
+        throw new Error('push notification metadata not loaded');
+      }
+      this.metadata.fcmToken = token;
+    });
+    if (!this.metadata) {
+      throw new Error('push notification metadata not loaded');
+    }
+    localStorageApi.savePushNotificationMetadata(this.metadata);
+    return true;
+  }
+
+  async _disableNotifications(): Promise<boolean> {
+    const registrations = [...(await navigator.serviceWorker?.getRegistrations() || [])];
+    
+    const registration = registrations.find(reg => reg.scope.endsWith(FIREBASE_SERVICE_WORKER_SCOPE));
+
+    if (!registration) {
+      throw new Error('unexpectedly missing service worker registration');
+    }
+    let subscription  = await registration.pushManager.getSubscription();
+    if (!subscription) {
+      throw new Error('unexpected missing subscription');
+    }
+    return await subscription.unsubscribe()
+  }
+
+  get fcmToken(): ?string {
+    return this.metadata?.fcmToken;
+  }
 }

@@ -153,15 +153,17 @@ const Output: React.FC<OutputProps> = ({ output }: any) => {
   const renderAssets = () => {
     if (!output.assets.length) return null;
 
-    return output.assets.map(asset => (
-      <TokenItem
-        key={asset.tokenInfo.id}
-        tokenInfo={asset?.tokenInfo}
-        quantity={asset.quantity}
-        isSent={false}
-        isPrimary={asset.tokenInfo.nature === Portfolio.Token.Nature.Primary}
-      />
-    ));
+    return output.assets
+      .filter(a => a !== null)
+      .map(asset => (
+        <TokenItem
+          key={asset.tokenInfo.id}
+          tokenInfo={asset?.tokenInfo}
+          quantity={asset?.quantity}
+          isSent={false}
+          isPrimary={asset.tokenInfo.nature === Portfolio.Token.Nature.Primary}
+        />
+      ));
   };
 
   return (

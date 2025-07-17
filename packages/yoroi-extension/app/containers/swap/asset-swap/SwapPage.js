@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
 import type { PriceImpact } from '../../../components/swap/types';
-import type { State } from '../context/swap-form/types';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import type { StoresProps } from '../../../stores';
@@ -95,15 +94,10 @@ function SwapPage(props: StoresProps & Intl): Node {
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);
   const [slippageValue, setSlippageValue] = useState(String(defaultSlippage));
   const [signRequest, setSignRequest] = useState<?HaskellShelleyTxSignRequest>(null);
-  const userPasswordState: ?State<string> = isHardwareWallet ? null : StateWrap(useState<string>(''));
   const txSubmitErrorState = StateWrap(useState<?Error>(null));
   const isValidTickers = sellTokenInfo?.ticker && buyTokenInfo?.ticker;
   // TODO check after if I can remove this - maybe add a displatch to add it directly in txProvider state
   const [parsedSignRequest, setParsedSignRequest] = useState(null);
-
-  // useEffect(() => {
-  //   userPasswordState?.update(passwordInputValue);
-  // }, [passwordInputValue, userPasswordState?.value]);
 
   useEffect(
     () => () => {
@@ -171,7 +165,7 @@ function SwapPage(props: StoresProps & Intl): Node {
       .catch(err => {
         console.error(`unexpected error: failed to get swap fee tiers: ${err}`);
       });
-  }, []);
+  }, [wallet.publicDeriverId]);
 
   const onAcceptDisclaimer = () => {
     disclaimerFlag
@@ -242,7 +236,6 @@ function SwapPage(props: StoresProps & Intl): Node {
   function processBackToStart() {
     runInAction(() => {
       setOrderStepValue(0);
-      userPasswordState?.update('');
       txSubmitErrorState.update(null);
       setSignRequest(null);
     });

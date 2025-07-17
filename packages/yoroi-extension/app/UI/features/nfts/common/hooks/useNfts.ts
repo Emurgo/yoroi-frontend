@@ -9,7 +9,7 @@ import {
 import { useNftGallery } from '../../module/NftGalleryContextProvider';
 import { NetworkUrl, Nft } from '../types';
 import { useParams } from 'react-router';
-import { getNetworkById , isCardanoHaskell } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, isCardanoHaskell } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { getNetworkUrl } from '../../../../utils/getNetworkUrl';
 
 export const useNfts = () => {
@@ -27,7 +27,7 @@ export const useNfts = () => {
     if (spendableBalance == null) {
       return;
     }
-
+    setLoading(true);
     const nfts = [...spendableBalance.nonDefaultEntries()]
       .map(entry => ({
         entry,
@@ -55,16 +55,21 @@ export const useNfts = () => {
 
     setNftsList(nfts);
     setLoading(false);
-  }, []);
+  }, [selectedWallet]);
 
   useEffect(() => {
-    const nftId = params.nftId;
-    if (nftsList.length > 0 && nftId) {
-      const index = nftsList.findIndex(nft => nft.id === nftId);
-      setCurrentNft(nftsList[index] || null);
-      setCurrentNftIndex(index);
+    if (!loading) {
+      const nftId = params.nftId;
+      if (nftsList.length > 0 && nftId) {
+        const index = nftsList.findIndex(nft => nft.id === nftId);
+        setCurrentNft(nftsList[index] || null);
+        setCurrentNftIndex(index);
+      } else {
+        setCurrentNft(null);
+        setCurrentNftIndex(-1);
+      }
     }
-  }, [params.nftId, nftsList]);
+  }, [params.nftId, nftsList, selectedWallet, loading]);
 
   return {
     networkUrl,
