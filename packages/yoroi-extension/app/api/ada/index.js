@@ -28,7 +28,6 @@ import {
 import type { TransactionMetadata } from './lib/storage/bridge/metadataUtils';
 import { createMetadata } from './lib/storage/bridge/metadataUtils';
 
-import { Cip1852Wallet, } from './lib/storage/models/Cip1852Wallet/wrapper';
 import type { HWFeatures, } from './lib/storage/database/walletTypes/core/tables';
 import { flattenInsertTree, } from './lib/storage/database/walletTypes/bip44/api/utils';
 import type { CoreAddressT } from './lib/storage/database/primitives/enums';
@@ -165,6 +164,7 @@ import type { IFetcher } from './lib/state-fetch/IFetcher.types';
 import { Bip44DerivationLevels, CoinType } from '@emurgo/yoroi-lib';
 import type { ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 import { encryptWithPassword } from '../../utils/passwordCipher';
+import { createAndRefreshCip1852Wallet } from './lib/storage/models/ConceptualWallet/traits';
 
 // ADA specific Request / Response params
 
@@ -1760,7 +1760,7 @@ export default class AdaApi {
       });
     }
   
-    const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+    const cip1852Wallet = await createAndRefreshCip1852Wallet(
       db,
       wallet.cip1852WrapperRow,
     );
@@ -1810,7 +1810,7 @@ export default class AdaApi {
         accountName: '', // set account name empty now
         network: request.network,
       });
-      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+      const cip1852Wallet = await createAndRefreshCip1852Wallet(
         request.db,
         wallet.cip1852WrapperRow,
       );
@@ -2060,7 +2060,7 @@ export default class AdaApi {
         network: request.network,
       });
 
-      const cip1852Wallet = await Cip1852Wallet.createCip1852Wallet(
+      const cip1852Wallet = await createAndRefreshCip1852Wallet(
         request.db,
         wallet.cip1852WrapperRow,
       );

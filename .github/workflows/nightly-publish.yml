@@ -84,6 +84,7 @@ jobs:
           git config --global user.email "rnd@emurgo.io"
 
       - name: Commit and push
+        if: github.ref_protected == false
         working-directory: ./packages/yoroi-extension
         run: |
           BRANCH_NAME="${{ github.head_ref || github.ref_name }}"

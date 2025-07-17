@@ -195,6 +195,7 @@
     "dropbox": "4.0.30",
     "es6-error": "4.1.1",
     "file-saver": "2.0.5",
+    "firebase": "^11.9.1",
     "immer": "^10.1.1",
     "jdenticon": "3.2.0",
     "legacySwap": "npm:@yoroi/swap@1.5.2",
