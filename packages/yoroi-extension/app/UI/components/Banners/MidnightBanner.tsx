@@ -37,9 +37,9 @@ export const MidnightBanner = ({ onClose }) => {
         sx: {
           position: 'relative',
           zIndex: 20,
-          transform: 'scale(1.5)',
-          top: '50px',
-          marginRight: '100px',
+          top: '16px',
+          marginRight: '76.72px',
+          height: '138px',
         },
       }}
     />
