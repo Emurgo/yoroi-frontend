@@ -1,22 +1,14 @@
 // @flow
 import type { HandlerType } from './type';
-import type {
-  ProtocolParameters as _ProtocolParameters
-} from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
+import type { ProtocolParameters as _ProtocolParameters } from '@emurgo/yoroi-lib/dist/protocol-parameters/models';
 import { ProtocolParametersApi } from '@emurgo/yoroi-lib/dist/protocol-parameters/emurgo-api';
 import {
   getNetworkById,
   getCardanoHaskellBaseConfigCombined,
   networks,
 } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
-import type {
-  CardanoHaskellConfig,
-  NetworkRow,
-} from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
-import {
-  type StorageField,
-  createStorageField,
-} from '../../../../../app/api/localStorage';
+import type { CardanoHaskellConfig, NetworkRow } from '../../../../../app/api/ada/lib/storage/database/primitives/tables';
+import { type StorageField, createStorageField } from '../../../../../app/api/localStorage';
 
 // tmp measure before lib update
 type ProtocolParameters = {|
@@ -45,7 +37,7 @@ function validate(protocolParameters: Object): boolean {
   );
 }
 
-const  EPOCH_TIMESTAMP = Object.freeze({
+const EPOCH_TIMESTAMP = Object.freeze({
   CardanoMainnet: {
     epoch: 504,
     startTimestamp: 1723931091000, // Aug 18, 2024 5:44:51 AM
@@ -53,10 +45,6 @@ const  EPOCH_TIMESTAMP = Object.freeze({
   CardanoPreprodTestnet: {
     epoch: 162,
     startTimestamp: 1724025600000, // Aug 19, 2024 8:00:00 AM
-  },
-  CardanoPreviewTestnet: {
-    epoch: 665,
-    startTimestamp: 1724112000000, // Aug 20, 2024 8:00:00 AM
   },
   CardanoSanchoTestnet: {
     epoch: 431,
@@ -117,7 +105,7 @@ class ProcolParameterApi {
       throw new Error('unexpectedly missing config parameters');
     }
 
-    return   {
+    return {
       linearFee: {
         constant: config.LinearFee.constant,
         coefficient: config.LinearFee.coefficient,
@@ -126,7 +114,7 @@ class ProcolParameterApi {
       poolDeposit: config.PoolDeposit,
       keyDeposit: config.KeyDeposit,
       epoch: currentEpoch,
-  };
+    };
   }
 
   getCacheStorage(): StorageField<ProtocolParameterCache | null> {
@@ -138,16 +126,13 @@ class ProcolParameterApi {
     );
   }
 
-  async getCachedProtocolParameters(
-    epoch: number,
-    allowFallbackToPreviousEpoch: boolean
-  ): Promise<?ProtocolParameters> {
+  async getCachedProtocolParameters(epoch: number, allowFallbackToPreviousEpoch: boolean): Promise<?ProtocolParameters> {
     const storage = this.getCacheStorage();
     const cache = await storage.get();
     if (!cache) {
       return null;
     }
-    return cache.find((protocolParameters) => {
+    return cache.find(protocolParameters => {
       if (allowFallbackToPreviousEpoch) {
         return protocolParameters.epoch <= epoch;
       }
@@ -161,7 +146,7 @@ class ProcolParameterApi {
     if (!cache) {
       cache = [];
     }
-    cache = cache.filter(( { epoch } ) => epoch > protocolParameters.epoch);
+    cache = cache.filter(({ epoch }) => epoch > protocolParameters.epoch);
     cache.push(protocolParameters);
     await storage.set(cache);
   }
@@ -190,12 +175,7 @@ class ProcolParameterApi {
         return fetched;
       }
     } catch (error) {
-      console.error(
-        'failed to fetch protocol parameters for network %s epoch $S:',
-        this.#networkId,
-        currentEpoch,
-        error
-      );
+      console.error('failed to fetch protocol parameters for network %s epoch $S:', this.#networkId, currentEpoch, error);
     }
     const cachedPrevious = await this.getCachedProtocolParameters(currentEpoch, true);
     if (cachedPrevious) {
@@ -205,24 +185,21 @@ class ProcolParameterApi {
   }
 }
 
-export const GetProtocolParameters: HandlerType<
-  {| networkId: number |},
-  ProtocolParameters
-> = Object.freeze({
+export const GetProtocolParameters: HandlerType<{| networkId: number |}, ProtocolParameters> = Object.freeze({
   typeTag: 'get-protocol-parameters',
 
-  handle: async (request) => {
+  handle: async request => {
     const api = new ProcolParameterApi(request.networkId);
     return await api.getProtocolParameters();
   },
 });
 
-export const getProtocolParameters: (number) => Promise<ProtocolParameters> =
- (networkId) => GetProtocolParameters.handle({ networkId });
+export const getProtocolParameters: number => Promise<ProtocolParameters> = networkId =>
+  GetProtocolParameters.handle({ networkId });
 
 export async function updateProtocolParametersCacheFromNetwork(networkId: number, epoch: ?number) {
   const api = new ProcolParameterApi(networkId);
-  if (epoch == null || await api.getCachedProtocolParameters(epoch, false) == null) {
+  if (epoch == null || (await api.getCachedProtocolParameters(epoch, false)) == null) {
     await api.fetchProtocolParametersFromNetwork();
   }
 }

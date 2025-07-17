@@ -68,7 +68,6 @@ export const WalletWordsSize = Object.freeze({
 export const CardanoNetworks = Object.freeze({
   MN: 'mainnet',
   PP: 'preprod',
-  PV: 'preview',
 });
 export const adaInLovelaces = 1000000;
 

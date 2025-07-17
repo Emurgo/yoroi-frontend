@@ -75,10 +75,6 @@ const messages = defineMessages({
     id: 'settings.general.aboutYoroi.network.preprod',
     defaultMessage: '!!!Preprod',
   },
-  preview: {
-    id: 'settings.general.aboutYoroi.network.preview',
-    defaultMessage: '!!!Preview',
-  },
   commitLabel: {
     id: 'settings.general.aboutYoroi.commitLabel',
     defaultMessage: '!!!Commit:',
@@ -163,8 +159,6 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
     switch (networkId) {
       case networks.CardanoPreprodTestnet.NetworkId:
         return intl.formatMessage(messages.preprod);
-      case networks.CardanoPreviewTestnet.NetworkId:
-        return intl.formatMessage(messages.preview);
       default:
         return intl.formatMessage(messages.mainnet);
     }
@@ -248,10 +242,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
 
         {(environment.isDev() || environment.isNightly()) && (
           <>
-            <LabelWithValue
-              label="FCM Token:"
-              value={fcmToken ?? ''}
-            />
+            <LabelWithValue label="FCM Token:" value={fcmToken ?? ''} />
           </>
         )}
       </Box>
