@@ -28,7 +28,9 @@ import environment from '../../../environment';
 // $FlowIgnore: suppressing this error
 import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
+// $FlowIgnore: suppressing this error
 import { withYoroiRemoteConfig } from '../../../UI/common/helpers/withYoroiRemoteConfig';
+// $FlowIgnore: suppressing this error
 import { BannerVisibilityManager } from '../../../UI/components/Banners/BannerVisibilityManager';
 
 const messages = defineMessages({
