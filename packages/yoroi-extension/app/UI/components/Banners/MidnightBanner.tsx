@@ -1,6 +1,6 @@
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
-import { MidnightIlustration } from '../Dialogs/MidnightIlustration';
+import { MidnightBannerIllustration } from '../Dialogs/MidnightBannerIllustration';
 
 export const MidnightBanner = ({ onClose }) => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
@@ -32,7 +32,7 @@ export const MidnightBanner = ({ onClose }) => {
         },
       }}
       displayIllustration={true}
-      illustration={<MidnightIlustration />}
+      illustration={<MidnightBannerIllustration />}
       illustrationProps={{
         sx: {
           position: 'relative',
