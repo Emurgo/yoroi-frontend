@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ampli } from '../../../../../../ampli/index';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
@@ -15,12 +15,10 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
 
   const [keyword, setKeyword] = useState<string>('');
   const [isLoading, _] = useState<boolean>(false);
-  const [tokenList, setTokenList] = useState(ftAssetList);
 
-  useMemo(() => {
+  const tokenList = useMemo(() => {
     if (!keyword || showWelcomeBanner) {
-      setTokenList(ftAssetList);
-      return;
+      return ftAssetList;
     }
 
     const lowercaseKeyword = keyword.toLowerCase();
@@ -32,11 +30,14 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
       );
     });
     if (temp && temp.length > 0) {
-      setTokenList(temp);
+      return temp;
     } else {
-      setTokenList([]);
+      return [];
     }
+  }, [keyword, showWelcomeBanner, ftAssetList]);
 
+  useEffect(() => {
+    const lowercaseKeyword = keyword.toLowerCase();
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const sendMetrics = () => {
       clearTimeout(timeout);
@@ -48,7 +49,7 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
     if (lowercaseKeyword.length > 0) sendMetrics();
 
     return () => clearTimeout(timeout);
-  }, [keyword, ftAssetList]);
+  }, [keyword]);
 
   return (
     <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>
