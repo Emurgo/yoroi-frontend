@@ -454,6 +454,8 @@
   "notifications.settings.duration.line2": "Adjust the display duration of in-app notifications to suit your preferences.",
   "notifications.settings.duration.title": "Display duration",
   "notifications.settings.durationDescription": "Display during {duration} seconds",
+  "notifications.settings.enablePushNotificationsDesc": "Allow push notifications",
+  "notifications.settings.enablePushNotificationsTitle": "Push notifications",
   "settings.cashback.title": "现金返还奖励钱包",
   "settings.cashback.note": "您的关联钱包是接收ADA现金返还奖励的指定钱包，并适用于所有合作伙伴网站。您可随时切换至其他钱包以确保现金返还奖励导向您首选的钱包，或选择“无”以拒绝此服务。",
   "settings.cashback.label": "已连接的钱包",
