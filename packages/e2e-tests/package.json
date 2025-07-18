@@ -45,7 +45,7 @@
     "@emurgo/cardano-serialization-lib-nodejs": "13.2.1",
     "bignumber.js": "^9.1.2",
     "chai": "^4.3.10",
-    "chromedriver": "138.0.0",
+    "chromedriver": "138.0.3",
     "cross-env": "^7.0.3",
     "dockerode": "^4.0.5",
     "json-server": "^0.17.4",
