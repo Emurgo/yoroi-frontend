@@ -1,5 +1,5 @@
 // @flow
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { action, configure } from 'mobx';
 import { setupApi } from '../../app/api/index';
 import createStores from '../../app/stores/index';
@@ -49,8 +49,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     }),
   };
 
-  const root = document.querySelector('#root');
-  if (root == null) {
+  const container = document.querySelector('#root');
+  if (container == null) {
     throw new Error('Root element not found.');
   }
   Logger.debug(`[yoroi] root located`);
@@ -65,7 +65,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     }
   }
 
-  render(<App stores={stores}/>, root);
+  const root = createRoot(container)
+  root.render(<App stores={stores}/>);
 };
 
 addCloseListener(TabIdKeys.Primary);

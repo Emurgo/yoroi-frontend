@@ -17,7 +17,7 @@ class TxReviewSubmit extends TxReviewCommon {
   // methods
   async enterPassword(password) {
     this.logger.info(`TxReviewSubmit::enterPassword is called. Password: ${password}`);
-    await this.input(this.passwordInputLocator, password);
+    await this.input(this.passwordInputLocator, password, true);
   }
   async getPasswordErrorMessage() {
     this.logger.info(`TxReviewSubmit::getPasswordErrorMessage is called.`);

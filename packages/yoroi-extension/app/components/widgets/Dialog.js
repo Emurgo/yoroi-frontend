@@ -41,6 +41,7 @@ export type Props = {|
   id?: string,
   +styleFlags?: StyleFlag,
   +forceBottomDivider?: boolean,
+  +forceTopDivider?: boolean,
   +contentHeader?: Node,
 |};
 
@@ -60,6 +61,7 @@ function Dialog(props: Props): Node {
     styleFlags,
     forceBottomDivider,
     contentHeader,
+    forceTopDivider,
   } = props;
 
   const [contentHasScroll, setContentHasScroll] = useState(false);
@@ -123,16 +125,16 @@ function Dialog(props: Props): Node {
         contentHasScroll={contentHasScroll}
       >
         {title != null && title !== '' ? (
-          // $FlowIgnore
-          <Typography
+          <Title
             as="h1"
             variant="body1"
             className="dialog__title"
             id={String(id) + '-dialogTitle-text'}
             color="ds.text_gray_medium"
+            forceTopDivider={forceTopDivider}
           >
             {title}
-          </Typography>
+          </Title>
         ) : null}
         {children != null ? (
           <ModalContent
@@ -278,6 +280,11 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
     },
   };
 });
+
+const Title = styled(Typography)(({ theme, forceTopDivider }) => ({
+  borderBottom: forceTopDivider ? '1px solid' : '',
+  borderBottomColor: theme.palette.grayscale['200']
+}));
 
 const ModalContent = styled(Box)(({ theme }) => ({
   overflowX: 'hidden',

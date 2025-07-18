@@ -149,10 +149,11 @@ const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
   wallet: null | { isTestnet: boolean, networkId: number, ... },
+  fcmToken: ?string,
   onSwitchNetwork: () => void,
 |};
 
-const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
+const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): Node => {
   const { openModal, closeModal } = useModal();
   const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
@@ -174,7 +175,6 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
     (async () => {
       const isTestnetModalDisplayed: boolean = await localStorageApi.getTestnetModalDisplayed();
       if (wallet && !wallet.isTestnet && !isTestnetModalDisplayed) {
-        console.log('should open testnet info modal')
         openModal({
           title: intl.formatMessage(messages.modalTitle),
           content: <TestNetworkInfoModal onClose={onCloseModalInfo} />,
@@ -245,6 +245,15 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork }: Props): Node => {
             componentId={basePageComponentPath + '-branchInfo-text'}
           />
         )}
+
+        {(environment.isDev() || environment.isNightly()) && (
+          <>
+            <LabelWithValue
+              label="FCM Token:"
+              value={fcmToken ?? ''}
+            />
+          </>
+        )}
       </Box>
 
       <Button
@@ -305,7 +314,7 @@ function LabelWithValue({
           : {})}
         variant="body1"
         color="ds.text_gray_medium"
-        sx={{ textDecoration: 'none' }}
+        sx={{ textDecoration: 'none', wordBreak: 'break-all' }}
         id={componentId || 'somewhere-someValue-text'}
       >
         {value}

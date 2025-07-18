@@ -1,44 +1,26 @@
 // @flow
 
-import type {
-  lf$Database, lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction, } from 'lovefield';
 
-import { Bip44Wallet } from '../Bip44Wallet/wrapper';
-import { Cip1852Wallet } from '../Cip1852Wallet/wrapper';
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
 import type {
+  IGetLastSyncInfo,
+  IGetLastSyncInfoRequest,
+  IGetLastSyncInfoResponse,
   IPublicDeriver,
   IPublicDeriverConstructor,
-  IGetLastSyncInfo, IGetLastSyncInfoRequest, IGetLastSyncInfoResponse,
 } from './interfaces';
-import type {
-  IRename, IRenameRequest, IRenameResponse,
-} from '../common/interfaces';
 
-import {
-  getAllSchemaTables,
-  raii,
-  StaleStateError,
-} from '../../database/utils';
+import { getAllSchemaTables, raii, StaleStateError, } from '../../database/utils';
 
-import type {
-  PublicDeriverRow,
-} from '../../database/walletTypes/core/tables';
-import {
-  GetPublicDeriver,
-  GetLastSyncForPublicDeriver,
-} from '../../database/walletTypes/core/api/read';
+import type { PublicDeriverRow, } from '../../database/walletTypes/core/tables';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, } from '../../database/walletTypes/core/api/read';
 import { ModifyPublicDeriver, } from '../../database/walletTypes/core/api/write';
 
-import type {
-  KeyDerivationRow,
-} from '../../database/primitives/tables';
-import {
-  GetKeyDerivation,
-} from '../../database/primitives/api/read';
-import { addTraitsForBip44Child, addTraitsForCip1852Child } from './traits';
+import type { KeyDerivationRow, } from '../../database/primitives/tables';
+import { GetKeyDerivation, } from '../../database/primitives/api/read';
+import { addTraitsForCip1852Child } from './traits';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
 import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
@@ -46,7 +28,7 @@ import { networks } from '../../database/prepackaged/networks';
 
 /** Snapshot of a PublicDeriver in the database */
 export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
-implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
+implements IPublicDeriver<Parent>, IGetLastSyncInfo {
   /**
    * Should only cache information we know will never change
    */
@@ -143,8 +125,8 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
   rawRename: (
     tx: lf$Transaction,
     deps: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
-    body: IRenameRequest,
-  ) => Promise<IRenameResponse> = async (tx, deps, body) => {
+    body: {| newName: string, |},
+  ) => Promise<void> = async (tx, deps, body) => {
     return await deps.ModifyPublicDeriver.rename(
       this.getDb(), tx,
       {
@@ -153,7 +135,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       }
     );
   }
-  rename: IRenameRequest => Promise<IRenameResponse> = async (body) => {
+  rename: {| newName: string, |} => Promise<void> = async (body) => {
     const deps = Object.freeze({
       ModifyPublicDeriver,
     });
@@ -161,7 +143,7 @@ implements IPublicDeriver<Parent>, IRename, IGetLastSyncInfo {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii<IRenameResponse>(
+    return await raii<void>(
       this.getDb(),
       depTables,
       async tx => this.rawRename(tx, deps, body)
@@ -207,42 +189,21 @@ export async function refreshPublicDeriverFunctionality(
     pubDeriver.KeyDerivationId,
   );
 
-  if (parent instanceof Bip44Wallet) {
-    const result = await addTraitsForBip44Child({
-      db,
-      pubDeriver,
-      pubDeriverKeyDerivation: keyDerivation,
-      conceptualWallet: parent,
-      startClass: PublicDeriver,
-    });
-    const finalClass = result.finalClass;
-    const instance = new finalClass({
-      publicDeriverId: pubDeriver.PublicDeriverId,
-      parent,
-      pathToPublic: result.pathToPublic,
-      derivationId: keyDerivation.KeyDerivationId,
-    });
-    return instance;
-  }
-  if (parent instanceof Cip1852Wallet) {
-    const result = await addTraitsForCip1852Child(
-      db,
-      pubDeriver,
-      keyDerivation,
-      parent,
-      PublicDeriver,
-    );
-    const finalClass = result.finalClass;
-    const instance = new finalClass({
-      publicDeriverId: pubDeriver.PublicDeriverId,
-      parent,
-      pathToPublic: result.pathToPublic,
-      derivationId: keyDerivation.KeyDerivationId,
-    });
-    return instance;
-  }
-
-  throw new Error(`${nameof(refreshPublicDeriverFunctionality)} unknown wallet type`);
+  const result = await addTraitsForCip1852Child(
+    db,
+    pubDeriver,
+    keyDerivation,
+    parent,
+    PublicDeriver,
+  );
+  const finalClass = result.finalClass;
+  const instance = new finalClass({
+    publicDeriverId: pubDeriver.PublicDeriverId,
+    parent,
+    pathToPublic: result.pathToPublic,
+    derivationId: keyDerivation.KeyDerivationId,
+  });
+  return instance;
 }
 
 async function getKeyDerivation(
@@ -272,5 +233,4 @@ async function getKeyDerivation(
   );
 }
 
-export type Bip44PublicDeriver = PublicDeriver<Bip44Wallet>;
-export type Cip1852PublicDeriver = PublicDeriver<Cip1852Wallet>;
+export type Cip1852PublicDeriver = PublicDeriver<ConceptualWallet>;

@@ -27,5 +27,17 @@
     "baseUrl": "https://sandbox-api.bringweb3.io/v1/extension/",
     "identifier": "G1TjqDrfxS8jhRYz15Sg2fMGsvZpdFF8IWgKe0g8",
     "apiEndpoint": "sandbox"
+  },
+  "fcm": {
+    "apiKey": "AIzaSyCzwU3ybOxkhW2sWTiryF4CYxwh2lxvZSM",
+    "authDomain": "yoroi-extension-14826.firebaseapp.com",
+    "projectId": "yoroi-extension-14826",
+    "storageBucket": "yoroi-extension-14826.firebasestorage.app",
+    "messagingSenderId": "290850618958",
+    "appId": "1:290850618958:web:8bd5fa25dc80522b9acd1f"
+  },
+  "notifications": {
+    "defaultDuration": 4,
+    "vapidPublicKey": "BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M"
   }
 }

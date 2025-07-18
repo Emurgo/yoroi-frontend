@@ -13,6 +13,22 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!Allow display of in-app notifications for key transactions',
     },
+    duration: {
+      id: 'notifications.settings.duration',
+      defaultMessage: '!!!Duration',
+    },
+    durationDescription: {
+      id: 'notifications.settings.durationDescription',
+      defaultMessage: '!!!Display during {duration} seconds',
+    },
+    enablePushNotificationsTitle: {
+      id: 'notifications.settings.enablePushNotificationsTitle',
+      defaultMessage: '!!!Push notifications',
+    },
+    enablePushNotificationsDesc: {
+      id: 'notifications.settings.enablePushNotificationsDesc',
+      defaultMessage: '!!!Allow push notifications',
+    },
   })
 );
 
@@ -22,5 +38,9 @@ export const useStrings = () => {
   return React.useRef({
     notifSettingsTitle: intl.formatMessage(messages.notifSettingsTitle),
     notifSettingsDesc: intl.formatMessage(messages.notifSettingsDesc),
+    duration: intl.formatMessage(messages.duration),
+    durationDescription: (duration: number) => intl.formatMessage(messages.durationDescription, { duration }),
+    enablePushNotificationsTitle: intl.formatMessage(messages.enablePushNotificationsTitle),
+    enablePushNotificationsDesc: intl.formatMessage(messages.enablePushNotificationsDesc),
   }).current;
 };

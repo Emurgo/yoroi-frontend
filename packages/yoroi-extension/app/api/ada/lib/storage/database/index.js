@@ -19,7 +19,6 @@ import { ModifyEncryptionMeta, ModifyNetworks, ModifyToken, } from './primitives
 import { ModifyExplorers, } from './explorers/api/write';
 import { populatePrimitivesDb, TransactionType } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
-import { populateBip44Db } from './walletTypes/bip44/tables';
 import { populateCip1852Db } from './walletTypes/cip1852/tables';
 import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
 import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
@@ -203,13 +202,12 @@ export async function copyDbToMemory(
 const populateAndCreate = async (
   storeType: $Values<typeof schema.DataStoreType>
 ): Promise<lf$Database> => {
-  const schemaVersion = 18;
+  const schemaVersion = 19;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
   populateCommonDb(schemaBuilder);
-  populateBip44Db(schemaBuilder);
   populateCip1852Db(schemaBuilder);
   populateUtxoTransactionsDb(schemaBuilder);
   populateAccountingTransactionsDb(schemaBuilder);
@@ -489,5 +487,8 @@ async function onUpgrade(
       'IsUsed',
       false
     );
+  }
+  if (version < 19) {
+    await rawDb.dropTable('Bip44Wrapper');
   }
 }

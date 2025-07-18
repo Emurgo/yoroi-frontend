@@ -1,16 +1,13 @@
 import { useRef } from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
+import globalMessages from '../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({
     back: {
       id: 'global.labels.back',
       defaultMessage: '!!!Back',
-    },
-    apply: {
-      id: 'global.labels.apply',
-      defaultMessage: '!!!Apply',
     },
     confirm: {
       id: 'global.labels.confirm',
@@ -27,10 +24,6 @@ export const messages = Object.freeze(
     total: {
       id: 'swap.total',
       defaultMessage: '!!!Total',
-    },
-    manual: {
-      id: 'swap.manual',
-      defaultMessage: '!!!Manual',
     },
     max: {
       id: 'swap.max',
@@ -386,12 +379,12 @@ export const useStrings = () => {
 
   return useRef({
     back: intl.formatMessage(messages.back),
-    apply: intl.formatMessage(messages.apply),
+    apply: intl.formatMessage(globalMessages.apply),
     confirm: intl.formatMessage(messages.confirm),
     continue: intl.formatMessage(messages.continue),
     cancel: intl.formatMessage(messages.cancel),
     total: intl.formatMessage(messages.total),
-    manual: intl.formatMessage(messages.manual),
+    manual: intl.formatMessage(globalMessages.manual),
     max: intl.formatMessage(messages.max),
     currentBalance: intl.formatMessage(messages.currentBalance),
     swap: intl.formatMessage(messages.swap),

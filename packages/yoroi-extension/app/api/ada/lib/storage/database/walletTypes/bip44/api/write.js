@@ -8,14 +8,9 @@ import {
   op,
 } from 'lovefield';
 
-import { GetBip44Wrapper } from './read';
-import type {
-  Bip44WrapperInsert, Bip44WrapperRow,
-} from '../tables';
 import type {
   Bip44ChainRow,
 } from '../../common/tables';
-import * as Bip44Tables from '../tables';
 import {
   Bip44ChainSchema,
 } from '../../common/tables';
@@ -32,60 +27,10 @@ import {
 import {
   GetChildWithSpecific, GetPathWithSpecific,
 } from '../../../primitives/api/read';
-import { RemoveKeyDerivationTree } from '../../../primitives/api/write';
 
 import {
   Bip44DerivationLevels,
 } from './utils';
-import { addNewRowToTable, } from '../../../utils';
-
-export class ModifyBip44Wrapper {
-  static ownTables: {|
-    Bip44Wrapper: typeof Bip44Tables.Bip44WrapperSchema,
-  |} = Object.freeze({
-    [Bip44Tables.Bip44WrapperSchema.name]: Bip44Tables.Bip44WrapperSchema,
-  });
-  static depTables: {|
-    GetBip44Wrapper: typeof GetBip44Wrapper,
-    RemoveKeyDerivationTree: typeof RemoveKeyDerivationTree,
-  |} = Object.freeze({
-    GetBip44Wrapper,
-    RemoveKeyDerivationTree,
-  });
-
-  static async add(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: Bip44WrapperInsert,
-  ): Promise<$ReadOnly<Bip44WrapperRow>> {
-    return await addNewRowToTable<Bip44WrapperInsert, Bip44WrapperRow>(
-      db, tx,
-      request,
-      ModifyBip44Wrapper.ownTables[Bip44Tables.Bip44WrapperSchema.name].name,
-    );
-  }
-
-  static async remove(
-    db: lf$Database,
-    tx: lf$Transaction,
-    id: number,
-  ): Promise<void> {
-    const fullRow = await ModifyBip44Wrapper.depTables.GetBip44Wrapper.get(
-      db, tx,
-      id
-    );
-    if (fullRow == null) {
-      throw new Error(`${nameof(ModifyBip44Wrapper)}::${nameof(ModifyBip44Wrapper.remove)} Should never happen`);
-    }
-
-    // delete related key derivations
-    // should cascade-delete the wrapper itself at the same time
-    await ModifyBip44Wrapper.depTables.RemoveKeyDerivationTree.remove(
-      db, tx,
-      { rootKeyId: fullRow.RootKeyDerivationId },
-    );
-  }
-}
 
 export class ModifyDisplayCutoff {
   static ownTables: {|

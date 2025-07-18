@@ -25,7 +25,7 @@ export function CopyAddress({ text, children, pathId }: {| text: string, childre
     try {
       await navigator.clipboard.writeText(text);
       setCopy(true);
-    } catch (error) {
+    } catch (_error) {
       setCopy(false);
     }
 
