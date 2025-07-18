@@ -25,7 +25,6 @@ import { IconWrapper, Icons } from '../../../../UI/components';
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
-import type { PushSubscription } from '../../../../stores/toplevel/PushNotificationStore';
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -150,16 +149,15 @@ const baseGithubUrl = 'https://github.com/Emurgo/yoroi-frontend/';
 
 type Props = {|
   wallet: null | { isTestnet: boolean, networkId: number, ... },
-  pushSubscription: PushSubscription | null,
+  fcmToken: ?string,
   onSwitchNetwork: () => void,
 |};
 
-const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: Props): Node => {
+const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): Node => {
   const { openModal, closeModal } = useModal();
   const intl = useIntl();
   const localStorageApi = new LocalStorageApi();
   const network = wallet && wallet.isTestnet ? 'testnet' : 'mainnet';
-  const displaySpecialInfo = environment.isDev() || environment.isNightly();
   const getNetworkValue = () => {
     const networkId = wallet && wallet.networkId;
     switch (networkId) {
@@ -248,11 +246,12 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, pushSubscription }: 
           />
         )}
 
-        {pushSubscription && displaySpecialInfo && (
+        {(environment.isDev() || environment.isNightly()) && (
           <>
-            <LabelWithValue label="Push endpoint:" value={pushSubscription.endpoint} />
-            <LabelWithValue label="Push key:" value={pushSubscription.keys.p256dh} />
-            <LabelWithValue label="Push auth:" value={pushSubscription.keys.auth} />
+            <LabelWithValue
+              label="FCM Token:"
+              value={fcmToken ?? ''}
+            />
           </>
         )}
       </Box>

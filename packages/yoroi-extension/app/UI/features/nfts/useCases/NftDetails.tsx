@@ -12,6 +12,7 @@ import NftImage from '../common/components/NftImage';
 import NftsNavigation from '../common/components/NftsNavigation';
 import NftMetadata from '../common/components/NftMetadata';
 import NftDetailsOverview from '../common/components/NftDetailsOverview';
+import { useNavigateTo } from '../common/hooks/useNavigateTo';
 
 const nftPathId = 'nftDetails';
 
@@ -39,6 +40,7 @@ export default function NftDetails() {
   const strings = useStrings();
   const tabSearchParam = new URLSearchParams(location.search).get('tab') || 'overview';
   const [currentTab, setCurrentTab] = useState<TabItem>({ id: tabSearchParam, label: 'Overview' });
+  const navigateTo = useNavigateTo();
 
   const onClose = () => setOpen(false);
 
@@ -67,6 +69,10 @@ export default function NftDetails() {
       },
     ];
   }, [currentNft, networkUrl]);
+
+  if (currentNftIndex === -1) {
+    navigateTo.nftGallery();
+  }
 
   return (
     <>
