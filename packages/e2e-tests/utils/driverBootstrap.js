@@ -46,25 +46,6 @@ export const getExtensionUrl = () => {
 export const getTransactionsURL = () => `${getExtensionUrl()}#/wallets/transactions`;
 
 // builders
-const getBraveBuilder = () => {
-  return new Builder()
-    .forBrowser(TargetBrowser.Chrome)
-    .setLoggingPrefs(prefs)
-    .setChromeOptions(
-      new chrome.Options()
-        .setChromeBinaryPath('/usr/bin/brave-browser')
-        .addArguments(
-          '--no-sandbox', // Disables the sandbox for all process types that are normally sandboxed. Meant to be used as a browser-level switch for testing purposes only
-          '--disable-gpu', // Disables GPU hardware acceleration. If software renderer is not in place, then the GPU process won't launch
-          '--disable-dev-shm-usage', // The /dev/shm partition is too small in certain VM environments, causing Chrome to fail or crash
-          '--disable-setuid-sandbox', // Disable the setuid sandbox (Linux only)
-          '--start-maximized' // Starts the browser maximized, regardless of any previous settings
-          // '--headless=new' // Runs the browser in the headless mode
-        )
-        .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
-    );
-};
-
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
   const chromeServiceBuilder = new chrome.ServiceBuilder(chromeDriver.path);
@@ -148,9 +129,6 @@ const getFirefoxBuilder = () => {
 // getting a builder according to a set browser
 export const getBuilder = () => {
   switch (getTargetBrowser()) {
-    case TargetBrowser.Brave: {
-      return getBraveBuilder();
-    }
     case TargetBrowser.FF: {
       return getFirefoxBuilder();
     }

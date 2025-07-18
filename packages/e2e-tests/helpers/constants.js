@@ -58,7 +58,6 @@ export const chromeBin = isMacOS()
   : '/usr/local/bin/chromedriver';
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
-  Brave: 'brave',
   FF: 'firefox',
 });
 export const WalletWordsSize = Object.freeze({
