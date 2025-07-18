@@ -20,6 +20,7 @@ import {
   isHeadless,
 } from './utils.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
+import * as chromeDriver from 'chromedriver';
 
 const prefs = new logging.Preferences();
 prefs.setLevel(logging.Type.BROWSER, logging.Level.ALL);
@@ -66,6 +67,7 @@ const getBraveBuilder = () => {
 
 const getChromeBuilder = () => {
   const downloadsDir = getDownloadsDir();
+  const chromeServiceBuilder = new chrome.ServiceBuilder(chromeDriver.path);
   const chromeOpts = new chrome.Options({
     'goog:chromeOptions': {
       enableExtensionTargets: true,
@@ -94,7 +96,8 @@ const getChromeBuilder = () => {
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)
     .setLoggingPrefs(prefs)
-    .setChromeOptions(chromeOpts);
+    .setChromeOptions(chromeOpts)
+    .setChromeService(chromeServiceBuilder);
 };
 
 const __getFFOptions = () => {
