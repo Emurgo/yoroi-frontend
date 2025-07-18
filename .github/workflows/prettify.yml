@@ -7,7 +7,7 @@ on:
     types: [ submitted ]
       
 jobs:
-  Test:
+  Prettier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
