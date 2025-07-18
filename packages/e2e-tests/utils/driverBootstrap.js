@@ -4,7 +4,6 @@ import firefox from 'selenium-webdriver/firefox.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import {
-  chromeBin,
   chromeExtIdUrl,
   firefoxBin,
   firefoxExtIdUrl,
@@ -54,7 +53,6 @@ const getChromeBuilder = () => {
       enableExtensionTargets: true,
     },
   })
-    .setChromeBinaryPath(chromeBin)
     .addExtensions(path.resolve(__extensionDir, 'Yoroi-test.crx'))
     .addArguments('--disable-dev-shm-usage')
     .addArguments('--no-sandbox')
