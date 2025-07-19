@@ -1,5 +1,5 @@
 import React from 'react';
-import { defineMessages , useIntl } from 'react-intl';
+import { defineMessages, useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -188,6 +188,20 @@ export const messages = Object.freeze(
       id: 'wallet.delegation.transaction.generation',
       defaultMessage: '!!!Generating transaction',
     },
+    insufficientFundsTitle: {
+      id: 'wallet.insufficientFunds.title',
+      defaultMessage: '!!!Insufficient funds.',
+    },
+    insufficientFundsSubtitle: {
+      id: 'wallet.insufficientFunds.subtitle',
+      defaultMessage:
+        '!!!Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount.',
+    },
+    insufficientFundsSubtitleHidden: {
+      id: 'wallet.insufficientFunds.subtitleHidden',
+      defaultMessage:
+        '!!!Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.',
+    },
   })
 );
 
@@ -242,5 +256,10 @@ export const useStrings = () => {
     step5Label: intl.formatMessage(messages.step5Label),
     processingLabel: intl.formatMessage(messages.processingLabel),
     txGeneration: intl.formatMessage(messages.txGeneration),
+    insufficientFundsTitle: intl.formatMessage(messages.insufficientFundsTitle),
+    insufficientFundsSubtitle: (requiredBalance: string, tokenName: string, currentBalance: string) =>
+      intl.formatMessage(messages.insufficientFundsSubtitle, { requiredBalance, tokenName, currentBalance }),
+    insufficientFundsSubtitleHidden: (requiredBalance: string, tokenName: string) =>
+      intl.formatMessage(messages.insufficientFundsSubtitleHidden, { requiredBalance, tokenName }),
   }).current;
 };

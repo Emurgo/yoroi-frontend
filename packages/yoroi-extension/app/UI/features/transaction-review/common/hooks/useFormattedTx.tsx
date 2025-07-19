@@ -1,7 +1,7 @@
 // import { usePortfolioTokenInfos } from '../../../Portfolio/common/hooks/usePortfolioTokenInfos';
 // import { useSelectedNetwork } from '../../../WalletManager/common/hooks/useSelectedNetwork';
 import { CredKind } from '@emurgo/cross-csl-core';
-import { isNonNullable } from '@yoroi/common';
+import { hexToAscii, isNonNullable } from '@yoroi/common';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { deriveRewardAddressFromAddress } from '../../../../utils/common';
 import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
@@ -40,23 +40,24 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 };
 
 const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
-  return inputUtxos.map((utxo) => {
-
+  return inputUtxos.map(utxo => {
     const address = utxo?.receiver;
     const { resolvedAddress, paymentCredKind } = resolveAddress(address);
 
     const rewardAddress = address !== null && paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;
     const isOwnAddress = address != null ? isOwnedAddress(walletAddresses, address) : null;
 
-    const assets = (utxo.assets??[]).map(asset => {
-      const tokenDetails = allAssetList.find(a => a.info.id === asset.Token?.Identifier);
-      const amount = asset.TokenList?.Amount;
-      if (tokenDetails == null || amount == null) {
-        return null
-      }
-      const tokenInfo = tokenDetails.info.id === '' ? primaryTokenInfo : tokenDetails;
-      return { tokenInfo, quantity: asQuantity(amount) }
-    }).filter(isNonNullable)
+    const assets = (utxo.assets ?? [])
+      .map(asset => {
+        const tokenDetails = allAssetList.find(a => a.info.id === asset.Token?.Identifier);
+        const amount = asset.TokenList?.Amount;
+        if (tokenDetails == null || amount == null) {
+          return null;
+        }
+        const tokenInfo = tokenDetails.info.id === '' ? primaryTokenInfo : tokenDetails;
+        return { tokenInfo, quantity: asQuantity(amount) };
+      })
+      .filter(isNonNullable);
 
     return {
       assets,
@@ -75,7 +76,7 @@ const formatOutputs = (
   allAssetList: any,
   networkId: number,
   primaryTokenInfo: any,
-  walletAddresses: any,
+  walletAddresses: any
 ): any => {
   return outputs.map(output => {
     const address = output.address;
@@ -93,12 +94,26 @@ const formatOutputs = (
 
     const multiAssets = Object.entries(output.amount.multiasset ?? []).flatMap(([policyId, assets]: any) => {
       return Object.entries(assets).map(([assetId, amount]) => {
-        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
-        if (tokenInfo == null) return null;
+        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`)?.info;
         const quantity: any = asQuantity(String(amount));
-        return {tokenInfo, quantity};
+
+        const fallbackTokenInfo = {
+          id: `${policyId}.${assetId}`,
+          name: hexToAscii(assetId),
+          decimals: 0,
+          status: 'unknown',
+          type: 'ft',
+          fingerprint: '',
+          quantity,
+        };
+
+        return {
+          tokenInfo: tokenInfo ?? fallbackTokenInfo,
+          quantity,
+        };
       });
     });
+
     const assets = [...primaryAssets, ...multiAssets];
 
     return {
@@ -128,9 +143,11 @@ const deriveAddress = (address: string, networkId: number) => {
   }
 };
 
-const resolveAddress = (addressBech32: string | undefined): {
-  resolvedAddress: string | undefined,
-  paymentCredKind: number | null,
+const resolveAddress = (
+  addressBech32: string | undefined
+): {
+  resolvedAddress: string | undefined;
+  paymentCredKind: number | null;
 } => {
   if (addressBech32 == null) {
     return { resolvedAddress: addressBech32, paymentCredKind: null };
@@ -146,12 +163,11 @@ const resolveAddress = (addressBech32: string | undefined): {
     resolvedAddress: addressBech32,
     paymentCredKind: address.payment_cred().kind() ?? null,
   };
-}
+};
 
 export const getAllUtxos = (inputs: TransactionInputs, walletUtxos: any) => {
   // noinspection JSIncompatibleTypesComparison
-  return inputs.filter(i => i != null)
-    .map(input => getUtxo(walletUtxos, input.transaction_id, input.index)) ?? [];
+  return inputs.filter(i => i != null).map(input => getUtxo(walletUtxos, input.transaction_id, input.index)) ?? [];
 };
 
 const getUtxo = (utxos: any, txHash: string, txIndex: number) => {

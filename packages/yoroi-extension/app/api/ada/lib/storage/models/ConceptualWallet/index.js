@@ -1,37 +1,25 @@
 
 // @flow
 
-import type {
-  lf$Database, lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction, } from 'lovefield';
 
-import type {
-  IConceptualWallet, IConceptualWalletConstructor, WalletType
-} from './interfaces';
+import type { IConceptualWallet, IConceptualWalletConstructor, WalletType } from './interfaces';
 import { WalletTypeOption, } from './interfaces';
 
-import {
-  getAllSchemaTables,
-  raii,
-  StaleStateError,
-} from '../../database/utils';
+import { getAllSchemaTables, raii, StaleStateError, } from '../../database/utils';
 
-import type {
-  IRename, IRenameRequest, IRenameResponse,
-} from '../common/interfaces';
 import { ModifyConceptualWallet, } from '../../database/walletTypes/core/api/write';
-import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
+import type { ConceptualWalletRow, HwWalletMetaRow } from '../../database/walletTypes/core/tables';
 import { GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 import Config from '../../../../../../config';
-import type {
-  NetworkRow, TokenRow,
-} from '../../database/primitives/tables';
+import type { NetworkRow, TokenRow, } from '../../database/primitives/tables';
 import type { DefaultTokenEntry } from '../../../../../common/lib/MultiToken';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
 import { Bip44TableMap } from '../../database/walletTypes/bip44/api/utils';
+import { ModifyCip1852Wrapper } from '../../database/walletTypes/cip1852/api/write';
 
 /** Snapshot of a ConceptualWallet in the database */
-export class ConceptualWallet implements IConceptualWallet, IRename {
+export class ConceptualWallet implements IConceptualWallet {
   /**
    * Should only cache information we know will never change
    */
@@ -124,7 +112,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
     return this.hardwareInfo;
   }
 
-  rename: IRenameRequest => Promise<IRenameResponse> = async (body) => {
+  rename: {| newName: string, |} => Promise<void> = async (body) => {
     const deps = Object.freeze({
       ModifyConceptualWallet,
     });
@@ -132,7 +120,7 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
       .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.db, table));
-    return await raii<IRenameResponse>(
+    return await raii<void>(
       this.db,
       depTables,
       async tx => {
@@ -172,6 +160,10 @@ export class ConceptualWallet implements IConceptualWallet, IRename {
   }
 
   rawRemove: (lf$Database, lf$Transaction) => Promise<void> = async (db, tx) => {
+    await ModifyCip1852Wrapper.remove(
+      db, tx,
+      this.getConceptualWalletId()
+    );
     await rawRemoveConceptualWallet(
       db, tx,
       this.getConceptualWalletId()

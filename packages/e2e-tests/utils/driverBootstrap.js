@@ -84,6 +84,7 @@ const getChromeBuilder = () => {
       'profile.content_settings.exceptions.clipboard': {
         '*': { last_modified: Date.now(), setting: 1 },
       },
+      'profile.default_content_setting_values.notifications': 1, // allow notification
     })
     .addArguments('disable-infobars')
     .addArguments('--enable-clipboard');

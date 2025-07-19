@@ -71,7 +71,6 @@ export default ({
       'alarms',
       // so that the background service could access `chrome.system.display.width`
       'system.display',
-      'notifications',
     ],
     host_permissions: [
       '*://connect.trezor.io/*',
