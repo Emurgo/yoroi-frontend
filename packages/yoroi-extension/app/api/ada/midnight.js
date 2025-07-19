@@ -44,12 +44,17 @@ export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<
         value
       });
     }
+    // seems Cardano airdrop is based on stake address and we only need to claim one base address
+    break;
   }
   return result;
 }
 
 export async function checkClaimForAddress(addrBech32: string): Promise<boolean> {
   const resp = await fetch(`https://external-claim.gd.midnighttge.io/claims/cardano?address=${addrBech32}`);
+  if (!resp.ok) {
+    return false;
+  }
   const data = await resp.json();
   /* schema:
     [
