@@ -431,7 +431,7 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
         },
       ]}
     >
-      <Typography variant="body1">
+      <Typography variant="body1" color="ds.text_gray_medium">
         {intl.formatMessage(messages.mnemonicClaimDialogText)}
       </Typography>
       <TextField
