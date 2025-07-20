@@ -340,6 +340,7 @@ export default function AirdropPage({ stores }: Props) {
             <ClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
+              message={getClaimMessage(unclaimedAddrs[0])}
             />
           ) : (
             <LedgerClaimDialog
@@ -386,14 +387,14 @@ function LedgerClaimDialog(props: {
       <Typography variant="body1" color="ds.text_gray_low">
         {intl.formatMessage(messages.messageLabel)}
       </Typography>
-      <Typography variant="body1">
+      <Typography variant="body1" color="ds.text_gray_medium">
         {props.message}
       </Typography>
     </Dialog>
   );
 }
 
-function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) => Promise<void> }) {
+function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) => Promise<void>, message: string }) {
   const intl = useIntl();
   const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
   const [password, setPassword] = useState('');
@@ -433,6 +434,12 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
     >
       <Typography variant="body1" color="ds.text_gray_medium">
         {intl.formatMessage(messages.mnemonicClaimDialogText)}
+      </Typography>
+      <Typography variant="body1" color="ds.text_gray_low" sx={{ marginTop: '16px' }}>
+        {intl.formatMessage(messages.messageLabel)}
+      </Typography>
+      <Typography variant="body1" color="ds.text_gray_medium" sx={{ marginBottom: '16px' }}>
+        {props.message}
       </Typography>
       <TextField
         error={error}
