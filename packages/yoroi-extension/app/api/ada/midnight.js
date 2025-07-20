@@ -87,7 +87,7 @@ export async function claimForAddress(
   addrClaimData: AddressClaimData,
   password: string, // only for mnemonic wallet
   locale: string, // only for Ledger
-): Promise<boolean> {
+): Promise<void> {
   const  payload = Buffer.from(
     getClaimMessage(addrClaimData),
     'ascii'
@@ -154,5 +154,7 @@ export async function claimForAddress(
       },
     }
   );
-  return resp.ok;
+  if (!resp.ok) {
+    throw new Error(`${resp.status}: ${resp.statusText}`);
+  }
 }
