@@ -399,15 +399,17 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
   const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isClaiming, setClaiming] = useState(false);
 
   const onClaim = async () => {
     setClaiming(true);
+    setError(null);
     try {
       await props.onClaim(password);
     } catch (error) {
       if (error instanceof WrongPassphraseError) {
-        setError(wrongPasswordErrorMessage);
+        setPasswordError(wrongPasswordErrorMessage);
       } else if (error instanceof Error) {
         setError(error.message);
       } else {
@@ -442,7 +444,7 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
         {props.message}
       </Typography>
       <TextField
-        error={error}
+        error={passwordError}
         type="password"
         className="walletPassword"
         value={password}
@@ -450,12 +452,15 @@ function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) =
         isLoading={isClaiming}
         onChange={e => {
           if (error === wrongPasswordErrorMessage) {
-            setError(null);
+            setPasswordError(null);
           }
           setPassword(e.target.value);
         }}
         autoFocus
       />
+      <Typography component="div" variant="body2" color="ds.text_error">
+        {error}
+      </Typography>
     </Dialog>
   );
 }
