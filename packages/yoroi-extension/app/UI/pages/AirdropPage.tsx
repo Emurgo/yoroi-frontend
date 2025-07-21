@@ -121,7 +121,6 @@ export default function AirdropPage({ stores }: Props) {
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
-  const [ledgerClaimingIndex, setLedgerClaimingIndex] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -145,7 +144,6 @@ export default function AirdropPage({ stores }: Props) {
       setAlloc(null);
       setClaimDone(false);
       setUnclaimedAddrs([]);
-      setLedgerClaimingIndex(0);
     };
   }, [wallet.publicDeriverId]);
 
@@ -165,19 +163,7 @@ export default function AirdropPage({ stores }: Props) {
       setClaimDialog(false);
       setClaimDone(true);
     } else { // ledger
-      try {
-        await claimForAddress(wallet, unclaimedAddrs[ledgerClaimingIndex], password, stores.profile.currentLocale);
-      } catch {
-        setClaimDialog(false);
-        return;
-      }
-
-      if (ledgerClaimingIndex === unclaimedAddrs.length - 1) {
-        setClaimDialog(false);
-        setClaimDone(true);
-      } else {
-        setLedgerClaimingIndex(ledgerClaimingIndex + 1);
-      }
+      await claimForAddress(wallet, unclaimedAddrs[0], password, stores.profile.currentLocale);
     }
   }
 
@@ -345,10 +331,8 @@ export default function AirdropPage({ stores }: Props) {
           ) : (
             <LedgerClaimDialog
               onClose={closeClaimDialog}
-              index={ledgerClaimingIndex + 1}
-              total={unclaimedAddrs.length}
               onClaim={claim}
-              message={getClaimMessage(unclaimedAddrs[ledgerClaimingIndex])}
+              message={getClaimMessage(unclaimedAddrs[0])}
             />
           )
         )}
@@ -359,36 +343,62 @@ export default function AirdropPage({ stores }: Props) {
 
 function LedgerClaimDialog(props: {
   onClose: () => void,
-  index: number,
-  total: number,
   message: string,
   onClaim: (_password: string) => Promise<void>
 }) {
   const intl = useIntl();
 
-  useEffect(() => {
-    props.onClaim('');
-    return () => {};
-  }, [props.index]);
+  const [error, setError] = useState<string | null>(null);
+  const [isClaiming, setClaiming] = useState(false);
 
-  const { index, total } = props;
+  const onClaim = async () => {
+    setClaiming(true);
+    setError(null);
+    try {
+      await props.onClaim('');
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error));
+      }
+    } finally {
+      setClaiming(false);
+    }
+  };
+
   return (
     <Dialog
       withCloseButton
       onClose={props.onClose}
-      title={intl.formatMessage(messages.ledgerClaimDialogTitle, { index, total })}
+      title={intl.formatMessage(messages.claimDialogTitle)}
+      dialogActions={[
+        {
+          label: intl.formatMessage(messages.claimDialogTitle),
+          primary: true,
+          disabled: isClaiming,
+          onClick: onClaim,
+        },
+      ]}
     >
       <Typography variant="body1">
         {intl.formatMessage(messages.ledgerClaimDialogText)}
       </Typography>
-      <Box sx={{ marginTop: '16px', marginBottom: '16px' }}>
-        <LoadingSpinner />
-      </Box>
+      {isClaiming ? (
+        <Box sx={{ marginTop: '16px', marginBottom: '16px' }}>
+          <LoadingSpinner />
+        </Box>
+      ) : (
+        <Box sx={{ height: '39px' }}></Box>
+      )}
       <Typography variant="body1" color="ds.text_gray_low">
         {intl.formatMessage(messages.messageLabel)}
       </Typography>
       <Typography variant="body1" color="ds.text_gray_medium">
         {props.message}
+      </Typography>
+      <Typography component="div" variant="body2" color="ds.text_error">
+        {error}
       </Typography>
     </Dialog>
   );
