@@ -32,6 +32,7 @@ import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { Portfolio } from '@yoroi/types';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -236,9 +237,10 @@ export default class SwapStore extends Store<StoresMap> {
   createRevampUnsignedSwapTx: ({|
     wallet: WalletState,
     swapState: any,
+    parsedCbor: any,
     datum: string,
     datumHash: string,
-    tokenInfos: Map<string, Portfolio.Token.Info>,
+    tokenInfos: Map<string, any>,
   |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, datum, datumHash, tokenInfos }) => {
     const sellTokenId = swapState.tokenInInput.tokenId;
     const buyTokenId = swapState.tokenOutInput.tokenId;
