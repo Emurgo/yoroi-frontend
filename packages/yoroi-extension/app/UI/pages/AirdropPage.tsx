@@ -114,8 +114,6 @@ export default function AirdropPage({ stores }: Props) {
     return null;
   }
   const isTrezor = wallet.type === 'trezor';
-  //  @ts-ignore
-  const dstAddr = addressHexToBech32(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address);
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
@@ -124,6 +122,9 @@ export default function AirdropPage({ stores }: Props) {
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
 
+  const destAddrBech32 = addressHexToBech32(
+    wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed).address.Hash
+  );
   useEffect(() => {
     (async () => {
       const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(wallet);
@@ -160,12 +161,12 @@ export default function AirdropPage({ stores }: Props) {
   const claim = async (password) => {
     if (wallet.type === 'mnemonic') {
       for (const addr of unclaimedAddrs) {
-        await claimForAddress(wallet, addr, password, stores.profile.currentLocale);
+        await claimForAddress(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
       }
       setClaimDialog(false);
       setClaimDone(true);
     } else { // ledger
-      await claimForAddress(wallet, unclaimedAddrs[0], password, stores.profile.currentLocale);
+      await claimForAddress(wallet, unclaimedAddrs[0], destAddrBech32, password, stores.profile.currentLocale);
     }
   }
 
@@ -239,7 +240,7 @@ export default function AirdropPage({ stores }: Props) {
                   {intl.formatMessage(messages.destinationAddress)}
                 </Typography>
                 <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                  {dstAddr}
+                  {destAddrBech32}
                 </Typography>
               </Box>
             )}
@@ -328,13 +329,13 @@ export default function AirdropPage({ stores }: Props) {
             <ClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
-              message={getClaimMessage(unclaimedAddrs[0])}
+              message={getClaimMessage(unclaimedAddrs[0].value, destAddrBech32)}
             />
           ) : (
             <LedgerClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
-              message={getClaimMessage(unclaimedAddrs[0])}
+              message={getClaimMessage(unclaimedAddrs[0].value, destAddrBech32)}
             />
           )
         )}
