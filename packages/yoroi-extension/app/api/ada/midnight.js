@@ -10,8 +10,9 @@ import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 const TC_HASH = '6bf2adf825baa496729e2eac1e895ebc77973744bce67f44276bf6006f5c21de863ed121e11828d8fc0241773191e26dc1134803a681a9a98ba0ae812553db24';
+// remember to change chrome/constants.js
 const CHECK_ENDPOINT = 'https://proof-staging.provtree-midnight.com';
-const CLAIM_ENDPOINT = 'https://external-claim.gd.midnighttge.io';
+const CLAIM_ENDPOINT = 'https://preprod.gd.midnighttge.io/claims/cardano';
 
 type AddressClaimData = {|
   addrHex: string,
@@ -51,7 +52,7 @@ export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<
 }
 
 export async function checkClaimForAddress(addrBech32: string): Promise<boolean> {
-  const resp = await fetch(`https://external-claim.gd.midnighttge.io/claims/cardano?address=${addrBech32}`);
+  const resp = await fetch(`${CLAIM_ENDPOINT}?address=${addrBech32}`);
   if (!resp.ok) {
     return false;
   }
@@ -72,35 +73,38 @@ export async function checkClaimForAddress(addrBech32: string): Promise<boolean>
       }
     ]
   */
-  if (Array.isArray(data) && data.length === 1 && data[0].address === addrBech32 && data[0].status === 'queued') {
+  if (Array.isArray(data) && data.length === 1 && (data[0].status === 'queued' || data[0].status === 'confirmed')) {
     return true;
   }
   return false;
 }
 
-export function getClaimMessage(addrClaimData: AddressClaimData): string {
-  return 'STAR ' + String(addrClaimData.value) + ' to ' + addrClaimData.addrBech32 + ' ' + TC_HASH;
+export function getClaimMessage(value: number, destAddrBech32: string): string {
+  return 'STAR ' + String(value) + ' to ' + destAddrBech32 + ' ' + TC_HASH;
 }
 
 export async function claimForAddress(
   wallet: WalletState,
   addrClaimData: AddressClaimData,
+  destAddrBech32: string,
   password: string, // only for mnemonic wallet
   locale: string, // only for Ledger
 ): Promise<void> {
   const  payload = Buffer.from(
-    getClaimMessage(addrClaimData),
+    getClaimMessage(addrClaimData.value, destAddrBech32),
     'ascii'
   ).toString('hex');
   let signResult;
+  let publicKey;
   if (wallet.type === 'mnemonic') {
     const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId);
     signResult  = await walletSignData(
       publicDeriver,
       password,
-      addrClaimData.addrHex,
+      wallet.stakingAddress,
       payload,
     );
+    publicKey = signResult.pubKey;
   } else if (wallet.type === 'ledger') {
     const ledgerConnect = new LedgerConnect({ locale });
     const network = getNetworkById(wallet.networkId);
@@ -111,13 +115,12 @@ export async function claimForAddress(
       params: {
         preferHexDisplay: false,
         messageHex: payload,
-        signingPath: addrClaimData.path,
+        signingPath: wallet.stakingAddressing.addressing.path,
         hashPayload,
         addressFieldType: MessageAddressFieldType.ADDRESS,
         address: {
-          type: AddressType.BASE_PAYMENT_KEY_STAKE_KEY,
+          type: AddressType.REWARD_KEY,
           params: {
-            spendingPath: addrClaimData.path,
             stakingPath: wallet.stakingAddressing.addressing.path,
           },
         },
@@ -132,20 +135,21 @@ export async function claimForAddress(
       signatureHex,
       payload,
       signingPublicKeyHex,
-      hashPayload,
+      false,
     );
+    publicKey = signingPublicKeyHex
   } else {
     throw new Error('unsupported wallet type');
   }
   const params = {
-    address: addrClaimData.addrBech32,
+    address: addressHexToBech32(wallet.stakingAddress),
     amount: addrClaimData.value,
     cose_sign1: signResult.signature,
-    dest_address: addrClaimData.addrBech32,
-    cose_key: signResult.key
+    dest_address: destAddrBech32,
+    public_key: publicKey,
   };
   const resp = await fetch(
-    `${CLAIM_ENDPOINT}/claims/cardano`,
+    CLAIM_ENDPOINT,
     {
       method: 'POST',
       body: JSON.stringify([params]),
