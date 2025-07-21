@@ -6,7 +6,7 @@ import { Box, styled } from '@mui/system';
 import type { ComponentType, Node } from 'react';
 import { useState, useEffect } from 'react';
 import { defineMessages, injectIntl } from 'react-intl';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { ampli } from '../../../../ampli/index';
 import { isCardanoHaskell } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { ReactComponent as BackArrow } from '../../../assets/images/assets-page/backarrow.inline.svg';
@@ -134,6 +134,7 @@ const STypography = styled(Typography)(({ theme }) => ({
 function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCount }: Props & Intl): Node {
   const nftImage = nftInfo?.image;
   const nftImageUrl = nftImage ? urlResolveForIpfsAndCorsproxy(nftImage) : null;
+  const navigate = useNavigate();
 
   const networkUrl = getNetworkUrl(network);
   const [activeTab, setActiveTab] = useState(tab !== null ? tab : tabs[0].id); // Overview tab
@@ -193,8 +194,10 @@ function NFTDetails({ nftInfo, network, intl, nextNftId, prevNftId, tab, nftsCou
     }
   }, [nftImageUrl]);
 
-  // Todo: Should be handling by displaying an error page
-  if (nftInfo == null) return null;
+  if (nftInfo == null) {
+    navigate(ROUTES.NFTS.ROOT);
+    return null;
+  }
 
   return (
     <Box sx={{ p: '24px', width: '100%' }}>
