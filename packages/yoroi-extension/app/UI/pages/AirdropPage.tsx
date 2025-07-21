@@ -383,7 +383,7 @@ function LedgerClaimDialog(props: {
         },
       ]}
     >
-      <Typography variant="body1">
+      <Typography variant="body1" color="ds.text_gray_medium">
         {intl.formatMessage(messages.ledgerClaimDialogText)}
       </Typography>
       {isClaiming ? (
