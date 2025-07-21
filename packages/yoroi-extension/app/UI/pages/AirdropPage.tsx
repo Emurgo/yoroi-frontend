@@ -105,6 +105,8 @@ interface Props {
   }
 }
 
+const NUMBER_OF_NIGHT_DECIMALS = 6;
+
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
   const wallet = stores.wallets.selected;
@@ -228,7 +230,7 @@ export default function AirdropPage({ stores }: Props) {
               </Typography>
               {/*  @ts-ignore */}
               <Typography variant="h1xl">
-                {alloc.toFormat()} NIGHT
+                {alloc.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat()} NIGHT
               </Typography>
             </Box>
             {!isTrezor && (
