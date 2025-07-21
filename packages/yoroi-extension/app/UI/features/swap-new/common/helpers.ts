@@ -28,8 +28,6 @@ export const useGetInputs = (walletUtxos: any[]) => {
         amount: bigint;
       }[];
 
-      console.log('matching', matching);
-
       const selected: any[] = [];
       let total = 0n;
 
@@ -38,11 +36,9 @@ export const useGetInputs = (walletUtxos: any[]) => {
         total += amount;
         if (total >= requiredAmount) break;
       }
-      console.log('selected', selected);
 
       if (total < requiredAmount) {
-        console.log('Not enough balance');
-        // throw new Error('Not enough balance');
+        throw new Error('Not enough balance');
       }
 
       const inputs = await Promise.all(

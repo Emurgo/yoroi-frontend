@@ -194,14 +194,10 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     setIsCreateOrderLoading(true);
 
     const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
-    // const tokenOutInfo = tokenInfos.get(state.tokenOutInput.tokenId);
 
     const quantityIn = Number(state.tokenInInput.value) * 10 ** (tokenInInfo?.decimals ?? 0);
     const amountsIn = { [state.tokenInInput.tokenId]: `${quantityIn}` };
-    console.log('amountsIn', amountsIn);
     const inputs = await getInputs(amountsIn);
-
-    console.log('CREATE DATA inputs', { inputs, state });
 
     swapManager.api
       .create({
@@ -215,7 +211,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       })
       .then(response => {
         setIsCreateOrderLoading(false);
-        console.log('CREATE DATA response', response);
         if (isLeft(response)) {
           action({ type: SwapAction.CreateError, value: response.error });
         } else {

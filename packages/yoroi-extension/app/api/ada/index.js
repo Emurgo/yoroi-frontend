@@ -1531,7 +1531,7 @@ export default class AdaApi {
       const addressedUtxo = asAddressedUtxo(request.publicDeriver.utxos);
       const changeAddr = request.publicDeriver.receiveAddress;
       const absSlotNumber = new BigNumber(TimeUtils.timeToAbsoluteSlot(fullConfig, new Date()));
-      console.log('request.entries', { entries: request.entries, changeAddr });
+
       const unsignedTx = await shelleyNewAdaUnsignedTx(
         request.entries,
         {
@@ -1547,7 +1547,6 @@ export default class AdaApi {
         request.metadata,
         request.publicDeriver.networkId
       );
-      console.log('shelleyNewAdaUnsignedTx unsignedTx', unsignedTx);
       return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,
@@ -1561,7 +1560,6 @@ export default class AdaApi {
         },
       });
     } catch (error) {
-      console.log('error', error);
       Logger.error(`${nameof(AdaApi)}::${nameof(this.createSimpleTx)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();

@@ -34,16 +34,12 @@ export const AssetSwap = () => {
 
   const handleSubmitTransaction = async password => {
     const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
-
-    console.log('[parsedCbor]', { parsedCbor, password });
     const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
       wallet,
       swapState: swapForm,
       tokenInfos,
       parsedCbor,
     });
-
-    console.log('[unisgnedTxRequest]', unisgnedTxRequest);
 
     try {
       await stores.transactionProcessingStore.adaSendAndRefresh({
@@ -52,10 +48,8 @@ export const AssetSwap = () => {
         password,
         callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
       });
-      console.log('Transaction submitted successfully');
       showTxResultModal(TransactionResult.SUCCESS);
     } catch (e) {
-      console.error('Error submitting transaction:', e);
       showTxResultModal(TransactionResult.FAIL);
     } finally {
       swapForm.action({ type: SwapAction.ResetForm });
@@ -68,7 +62,6 @@ export const AssetSwap = () => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: passswordInput => {
-          console.log('PASSWARDSUBMIT', passswordInput);
           handleSubmitTransaction(passswordInput);
         },
         cborTx: swapForm.createTx.cbor,
@@ -105,14 +98,16 @@ export const AssetSwap = () => {
       <LoadingButton
         //  @ts-ignore
         variant="primary"
-        onClick={createOrder}
+        onClick={() => {
+          createOrder();
+        }}
         loading={isCreateOrderLoading}
       >
         Swap
       </LoadingButton>
     </Content>
   );
-};;
+};
 
 const Content = styled(Stack)(({ theme }: any) => ({
   ...theme.atoms.pt_xl,
