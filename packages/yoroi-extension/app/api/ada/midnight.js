@@ -159,6 +159,11 @@ export async function claimForAddress(
     }
   );
   if (!resp.ok) {
-    throw new Error(`${resp.status}: ${resp.statusText}`);
+    let errorMessage = '';
+    try {
+      const respBody = await resp.json();
+      errorMessage = respBody[0].error.message;
+    } catch {}
+    throw new Error(`Error ${resp.status} response: ${errorMessage}`);
   }
 }
