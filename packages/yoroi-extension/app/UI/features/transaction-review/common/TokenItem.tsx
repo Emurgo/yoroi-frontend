@@ -10,13 +10,13 @@ interface TokenItemProps {
 }
 
 const getDecimals = (tokenInfo: any) => {
-  if (typeof tokenInfo.decimals === 'number') {
+  if (typeof tokenInfo?.decimals === 'number') {
     return tokenInfo.decimals;
   }
-  if (typeof tokenInfo.info?.numberOfDecimals === 'number') {
+  if (typeof tokenInfo?.info?.numberOfDecimals === 'number') {
     return tokenInfo.info.numberOfDecimals;
   }
-  if (typeof tokenInfo.numberOfDecimals === 'number') {
+  if (typeof tokenInfo?.numberOfDecimals === 'number') {
     return tokenInfo.numberOfDecimals;
   }
   return 0;
@@ -32,7 +32,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, 
     return (
       <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
         <Typography variant="body1" color={primaryColor}>
-          {value} {tokenInfo.name || tokenInfo?.info.name}
+          {value} {tokenInfo?.name || tokenInfo?.info?.name}
         </Typography>
       </Box>
     );
@@ -43,7 +43,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, 
   return (
     <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
       <Typography variant="body1" color={primaryColor}>
-        {value} {tokenInfo.name || tokenInfo?.info.name}
+        {value} {tokenInfo?.name || tokenInfo?.info?.name}
       </Typography>
     </Box>
   );
