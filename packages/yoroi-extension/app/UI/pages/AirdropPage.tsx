@@ -17,6 +17,7 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 import { LoadingButton } from '@mui/lab';
 import Dialog from '../../components/widgets/Dialog';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
+import { forceNonNull } from '../../coreUtils.js';
 
 const messages = defineMessages({
   size: {
@@ -94,9 +95,15 @@ interface Props {
       selected: null | {
         publicDeriverId: number,
         type: 'mnemonic' | 'ledger' | 'trezor',
-        allAddressesByType: {
-          address: string,
-        }[][],
+        allAddresses: {
+          utxoAddresses: {
+            address: {
+              Hash: string,
+              IsUsed: boolean,
+              Type: number,
+            }
+          }[],
+        },
       },
     },
     profile: {
@@ -123,7 +130,7 @@ export default function AirdropPage({ stores }: Props) {
   const [isClaimDone, setClaimDone] = useState(false);
 
   const destAddrBech32 = addressHexToBech32(
-    wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed).address.Hash
+    forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
   );
   useEffect(() => {
     (async () => {
@@ -329,13 +336,13 @@ export default function AirdropPage({ stores }: Props) {
             <ClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
-              message={getClaimMessage(unclaimedAddrs[0].value, destAddrBech32)}
+              message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
           ) : (
             <LedgerClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
-              message={getClaimMessage(unclaimedAddrs[0].value, destAddrBech32)}
+              message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
           )
         )}
