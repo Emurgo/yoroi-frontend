@@ -7,7 +7,10 @@ export const useGetInputs = (walletUtxos: any[]) => {
   const getInputs = async (amounts: { [tokenId: string]: string }) => {
     try {
       const tokenId = Object.keys(amounts)[0];
-      const requiredAmount = BigInt(amounts[tokenId] * 1000000);
+      if (tokenId === undefined) {
+        throw new Error('No tokenId provided in amounts');
+      }
+      const requiredAmount = BigInt(Number(amounts[tokenId]!) * 1000000);
 
       const matching = walletUtxos
         .map(utxo => {
@@ -29,7 +32,7 @@ export const useGetInputs = (walletUtxos: any[]) => {
       }[];
 
       const selected: any[] = [];
-      let total = 0n;
+      let total = BigInt(0);
 
       for (const { utxo, amount } of matching) {
         selected.push(utxo);

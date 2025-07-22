@@ -5,7 +5,7 @@ import { Chain } from '@yoroi/types';
 const supportedSizes = [64, 128, 256, 512, 720] as const;
 const getClosestSize = (size: number | string) => {
   const n = Number(size);
-  return supportedSizes.find(s => n <= s) ?? supportedSizes.at(-1);
+  return supportedSizes.find(s => n <= s) ?? supportedSizes[supportedSizes.length - 1];
 };
 
 type UsePortfolioImageProps = {

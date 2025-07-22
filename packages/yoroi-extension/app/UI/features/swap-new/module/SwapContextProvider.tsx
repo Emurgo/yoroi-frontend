@@ -554,8 +554,11 @@ export type SwapContext = SwapState & {
   ftAssetList: any;
   tokenInfoList: any;
   swapForm: any;
+  stores: any;
   primaryTokenInfo: any;
   loadingTokenList: boolean;
+  isCreateOrderLoading: boolean;
+  isEstimateOrderLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
 };
 
@@ -576,8 +579,11 @@ const SwapContext = createContext<SwapContext>({
   ftAssetList: [],
   tokenInfoList: [],
   swapForm: {},
+  stores: undefined,
   primaryTokenInfo: {},
   loadingTokenList: false,
+  isCreateOrderLoading: false,
+  isEstimateOrderLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
 });
 

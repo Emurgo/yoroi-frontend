@@ -1,5 +1,4 @@
 import { Typography, Stack } from '@mui/material';
-import { useSwapRevamp } from '../../../module/SwapContextProvider';
 
 type DexRoute = {
   id: string;
@@ -16,7 +15,6 @@ type Props = {
 };
 
 export const DexRouteTable = ({ data }: Props) => {
-  const { swapForm } = useSwapRevamp();
   const total = data.reduce((acc, curr) => (acc += curr.expectedOutputWithoutSlippage), 0);
 
   return (
