@@ -611,7 +611,7 @@ class BasePage {
       const callback = args[args.length - 1];
       window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
     });
-    const { name, version } = allDBs[0];
+    const { name, version } = allDBs[allDBs.length - 1];
 
     await this.driver.executeScript(
       (dbName, dbVersion, table) => {
@@ -648,7 +648,7 @@ class BasePage {
       const callback = args[args.length - 1];
       window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
     });
-    const { name, version } = allDBs[0];
+    const { name, version } = allDBs[allDBs.length - 1];
 
     await this.driver.executeScript(
       (dbName, dbVersion) => {
@@ -743,7 +743,7 @@ class BasePage {
       const callback = args[args.length - 1];
       window.allDBsPromise.then(response => callback(response)).catch(err => callback(err));
     });
-    const { name, version } = allDBs[0];
+    const { name, version } = allDBs[allDBs.length - 1];
 
     for (const valueItem of value) {
       await this.driver.executeScript(
@@ -791,7 +791,7 @@ class BasePage {
 
   async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
     // import info into the indexedDB
-    const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`);
+    const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`, true);
     for (const dbKey in dbSnapshot) {
       isFirefox()
         ? await this.setInfoToIndexedDBFirefox(dbKey, dbSnapshot[dbKey])
