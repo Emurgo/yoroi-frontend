@@ -113,7 +113,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
       atoms={atoms}
       direction={direction}
       onClick={() => {
-        direction === ASSET_DIRECTION_OUT && swapForm.tokenOutInput.value.length === 0 ? onAssetSelect() : undefined;
+        direction === ASSET_DIRECTION_OUT && swapForm.tokenOutInput.value.length === 0 && onAssetSelect();
       }}
     >
       <Stack spacing={1} {...atoms.gap_sm}>
