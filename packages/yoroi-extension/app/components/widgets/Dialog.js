@@ -130,7 +130,6 @@ function Dialog(props: Props): Node {
             variant="body1"
             className="dialog__title"
             id={String(id) + '-dialogTitle-text'}
-            color="ds.text_gray_medium"
             forceTopDivider={forceTopDivider}
           >
             {title}
@@ -272,6 +271,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
       fontWeight: 500,
       textAlign: 'center',
       textTransform: 'uppercase',
+      color: theme.palette.ds.text_gray_medium,
       letterSpacing: 0,
       display: 'block',
       borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
