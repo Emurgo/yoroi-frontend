@@ -202,9 +202,6 @@ class BasePage {
 
   /**
    * Utility method for logging and error handling.
-   * @param {string} action - Action name for logging.
-   * @param {Function} fn - Async function to execute.
-   * @returns {Promise<*>} - Result of the function.
    */
   async withLogging(action, fn) {
     this.logger.info(`${this.constructor.name}::${action} called`);
@@ -220,9 +217,6 @@ class BasePage {
 
   /**
    * Generic tab navigation by visible name.
-   * @param {string} tabName - The name of the tab to navigate to.
-   * @param {string} [locatorTemplate] - Optional XPath template with ${tabName} placeholder.
-   * @param {number} [timeout=10000] - Timeout in ms.
    */
   async navigateToTab(tabName, locatorTemplate = '//div[contains(text(), "${tabName}")]', timeout = 10000) {
     const tabLocator = {
