@@ -53,12 +53,9 @@ export const firefoxBin =
   process.env.FIREFOX_BIN != null
     ? process.env.FIREFOX_BIN
     : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
-export const chromeBin = isMacOS()
-  ? '/Applications/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing'
-  : '/usr/local/bin/chromedriver';
+export const chromeBin = process.env.CHROME_PATH;
 export const TargetBrowser = Object.freeze({
   Chrome: 'chrome',
-  Brave: 'brave',
   FF: 'firefox',
 });
 export const WalletWordsSize = Object.freeze({
