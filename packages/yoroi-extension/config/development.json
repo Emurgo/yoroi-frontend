@@ -1,6 +1,6 @@
 {
   "network": {
-    "name": "testnet",
+    "name": "development",
     "priceBackendUrl": "http://localhost:8080"
   },
   "poolExplorer": {
