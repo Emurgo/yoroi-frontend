@@ -12,7 +12,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 /* eslint-disable no-console */
 
-const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
+const plugins = (folder: string, _networkName: string): * => {
   const pageTitle = 'Yoroi';
 
   return [
@@ -73,7 +73,7 @@ const plugins = (folder /*: string */, _networkName /*: string */) /*: * */ => {
   ];
 };
 
-const rules /*: boolean => Array<*> */ = _isDev => [
+const rules: boolean => Array<*> = _isDev => [
   // Pdfjs Worker webpack config, reference to issue: https://github.com/mozilla/pdf.js/issues/7612#issuecomment-315179422
   {
     test: /pdf\.worker(\.min)?\.js$/,
@@ -191,7 +191,7 @@ const optimization = {
   },
 };
 
-const resolve = () /*: * */ => ({
+const resolve = (): * => ({
   extensions: ['*', '.tsx', '.ts', '.js', '.wasm'],
   fallback: {
     vm: false,
@@ -212,13 +212,7 @@ const resolve = () /*: * */ => ({
   alias: { process: 'process/browser' },
 });
 
-const definePlugin = (
-  networkName /*: string */,
-  isProd /*: boolean */,
-  isNightly /*: boolean */,
-  isLight /*: boolean */ = false,
-  isE2E /*: boolean */,
-) /*: * */ => {
+const definePlugin = (networkName: string, isProd: boolean, isNightly: boolean, isLight: boolean = false, isE2E: boolean): * => {
   return {
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),

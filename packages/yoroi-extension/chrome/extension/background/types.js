@@ -6,7 +6,7 @@ import type {
   IGetAllUtxoAddressesResponse,
   Addressing,
 } from '../../../app/api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { LastSyncInfoRow, } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
+import type { LastSyncInfoRow } from '../../../app/api/ada/lib/storage/database/walletTypes/core/tables';
 import type { CoreAddressT } from '../../../app/api/ada/lib/storage/database/primitives/enums';
 import type { AssuranceMode } from '../../../app/types/transactionAssurance.types';
 import type { MultiToken } from '../../../app/api/common/lib/MultiToken';

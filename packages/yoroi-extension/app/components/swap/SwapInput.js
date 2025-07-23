@@ -75,7 +75,7 @@ export default function SwapInput({
   }, [id]);
 
   const defaultImage = name === 'dark-theme' ? defaultTokenDarkImage : defaultTokenImage;
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : (remoteTokenLogo ?? defaultImage);
 
   return (
     <Box>

@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { injectIntl, defineMessages, type $npm$ReactIntl$IntlShape } from 'react-intl';
-import { ReactComponent as Illustration }  from '../../assets/images/swap-testnet.svg';
+import { ReactComponent as Illustration } from '../../assets/images/swap-testnet.svg';
 import { Box, Typography, Button } from '@mui/material';
 
 const messages = defineMessages({
@@ -20,15 +20,10 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  onSwitch: () => void,              
+  onSwitch: () => void,
 |};
 
-function TestnetDisabledSwap({
-  onSwitch, intl
-}: {|
-  ...Props,
-  intl: $npm$ReactIntl$IntlShape
-|}): Node {
+function TestnetDisabledSwap({ onSwitch, intl }: {| ...Props, intl: $npm$ReactIntl$IntlShape |}): Node {
   return (
     <Box
       sx={{
@@ -48,7 +43,7 @@ function TestnetDisabledSwap({
             textAlign: 'center',
             fontWeight: 500,
             fontSize: '18px',
-            lineHeight: '26px'
+            lineHeight: '26px',
           }}
           color="ds.text_gray_medium"
         >
@@ -67,9 +62,7 @@ function TestnetDisabledSwap({
         </Typography>
       </Box>
       <Box sx={{ width: 'fit-content', margin: 'auto' }}>
-        <Button onClick={onSwitch}>
-          {intl.formatMessage(messages.switchNetwork)}
-        </Button>
+        <Button onClick={onSwitch}>{intl.formatMessage(messages.switchNetwork)}</Button>
       </Box>
     </Box>
   );

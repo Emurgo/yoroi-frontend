@@ -37,86 +37,41 @@ export class LedgerConnect {
     this.locale = params.locale;
   }
 
-  getExtendedPublicKey: {|
+  getExtendedPublicKey: ({|
     serial: ?string,
     params: GetExtendedPublicKeyRequest,
-  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY,
-      request.params,
-      request.serial,
-    );
-  }
+  |}) => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> = request => {
+    return this._requestLedger(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY, request.params, request.serial);
+  };
 
-  getExtendedPublicKeys: {|
+  getExtendedPublicKeys: ({|
     serial: ?string,
     params: GetExtendedPublicKeysRequest,
-  |} => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeysResponse>> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS,
-      request.params,
-      request.serial,
-    );
-  }
+  |}) => Promise<ExtendedPublicKeyResp<GetExtendedPublicKeysResponse>> = request => {
+    return this._requestLedger(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS, request.params, request.serial);
+  };
 
-  signTransaction: {|
+  signTransaction: ({|
     serial: ?string,
     params: SignTransactionRequest,
     useOpenTab?: boolean,
-  |} => Promise<SignTransactionResponse> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.SIGN_TX,
-      request.params,
-      request.serial,
-      false,
-      request.useOpenTab === true,
-    );
-  }
+  |}) => Promise<SignTransactionResponse> = request => {
+    return this._requestLedger(OPERATION_NAME.SIGN_TX, request.params, request.serial, false, request.useOpenTab === true);
+  };
 
-  showAddress: {|
-    serial: ?string,
-    params: ShowAddressRequestWrapper,
-  |} => Promise<void> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.SHOW_ADDRESS,
-      request.params,
-      request.serial,
-    );
-  }
+  showAddress: ({| serial: ?string, params: ShowAddressRequestWrapper |}) => Promise<void> = request => {
+    return this._requestLedger(OPERATION_NAME.SHOW_ADDRESS, request.params, request.serial);
+  };
 
-  getVersion: {|
-    serial: ?string,
-    dontCloseTab?: boolean,
-  |} => Promise<GetVersionResponse> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.GET_LEDGER_VERSION,
-      undefined,
-      request.serial,
-      true,
-    );
-  }
+  getVersion: ({| serial: ?string, dontCloseTab?: boolean |}) => Promise<GetVersionResponse> = request => {
+    return this._requestLedger(OPERATION_NAME.GET_LEDGER_VERSION, undefined, request.serial, true);
+  };
 
-  signMessage: {|
-    serial: ?string,
-    params: MessageData,
-    useOpenTab?: boolean,
-  |} => Promise<SignedMessageData> = (request) => {
-    return this._requestLedger(
-      OPERATION_NAME.SIGN_MESSAGE,
-      request.params,
-      request.serial,
-      false,
-      request.useOpenTab === true,
-    );
-  }
+  signMessage: ({| serial: ?string, params: MessageData, useOpenTab?: boolean |}) => Promise<SignedMessageData> = request => {
+    return this._requestLedger(OPERATION_NAME.SIGN_MESSAGE, request.params, request.serial, false, request.useOpenTab === true);
+  };
 
-  async _requestLedger(
-    action: string,
-    params: any,
-    serial: ?string,
-    dontCloseTab?: boolean,
-    useOpenTab?: boolean,
-  ): any {
+  async _requestLedger(action: string, params: any, serial: ?string, dontCloseTab?: boolean, useOpenTab?: boolean): any {
     let tabId;
     if (useOpenTab && this.tabId != null) {
       tabId = this.tabId;
@@ -131,12 +86,14 @@ export class LedgerConnect {
       chrome.tabs.sendMessage(
         tabId,
         {
-          data: JSON.parse(JSON.stringify({
-            action,
-            params,
-            target: YOROI_LEDGER_CONNECT_TARGET_NAME,
-            serial,
-          })),
+          data: JSON.parse(
+            JSON.stringify({
+              action,
+              params,
+              target: YOROI_LEDGER_CONNECT_TARGET_NAME,
+              serial,
+            })
+          ),
         },
         (response: ?MessageType) => {
           if (response != null) {
@@ -148,7 +105,7 @@ export class LedgerConnect {
           } else {
             reject(new Error('Forcefully cancelled by user'));
           }
-        },
+        }
       );
     });
   }
@@ -164,11 +121,9 @@ export class LedgerConnect {
       chrome.runtime.onMessage.addListener(readyListener);
       chrome.tabs.getCurrent(tab => {
         chrome.tabs.create({ url: `ledger.html?locale=${this.locale}&mainTabId=${tab.id}` });
-      })
+      });
     });
   }
 
-  dispose() {
-  }
+  dispose() {}
 }
-

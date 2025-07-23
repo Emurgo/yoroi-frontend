@@ -33,7 +33,7 @@ export const ModalManager = () => {
   const modalOnClose = () => {
     if (typeof onClose === 'function') onClose();
     closeModal();
-  }
+  };
 
   return (
     <BootstrapDialog

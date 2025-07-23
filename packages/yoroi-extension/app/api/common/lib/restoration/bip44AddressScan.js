@@ -1,4 +1,3 @@
-
 // @flow
 
 import { range } from 'lodash';
@@ -11,9 +10,7 @@ type AddressInfo = {|
   index: number,
 |};
 
-export type GenerateAddressFunc = (
-  indices: Array<number>,
-) => Array<string>;
+export type GenerateAddressFunc = (indices: Array<number>) => Array<string>;
 
 /** Repeatedly scan addresses until there is a contiguous block of `scanSize` addresses unused
  * @returns all scanned addresses
@@ -24,7 +21,7 @@ export async function discoverAllAddressesFrom(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): Promise<Array<{| address: string, isUsed: boolean, index: number |}>> {
   let fetchedAddressesInfo: Array<AddressInfo> = [];
   let highestUsedIndex = initialHighestUsedIndex;
@@ -42,7 +39,7 @@ export async function discoverAllAddressesFrom(
         scanSize,
         requestSize,
         checkAddressesInUse,
-        network,
+        network
       );
 
     const newHighestUsedIndex = _findNewHighestIndex(
@@ -63,9 +60,11 @@ export async function discoverAllAddressesFrom(
       highestInBatch = i;
     }
   }
-  return fetchedAddressesInfo
-    // bip-44 requires scanSize buffer
-    .slice(0, (highestInBatch + scanSize) + 1) // +1 since range is exclusive
+  return (
+    fetchedAddressesInfo
+      // bip-44 requires scanSize buffer
+      .slice(0, highestInBatch + scanSize + 1)
+  ); // +1 since range is exclusive
 }
 
 /** Scan a set of addresses and find the largest index that is used */
@@ -73,7 +72,7 @@ function _findNewHighestIndex(
   newFetchedAddressesInfo: Array<AddressInfo>,
   offset: number,
   highestUsedIndex: number,
-  scanSize: number,
+  scanSize: number
 ): number {
   // get all addresses added in this scan
   const newlyAddedAddresses = newFetchedAddressesInfo.slice(
@@ -82,15 +81,12 @@ function _findNewHighestIndex(
   );
 
   // find new highest used
-  const newHighestUsedIndex = newlyAddedAddresses.reduce(
-    (currentHighestIndex, addressInfo) => {
-      if (addressInfo.index > currentHighestIndex && addressInfo.isUsed) {
-        return addressInfo.index;
-      }
-      return currentHighestIndex;
-    },
-    highestUsedIndex
-  );
+  const newHighestUsedIndex = newlyAddedAddresses.reduce((currentHighestIndex, addressInfo) => {
+    if (addressInfo.index > currentHighestIndex && addressInfo.isUsed) {
+      return addressInfo.index;
+    }
+    return currentHighestIndex;
+  }, highestUsedIndex);
 
   return newHighestUsedIndex;
 }
@@ -107,7 +103,7 @@ async function _scanNextBatch(
   scanSize: number,
   requestSize: number,
   checkAddressesInUse: FilterFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): Promise<Array<AddressInfo>> {
   /* Optimization: use `requestSize` to batch calls to crypto backend and to backend-service api
    * Allows us to make more than `scanSize` calls at a time
@@ -122,15 +118,10 @@ async function _scanNextBatch(
   }
 
   // create batch
-  const addressesIndex = range(
-    fetchedAddressesInfo.length + offset,
-    fetchedAddressesInfo.length + offset + requestSize
-  );
+  const addressesIndex = range(fetchedAddressesInfo.length + offset, fetchedAddressesInfo.length + offset + requestSize);
 
   // batch to cryptography backend
-  const newAddresses = generateAddressFunc(
-    addressesIndex,
-  );
+  const newAddresses = generateAddressFunc(addressesIndex);
 
   // batch to backend API
   const usedAddresses = await checkAddressesInUse({
@@ -139,12 +130,7 @@ async function _scanNextBatch(
   });
 
   // Update metadata for new addresses
-  const newFetchedAddressesInfo = _addFetchedAddressesInfo(
-    fetchedAddressesInfo,
-    newAddresses,
-    usedAddresses,
-    addressesIndex,
-  );
+  const newFetchedAddressesInfo = _addFetchedAddressesInfo(fetchedAddressesInfo, newAddresses, usedAddresses, addressesIndex);
 
   return newFetchedAddressesInfo;
 }
@@ -154,14 +140,14 @@ function _addFetchedAddressesInfo(
   fetchedAddressesInfo: Array<AddressInfo>,
   newAddresses: Array<string>,
   usedAddresses: Array<string>,
-  addressesIndex: Array<number>,
+  addressesIndex: Array<number>
 ): Array<AddressInfo> {
   const isUsedSet = new Set(usedAddresses);
 
   const newAddressesInfo = newAddresses.map((address, position) => ({
     address,
     isUsed: isUsedSet.has(address),
-    index: addressesIndex[position]
+    index: addressesIndex[position],
   }));
 
   return fetchedAddressesInfo.concat(newAddressesInfo);

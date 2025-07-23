@@ -32,8 +32,7 @@ const messages = defineMessages({
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
-    defaultMessage:
-      '!!!I understand that my money are held securely on this device only, not on the company servers',
+    defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
@@ -72,7 +71,7 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const {
@@ -130,15 +129,11 @@ export default class WalletRecoveryPhraseEntryDialog extends Component<Props> {
         ))}
       </div>
     ) : (
-      <div className={styles.phrasePlaceholder}>
-        {intl.formatMessage(messages.verificationInstructions)}
-      </div>
+      <div className={styles.phrasePlaceholder}>{intl.formatMessage(messages.verificationInstructions)}</div>
     );
 
     const phraseDoesNotMatchError =
-      !isValid && enteredPhrase.length === recoveryPhraseSorted.length
-        ? intl.formatMessage(messages.phraseDoesNotMatch)
-        : '';
+      !isValid && enteredPhrase.length === recoveryPhraseSorted.length ? intl.formatMessage(messages.phraseDoesNotMatch) : '';
 
     return (
       <Dialog

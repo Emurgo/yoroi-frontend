@@ -3,10 +3,10 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { getAddressPayload } from '../../api/ada/lib/storage/bridge/utils';
-import { getMangledFilter, } from '../../stores/stateless/mangledAddresses';
+import { getMangledFilter } from '../../stores/stateless/mangledAddresses';
 import TransferSendPage from './TransferSendPage';
 import globalMessages from '../../i18n/global-messages';
-import { IntlContext, } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresProps } from '../../stores';
 
@@ -16,27 +16,20 @@ type Props = {|
 
 @observer
 export default class UnmangleTxDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   componentDidMount() {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(UnmangleTxDialogContainer)} no wallet selected`);
     }
 
-    const getAddresses = (clazz) => {
+    const getAddresses = clazz => {
       const entries = this.props.stores.addresses.addressSubgroupMap.get(clazz)?.all ?? [];
-      const payloadList = entries.map(
-        info => getAddressPayload(info.address, getNetworkById(selected.networkId))
-      );
+      const payloadList = entries.map(info => getAddressPayload(info.address, getNetworkById(selected.networkId)));
       return new Set(payloadList);
     };
 
-
-    const filter = getMangledFilter(
-      getAddresses,
-      selected.networkId,
-    );
+    const filter = getMangledFilter(getAddresses, selected.networkId);
     // note: don't await
     // noinspection JSIgnoredPromiseFromCall
     this.props.stores.transactionBuilderStore.initializeTx({
@@ -72,10 +65,8 @@ export default class UnmangleTxDialogContainer extends Component<{| ...Props, ..
         toTransferTx={tentativeTx => ({
           recoveredBalance: tentativeTx.totalInput(),
           fee: tentativeTx.fee(),
-          senders: tentativeTx
-            .uniqueSenderAddresses(),
-          receivers: tentativeTx
-            .receivers(false),
+          senders: tentativeTx.uniqueSenderAddresses(),
+          receivers: tentativeTx.receivers(false),
         })}
       />
     );

@@ -22,14 +22,13 @@ export class ServerError extends Error {
   }
 }
 
-export const fetchAndEnsureSuccess: typeof fetch = (...args): ReturnType<typeof fetch> =>  {
+export const fetchAndEnsureSuccess: typeof fetch = (...args): ReturnType<typeof fetch> => {
   return fetch(...args).then(resp => {
     if (resp.ok) {
       return resp;
     }
     return resp.text().then(data => {
       throw new ServerError({ status: resp.status, data });
-    })
+    });
   });
-}
-
+};

@@ -2,24 +2,16 @@
 
 // Handle restoring wallets that follow cip1852
 
-import {
-  discoverAllAddressesFrom,
-} from '../../../common/lib/restoration/bip44AddressScan';
-import type {
-  GenerateAddressFunc,
-} from '../../../common/lib/restoration/bip44AddressScan';
+import { discoverAllAddressesFrom } from '../../../common/lib/restoration/bip44AddressScan';
+import type { GenerateAddressFunc } from '../../../common/lib/restoration/bip44AddressScan';
 import type { ConfigType } from '../../../../../config/config-types';
 
-import {
-  ChainDerivations, BIP44_SCAN_SIZE,
-} from '../../../../config/numbersConfig';
+import { ChainDerivations, BIP44_SCAN_SIZE } from '../../../../config/numbersConfig';
 
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 
-import type {
-  TreeInsert, InsertRequest,
-} from '../../lib/storage/database/walletTypes/common/utils.types';
-import type { AddByHashFunc, } from '../../../common/lib/storage/bridge/hashMapper';
+import type { TreeInsert, InsertRequest } from '../../lib/storage/database/walletTypes/common/utils.types';
+import type { AddByHashFunc } from '../../../common/lib/storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../lib/storage/database/primitives/tables';
 import { CoreAddressTypes } from '../../lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../lib/storage/database/walletTypes/common/tables';
@@ -31,12 +23,8 @@ import type { FilterFunc } from '../../lib/state-fetch/types';
 declare var CONFIG: ConfigType;
 const addressRequestSize = CONFIG.app.addressRequestSize;
 
-function genKeyhashBatchFunc(
-  addressChain: RustModule.WalletV4.Bip32PublicKey,
-): GenerateAddressFunc {
-  return (
-    indices: Array<number>
-  ) => {
+function genKeyhashBatchFunc(addressChain: RustModule.WalletV4.Bip32PublicKey): GenerateAddressFunc {
+  return (indices: Array<number>) => {
     return indices.map(i => {
       const addressKey = addressChain.derive(i).to_raw_key();
       return addressKey.hash().to_bech32(Bech32Prefix.PAYMENT_KEY_HASH);
@@ -48,13 +36,13 @@ export async function addShelleyChimericAccountAddress(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV4.PublicKey,
-  chainNetworkId: number,
+  chainNetworkId: number
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
   const accountAddr = RustModule.WalletV4.RewardAddress.new(
     chainNetworkId,
-    RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash()),
+    RustModule.WalletV4.Credential.from_keyhash(stakingKey.hash())
   );
   await addByHash({
     ...insertRequest,
@@ -74,7 +62,7 @@ export async function addShelleyUtxoAddress(
   insertRequest: InsertRequest,
   stakingKey: RustModule.WalletV4.PublicKey,
   keyHash: RustModule.WalletV4.Ed25519KeyHash,
-  networkId: number,
+  networkId: number
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
@@ -123,12 +111,10 @@ async function scanChain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
-    request.network,
+    request.network
   );
 
-  const config = getCardanoHaskellBaseConfig(
-    request.network
-  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const config = getCardanoHaskellBaseConfig(request.network).reduce((acc, next) => Object.assign(acc, next), {});
 
   /**
    * TODO: we need an endpoint here that
@@ -136,23 +122,22 @@ async function scanChain(request: {|
    * that way we can properly generate pointer addresses ahead of time
    */
 
-  return addresses
-    .map(({ address, isUsed }, i) => {
-      return {
-        index: i + request.lastUsedIndex + 1,
-        insert: async insertRequest => {
-          return await addShelleyUtxoAddress(
-            request.addByHash,
-            insertRequest,
-            request.stakingKey,
-            RustModule.WalletV4.Ed25519KeyHash.from_bech32(address),
-            Number.parseInt(config.ChainNetworkId, 10),
-          );
-        },
-        isUsed,
-        address,
-      };
-    });
+  return addresses.map(({ address, isUsed }, i) => {
+    return {
+      index: i + request.lastUsedIndex + 1,
+      insert: async insertRequest => {
+        return await addShelleyUtxoAddress(
+          request.addByHash,
+          insertRequest,
+          request.stakingKey,
+          RustModule.WalletV4.Ed25519KeyHash.from_bech32(address),
+          Number.parseInt(config.ChainNetworkId, 10)
+        );
+      },
+      isUsed,
+      address,
+    };
+  });
 }
 
 // <TODO:PENDING_REMOVAL> legacy
@@ -167,17 +152,11 @@ export async function scanShelleyCip1852Account(request: {|
 |}): Promise<TreeInsert<Bip44ChainInsert>> {
   const key = RustModule.WalletV4.Bip32PublicKey.from_hex(request.accountPublicKey);
 
-  const config = getCardanoHaskellBaseConfig(
-    request.network
-  ).reduce((acc, next) => Object.assign(acc, next), {});
+  const config = getCardanoHaskellBaseConfig(request.network).reduce((acc, next) => Object.assign(acc, next), {});
 
   const insert = await scanAccount({
-    generateInternalAddresses: genKeyhashBatchFunc(
-      key.derive(ChainDerivations.INTERNAL),
-    ),
-    generateExternalAddresses: genKeyhashBatchFunc(
-      key.derive(ChainDerivations.EXTERNAL),
-    ),
+    generateInternalAddresses: genKeyhashBatchFunc(key.derive(ChainDerivations.INTERNAL)),
+    generateExternalAddresses: genKeyhashBatchFunc(key.derive(ChainDerivations.EXTERNAL)),
     lastUsedInternal: request.lastUsedInternal,
     lastUsedExternal: request.lastUsedExternal,
     network: request.network,
@@ -219,12 +198,7 @@ async function scanAccount(request: {|
   const accountAddress = [0].map(i => ({
     index: i,
     insert: async insertRequest => {
-      return await addShelleyChimericAccountAddress(
-        request.addByHash,
-        insertRequest,
-        request.stakingKey,
-        request.chainNetworkId
-      );
+      return await addShelleyChimericAccountAddress(request.addByHash, insertRequest, request.stakingKey, request.chainNetworkId);
     },
   }));
 
@@ -232,27 +206,30 @@ async function scanAccount(request: {|
     {
       index: ChainDerivations.EXTERNAL,
       // initial value. Doesn't override existing entry
-      insert: insertRequest => Promise.resolve({
-        KeyDerivationId: insertRequest.keyDerivationId,
-        DisplayCutoff: 0,
-      }),
+      insert: insertRequest =>
+        Promise.resolve({
+          KeyDerivationId: insertRequest.keyDerivationId,
+          DisplayCutoff: 0,
+        }),
       children: externalAddresses,
     },
     {
       index: ChainDerivations.INTERNAL,
-      insert: insertRequest => Promise.resolve({
-        KeyDerivationId: insertRequest.keyDerivationId,
-        DisplayCutoff: null,
-      }),
+      insert: insertRequest =>
+        Promise.resolve({
+          KeyDerivationId: insertRequest.keyDerivationId,
+          DisplayCutoff: null,
+        }),
       children: internalAddresses,
     },
     {
       index: ChainDerivations.CHIMERIC_ACCOUNT,
-      insert: insertRequest => Promise.resolve({
-        KeyDerivationId: insertRequest.keyDerivationId,
-        DisplayCutoff: null,
-      }),
+      insert: insertRequest =>
+        Promise.resolve({
+          KeyDerivationId: insertRequest.keyDerivationId,
+          DisplayCutoff: null,
+        }),
       children: accountAddress,
-    }
+    },
   ];
 }

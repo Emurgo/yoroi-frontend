@@ -20,4 +20,3 @@ export const setupApi: void => Promise<Api> = async () => ({
   externalStorage: new ExternalStorageApi(),
   export: new ExportApi(),
 });
-

@@ -3,14 +3,11 @@
 
 const { injectedScripts } = require('./constants');
 
-/*::
 type Icons = {|
   '16': string,
   '48': string,
   '128': string,
 |};
-*/
-
 export default ({
   description,
   defaultTitle,
@@ -23,7 +20,7 @@ export default ({
   version,
   enableProtocolHandlers,
   shouldInjectConnector,
-} /*: {|
+}: {|
   description: string,
   defaultTitle: string,
   titleOverride?: boolean,
@@ -35,17 +32,18 @@ export default ({
   version: string,
   enableProtocolHandlers: boolean,
   shouldInjectConnector: boolean,
-|} */
-)/* : * */ => { // eslint-disable-line function-paren-newline
-  const icons = iconOverride == null
-    ? {
-      /* eslint-disable quote-props */
-      '16': 'img/icon-16.png',
-      '48': 'img/icon-48.png',
-      '128': 'img/icon-128.png',
-      /* eslint-enable quote-props */
-    }
-    : iconOverride;
+|}): * => {
+  // eslint-disable-line function-paren-newline
+  const icons =
+    iconOverride == null
+      ? {
+          /* eslint-disable quote-props */
+          '16': 'img/icon-16.png',
+          '48': 'img/icon-48.png',
+          '128': 'img/icon-128.png',
+          /* eslint-enable quote-props */
+        }
+      : iconOverride;
   const base = {
     version,
     // the name shown in chrome://extensions
@@ -79,59 +77,36 @@ export default ({
         js: ['js/trezor-content-script.js'],
       },
       {
-        matches: [
-          'http://*/*',
-          'https://*/*',
-        ],
-        js: [
-          'js/bringInject.js',
-        ],
+        matches: ['http://*/*', 'https://*/*'],
+        js: ['js/bringInject.js'],
         run_at: 'document_start',
-      }
+      },
     ],
     content_security_policy: contentSecurityPolicy,
     protocol_handlers: !enableProtocolHandlers
       ? []
       : [
-        {
-          protocol: 'web+cardano',
-          name: 'Yoroi',
-          uriTemplate: 'main_window.html#/send-from-uri?q=%s',
-        },
-      ],
-    web_accessible_resources: [
-      'js/bringInject.js',
-    ],
+          {
+            protocol: 'web+cardano',
+            name: 'Yoroi',
+            uriTemplate: 'main_window.html#/send-from-uri?q=%s',
+          },
+        ],
+    web_accessible_resources: ['js/bringInject.js'],
   };
 
   if (shouldInjectConnector) {
-    base.content_scripts.push(
-      {
-        matches: [
-          'file://*/*',
-          'http://*/*',
-          'https://*/*',
-        ],
-        js: [
-          'js/inject.js',
-        ],
-        run_at: 'document_start',
-        all_frames: true,
-      }
-    );
-    base.web_accessible_resources.splice(
-      0,
-      0,
-      ...injectedScripts.map(script => `js/${script}`)
-    );
+    base.content_scripts.push({
+      matches: ['file://*/*', 'http://*/*', 'https://*/*'],
+      js: ['js/inject.js'],
+      run_at: 'document_start',
+      all_frames: true,
+    });
+    base.web_accessible_resources.splice(0, 0, ...injectedScripts.map(script => `js/${script}`));
   }
 
-  const verName /*: {| version_name?: string |} */ = versionName != null
-    ? { version_name: versionName }
-    : Object.freeze({});
-  const extKey /*: {| key?: string |} */ = extensionKey != null
-    ? { key: extensionKey }
-    : Object.freeze({});
+  const verName: {| version_name?: string |} = versionName != null ? { version_name: versionName } : Object.freeze({});
+  const extKey: {| key?: string |} = extensionKey != null ? { key: extensionKey } : Object.freeze({});
   return {
     ...verName,
     ...base,

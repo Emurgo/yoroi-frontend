@@ -30,18 +30,22 @@ function ReceiveWithNavigation({ addressStores, setFilter, activeFilter, childre
         width: '100%',
       }}
     >
-      <Box sx={{
-        flexShrink: 0,
-        height: '100%'
-      }}>
-        <ReceiveNavigationRevamp addressStores={addressStores} setFilter={setFilter} activeFilter={activeFilter}/>
+      <Box
+        sx={{
+          flexShrink: 0,
+          height: '100%',
+        }}
+      >
+        <ReceiveNavigationRevamp addressStores={addressStores} setFilter={setFilter} activeFilter={activeFilter} />
       </Box>
-      <Box sx={{
-        height: '100%',
-        minHeight: '200px',
-        overflow: 'auto',
-        flex: 1
-      }}>
+      <Box
+        sx={{
+          height: '100%',
+          minHeight: '200px',
+          overflow: 'auto',
+          flex: 1,
+        }}
+      >
         {children}
       </Box>
     </Box>

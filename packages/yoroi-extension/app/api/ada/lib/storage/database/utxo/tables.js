@@ -76,37 +76,29 @@ export const UtxoDiffToBestBlockSchema: {|
 };
 
 export const populateUtxoDb = (schemaBuilder: lf$schema$Builder) => {
-  schemaBuilder.createTable(UtxoAtSafePointSchema.name)
+  schemaBuilder
+    .createTable(UtxoAtSafePointSchema.name)
     .addColumn(UtxoAtSafePointSchema.properties.UtxoAtSafePointId, Type.INTEGER)
     .addColumn(UtxoAtSafePointSchema.properties.PublicDeriverId, Type.INTEGER)
     .addColumn(UtxoAtSafePointSchema.properties.UtxoAtSafePoint, Type.OBJECT)
-    .addPrimaryKey(
-      ([UtxoAtSafePointSchema.properties.UtxoAtSafePointId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([UtxoAtSafePointSchema.properties.UtxoAtSafePointId]: Array<string>), true)
     .addForeignKey('UtxoAtSafePoint_PublicDeriver', {
       local: UtxoAtSafePointSchema.properties.PublicDeriverId,
-      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
+      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`,
     })
-    .addIndex(
-      'UtxoAtSafePoint_PublicDeriver_Index',
-      ([UtxoAtSafePointSchema.properties.PublicDeriverId]: Array<string>),
-      false
-    );
+    .addIndex('UtxoAtSafePoint_PublicDeriver_Index', ([UtxoAtSafePointSchema.properties.PublicDeriverId]: Array<string>), false);
 
-  schemaBuilder.createTable(UtxoDiffToBestBlockSchema.name)
+  schemaBuilder
+    .createTable(UtxoDiffToBestBlockSchema.name)
     .addColumn(UtxoDiffToBestBlockSchema.properties.UtxoDiffToBestBlockId, Type.INTEGER)
     .addColumn(UtxoDiffToBestBlockSchema.properties.PublicDeriverId, Type.INTEGER)
     .addColumn(UtxoDiffToBestBlockSchema.properties.lastBestBlockHash, Type.STRING)
     .addColumn(UtxoDiffToBestBlockSchema.properties.spentUtxoIds, Type.OBJECT)
     .addColumn(UtxoDiffToBestBlockSchema.properties.newUtxos, Type.OBJECT)
-    .addPrimaryKey(
-      ([UtxoDiffToBestBlockSchema.properties.UtxoDiffToBestBlockId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([UtxoDiffToBestBlockSchema.properties.UtxoDiffToBestBlockId]: Array<string>), true)
     .addForeignKey('UtxoDiffToBestBlock_PublicDeriver', {
       local: UtxoDiffToBestBlockSchema.properties.PublicDeriverId,
-      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`
+      ref: `${PublicDeriverSchema.name}.${PublicDeriverSchema.properties.PublicDeriverId}`,
     })
     .addIndex(
       'UtxoDiffToBestBlock_PublicDeriver_Index',
@@ -115,12 +107,10 @@ export const populateUtxoDb = (schemaBuilder: lf$schema$Builder) => {
     )
     .addIndex(
       'UtxoDiffToBestBlock_PublicDeriver_lastBestBlockHash_Index',
-      (
-        [
-          UtxoDiffToBestBlockSchema.properties.PublicDeriverId,
-          UtxoDiffToBestBlockSchema.properties.lastBestBlockHash,
-        ]: Array<string>
-      ),
-      true,
+      ([
+        UtxoDiffToBestBlockSchema.properties.PublicDeriverId,
+        UtxoDiffToBestBlockSchema.properties.lastBestBlockHash,
+      ]: Array<string>),
+      true
     );
 };

@@ -34,7 +34,9 @@ export function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`npx webpack --config webpack-mv2/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()}`);
+  exec(
+    `npx webpack --config webpack-mv2/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()}`
+  );
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');
@@ -66,11 +68,13 @@ export function buildDev(env: string) {
 
   console.log('[Webpack Dev]');
   console.log('-'.repeat(80));
-  console.log('Please load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n');
+  console.log(
+    'Please load unpacked extensions with `./dev` folder. (see https://developer.chrome.com/extensions/getstarted#unpacked)\n'
+  );
 
   const serverOpts: any = {
     host: 'localhost',
-    port: connections.Ports.WebpackDev
+    port: connections.Ports.WebpackDev,
   };
 
   if (argv.type === 'debug') {
@@ -83,11 +87,7 @@ export function buildDev(env: string) {
   }
 
   createWebpackServer(
-    config.baseDevConfig(
-      argv.env,
-      isNightly,
-      !shouldInjectConnector
-    ),
+    config.baseDevConfig(argv.env, isNightly, !shouldInjectConnector),
     webpack,
     webpackDevMiddleware,
     webpackHotMiddleware,
@@ -96,12 +96,7 @@ export function buildDev(env: string) {
 
   const Webpack = require('webpack');
   const WebpackDevServer = require('webpack-dev-server');
-  const webpackConfig = config.contentScriptConfig(
-    argv.env,
-    isNightly,
-    !shouldInjectConnector,
-    isE2E,
-  );
+  const webpackConfig = config.contentScriptConfig(argv.env, isNightly, !shouldInjectConnector, isE2E);
   const server = new WebpackDevServer(webpackConfig.devServer, Webpack(webpackConfig));
   server.start();
 }

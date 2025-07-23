@@ -9,33 +9,22 @@ const customPath = path.join(__dirname, './customPublicPath');
 
 const defaultPublicPath = '/js/';
 
-/*::
 type EnvParams = {|
   networkName: string,
-  nightly: "true" | "false",
+  nightly: 'true' | 'false',
   publicPath?: string,
-  isLight: "true" | "false",
-  isE2E: "true" | "false",
+  isLight: 'true' | 'false',
+  isE2E: 'true' | 'false',
 |};
-*/
-const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
+const baseProdConfig = (env: EnvParams): * => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
   resolve: commonConfig.resolve(),
   entry: {
-    yoroi: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/index')
-    ],
-    connector: [
-      customPath,
-      path.join(__dirname, '../chrome/extension/connector/index')
-    ],
-    ledger: [
-      customPath,
-      path.join(__dirname, '../ledger/index')
-    ],
+    yoroi: [customPath, path.join(__dirname, '../chrome/extension/index')],
+    connector: [customPath, path.join(__dirname, '../chrome/extension/connector/index')],
+    ledger: [customPath, path.join(__dirname, '../ledger/index')],
   },
   output: {
     path: path.join(__dirname, '../build/js'),
@@ -45,13 +34,9 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
   },
   plugins: [
     ...commonConfig.plugins('build', env.networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      env.networkName,
-      true,
-      JSON.parse(env.nightly),
-      JSON.parse(env.isLight),
-      JSON.parse(env.isE2E),
-    )),
+    new webpack.DefinePlugin(
+      commonConfig.definePlugin(env.networkName, true, JSON.parse(env.nightly), JSON.parse(env.isLight), JSON.parse(env.isE2E))
+    ),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],
   module: {
@@ -62,8 +47,8 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: []
-        }
+          presets: [],
+        },
       },
       {
         test: /\.(js|jsx)$/,
@@ -72,25 +57,23 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS
           publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
         },
       },
-    ]
-  }
+    ],
+  },
 });
 
-const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
+const backgroundServiceWorkerConfig = (env: EnvParams): * => ({
   mode: 'production',
   experiments: { asyncWebAssembly: true },
   resolve: commonConfig.resolve(),
   entry: {
-    background: [
-      path.join(__dirname, '../chrome/extension/background/index')
-    ],
+    background: [path.join(__dirname, '../chrome/extension/background/index')],
   },
   output: {
     path: path.join(__dirname, '../build/js'),
@@ -99,23 +82,16 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
   },
   plugins: [
     ...commonConfig.plugins('build', env.networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      env.networkName,
-      true,
-      JSON.parse(env.nightly),
-      JSON.parse(env.isLight),
-      JSON.parse(env.isE2E),
-    )),
+    new webpack.DefinePlugin(
+      commonConfig.definePlugin(env.networkName, true, JSON.parse(env.nightly), JSON.parse(env.isLight), JSON.parse(env.isE2E))
+    ),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /rustLoader/,
-      (resource) => {
-        resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground')
-      }
-    ),
+    new webpack.NormalModuleReplacementPlugin(/rustLoader/, resource => {
+      resource.request = resource.request.replace('rustLoader', 'rustLoaderForBackground');
+    }),
   ],
   module: {
     rules: [
@@ -125,8 +101,8 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: []
-        }
+          presets: [],
+        },
       },
       {
         test: /\.(js|jsx)$/,
@@ -135,26 +111,24 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
       },
       {
         test: /\.(eot|otf|ttf|woff|woff2|gif|png)$/,
-        include: [ path.resolve(__dirname, '../app') ],
+        include: [path.resolve(__dirname, '../app')],
         loader: 'file-loader',
         options: {
           // Need to specify public path so assets can be loaded from static resources like CSS
           publicPath: env.publicPath == null ? defaultPublicPath : env.publicPath,
         },
       },
-    ]
-  }
+    ],
+  },
 });
 
-const bringContentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
+const bringContentScriptConfig = (env: EnvParams): * => ({
   mode: 'production',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
   resolve: commonConfig.resolve(),
   entry: {
-    contentScript: [
-      path.join(__dirname, '../chrome/content-scripts/bringInject.js'),
-    ]
+    contentScript: [path.join(__dirname, '../chrome/content-scripts/bringInject.js')],
   },
   output: {
     path: path.join(__dirname, '../build/js'),
@@ -164,15 +138,11 @@ const bringContentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
   plugins: [
     ...commonConfig.plugins('build', env.networkName),
     new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 1
+      maxChunks: 1,
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(
-      env.networkName,
-      true,
-      JSON.parse(env.nightly),
-      JSON.parse(env.isLight),
-      JSON.parse(env.isE2E),
-    )),
+    new webpack.DefinePlugin(
+      commonConfig.definePlugin(env.networkName, true, JSON.parse(env.nightly), JSON.parse(env.isLight), JSON.parse(env.isE2E))
+    ),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],
   module: {
@@ -183,10 +153,10 @@ const bringContentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: []
-        }
+          presets: [],
+        },
       },
-    ]
+    ],
   },
 });
 

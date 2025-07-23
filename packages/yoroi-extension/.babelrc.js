@@ -2,36 +2,37 @@
 
 /**
  * when running jest we need to use nodejs and not browser configurations
-*/
+ */
 const nodePlugins = {
   plugins: [
     'dynamic-import-node',
     '@babel/plugin-transform-runtime',
-    ['module-resolver', {
-      alias: {
-        'cardano-wallet-browser': 'cardano-wallet',
-        '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
-        '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
-        '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
-      }
-    }]
-  ]
+    [
+      'module-resolver',
+      {
+        alias: {
+          'cardano-wallet-browser': 'cardano-wallet',
+          '@emurgo/cardano-serialization-lib-browser': '@emurgo/cardano-serialization-lib-nodejs',
+          '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
+          '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
+        },
+      },
+    ],
+  ],
 };
 
-/*::
 // https://babeljs.io/docs/en/config-files#config-function-api
-type ApiType = { env: (void | string | Array<string>) => (string | boolean), ... };
-*/
-module.exports = function (api /*: ApiType */) /*: * */ {
+type ApiType = { env: (void | string | Array<string>) => string | boolean, ... };
+module.exports = function (api: ApiType): * {
   return {
     presets: [
       [
         '@babel/preset-env',
         {
           corejs: 3,
-          modules: (api.env('test') || api.env('jest')) ? 'commonjs' : 'auto',
+          modules: api.env('test') || api.env('jest') ? 'commonjs' : 'auto',
           useBuiltIns: 'entry',
-        }
+        },
       ],
       '@babel/preset-flow',
       [
@@ -67,24 +68,24 @@ module.exports = function (api /*: ApiType */) /*: * */ {
       [
         '@babel/plugin-proposal-decorators',
         {
-          legacy: true
-        }
+          legacy: true,
+        },
       ],
       [
         '@babel/plugin-transform-runtime',
         {
           // CoreJS breaks Jest mocks for some reason
-          corejs: (api.env('test') || api.env('jest')) ? false : 3,
+          corejs: api.env('test') || api.env('jest') ? false : 3,
           helpers: true,
-          regenerator: true
-        }
+          regenerator: true,
+        },
       ],
       [
         'react-intl',
         {
           messagesDir: './translations/messages/',
-          extractSourceLocation: true
-        }
+          extractSourceLocation: true,
+        },
       ],
       'add-module-exports',
       '@babel/plugin-transform-private-methods',
@@ -94,6 +95,6 @@ module.exports = function (api /*: ApiType */) /*: * */ {
     env: {
       test: nodePlugins,
       jest: nodePlugins,
-    }
+    },
   };
 };
