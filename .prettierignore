@@ -20,5 +20,6 @@ packages/yoroi-extension/scripts/sslOverrides.js
 *.d.ts
 **/app/UI/**/*.d.ts
 packages/yoroi-extension/chrome/manifest.*.json
+packages/yoroi-extension/chrome/extension/background/handlers/yoroi
 packages/yoroi-extension/translations/messages
 packages/yoroi-extension/translations/reports
