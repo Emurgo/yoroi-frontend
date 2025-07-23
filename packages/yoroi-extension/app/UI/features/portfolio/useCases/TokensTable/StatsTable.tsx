@@ -41,7 +41,7 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const [{ order, orderBy }, setSortState] = useState<ISortState>({
-    order: '',
+    order: null,
     orderBy: '',
   });
   const list = useMemo(() => [...data], [data]);
