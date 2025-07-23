@@ -23,19 +23,19 @@ class SwitchNetworkModal extends BasePage {
   switchNetworkDropdownLocator = {
     locator: 'switchNetworkDialog-selectNetwork-dropdown',
     method: 'id',
-  }
+  };
   mainnetMenuItemLocator = {
     locator: 'switchNetworkDialog-selectNetwork_0-menuItem',
     method: 'id',
-  }
+  };
   preprodMenuItemLocator = {
     locator: 'switchNetworkDialog-selectNetwork_250-menuItem',
     method: 'id',
-  }
+  };
   previewMenuItemLocator = {
     locator: 'switchNetworkDialog-selectNetwork_350-menuItem',
     method: 'id',
-  }
+  };
   // cancel
   switchNetworkCancelBtnLocator = {
     locator: 'switchNetworkDialog-cancel-button',
@@ -80,7 +80,7 @@ class SwitchNetworkModal extends BasePage {
         networkLocator = this.previewMenuItemLocator;
         break;
       default:
-        throw new Error("Unknokwn network to select");
+        throw new Error('Unknokwn network to select');
     }
     await this.click(networkLocator);
     if (applySelection) {

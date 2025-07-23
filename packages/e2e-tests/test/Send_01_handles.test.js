@@ -95,9 +95,7 @@ describe('Handle handles', function () {
         const helperText = await sendStep1Page.getReceiverHelperText();
         expect(helperText, 'A different provider is displayed').to.equal(testDatum.provider);
         const handlerAddress = await sendStep1Page.getReceiverHandlerAddress();
-        expect(handlerAddress, 'Address is in a wrong format').to.match(
-          /addr1[a-z0-9]{5}\.{3}[a-z0-9]{10}/
-        );
+        expect(handlerAddress, 'Address is in a wrong format').to.match(/addr1[a-z0-9]{5}\.{3}[a-z0-9]{10}/);
         await sendStep1Page.takeScreenshot(
           this.test.parent.parent.title,
           `Check displayed info and continue_${testDatum.provider}`
@@ -143,8 +141,7 @@ describe('Handle handles', function () {
 
       it(`Wait and check displayed info, ${testNegativeDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
-        const errorMessageIsDisplayed =
-          await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
+        const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
         expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
       });
     });

@@ -11,14 +11,7 @@ import {
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import {
-  getDownloadsDir,
-  getTargetBrowser,
-  isBrave,
-  isChrome,
-  isFirefox,
-  isHeadless,
-} from './utils.js';
+import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox, isHeadless } from './utils.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 import * as chromeDriver from 'chromedriver';
 

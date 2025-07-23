@@ -1,10 +1,5 @@
 import BasePage from '../../../basepage.js';
-import {
-  twoSeconds,
-  quarterSecond,
-  defaultWaitTimeout,
-  halfSecond,
-} from '../../../../helpers/timeConstants.js';
+import { twoSeconds, quarterSecond, defaultWaitTimeout, halfSecond } from '../../../../helpers/timeConstants.js';
 import { isHeadless, isLinux } from '../../../../utils/utils.js';
 
 class ExportTransactionsModal extends BasePage {
@@ -22,8 +17,7 @@ class ExportTransactionsModal extends BasePage {
     method: 'xpath',
   };
   exportStartDateFieldsetLocator = {
-    locator:
-      '//div[contains(@class, "exportTransactionsDialog-startDate-datePicker")]/div/fieldset',
+    locator: '//div[contains(@class, "exportTransactionsDialog-startDate-datePicker")]/div/fieldset',
     method: 'xpath',
   };
   exportEndDateInputLocator = {
@@ -74,9 +68,7 @@ class ExportTransactionsModal extends BasePage {
 
       return true;
     } catch (error) {
-      this.logger.warn(
-        `ExportTransactionsModal::isDisplayed there is something wrong with Export Transaction Dialog`
-      );
+      this.logger.warn(`ExportTransactionsModal::isDisplayed there is something wrong with Export Transaction Dialog`);
       return false;
     }
   }
@@ -87,9 +79,7 @@ class ExportTransactionsModal extends BasePage {
       defaultWaitTimeout,
       halfSecond
     );
-    this.logger.info(
-      `ExportTransactionsModal::isNotDisplayed The export modal is displayed: ${modalWindowIsNotPresented}`
-    );
+    this.logger.info(`ExportTransactionsModal::isNotDisplayed The export modal is displayed: ${modalWindowIsNotPresented}`);
     return modalWindowIsNotPresented;
   }
   async _ubuntuHeadlessSetDate(dateString) {
@@ -139,10 +129,7 @@ class ExportTransactionsModal extends BasePage {
   async exportButtonIsEnabled() {
     const buttonIsEnabled = await this.customWaiter(
       async () => {
-        const buttonlIsEnabled = await this.getAttribute(
-          this.exportTransactionsButtonLocator,
-          'disabled'
-        );
+        const buttonlIsEnabled = await this.getAttribute(this.exportTransactionsButtonLocator, 'disabled');
         return buttonlIsEnabled === null;
       },
       twoSeconds,
