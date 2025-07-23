@@ -33,8 +33,7 @@ packages/yoroi-extension/app/utils/tabManager.js
 packages/yoroi-extension/chrome/content-scripts/3rd-party-trezor/
 packages/yoroi-extension/chrome/extension/background/index.js
 packages/yoroi-extension/chrome/extension/background/subscriptionManager.js
-packages/yoroi-extension/chrome/manifest-mv2.template.js
-packages/yoroi-extension/chrome/manifest.template.js
+packages/yoroi-extension/chrome/manifest*
 packages/yoroi-extension/webpack/*
 packages/yoroi-extension/webpack-mv2/*
 packages/yoroi-extension/.babelrc.js
