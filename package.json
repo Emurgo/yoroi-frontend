@@ -8,7 +8,7 @@
     "test": "lerna run test --stream",
     "translations:purge": "lerna run translations:purge -- stream",
     "archive:src": "func() { git rev-parse HEAD > COMMIT && git rev-parse --abbrev-ref HEAD > BRANCH && git archive --format zip --add-file COMMIT --add-file BRANCH -o $1 HEAD && rm COMMIT BRANCH; }; func",
-    "fmt:fix": "prettier . --write .prettierrc",
+    "fmt:fix": "prettier . --config .prettierrc --write",
     "fmt:check": "prettier . --config .prettierrc --check --log-level warn"
   },
   "devDependencies": {
