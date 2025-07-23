@@ -15,25 +15,33 @@ interface Props {
 }
 
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
+  const defaultSortDirections: Record<string, 'asc' | 'desc'> = {
+    price: 'desc',
+    totalAmount: 'desc',
+    portfolioPercents: 'asc',
+    '24h': 'desc',
+    '1W': 'desc',
+    '1M': 'desc',
+  };
+
   const handleRequestSort = (property: string) => {
-    const sortColumn = headCells.find(cell => cell.id === property);
-    const isNumeric = sortColumn?.sortType === 'numeric';
-
-    const direction = property !== orderBy ? (isNumeric ? 'desc' : 'asc') : order === 'asc' ? 'desc' : 'asc';
-
+    const defaultDirection = defaultSortDirections[property] ?? 'asc';
+    const direction = property !== orderBy ? defaultDirection : order === 'asc' ? 'desc' : 'asc';
     setSortState({ order: direction, orderBy: property });
   };
 
   const compareValues = (a: any, b: any, sortType: TableSortType): number => {
     if (!orderBy) return 0;
 
-    if (orderBy === 'price') {
-      const aPrice = Number(a.price);
-      const bPrice = Number(b.price);
+    const isInvalid = (val: any) => isNaN(Number(val)) || Number(val) === 0;
 
-      if (aPrice === 0 && bPrice === 0) return 0;
-      if (aPrice === 0) return 1;
-      if (bPrice === 0) return -1;
+    if (['price', 'portfolioPercents', 'totalAmount', '24h', '1W', '1M'].includes(orderBy)) {
+      const aInvalid = isInvalid(a[orderBy]);
+      const bInvalid = isInvalid(b[orderBy]);
+
+      if (aInvalid && !bInvalid) return 1;
+      if (!aInvalid && bInvalid) return -1;
+      if (aInvalid && bInvalid) return 0;
     }
 
     let comparison = 0;
@@ -45,9 +53,21 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
         comparison = aValue === bValue ? 0 : aValue < bValue ? -1 : 1;
         break;
       }
-      case 'character':
-        comparison = String(a.info[orderBy]).localeCompare(String(b.info[orderBy]));
+      case 'character': {
+        const aName = String(a.info[orderBy] ?? '');
+        const bName = String(b.info[orderBy] ?? '');
+
+        const startsWithSymbolOrNumber = (str: string) => /^[^a-zA-Z]/.test(str);
+
+        const aIsWeird = startsWithSymbolOrNumber(aName);
+        const bIsWeird = startsWithSymbolOrNumber(bName);
+
+        if (aIsWeird && !bIsWeird) return 1;
+        if (!aIsWeird && bIsWeird) return -1;
+
+        comparison = aName.localeCompare(bName, undefined, { sensitivity: 'base' });
         break;
+      }
       default:
         comparison = a[orderBy] === b[orderBy] ? 0 : a[orderBy] < b[orderBy] ? -1 : 1;
     }
