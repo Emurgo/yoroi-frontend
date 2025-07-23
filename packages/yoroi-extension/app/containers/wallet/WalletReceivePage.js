@@ -334,8 +334,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
     );
   }
 
-  getTypeStore: any => void | {|
-    // unused for now
+  getTypeStore: any => void | {| // unused for now
     +request: IAddressTypeUiSubset,
     +meta: AddressSubgroupMeta<IAddressTypeStore>,
   |} = _publicDeriver => {
