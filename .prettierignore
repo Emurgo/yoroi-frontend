@@ -7,6 +7,8 @@
 **/build
 **/dev
 **/i18n/
+**/.babelrc.js
+**/flowconfig
 packages/e2e-tests/helpers/wallet-dbSnapshots/
 packages/e2e-tests/testRunsData_*/
 packages/e2e-tests/mochawesome-report/

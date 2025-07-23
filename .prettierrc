@@ -15,7 +15,8 @@
     {
       "files": "*.{js,jsx}",
       "options": {
-        "parser": "flow"
+        "parser": "babel-flow",
+        "babelFlowVersion": "detect"
       }
     }
   ]
