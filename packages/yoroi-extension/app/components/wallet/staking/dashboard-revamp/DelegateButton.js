@@ -5,8 +5,10 @@ import { TransactionResult } from '../../../../UI/features/transaction-review/co
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { observer } from 'mobx-react';
 import { useStrings } from '../../../../UI/features/transaction-review/common/hooks/useStrings';
+import { StyledLink } from './StakePool/StakePool.styles';
+import { getSocialMediaLinks } from './UndelegateButton';
 
-export const DelegateButton = observer(({ stores, label, disabled, poolName, poolID }) => {
+export const DelegateButton = observer(({ stores, label, disabled, poolName, socialMediaInfo, poolID }) => {
   const {
     openTxReviewModal,
     startLoadingTxReview,
@@ -33,7 +35,10 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
+                  primaryTokenInfo.name
+                }`}
+                socialMediaInfo={socialMediaInfo}
               />
             ),
             duplicated: false,
@@ -81,8 +86,12 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
   );
 });
 
-const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
-  const strings =  useStrings();
+const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
+  const strings = useStrings();
+  const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
+  const urls = getSocialMediaLinks(socialLinks, websiteUrl);
+  const link = websiteUrl ?? urls[0];
+
   return (
     <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">
@@ -102,7 +111,9 @@ const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
             component="img"
             src={avatarGenerated}
           />
-          <Typography color="ds.text_gray_medium">{poolName}</Typography>
+          <StyledLink href={link} target="_blank" rel="noreferrer noopener">
+            <Typography color="ds.text_gray_medium">{poolName}</Typography>
+          </StyledLink>
         </Stack>
       </Stack>
     </Stack>
