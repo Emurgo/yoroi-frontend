@@ -9,15 +9,23 @@ interface TokenItemProps {
   isPrimary: boolean;
 }
 
-export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, tokenInfo, quantity }: TokenItemProps) => {
-const decimas =
-  typeof tokenInfo.decimals === 'number'
-    ? tokenInfo.decimals
-    : typeof tokenInfo.info?.numberOfDecimals === 'number'
-    ? tokenInfo.info.numberOfDecimals
-    : 0;
+const getDecimals = (tokenInfo: any) => {
+  if (typeof tokenInfo.decimals === 'number') {
+    return tokenInfo.decimals;
+  }
+  if (typeof tokenInfo.info?.numberOfDecimals === 'number') {
+    return tokenInfo.info.numberOfDecimals;
+  }
+  if (typeof tokenInfo.numberOfDecimals === 'number') {
+    return tokenInfo.numberOfDecimals;
+  }
+  return 0;
+};
 
-const value = new BigNumber(quantity).shiftedBy(-decimas).toString();
+export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, tokenInfo, quantity }: TokenItemProps) => {
+  const decimals = getDecimals(tokenInfo);
+
+  const value = new BigNumber(quantity).shiftedBy(-decimals).toString();
   if (isSent) {
     const primaryColor = isPrimary ? 'ds.white_static' : 'ds.text_primary_medium';
     const primaryBackground = isPrimary ? 'ds.primary_500' : 'ds.primary_100';

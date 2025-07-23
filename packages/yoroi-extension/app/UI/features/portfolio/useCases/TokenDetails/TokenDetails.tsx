@@ -8,6 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { TokenChartInterval } from './ChartDetails/TokenChartInterval';
 import HeaderSection from './HeaderDetails/Header';
 import OverviewPerformance from './OverviewPerformanceDetails/OverviewPerformance';
+import { usePortfolio } from '../../module/PortfolioContextProvider';
 
 const Header = styled(Box)({
   display: 'flex',
@@ -29,13 +30,16 @@ const TokenDetails = observer(
     const navigateTo = useNavigateTo();
     const strings = useStrings();
     const isPrimaryToken: boolean = tokenInfo.id === '-';
+    const { isTestnet } = usePortfolio();
 
     return (
       <Box sx={{ width: '100%' }}>
         <Header>
           <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
           <Stack direction="row" spacing={theme.spacing(16)}>
-            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
+            {isTestnet ? null : (
+              <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
+            )}
             <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
             <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
           </Stack>
